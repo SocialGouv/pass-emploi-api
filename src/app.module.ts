@@ -229,7 +229,7 @@ import { UpdateJeunePreferencesCommandHandler } from './application/commands/upd
 import { GetPreferencesJeuneQueryHandler } from './application/queries/get-preferences-jeune.handler.db'
 import { GetRendezVousConseillerPaginesQueryHandler } from './application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
 import { ConseillerForJeuneAvecPartageAuthorizer } from './application/authorizers/authorize-conseiller-for-jeune-avec-partage'
-import { GetFavorisJeunePourConseillerQueryHandler } from './application/queries/get-favoris-jeune-pour-conseiller.query.handler.db'
+import { GetFavorisJeuneQueryHandler } from './application/queries/favoris/get-favoris-jeune.query.handler.db'
 import { GetMetadonneesFavorisJeuneQueryHandler } from './application/queries/get-metadonnees-favoris-jeune.query.handler.db'
 import { HandleJobRappelActionCommandHandler } from './application/commands/jobs/handle-job-rappel-action.command'
 import { AddCommentaireActionCommandHandler } from './application/commands/action/add-commentaire-action.command.handler'
@@ -655,7 +655,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetPreferencesJeuneQueryHandler,
     GetMetadonneesFavorisJeuneQueryHandler,
     ModifierJeuneDuConseillerCommandHandler,
-    GetFavorisJeunePourConseillerQueryHandler,
+    GetFavorisJeuneQueryHandler,
     AddCommentaireActionCommandHandler,
     GetCommentairesActionQueryHandler,
     GetJeuneHomeAgendaQueryHandler,

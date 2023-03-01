@@ -14,7 +14,8 @@ export function fromOffreEmploiSqlToFavorisQueryModel(
       ? Offre.Favori.Type.ALTERNANCE
       : Offre.Favori.Type.EMPLOI,
     organisation: offre.nomEntreprise,
-    localisation: offre.nomLocalisation ?? undefined
+    localisation: offre.nomLocalisation ?? undefined,
+    tags: [offre.typeContrat, offre.duree]
   }
 }
 
@@ -26,18 +27,24 @@ export function fromOffreImmersionSqlToFavorisQueryModel(
     titre: offre.metier,
     type: Offre.Favori.Type.IMMERSION,
     organisation: offre.nomEtablissement,
-    localisation: offre.ville
+    localisation: offre.ville,
+    tags: [offre.secteurActivite]
   }
 }
 
 export function fromOffreServiceCiviqueSqlToFavorisQueryModel(
   offre: FavoriOffreEngagementSqlModel
 ): FavorisQueryModel {
+  const tags = [offre.domaine]
+  if (offre.dateDeDebut) {
+    tags.push(offre.dateDeDebut)
+  }
   return {
     idOffre: offre.idOffre,
     titre: offre.titre,
     type: Offre.Favori.Type.SERVICE_CIVIQUE,
     organisation: offre.organisation ?? undefined,
-    localisation: offre.ville ?? undefined
+    localisation: offre.ville ?? undefined,
+    tags
   }
 }

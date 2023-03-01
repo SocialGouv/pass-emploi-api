@@ -1,29 +1,31 @@
-import { getDatabase } from '../../utils/database-for-testing'
+import { getDatabase } from '../../../utils/database-for-testing'
 import {
   unFavoriOffreEmploi,
   unFavoriOffreEngagement,
   unFavoriOffreImmersion
-} from '../../fixtures/sql-models/favoris.sql-model'
-import { FavoriOffreEmploiSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-emploi.sql-model'
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { GetFavorisJeunePourConseillerQueryHandler } from '../../../src/application/queries/get-favoris-jeune-pour-conseiller.query.handler.db'
+} from '../../../fixtures/sql-models/favoris.sql-model'
+import { FavoriOffreEmploiSqlModel } from '../../../../src/infrastructure/sequelize/models/favori-offre-emploi.sql-model'
+import { expect, StubbedClass, stubClass } from '../../../utils'
+import { GetFavorisJeuneQueryHandler } from '../../../../src/application/queries/favoris/get-favoris-jeune.query.handler.db'
 import {
   JeuneDto,
   JeuneSqlModel
-} from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { FavorisQueryModel } from '../../../src/application/queries/query-models/favoris.query-model'
-import { AsSql } from '../../../src/infrastructure/sequelize/types'
-import { FavoriOffreImmersionSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
-import { FavoriOffreEngagementSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-engagement.sql-model'
-import { ConseillerForJeuneAvecPartageAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune-avec-partage'
-import { Offre } from '../../../src/domain/offre/offre'
+} from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
+import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { FavorisQueryModel } from '../../../../src/application/queries/query-models/favoris.query-model'
+import { AsSql } from '../../../../src/infrastructure/sequelize/types'
+import { FavoriOffreImmersionSqlModel } from '../../../../src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
+import { FavoriOffreEngagementSqlModel } from '../../../../src/infrastructure/sequelize/models/favori-offre-engagement.sql-model'
+import { ConseillerForJeuneAvecPartageAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-for-jeune-avec-partage'
+import { Offre } from '../../../../src/domain/offre/offre'
+import { JeuneAuthorizer } from '../../../../src/application/authorizers/authorize-jeune'
 
 describe('GetFavorisJeunePourConseillerQueryHandler', () => {
   let conseillerForJeuneAvecPartageAuthorizer: StubbedClass<ConseillerForJeuneAvecPartageAuthorizer>
-  let getFavorisJeunePourConseillerQueryHandler: GetFavorisJeunePourConseillerQueryHandler
+  let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
+  let getFavorisJeunePourConseillerQueryHandler: GetFavorisJeuneQueryHandler
 
   const idJeune = 'poi-id-jeune'
   const idConseiller = 'poi-id-conseiller'
@@ -33,11 +35,12 @@ describe('GetFavorisJeunePourConseillerQueryHandler', () => {
     conseillerForJeuneAvecPartageAuthorizer = stubClass(
       ConseillerForJeuneAvecPartageAuthorizer
     )
+    jeuneAuthorizer = stubClass(JeuneAuthorizer)
 
-    getFavorisJeunePourConseillerQueryHandler =
-      new GetFavorisJeunePourConseillerQueryHandler(
-        conseillerForJeuneAvecPartageAuthorizer
-      )
+    getFavorisJeunePourConseillerQueryHandler = new GetFavorisJeuneQueryHandler(
+      conseillerForJeuneAvecPartageAuthorizer,
+      jeuneAuthorizer
+    )
   })
 
   describe('handle', () => {
@@ -91,14 +94,16 @@ describe('GetFavorisJeunePourConseillerQueryHandler', () => {
         titre: 'poi-titre-1',
         type: Offre.Favori.Type.EMPLOI,
         organisation: 'poi-entreprise',
-        localisation: undefined
+        localisation: undefined,
+        tags: ['aa', '2 ans']
       }
       const favoriOffreAlternance: FavorisQueryModel = {
         idOffre: 'poi-id-offre-2',
         titre: 'poi-titre-2',
         type: Offre.Favori.Type.ALTERNANCE,
         organisation: 'poi-entreprise',
-        localisation: undefined
+        localisation: undefined,
+        tags: ['aa', '2 ans']
       }
       const listeAttendue = [favoriOffreEmploi, favoriOffreAlternance]
 
@@ -138,14 +143,16 @@ describe('GetFavorisJeunePourConseillerQueryHandler', () => {
         titre: 'poi-metier-2e-dans-la-liste-triee',
         type: Offre.Favori.Type.IMMERSION,
         organisation: 'poi-etablissement',
-        localisation: 'marseille'
+        localisation: 'marseille',
+        tags: ['patisserie']
       }
       const favoriOffreImmersion2: FavorisQueryModel = {
         idOffre: 'poi-id-offre',
         titre: 'poi-metier-1er-dans-la-liste-triee',
         type: Offre.Favori.Type.IMMERSION,
         organisation: 'poi-etablissement',
-        localisation: 'marseille'
+        localisation: 'marseille',
+        tags: ['patisserie']
       }
       const listeAttendue = [favoriOffreImmersion1, favoriOffreImmersion2]
 
@@ -172,7 +179,8 @@ describe('GetFavorisJeunePourConseillerQueryHandler', () => {
         titre: 'poi-titre',
         type: Offre.Favori.Type.SERVICE_CIVIQUE,
         organisation: undefined,
-        localisation: undefined
+        localisation: undefined,
+        tags: ['infra']
       }
       const listeAttendue = [favoriOffreServiceCivique]
 
