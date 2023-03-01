@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsArray, IsBoolean, IsString, ValidateIf } from 'class-validator'
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsBoolean,
+  IsString,
+  ValidateIf
+} from 'class-validator'
 
 export class TeleverserCsvPayload {
   @ApiProperty({ type: 'string', format: 'binary' })
@@ -36,7 +42,8 @@ export class TransfererJeunesPayload {
   @IsString()
   idConseillerCible: string
 
-  @ApiProperty({ isArray: true })
+  @ApiProperty()
   @IsArray()
+  @ArrayNotEmpty()
   idsJeunes: string[]
 }
