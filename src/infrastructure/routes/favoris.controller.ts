@@ -37,7 +37,7 @@ import {
   DeleteFavoriOffreServiceCiviqueCommand,
   DeleteFavoriOffreServiceCiviqueCommandHandler
 } from '../../application/commands/delete-favori-offre-service-civique.command.handler'
-import { GetFavorisJeunePourConseillerQueryHandler } from '../../application/queries/get-favoris-jeune-pour-conseiller.query.handler.db'
+import { GetFavorisJeuneQueryHandler } from '../../application/queries/favoris/get-favoris-jeune.query.handler.db'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from '../../application/queries/get-favoris-offres-emploi-jeune.query.handler.db'
 import { GetFavorisOffresImmersionJeuneQueryHandler } from '../../application/queries/get-favoris-offres-immersion-jeune.query.handler.db'
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../application/queries/get-favoris-service-civique-jeune.query.handler.db'
@@ -76,7 +76,7 @@ import {
 @ApiTags('Favoris')
 export class FavorisController {
   constructor(
-    private readonly getFavorisJeunePourConseillerQueryHandler: GetFavorisJeunePourConseillerQueryHandler,
+    private readonly getFavorisJeuneQueryHandler: GetFavorisJeuneQueryHandler,
     private readonly getFavorisOffresEmploiJeuneQueryHandler: GetFavorisOffresEmploiJeuneQueryHandler,
     private readonly getFavorisOffresImmersionJeuneQueryHandler: GetFavorisOffresImmersionJeuneQueryHandler,
     private readonly getFavorisServiceCiviqueJeuneQueryHandler: GetFavorisServiceCiviqueJeuneQueryHandler,
@@ -90,8 +90,8 @@ export class FavorisController {
   ) {}
 
   @ApiOperation({
-    summary: "Récupère tous les favoris d'un jeune",
-    description: 'Autorisé pour le conseiller du jeune'
+    summary: "Récupère tous les favoris d'un jeune.",
+    description: 'Autorisé pour le jeune et son conseiller.'
   })
   @ApiResponse({
     type: FavorisQueryModel,
@@ -102,10 +102,7 @@ export class FavorisController {
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<FavorisQueryModel[]> {
-    return this.getFavorisJeunePourConseillerQueryHandler.execute(
-      { idJeune },
-      utilisateur
-    )
+    return this.getFavorisJeuneQueryHandler.execute({ idJeune }, utilisateur)
   }
 
   @ApiOperation({

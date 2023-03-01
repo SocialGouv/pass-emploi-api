@@ -65,10 +65,10 @@ export function toOffreEmploi(
       favoriOffreEmploiSqlModel.isAlternance === null
         ? undefined
         : favoriOffreEmploiSqlModel.isAlternance,
-    duree: favoriOffreEmploiSqlModel.duree,
+    duree: favoriOffreEmploiSqlModel.duree ?? undefined,
     localisation: buildLocalisation(favoriOffreEmploiSqlModel),
     typeContrat: favoriOffreEmploiSqlModel.typeContrat,
-    nomEntreprise: favoriOffreEmploiSqlModel.nomEntreprise,
+    nomEntreprise: favoriOffreEmploiSqlModel.nomEntreprise ?? undefined,
     titre: favoriOffreEmploiSqlModel.titre
   }
 }

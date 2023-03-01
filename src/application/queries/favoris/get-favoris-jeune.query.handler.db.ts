@@ -1,29 +1,31 @@
-import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Result } from '../../building-blocks/types/result'
-import { FavoriOffreEmploiSqlModel } from '../../infrastructure/sequelize/models/favori-offre-emploi.sql-model'
+import { QueryHandler } from '../../../building-blocks/types/query-handler'
+import { Result } from '../../../building-blocks/types/result'
+import { FavoriOffreEmploiSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-emploi.sql-model'
 import {
   fromOffreEmploiSqlToFavorisQueryModel,
   fromOffreImmersionSqlToFavorisQueryModel,
   fromOffreServiceCiviqueSqlToFavorisQueryModel
-} from './query-mappers/favoris.mappers'
-import { FavorisQueryModel } from './query-models/favoris.query-model'
-import { FavoriOffreImmersionSqlModel } from '../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
-import { FavoriOffreEngagementSqlModel } from '../../infrastructure/sequelize/models/favori-offre-engagement.sql-model'
-import { Authentification } from '../../domain/authentification'
-import { ConseillerForJeuneAvecPartageAuthorizer } from '../authorizers/authorize-conseiller-for-jeune-avec-partage'
+} from '../query-mappers/favoris.mappers'
+import { FavorisQueryModel } from '../query-models/favoris.query-model'
+import { FavoriOffreImmersionSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
+import { FavoriOffreEngagementSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-engagement.sql-model'
+import { Authentification } from '../../../domain/authentification'
+import { ConseillerForJeuneAvecPartageAuthorizer } from '../../authorizers/authorize-conseiller-for-jeune-avec-partage'
 import { Injectable } from '@nestjs/common'
+import { JeuneAuthorizer } from '../../authorizers/authorize-jeune'
 
 interface GetFavorisJeunePourConseillerQuery {
   idJeune: string
 }
 
 @Injectable()
-export class GetFavorisJeunePourConseillerQueryHandler extends QueryHandler<
+export class GetFavorisJeuneQueryHandler extends QueryHandler<
   GetFavorisJeunePourConseillerQuery,
   FavorisQueryModel[]
 > {
   constructor(
-    private conseillerForJeuneAvecPartageAuthorizer: ConseillerForJeuneAvecPartageAuthorizer
+    private conseillerForJeuneAvecPartageAuthorizer: ConseillerForJeuneAvecPartageAuthorizer,
+    private jeuneAuthorizer: JeuneAuthorizer
   ) {
     super('GetFavorisJeunePourConseillerQueryHandler')
   }
@@ -31,10 +33,14 @@ export class GetFavorisJeunePourConseillerQueryHandler extends QueryHandler<
     query: GetFavorisJeunePourConseillerQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerForJeuneAvecPartageAuthorizer.authorize(
-      query.idJeune,
-      utilisateur
-    )
+    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+      return this.conseillerForJeuneAvecPartageAuthorizer.authorize(
+        query.idJeune,
+        utilisateur
+      )
+    } else {
+      return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+    }
   }
 
   async handle(

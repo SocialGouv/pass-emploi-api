@@ -32,9 +32,11 @@ export class FavoriOffreEmploiSqlModel extends Model {
 
   @Column({ field: 'type_contrat' }) typeContrat: string
 
-  @Column({ field: 'nom_entreprise' }) nomEntreprise: string
+  @Column({ field: 'nom_entreprise', type: DataType.STRING }) nomEntreprise:
+    | string
+    | null
 
-  @Column({ field: 'duree' }) duree: string
+  @Column({ field: 'duree', type: DataType.STRING }) duree: string | null
 
   @Column({
     field: 'is_alternance',

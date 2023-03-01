@@ -50,7 +50,7 @@ import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../../src/application/queries/get-favoris-service-civique-jeune.query.handler.db'
 import { uneOffreServiceCivique } from '../../fixtures/offre-service-civique.fixture'
-import { GetFavorisJeunePourConseillerQueryHandler } from '../../../src/application/queries/get-favoris-jeune-pour-conseiller.query.handler.db'
+import { GetFavorisJeuneQueryHandler } from '../../../src/application/queries/favoris/get-favoris-jeune.query.handler.db'
 import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/get-metadonnees-favoris-jeune.query.handler.db'
 import { Offre } from '../../../src/domain/offre/offre'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
@@ -65,7 +65,7 @@ describe('FavorisController', () => {
   let addFavoriOffreEngagementCommandHandler: StubbedClass<AddFavoriOffreServiceCiviqueCommandHandler>
   let deleteFavoriOffreEngagementCommandHandler: StubbedClass<DeleteFavoriOffreServiceCiviqueCommandHandler>
   let getFavorisServiceCiviqueJeuneQueryHandler: StubbedClass<GetFavorisServiceCiviqueJeuneQueryHandler>
-  let getFavorisJeunePourConseillerQueryHandler: StubbedClass<GetFavorisJeunePourConseillerQueryHandler>
+  let getFavorisJeunePourConseillerQueryHandler: StubbedClass<GetFavorisJeuneQueryHandler>
   let getMetadonneesFavorisJeuneQueryHandler: StubbedClass<GetMetadonneesFavorisJeuneQueryHandler>
   let app: INestApplication
 
@@ -99,7 +99,7 @@ describe('FavorisController', () => {
       GetFavorisServiceCiviqueJeuneQueryHandler
     )
     getFavorisJeunePourConseillerQueryHandler = app.get(
-      GetFavorisJeunePourConseillerQueryHandler
+      GetFavorisJeuneQueryHandler
     )
     getMetadonneesFavorisJeuneQueryHandler = app.get(
       GetMetadonneesFavorisJeuneQueryHandler
