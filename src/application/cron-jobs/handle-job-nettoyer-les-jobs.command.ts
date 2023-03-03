@@ -1,14 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Job } from '../../../building-blocks/types/job'
-import { JobHandler } from '../../../building-blocks/types/job-handler'
-import { emptySuccess, Result } from '../../../building-blocks/types/result'
+import { Job } from '../../building-blocks/types/job'
+import { JobHandler } from '../../building-blocks/types/job-handler'
+import { emptySuccess, Result } from '../../building-blocks/types/result'
 import {
   Planificateur,
   PlanificateurRepositoryToken,
   ProcessJobType
-} from '../../../domain/planificateur'
-import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
-import { DateService } from '../../../utils/date-service'
+} from '../../domain/planificateur'
+import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
+import { DateService } from '../../utils/date-service'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.NETTOYER_LES_JOBS)
@@ -40,7 +40,8 @@ export class HandleNettoyerLesJobsCommandHandler extends JobHandler<Job> {
       succes: erreur ? false : true,
       dateExecution: maintenant,
       tempsExecution: DateService.calculerTempsExecution(maintenant),
-      resultat: erreur ?? stats
+      resultat: erreur ?? stats,
+      erreur
     }
   }
 

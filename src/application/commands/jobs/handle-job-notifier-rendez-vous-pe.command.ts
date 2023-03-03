@@ -123,7 +123,8 @@ export class HandleJobNotifierRendezVousPECommandHandler extends JobHandler<Job>
         succes: false,
         dateExecution: maintenant,
         tempsExecution: maintenant.diffNow().milliseconds * -1,
-        resultat: stats
+        resultat: stats,
+        erreur: e
       }
     }
   }

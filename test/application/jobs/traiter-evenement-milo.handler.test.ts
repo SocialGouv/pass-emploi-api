@@ -3,26 +3,26 @@ import { createSandbox } from 'sinon'
 import {
   TraiterEvenementMiloJobHandler,
   Traitement
-} from '../../../../src/application/jobs/rendez-vous-milo/traiter-evenement-milo.handler'
-import { Jeune } from '../../../../src/domain/jeune/jeune'
+} from '../../../src/application/jobs/traiter-evenement-milo.handler'
+import { Jeune } from '../../../src/domain/jeune/jeune'
 import {
   Planificateur,
   PlanificateurService
-} from '../../../../src/domain/planificateur'
-import { RendezVous } from '../../../../src/domain/rendez-vous/rendez-vous'
-import { SuiviJob } from '../../../../src/domain/suivi-job'
-import { DateService } from '../../../../src/utils/date-service'
-import { uneDate, uneDatetime } from '../../../fixtures/date.fixture'
+} from '../../../src/domain/planificateur'
+import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
+import { SuiviJob } from '../../../src/domain/suivi-job'
+import { DateService } from '../../../src/utils/date-service'
+import { uneDate, uneDatetime } from '../../fixtures/date.fixture'
 import {
   unEvenementMilo,
   unRendezVousMilo
-} from '../../../fixtures/partenaire.fixture'
-import { unRendezVous } from '../../../fixtures/rendez-vous.fixture'
-import { expect, StubbedClass, stubClass } from '../../../utils'
-import { unJeune } from '../../../fixtures/jeune.fixture'
-import { RendezVousMilo } from '../../../../src/domain/rendez-vous/rendez-vous.milo'
-import { Notification } from '../../../../src/domain/notification/notification'
-import { testConfig } from '../../../utils/module-for-testing'
+} from '../../fixtures/partenaire.fixture'
+import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
+import { expect, StubbedClass, stubClass } from '../../utils'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import { RendezVousMilo } from '../../../src/domain/rendez-vous/rendez-vous.milo'
+import { Notification } from '../../../src/domain/notification/notification'
+import { testConfig } from '../../utils/module-for-testing'
 
 describe('TraiterEvenementMiloJobHandler', () => {
   let handler: TraiterEvenementMiloJobHandler

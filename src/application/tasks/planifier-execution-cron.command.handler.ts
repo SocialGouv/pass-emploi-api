@@ -1,12 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Command } from '../../../building-blocks/types/command'
-import { CommandHandler } from '../../../building-blocks/types/command-handler'
-import { emptySuccess, Result } from '../../../building-blocks/types/result'
+import { Command } from '../../building-blocks/types/command'
+import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { emptySuccess, Result } from '../../building-blocks/types/result'
 import {
   Planificateur,
   PlanificateurRepositoryToken
-} from '../../../domain/planificateur'
-import { DateService } from '../../../utils/date-service'
+} from '../../domain/planificateur'
+import { DateService } from '../../utils/date-service'
 
 export interface PlanifierExecutionCronCommand extends Command {
   jobType: Planificateur.JobType

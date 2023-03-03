@@ -1,10 +1,10 @@
-import { HandleNettoyerLesJobsCommandHandler } from '../../../../src/application/commands/jobs/handle-job-nettoyer-les-jobs.command'
+import { HandleNettoyerLesJobsCommandHandler } from '../../../src/application/cron-jobs/handle-job-nettoyer-les-jobs.command'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
-import { Planificateur } from '../../../../src/domain/planificateur'
-import { SuiviJob } from '../../../../src/domain/suivi-job'
-import { DateService } from '../../../../src/utils/date-service'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { Planificateur } from '../../../src/domain/planificateur'
+import { SuiviJob } from '../../../src/domain/suivi-job'
+import { DateService } from '../../../src/utils/date-service'
 
 describe('HandleNettoyerLesJobsCommandHandler', () => {
   describe('handle', () => {

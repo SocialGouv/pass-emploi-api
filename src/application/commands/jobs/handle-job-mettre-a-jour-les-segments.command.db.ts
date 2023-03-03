@@ -79,7 +79,8 @@ export class HandleJobMettreAJourLesSegmentsCommandHandler extends JobHandler<Jo
         succes: false,
         dateExecution: maintenant,
         tempsExecution: DateService.calculerTempsExecution(maintenant),
-        resultat: {}
+        resultat: {},
+        erreur: e
       }
     }
   }

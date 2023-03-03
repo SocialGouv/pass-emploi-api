@@ -105,7 +105,8 @@ export class HandleJobGenererJDDCommandHandler extends JobHandler<HandleJobGener
         succes: false,
         tempsExecution: DateService.calculerTempsExecution(debut),
         resultat: {},
-        dateExecution: debut
+        dateExecution: debut,
+        erreur: e
       }
     }
   }

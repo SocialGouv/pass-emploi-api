@@ -1,16 +1,16 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { SynchronizeJobsCommandHandler } from '../../../../src/application/commands/tasks/synchronize-jobs.command'
+import { SynchronizeJobsCommandHandler } from '../../../src/application/tasks/synchronize-jobs.command'
 import {
   Planificateur,
   PlanificateurService
-} from '../../../../src/domain/planificateur'
-import { RendezVous } from '../../../../src/domain/rendez-vous/rendez-vous'
-import { Action } from '../../../../src/domain/action/action'
-import { unRendezVous } from '../../../fixtures/rendez-vous.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
-import { uneAction } from '../../../fixtures/action.fixture'
-import { emptySuccess } from '../../../../src/building-blocks/types/result'
+} from '../../../src/domain/planificateur'
+import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
+import { Action } from '../../../src/domain/action/action'
+import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { uneAction } from '../../fixtures/action.fixture'
+import { emptySuccess } from '../../../src/building-blocks/types/result'
 
 describe('SynchronizeJobsCommandHandler', () => {
   let synchronizeJobsCommandHandler: SynchronizeJobsCommandHandler

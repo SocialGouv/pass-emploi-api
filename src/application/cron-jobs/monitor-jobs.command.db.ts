@@ -1,20 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { parseExpression } from 'cron-parser'
 import { Op } from 'sequelize'
-import { Job } from '../../../building-blocks/types/job'
-import { JobHandler } from '../../../building-blocks/types/job-handler'
+import { Job } from '../../building-blocks/types/job'
+import { JobHandler } from '../../building-blocks/types/job-handler'
 import {
   listeCronJobs,
   Planificateur,
   ProcessJobType
-} from '../../../domain/planificateur'
+} from '../../domain/planificateur'
 import {
   RapportJob24h,
   SuiviJob,
   SuiviJobServiceToken
-} from '../../../domain/suivi-job'
-import { SuiviJobSqlModel } from '../../../infrastructure/sequelize/models/suivi-job.sql-model'
-import { DateService } from '../../../utils/date-service'
+} from '../../domain/suivi-job'
+import { SuiviJobSqlModel } from '../../infrastructure/sequelize/models/suivi-job.sql-model'
+import { DateService } from '../../utils/date-service'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.MONITORER_JOBS)

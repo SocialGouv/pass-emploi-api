@@ -1,25 +1,25 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { DateTime } from 'luxon'
-import { JobHandler } from '../../../building-blocks/types/job-handler'
-import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
-import { Notification } from '../../../domain/notification/notification'
+import { JobHandler } from '../../building-blocks/types/job-handler'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Notification } from '../../domain/notification/notification'
 import {
   Planificateur,
   PlanificateurService,
   ProcessJobType
-} from '../../../domain/planificateur'
+} from '../../domain/planificateur'
 import {
   RendezVous,
   RendezVousRepositoryToken
-} from '../../../domain/rendez-vous/rendez-vous'
+} from '../../domain/rendez-vous/rendez-vous'
 import {
   MiloRendezVousRepositoryToken,
   RendezVousMilo
-} from '../../../domain/rendez-vous/rendez-vous.milo'
-import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
-import { DateService } from '../../../utils/date-service'
-import { buildError } from '../../../utils/logger.module'
+} from '../../domain/rendez-vous/rendez-vous.milo'
+import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
+import { DateService } from '../../utils/date-service'
+import { buildError } from '../../utils/logger.module'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.TRAITER_EVENEMENT_MILO)

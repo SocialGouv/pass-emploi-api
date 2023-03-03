@@ -37,3 +37,17 @@ export namespace SuiviJob {
     save(suiviJob: SuiviJob): Promise<void>
   }
 }
+
+export function estJobSuivi(jobType: Planificateur.JobType): boolean {
+  return ![Planificateur.JobType.MONITORER_JOBS].includes(jobType)
+}
+export function estNotifiable(suiviJob: SuiviJob): boolean {
+  return (
+    suiviJob.succes === false ||
+    ![
+      Planificateur.JobType.MONITORER_JOBS,
+      Planificateur.JobType.SUIVRE_FILE_EVENEMENTS_MILO,
+      Planificateur.JobType.NOTIFIER_RENDEZVOUS_PE
+    ].includes(suiviJob.jobType)
+  )
+}

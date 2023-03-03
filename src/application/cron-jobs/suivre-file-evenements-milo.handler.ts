@@ -1,18 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Job } from 'bull'
-import { JobHandler } from '../../../building-blocks/types/job-handler'
+import { JobHandler } from '../../building-blocks/types/job-handler'
 import {
   Planificateur,
   PlanificateurRepositoryToken,
   PlanificateurService,
   ProcessJobType
-} from '../../../domain/planificateur'
-import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
-import { DateService } from '../../../utils/date-service'
+} from '../../domain/planificateur'
+import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
+import { DateService } from '../../utils/date-service'
 import {
   RendezVousMilo,
   MiloRendezVousRepositoryToken
-} from '../../../domain/rendez-vous/rendez-vous.milo'
+} from '../../domain/rendez-vous/rendez-vous.milo'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.SUIVRE_FILE_EVENEMENTS_MILO)

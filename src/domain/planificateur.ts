@@ -88,6 +88,7 @@ export namespace Planificateur {
   export interface CronJob {
     type: JobType
     expression: string
+    description?: string
     dateDebutExecution?: Date
   }
 
@@ -99,56 +100,72 @@ export namespace Planificateur {
 export const listeCronJobs: Planificateur.CronJob[] = [
   {
     type: Planificateur.JobType.SUIVRE_FILE_EVENEMENTS_MILO,
-    expression: '*/15 * * * *'
+    expression: '*/15 * * * *',
+    description: 'Toutes les 15 minutes.'
   },
   {
     type: Planificateur.JobType.RECUPERER_SITUATIONS_JEUNES_MILO,
-    expression: '0 0 * * *'
+    expression: '0 0 * * *',
+    description: 'Tous les jours à minuit.'
   },
   {
     type: Planificateur.JobType.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS,
-    expression: '0 1 * * *'
+    expression: '0 1 * * *',
+    description: 'Tous les jours à 1h.'
   },
   {
     type: Planificateur.JobType.NETTOYER_LES_PIECES_JOINTES,
     expression: '0 2 * * *',
-    dateDebutExecution: new Date('2022-10-01')
+    dateDebutExecution: new Date('2022-10-01'),
+    description: 'Tous les jours à 2h.'
   },
   {
     type: Planificateur.JobType.NETTOYER_LES_JOBS,
-    expression: '0 4 * * *'
+    expression: '0 4 * * *',
+    description: 'Tous les jours à 4h. Supprime les jobs passés.'
   },
   {
     type: Planificateur.JobType.NETTOYER_LES_DONNEES,
-    expression: '0 5 * * *'
+    expression: '0 5 * * *',
+    description:
+      "Tous les jours à 5h. Supprime les archives, les logs et les évenements d'engagement hebdo."
   },
   {
     type: Planificateur.JobType.MAIL_CONSEILLER_MESSAGES,
-    expression: '0 8 * * 1-5'
+    expression: '0 8 * * 1-5',
+    description: 'Du lundi au vendredi à 8h.'
   },
   {
     type: Planificateur.JobType.NOUVELLES_OFFRES_EMPLOI,
-    expression: '0 9 * * *'
+    expression: '0 9 * * *',
+    description: 'Tous les jours à 9h.'
   },
   {
     type: Planificateur.JobType.NOUVELLES_OFFRES_SERVICE_CIVIQUE,
-    expression: '0 11 * * *'
+    expression: '0 11 * * *',
+    description: 'Tous les jours à 11h.'
   },
   {
     type: Planificateur.JobType.NOTIFIER_RENDEZVOUS_PE,
-    expression: '0 */2 * * *'
+    expression: '0 */2 * * *',
+    description: 'Toutes les 2 heures.'
   },
   {
     type: Planificateur.JobType.MAJ_AGENCE_AC,
-    expression: '0 3 * * *'
+    expression: '0 3 * * *',
+    description:
+      'Tous les jours à 3h. Cohérence AC avec agence du conseiller créateur.'
   },
   {
     type: Planificateur.JobType.MONITORER_JOBS,
-    expression: '45 9 * * *'
+    expression: '45 9 * * *',
+    description: 'Tous les jours à 9h45.'
   },
   {
     type: Planificateur.JobType.MAJ_SEGMENTS,
-    expression: '0 6 * * *'
+    expression: '0 6 * * *',
+    description:
+      "Tous les jours à 6h. MAJ Segments d'utilisateurs sur Firebase."
   }
 ]
 

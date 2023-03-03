@@ -2,12 +2,12 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { RapportJob24h, SuiviJob } from 'src/domain/suivi-job'
 import { uneDatetime } from 'test/fixtures/date.fixture'
-import { MonitorJobsCommandHandler } from '../../../../src/application/commands/jobs/monitor-jobs.command.db'
-import { Planificateur } from '../../../../src/domain/planificateur'
-import { SuiviJobSqlModel } from '../../../../src/infrastructure/sequelize/models/suivi-job.sql-model'
-import { DateService } from '../../../../src/utils/date-service'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
-import { getDatabase } from '../../../utils/database-for-testing'
+import { MonitorJobsCommandHandler } from '../../../src/application/cron-jobs/monitor-jobs.command.db'
+import { Planificateur } from '../../../src/domain/planificateur'
+import { SuiviJobSqlModel } from '../../../src/infrastructure/sequelize/models/suivi-job.sql-model'
+import { DateService } from '../../../src/utils/date-service'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('MonitorJobsCommandHandler', () => {
   let monitorJobsCommandHandler: MonitorJobsCommandHandler
