@@ -111,7 +111,8 @@ export class FirebaseClient implements IFirebaseClient {
     if (chat.empty) {
       const newChat = {
         jeuneId,
-        conseillerId
+        conseillerId,
+        newConseillerMessageCount: 0
       }
       await this.firestore.collection(collectionPath).add(newChat)
     }
