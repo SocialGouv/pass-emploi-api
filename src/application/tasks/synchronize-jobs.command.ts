@@ -1,21 +1,21 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Command } from '../../../building-blocks/types/command'
-import { CommandHandler } from '../../../building-blocks/types/command-handler'
+import { Command } from '../../building-blocks/types/command'
+import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
   emptySuccess,
   isSuccess,
   Result
-} from '../../../building-blocks/types/result'
+} from '../../building-blocks/types/result'
 import {
   Planificateur,
   PlanificateurRepositoryToken,
   PlanificateurService
-} from '../../../domain/planificateur'
+} from '../../domain/planificateur'
 import {
   RendezVous,
   RendezVousRepositoryToken
-} from '../../../domain/rendez-vous/rendez-vous'
-import { Action, ActionsRepositoryToken } from '../../../domain/action/action'
+} from '../../domain/rendez-vous/rendez-vous'
+import { Action, ActionsRepositoryToken } from '../../domain/action/action'
 
 @Injectable()
 export class SynchronizeJobsCommandHandler extends CommandHandler<

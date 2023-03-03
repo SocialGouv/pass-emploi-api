@@ -1,13 +1,13 @@
 import { Logger } from '@nestjs/common'
 import * as APM from 'elastic-apm-node'
+import { Planificateur } from '../../domain/planificateur'
+import { estJobSuivi, estNotifiable, SuiviJob } from '../../domain/suivi-job'
 import { getAPMInstance } from '../../infrastructure/monitoring/apm.init'
 import { LogEvent, LogEventKey } from './log.event'
-import { SuiviJob } from '../../domain/suivi-job'
-import { Planificateur } from '../../domain/planificateur'
 import JobType = Planificateur.JobType
 
 /**
- * Implémente la logique nécessaire à la réalisation du job envoyée au système.
+ * Implémente la logique nécessaire à la réalisation du Job envoyé au système.
  */
 export abstract class JobHandler<T> {
   protected logger: Logger
@@ -24,13 +24,17 @@ export abstract class JobHandler<T> {
 
   async execute(job?: T): Promise<SuiviJob> {
     try {
-      const result = await this.handle(job)
-      await this.suiviJobService.save(result)
-      if (result.succes === false) {
-        await this.suiviJobService.notifierResultatJob(result)
+      const suiviJob = await this.handle(job)
+
+      if (estJobSuivi(suiviJob.jobType)) {
+        await this.suiviJobService.save(suiviJob)
+        if (estNotifiable(suiviJob)) {
+          await this.suiviJobService.notifierResultatJob(suiviJob)
+        }
       }
-      this.logAfter(result)
-      return result
+
+      this.logAfter(suiviJob)
+      return suiviJob
     } catch (e) {
       this.apmService.captureError(e)
       this.logAfter(e)

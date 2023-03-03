@@ -2,7 +2,8 @@ import { HttpService } from '@nestjs/axios'
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
-import { RapportJob24h, SuiviJob } from '../../domain/suivi-job'
+import { listeCronJobs } from '../../domain/planificateur'
+import { estJobSuivi, RapportJob24h, SuiviJob } from '../../domain/suivi-job'
 import {
   SuiviJobDto,
   SuiviJobSqlModel
@@ -74,7 +75,9 @@ function construireMessage(suiviJob: SuiviJob): string {
     ...Object.entries(suiviJobStringified).filter(
       entry => !isArrayOrObject(entry[1])
     ),
-    ...Object.entries(suiviJob.resultat as ArrayLike<unknown>)
+    ...Object.entries(suiviJob.resultat as ArrayLike<unknown>).filter(
+      entry => !isArrayOrObject(entry[1])
+    )
   ]
   const statutIcon = suiviJob.succes ? ':white_check_mark:' : ':x:'
 
@@ -93,15 +96,19 @@ function construireRapport(
   rapportJobs: RapportJob24h[],
   logsUrl: string
 ): string {
-  const rapportJobsStringified = rapportJobs.map(rapportJob => ({
-    aBienTourne:
-      rapportJob.nbExecutionsAttendues !== rapportJob.nbExecutions
-        ? ':x:'
-        : ':white_check_mark:',
-    pasEnEchec: rapportJob.nbEchecs > 0 ? ':x:' : ':white_check_mark:',
-    ...rapportJob,
-    logs: `[lien](${logsUrl}/app/discover#/?_g=(time:(from:now-24h%2Fh,to:now))&_a=(query:(language:kuery,query:"${rapportJob.jobType}")))`
-  }))
+  const rapportJobsStringified = rapportJobs
+    .filter(job => estJobSuivi(job.jobType))
+    .map(rapportJob => ({
+      aBienTourne:
+        rapportJob.nbExecutionsAttendues !== rapportJob.nbExecutions
+          ? ':x:'
+          : ':white_check_mark:',
+      pasEnEchec: rapportJob.nbEchecs > 0 ? ':x:' : ':white_check_mark:',
+      ...rapportJob,
+      description: listeCronJobs.find(cron => cron.type === rapportJob.jobType)
+        ?.description,
+      logs: `[lien](${logsUrl}/app/discover#/?_g=(time:(from:now-24h%2Fh,to:now))&_a=(query:(language:kuery,query:"${rapportJob.jobType}")))`
+    }))
   const headers = Object.keys(rapportJobsStringified[0])
     .map(header => header)
     .join('|')

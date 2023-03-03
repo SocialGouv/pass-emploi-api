@@ -55,7 +55,7 @@ describe('SuiviJobService', () => {
         dateExecution: uneDatetime(),
         tempsExecution: 0,
         nbErreurs: 0,
-        resultat: { unChamp: 'present' }
+        resultat: { unChamp: 'present', unTableau: [], unObjet: {} }
       }
       const stringBody =
         '{"username":"CEJ Lama","text":"### Résultat du job _MAJ_AGENCE_AC_\\n| Statut | :white_check_mark: |\\n    |:------------------------|:------------|\\n    | jobType | MAJ_AGENCE_AC |\\n| succes | true |\\n| dateExecution | 2020-04-06T14:00:00.000+02:00 |\\n| tempsExecution | 0 |\\n| nbErreurs | 0 |\\n| unChamp | present |"}'
@@ -117,7 +117,7 @@ describe('SuiviJobService', () => {
         }
       ]
       const stringBody =
-        '{"username":"CEJ Lama","text":"### Rapport quotidien des CRONs\\n|aBienTourne|pasEnEchec|jobType|nbExecutionsAttendues|nbExecutions|nbErreurs|nbEchecs|logs\\n|:---|:---|:---|:---|:---|:---|:---|:---\\n|:x:|:white_check_mark:|NETTOYER_LES_DONNEES|3|2|1|0|[lien](https://elastic.com/app/discover#/?_g=(time:(from:now-24h%2Fh,to:now))&_a=(query:(language:kuery,query:\\"NETTOYER_LES_DONNEES\\")))|"}'
+        '{"username":"CEJ Lama","text":"### Rapport quotidien des CRONs\\n|aBienTourne|pasEnEchec|jobType|nbExecutionsAttendues|nbExecutions|nbErreurs|nbEchecs|description|logs\\n|:---|:---|:---|:---|:---|:---|:---|:---|:---\\n|:x:|:white_check_mark:|NETTOYER_LES_DONNEES|3|2|1|0|Tous les jours à 5h. Supprime les archives, les logs et les évenements d\'engagement hebdo.|[lien](https://elastic.com/app/discover#/?_g=(time:(from:now-24h%2Fh,to:now))&_a=(query:(language:kuery,query:\\"NETTOYER_LES_DONNEES\\")))|"}'
 
       const scope = nock(configService.get('mattermost').jobWebhookUrl)
         .post('', stringBody)

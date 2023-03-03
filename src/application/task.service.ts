@@ -3,9 +3,9 @@ import {
   Planificateur,
   PlanificateurRepositoryToken
 } from '../domain/planificateur'
-import { PlanifierExecutionCronCommandHandler } from './commands/tasks/planifier-execution-cron.command.handler'
-import { InitCronsCommandHandler } from './commands/tasks/init-crons.command'
-import { SynchronizeJobsCommandHandler } from './commands/tasks/synchronize-jobs.command'
+import { PlanifierExecutionCronCommandHandler } from './tasks/planifier-execution-cron.command.handler'
+import { InitCronsCommandHandler } from './tasks/init-crons.command'
+import { SynchronizeJobsCommandHandler } from './tasks/synchronize-jobs.command'
 
 export enum Task {
   DUMMY_JOB = 'DUMMY_JOB',
