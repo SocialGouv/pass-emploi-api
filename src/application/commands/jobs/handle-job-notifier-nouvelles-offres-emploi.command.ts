@@ -159,7 +159,8 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends JobHan
         ...suivi,
         nbErreurs: stats.echecs,
         tempsExecution: DateService.calculerTempsExecution(maintenant),
-        resultat: e
+        resultat: e,
+        erreur: e
       }
     }
   }

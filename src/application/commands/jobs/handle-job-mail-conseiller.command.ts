@@ -114,7 +114,8 @@ export class HandleJobMailConseillerCommandHandler extends JobHandler<Job> {
       succes,
       dateExecution: maintenant,
       tempsExecution: DateService.calculerTempsExecution(maintenant),
-      resultat: erreur ?? stats
+      resultat: erreur ?? stats,
+      erreur
     }
   }
 }

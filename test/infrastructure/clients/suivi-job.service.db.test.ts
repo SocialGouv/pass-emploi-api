@@ -117,7 +117,7 @@ describe('SuiviJobService', () => {
         }
       ]
       const stringBody =
-        '{"username":"CEJ Lama","text":"### Rapport quotidien des CRONs\\n|aBienTourne|pasEnEchec|jobType|nbExecutionsAttendues|nbExecutions|nbErreurs|nbEchecs|logs\\n|:---|:---|:---|:---|:---|:---|:---|:---\\n|:x:|:white_check_mark:|NETTOYER_LES_DONNEES|3|2|1|0|[lien](https://elastic.com/app/discover#/?_g=(time:(from:now-24h%2Fh,to:now))&_a=(query:(language:kuery,query:\\"NETTOYER_LES_DONNEES\\")))|"}'
+        '{"username":"CEJ Lama","text":"### Rapport quotidien des CRONs\\n|aBienTourne|pasEnEchec|jobType|nbExecutionsAttendues|nbExecutions|nbErreurs|nbEchecs|description|logs\\n|:---|:---|:---|:---|:---|:---|:---|:---|:---\\n|:x:|:white_check_mark:|NETTOYER_LES_DONNEES|3|2|1|0|Tous les jours à 5h. Supprime entre autres les évenements d\'engagement hebdo de plus d\'une semaine|[lien](https://elastic.com/app/discover#/?_g=(time:(from:now-24h%2Fh,to:now))&_a=(query:(language:kuery,query:\\"NETTOYER_LES_DONNEES\\")))|"}'
 
       const scope = nock(configService.get('mattermost').jobWebhookUrl)
         .post('', stringBody)

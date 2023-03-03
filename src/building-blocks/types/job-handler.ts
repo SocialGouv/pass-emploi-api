@@ -1,13 +1,13 @@
 import { Logger } from '@nestjs/common'
 import * as APM from 'elastic-apm-node'
+import { Planificateur } from '../../domain/planificateur'
+import { SuiviJob } from '../../domain/suivi-job'
 import { getAPMInstance } from '../../infrastructure/monitoring/apm.init'
 import { LogEvent, LogEventKey } from './log.event'
-import { SuiviJob } from '../../domain/suivi-job'
-import { Planificateur } from '../../domain/planificateur'
 import JobType = Planificateur.JobType
 
 /**
- * Implémente la logique nécessaire à la réalisation du job envoyée au système.
+ * Implémente la logique nécessaire à la réalisation du Job envoyé au système.
  */
 export abstract class JobHandler<T> {
   protected logger: Logger
@@ -24,13 +24,17 @@ export abstract class JobHandler<T> {
 
   async execute(job?: T): Promise<SuiviJob> {
     try {
-      const result = await this.handle(job)
-      await this.suiviJobService.save(result)
-      if (result.succes === false) {
-        await this.suiviJobService.notifierResultatJob(result)
+      const suiviJob = await this.handle(job)
+
+      if (this.estJobSuivi()) {
+        await this.suiviJobService.save(suiviJob)
+        if (this.estNotifiable(suiviJob)) {
+          await this.suiviJobService.notifierResultatJob(suiviJob)
+        }
       }
-      this.logAfter(result)
-      return result
+
+      this.logAfter(suiviJob)
+      return suiviJob
     } catch (e) {
       this.apmService.captureError(e)
       this.logAfter(e)
@@ -47,5 +51,18 @@ export abstract class JobHandler<T> {
       result: result
     })
     this.logger.log(event)
+  }
+  private estJobSuivi(): boolean {
+    return ![Planificateur.JobType.MONITORER_JOBS].includes(this.jobType)
+  }
+  private estNotifiable(suiviJob: SuiviJob): boolean {
+    return (
+      suiviJob.succes === false ||
+      ![
+        Planificateur.JobType.MONITORER_JOBS,
+        Planificateur.JobType.SUIVRE_FILE_EVENEMENTS_MILO,
+        Planificateur.JobType.NOTIFIER_RENDEZVOUS_PE
+      ].includes(this.jobType)
+    )
   }
 }

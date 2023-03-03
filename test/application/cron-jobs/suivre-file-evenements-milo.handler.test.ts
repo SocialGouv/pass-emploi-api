@@ -1,16 +1,16 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox, createSandbox } from 'sinon'
 import { StubbedClass, expect, stubClass } from 'test/utils'
-import { SuivreEvenementsMiloCronJobHandler } from '../../../../src/application/cron-jobs/rendez-vous-milo/suivre-file-evenements-milo.handler'
+import { SuivreEvenementsMiloCronJobHandler } from '../../../src/application/cron-jobs/suivre-file-evenements-milo.handler'
 import {
   Planificateur,
   PlanificateurService
-} from '../../../../src/domain/planificateur'
-import { SuiviJob } from '../../../../src/domain/suivi-job'
-import { DateService } from '../../../../src/utils/date-service'
-import { unEvenementMilo } from '../../../fixtures/partenaire.fixture'
-import { uneDatetime } from '../../../fixtures/date.fixture'
-import { RendezVousMilo } from '../../../../src/domain/rendez-vous/rendez-vous.milo'
+} from '../../../src/domain/planificateur'
+import { SuiviJob } from '../../../src/domain/suivi-job'
+import { DateService } from '../../../src/utils/date-service'
+import { unEvenementMilo } from '../../fixtures/partenaire.fixture'
+import { uneDatetime } from '../../fixtures/date.fixture'
+import { RendezVousMilo } from '../../../src/domain/rendez-vous/rendez-vous.milo'
 
 describe('SuivreEvenementsMiloCronJobHandler', () => {
   let suivreEvenementsMiloHandler: SuivreEvenementsMiloCronJobHandler

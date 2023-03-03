@@ -2,6 +2,7 @@ import { HttpService } from '@nestjs/axios'
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
+import { listeCronJobs } from '../../domain/planificateur'
 import { RapportJob24h, SuiviJob } from '../../domain/suivi-job'
 import {
   SuiviJobDto,
@@ -100,6 +101,8 @@ function construireRapport(
         : ':white_check_mark:',
     pasEnEchec: rapportJob.nbEchecs > 0 ? ':x:' : ':white_check_mark:',
     ...rapportJob,
+    description: listeCronJobs.find(cron => cron.type === rapportJob.jobType)
+      ?.description,
     logs: `[lien](${logsUrl}/app/discover#/?_g=(time:(from:now-24h%2Fh,to:now))&_a=(query:(language:kuery,query:"${rapportJob.jobType}")))`
   }))
   const headers = Object.keys(rapportJobsStringified[0])
