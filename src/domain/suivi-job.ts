@@ -39,7 +39,12 @@ export namespace SuiviJob {
 }
 
 export function estJobSuivi(jobType: Planificateur.JobType): boolean {
-  return ![Planificateur.JobType.MONITORER_JOBS].includes(jobType)
+  return ![
+    Planificateur.JobType.MONITORER_JOBS,
+    Planificateur.JobType.RENDEZVOUS,
+    Planificateur.JobType.RAPPEL_ACTION,
+    Planificateur.JobType.TRAITER_EVENEMENT_MILO
+  ].includes(jobType)
 }
 export function estNotifiable(suiviJob: SuiviJob): boolean {
   return (
@@ -47,7 +52,10 @@ export function estNotifiable(suiviJob: SuiviJob): boolean {
     ![
       Planificateur.JobType.MONITORER_JOBS,
       Planificateur.JobType.SUIVRE_FILE_EVENEMENTS_MILO,
-      Planificateur.JobType.NOTIFIER_RENDEZVOUS_PE
+      Planificateur.JobType.NOTIFIER_RENDEZVOUS_PE,
+      Planificateur.JobType.RENDEZVOUS,
+      Planificateur.JobType.RAPPEL_ACTION,
+      Planificateur.JobType.TRAITER_EVENEMENT_MILO
     ].includes(suiviJob.jobType)
   )
 }
