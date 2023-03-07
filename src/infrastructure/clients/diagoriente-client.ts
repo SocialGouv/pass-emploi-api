@@ -4,7 +4,13 @@ import { ConfigService } from '@nestjs/config'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import { firstValueFrom } from 'rxjs'
 import { TypeUrlDiagoriente } from '../../application/queries/get-diagoriente-urls.query.handler'
-import { Result, success } from '../../building-blocks/types/result'
+import { CompteDiagorienteInvalideError } from '../../building-blocks/types/domain-error'
+import {
+  emptySuccess,
+  failure,
+  Result,
+  success
+} from '../../building-blocks/types/result'
 import { handleAxiosError } from './utils/axios-error-handler'
 
 const mapTypeUrlToRedirect: Record<TypeUrlDiagoriente, string> = {
@@ -65,6 +71,37 @@ export class DiagorienteClient {
         e,
         this.logger,
         "La récupération de l'url Diagoriente a échoué"
+      )
+    }
+  }
+
+  async register(userInfo: UserInfo): Promise<Result> {
+    try {
+      const response = await this.post<{ date: unknown; errors?: unknown[] }>({
+        query:
+          'mutation ($clientId: String!, $clientSecret: String!, $userInfo: PartnerAuthUserInfo!) {\r\n  registerByPartner(clientId: $clientId, clientSecret: $clientSecret, userInfo: $userInfo) {\r\n    status\r\n  }\r\n}',
+        variables: {
+          clientId: this.diagorienteClientId,
+          clientSecret: this.diagorienteClientSecret,
+          userInfo: {
+            userId: userInfo.id,
+            email: userInfo.email,
+            firstName: userInfo.prenom,
+            lastName: userInfo.nom
+          }
+        }
+      })
+
+      if (response.data.errors) {
+        return failure(new CompteDiagorienteInvalideError(userInfo.id))
+      }
+      return emptySuccess()
+    } catch (e) {
+      e.config.data = 'REDACTED'
+      return handleAxiosError(
+        e,
+        this.logger,
+        'La création du compte Diagoriente a échoué'
       )
     }
   }
