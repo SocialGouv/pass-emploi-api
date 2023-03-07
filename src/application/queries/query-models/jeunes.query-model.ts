@@ -76,6 +76,9 @@ class ConseillerQueryModel {
 }
 
 export class ConseillerJeuneQueryModel {
+  @ApiProperty()
+  id: string
+
   @ApiProperty({ required: false })
   email?: string
 
