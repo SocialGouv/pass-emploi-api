@@ -81,6 +81,17 @@ module.exports = {
         email: 'thomas.tourret@octo.com',
         structure: 'MILO',
         id_authentification: 'd3788357-bba0-491e-8e86-c417cd1a0ca0'
+      },
+      {
+        id: 'kele',
+        prenom: 'Kévin',
+        nom: 'LE',
+        id_conseiller: '41',
+        date_creation: '2021-11-24T10:00:00.000Z',
+        date_premiere_connexion: '2021-11-24T10:00:00.000Z',
+        email: 'kevin.b.le@octo.com',
+        structure: 'MILO',
+        id_authentification: 'kele'
       }
     ])
   },

@@ -174,6 +174,7 @@ import { RecherchesConseillersController } from './infrastructure/routes/recherc
 import { ReferentielsController } from './infrastructure/routes/referentiels.controller'
 import { RendezVousController } from './infrastructure/routes/rendez-vous.controller'
 import { ServicesCiviqueController } from './infrastructure/routes/services-civique.controller'
+import { ImmersionController } from './infrastructure/routes/immersion.controller'
 import { databaseProviders } from './infrastructure/sequelize/providers'
 import { DateService } from './utils/date-service'
 import { IdService } from './utils/id-service'
@@ -193,6 +194,7 @@ import { DeleteJeuneCommandHandler } from './application/commands/delete-jeune.c
 import { AgenceRepositoryToken } from './domain/agence'
 import { AgenceSqlRepository } from './infrastructure/repositories/agence-sql.repository.db'
 import { GetAgencesQueryHandler } from './application/queries/get-agences.query.handler.db'
+import { CreateContactImmersionCommandHandler } from './application/commands/immersion/create-contact-immersion.command.handler'
 import { ModifierConseillerCommandHandler } from './application/commands/modifier-conseiller.command.handler'
 import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './application/commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
 import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from './application/commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
@@ -343,6 +345,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     RecherchesJeunesController,
     RecherchesConseillersController,
     DiagorienteController,
+    ImmersionController,
     // Evenements d'engagement
     EvenementsController,
     // Messages
@@ -572,6 +575,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetJeunesEtablissementV2QueryHandler,
     GetActionsJeuneQueryHandler,
     CreateActionCommandHandler,
+    CreateContactImmersionCommandHandler,
     CreerJeunePoleEmploiCommandHandler,
     AddFavoriOffreEmploiCommandHandler,
     AddFavoriOffreImmersionCommandHandler,

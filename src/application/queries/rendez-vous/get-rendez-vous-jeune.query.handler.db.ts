@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Op } from 'sequelize'
-import { ConseillerAgenceAuthorizer } from 'src/application/authorizers/authorize-conseiller-agence'
+import { ConseillerAgenceAuthorizer } from '../../authorizers/authorize-conseiller-agence'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import { Result, success } from '../../../building-blocks/types/result'
