@@ -93,6 +93,16 @@ export class JeuneNonLieAuConseillerError implements DomainError {
   }
 }
 
+export class CompteDiagorienteInvalideError implements DomainError {
+  static CODE = 'COMPTE_DIAGORIENTE_INVALIDE'
+  readonly code: string = CompteDiagorienteInvalideError.CODE
+  readonly message: string
+
+  constructor(idJeune: string) {
+    this.message = `Le compte du jeune ${idJeune} n'a pas pu être créé sur Diagoriente`
+  }
+}
+
 export class JeuneNonLieALAgenceError implements DomainError {
   static CODE = 'JEUNE_NON_LIE_A_L_AGENCE'
   readonly code: string = JeuneNonLieALAgenceError.CODE

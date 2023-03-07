@@ -10,6 +10,7 @@ import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.excepti
 import {
   CampagneExisteDejaError,
   CampagneNonActive,
+  CompteDiagorienteInvalideError,
   ConseillerSansAgenceError,
   DossierExisteDejaError,
   DroitsInsuffisants,
@@ -50,6 +51,7 @@ export function handleFailure(result: Result): void {
       case DroitsInsuffisants.CODE:
       case JeunePasInactifError.CODE:
       case JeuneNonLieAuConseillerError.CODE:
+      case CompteDiagorienteInvalideError.CODE:
         throw new ForbiddenException(result.error.message)
       case EmailExisteDejaError.CODE:
       case DossierExisteDejaError.CODE:

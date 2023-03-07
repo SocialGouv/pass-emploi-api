@@ -1,10 +1,17 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { ApiProperty } from '@nestjs/swagger'
 import { IsArray } from 'class-validator'
+import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { isFailure, Result, success } from '../../building-blocks/types/result'
+import {
+  failure,
+  isFailure,
+  Result,
+  success
+} from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
+import { JeunesRepositoryToken, Jeune } from '../../domain/jeune/jeune'
 import { DiagorienteClient } from '../../infrastructure/clients/diagoriente-client'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 
@@ -38,7 +45,9 @@ export class GetDiagorienteMetiersFavorisQueryHandler extends QueryHandler<
 > {
   constructor(
     private readonly jeuneAuthorizer: JeuneAuthorizer,
-    private readonly diagorienteClient: DiagorienteClient
+    private readonly diagorienteClient: DiagorienteClient,
+    @Inject(JeunesRepositoryToken)
+    private readonly jeunesRepository: Jeune.Repository
   ) {
     super('GetDiagorienteMetiersFavorisQueryHandler')
   }
@@ -46,6 +55,24 @@ export class GetDiagorienteMetiersFavorisQueryHandler extends QueryHandler<
   async handle(
     query: GetDiagorienteMetiersFavorisQuery
   ): Promise<Result<DiagorienteMetiersFavorisQueryModel>> {
+    const jeune = (await this.jeunesRepository.get(query.idJeune))!
+
+    if (!jeune.email) {
+      return failure(new MauvaiseCommandeError('Jeune sans email'))
+    }
+
+    const infosJeune = {
+      id: jeune.id,
+      email: jeune.email,
+      prenom: jeune.firstName,
+      nom: jeune.lastName
+    }
+    const resultRegister = await this.diagorienteClient.register(infosJeune)
+
+    if (isFailure(resultRegister)) {
+      return resultRegister
+    }
+
     const result = await this.diagorienteClient.getMetiersFavoris(query.idJeune)
 
     if (isFailure(result)) {

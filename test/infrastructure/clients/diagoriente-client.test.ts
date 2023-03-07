@@ -1,8 +1,15 @@
 import { HttpService } from '@nestjs/axios'
 import * as nock from 'nock'
 import { TypeUrlDiagoriente } from '../../../src/application/queries/get-diagoriente-urls.query.handler'
-import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
-import { failure, success } from '../../../src/building-blocks/types/result'
+import {
+  CompteDiagorienteInvalideError,
+  ErreurHttp
+} from '../../../src/building-blocks/types/domain-error'
+import {
+  emptySuccess,
+  failure,
+  success
+} from '../../../src/building-blocks/types/result'
 import { DiagorienteClient } from '../../../src/infrastructure/clients/diagoriente-client'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { expect } from '../../utils'
@@ -64,6 +71,49 @@ describe('DiagorienteClient', () => {
         failure(
           new ErreurHttp("La récupération de l'url Diagoriente a échoué", 429)
         )
+      )
+    })
+  })
+
+  describe('register', () => {
+    it('renvoie un success', async () => {
+      // Given
+      const expectedBody =
+        '{"query":"mutation ($clientId: String!, $clientSecret: String!, $userInfo: PartnerAuthUserInfo!) {\\r\\n  registerByPartner(clientId: $clientId, clientSecret: $clientSecret, userInfo: $userInfo) {\\r\\n    status\\r\\n  }\\r\\n}","variables":{"clientId":"diagoriente-client-id","clientSecret":"diagoriente-client-secret","userInfo":{"userId":"ABCDE","email":"john.doe@plop.io","firstName":"John","lastName":"Doe"}}}'
+
+      nock(apiUrl).post('/graphql', expectedBody).reply(200, { data: {} })
+
+      // When
+      const result = await diagorienteClient.register({
+        id: jeune.id,
+        email: jeune.email,
+        prenom: jeune.firstName,
+        nom: jeune.lastName
+      })
+
+      // Then
+      expect(result).to.deep.equal(emptySuccess())
+    })
+    it("renvoie une failure quand l'id et email est déjà associé à un autre compte", async () => {
+      // Given
+      const expectedBody =
+        '{"query":"mutation ($clientId: String!, $clientSecret: String!, $userInfo: PartnerAuthUserInfo!) {\\r\\n  registerByPartner(clientId: $clientId, clientSecret: $clientSecret, userInfo: $userInfo) {\\r\\n    status\\r\\n  }\\r\\n}","variables":{"clientId":"diagoriente-client-id","clientSecret":"diagoriente-client-secret","userInfo":{"userId":"ABCDE","email":"john.doe@plop.io","firstName":"John","lastName":"Doe"}}}'
+
+      nock(apiUrl)
+        .post('/graphql', expectedBody)
+        .reply(200, { data: {}, errors: [] })
+
+      // When
+      const result = await diagorienteClient.register({
+        id: jeune.id,
+        email: jeune.email,
+        prenom: jeune.firstName,
+        nom: jeune.lastName
+      })
+
+      // Then
+      expect(result).to.deep.equal(
+        failure(new CompteDiagorienteInvalideError(jeune.id))
       )
     })
   })

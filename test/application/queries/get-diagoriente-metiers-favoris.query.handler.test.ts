@@ -1,16 +1,28 @@
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import {
   GetDiagorienteMetiersFavorisQuery,
   GetDiagorienteMetiersFavorisQueryHandler
 } from 'src/application/queries/get-diagoriente-metiers-favoris.query.handler'
-import { failure, success } from 'src/building-blocks/types/result'
+import {
+  emptySuccess,
+  failure,
+  success
+} from 'src/building-blocks/types/result'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
-import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
+import {
+  CompteDiagorienteInvalideError,
+  ErreurHttp,
+  MauvaiseCommandeError
+} from '../../../src/building-blocks/types/domain-error'
+import { Jeune } from '../../../src/domain/jeune/jeune'
 import { DiagorienteClient } from '../../../src/infrastructure/clients/diagoriente-client'
+import { unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('GetDiagorienteMetiersFavorisQueryHandler', () => {
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
+  let jeunesRepository: StubbedType<Jeune.Repository>
   let diagorienteClient: StubbedClass<DiagorienteClient>
   let handler: GetDiagorienteMetiersFavorisQueryHandler
   let sandbox: SinonSandbox
@@ -19,154 +31,253 @@ describe('GetDiagorienteMetiersFavorisQueryHandler', () => {
     sandbox = createSandbox()
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     diagorienteClient = stubClass(DiagorienteClient)
+    jeunesRepository = stubInterface(sandbox)
 
     handler = new GetDiagorienteMetiersFavorisQueryHandler(
       jeuneAuthorizer,
-      diagorienteClient
+      diagorienteClient,
+      jeunesRepository
     )
   })
   afterEach(() => {
     sandbox.restore()
   })
 
-  describe('quand la recuperation des metiers favoris est en succes', () => {
-    it('renvoie les métiers favoris', async () => {
+  describe('jeune sans email', () => {
+    it('renvoie failure', async () => {
       // Given
+      const jeune = unJeune({ email: undefined })
       const query: GetDiagorienteMetiersFavorisQuery = {
         idJeune: 'test'
       }
-
-      diagorienteClient.getMetiersFavoris.withArgs(query.idJeune).resolves(
-        success({
-          data: {
-            userByPartner: {
-              favorites: [
-                {
-                  tag: {
-                    code: 'string',
-                    id: 'string',
-                    title: 'string'
-                  },
-                  id: 'string',
-                  favorited: true
-                }
-              ]
-            }
-          }
-        })
-      )
+      jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
 
       // When
       const result = await handler.handle(query)
 
       // Then
-      expect(diagorienteClient.getMetiersFavoris).to.have.been.calledOnce()
       expect(result).to.deep.equal(
-        success({
-          aDesMetiersFavoris: true,
-          metiersFavoris: [
-            {
-              rome: 'string',
-              titre: 'string'
-            }
-          ]
-        })
+        failure(new MauvaiseCommandeError('Jeune sans email'))
       )
-    })
-    it('renvoie aDesMetiersFavoris false', async () => {
-      // Given
-      const query: GetDiagorienteMetiersFavorisQuery = {
-        idJeune: 'test'
-      }
-
-      diagorienteClient.getMetiersFavoris.withArgs(query.idJeune).resolves(
-        success({
-          data: {
-            userByPartner: {
-              favorites: [
-                {
-                  tag: {
-                    code: 'string',
-                    id: 'string',
-                    title: 'string'
-                  },
-                  id: 'string',
-                  favorited: false
-                }
-              ]
-            }
-          }
-        })
-      )
-
-      // When
-      const result = await handler.handle(query)
-
-      // Then
-      expect(diagorienteClient.getMetiersFavoris).to.have.been.calledOnce()
-      expect(result).to.deep.equal(
-        success({
-          aDesMetiersFavoris: false,
-          metiersFavoris: []
-        })
-      )
-    })
-    it("renvoie uniquement le booleen quand le detail n'est pas demandé", async () => {
-      // Given
-      const query: GetDiagorienteMetiersFavorisQuery = {
-        idJeune: 'test',
-        detail: false
-      }
-
-      diagorienteClient.getMetiersFavoris.withArgs(query.idJeune).resolves(
-        success({
-          data: {
-            userByPartner: {
-              favorites: [
-                {
-                  tag: {
-                    code: 'string',
-                    id: 'string',
-                    title: 'string'
-                  },
-                  id: 'string',
-                  favorited: true
-                }
-              ]
-            }
-          }
-        })
-      )
-
-      // When
-      const result = await handler.handle(query)
-
-      // Then
-      expect(diagorienteClient.getMetiersFavoris).to.have.been.calledOnce()
-      expect(result).to.deep.equal(
-        success({
-          aDesMetiersFavoris: true,
-          metiersFavoris: undefined
-        })
-      )
+      expect(diagorienteClient.register).not.to.have.been.called()
+      expect(diagorienteClient.getMetiersFavoris).not.to.have.been.called()
     })
   })
-  describe('quand la recuperation des metiers favoris est en failure', () => {
-    it('renvoie la failure', async () => {
+
+  describe('jeune avec email', () => {
+    describe('register en echec', async () => {
       // Given
-      const query: GetDiagorienteMetiersFavorisQuery = {
-        idJeune: 'test'
+      const jeune = unJeune()
+      const infosJeune = {
+        id: jeune.id,
+        email: jeune.email,
+        prenom: jeune.firstName,
+        nom: jeune.lastName
       }
-      diagorienteClient.getMetiersFavoris
-        .withArgs(query.idJeune)
-        .resolves(failure(new ErreurHttp('Erreur Diago', 429)))
+      const query: GetDiagorienteMetiersFavorisQuery = {
+        idJeune: jeune.id
+      }
+      jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
+      diagorienteClient.register
+        .withArgs(infosJeune)
+        .resolves(failure(new CompteDiagorienteInvalideError(jeune.id)))
 
       // When
       const result = await handler.handle(query)
 
       // Then
-      expect(diagorienteClient.getMetiersFavoris).to.have.been.calledOnce()
-      expect(result).to.deep.equal(failure(new ErreurHttp('Erreur Diago', 429)))
+      expect(result).to.deep.equal(
+        failure(new CompteDiagorienteInvalideError(jeune.id))
+      )
+    })
+    describe('register en succes', async () => {
+      describe('quand la recuperation des metiers favoris est en succes', () => {
+        it('renvoie les métiers favoris', async () => {
+          // Given
+          const jeune = unJeune()
+          const infosJeune = {
+            id: jeune.id,
+            email: jeune.email,
+            prenom: jeune.firstName,
+            nom: jeune.lastName
+          }
+          const query: GetDiagorienteMetiersFavorisQuery = {
+            idJeune: jeune.id
+          }
+          jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
+          diagorienteClient.register
+            .withArgs(infosJeune)
+            .resolves(emptySuccess())
+
+          diagorienteClient.getMetiersFavoris.withArgs(query.idJeune).resolves(
+            success({
+              data: {
+                userByPartner: {
+                  favorites: [
+                    {
+                      tag: {
+                        code: 'string',
+                        id: 'string',
+                        title: 'string'
+                      },
+                      id: 'string',
+                      favorited: true
+                    }
+                  ]
+                }
+              }
+            })
+          )
+
+          // When
+          const result = await handler.handle(query)
+
+          // Then
+          expect(diagorienteClient.getMetiersFavoris).to.have.been.calledOnce()
+          expect(result).to.deep.equal(
+            success({
+              aDesMetiersFavoris: true,
+              metiersFavoris: [
+                {
+                  rome: 'string',
+                  titre: 'string'
+                }
+              ]
+            })
+          )
+        })
+        it('renvoie aDesMetiersFavoris false', async () => {
+          // Given
+          const jeune = unJeune()
+          const infosJeune = {
+            id: jeune.id,
+            email: jeune.email,
+            prenom: jeune.firstName,
+            nom: jeune.lastName
+          }
+          const query: GetDiagorienteMetiersFavorisQuery = {
+            idJeune: jeune.id
+          }
+          jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
+          diagorienteClient.register
+            .withArgs(infosJeune)
+            .resolves(emptySuccess())
+
+          diagorienteClient.getMetiersFavoris.withArgs(query.idJeune).resolves(
+            success({
+              data: {
+                userByPartner: {
+                  favorites: [
+                    {
+                      tag: {
+                        code: 'string',
+                        id: 'string',
+                        title: 'string'
+                      },
+                      id: 'string',
+                      favorited: false
+                    }
+                  ]
+                }
+              }
+            })
+          )
+
+          // When
+          const result = await handler.handle(query)
+
+          // Then
+          expect(diagorienteClient.getMetiersFavoris).to.have.been.calledOnce()
+          expect(result).to.deep.equal(
+            success({
+              aDesMetiersFavoris: false,
+              metiersFavoris: []
+            })
+          )
+        })
+        it("renvoie uniquement le booleen quand le detail n'est pas demandé", async () => {
+          // Given
+          const jeune = unJeune()
+          const infosJeune = {
+            id: jeune.id,
+            email: jeune.email,
+            prenom: jeune.firstName,
+            nom: jeune.lastName
+          }
+          const query: GetDiagorienteMetiersFavorisQuery = {
+            idJeune: jeune.id,
+            detail: false
+          }
+          jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
+          diagorienteClient.register
+            .withArgs(infosJeune)
+            .resolves(emptySuccess())
+
+          diagorienteClient.getMetiersFavoris.withArgs(query.idJeune).resolves(
+            success({
+              data: {
+                userByPartner: {
+                  favorites: [
+                    {
+                      tag: {
+                        code: 'string',
+                        id: 'string',
+                        title: 'string'
+                      },
+                      id: 'string',
+                      favorited: true
+                    }
+                  ]
+                }
+              }
+            })
+          )
+
+          // When
+          const result = await handler.handle(query)
+
+          // Then
+          expect(diagorienteClient.getMetiersFavoris).to.have.been.calledOnce()
+          expect(result).to.deep.equal(
+            success({
+              aDesMetiersFavoris: true,
+              metiersFavoris: undefined
+            })
+          )
+        })
+      })
+      describe('quand la recuperation des metiers favoris est en failure', () => {
+        it('renvoie la failure', async () => {
+          // Given
+          const jeune = unJeune()
+          const infosJeune = {
+            id: jeune.id,
+            email: jeune.email,
+            prenom: jeune.firstName,
+            nom: jeune.lastName
+          }
+          const query: GetDiagorienteMetiersFavorisQuery = {
+            idJeune: jeune.id
+          }
+          jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
+          diagorienteClient.register
+            .withArgs(infosJeune)
+            .resolves(emptySuccess())
+
+          diagorienteClient.getMetiersFavoris
+            .withArgs(query.idJeune)
+            .resolves(failure(new ErreurHttp('Erreur Diago', 429)))
+
+          // When
+          const result = await handler.handle(query)
+
+          // Then
+          expect(diagorienteClient.getMetiersFavoris).to.have.been.calledOnce()
+          expect(result).to.deep.equal(
+            failure(new ErreurHttp('Erreur Diago', 429))
+          )
+        })
+      })
     })
   })
 })
