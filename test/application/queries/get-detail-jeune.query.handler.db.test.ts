@@ -92,6 +92,7 @@ describe('GetDetailJeuneQueryHandler', () => {
         const expected = unDetailJeuneQueryModel({
           id: idJeune,
           conseiller: {
+            id: conseillerDto.id,
             email: conseillerDto.email!,
             nom: conseillerDto.nom,
             prenom: conseillerDto.prenom,
@@ -121,6 +122,7 @@ describe('GetDetailJeuneQueryHandler', () => {
         const expected = unDetailJeuneQueryModel({
           id: idJeune,
           conseiller: {
+            id: conseillerDto.id,
             email: conseillerDto.email!,
             nom: conseillerDto.nom,
             prenom: conseillerDto.prenom,
@@ -160,6 +162,7 @@ describe('GetDetailJeuneQueryHandler', () => {
         const expected = unDetailJeuneQueryModel({
           id: idJeune,
           conseiller: {
+            id: conseillerDto.id,
             email: conseillerDto.email!,
             nom: conseillerDto.nom,
             prenom: conseillerDto.prenom,
@@ -272,6 +275,7 @@ describe('GetDetailJeuneQueryHandler', () => {
         const expected = unDetailJeuneQueryModel({
           id: idJeune,
           conseiller: {
+            id: conseillerDto.id,
             email: conseillerDto.email!,
             nom: conseillerDto.nom,
             prenom: conseillerDto.prenom,
@@ -307,6 +311,7 @@ describe('GetDetailJeuneQueryHandler', () => {
         const expected = unDetailJeuneQueryModel({
           id: idJeune,
           conseiller: {
+            id: idConseiller,
             email: unConseillerDto({ id: idConseiller }).email!,
             nom: unConseillerDto({ id: idConseiller }).nom,
             prenom: unConseillerDto({ id: idConseiller }).prenom,
@@ -368,6 +373,7 @@ describe('GetDetailJeuneQueryHandler', () => {
         const expected = unDetailJeuneQueryModel({
           id: idJeune,
           conseiller: {
+            id: conseillerDto.id,
             email: conseillerDto.email!,
             nom: conseillerDto.nom,
             prenom: conseillerDto.prenom,
