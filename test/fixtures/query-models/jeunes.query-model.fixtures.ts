@@ -24,6 +24,7 @@ export function unConseillerJeuneQueryModel(
   args: Partial<ConseillerJeuneQueryModel> = {}
 ): ConseillerJeuneQueryModel {
   const defaults: ConseillerJeuneQueryModel = {
+    id: 'ABCDE',
     prenom: 'Blanche',
     nom: 'Neige',
     email: 'blanche.neige@sept.nains',
