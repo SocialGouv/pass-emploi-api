@@ -89,7 +89,7 @@ export class ConseillerAgenceAuthorizer {
     return failure(new DroitsInsuffisants())
   }
 
-  async authorizeConseillerAvecUnJeuneDeLAgenceMILODansLeRendezVous(
+  async authorizeConseillerMILOAvecUnJeuneDansLeRendezVous(
     idRendezVous: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
@@ -102,8 +102,17 @@ export class ConseillerAgenceAuthorizer {
         utilisateur.id
       )
 
-      if (rendezVous && conseillerUtilisateur?.agence) {
+      if (rendezVous && conseillerUtilisateur) {
         if (
+          rendezVous.jeunes.some(
+            jeune => jeune.conseiller?.id === conseillerUtilisateur.id
+          )
+        ) {
+          return emptySuccess()
+        }
+
+        if (
+          conseillerUtilisateur?.agence &&
           rendezVous.jeunes.some(
             jeune =>
               jeune.conseiller?.idAgence === conseillerUtilisateur.agence!.id
