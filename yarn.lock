@@ -1916,6 +1916,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lukeed/csprng@npm:^1.0.0":
+  version: 1.0.1
+  resolution: "@lukeed/csprng@npm:1.0.1"
+  checksum: fd84d6832775052d6bff3e78b0bc7f4b29b2fafa71b04826b0713f55d9a447a0b273d4eb70d02d89bb879e9d768cd9716da818dafa32ba6f7ecb639cbdc6806d
+  languageName: node
+  linkType: hard
+
 "@moleculer/vorpal@npm:^1.11.5":
   version: 1.11.5
   resolution: "@moleculer/vorpal@npm:1.11.5"
@@ -2022,13 +2029,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/common@npm:9.2.1":
-  version: 9.2.1
-  resolution: "@nestjs/common@npm:9.2.1"
+"@nestjs/common@npm:9.3.9":
+  version: 9.3.9
+  resolution: "@nestjs/common@npm:9.3.9"
   dependencies:
     iterare: 1.2.1
-    tslib: 2.4.1
-    uuid: 9.0.0
+    tslib: 2.5.0
+    uid: 2.0.1
   peerDependencies:
     cache-manager: <=5
     class-transformer: "*"
@@ -2042,7 +2049,7 @@ __metadata:
       optional: true
     class-validator:
       optional: true
-  checksum: 82acae70df519f1f217f5b11354c29e1f3b9e5ddd5f73385bd76705c235507230bb19c6c0eb696938565ce70c33cecb487d539c829d1c8d39121fcf3468b4d55
+  checksum: 48fde36befe8f8d4527ec4e9b3ab5a0929c6fb5f5e47fa3312dc2789d523503bf20a92eceb2ad88e506614a2574af60b5c4ea6211956264ac16bc0eb737de5e5
   languageName: node
   linkType: hard
 
@@ -2062,17 +2069,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/core@npm:9.2.1":
-  version: 9.2.1
-  resolution: "@nestjs/core@npm:9.2.1"
+"@nestjs/core@npm:9.3.9":
+  version: 9.3.9
+  resolution: "@nestjs/core@npm:9.3.9"
   dependencies:
     "@nuxtjs/opencollective": 0.3.2
     fast-safe-stringify: 2.1.1
     iterare: 1.2.1
-    object-hash: 3.0.0
     path-to-regexp: 3.2.0
-    tslib: 2.4.1
-    uuid: 9.0.0
+    tslib: 2.5.0
+    uid: 2.0.1
   peerDependencies:
     "@nestjs/common": ^9.0.0
     "@nestjs/microservices": ^9.0.0
@@ -2087,7 +2093,7 @@ __metadata:
       optional: true
     "@nestjs/websockets":
       optional: true
-  checksum: 006edefb175840f7706e3ae755dfd984e112d40fe3ce26bd75ee019652c38b5225c751617efaf6054b07ddb1f7e044f49015520889f0003aa9aab33111d59172
+  checksum: b2a29c8b61b8b7bbc8d883d4ff9aed80504e28c11bd627fccbeb11a7920559b8d885efecee4799c3bd9c2cd0224dd519c7b2dcdfa9f523855529143596e1837a
   languageName: node
   linkType: hard
 
@@ -2108,19 +2114,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/platform-express@npm:9.2.1":
-  version: 9.2.1
-  resolution: "@nestjs/platform-express@npm:9.2.1"
+"@nestjs/platform-express@npm:9.3.9":
+  version: 9.3.9
+  resolution: "@nestjs/platform-express@npm:9.3.9"
   dependencies:
     body-parser: 1.20.1
     cors: 2.8.5
     express: 4.18.2
     multer: 1.4.4-lts.1
-    tslib: 2.4.1
+    tslib: 2.5.0
   peerDependencies:
     "@nestjs/common": ^9.0.0
     "@nestjs/core": ^9.0.0
-  checksum: a20d5471b1dcc56f056af14593d94ed8e155208338359e72519ed052ffdc741c5b27a75726c46277dc8baadd99615b369c6874353e73c95133b90a05b79810e9
+  checksum: 26b41de9ded9134e259a4203ca2305f5436d64710b1880844214bbdbaffb112487b6d0d08d41a880051c3f6607807d10c9dcba715ed0d7b551231349f549472a
   languageName: node
   linkType: hard
 
@@ -2166,9 +2172,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/terminus@npm:9.1.4":
-  version: 9.1.4
-  resolution: "@nestjs/terminus@npm:9.1.4"
+"@nestjs/terminus@npm:9.2.1":
+  version: 9.2.1
+  resolution: "@nestjs/terminus@npm:9.2.1"
   dependencies:
     boxen: 5.1.2
     check-disk-space: 3.3.1
@@ -2214,7 +2220,7 @@ __metadata:
       optional: true
     typeorm:
       optional: true
-  checksum: 35b051951953f001e76fba73e99f74b9fdd42c4b66739b980987dc0aa03a59d64652ed7032a0e6731e71ed5c06af80e59c57915def4d79f3a3c7dbf89d5db9d0
+  checksum: ac09b7fced4bc712fc1e7b974a73b905f9fea670589477cf7e8b8c98df27f114747cc0f5b660adf327e7a6670a892a2c749e03c2b1a5d5af9cb6ea4d0300da94
   languageName: node
   linkType: hard
 
@@ -8972,13 +8978,13 @@ __metadata:
     "@google-cloud/bigquery": ^6.0.3
     "@nestjs/axios": 1.0.1
     "@nestjs/cli": ^9.1.5
-    "@nestjs/common": 9.2.1
+    "@nestjs/common": 9.3.9
     "@nestjs/config": 2.3.1
-    "@nestjs/core": 9.2.1
-    "@nestjs/platform-express": 9.2.1
+    "@nestjs/core": 9.3.9
+    "@nestjs/platform-express": 9.3.9
     "@nestjs/schematics": ^9.0.3
     "@nestjs/swagger": 6.2.1
-    "@nestjs/terminus": 9.1.4
+    "@nestjs/terminus": 9.2.1
     "@nestjs/testing": ^9.2.1
     "@salesforce/ts-sinon": ^1.4.2
     "@types/bull": ^4.10.0
@@ -9361,17 +9367,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"object-hash@npm:3.0.0, object-hash@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "object-hash@npm:3.0.0"
-  checksum: 80b4904bb3857c52cc1bfd0b52c0352532ca12ed3b8a6ff06a90cd209dfda1b95cee059a7625eb9da29537027f68ac4619363491eedb2f5d3dddbba97494fd6c
-  languageName: node
-  linkType: hard
-
 "object-hash@npm:^2.0.1":
   version: 2.2.0
   resolution: "object-hash@npm:2.2.0"
   checksum: 55ba841e3adce9c4f1b9b46b41983eda40f854e0d01af2802d3ae18a7085a17168d6b81731d43fdf1d6bcbb3c9f9c56d22c8fea992203ad90a38d7d919bc28f1
+  languageName: node
+  linkType: hard
+
+"object-hash@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "object-hash@npm:3.0.0"
+  checksum: 80b4904bb3857c52cc1bfd0b52c0352532ca12ed3b8a6ff06a90cd209dfda1b95cee059a7625eb9da29537027f68ac4619363491eedb2f5d3dddbba97494fd6c
   languageName: node
   linkType: hard
 
@@ -12036,17 +12042,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tslib@npm:2.5.0, tslib@npm:^2.1.0, tslib@npm:^2.3.1, tslib@npm:^2.5.0":
+  version: 2.5.0
+  resolution: "tslib@npm:2.5.0"
+  checksum: ae3ed5f9ce29932d049908ebfdf21b3a003a85653a9a140d614da6b767a93ef94f460e52c3d787f0e4f383546981713f165037dc2274df212ea9f8a4541004e1
+  languageName: node
+  linkType: hard
+
 "tslib@npm:^1.11.1, tslib@npm:^1.8.1, tslib@npm:^1.9.0":
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
   checksum: dbe628ef87f66691d5d2959b3e41b9ca0045c3ee3c7c7b906cc1e328b39f199bb1ad9e671c39025bd56122ac57dfbf7385a94843b1cc07c60a4db74795829acd
-  languageName: node
-  linkType: hard
-
-"tslib@npm:^2.1.0, tslib@npm:^2.3.1, tslib@npm:^2.5.0":
-  version: 2.5.0
-  resolution: "tslib@npm:2.5.0"
-  checksum: ae3ed5f9ce29932d049908ebfdf21b3a003a85653a9a140d614da6b767a93ef94f460e52c3d787f0e4f383546981713f165037dc2274df212ea9f8a4541004e1
   languageName: node
   linkType: hard
 
@@ -12220,6 +12226,15 @@ __metadata:
   bin:
     uglifyjs: bin/uglifyjs
   checksum: 7b3897df38b6fc7d7d9f4dcd658599d81aa2b1fb0d074829dd4e5290f7318dbca1f4af2f45acb833b95b1fe0ed4698662ab61b87e94328eb4c0a0d3435baf924
+  languageName: node
+  linkType: hard
+
+"uid@npm:2.0.1":
+  version: 2.0.1
+  resolution: "uid@npm:2.0.1"
+  dependencies:
+    "@lukeed/csprng": ^1.0.0
+  checksum: 0a3c697d8dd1f3b647afa35c411b11fd8fa2fb6dbd8a49fe109a4aa5214068c2c58781aa6e4516dfd16f0fc524fb7bba0833e9c1dc1ed3f1965b520349be9ad5
   languageName: node
   linkType: hard
 
