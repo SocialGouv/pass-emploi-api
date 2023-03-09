@@ -15,7 +15,10 @@ import { RendezVousJeuneAssociationSqlModel } from '../../../../src/infrastructu
 import { RendezVousSqlModel } from '../../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { DateService } from '../../../../src/utils/date-service'
 import { uneDatetime, uneDatetimeMinuit } from '../../../fixtures/date.fixture'
-import { uneConfiguration } from '../../../fixtures/jeune.fixture'
+import {
+  unConseillerDuJeune,
+  uneConfiguration
+} from '../../../fixtures/jeune.fixture'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { unEtablissementDto } from '../../../fixtures/sql-models/etablissement.sq-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
@@ -31,10 +34,13 @@ describe('AnimationsCollectivesSqlRepository', () => {
   let animationsCollectivesSqlRepository: AnimationCollectiveSqlRepository
   const maintenant = uneDatetime()
   const aujourdhuiMinuit = uneDatetimeMinuit()
-  const jeune = unJeuneDuRendezVous()
+  const jeune = unJeuneDuRendezVous({
+    conseiller: unConseillerDuJeune({ idAgence: undefined })
+  })
   const unAutreJeune = unJeuneDuRendezVous({
     id: 'un-autre-jeune',
-    configuration: uneConfiguration({ idJeune: 'un-autre-jeune' })
+    configuration: uneConfiguration({ idJeune: 'un-autre-jeune' }),
+    conseiller: unConseillerDuJeune({ idAgence: undefined })
   })
 
   before(async () => {
@@ -149,7 +155,8 @@ describe('AnimationsCollectivesSqlRepository', () => {
               email: 'nils.tavernier@passemploi.com',
               firstName: 'Nils',
               id: '1',
-              lastName: 'Tavernier'
+              lastName: 'Tavernier',
+              idAgence: undefined
             },
             email: 'john.doe@plop.io',
             firstName: 'John',
@@ -253,7 +260,8 @@ describe('AnimationsCollectivesSqlRepository', () => {
               email: 'nils.tavernier@passemploi.com',
               firstName: 'Nils',
               id: '1',
-              lastName: 'Tavernier'
+              lastName: 'Tavernier',
+              idAgence: undefined
             },
             email: 'john.doe@plop.io',
             firstName: 'John',
@@ -322,7 +330,8 @@ describe('AnimationsCollectivesSqlRepository', () => {
           // Given
           const nouveauJeune = unJeuneDuRendezVous({
             id: 'nouveauJeune',
-            configuration: uneConfiguration({ idJeune: 'nouveauJeune' })
+            configuration: uneConfiguration({ idJeune: 'nouveauJeune' }),
+            conseiller: unConseillerDuJeune({ idAgence: undefined })
           })
           await JeuneSqlModel.creer(unJeuneDto({ id: nouveauJeune.id }))
           const animationCollectiveAvecUnJeuneDePlus: RendezVous.AnimationCollective =
