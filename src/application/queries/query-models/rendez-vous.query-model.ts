@@ -9,7 +9,7 @@ import {
 } from '../../../domain/rendez-vous/rendez-vous'
 import { PaginationQueryModel } from './common/pagination.query-model'
 
-class JeuneQueryModel {
+class RendezVousConseillerJeuneQueryModel {
   @ApiProperty()
   id: string
 
@@ -18,6 +18,9 @@ class JeuneQueryModel {
 
   @ApiProperty()
   prenom: string
+
+  @ApiProperty()
+  idConseiller: string
 
   @ApiProperty({ required: false })
   futPresent?: boolean
@@ -189,7 +192,7 @@ export class RendezVousConseillerQueryModel
   presenceConseiller?: boolean
 
   @ApiProperty()
-  jeunes: JeuneQueryModel[]
+  jeunes: RendezVousConseillerJeuneQueryModel[]
 
   @ApiProperty({ required: false })
   createur?: {

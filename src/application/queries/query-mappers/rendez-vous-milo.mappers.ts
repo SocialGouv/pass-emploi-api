@@ -97,6 +97,7 @@ export function fromSqlToRendezVousConseillerQueryModel(
       id: jeune.id,
       prenom: jeune.prenom,
       nom: jeune.nom,
+      idConseiller: jeune.idConseiller!,
       futPresent: getPresence(jeune)
     })),
     type: {
