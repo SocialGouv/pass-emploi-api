@@ -47,6 +47,7 @@ psql -d ${DUMP_RESTORE_DB_TARGET} \
   -c "CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder CASCADE SCHEMA public;" \
   -c "CREATE EXTENSION IF NOT EXISTS postgis_topology SCHEMA topology;" \
   -c "CREATE EXTENSION IF NOT EXISTS pg_trgm SCHEMA public;" \
+  -c "create index evenement_engagement_pkey on evenement_engagement (id);" \
   -c "create index evenement_engagement_id_utilisateur_index on evenement_engagement (id_utilisateur);" \
   -c "create index evenement_engagement_type_utilisateur_index on evenement_engagement (type_utilisateur);" \
   -c "create index evenement_engagement_structure_index on evenement_engagement (structure);" \
