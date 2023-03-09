@@ -86,7 +86,8 @@ function fromJeuneSqlToJeuneDuRdv(jeune: JeuneSqlModel): JeuneDuRendezVous {
       id: jeune.conseiller!.id,
       firstName: jeune.conseiller!.prenom,
       lastName: jeune.conseiller!.nom,
-      email: jeune.conseiller!.email ?? undefined
+      email: jeune.conseiller!.email ?? undefined,
+      idAgence: jeune.conseiller!.idAgence ?? undefined
     },
     configuration: toConfigurationApplication(jeune)
   }
