@@ -1,22 +1,22 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
 import {
-  Result,
   emptySuccess,
-  failure
+  failure,
+  Result
 } from '../../building-blocks/types/result'
+import { Action, ActionsRepositoryToken } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
 import {
   Conseiller,
   ConseillersRepositoryToken
 } from '../../domain/conseiller/conseiller'
+import { Core } from '../../domain/core'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
-import { Action, ActionsRepositoryToken } from '../../domain/action/action'
 import {
   RendezVous,
   RendezVousRepositoryToken
 } from '../../domain/rendez-vous/rendez-vous'
-import { Core } from '../../domain/core'
 
 @Injectable()
 export class ConseillerAgenceAuthorizer {
@@ -103,6 +103,13 @@ export class ConseillerAgenceAuthorizer {
       )
 
       if (rendezVous && conseillerUtilisateur) {
+        if (
+          conseillerUtilisateur.agence &&
+          conseillerUtilisateur.agence.id === rendezVous.idAgence
+        ) {
+          return emptySuccess()
+        }
+
         if (
           rendezVous.jeunes.some(
             jeune => jeune.conseiller?.id === conseillerUtilisateur.id
