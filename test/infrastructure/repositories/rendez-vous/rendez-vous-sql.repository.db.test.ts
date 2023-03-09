@@ -18,7 +18,10 @@ import {
   RendezVous
 } from '../../../../src/domain/rendez-vous/rendez-vous'
 import { Core } from '../../../../src/domain/core'
-import { uneConfiguration } from '../../../fixtures/jeune.fixture'
+import {
+  unConseillerDuJeune,
+  uneConfiguration
+} from '../../../fixtures/jeune.fixture'
 import {
   DatabaseForTesting,
   getDatabase
@@ -53,7 +56,9 @@ describe('RendezVousRepositorySql', () => {
         structure: Structure.POLE_EMPLOI
       })
     )
-    jeune = unJeuneDuRendezVous()
+    jeune = unJeuneDuRendezVous({
+      conseiller: unConseillerDuJeune({ idAgence: undefined })
+    })
     await JeuneSqlModel.creer(unJeuneDto())
     unAutreJeune = unJeuneDuRendezVous({ id: 'un-autre-jeune' })
     await JeuneSqlModel.creer(unJeuneDto({ id: 'un-autre-jeune' }))
@@ -131,7 +136,8 @@ describe('RendezVousRepositorySql', () => {
           // Given
           const nouveauJeune = unJeuneDuRendezVous({
             id: 'nouveauJeune',
-            configuration: uneConfiguration({ idJeune: 'nouveauJeune' })
+            configuration: uneConfiguration({ idJeune: 'nouveauJeune' }),
+            conseiller: unConseillerDuJeune({ idAgence: undefined })
           })
           await JeuneSqlModel.creer(unJeuneDto({ id: nouveauJeune.id }))
           const rendezVousAvecUnJeuneDePlus: RendezVous = {
