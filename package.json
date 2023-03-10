@@ -145,7 +145,7 @@
     "dirty-chai": "^2.0.1",
     "dotenv-cli": "^7.0.0",
     "dotvault": "^0.0.9",
-    "eslint": "8.35.0",
+    "eslint": "8.36.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-chai-friendly": "^0.7.2",
     "eslint-plugin-mocha": "^10.1.0",
