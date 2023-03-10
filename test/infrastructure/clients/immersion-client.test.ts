@@ -40,4 +40,58 @@ describe('ImmersionClient', () => {
       expect(response.data).to.deep.equal({ resultats })
     })
   })
+  describe('postFormulaireImmersion', () => {
+    it('fait un appel en succes', async () => {
+      // Given
+      const params = {
+        offer: {
+          romeCode: 'romeCode',
+          romeLabel: 'romeLabel'
+        },
+        siret: 'siret',
+        potentialBeneficiaryFirstName: 'potentialBeneficiaryFirstName',
+        potentialBeneficiaryLastName: 'potentialBeneficiaryLastName',
+        potentialBeneficiaryEmail: 'potentialBeneficiaryEmail',
+        contactMode: 'EMAIL',
+        message: 'test'
+      }
+
+      nock('https://api.api-immersion.beta.gouv.op')
+        .post('/v1/contact-establishment', params)
+        .reply(200, {})
+        .isDone()
+
+      // When
+      const response = await immersionClient.postFormulaireImmersion(params)
+
+      // Then
+      expect(response._isSuccess).to.equal(true)
+    })
+    it('fait un appel en echec et renvoie une failure', async () => {
+      // Given
+      const params = {
+        offer: {
+          romeCode: 'romeCode',
+          romeLabel: 'romeLabel'
+        },
+        siret: 'siret',
+        potentialBeneficiaryFirstName: 'potentialBeneficiaryFirstName',
+        potentialBeneficiaryLastName: 'potentialBeneficiaryLastName',
+        potentialBeneficiaryEmail: 'potentialBeneficiaryEmail',
+        contactMode: 'EMAIL',
+        message: 'test'
+      }
+
+      nock('https://api.api-immersion.beta.gouv.op')
+        .post('/v1/contact-establishment', params)
+        .reply(429, {})
+        .isDone()
+
+      // When
+      const response = await immersionClient.postFormulaireImmersion(params)
+
+      // Then
+      expect(response._isSuccess).to.equal(false)
+    })
+  })
 })
