@@ -75,7 +75,8 @@ describe('ActionsController', () => {
           jeune: {
             id: '1',
             lastName: 'Saez',
-            firstName: 'Damien'
+            firstName: 'Damien',
+            idConseiller: 'id-conseiller'
           },
           creatorType: 'conseiller',
           creator: 'Nils Tavernier',

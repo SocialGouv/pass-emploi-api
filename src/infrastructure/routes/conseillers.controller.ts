@@ -236,7 +236,8 @@ export class ConseillersController {
       return {
         id: jeune.id,
         firstName: jeune.firstName,
-        lastName: jeune.lastName
+        lastName: jeune.lastName,
+        idConseiller: jeune.conseiller!.id
       }
     }
 
