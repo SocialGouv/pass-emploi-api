@@ -93,14 +93,16 @@ describe('CampagnesController', () => {
         createEvaluationCommandHandler.execute
           .withArgs({
             idJeune: 'idJeune',
-            idCampagne: 'idCampagne',
+            idCampagne: '319ecb4b-067f-442c-b0a2-75cf2c47ccfb',
             reponses: []
           })
           .resolves(emptySuccess())
 
         // When
         await request(app.getHttpServer())
-          .post('/jeunes/idJeune/campagnes/idCampagne/evaluer')
+          .post(
+            '/jeunes/idJeune/campagnes/319ecb4b-067f-442c-b0a2-75cf2c47ccfb/evaluer'
+          )
           .set('authorization', unHeaderAuthorization())
           .send([])
 
@@ -114,14 +116,16 @@ describe('CampagnesController', () => {
         createEvaluationCommandHandler.execute
           .withArgs({
             idJeune: 'idJeune',
-            idCampagne: 'idCampagne',
+            idCampagne: '319ecb4b-067f-442c-b0a2-75cf2c47ccfb',
             reponses: []
           })
           .resolves(failure(new ReponsesCampagneInvalide()))
 
         // When
         await request(app.getHttpServer())
-          .post('/jeunes/idJeune/campagnes/idCampagne/evaluer')
+          .post(
+            '/jeunes/idJeune/campagnes/319ecb4b-067f-442c-b0a2-75cf2c47ccfb/evaluer'
+          )
           .set('authorization', unHeaderAuthorization())
           .send([])
 
@@ -131,7 +135,7 @@ describe('CampagnesController', () => {
     })
     ensureUserAuthenticationFailsIfInvalid(
       'post',
-      '/jeunes/idJeune/campagnes/idCampagne/evaluer'
+      '/jeunes/idJeune/campagnes/319ecb4b-067f-442c-b0a2-75cf2c47ccfb/evaluer'
     )
   })
 })
