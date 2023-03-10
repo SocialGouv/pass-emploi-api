@@ -1,15 +1,15 @@
-import { Command } from '../../building-blocks/types/command'
-import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { Authentification } from '../../domain/authentification'
+import { Command } from '../../../building-blocks/types/command'
+import { CommandHandler } from '../../../building-blocks/types/command-handler'
+import { Authentification } from '../../../domain/authentification'
 import {
   emptySuccess,
   isFailure,
   Result
-} from '../../building-blocks/types/result'
-import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
-import { Campagne, CampagneRepositoryToken } from '../../domain/campagne'
+} from '../../../building-blocks/types/result'
+import { JeuneAuthorizer } from '../../authorizers/authorize-jeune'
+import { Campagne, CampagneRepositoryToken } from '../../../domain/campagne'
 import { Inject } from '@nestjs/common'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
 
 export interface CreateEvaluationCommand extends Command {
   idCampagne: string

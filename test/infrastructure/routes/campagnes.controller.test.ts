@@ -3,7 +3,7 @@ import { StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
 import * as request from 'supertest'
-import { CreateCampagneCommandHandler } from '../../../src/application/commands/create-campagne.command'
+import { CreateCampagneCommandHandler } from '../../../src/application/commands/campagne/create-campagne.command'
 import { CreateCampagnePayload } from '../../../src/infrastructure/routes/validation/campagnes.inputs'
 import { uneCampagne } from '../../fixtures/campagne.fixture'
 import {
@@ -15,7 +15,7 @@ import {
   CampagneExisteDejaError,
   ReponsesCampagneInvalide
 } from '../../../src/building-blocks/types/domain-error'
-import { CreateEvaluationCommandHandler } from '../../../src/application/commands/create-evaluation.command'
+import { CreateEvaluationCommandHandler } from '../../../src/application/commands/campagne/create-evaluation.command'
 import { before } from 'mocha'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 

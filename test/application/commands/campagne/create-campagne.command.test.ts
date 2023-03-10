@@ -5,14 +5,14 @@ import { Authentification } from 'src/domain/authentification'
 import {
   CreateCampagneCommand,
   CreateCampagneCommandHandler
-} from '../../../src/application/commands/create-campagne.command'
-import { CampagneExisteDejaError } from '../../../src/building-blocks/types/domain-error'
-import { failure, success } from '../../../src/building-blocks/types/result'
-import { Campagne } from '../../../src/domain/campagne'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import { uneCampagne } from '../../fixtures/campagne.fixture'
-import { uneDatetime } from '../../fixtures/date.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+} from '../../../../src/application/commands/campagne/create-campagne.command'
+import { CampagneExisteDejaError } from '../../../../src/building-blocks/types/domain-error'
+import { failure, success } from '../../../../src/building-blocks/types/result'
+import { Campagne } from '../../../../src/domain/campagne'
+import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
+import { uneCampagne } from '../../../fixtures/campagne.fixture'
+import { uneDatetime } from '../../../fixtures/date.fixture'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 
 describe('CreateCampagneCommandHandler', () => {
   let campagneRepository: StubbedType<Campagne.Repository>
