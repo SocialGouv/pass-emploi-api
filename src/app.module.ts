@@ -311,6 +311,7 @@ import { DiagorienteController } from './infrastructure/routes/diagoriente.contr
 import { GetDiagorienteUrlsQueryHandler } from './application/queries/get-diagoriente-urls.query.handler'
 import { ArchiverJeuneSupportCommandHandler } from './application/commands/support/archiver-jeune-support.command.handler'
 import { GetDiagorienteMetiersFavorisQueryHandler } from './application/queries/get-diagoriente-metiers-favoris.query.handler'
+import { EnvoyerFormulaireContactImmersionCommandHandler } from './application/commands/immersion/envoyer-formulaire-contact-immersion.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -672,6 +673,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateSuggestionConseillerOffreEmploiCommandHandler,
     CreateSuggestionConseillerServiceCiviqueCommandHandler,
     CreateSuggestionConseillerImmersionCommandHandler,
+    EnvoyerFormulaireContactImmersionCommandHandler,
     GetActionsPredefiniesQueryHandler,
     GetAnimationsCollectivesQueryHandler,
     GetAnimationsCollectivesV2QueryHandler,
