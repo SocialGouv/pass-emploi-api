@@ -60,6 +60,7 @@ function fromSqlToJeuneQueryModel(
   return {
     id: jeuneSqlModel.id,
     firstName: jeuneSqlModel.prenom,
-    lastName: jeuneSqlModel.nom
+    lastName: jeuneSqlModel.nom,
+    idConseiller: jeuneSqlModel.idConseiller!
   }
 }
