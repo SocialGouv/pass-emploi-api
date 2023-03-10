@@ -13,45 +13,49 @@ import {
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger'
+import { EnvoyerFormulaireContactImmersionCommandHandler } from '../../application/commands/immersion/envoyer-formulaire-contact-immersion.command.handler'
+import { NotifierNouvellesImmersionsCommandHandler } from '../../application/commands/notifier-nouvelles-immersions.command.handler'
 import {
-  DetailOffreImmersionQueryModel,
-  OffreImmersionQueryModel
-} from '../../application/queries/query-models/offres-immersion.query-model'
+  GetDetailOffreImmersionQuery,
+  GetDetailOffreImmersionQueryHandler
+} from '../../application/queries/get-detail-offre-immersion.query.handler'
 import {
   GetOffresImmersionQuery,
   GetOffresImmersionQueryHandler
 } from '../../application/queries/get-offres-immersion.query.handler'
+import {
+  DetailOffreImmersionQueryModel,
+  OffreImmersionQueryModel
+} from '../../application/queries/query-models/offres-immersion.query-model'
 import {
   RechercheDetailOffreInvalide,
   RechercheDetailOffreNonTrouve,
   RechercheOffreInvalide
 } from '../../building-blocks/types/domain-error'
 import { isSuccess } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
+import { Utilisateur } from '../decorators/authenticated.decorator'
+import { SkipOidcAuth } from '../decorators/skip-oidc-auth.decorator'
+import { handleFailure } from './failure.handler'
 import {
   GetOffresImmersionQueryParams,
-  NouvellesOffresImmersions
+  NouvellesOffresImmersions,
+  PostImmersionContactBody
 } from './validation/offres-immersion.inputs'
-import {
-  GetDetailOffreImmersionQuery,
-  GetDetailOffreImmersionQueryHandler
-} from '../../application/queries/get-detail-offre-immersion.query.handler'
-import { Utilisateur } from '../decorators/authenticated.decorator'
-import { Authentification } from '../../domain/authentification'
-import { SkipOidcAuth } from '../decorators/skip-oidc-auth.decorator'
-import { NotifierNouvellesImmersionsCommandHandler } from '../../application/commands/notifier-nouvelles-immersions.command.handler'
-import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
 
-@Controller('offres-immersion')
+@Controller()
 @ApiOAuth2([])
 @ApiTags("Offres d'immersion")
 export class OffresImmersionController {
   constructor(
     private readonly getDetailOffreImmersionQueryHandler: GetDetailOffreImmersionQueryHandler,
     private readonly getOffresImmersionQueryHandler: GetOffresImmersionQueryHandler,
-    private readonly notifierNouvellesImmersionsCommandHandler: NotifierNouvellesImmersionsCommandHandler
+    private readonly notifierNouvellesImmersionsCommandHandler: NotifierNouvellesImmersionsCommandHandler,
+    private readonly envoyerFormulaireContactImmersionCommandHandler: EnvoyerFormulaireContactImmersionCommandHandler
   ) {}
 
-  @Get()
+  @Get('offres-immersion')
   @ApiResponse({
     type: OffreImmersionQueryModel,
     isArray: true
@@ -83,7 +87,7 @@ export class OffresImmersionController {
     throw new RuntimeException(result.error.message)
   }
 
-  @Get(':idOffreImmersion')
+  @Get('offres-immersion/:idOffreImmersion')
   @ApiResponse({
     type: DetailOffreImmersionQueryModel
   })
@@ -118,7 +122,7 @@ export class OffresImmersionController {
     Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
     Authentification.Partenaire.IMMERSION
   )
-  @Post()
+  @Post('offres-immersion')
   @HttpCode(202)
   async notifierNouvellesImmersions(
     @Body() nouvellesImmersions: NouvellesOffresImmersions
@@ -126,5 +130,20 @@ export class OffresImmersionController {
     this.notifierNouvellesImmersionsCommandHandler.execute({
       immersions: nouvellesImmersions.immersions
     })
+  }
+
+  @Post('jeunes/:idJeune/offres-immersion/contact')
+  async postFormulaireImmersion(
+    @Param('idJeune') idJeune: string,
+    @Body() postImmersionContactBody: PostImmersionContactBody,
+    @Utilisateur()
+    utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result =
+      await this.envoyerFormulaireContactImmersionCommandHandler.execute(
+        { idJeune, ...postImmersionContactBody },
+        utilisateur
+      )
+    handleFailure(result)
   }
 }
