@@ -1,4 +1,11 @@
-import { Body, Controller, Param, ParseArrayPipe, Post } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Param,
+  ParseArrayPipe,
+  ParseUUIDPipe,
+  Post
+} from '@nestjs/common'
 import { ApiBody, ApiOAuth2, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { ValidateNested } from 'class-validator'
 import { DateTime } from 'luxon'
@@ -22,16 +29,16 @@ import {
 
 @Controller()
 @ApiOAuth2([])
-@ApiTags('Campagnes')
 export class CampagnesController {
   constructor(
     private createCampagneCommandHandler: CreateCampagneCommandHandler,
     private createEvaluationCommandHandler: CreateEvaluationCommandHandler
   ) {}
 
+  @ApiTags('Support')
   @ApiOperation({
-    summary: "Création d'une nouvelle campagne",
-    description: 'Autorisé pour le support'
+    summary: "Création d'une nouvelle campagne.",
+    description: 'Autorisé pour le support.'
   })
   @Post('campagnes')
   async creerCampagne(
@@ -55,9 +62,10 @@ export class CampagnesController {
     throw handleFailure(result)
   }
 
+  @ApiTags('Campagnes')
   @ApiOperation({
-    summary: 'Poster une évaluation',
-    description: 'Autorisé pour un jeune'
+    summary: 'Poster une évaluation (réponses à une campagne active).',
+    description: 'Autorisé pour un jeune.'
   })
   @Post('jeunes/:idJeune/campagnes/:idCampagne/evaluer')
   @ValidateNested({ each: true })
@@ -69,7 +77,7 @@ export class CampagnesController {
     @Body(new ParseArrayPipe({ items: ReponseCampagnePayload }))
     reponsesCampagnePayload: ReponseCampagnePayload[],
     @Param('idJeune') idJeune: string,
-    @Param('idCampagne') idCampagne: string,
+    @Param('idCampagne', new ParseUUIDPipe()) idCampagne: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     const command: CreateEvaluationCommand = {
