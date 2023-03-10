@@ -46,7 +46,14 @@ psql -d ${DUMP_RESTORE_DB_TARGET} \
   -c "CREATE EXTENSION IF NOT EXISTS postgis SCHEMA public;" \
   -c "CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder CASCADE SCHEMA public;" \
   -c "CREATE EXTENSION IF NOT EXISTS postgis_topology SCHEMA topology;" \
-  -c "CREATE EXTENSION IF NOT EXISTS pg_trgm SCHEMA public;" \
+  -c "CREATE EXTENSION IF NOT EXISTS pg_trgm SCHEMA public;"
+echo "extensions OK"
+
+pg_restore --clean --if-exists --no-owner --no-privileges --no-comments --dbname "${DUMP_RESTORE_DB_TARGET}" dump.pgsql
+
+echo "restore OK"
+
+psql -d ${DUMP_RESTORE_DB_TARGET} \
   -c "create index evenement_engagement_date_evenement_index on evenement_engagement (date_evenement);" \
   -c "create index evenement_engagement_categorie_index on evenement_engagement (categorie);" \
   -c "create index evenement_engagement_action_index on evenement_engagement (action);" \
@@ -55,10 +62,7 @@ psql -d ${DUMP_RESTORE_DB_TARGET} \
   -c "create index evenement_engagement_type_utilisateur_index on evenement_engagement (type_utilisateur);" \
   -c "create index evenement_engagement_structure_index on evenement_engagement (structure);" \
   -c "create index evenement_engagement_code_index on evenement_engagement (code);"
-echo "extensions et index OK"
 
-pg_restore --clean --drop-cascade --if-exists --no-owner --no-privileges --no-comments --dbname "${DUMP_RESTORE_DB_TARGET}" dump.pgsql
-
-echo "restore OK"
+echo "index OK"
 
 rm -f dump.pgsql
