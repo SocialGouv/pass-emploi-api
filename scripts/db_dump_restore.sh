@@ -57,7 +57,7 @@ psql -d ${DUMP_RESTORE_DB_TARGET} \
   -c "create index evenement_engagement_code_index on evenement_engagement (code);"
 echo "extensions et index OK"
 
-pg_restore --clean --if-exists --no-owner --no-privileges --no-comments --dbname "${DUMP_RESTORE_DB_TARGET}" dump.pgsql
+pg_restore --clean --drop-cascade --if-exists --no-owner --no-privileges --no-comments --dbname "${DUMP_RESTORE_DB_TARGET}" dump.pgsql
 
 echo "restore OK"
 
