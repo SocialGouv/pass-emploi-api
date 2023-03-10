@@ -31,7 +31,7 @@ describe('Campagne', () => {
     campagneFactory = new Campagne.Factory(idService, dateService)
   })
 
-  describe('evaluer', () => {
+  describe('construireEvaluation', () => {
     describe('quand la campagne est absente', () => {
       it('rejette', () => {
         // Given
@@ -88,6 +88,42 @@ describe('Campagne', () => {
         const campagneEnCours = uneCampagne({
           dateDebut: maintenant.minus({ week: 1 }),
           dateFin: maintenant.plus({ week: 1 })
+        })
+
+        describe('quand elle commence et se termine le jour même', () => {
+          it('retourne une évaluation', () => {
+            // Given
+            const campagneEnCours = uneCampagne({
+              dateDebut: maintenant,
+              dateFin: maintenant
+            })
+            const reponsesValides: Campagne.Reponse[] = [
+              {
+                idReponse: 1,
+                idQuestion: 1
+              }
+            ]
+
+            // When
+            const evaluation = campagneFactory.construireEvaluation(
+              campagneEnCours,
+              jeune,
+              reponsesValides
+            )
+
+            // Then
+            const expected: Campagne.Evaluation = {
+              idCampagne: campagneEnCours.id,
+              jeune: {
+                id: jeune.id,
+                dateCreation: jeune.creationDate,
+                structure: jeune.structure
+              },
+              reponses: reponsesValides,
+              date: maintenant
+            }
+            expect(evaluation).to.be.deep.equal(success(expected))
+          })
         })
 
         describe('quand les réponses sont valides', () => {

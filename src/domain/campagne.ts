@@ -82,8 +82,8 @@ export namespace Campagne {
       const maintenant = this.dateService.now()
 
       const laCampagneEstActive =
-        maintenant.startOf('day') > campagne.dateDebut.startOf('day') &&
-        maintenant.startOf('day') < campagne.dateFin.startOf('day')
+        maintenant.startOf('day') >= campagne.dateDebut.startOf('day') &&
+        maintenant.startOf('day') < campagne.dateFin.endOf('day')
 
       if (!laCampagneEstActive) {
         return failure(new CampagneNonActive(campagne.nom))

@@ -1,25 +1,25 @@
 import {
   CreateEvaluationCommand,
   CreateEvaluationCommandHandler
-} from '../../../src/application/commands/create-evaluation.command'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { Campagne } from '../../../src/domain/campagne'
+} from '../../../../src/application/commands/campagne/create-evaluation.command'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
+import { Campagne } from '../../../../src/domain/campagne'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { Jeune } from '../../../src/domain/jeune/jeune'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { Jeune } from '../../../../src/domain/jeune/jeune'
+import { JeuneAuthorizer } from '../../../../src/application/authorizers/authorize-jeune'
 import { SinonSandbox } from 'sinon'
-import { unJeune } from '../../fixtures/jeune.fixture'
+import { unJeune } from '../../../fixtures/jeune.fixture'
 import {
   uneCampagne,
   uneEvaluationComplete
-} from '../../fixtures/campagne.fixture'
+} from '../../../fixtures/campagne.fixture'
 import {
   failure,
   isSuccess,
   success
-} from '../../../src/building-blocks/types/result'
-import { ReponsesCampagneInvalide } from '../../../src/building-blocks/types/domain-error'
-import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+} from '../../../../src/building-blocks/types/result'
+import { ReponsesCampagneInvalide } from '../../../../src/building-blocks/types/domain-error'
+import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
 
 describe('CreateEvaluationCommandHandler', () => {
   const sandbox: SinonSandbox = createSandbox()

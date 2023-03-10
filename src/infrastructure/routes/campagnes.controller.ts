@@ -5,11 +5,11 @@ import { DateTime } from 'luxon'
 import {
   CreateCampagneCommand,
   CreateCampagneCommandHandler
-} from '../../application/commands/create-campagne.command'
+} from '../../application/commands/campagne/create-campagne.command'
 import {
   CreateEvaluationCommand,
   CreateEvaluationCommandHandler
-} from '../../application/commands/create-evaluation.command'
+} from '../../application/commands/campagne/create-evaluation.command'
 import { isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
