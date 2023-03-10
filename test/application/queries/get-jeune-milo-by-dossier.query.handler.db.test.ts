@@ -55,7 +55,9 @@ describe('GetJeuneMiloByDossierQueryHandler', () => {
           unUtilisateurConseiller()
         )
         // Then
-        expect(actual).to.deep.equal(success(unJeuneQueryModel({ id: 'test' })))
+        expect(actual).to.deep.equal(
+          success(unJeuneQueryModel({ id: 'test', idConseiller: '1' }))
+        )
       })
     })
     describe('quand le dossier existe pour un autre conseiller', () => {
