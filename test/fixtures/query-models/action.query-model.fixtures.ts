@@ -38,7 +38,8 @@ export const uneActionQueryModelTermineeAvecQualification = (
   jeune: {
     id: action.idJeune,
     firstName: jeune.firstName,
-    lastName: jeune.lastName
+    lastName: jeune.lastName,
+    idConseiller: jeune.conseiller!.id
   },
   dateFinReelle: action.dateFinReelle?.toISO(),
   etat: Action.Qualification.Etat.QUALIFIEE,
@@ -63,7 +64,8 @@ export function uneActionQueryModel(
     jeune: {
       id: '1',
       firstName: 'Damien',
-      lastName: 'Saez'
+      lastName: 'Saez',
+      idConseiller: 'id-conseiller'
     },
     creatorType: Action.TypeCreateur.CONSEILLER,
     creator: 'Nils Tavernier',

@@ -78,7 +78,8 @@ export function unJeuneQueryModel(
   const defaults: JeuneQueryModel = {
     id: 'ABCDE',
     firstName: 'John',
-    lastName: 'Doe'
+    lastName: 'Doe',
+    idConseiller: 'id-conseiller'
   }
 
   return { ...defaults, ...args }
