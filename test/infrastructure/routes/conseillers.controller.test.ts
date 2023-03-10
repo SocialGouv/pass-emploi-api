@@ -61,7 +61,7 @@ import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { unDossierMilo } from '../../fixtures/milo.fixture'
 import { detailConseillerQueryModel } from '../../fixtures/query-models/conseiller.query-model.fixtures'
-import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
+import { unJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
@@ -808,14 +808,14 @@ describe('ConseillersController', () => {
         // Given
         getJeuneMiloByDossierQueryHandler.execute
           .withArgs({ idDossier: '1' }, unUtilisateurDecode())
-          .resolves(success(unDetailJeuneQueryModel()))
+          .resolves(success(unJeuneQueryModel()))
 
         // When - Then
         await request(app.getHttpServer())
           .get('/conseillers/milo/jeunes/1')
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.OK)
-          .expect(JSON.stringify(unDetailJeuneQueryModel()))
+          .expect(JSON.stringify(unJeuneQueryModel()))
       })
     })
 

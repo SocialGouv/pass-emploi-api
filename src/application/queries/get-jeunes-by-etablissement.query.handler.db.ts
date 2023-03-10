@@ -76,7 +76,8 @@ export class GetJeunesByEtablissementQueryHandler extends QueryHandler<
     return sqlJeunes.map(jeune => ({
       id: jeune.id,
       firstName: jeune.prenom,
-      lastName: jeune.nom
+      lastName: jeune.nom,
+      idConseiller: jeune.idConseiller!
     }))
   }
 }

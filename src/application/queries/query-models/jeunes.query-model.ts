@@ -23,6 +23,9 @@ export class JeuneQueryModel {
 
   @ApiProperty()
   firstName: string
+
+  @ApiProperty()
+  idConseiller: string
 }
 
 export class IdentiteJeuneQueryModel {
