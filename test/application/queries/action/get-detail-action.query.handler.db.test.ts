@@ -117,7 +117,8 @@ describe('GetDetailActionQueryHandler', () => {
             jeune: {
               id: action.idJeune,
               firstName: jeune.firstName,
-              lastName: jeune.lastName
+              lastName: jeune.lastName,
+              idConseiller: jeune.conseiller.id
             },
             qualification: undefined
           })

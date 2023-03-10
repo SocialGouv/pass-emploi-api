@@ -94,8 +94,16 @@ describe('GetJeunesByEtablissementQueryHandler', () => {
       // Then
       expect(actual).to.deep.equal(
         success([
-          unJeuneQueryModel({ id: 'jeune-conseiller-1', firstName: 'Alice' }),
-          unJeuneQueryModel({ id: 'jeune-conseiller-2', firstName: 'Béatrice' })
+          unJeuneQueryModel({
+            id: 'jeune-conseiller-1',
+            firstName: 'Alice',
+            idConseiller: '1'
+          }),
+          unJeuneQueryModel({
+            id: 'jeune-conseiller-2',
+            firstName: 'Béatrice',
+            idConseiller: '2'
+          })
         ])
       )
     })
