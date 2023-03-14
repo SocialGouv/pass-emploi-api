@@ -93,25 +93,9 @@ export function buildLocalisation(
 export function buildContact(
   offreImmpersionDto: PartenaireImmersion.Dto
 ): ContactImmersionQueryModel | undefined {
-  if (
-    !offreImmpersionDto.contactDetails ||
-    !offreImmpersionDto.contactDetails.id ||
-    !offreImmpersionDto.contactDetails.firstName ||
-    !offreImmpersionDto.contactDetails.lastName ||
-    !offreImmpersionDto.contactDetails.role
-  ) {
-    return undefined
-  }
-
-  return {
-    id: offreImmpersionDto.contactDetails.id,
-    nom: offreImmpersionDto.contactDetails.firstName,
-    prenom: offreImmpersionDto.contactDetails.lastName,
-    telephone: offreImmpersionDto.contactDetails.phone,
-    email: offreImmpersionDto.contactDetails.email,
-    role: offreImmpersionDto.contactDetails.role,
-    modeDeContact: offreImmpersionDto.contactMode
-      ? fromContactMode[offreImmpersionDto.contactMode]
-      : undefined
-  }
+  return offreImmpersionDto.contactMode
+    ? {
+        modeDeContact: fromContactMode[offreImmpersionDto.contactMode]
+      }
+    : undefined
 }
