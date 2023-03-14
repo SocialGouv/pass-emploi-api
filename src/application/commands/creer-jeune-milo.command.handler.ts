@@ -9,9 +9,9 @@ import {
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
 import {
-  Result,
   failure,
   isFailure,
+  Result,
   success
 } from '../../building-blocks/types/result'
 import {
@@ -25,11 +25,12 @@ import {
 } from '../../domain/conseiller/conseiller'
 import { Core } from '../../domain/core'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
-import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import {
   JeuneMilo,
   MiloJeuneRepositoryToken
 } from '../../domain/jeune/jeune.milo'
+import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { IdentiteJeuneQueryModel } from '../queries/query-models/jeunes.query-model'
 
 export interface CreerJeuneMiloCommand extends Command {
   idPartenaire: string
@@ -42,7 +43,7 @@ export interface CreerJeuneMiloCommand extends Command {
 @Injectable()
 export class CreerJeuneMiloCommandHandler extends CommandHandler<
   CreerJeuneMiloCommand,
-  Core.Id
+  IdentiteJeuneQueryModel
 > {
   constructor(
     private conseillerAuthorizer: ConseillerAuthorizer,
@@ -59,7 +60,9 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     super('CreerJeuneMiloCommandHandler')
   }
 
-  async handle(command: CreerJeuneMiloCommand): Promise<Result<Core.Id>> {
+  async handle(
+    command: CreerJeuneMiloCommand
+  ): Promise<Result<IdentiteJeuneQueryModel>> {
     const conseiller = await this.conseillerRepository.get(command.idConseiller)
     if (!conseiller) {
       return failure(new NonTrouveError('Conseiller', command.idConseiller))
@@ -115,7 +118,11 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
       conseiller.id
     )
 
-    return success({ id: nouveauJeune.id })
+    return success({
+      id: nouveauJeune.id,
+      prenom: nouveauJeune.firstName,
+      nom: nouveauJeune.lastName
+    })
   }
 
   async authorize(
