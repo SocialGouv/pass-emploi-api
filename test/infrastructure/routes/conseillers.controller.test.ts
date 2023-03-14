@@ -863,7 +863,7 @@ describe('ConseillersController', () => {
 
         creerJeuneMiloCommandHandler.execute
           .withArgs(command, unUtilisateurDecode())
-          .resolves(success({ id: 'idJeune' }))
+          .resolves(success({ id: 'idJeune', prenom: 'prenom', nom: 'nom' }))
 
         // When - Then
         await request(app.getHttpServer())
@@ -871,7 +871,7 @@ describe('ConseillersController', () => {
           .send(payload)
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.CREATED)
-          .expect({ id: 'idJeune' })
+          .expect({ id: 'idJeune', prenom: 'prenom', nom: 'nom' })
       })
     })
 
