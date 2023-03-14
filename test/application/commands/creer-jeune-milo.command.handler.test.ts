@@ -24,13 +24,13 @@ import { Chat } from '../../../src/domain/chat'
 import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { Core } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune/jeune'
+import { JeuneMilo } from '../../../src/domain/jeune/jeune.milo'
 import { DateService } from '../../../src/utils/date-service'
 import { IdService } from '../../../src/utils/id-service'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { StubbedClass, createSandbox, expect, stubClass } from '../../utils'
-import { JeuneMilo } from '../../../src/domain/jeune/jeune.milo'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('CreerJeuneMiloCommandHandler', () => {
   let creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler
@@ -131,7 +131,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
         const result = await creerJeuneMiloCommandHandler.handle(command)
 
         // Then
-        const expextedJeune: Jeune = {
+        const expectedJeune: Jeune = {
           id: 'DFKAL',
           firstName: 'prenom',
           lastName: 'nom',
@@ -152,7 +152,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
           }
         }
         expect(jeuneRepository.save).to.have.been.calledWithExactly(
-          expextedJeune
+          expectedJeune
         )
         expect(
           authentificationRepository.updateJeune
@@ -163,7 +163,9 @@ describe('CreerJeuneMiloCommandHandler', () => {
         expect(
           chatRepository.initializeChatIfNotExists
         ).to.have.been.calledWith(idNouveauJeune, conseiller.id)
-        expect(result).to.deep.equal(success({ id: idNouveauJeune }))
+        expect(result).to.deep.equal(
+          success({ id: 'DFKAL', prenom: 'prenom', nom: 'nom' })
+        )
       })
 
       it("minusculise l'email", async () => {

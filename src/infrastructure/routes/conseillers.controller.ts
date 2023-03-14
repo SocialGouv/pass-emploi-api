@@ -440,7 +440,7 @@ export class ConseillersController {
   async postJeuneMilo(
     @Body() creerJeuneMiloPayload: CreerJeuneMiloPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<Core.Id> {
+  ): Promise<IdentiteJeuneQueryModel> {
     const command: CreerJeuneMiloCommand = {
       idConseiller: creerJeuneMiloPayload.idConseiller,
       email: creerJeuneMiloPayload.email,
