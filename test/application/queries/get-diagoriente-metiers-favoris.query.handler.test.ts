@@ -140,7 +140,7 @@ describe('GetDiagorienteMetiersFavorisQueryHandler', () => {
               metiersFavoris: [
                 {
                   rome: 'string',
-                  titre: 'string'
+                  libelle: 'string'
                 }
               ]
             })

@@ -17,7 +17,7 @@ import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 
 class MetiersFavorisQueryModel {
   @ApiProperty()
-  titre: string
+  libelle: string
   @ApiProperty()
   rome: string
 }
@@ -81,7 +81,7 @@ export class GetDiagorienteMetiersFavorisQueryHandler extends QueryHandler<
 
     const metiersFavoris = result.data.data.userByPartner.favorites
       .filter(favori => favori.favorited)
-      .map(favori => ({ rome: favori.tag.code, titre: favori.tag.title }))
+      .map(favori => ({ rome: favori.tag.code, libelle: favori.tag.title }))
 
     return success({
       aDesMetiersFavoris: Boolean(metiersFavoris.length),
