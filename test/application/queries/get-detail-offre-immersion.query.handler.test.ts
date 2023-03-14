@@ -69,13 +69,7 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
             secteurActivite: 'naf',
             ville: 'Paris',
             contact: {
-              email: undefined,
-              id: '1',
-              modeDeContact: 'PRESENTIEL',
-              nom: 'Nils',
-              prenom: 'Tavernier',
-              role: 'manager',
-              telephone: undefined
+              modeDeContact: 'PRESENTIEL'
             }
           })
         )

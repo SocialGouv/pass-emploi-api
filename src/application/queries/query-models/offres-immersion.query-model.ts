@@ -2,19 +2,33 @@ import { ApiProperty } from '@nestjs/swagger'
 import { Offre } from '../../../domain/offre/offre'
 
 export class ContactImmersionQueryModel {
-  @ApiProperty()
-  id: string
-  @ApiProperty()
-  nom: string
-  @ApiProperty()
-  prenom: string
-  @ApiProperty()
-  role: string
-  @ApiProperty()
+  @ApiProperty({
+    required: false
+  })
+  id?: string
+  @ApiProperty({
+    required: false
+  })
+  nom?: string
+  @ApiProperty({
+    required: false
+  })
+  prenom?: string
+  @ApiProperty({
+    required: false
+  })
+  role?: string
+  @ApiProperty({
+    required: false
+  })
   email?: string
-  @ApiProperty()
+  @ApiProperty({
+    required: false
+  })
   telephone?: string
-  @ApiProperty()
+  @ApiProperty({
+    required: false
+  })
   modeDeContact?: Offre.Immersion.MethodeDeContact
 }
 
