@@ -13,9 +13,9 @@ import {
 } from '../../domain/chat'
 import { Jeune } from '../../domain/jeune/jeune'
 import { ChatCryptoService } from '../../utils/chat-crypto-service'
+import { DateService } from '../../utils/date-service'
 import { buildError } from '../../utils/logger.module'
 import { getAPMInstance } from '../monitoring/apm.init'
-import { DateService } from '../../utils/date-service'
 import {
   FirebaseChat,
   FirebaseGroupeMessage,
@@ -344,6 +344,12 @@ export class FirebaseClient implements IFirebaseClient {
 
     if (!chatsASupprimer.empty) {
       for (const chat of chatsASupprimer.docs) {
+        const messages = await chat.ref
+          .collection(FIREBASE_MESSAGES_PATH)
+          .listDocuments()
+        for (const message of messages) {
+          message.delete()
+        }
         await collection.doc(chat.id).delete()
       }
     }
