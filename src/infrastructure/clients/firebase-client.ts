@@ -262,7 +262,7 @@ export class FirebaseClient implements IFirebaseClient {
       await this.firestore.runTransaction(async t => {
         const conversations = this.firestore.collection(FIREBASE_CHAT_PATH)
 
-        const jeunesIdsPar10: string[][] = chunk(idsJeunes)
+        const jeunesIdsPar10: string[][] = chunkify(idsJeunes)
 
         for (const ids of jeunesIdsPar10) {
           const conversationsCibles = await conversations
@@ -347,9 +347,11 @@ export class FirebaseClient implements IFirebaseClient {
         const messages = await chat.ref
           .collection(FIREBASE_MESSAGES_PATH)
           .listDocuments()
-        for (const message of messages) {
-          message.delete()
+        const batches = chunkify(messages)
+        for (const batch of batches) {
+          await Promise.all(batch.map(message => message.delete()))
         }
+
         await collection.doc(chat.id).delete()
       }
     }
@@ -366,9 +368,11 @@ export class FirebaseClient implements IFirebaseClient {
         const messages = await liste.ref
           .collection(FIREBASE_MESSAGES_PATH)
           .listDocuments()
-        for (const message of messages) {
-          message.delete()
+        const batches = chunkify(messages)
+        for (const batch of batches) {
+          await Promise.all(batch.map(message => message.delete()))
         }
+
         await collection.doc(liste.id).delete()
       }
     }
@@ -411,9 +415,9 @@ export class FirebaseClient implements IFirebaseClient {
   }
 }
 
-function chunk(tableau: string[]): string[][] {
+function chunkify<T>(tableau: T[]): T[][] {
   const chunkSize = 10
-  const resultat: string[][] = []
+  const resultat: T[][] = []
 
   for (let i = 0, len = tableau.length; i < len; i += chunkSize) {
     resultat.push(tableau.slice(i, i + chunkSize))
