@@ -363,6 +363,12 @@ export class FirebaseClient implements IFirebaseClient {
 
     if (!listeASupprimer.empty) {
       for (const liste of listeASupprimer.docs) {
+        const messages = await liste.ref
+          .collection(FIREBASE_MESSAGES_PATH)
+          .listDocuments()
+        for (const message of messages) {
+          message.delete()
+        }
         await collection.doc(liste.id).delete()
       }
     }
