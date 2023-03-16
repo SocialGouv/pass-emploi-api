@@ -344,15 +344,7 @@ export class FirebaseClient implements IFirebaseClient {
 
     if (!chatsASupprimer.empty) {
       for (const chat of chatsASupprimer.docs) {
-        const messages = await chat.ref
-          .collection(FIREBASE_MESSAGES_PATH)
-          .listDocuments()
-        const batches = chunkify(messages)
-        for (const batch of batches) {
-          await Promise.all(batch.map(message => message.delete()))
-        }
-
-        await collection.doc(chat.id).delete()
+        await this.firestore.recursiveDelete(chat.ref)
       }
     }
   }
@@ -365,15 +357,7 @@ export class FirebaseClient implements IFirebaseClient {
 
     if (!listeASupprimer.empty) {
       for (const liste of listeASupprimer.docs) {
-        const messages = await liste.ref
-          .collection(FIREBASE_MESSAGES_PATH)
-          .listDocuments()
-        const batches = chunkify(messages)
-        for (const batch of batches) {
-          await Promise.all(batch.map(message => message.delete()))
-        }
-
-        await collection.doc(liste.id).delete()
+        await this.firestore.recursiveDelete(liste.ref)
       }
     }
   }
