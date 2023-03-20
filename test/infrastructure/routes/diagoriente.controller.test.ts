@@ -94,7 +94,7 @@ describe('DiagorienteController', () => {
         getDiagorienteMetiersFavorisQueryHandler.execute.resolves(
           success({
             aDesMetiersFavoris: true,
-            metiersFavoris: [{ libelle: 'libelle', rome: 'rome' }]
+            metiersFavoris: [{ libelle: 'libelle', code: 'code' }]
           })
         )
 
@@ -106,7 +106,7 @@ describe('DiagorienteController', () => {
           .expect(HttpStatus.OK)
           .expect({
             aDesMetiersFavoris: true,
-            metiersFavoris: [{ libelle: 'libelle', rome: 'rome' }]
+            metiersFavoris: [{ libelle: 'libelle', code: 'code' }]
           })
         expect(
           getDiagorienteMetiersFavorisQueryHandler.execute

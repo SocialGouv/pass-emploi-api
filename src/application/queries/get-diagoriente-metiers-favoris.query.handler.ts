@@ -19,7 +19,7 @@ class MetiersFavorisQueryModel {
   @ApiProperty()
   libelle: string
   @ApiProperty()
-  rome: string
+  code: string
 }
 export class DiagorienteMetiersFavorisQueryModel {
   @ApiProperty()
@@ -81,7 +81,7 @@ export class GetDiagorienteMetiersFavorisQueryHandler extends QueryHandler<
 
     const metiersFavoris = result.data.data.userByPartner.favorites
       .filter(favori => favori.favorited)
-      .map(favori => ({ rome: favori.tag.code, libelle: favori.tag.title }))
+      .map(favori => ({ code: favori.tag.code, libelle: favori.tag.title }))
 
     return success({
       aDesMetiersFavoris: Boolean(metiersFavoris.length),
