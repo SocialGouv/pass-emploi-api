@@ -139,7 +139,7 @@ describe('GetDiagorienteMetiersFavorisQueryHandler', () => {
               aDesMetiersFavoris: true,
               metiersFavoris: [
                 {
-                  rome: 'string',
+                  code: 'string',
                   libelle: 'string'
                 }
               ]
