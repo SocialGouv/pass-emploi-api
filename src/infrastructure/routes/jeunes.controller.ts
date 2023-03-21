@@ -37,6 +37,7 @@ import {
   JeuneHomeDemarcheQueryModel
 } from '../../application/queries/query-models/home-jeune.query-model'
 import {
+  AccueilJeuneQueryModel,
   DetailJeuneQueryModel,
   HistoriqueConseillerJeuneQueryModel,
   PreferencesJeuneQueryModel
@@ -103,6 +104,7 @@ import {
 } from '../../application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
 import { GetUnRendezVousJeuneQueryHandler } from '../../application/queries/rendez-vous/get-un-rendez-vous-jeune.query.handler.db'
 import { IdQueryModel } from '../../application/queries/query-models/common.query-models'
+import { unRendezVousJeuneDetailQueryModel } from 'test/fixtures/query-models/rendez-vous.query-model.fixtures'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -151,6 +153,35 @@ export class JeunesController {
       return result.data
     }
     throw handleFailure(result)
+  }
+
+  @Get(':idJeune/accueil')
+  @ApiOperation({
+    description:
+      "Permet de récupérer les éléments de la page d'accueil d'un jeune"
+  })
+  @ApiResponse({
+    type: AccueilJeuneQueryModel
+  })
+  async getAccueil(
+    @Param('idJeune') _idJeune: string,
+    @Query() _queryParams: MaintenantQueryParams,
+    @Utilisateur() _utilisateur: Authentification.Utilisateur
+  ): Promise<AccueilJeuneQueryModel> {
+    const result = {
+      dateDerniereMiseAJour: '2011-10-05T14:48:00.000Z',
+      cetteSemaine: {
+        nombreRendezVous: 0,
+        nombreActionsDemarchesEnRetard: 0,
+        nombreActionsDemarchesARealiser: 0
+      },
+      prochainRendezVous: unRendezVousJeuneDetailQueryModel(),
+      evenementsAVenir: [],
+      mesAlertes: [],
+      mesFavoris: []
+    }
+
+    return result
   }
 
   @Get(':idJeune/conseillers')
