@@ -37,6 +37,7 @@ import {
   JeuneHomeDemarcheQueryModel
 } from '../../application/queries/query-models/home-jeune.query-model'
 import {
+  AccueilJeuneQueryModel,
   DetailJeuneQueryModel,
   HistoriqueConseillerJeuneQueryModel,
   PreferencesJeuneQueryModel
@@ -103,6 +104,7 @@ import {
 } from '../../application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
 import { GetUnRendezVousJeuneQueryHandler } from '../../application/queries/rendez-vous/get-un-rendez-vous-jeune.query.handler.db'
 import { IdQueryModel } from '../../application/queries/query-models/common.query-models'
+
 import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/accueil/get-accueil-jeune-milo-query-handler'
 
 @Controller('jeunes')
