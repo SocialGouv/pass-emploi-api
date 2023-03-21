@@ -3,6 +3,13 @@ import { JeuneMilo } from '../../../domain/jeune/jeune.milo'
 import { ArchiveJeune } from '../../../domain/archive-jeune'
 import { Jeune } from '../../../domain/jeune/jeune'
 
+import {
+  RendezVousJeuneDetailQueryModel,
+  RendezVousJeuneQueryModel
+} from './rendez-vous.query-model'
+import { RechercheQueryModel } from './recherches.query-model'
+import { FavorisQueryModel } from './favoris.query-model'
+
 class SituationQueryModel {
   @ApiProperty()
   etat: string
@@ -151,6 +158,41 @@ export class DetailJeuneQueryModel {
 
   @ApiProperty({ required: false })
   dateFinCEJ?: string
+}
+
+class ResumeSemaineJeune {
+  @ApiProperty()
+  nombreRendezVous: number
+
+  @ApiProperty()
+  nombreActionsDemarchesEnRetard: number
+
+  @ApiProperty()
+  nombreActionsDemarchesARealiser: number
+}
+
+export class AccueilJeuneQueryModel {
+  @ApiProperty({
+    description: 'Uniquement pour PE'
+  })
+  dateDerniereMiseAJour: string | null
+
+  @ApiProperty()
+  cetteSemaine: ResumeSemaineJeune
+
+  @ApiProperty()
+  prochainRendezVous: RendezVousJeuneQueryModel
+
+  @ApiProperty({
+    description: 'AC et sessions uniques à Milo'
+  })
+  evenementsAVenir: RendezVousJeuneDetailQueryModel[] | null
+
+  @ApiProperty()
+  mesAlertes: RechercheQueryModel[]
+
+  @ApiPropertyOptional()
+  mesFavoris: FavorisQueryModel[]
 }
 
 export class DetailJeuneConseillerQueryModel {
