@@ -104,10 +104,8 @@ import {
 } from '../../application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
 import { GetUnRendezVousJeuneQueryHandler } from '../../application/queries/rendez-vous/get-un-rendez-vous-jeune.query.handler.db'
 import { IdQueryModel } from '../../application/queries/query-models/common.query-models'
-import {
-  CodeTypeRendezVous,
-  RendezVous
-} from 'src/domain/rendez-vous/rendez-vous'
+
+import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/get-accueil-jeune-milo-query-handler'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -134,7 +132,8 @@ export class JeunesController {
     private readonly updateJeunePreferencesCommandHandler: UpdateJeunePreferencesCommandHandler,
     private readonly getPreferencesJeuneQueryHandler: GetPreferencesJeuneQueryHandler,
     private readonly getAnimationsCollectivesJeuneQueryHandler: GetAnimationsCollectivesJeuneQueryHandler,
-    private readonly getUnRendezVousJeuneQueryHandler: GetUnRendezVousJeuneQueryHandler
+    private readonly getUnRendezVousJeuneQueryHandler: GetUnRendezVousJeuneQueryHandler,
+    private readonly getAccueilJeuneMiloQueryHandler: GetAccueilJeuneMiloQueryHandler
   ) {}
 
   @Get(':idJeune')
@@ -158,62 +157,28 @@ export class JeunesController {
     throw handleFailure(result)
   }
 
-  @Get(':idJeune/accueil')
+  @Get(':idJeune/milo/accueil')
   @ApiOperation({
     description:
-      "Permet de récupérer les éléments de la page d'accueil d'un jeune"
+      "Permet de récupérer les éléments de la page d'accueil d'un jeune MILO"
   })
   @ApiResponse({
     type: AccueilJeuneQueryModel
   })
-  async getAccueil(
-    @Param('idJeune') _idJeune: string,
-    @Query() _queryParams: MaintenantQueryParams,
-    @Utilisateur() _utilisateur: Authentification.Utilisateur
+  async getAccueilMilo(
+    @Param('idJeune') idJeune: string,
+    @Query() queryParams: MaintenantQueryParams,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<AccueilJeuneQueryModel> {
-    const result = {
-      dateDerniereMiseAJour: '2011-10-05T14:48:00.000Z',
-      cetteSemaine: {
-        nombreRendezVous: 0,
-        nombreActionsDemarchesEnRetard: 0,
-        nombreActionsDemarchesARealiser: 0
-      },
-      prochainRendezVous: {
-        adresse: undefined,
-        comment: 'commentaire',
-        conseiller: {
-          id: '1',
-          nom: 'Tavernier',
-          prenom: 'Nils'
-        },
-        createur: {
-          id: '1',
-          nom: 'Tavernier',
-          prenom: 'Nils'
-        },
-        date: new Date('2022-08-16T12:00:00.000Z'),
-        duration: 30,
-        id: 'db5c33e3-9fa2-4853-86b3-6cbe9c3cddc9',
-        invitation: false,
-        isLocaleDate: false,
-        modality: 'modalite',
-        organisme: undefined,
-        precision: undefined,
-        presenceConseiller: true,
-        title: 'rdv',
-        type: {
-          code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
-          label: 'Entretien individuel conseiller'
-        },
-        source: RendezVous.Source.PASS_EMPLOI,
-        futPresent: undefined
-      },
-      evenementsAVenir: [],
-      mesAlertes: [],
-      mesFavoris: []
-    }
+    const result = await this.getAccueilJeuneMiloQueryHandler.execute(
+      { idJeune, maintenant: queryParams.maintenant },
+      utilisateur
+    )
 
-    return result
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
   }
 
   @Get(':idJeune/conseillers')

@@ -312,6 +312,8 @@ import { GetDiagorienteUrlsQueryHandler } from './application/queries/get-diagor
 import { ArchiverJeuneSupportCommandHandler } from './application/commands/support/archiver-jeune-support.command.handler'
 import { GetDiagorienteMetiersFavorisQueryHandler } from './application/queries/get-diagoriente-metiers-favoris.query.handler'
 import { EnvoyerFormulaireContactImmersionCommandHandler } from './application/commands/immersion/envoyer-formulaire-contact-immersion.command.handler'
+import { GetAccueilJeuneMiloQueryHandler } from './application/queries/get-accueil-jeune-milo-query-handler'
+import { GetAccueilJeunePoleEmploiQueryHandler } from './application/queries/get-accueil-jeune-pole-emploi-query-handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -678,6 +680,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetAnimationsCollectivesQueryHandler,
     GetAnimationsCollectivesV2QueryHandler,
     GetJeunesByEtablissementQueryHandler,
+    GetAccueilJeuneMiloQueryHandler,
+    GetAccueilJeunePoleEmploiQueryHandler,
     CloturerAnimationCollectiveCommandHandler,
     GetAnimationsCollectivesJeuneQueryHandler,
     GetUnRendezVousJeuneQueryHandler,

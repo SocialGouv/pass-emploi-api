@@ -175,18 +175,18 @@ export class AccueilJeuneQueryModel {
   @ApiProperty({
     description: 'Uniquement pour PE'
   })
-  dateDerniereMiseAJour: string | null
+  dateDerniereMiseAJour: string | undefined
 
   @ApiProperty()
   cetteSemaine: ResumeSemaineJeune
 
   @ApiProperty()
-  prochainRendezVous: RendezVousJeuneQueryModel
+  prochainRendezVous: RendezVousJeuneQueryModel | undefined
 
   @ApiProperty({
     description: 'AC et sessions uniques à Milo'
   })
-  evenementsAVenir: RendezVousJeuneDetailQueryModel[] | null
+  evenementsAVenir: RendezVousJeuneDetailQueryModel[] | undefined
 
   @ApiProperty()
   mesAlertes: RechercheQueryModel[]

@@ -33,6 +33,7 @@ import { GetPreferencesJeuneQueryHandler } from '../../../src/application/querie
 import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../src/application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { GetRendezVousJeuneQueryHandler } from '../../../src/application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
 import {
+  AccueilJeuneQueryModel,
   DetailJeuneQueryModel,
   PreferencesJeuneQueryModel
 } from '../../../src/application/queries/query-models/jeunes.query-model'
@@ -57,7 +58,8 @@ import {
   unHeaderAuthorization,
   unJwtPayloadValide,
   unJwtPayloadValideJeunePE,
-  unUtilisateurDecode
+  unUtilisateurDecode,
+  unUtilisateurDecodePoleEmploi
 } from '../../fixtures/authentification.fixture'
 import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import { enleverLesUndefined, expect, StubbedClass } from '../../utils'
@@ -79,6 +81,7 @@ import { DateService } from '../../../src/utils/date-service'
 import { Cached } from '../../../src/building-blocks/types/query'
 import { JeuneHomeDemarcheQueryModel } from '../../../src/application/queries/query-models/home-jeune.query-model'
 import { Authentification } from '../../../src/domain/authentification'
+import { GetAccueilJeuneMiloQueryHandler } from '../../../src/application/queries/get-accueil-jeune-milo-query-handler'
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
@@ -101,6 +104,7 @@ describe('JeunesController', () => {
   let getPreferencesJeuneQueryHandler: StubbedClass<GetPreferencesJeuneQueryHandler>
   let getAnimationsCollectivesJeuneQueryHandler: StubbedClass<GetAnimationsCollectivesJeuneQueryHandler>
   let getUnRendezVousJeuneQueryHandler: StubbedClass<GetUnRendezVousJeuneQueryHandler>
+  let getAccueilJeuneMiloQueryHandler: StubbedClass<GetAccueilJeuneMiloQueryHandler>
   let jwtService: StubbedClass<JwtService>
   let dateService: StubbedClass<DateService>
   let app: INestApplication
@@ -145,6 +149,8 @@ describe('JeunesController', () => {
       GetAnimationsCollectivesJeuneQueryHandler
     )
     getUnRendezVousJeuneQueryHandler = app.get(GetUnRendezVousJeuneQueryHandler)
+    getAccueilJeuneMiloQueryHandler = app.get(GetAccueilJeuneMiloQueryHandler)
+
     jwtService = app.get(JwtService)
     dateService = app.get(DateService)
     dateService.now.returns(now)
@@ -418,6 +424,61 @@ describe('JeunesController', () => {
     })
 
     ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/ABCDE/action')
+  })
+
+  describe.only('GET /jeunes/:idJeune/milo/accueil', () => {
+    const idJeune = '1'
+    const maintenant = '2023-03-03'
+    const accueilJeuneQueryModel: AccueilJeuneQueryModel = {
+      dateDerniereMiseAJour: undefined,
+      cetteSemaine: {
+        nombreRendezVous: 1,
+        nombreActionsDemarchesEnRetard: 1,
+        nombreActionsDemarchesARealiser: 1
+      },
+      prochainRendezVous: undefined,
+      evenementsAVenir: [],
+      mesAlertes: [],
+      mesFavoris: []
+    }
+    it("renvoie l'accueil d'un jeune MILO sans personnalisation", async () => {
+      getAccueilJeuneMiloQueryHandler.execute
+        .withArgs(
+          {
+            idJeune,
+            maintenant
+          },
+          unUtilisateurDecode()
+        )
+        .resolves(success(accueilJeuneQueryModel))
+      const {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        dateDerniereMiseAJour,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        prochainRendezVous,
+        ...accueilJeuneQueryModelResume
+      } = accueilJeuneQueryModel
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/milo/accueil?maintenant=2023-03-03`)
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+        .expect({ ...accueilJeuneQueryModelResume })
+    })
+    it('renvoie une erreur quand le jeune est un jeune PE', async () => {
+      getAccueilJeuneMiloQueryHandler.execute
+        .withArgs(
+          {
+            idJeune,
+            maintenant
+          },
+          unUtilisateurDecode()
+        )
+        .resolves(failure(new DroitsInsuffisants()))
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/milo/accueil?maintenant=2023-03-03`)
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.FORBIDDEN)
+    })
   })
 
   describe('GET /jeunes/:idJeune', () => {
