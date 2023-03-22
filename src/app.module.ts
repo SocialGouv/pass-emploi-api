@@ -165,6 +165,7 @@ import { EvenementsController } from './infrastructure/routes/evenements.control
 import { FavorisController } from './infrastructure/routes/favoris.controller'
 import { HealthController } from './infrastructure/routes/health.controller'
 import { JeunesController } from './infrastructure/routes/jeunes.controller'
+import { JeunesMiloController } from './infrastructure/routes/jeunes.milo.controller'
 import { JeunesControllerV2 } from './infrastructure/routes/v2/jeunes.controller.v2'
 import { ConseillersControllerV2 } from './infrastructure/routes/v2/conseillers.controller.v2'
 import { OffresEmploiController } from './infrastructure/routes/offres-emploi.controller'
@@ -312,6 +313,8 @@ import { GetDiagorienteUrlsQueryHandler } from './application/queries/get-diagor
 import { ArchiverJeuneSupportCommandHandler } from './application/commands/support/archiver-jeune-support.command.handler'
 import { GetDiagorienteMetiersFavorisQueryHandler } from './application/queries/get-diagoriente-metiers-favoris.query.handler'
 import { EnvoyerFormulaireContactImmersionCommandHandler } from './application/commands/immersion/envoyer-formulaire-contact-immersion.command.handler'
+import { GetAccueilJeuneMiloQueryHandler } from './application/queries/accueil/get-accueil-jeune-milo-query-handler'
+import { GetAccueilJeunePoleEmploiQueryHandler } from './application/queries/accueil/get-accueil-jeune-pole-emploi-query-handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -330,6 +333,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     // De base
     ActionsController,
     JeunesController,
+    JeunesMiloController,
     JeunesControllerV2,
     ConseillersController,
     ConseillersControllerV2,
@@ -678,6 +682,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetAnimationsCollectivesQueryHandler,
     GetAnimationsCollectivesV2QueryHandler,
     GetJeunesByEtablissementQueryHandler,
+    GetAccueilJeuneMiloQueryHandler,
+    GetAccueilJeunePoleEmploiQueryHandler,
     CloturerAnimationCollectiveCommandHandler,
     GetAnimationsCollectivesJeuneQueryHandler,
     GetUnRendezVousJeuneQueryHandler,
