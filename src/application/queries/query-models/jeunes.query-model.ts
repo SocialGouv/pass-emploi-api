@@ -171,22 +171,46 @@ class ResumeSemaineJeune {
   nombreActionsDemarchesARealiser: number
 }
 
-export class AccueilJeuneQueryModel {
+export class AccueilJeuneMiloQueryModel {
   @ApiProperty({
-    description: 'Uniquement pour PE'
+    required: false
   })
-  dateDerniereMiseAJour: string | null
+  dateDerniereMiseAJour: string | undefined
 
   @ApiProperty()
   cetteSemaine: ResumeSemaineJeune
 
   @ApiProperty()
-  prochainRendezVous: RendezVousJeuneQueryModel
+  prochainRendezVous: RendezVousJeuneQueryModel | undefined
 
   @ApiProperty({
-    description: 'AC et sessions uniques à Milo'
+    required: false
   })
-  evenementsAVenir: RendezVousJeuneDetailQueryModel[] | null
+  evenementsAVenir: RendezVousJeuneDetailQueryModel[] | undefined
+
+  @ApiProperty()
+  mesAlertes: RechercheQueryModel[]
+
+  @ApiPropertyOptional()
+  mesFavoris: FavorisQueryModel[]
+}
+
+export class AccueilJeunePoleEmploiQueryModel {
+  @ApiProperty({
+    required: false
+  })
+  dateDerniereMiseAJour: string | undefined
+
+  @ApiProperty()
+  cetteSemaine: ResumeSemaineJeune
+
+  @ApiProperty()
+  prochainRendezVous: RendezVousJeuneQueryModel | undefined
+
+  @ApiProperty({
+    required: false
+  })
+  evenementsAVenir: RendezVousJeuneDetailQueryModel[] | undefined
 
   @ApiProperty()
   mesAlertes: RechercheQueryModel[]
