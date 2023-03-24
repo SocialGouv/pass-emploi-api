@@ -119,11 +119,11 @@ export const listeCronJobs: Planificateur.CronJob[] = [
     dateDebutExecution: new Date('2022-10-01'),
     description: 'Tous les jours à 2h.'
   },
-  // {
-  //   type: Planificateur.JobType.NETTOYER_LES_JOBS,
-  //   expression: '0 4 * * *',
-  //   description: 'Tous les jours à 4h. Supprime les jobs passés.'
-  // },
+  {
+    type: Planificateur.JobType.NETTOYER_LES_JOBS,
+    expression: '0 4 * * *',
+    description: 'Tous les jours à 4h. Supprime les jobs passés.'
+  },
   {
     type: Planificateur.JobType.NETTOYER_LES_DONNEES,
     expression: '0 5 * * *',
