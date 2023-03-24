@@ -104,7 +104,10 @@ import {
 } from '../../application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
 import { GetUnRendezVousJeuneQueryHandler } from '../../application/queries/rendez-vous/get-un-rendez-vous-jeune.query.handler.db'
 import { IdQueryModel } from '../../application/queries/query-models/common.query-models'
-import { unRendezVousJeuneDetailQueryModel } from 'test/fixtures/query-models/rendez-vous.query-model.fixtures'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from 'src/domain/rendez-vous/rendez-vous'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -175,7 +178,36 @@ export class JeunesController {
         nombreActionsDemarchesEnRetard: 0,
         nombreActionsDemarchesARealiser: 0
       },
-      prochainRendezVous: unRendezVousJeuneDetailQueryModel(),
+      prochainRendezVous: {
+        adresse: undefined,
+        comment: 'commentaire',
+        conseiller: {
+          id: '1',
+          nom: 'Tavernier',
+          prenom: 'Nils'
+        },
+        createur: {
+          id: '1',
+          nom: 'Tavernier',
+          prenom: 'Nils'
+        },
+        date: new Date('2022-08-16T12:00:00.000Z'),
+        duration: 30,
+        id: 'db5c33e3-9fa2-4853-86b3-6cbe9c3cddc9',
+        invitation: false,
+        isLocaleDate: false,
+        modality: 'modalite',
+        organisme: undefined,
+        precision: undefined,
+        presenceConseiller: true,
+        title: 'rdv',
+        type: {
+          code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+          label: 'Entretien individuel conseiller'
+        },
+        source: RendezVous.Source.PASS_EMPLOI,
+        futPresent: undefined
+      },
       evenementsAVenir: [],
       mesAlertes: [],
       mesFavoris: []
