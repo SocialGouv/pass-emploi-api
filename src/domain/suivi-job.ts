@@ -24,9 +24,6 @@ export interface RapportJob24h {
 
 export interface NettoyageJobsStats {
   nbJobsNettoyes: number
-  listeJobsNettoyes: Array<{ id: string; type: string }>
-  nbErreurs: number
-  listeErreurs: Array<{ id: string; type: string }>
   tempsDExecution?: number
 }
 

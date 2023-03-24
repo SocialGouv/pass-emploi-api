@@ -1,11 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import Bull, * as QueueBull from 'bull'
-import { DateTime } from 'luxon'
+import { DateTime, Duration } from 'luxon'
 import { Planificateur } from '../../domain/planificateur'
 import { NettoyageJobsStats } from '../../domain/suivi-job'
 import { DateService } from '../../utils/date-service'
-import { buildError } from '../../utils/logger.module'
 
 const CRON_TIMEZONE = 'Europe/Paris'
 
@@ -117,37 +116,11 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
 
   async supprimerLesJobsPasses(): Promise<NettoyageJobsStats> {
     const stats: NettoyageJobsStats = {
-      listeJobsNettoyes: [],
-      nbJobsNettoyes: 0,
-      listeErreurs: [],
-      nbErreurs: 0
+      nbJobsNettoyes: 0
     }
-    const ilYA7Jours = this.dateService.now().minus({ day: 7 }).toMillis()
-    const jobs = await this.queue.getCompleted()
-    for (const job of jobs) {
-      if (job.timestamp < ilYA7Jours) {
-        try {
-          await this.queue.removeJobs(job.id.toString())
-          stats.listeJobsNettoyes.push({
-            id: job.id.toString(),
-            type: job.data.type
-          })
-          stats.nbJobsNettoyes++
-        } catch (e) {
-          this.logger.error(
-            buildError(
-              `Erreur lors de la suppression du job de type ${job.data.type} et d'id ${job.id}`,
-              e
-            )
-          )
-          stats.listeErreurs.push({
-            id: job.id.toString(),
-            type: job.data.type
-          })
-          stats.nbErreurs++
-        }
-      }
-    }
+    const ilYA7Jours = Duration.fromObject({ day: 7 }).toMillis()
+    const jobs = await this.queue.clean(ilYA7Jours, 'completed')
+    stats.nbJobsNettoyes = jobs.length
     return stats
   }
 
