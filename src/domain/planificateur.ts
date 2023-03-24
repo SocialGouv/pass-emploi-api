@@ -98,11 +98,11 @@ export namespace Planificateur {
 }
 
 export const listeCronJobs: Planificateur.CronJob[] = [
-  {
-    type: Planificateur.JobType.SUIVRE_FILE_EVENEMENTS_MILO,
-    expression: '*/15 * * * *',
-    description: 'Toutes les 15 minutes.'
-  },
+  // {
+  //   type: Planificateur.JobType.SUIVRE_FILE_EVENEMENTS_MILO,
+  //   expression: '*/15 * * * *',
+  //   description: 'Toutes les 15 minutes.'
+  // },
   {
     type: Planificateur.JobType.RECUPERER_SITUATIONS_JEUNES_MILO,
     expression: '0 0 * * *',
@@ -119,11 +119,11 @@ export const listeCronJobs: Planificateur.CronJob[] = [
     dateDebutExecution: new Date('2022-10-01'),
     description: 'Tous les jours à 2h.'
   },
-  {
-    type: Planificateur.JobType.NETTOYER_LES_JOBS,
-    expression: '0 4 * * *',
-    description: 'Tous les jours à 4h. Supprime les jobs passés.'
-  },
+  // {
+  //   type: Planificateur.JobType.NETTOYER_LES_JOBS,
+  //   expression: '0 4 * * *',
+  //   description: 'Tous les jours à 4h. Supprime les jobs passés.'
+  // },
   {
     type: Planificateur.JobType.NETTOYER_LES_DONNEES,
     expression: '0 5 * * *',
