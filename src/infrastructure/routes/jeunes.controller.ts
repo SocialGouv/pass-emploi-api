@@ -37,7 +37,6 @@ import {
   JeuneHomeDemarcheQueryModel
 } from '../../application/queries/query-models/home-jeune.query-model'
 import {
-  AccueilJeuneQueryModel,
   DetailJeuneQueryModel,
   HistoriqueConseillerJeuneQueryModel,
   PreferencesJeuneQueryModel
@@ -105,8 +104,6 @@ import {
 import { GetUnRendezVousJeuneQueryHandler } from '../../application/queries/rendez-vous/get-un-rendez-vous-jeune.query.handler.db'
 import { IdQueryModel } from '../../application/queries/query-models/common.query-models'
 
-import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/accueil/get-accueil-jeune-milo-query-handler'
-
 @Controller('jeunes')
 @ApiOAuth2([])
 @ApiTags('Jeunes')
@@ -132,8 +129,7 @@ export class JeunesController {
     private readonly updateJeunePreferencesCommandHandler: UpdateJeunePreferencesCommandHandler,
     private readonly getPreferencesJeuneQueryHandler: GetPreferencesJeuneQueryHandler,
     private readonly getAnimationsCollectivesJeuneQueryHandler: GetAnimationsCollectivesJeuneQueryHandler,
-    private readonly getUnRendezVousJeuneQueryHandler: GetUnRendezVousJeuneQueryHandler,
-    private readonly getAccueilJeuneMiloQueryHandler: GetAccueilJeuneMiloQueryHandler
+    private readonly getUnRendezVousJeuneQueryHandler: GetUnRendezVousJeuneQueryHandler
   ) {}
 
   @Get(':idJeune')
