@@ -1,6 +1,6 @@
 import { PartenaireImmersion } from '../../src/infrastructure/repositories/dto/immersion.dto'
 
-export const offreImmersionDto = (): PartenaireImmersion.Dto => ({
+export const uneOffreImmersionDto = (): PartenaireImmersion.Dto => ({
   romeLabel: 'rome',
   nafLabel: 'naf',
   id: 'id',
