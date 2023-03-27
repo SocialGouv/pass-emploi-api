@@ -63,18 +63,20 @@ export function toOffreImmersionQueryModel(
 }
 
 export function toDetailOffreImmersionQueryModel(
-  offreImmpersionDto: PartenaireImmersion.Dto
+  offreImmersionDto: PartenaireImmersion.Dto
 ): DetailOffreImmersionQueryModel {
   return {
-    id: offreImmpersionDto.id,
-    metier: offreImmpersionDto.romeLabel,
-    nomEtablissement: offreImmpersionDto.name,
-    secteurActivite: offreImmpersionDto.nafLabel,
-    ville: offreImmpersionDto.city,
-    adresse: offreImmpersionDto.address,
-    estVolontaire: offreImmpersionDto.voluntaryToImmersion,
-    localisation: buildLocalisation(offreImmpersionDto),
-    contact: buildContact(offreImmpersionDto)
+    id: offreImmersionDto.id,
+    codeRome: offreImmersionDto.rome,
+    siret: offreImmersionDto.siret,
+    metier: offreImmersionDto.romeLabel,
+    nomEtablissement: offreImmersionDto.name,
+    secteurActivite: offreImmersionDto.nafLabel,
+    ville: offreImmersionDto.city,
+    adresse: offreImmersionDto.address,
+    estVolontaire: offreImmersionDto.voluntaryToImmersion,
+    localisation: buildLocalisation(offreImmersionDto),
+    contact: buildContact(offreImmersionDto)
   }
 }
 

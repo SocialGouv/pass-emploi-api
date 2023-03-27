@@ -1,19 +1,19 @@
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
-import { offreImmersionDto } from '../../fixtures/offre-immersion.dto.fixture'
 import { expect } from 'chai'
-import { failure, success } from '../../../src/building-blocks/types/result'
+import { GetDetailOffreImmersionQueryHandler } from '../../../src/application/queries/get-detail-offre-immersion.query.handler'
 import {
   RechercheDetailOffreInvalide,
   RechercheDetailOffreNonTrouve
 } from '../../../src/building-blocks/types/domain-error'
-import { StubbedClass, stubClass } from '../../utils'
+import { failure, success } from '../../../src/building-blocks/types/result'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { ImmersionClient } from '../../../src/infrastructure/clients/immersion-client'
-import { GetDetailOffreImmersionQueryHandler } from 'src/application/queries/get-detail-offre-immersion.query.handler'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
-import { Evenement, EvenementService } from '../../../src/domain/evenement'
+import { uneOffreImmersionDto } from '../../fixtures/offre-immersion.dto.fixture'
+import { StubbedClass, stubClass } from '../../utils'
 
 describe('GetDetailOffreImmersionQueryHandler', () => {
   let getDetailOffreImmersionQueryHandler: GetDetailOffreImmersionQueryHandler
@@ -41,7 +41,7 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
           request: undefined,
           status: 200,
           statusText: '',
-          data: offreImmersionDto()
+          data: uneOffreImmersionDto()
         }
 
         immersionClient.get.resolves(response)
@@ -68,6 +68,8 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
             nomEtablissement: 'name',
             secteurActivite: 'naf',
             ville: 'Paris',
+            codeRome: 'D112',
+            siret: '123456',
             contact: {
               email: undefined,
               id: '1',
