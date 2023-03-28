@@ -11,6 +11,7 @@ import { expect, StubbedClass, stubClass } from '../../utils'
 import { failure, isSuccess } from '../../../src/building-blocks/types/result'
 import {
   ConseillerSansAgenceError,
+  DateNonAutoriseeError,
   JeuneNonLieALAgenceError,
   MauvaiseCommandeError
 } from '../../../src/building-blocks/types/domain-error'
@@ -66,11 +67,12 @@ describe('Rendez-vous', () => {
         describe('quand tout est bon', () => {
           it('crée un rdv', async () => {
             // Given
+            const dateAujourdhui = new Date()
             const infosRdv: InfosRendezVousACreer = {
               idsJeunes: ['1'],
               idConseiller: '41',
               commentaire: '',
-              date: uneDatetime().toJSDate().toISOString(),
+              date: dateAujourdhui.toISOString(),
               duree: 10
             }
             const conseiller = unConseiller()
@@ -87,7 +89,7 @@ describe('Rendez-vous', () => {
                 nom: 'Tavernier',
                 prenom: 'Nils'
               },
-              date: new Date('2020-04-06T12:00:00.000Z'),
+              date: dateAujourdhui,
               duree: 10,
               id: '26279b34-318a-45e4-a8ad-514a1090462c',
               source: RendezVous.Source.PASS_EMPLOI,
@@ -140,11 +142,12 @@ describe('Rendez-vous', () => {
           describe('quand tout est bon', () => {
             it('renvoie un rdv avec agence', async () => {
               // Given
+              const dateAujourdhui = new Date()
               const infosRdv: InfosRendezVousACreer = {
                 idsJeunes: ['1'],
                 idConseiller: '41',
                 commentaire: '',
-                date: uneDatetime().toJSDate().toISOString(),
+                date: dateAujourdhui.toISOString(),
                 duree: 10,
                 type: CodeTypeRendezVous.INFORMATION_COLLECTIVE
               }
@@ -174,11 +177,12 @@ describe('Rendez-vous', () => {
         describe("quand le conseiller n'a pas d'agence", () => {
           it('renvoie une failure', async () => {
             // Given
+            const dateAujourdhui = new Date()
             const infosRdv: InfosRendezVousACreer = {
               idsJeunes: ['1'],
               idConseiller: '41',
               commentaire: '',
-              date: uneDatetime().toJSDate().toISOString(),
+              date: dateAujourdhui.toISOString(),
               duree: 10,
               type: CodeTypeRendezVous.INFORMATION_COLLECTIVE
             }
@@ -246,14 +250,46 @@ describe('Rendez-vous', () => {
           )
         })
       })
-    })
-  })
+      describe('quand la date du rendez-vous n’est pas valide', () => {
+        describe('quand la date du rendez-vous est dans plus de 2 ans', () => {
+          it('rejette', () => {
+            // Given
+            const infosRdv: InfosRendezVousACreer = {
+              idsJeunes: ['1'],
+              idConseiller: '41',
+              commentaire: '',
+              date: new Date('2020-09-20 10:27:21').toISOString(),
+              duree: 10
+            }
+            const conseiller = unConseiller()
 
-  describe('Service', () => {
-    let service: RendezVous.Service
+            // When
+            const result = factory.creer(infosRdv, [unJeune()], conseiller)
 
-    beforeEach(() => {
-      service = new RendezVous.Service()
+            // Then
+            expect(result).to.deep.equal(failure(new DateNonAutoriseeError()))
+          })
+        })
+        describe('quand la date du rendez-vous était il y à plus d’1 ans', () => {
+          it('rejette', () => {
+            // Given
+            const infosRdv: InfosRendezVousACreer = {
+              idsJeunes: ['1'],
+              idConseiller: '41',
+              commentaire: '',
+              date: new Date('2026-09-20 10:27:21').toISOString(),
+              duree: 10
+            }
+            const conseiller = unConseiller()
+
+            // When
+            const result = factory.creer(infosRdv, [unJeune()], conseiller)
+
+            // Then
+            expect(result).to.deep.equal(failure(new DateNonAutoriseeError()))
+          })
+        })
+      })
     })
 
     describe('mettreAJour', () => {
@@ -267,7 +303,7 @@ describe('Rendez-vous', () => {
             })
 
             // When
-            const result = service.mettreAJour(unAtelierCloture, {
+            const result = factory.mettreAJour(unAtelierCloture, {
               ...unAtelierCloture,
               date: '2020-04-06T12:00:00.000Z'
             })
@@ -288,7 +324,7 @@ describe('Rendez-vous', () => {
             })
 
             // When
-            const result = service.mettreAJour(rendezVous, {
+            const result = factory.mettreAJour(rendezVous, {
               ...rendezVous,
               date: '2020-04-06T12:00:00.000Z',
               jeunes: [unJeuneDuRendezVous(), unJeuneDuRendezVous()]
@@ -309,7 +345,7 @@ describe('Rendez-vous', () => {
             })
 
             // When
-            const result = service.mettreAJour(unAtelier, {
+            const result = factory.mettreAJour(unAtelier, {
               ...unAtelier,
               date: '2020-04-06T12:00:00.000Z',
               jeunes: [
@@ -328,15 +364,16 @@ describe('Rendez-vous', () => {
         describe('quand tout est bon', () => {
           it('met à jour le rendez vous', () => {
             // Given
+            const dateAujourdhui = new Date()
             const rendezVous = unRendezVous({
               type: CodeTypeRendezVous.ATELIER
             })
 
             // When
-            const result = service.mettreAJour(rendezVous, {
+            const result = factory.mettreAJour(rendezVous, {
               ...rendezVous,
               titre: 'Nouveau titre',
-              date: '2020-04-06T12:00:00.000Z',
+              date: dateAujourdhui.toISOString(),
               jeunes: [unJeuneDuRendezVous()],
               modalite: 'nouveau',
               adresse: 'nouvelle',
@@ -348,7 +385,7 @@ describe('Rendez-vous', () => {
             // Then
             expect(isSuccess(result) && result.data).to.deep.equal({
               ...rendezVous,
-              date: new Date('2020-04-06T12:00:00.000Z'),
+              date: dateAujourdhui,
               jeunes: [unJeuneDuRendezVous()],
               titre: 'Nouveau titre',
               modalite: 'nouveau',
@@ -370,7 +407,7 @@ describe('Rendez-vous', () => {
             })
 
             // When
-            const result = service.mettreAJour(rendezVous, {
+            const result = factory.mettreAJour(rendezVous, {
               ...rendezVous,
               date: '2020-04-06T12:00:00.000Z',
               jeunes: []
@@ -393,7 +430,7 @@ describe('Rendez-vous', () => {
             })
 
             // When
-            const result = service.mettreAJour(rendezVous, {
+            const result = factory.mettreAJour(rendezVous, {
               ...rendezVous,
               date: '2020-04-06T12:00:00.000Z',
               presenceConseiller: false
@@ -408,6 +445,21 @@ describe('Rendez-vous', () => {
               )
             )
           })
+          it('rejette quand on veut modifier la date du rendez-vous', () => {
+            // Given
+            const rendezVous = unRendezVous({
+              date: new Date()
+            })
+
+            // When
+            const result = factory.mettreAJour(rendezVous, {
+              ...rendezVous,
+              date: '2020-04-06T12:00:00.000Z'
+            })
+
+            // Then
+            expect(result).to.deep.equal(failure(new DateNonAutoriseeError()))
+          })
         })
         describe('quand on renseigne un nombre maximum de participants', () => {
           it('rejette avec une MauvaiseCommandeError', async () => {
@@ -417,7 +469,7 @@ describe('Rendez-vous', () => {
             })
 
             // When
-            const result = service.mettreAJour(rendezVous, {
+            const result = factory.mettreAJour(rendezVous, {
               ...rendezVous,
               date: '2020-04-06T12:00:00.000Z',
               nombreMaxParticipants: 8
@@ -432,15 +484,16 @@ describe('Rendez-vous', () => {
         describe('quand tout est bon', () => {
           it('met à jour le rendez vous', () => {
             // Given
+            const dateAujourdhui = new Date()
             const rendezVous = unRendezVous({
               type: CodeTypeRendezVous.AUTRE
             })
 
             // When
-            const result = service.mettreAJour(rendezVous, {
+            const result = factory.mettreAJour(rendezVous, {
               ...rendezVous,
               titre: 'Nouveau titre',
-              date: '2020-04-06T12:00:00.000Z',
+              date: dateAujourdhui.toISOString(),
               jeunes: [unJeuneDuRendezVous()],
               modalite: 'nouveau',
               adresse: 'nouvelle',
@@ -451,7 +504,7 @@ describe('Rendez-vous', () => {
             // Then
             expect(isSuccess(result) && result.data).to.deep.equal({
               ...rendezVous,
-              date: new Date('2020-04-06T12:00:00.000Z'),
+              date: dateAujourdhui,
               jeunes: [unJeuneDuRendezVous()],
               titre: 'Nouveau titre',
               modalite: 'nouveau',

@@ -395,7 +395,6 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Demarche.Factory,
     RendezVous.Historique.Factory,
     RendezVous.Factory,
-    RendezVous.Service,
     Jeune.Factory,
     Jeune.ConfigurationApplication.Factory,
     Fichier.Factory,
