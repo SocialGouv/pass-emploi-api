@@ -78,6 +78,15 @@ export namespace RendezVousMilo {
     ): Promise<RendezVousMilo | undefined>
   }
 
+  export function timezonerDateMilo(
+    dateString: string,
+    jeune: JeuneDuRendezVous
+  ): DateTime {
+    return DateTime.fromFormat(dateString, MILO_DATE_FORMAT, {
+      zone: jeune.configuration.fuseauHoraire ?? 'Europe/Paris'
+    })
+  }
+
   @Injectable()
   export class Factory {
     constructor(private idService: IdService) {}
@@ -147,28 +156,19 @@ export namespace RendezVousMilo {
       rendezVousMilo: RendezVousMilo,
       jeune: JeuneDuRendezVous
     ): { dateTimeDebut: DateTime; duree: number } {
-      const dateTimeDebut = this.timezonerLaDate(
+      const dateTimeDebut = timezonerDateMilo(
         rendezVousMilo.dateHeureDebut,
         jeune
       )
       let duree = 0
       if (rendezVousMilo.dateHeureFin) {
-        const dateTimeFin = this.timezonerLaDate(
+        const dateTimeFin = timezonerDateMilo(
           rendezVousMilo.dateHeureFin,
           jeune
         )
         duree = dateTimeFin.diff(dateTimeDebut, 'minutes').get('minutes')
       }
       return { dateTimeDebut, duree }
-    }
-
-    private timezonerLaDate(
-      dateString: string,
-      jeune: JeuneDuRendezVous
-    ): DateTime {
-      return DateTime.fromFormat(dateString, MILO_DATE_FORMAT, {
-        zone: jeune.configuration.fuseauHoraire ?? 'Europe/Paris'
-      })
     }
   }
 }

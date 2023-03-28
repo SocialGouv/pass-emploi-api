@@ -36,6 +36,7 @@ describe('TraiterEvenementMiloJobHandler', () => {
   let planificateurService: StubbedClass<PlanificateurService>
 
   const maintenant = uneDatetime()
+
   const jeune: Jeune = unJeune()
   const idPartenaireBeneficiaire = '123456'
 
@@ -191,6 +192,29 @@ describe('TraiterEvenementMiloJobHandler', () => {
             // Given
             const rendezVousMilo: RendezVousMilo = unRendezVousMilo({
               statut: 'Annulé'
+            })
+            miloRendezVousRepository.findRendezVousByEvenement
+              .withArgs(evenement)
+              .resolves(rendezVousMilo)
+
+            // When
+            const result = await handler.handle(job)
+
+            // Then
+            expect(result.resultat).to.be.deep.equal({
+              traitement: Traitement.TRAITEMENT_CREATE_INCONNU,
+              idJeune: jeune.id,
+              idRendezVous: undefined
+            })
+            expect(rendezVousRepository.save).to.not.have.been.called()
+          })
+        })
+        describe('quand date rdv MILO non recuperable', () => {
+          it('ne fait rien', async () => {
+            // Given
+            const rendezVousMilo: RendezVousMilo = unRendezVousMilo({
+              statut: 'Absent',
+              dateHeureDebut: maintenant.minus({ year: 1, days: 1 }).toISO()
             })
             miloRendezVousRepository.findRendezVousByEvenement
               .withArgs(evenement)
@@ -415,6 +439,45 @@ describe('TraiterEvenementMiloJobHandler', () => {
                 expect(
                   notificationService.notifierLesJeunesDuRdv
                 ).not.to.have.been.called()
+              })
+            })
+            describe('quand date non recuperable', () => {
+              it('supprime le rdv CEJ et notifie', async () => {
+                const rendezVous = unRendezVous()
+                rendezVousRepository.getByIdPartenaire
+                  .withArgs(evenement.idObjet, evenement.objet)
+                  .returns(rendezVous)
+
+                const rendezVousMilo: RendezVousMilo = unRendezVousMilo({
+                  statut: 'Absent',
+                  dateHeureDebut: maintenant.minus({ year: 1, days: 1 }).toISO()
+                })
+                miloRendezVousRepository.findRendezVousByEvenement
+                  .withArgs(evenement)
+                  .resolves(rendezVousMilo)
+
+                // When
+                const result = await handler.handle(job)
+
+                // Then
+                expect(result.resultat).to.be.deep.equal({
+                  traitement: Traitement.RENDEZ_VOUS_SUPPRIME,
+                  idJeune: jeune.id,
+                  idRendezVous: rendezVous.id
+                })
+                expect(
+                  rendezVousRepository.delete
+                ).to.have.been.calledOnceWithExactly(rendezVous.id)
+                expect(rendezVousRepository.save).not.to.have.been.called()
+                expect(
+                  planificateurService.supprimerRappelsParId
+                ).to.have.been.calledOnceWithExactly(rendezVous.id)
+                expect(
+                  notificationService.notifierLesJeunesDuRdv
+                ).to.have.been.calledOnceWithExactly(
+                  rendezVous,
+                  Notification.Type.DELETED_RENDEZVOUS
+                )
               })
             })
             describe('quand statut recuperable', () => {
