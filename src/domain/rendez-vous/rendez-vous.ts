@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import {
   ConseillerSansAgenceError,
+  DateNonAutoriseeError,
   JeuneNonLieALAgenceError,
   JeuneNonLieAuConseillerError,
   MauvaiseCommandeError
@@ -222,6 +223,14 @@ export namespace RendezVous {
     return emptySuccess()
   }
 
+  function verifierDateRendezVous(date: string): boolean {
+    const dateIlYAUnAn = DateTime.now().minus({ year: 1 }).toJSDate()
+    const dateDansDeuxAns = DateTime.now().plus({ year: 2 }).toJSDate()
+    const rdvDate = new Date(date)
+
+    return rdvDate > dateIlYAUnAn && rdvDate < dateDansDeuxAns
+  }
+
   @Injectable()
   export class Factory {
     constructor(private idService: IdService) {}
@@ -280,6 +289,10 @@ export namespace RendezVous {
               )
             }
           }
+      }
+
+      if (!verifierDateRendezVous(infosRendezVousACreer.date)) {
+        return failure(new DateNonAutoriseeError())
       }
 
       return success({

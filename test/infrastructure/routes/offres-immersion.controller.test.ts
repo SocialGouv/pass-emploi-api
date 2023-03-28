@@ -32,7 +32,6 @@ import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
 import { StubbedClass, expect } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
-import { EnvoyerFormulaireContactImmersionCommandHandler } from '../../../src/application/commands/immersion/envoyer-formulaire-contact-immersion.command.handler'
 
 describe('OffresImmersionController', () => {
   let getOffresImmersionQueryHandler: StubbedClass<GetOffresImmersionQueryHandler>
