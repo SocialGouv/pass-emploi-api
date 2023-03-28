@@ -12,6 +12,7 @@ import {
   CampagneNonActive,
   CompteDiagorienteInvalideError,
   ConseillerSansAgenceError,
+  DateNonAutoriseeError,
   DossierExisteDejaError,
   DroitsInsuffisants,
   EmailExisteDejaError,
@@ -37,6 +38,7 @@ export function handleFailure(result: Result): void {
         throw new RuntimeException(result.error.message)
       case NonTrouveError.CODE:
         throw new NotFoundException(result.error.message)
+      case DateNonAutoriseeError.CODE:
       case MauvaiseCommandeError.CODE:
       case ReponsesCampagneInvalide.CODE:
       case CampagneNonActive.CODE:

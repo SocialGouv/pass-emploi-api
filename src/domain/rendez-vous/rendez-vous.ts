@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import {
   ConseillerSansAgenceError,
+  DateNonAutoriseeError,
   JeuneNonLieALAgenceError,
   JeuneNonLieAuConseillerError,
   MauvaiseCommandeError
@@ -18,6 +19,7 @@ import { Conseiller } from '../conseiller/conseiller'
 import { Jeune } from '../jeune/jeune'
 import * as _AnimationCollective from './animation-collective'
 import * as _Historique from './historique'
+import { DateService } from '../../utils/date-service'
 
 export const RendezVousRepositoryToken = 'RendezVous.Repository'
 
@@ -222,6 +224,17 @@ export namespace RendezVous {
     return emptySuccess()
   }
 
+  function isDateRendezVousValide(date: string): boolean {
+    const dateIlYAUnAn = DateTime.now().minus({ year: 1 })
+    const dateDansDeuxAns = DateTime.now().plus({ year: 2 })
+    const rdvDate = DateTime.fromISO(date)
+    return (
+      rdvDate &&
+      DateService.isGreater(rdvDate, dateIlYAUnAn) &&
+      DateService.isGreater(dateDansDeuxAns, rdvDate)
+    )
+  }
+
   @Injectable()
   export class Factory {
     constructor(private idService: IdService) {}
@@ -282,6 +295,10 @@ export namespace RendezVous {
           }
       }
 
+      if (!isDateRendezVousValide(infosRendezVousACreer.date)) {
+        return failure(new DateNonAutoriseeError())
+      }
+
       return success({
         id: this.idService.uuid(),
         source: Source.PASS_EMPLOI,
@@ -310,10 +327,7 @@ export namespace RendezVous {
         nombreMaxParticipants: infosRendezVousACreer.nombreMaxParticipants
       })
     }
-  }
 
-  @Injectable()
-  export class Service {
     mettreAJour(
       rendezVousInitial: RendezVous,
       infosRendezVousAMettreAJour: InfosRendezVousAMettreAJour
@@ -379,6 +393,10 @@ export namespace RendezVous {
           return failure(
             new MauvaiseCommandeError('Le type de rendez-vous est invalide')
           )
+      }
+
+      if (!isDateRendezVousValide(infosRendezVousAMettreAJour.date)) {
+        return failure(new DateNonAutoriseeError())
       }
 
       return success({
