@@ -8,6 +8,7 @@ import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
 import { ArchiveJeuneSqlModel } from '../../infrastructure/sequelize/models/archive-jeune.sql-model'
 import { EvenementEngagementHebdoSqlModel } from '../../infrastructure/sequelize/models/evenement-engagement-hebdo.sql-model'
 import { LogApiPartenaireSqlModel } from '../../infrastructure/sequelize/models/log-api-partenaire.sql-model'
+import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { SuiviJobSqlModel } from '../../infrastructure/sequelize/models/suivi-job.sql-model'
 import { DateService } from '../../utils/date-service'
 
@@ -26,8 +27,10 @@ export class HandleJobNettoyerLesDonneesCommandHandler extends JobHandler<Job> {
     const maintenant = this.dateService.now()
     let nbErreurs = 0
     let nombreArchivesSupprimees = -1
-    let nombreLogsApiSupprimees = -1
-    let nombreSuiviJobsSupprimees = -1
+    let nombreLogsApiSupprimes = -1
+    let nombreEvenementsEngagementHebdoSupprimes = -1
+    let nombreSuiviJobsSupprimes = -1
+    let nombreRdvSupprimes = -1
 
     try {
       nombreArchivesSupprimees = await ArchiveJeuneSqlModel.destroy({
@@ -38,7 +41,7 @@ export class HandleJobNettoyerLesDonneesCommandHandler extends JobHandler<Job> {
     }
 
     try {
-      nombreLogsApiSupprimees = await LogApiPartenaireSqlModel.destroy({
+      nombreLogsApiSupprimes = await LogApiPartenaireSqlModel.destroy({
         where: dateSuperieureAUnMois(maintenant)
       })
     } catch (_e) {
@@ -46,7 +49,7 @@ export class HandleJobNettoyerLesDonneesCommandHandler extends JobHandler<Job> {
     }
 
     try {
-      nombreSuiviJobsSupprimees =
+      nombreEvenementsEngagementHebdoSupprimes =
         await EvenementEngagementHebdoSqlModel.destroy({
           where: dateEvenementSuperieureAUneSemaine(maintenant)
         })
@@ -55,8 +58,16 @@ export class HandleJobNettoyerLesDonneesCommandHandler extends JobHandler<Job> {
     }
 
     try {
-      nombreSuiviJobsSupprimees = await SuiviJobSqlModel.destroy({
+      nombreSuiviJobsSupprimes = await SuiviJobSqlModel.destroy({
         where: dateExecutionSuperieureADeuxJours(maintenant)
+      })
+    } catch (_e) {
+      nbErreurs++
+    }
+
+    try {
+      nombreRdvSupprimes = await RendezVousSqlModel.destroy({
+        where: dateSuppressionSuperieureASixMois(maintenant)
       })
     } catch (_e) {
       nbErreurs++
@@ -70,8 +81,10 @@ export class HandleJobNettoyerLesDonneesCommandHandler extends JobHandler<Job> {
       tempsExecution: DateService.calculerTempsExecution(maintenant),
       resultat: {
         nombreArchivesSupprimees,
-        nombreLogsApiSupprimees,
-        nombreEvenementsEngagementSupprimees: nombreSuiviJobsSupprimees
+        nombreLogsApiSupprimees: nombreLogsApiSupprimes,
+        nombreEvenementsEngagementHebdoSupprimes,
+        nombreSuiviJobsSupprimes,
+        nombreRdvSupprimes
       }
     }
   }
@@ -100,5 +113,11 @@ function dateEvenementSuperieureAUneSemaine(
 function dateExecutionSuperieureADeuxJours(maintenant: DateTime): WhereOptions {
   return {
     dateExecution: { [Op.lt]: maintenant.minus({ days: 2 }).toJSDate() }
+  }
+}
+
+function dateSuppressionSuperieureASixMois(maintenant: DateTime): WhereOptions {
+  return {
+    dateSuppression: { [Op.lt]: maintenant.minus({ months: 6 }).toJSDate() }
   }
 }

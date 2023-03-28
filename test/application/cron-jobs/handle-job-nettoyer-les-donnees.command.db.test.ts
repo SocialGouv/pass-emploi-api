@@ -12,50 +12,143 @@ import { EvenementEngagementHebdoSqlModel } from '../../../src/infrastructure/se
 import { Core } from '../../../src/domain/core'
 import { SuiviJobSqlModel } from '../../../src/infrastructure/sequelize/models/suivi-job.sql-model'
 import { Planificateur } from '../../../src/domain/planificateur'
+import {
+  RendezVousDto,
+  RendezVousSqlModel
+} from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
+import { AsSql } from '../../../src/infrastructure/sequelize/types'
 
 describe('HandleJobNettoyerLesDonneesCommandHandler', () => {
   let handleJobNettoyerLesDonneesCommandHandler: HandleJobNettoyerLesDonneesCommandHandler
-  let dateSevice: StubbedClass<DateService>
+  let dateService: StubbedClass<DateService>
   let suiviJobService: StubbedType<SuiviJob.Service>
+  let rendezVousDto: AsSql<RendezVousDto>
+  let rendezVousDtoSansDateSuppression: AsSql<RendezVousDto>
+  let rendezVousAvantNettoyage: RendezVousSqlModel | null
 
-  beforeEach(async () => {
+  before(async () => {
     await getDatabase().cleanPG()
     const sandbox: SinonSandbox = createSandbox()
-    dateSevice = stubClass(DateService)
-    dateSevice.now.returns(uneDatetime())
+    dateService = stubClass(DateService)
+    dateService.now.returns(uneDatetime())
     suiviJobService = stubInterface(sandbox)
 
     handleJobNettoyerLesDonneesCommandHandler =
-      new HandleJobNettoyerLesDonneesCommandHandler(dateSevice, suiviJobService)
+      new HandleJobNettoyerLesDonneesCommandHandler(
+        dateService,
+        suiviJobService
+      )
+
+    // Given - Archive
+    await ArchiveJeuneSqlModel.create({
+      idJeune: 'idJeuneASupprimer',
+      prenom: 'prenom',
+      nom: 'nom',
+      motif: 'motif',
+      dateArchivage: uneDatetime().minus({ years: 2, day: 1 }).toJSDate(),
+      donnees: { nom: 'nom' }
+    })
+    await ArchiveJeuneSqlModel.create({
+      idJeune: 'idJeuneAGarder',
+      prenom: 'prenom',
+      nom: 'nom',
+      motif: 'motif',
+      dateArchivage: uneDatetime()
+        .minus({ years: 2 })
+        .plus({ day: 1 })
+        .toJSDate(),
+      donnees: { nom: 'nom' }
+    })
+
+    // Given - Log Api Partenaire
+    await LogApiPartenaireSqlModel.create({
+      id: 'a282ae5e-b1f0-4a03-86a3-1870d913da93',
+      date: uneDatetime().minus({ months: 1, day: 1 }).toJSDate(),
+      idUtilisateur: 'idUtilisateur',
+      typeUtilisateur: 'typeUtilisateur',
+      pathPartenaire: 'pathASupprimer',
+      resultatPartenaire: { nom: 'nom' },
+      resultat: { nom: 'nom' },
+      transactionId: 'transactionId'
+    })
+    await LogApiPartenaireSqlModel.create({
+      id: '826553e8-7581-44ab-9d76-f04be13f8971',
+      date: uneDatetime().minus({ months: 1 }).plus({ day: 1 }).toJSDate(),
+      idUtilisateur: 'idUtilisateur',
+      typeUtilisateur: 'typeUtilisateur',
+      pathPartenaire: 'pathAGarder',
+      resultatPartenaire: { nom: 'nom' },
+      resultat: { nom: 'nom' },
+      transactionId: 'transactionId'
+    })
+
+    // Given - Evenement Engagement Hebdo
+    await EvenementEngagementHebdoSqlModel.create({
+      id: 1,
+      dateEvenement: uneDatetime().minus({ week: 1, day: 1 }).toJSDate(),
+      idUtilisateur: 'idUtilisateur',
+      typeUtilisateur: 'typeUtilisateur',
+      structure: Core.Structure.POLE_EMPLOI,
+      categorie: 'aa',
+      action: 'aa',
+      nom: 'aa',
+      code: 'aa'
+    })
+    await EvenementEngagementHebdoSqlModel.create({
+      id: 2,
+      dateEvenement: uneDatetime()
+        .minus({ week: 1 })
+        .plus({ day: 1 })
+        .toJSDate(),
+      idUtilisateur: 'idUtilisateur',
+      typeUtilisateur: 'typeUtilisateur',
+      structure: Core.Structure.POLE_EMPLOI,
+      categorie: 'aa',
+      action: 'aa',
+      nom: 'aa',
+      code: 'aa'
+    })
+
+    // Given - Suivi Job
+    await SuiviJobSqlModel.create({
+      id: 1,
+      dateExecution: uneDatetime().minus({ days: 3 }).toJSDate(),
+      jobType: Planificateur.JobType.NETTOYER_LES_DONNEES,
+      succes: false,
+      resultat: {},
+      nbErreurs: 10,
+      tempsExecution: 10
+    })
+    await SuiviJobSqlModel.create({
+      id: 2,
+      dateExecution: uneDatetime().minus({ days: 1 }).toJSDate(),
+      jobType: Planificateur.JobType.NETTOYER_LES_DONNEES,
+      succes: false,
+      resultat: {},
+      nbErreurs: 10,
+      tempsExecution: 10
+    })
+
+    // Given - Rendez-vous
+    rendezVousDto = unRendezVousDto({
+      dateSuppression: uneDatetime().minus({ months: 7 }).toJSDate()
+    })
+    rendezVousDtoSansDateSuppression = unRendezVousDto({
+      dateSuppression: null
+    })
+    await RendezVousSqlModel.create(rendezVousDto)
+    await RendezVousSqlModel.create(rendezVousDtoSansDateSuppression)
+    rendezVousAvantNettoyage = await RendezVousSqlModel.findByPk(
+      rendezVousDto.id
+    )
+
+    // When
+    await handleJobNettoyerLesDonneesCommandHandler.handle()
   })
 
   describe('archives', () => {
     it('supprime les archives de plus de 2 ans', async () => {
-      // Given
-      await ArchiveJeuneSqlModel.create({
-        idJeune: 'idJeuneASupprimer',
-        prenom: 'prenom',
-        nom: 'nom',
-        motif: 'motif',
-        dateArchivage: uneDatetime().minus({ years: 2, day: 1 }).toJSDate(),
-        donnees: { nom: 'nom' }
-      })
-
-      await ArchiveJeuneSqlModel.create({
-        idJeune: 'idJeuneAGarder',
-        prenom: 'prenom',
-        nom: 'nom',
-        motif: 'motif',
-        dateArchivage: uneDatetime()
-          .minus({ years: 2 })
-          .plus({ day: 1 })
-          .toJSDate(),
-        donnees: { nom: 'nom' }
-      })
-
-      // When
-      await handleJobNettoyerLesDonneesCommandHandler.handle()
-
       // Then
       const archives = await ArchiveJeuneSqlModel.findAll()
       expect(archives).to.have.length(1)
@@ -65,32 +158,6 @@ describe('HandleJobNettoyerLesDonneesCommandHandler', () => {
 
   describe('logs api partenaires', () => {
     it("supprime les logs de plus d'un mois", async () => {
-      // Given
-      await LogApiPartenaireSqlModel.create({
-        id: 'a282ae5e-b1f0-4a03-86a3-1870d913da93',
-        date: uneDatetime().minus({ months: 1, day: 1 }).toJSDate(),
-        idUtilisateur: 'idUtilisateur',
-        typeUtilisateur: 'typeUtilisateur',
-        pathPartenaire: 'pathASupprimer',
-        resultatPartenaire: { nom: 'nom' },
-        resultat: { nom: 'nom' },
-        transactionId: 'transactionId'
-      })
-
-      await LogApiPartenaireSqlModel.create({
-        id: '826553e8-7581-44ab-9d76-f04be13f8971',
-        date: uneDatetime().minus({ months: 1 }).plus({ day: 1 }).toJSDate(),
-        idUtilisateur: 'idUtilisateur',
-        typeUtilisateur: 'typeUtilisateur',
-        pathPartenaire: 'pathAGarder',
-        resultatPartenaire: { nom: 'nom' },
-        resultat: { nom: 'nom' },
-        transactionId: 'transactionId'
-      })
-
-      // When
-      await handleJobNettoyerLesDonneesCommandHandler.handle()
-
       // Then
       const logs = await LogApiPartenaireSqlModel.findAll()
       expect(logs).to.have.length(1)
@@ -100,37 +167,6 @@ describe('HandleJobNettoyerLesDonneesCommandHandler', () => {
 
   describe("evenements d'engagement hebdo", () => {
     it("supprime les données de plus d'une semaine", async () => {
-      // Given
-      await EvenementEngagementHebdoSqlModel.create({
-        id: 1,
-        dateEvenement: uneDatetime().minus({ week: 1, day: 1 }).toJSDate(),
-        idUtilisateur: 'idUtilisateur',
-        typeUtilisateur: 'typeUtilisateur',
-        structure: Core.Structure.POLE_EMPLOI,
-        categorie: 'aa',
-        action: 'aa',
-        nom: 'aa',
-        code: 'aa'
-      })
-
-      await EvenementEngagementHebdoSqlModel.create({
-        id: 2,
-        dateEvenement: uneDatetime()
-          .minus({ week: 1 })
-          .plus({ day: 1 })
-          .toJSDate(),
-        idUtilisateur: 'idUtilisateur',
-        typeUtilisateur: 'typeUtilisateur',
-        structure: Core.Structure.POLE_EMPLOI,
-        categorie: 'aa',
-        action: 'aa',
-        nom: 'aa',
-        code: 'aa'
-      })
-
-      // When
-      await handleJobNettoyerLesDonneesCommandHandler.handle()
-
       // Then
       const events = await EvenementEngagementHebdoSqlModel.findAll()
       expect(events).to.have.length(1)
@@ -140,34 +176,24 @@ describe('HandleJobNettoyerLesDonneesCommandHandler', () => {
 
   describe('suivi jobs', () => {
     it('supprime les données de plus de deux jours', async () => {
-      // Given
-      await SuiviJobSqlModel.create({
-        id: 1,
-        dateExecution: uneDatetime().minus({ days: 3 }).toJSDate(),
-        jobType: Planificateur.JobType.NETTOYER_LES_DONNEES,
-        succes: false,
-        resultat: {},
-        nbErreurs: 10,
-        tempsExecution: 10
-      })
-
-      await SuiviJobSqlModel.create({
-        id: 2,
-        dateExecution: uneDatetime().minus({ days: 1 }).toJSDate(),
-        jobType: Planificateur.JobType.NETTOYER_LES_DONNEES,
-        succes: false,
-        resultat: {},
-        nbErreurs: 10,
-        tempsExecution: 10
-      })
-
-      // When
-      await handleJobNettoyerLesDonneesCommandHandler.handle()
-
       // Then
       const suivi = await SuiviJobSqlModel.findAll()
       expect(suivi).to.have.length(1)
       expect(suivi[0].id).to.equal(2)
+    })
+  })
+
+  describe('rendez-vous supprimés', () => {
+    it('supprime les rendez-vous archivés de plus de six mois', async () => {
+      // Then
+      const rendezVousApresNettoyage = await RendezVousSqlModel.findByPk(
+        rendezVousDto.id
+      )
+      const rendezVousSansDateSuppressionApresNettoyage =
+        await RendezVousSqlModel.findByPk(rendezVousDtoSansDateSuppression.id)
+      expect(rendezVousAvantNettoyage).not.to.be.null()
+      expect(rendezVousSansDateSuppressionApresNettoyage).not.to.be.null()
+      expect(rendezVousApresNettoyage).to.be.null()
     })
   })
 })

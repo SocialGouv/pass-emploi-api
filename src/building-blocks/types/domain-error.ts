@@ -231,3 +231,13 @@ export class PasDeRappelError implements DomainError {
     this.message = `Pas de rappel à envoyer pour l'action ${idAction} car ${raison}`
   }
 }
+
+export class DateNonAutoriseeError implements DomainError {
+  static CODE = 'DATE_NON_AUTORISEE'
+  readonly code: string = DateNonAutoriseeError.CODE
+  readonly message: string
+
+  constructor() {
+    this.message = `La date renseignée n’est pas valide.`
+  }
+}
