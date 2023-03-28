@@ -195,6 +195,22 @@ export class AccueilJeuneQueryModel {
   mesFavoris: FavorisQueryModel[]
 }
 
+export class AccueilJeunePoleEmploiQueryModel {
+  @ApiProperty()
+  dateDerniereMiseAJour: string | undefined
+
+  @ApiProperty()
+  cetteSemaine: ResumeSemaineJeune
+
+  @ApiProperty()
+  prochainRendezVous: RendezVousJeuneQueryModel | undefined
+
+  @ApiProperty()
+  mesAlertes: RechercheQueryModel[]
+
+  @ApiPropertyOptional()
+  mesFavoris: FavorisQueryModel[]
+}
 export class DetailJeuneConseillerQueryModel {
   @ApiProperty()
   id: string

@@ -313,7 +313,7 @@ import { ArchiverJeuneSupportCommandHandler } from './application/commands/suppo
 import { GetDiagorienteMetiersFavorisQueryHandler } from './application/queries/get-diagoriente-metiers-favoris.query.handler'
 import { EnvoyerFormulaireContactImmersionCommandHandler } from './application/commands/immersion/envoyer-formulaire-contact-immersion.command.handler'
 import { GetAccueilJeuneMiloQueryHandler } from './application/queries/get-accueil-jeune-milo-query-handler'
-import { GetAccueilJeunePoleEmploiQueryHandler } from './application/queries/get-accueil-jeune-pole-emploi-query-handler'
+import { GetAccueilJeunePoleEmploiQueryHandler } from './application/queries/get-accueil-jeune-pole-emploi.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [

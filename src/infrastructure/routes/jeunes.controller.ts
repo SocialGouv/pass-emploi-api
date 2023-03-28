@@ -37,6 +37,7 @@ import {
   JeuneHomeDemarcheQueryModel
 } from '../../application/queries/query-models/home-jeune.query-model'
 import {
+  AccueilJeunePoleEmploiQueryModel,
   AccueilJeuneQueryModel,
   DetailJeuneQueryModel,
   HistoriqueConseillerJeuneQueryModel,
@@ -106,6 +107,7 @@ import { GetUnRendezVousJeuneQueryHandler } from '../../application/queries/rend
 import { IdQueryModel } from '../../application/queries/query-models/common.query-models'
 
 import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/get-accueil-jeune-milo-query-handler'
+import { GetAccueilJeunePoleEmploiQueryHandler } from '../../application/queries/get-accueil-jeune-pole-emploi.query.handler'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -133,7 +135,8 @@ export class JeunesController {
     private readonly getPreferencesJeuneQueryHandler: GetPreferencesJeuneQueryHandler,
     private readonly getAnimationsCollectivesJeuneQueryHandler: GetAnimationsCollectivesJeuneQueryHandler,
     private readonly getUnRendezVousJeuneQueryHandler: GetUnRendezVousJeuneQueryHandler,
-    private readonly getAccueilJeuneMiloQueryHandler: GetAccueilJeuneMiloQueryHandler
+    private readonly getAccueilJeuneMiloQueryHandler: GetAccueilJeuneMiloQueryHandler,
+    private readonly getAccueilJeunePoleEmploiQueryHandler: GetAccueilJeunePoleEmploiQueryHandler
   ) {}
 
   @Get(':idJeune')
@@ -172,6 +175,31 @@ export class JeunesController {
   ): Promise<AccueilJeuneQueryModel> {
     const result = await this.getAccueilJeuneMiloQueryHandler.execute(
       { idJeune, maintenant: queryParams.maintenant },
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
+  }
+
+  @Get(':idJeune/pole-emploi/accueil')
+  @ApiOperation({
+    description:
+      "Permet de récupérer les éléments de la page d'accueil d'un jeune MILO"
+  })
+  @ApiResponse({
+    type: AccueilJeuneQueryModel
+  })
+  async getAccueilPoleEmploi(
+    @Param('idJeune') idJeune: string,
+    @Query() queryParams: MaintenantQueryParams,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string
+  ): Promise<AccueilJeunePoleEmploiQueryModel> {
+    const result = await this.getAccueilJeunePoleEmploiQueryHandler.execute(
+      { idJeune, maintenant: queryParams.maintenant, accessToken },
       utilisateur
     )
 
