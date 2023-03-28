@@ -316,6 +316,7 @@ import { EnvoyerFormulaireContactImmersionCommandHandler } from './application/c
 import { GetAccueilJeuneMiloQueryHandler } from './application/queries/accueil/get-accueil-jeune-milo.query.handler.db'
 import { GetAccueilJeunePoleEmploiQueryHandler } from './application/queries/accueil/get-accueil-jeune-pole-emploi.query.handler.db'
 import { JeunesPoleEmploiController } from './infrastructure/routes/jeunes.pole-emploi.controller'
+import { HandleJobDumpForAnalyticsCommandHandler } from './application/cron-jobs/handle-job-dump-for-analytics.command'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -728,7 +729,8 @@ export const JobHandlerProviders = [
   MonitorJobsCommandHandler,
   HandleJobGenererJDDCommandHandler,
   SuivreEvenementsMiloCronJobHandler,
-  TraiterEvenementMiloJobHandler
+  TraiterEvenementMiloJobHandler,
+  HandleJobDumpForAnalyticsCommandHandler
 ]
 
 @Module(buildModuleMetadata())
