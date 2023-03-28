@@ -55,7 +55,8 @@ export namespace Planificateur {
     MONITORER_JOBS = 'MONITORER_JOBS',
     GENERER_JDD = 'GENERER_JDD',
     SUIVRE_FILE_EVENEMENTS_MILO = 'SUIVRE_FILE_EVENEMENTS_MILO',
-    TRAITER_EVENEMENT_MILO = 'TRAITER_EVENEMENT_MILO'
+    TRAITER_EVENEMENT_MILO = 'TRAITER_EVENEMENT_MILO',
+    DUMP_ANALYTICS = 'DUMP_ANALYTICS'
   }
 
   export interface JobRendezVous {
@@ -166,6 +167,11 @@ export const listeCronJobs: Planificateur.CronJob[] = [
     expression: '0 6 * * *',
     description:
       "Tous les jours à 6h. MAJ Segments d'utilisateurs sur Firebase."
+  },
+  {
+    type: Planificateur.JobType.DUMP_ANALYTICS,
+    expression: '0 2 * * 1',
+    description: 'Tous les lundi à 2h AM. Dump de la DB vers analytics.'
   }
 ]
 
