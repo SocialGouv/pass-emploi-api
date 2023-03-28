@@ -52,7 +52,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     private rendezVousRepository: RendezVous.Repository,
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
-    private rendezVousService: RendezVous.Service,
+    private rendezVousFactory: RendezVous.Factory,
     private notificationService: Notification.Service,
     @Inject(MailServiceToken)
     private mailClient: Mail.Service,
@@ -80,7 +80,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
       return failure(new NonTrouveError('Jeune'))
     }
 
-    const result = this.rendezVousService.mettreAJour(rendezVous, {
+    const result = this.rendezVousFactory.mettreAJour(rendezVous, {
       ...command,
       jeunes
     })

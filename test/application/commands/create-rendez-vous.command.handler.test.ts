@@ -16,6 +16,7 @@ import { Notification } from '../../../src/domain/notification/notification'
 import { uneConfiguration, unJeune } from '../../fixtures/jeune.fixture'
 import {
   ConseillerSansAgenceError,
+  DateNonAutoriseeError,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
 import { Jeune } from '../../../src/domain/jeune/jeune'
@@ -170,6 +171,40 @@ describe('CreateRendezVousCommandHandler', () => {
         expect(result).to.deep.equal(
           failure(new ConseillerSansAgenceError(conseiller.id))
         )
+      })
+    })
+
+    describe("quand la date du rendez-vous n'est pas valide", () => {
+      it('renvoie une failure', async () => {
+        // Given
+        const command: CreateRendezVousCommand = {
+          idsJeunes: [jeune1.id, jeune2.id],
+          idConseiller: conseiller.id,
+          commentaire: rendezVous.commentaire,
+          date: new Date('2020-09-20 10:27:21').toDateString(),
+          duree: rendezVous.duree
+        }
+        conseillerRepository.get
+          .withArgs(command.idConseiller)
+          .resolves(conseiller)
+        jeuneRepository.findAll
+          .withArgs(command.idsJeunes)
+          .resolves([jeune1, jeune2])
+
+        rendezVousFactory.creer
+          .withArgs(command, [jeune1, jeune2], conseiller)
+          .returns(failure(new DateNonAutoriseeError()))
+
+        // When
+        const result = await createRendezVousCommandHandler.handle(command)
+
+        // Then
+        expect(rendezVousRepository.save).not.to.have.been.calledWith(
+          rendezVous.id
+        )
+        expect(notificationService.notifierLesJeunesDuRdv).to.have.callCount(0)
+        expect(mailClient.envoyerMailRendezVous).callCount(0)
+        expect(result).to.deep.equal(failure(new DateNonAutoriseeError()))
       })
     })
     describe('quand la création est possible', () => {
