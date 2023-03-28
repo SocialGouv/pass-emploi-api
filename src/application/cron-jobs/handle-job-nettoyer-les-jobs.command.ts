@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Job } from '../../building-blocks/types/job'
 import { JobHandler } from '../../building-blocks/types/job-handler'
-import { emptySuccess, Result } from '../../building-blocks/types/result'
 import {
   Planificateur,
   PlanificateurRepositoryToken,
@@ -43,13 +42,5 @@ export class HandleNettoyerLesJobsCommandHandler extends JobHandler<Job> {
       resultat: erreur ?? stats,
       erreur
     }
-  }
-
-  async authorize(): Promise<Result> {
-    return emptySuccess()
-  }
-
-  async monitor(): Promise<void> {
-    return
   }
 }
