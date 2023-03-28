@@ -1,9 +1,14 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
+import { EnvoyerFormulaireContactImmersionCommandHandler } from '../../../src/application/commands/immersion/envoyer-formulaire-contact-immersion.command.handler'
 import {
   NotifierNouvellesImmersionsCommand,
   NotifierNouvellesImmersionsCommandHandler
 } from '../../../src/application/commands/notifier-nouvelles-immersions.command.handler'
+import {
+  GetDetailOffreImmersionQuery,
+  GetDetailOffreImmersionQueryHandler
+} from '../../../src/application/queries/get-detail-offre-immersion.query.handler'
 import {
   GetOffresImmersionQuery,
   GetOffresImmersionQueryHandler
@@ -24,12 +29,8 @@ import {
   success
 } from '../../../src/building-blocks/types/result'
 import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
-import { expect, StubbedClass } from '../../utils'
+import { StubbedClass, expect } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import {
-  GetDetailOffreImmersionQuery,
-  GetDetailOffreImmersionQueryHandler
-} from '../../../src/application/queries/get-detail-offre-immersion.query.handler'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 import { EnvoyerFormulaireContactImmersionCommandHandler } from '../../../src/application/commands/immersion/envoyer-formulaire-contact-immersion.command.handler'
 
@@ -119,7 +120,7 @@ describe('OffresImmersionController', () => {
       idOffreImmersion: '1'
     }
     describe('quand tout va bien', () => {
-      it('renvoit la bonne offre recherchée', async () => {
+      it('renvoie la bonne offre recherchée', async () => {
         // Given
         const detailOffreImmersionQueryModel: DetailOffreImmersionQueryModel = {
           adresse: 'addresse',
@@ -128,7 +129,9 @@ describe('OffresImmersionController', () => {
           metier: 'rome',
           nomEtablissement: 'name',
           secteurActivite: 'naf',
-          ville: 'Paris'
+          ville: 'Paris',
+          codeRome: 'rome',
+          siret: 'siret'
         }
         getDetailOffreImmersionQueryHandler.execute
           .withArgs(query)

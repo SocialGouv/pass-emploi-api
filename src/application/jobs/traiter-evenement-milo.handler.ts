@@ -111,7 +111,11 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
     rendezVousMILO?: RendezVousMilo,
     FT_NOTIFIER_RDV_MILO?: boolean
   ): Promise<SuiviJob> {
-    if (rendezVousMILO && this.isStatutRecuperable(rendezVousMILO)) {
+    if (
+      rendezVousMILO &&
+      this.isDateRecuperable(rendezVousMILO, jeune) &&
+      this.isStatutRecuperable(rendezVousMILO)
+    ) {
       const newRendezVousCEJ = this.rendezVousMiloFactory.createRendezVousCEJ(
         rendezVousMILO,
         jeune
@@ -150,7 +154,10 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
   ): Promise<SuiviJob> {
     if (rendezVousMILO) {
       if (rendezVousCEJExistant) {
-        if (!this.isStatutRecuperable(rendezVousMILO)) {
+        if (
+          !this.isStatutRecuperable(rendezVousMILO) ||
+          !this.isDateRecuperable(rendezVousMILO, jeune)
+        ) {
           return this.deleteRendezVousMILO(
             jeune,
             maintenant,
@@ -333,6 +340,22 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
       )
       this.apmService.captureError(e)
     }
+  }
+
+  private isDateRecuperable(
+    rendezVousMILO: RendezVousMilo,
+    jeune: Jeune
+  ): boolean {
+    const ilYa1An = this.dateService.now().minus({ year: 1 })
+    const dans2Ans = this.dateService.now().plus({ year: 2 })
+    const dateRdv = RendezVousMilo.timezonerDateMilo(
+      rendezVousMILO.dateHeureDebut,
+      jeune
+    )
+    return (
+      DateService.isGreater(dateRdv, ilYa1An) &&
+      DateService.isGreater(dans2Ans, dateRdv)
+    )
   }
 
   private isStatutRecuperable(rendezVousMILO: RendezVousMilo): boolean {

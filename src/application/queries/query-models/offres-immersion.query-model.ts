@@ -59,12 +59,20 @@ export interface FavoriOffreImmersionIdQueryModel {
 
 export class DetailOffreImmersionQueryModel extends OffreImmersionQueryModel {
   @ApiProperty()
+  codeRome: string
+
+  @ApiProperty()
+  siret: string
+
+  @ApiProperty()
   adresse: string
+
   @ApiProperty({
     required: false,
     type: LocalisationQueryModel
   })
   localisation?: LocalisationQueryModel
+
   @ApiProperty({
     required: false
   })

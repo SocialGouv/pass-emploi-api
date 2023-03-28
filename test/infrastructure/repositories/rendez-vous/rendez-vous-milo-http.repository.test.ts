@@ -132,8 +132,8 @@ describe('MiloEvenementsHttpRepository', () => {
           // Given
           const rendezVousJson: RendezVousMiloDto = {
             id: idObjet,
-            dateHeureDebut: '2022-10-06 10:00:00',
-            dateHeureFin: '2022-10-06 12:00:00',
+            dateHeureDebut: '2020-10-06 10:00:00',
+            dateHeureFin: '2020-10-06 12:00:00',
             objet: 'Test RDV',
             conseiller: 'SIMILO SIMILO',
             idDossier: idPartenaireBeneficiaire,
@@ -199,8 +199,8 @@ describe('MiloEvenementsHttpRepository', () => {
             lieu: 'la',
             nom: 'je suis un titre mais en fait le nom',
             id: idObjet.toString(),
-            dateHeureDebut: '2022-10-06 10:00:00',
-            dateHeureFin: '2022-10-06 12:00:00',
+            dateHeureDebut: '2020-10-06 10:00:00',
+            dateHeureFin: '2020-10-06 12:00:00',
             idDossier: idPartenaireBeneficiaire.toString(),
             commentaire: 'un petit commentaire plus ou moins long',
             statut: 'Prescrit'
