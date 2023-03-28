@@ -24,7 +24,7 @@ import { Authentification } from '../../../src/domain/authentification'
 describe('UpdateRendezVousCommandHandler', () => {
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
-  let rendezVousService: StubbedClass<RendezVous.Service>
+  let rendezVousFactory: StubbedClass<RendezVous.Factory>
   let notificationService: StubbedClass<Notification.Service>
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let mailService: StubbedType<Mail.Service>
@@ -41,7 +41,7 @@ describe('UpdateRendezVousCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     rendezVousRepository = stubInterface(sandbox)
     jeuneRepository = stubInterface(sandbox)
-    rendezVousService = stubClass(RendezVous.Service)
+    rendezVousFactory = stubClass(RendezVous.Factory)
     notificationService = stubClass(Notification.Service)
     conseillerRepository = stubInterface(sandbox)
     mailService = stubInterface(sandbox)
@@ -54,7 +54,7 @@ describe('UpdateRendezVousCommandHandler', () => {
     updateRendezVousCommandHandler = new UpdateRendezVousCommandHandler(
       rendezVousRepository,
       jeuneRepository,
-      rendezVousService,
+      rendezVousFactory,
       notificationService,
       mailService,
       conseillerRepository,
@@ -136,7 +136,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           .resolves(rendezVous)
         jeuneRepository.findAll.withArgs(command.idsJeunes).resolves([jeune])
 
-        rendezVousService.mettreAJour
+        rendezVousFactory.mettreAJour
           .withArgs(rendezVous, { ...command, jeunes: [jeune] })
           .returns(success(rendezVousUpdated))
 
@@ -175,7 +175,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           .resolves(rendezVousSansInvitation)
         jeuneRepository.findAll.withArgs([jeune.id]).resolves([jeune])
 
-        rendezVousService.mettreAJour
+        rendezVousFactory.mettreAJour
           .withArgs(rendezVousSansInvitation, { ...command, jeunes: [jeune] })
           .returns(success(rendezVousSansInvitation))
 
@@ -204,7 +204,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         conseillerRepository.get
           .withArgs(rendezVousUpdated.createur.id)
           .resolves(rendezVousUpdated.jeunes[0].conseiller)
-        rendezVousService.mettreAJour
+        rendezVousFactory.mettreAJour
           .withArgs(rendezVousAvecInvitation, { ...command, jeunes: [jeune] })
           .returns(success(rendezVousUpdated))
 
@@ -230,7 +230,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           ...rendezVous,
           date: rendezVous.date
         }
-        rendezVousService.mettreAJour
+        rendezVousFactory.mettreAJour
           .withArgs(rendezVous, { ...command, jeunes: [jeune] })
           .returns(success(rendezVousUpdated))
 
@@ -262,7 +262,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           jeunes: [jeune],
           date: new Date('2022-05-04T09:54:04.561Z')
         }
-        rendezVousService.mettreAJour
+        rendezVousFactory.mettreAJour
           .withArgs(rendezVous, { ...command, jeunes: [jeune] })
           .returns(success(rendezVousUpdated))
 
@@ -305,7 +305,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           .withArgs(commandAvecUnJeuneEnPlus.idsJeunes)
           .resolves([jeune, jeuneAjoute])
         jeuneRepository.get.withArgs(jeuneAjoute.id).resolves(jeuneAjoute)
-        rendezVousService.mettreAJour
+        rendezVousFactory.mettreAJour
           .withArgs(rendezVousInitial, {
             ...commandAvecUnJeuneEnPlus,
             jeunes: [jeune, jeuneAjoute]
@@ -345,7 +345,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         jeuneRepository.findAll
           .withArgs(commandAvecUnJeuneEnMoins.idsJeunes)
           .resolves([jeune])
-        rendezVousService.mettreAJour
+        rendezVousFactory.mettreAJour
           .withArgs(rendezVousInitial, {
             ...commandAvecUnJeuneEnMoins,
             jeunes: [jeune]
