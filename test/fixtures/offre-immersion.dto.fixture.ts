@@ -19,9 +19,9 @@ export const uneOffreImmersionDto = (): PartenaireImmersion.Dto => ({
   siret: '123456',
   contactMode: PartenaireImmersion.ContactMode.IN_PERSON,
   contactDetails: {
-    id: '1',
-    lastName: 'Tavernier',
-    firstName: 'Nils',
-    role: 'manager'
+    id: undefined,
+    lastName: undefined,
+    firstName: undefined,
+    role: undefined
   }
 })
