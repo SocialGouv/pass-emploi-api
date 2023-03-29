@@ -72,11 +72,11 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
             siret: '123456',
             contact: {
               email: undefined,
-              id: '1',
+              id: undefined,
               modeDeContact: 'PRESENTIEL',
-              nom: 'Nils',
-              prenom: 'Tavernier',
-              role: 'manager',
+              nom: undefined,
+              prenom: undefined,
+              role: undefined,
               telephone: undefined
             }
           })

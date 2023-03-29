@@ -3,13 +3,13 @@ import { Offre } from '../../../domain/offre/offre'
 
 export class ContactImmersionQueryModel {
   @ApiProperty()
-  id: string
+  id?: string
   @ApiProperty()
-  nom: string
+  nom?: string
   @ApiProperty()
-  prenom: string
+  prenom?: string
   @ApiProperty()
-  role: string
+  role?: string
   @ApiProperty()
   email?: string
   @ApiProperty()
