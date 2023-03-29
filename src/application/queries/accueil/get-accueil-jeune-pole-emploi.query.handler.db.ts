@@ -1,24 +1,24 @@
-import { Query } from '@google-cloud/bigquery'
-import { Injectable } from '@nestjs/common'
-import { DateTime } from 'luxon'
-import { JeuneAuthorizer } from 'src/application/authorizers/authorize-jeune'
-import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
-import { QueryHandler } from 'src/building-blocks/types/query-handler'
 import {
   failure,
   isFailure,
   Result,
   success
-} from 'src/building-blocks/types/result'
-import { Authentification } from 'src/domain/authentification'
-import { Core } from 'src/domain/core'
-import { Demarche } from 'src/domain/demarche'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+} from '../../../building-blocks/types/result'
+import { Injectable } from '@nestjs/common'
+import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import { GetDemarchesQueryGetter } from '../query-getters/pole-emploi/get-demarches.query.getter'
-import { GetRendezVousJeunePoleEmploiQueryGetter } from '../query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { AccueilJeunePoleEmploiQueryModel } from '../query-models/jeunes.pole-emploi.query-model'
+import { DateTime } from 'luxon'
+import { Demarche } from '../../../domain/demarche'
+import { DroitsInsuffisants } from '../../../building-blocks/types/domain-error'
+import { GetRendezVousJeunePoleEmploiQueryGetter } from '../query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
+import { Authentification } from '../../../domain/authentification'
+import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client'
+import { JeunePoleEmploiAuthorizer } from '../../authorizers/authorize-jeune-pole-emploi'
+import { Core } from '../../../domain/core'
+import { Query } from '../../../building-blocks/types/query'
 
-interface GetAccueilJeunePoleEmploiQuery extends Query {
+export interface GetAccueilJeunePoleEmploiQuery extends Query {
   idJeune: string
   maintenant: string
   accessToken: string
@@ -30,7 +30,7 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
   Result<AccueilJeunePoleEmploiQueryModel>
 > {
   constructor(
-    private jeuneAuthorizer: JeuneAuthorizer,
+    private jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer,
     private keycloakClient: KeycloakClient,
     private getDemarchesQueryGetter: GetDemarchesQueryGetter,
     private getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter
@@ -84,7 +84,6 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
         DateTime.fromISO(demarche.dateFin) >= maintenant &&
         DateTime.fromISO(demarche.dateFin) <= dateFinDeSemaine
     ).length
-
     const nombreDeDemarchesEnRetard = resultDemarches.data.queryModel.filter(
       demarche =>
         DateTime.fromISO(demarche.dateFin) <= maintenant &&
@@ -92,27 +91,28 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
         demarche.statut !== Demarche.Statut.ANNULEE
     ).length
 
-    let dateLaPlusAncienne: string | undefined
+    const prochainRendezVous =
+      resultRendezVous.data.queryModel.length > 0
+        ? resultRendezVous.data.queryModel.filter(
+            rdv => rdv.date >= maintenant.toJSDate()
+          )[0]
+        : undefined
+    let dateDerniereMiseAJour: string | undefined = undefined
     if (resultDemarches.data.dateDuCache && resultRendezVous.data.dateDuCache) {
-      dateLaPlusAncienne = recupererLaDateLaPlusAncienne(
+      dateDerniereMiseAJour = recupererLaDateLaPlusAncienne(
         resultDemarches.data.dateDuCache,
         resultRendezVous.data.dateDuCache
       ).toISO()
-    } else {
-      dateLaPlusAncienne = undefined
     }
 
     const data: AccueilJeunePoleEmploiQueryModel = {
-      dateDerniereMiseAJour: dateLaPlusAncienne,
+      dateDerniereMiseAJour,
       cetteSemaine: {
         nombreRendezVous: nombreDeRendezVous,
         nombreActionsDemarchesEnRetard: nombreDeDemarchesEnRetard,
         nombreActionsDemarchesARealiser: nombreDedemarchesARealiser
       },
-      prochainRendezVous: nombreDeRendezVous
-        ? undefined
-        : resultRendezVous.data.queryModel[0],
-      evenementsAVenir: [],
+      prochainRendezVous,
       mesAlertes: [],
       mesFavoris: []
     }
@@ -123,11 +123,11 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
     query: GetAccueilJeunePoleEmploiQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (
-      utilisateur.structure === Core.Structure.POLE_EMPLOI ||
-      utilisateur.structure === Core.Structure.PASS_EMPLOI
-    ) {
-      return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
+    if (utilisateur.structure === Core.Structure.POLE_EMPLOI) {
+      return this.jeunePoleEmploiAuthorizer.authorize(
+        query.idJeune,
+        utilisateur
+      )
     }
     return failure(new DroitsInsuffisants())
   }
