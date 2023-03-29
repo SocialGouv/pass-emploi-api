@@ -3,6 +3,7 @@ import { JeuneAuthorizer } from 'src/application/authorizers/authorize-jeune'
 import { CommandHandler } from 'src/building-blocks/types/command-handler'
 import { Result } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import {
   FormulaireImmersionPayload,
   ImmersionClient
@@ -27,7 +28,8 @@ export class EnvoyerFormulaireContactImmersionCommandHandler extends CommandHand
 > {
   constructor(
     private jeuneAuthorizer: JeuneAuthorizer,
-    private immersionClient: ImmersionClient
+    private immersionClient: ImmersionClient,
+    private evenementService: EvenementService
   ) {
     super('CreateContactImmersionCommandHandler')
   }
@@ -60,7 +62,10 @@ export class EnvoyerFormulaireContactImmersionCommandHandler extends CommandHand
     return this.immersionClient.postFormulaireImmersion(params)
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creer(
+      Evenement.Code.OFFRE_IMMERSION_ENVOI_FORMULAIRE,
+      utilisateur
+    )
   }
 }

@@ -3,18 +3,6 @@ import { Offre } from '../../../domain/offre/offre'
 
 export class ContactImmersionQueryModel {
   @ApiProperty()
-  id?: string
-  @ApiProperty()
-  nom?: string
-  @ApiProperty()
-  prenom?: string
-  @ApiProperty()
-  role?: string
-  @ApiProperty()
-  email?: string
-  @ApiProperty()
-  telephone?: string
-  @ApiProperty()
   modeDeContact?: Offre.Immersion.MethodeDeContact
 }
 
