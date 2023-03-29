@@ -4,7 +4,7 @@ import { expect, StubbedClass, stubClass } from '../../../utils'
 import { success } from '../../../../src/building-blocks/types/result'
 
 import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
-import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/accueil/get-accueil-jeune-milo-query-handler'
+import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/accueil/get-accueil-jeune-milo.query.handler.db'
 import { JeuneAuthorizer } from 'src/application/authorizers/authorize-jeune'
 import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
