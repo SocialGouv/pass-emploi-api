@@ -44,10 +44,10 @@ export namespace PartenaireImmersion {
     contactMode?: ContactMode
     contactDetails:
       | {
-          id: string
-          lastName: string
-          firstName: string
-          role: string
+          id?: string
+          lastName?: string
+          firstName?: string
+          role?: string
           email?: string
           phone?: string
         }
