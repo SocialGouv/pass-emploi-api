@@ -71,13 +71,7 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
             codeRome: 'D112',
             siret: '123456',
             contact: {
-              email: undefined,
-              id: undefined,
-              modeDeContact: 'PRESENTIEL',
-              nom: undefined,
-              prenom: undefined,
-              role: undefined,
-              telephone: undefined
+              modeDeContact: 'PRESENTIEL'
             }
           })
         )
