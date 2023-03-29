@@ -16,7 +16,7 @@ import { getApplicationWithStubbedDependencies } from '../../utils/module-for-te
 import { DateService } from '../../../src/utils/date-service'
 
 import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
-import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/accueil/get-accueil-jeune-milo-query-handler'
+import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/accueil/get-accueil-jeune-milo.query.handler.db'
 import { AccueilJeuneMiloQueryModel } from 'src/application/queries/query-models/jeunes.milo.query-model'
 
 describe('JeunesMiloController', () => {
