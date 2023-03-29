@@ -96,12 +96,6 @@ export function buildContact(
   offreImmpersionDto: PartenaireImmersion.Dto
 ): ContactImmersionQueryModel | undefined {
   return {
-    id: undefined,
-    nom: undefined,
-    prenom: undefined,
-    telephone: undefined,
-    email: undefined,
-    role: undefined,
     modeDeContact: offreImmpersionDto.contactMode
       ? fromContactMode[offreImmpersionDto.contactMode]
       : undefined
