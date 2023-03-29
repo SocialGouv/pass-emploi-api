@@ -4,6 +4,7 @@ import {
   EnvoyerFormulaireContactImmersionCommandHandler
 } from 'src/application/commands/immersion/envoyer-formulaire-contact-immersion.command.handler'
 import { emptySuccess } from 'src/building-blocks/types/result'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { ImmersionClient } from 'src/infrastructure/clients/immersion-client'
 import { unUtilisateurJeune } from 'test/fixtures/authentification.fixture'
 import { expect, StubbedClass, stubClass } from 'test/utils'
@@ -12,14 +13,17 @@ describe('EnvoyerFormulaireContactImmersionCommandHandler', () => {
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let envoyerFormulaireContactImmersionCommandHandler: EnvoyerFormulaireContactImmersionCommandHandler
   let immersionClient: StubbedClass<ImmersionClient>
+  let evenementService: StubbedClass<EvenementService>
 
   beforeEach(async () => {
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     immersionClient = stubClass(ImmersionClient)
+    evenementService = stubClass(EvenementService)
     envoyerFormulaireContactImmersionCommandHandler =
       new EnvoyerFormulaireContactImmersionCommandHandler(
         jeuneAuthorizer,
-        immersionClient
+        immersionClient,
+        evenementService
       )
   })
 
@@ -87,6 +91,18 @@ describe('EnvoyerFormulaireContactImmersionCommandHandler', () => {
       // Then
       expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
         'idJeune',
+        utilisateur
+      )
+    })
+  })
+  describe('monitor', () => {
+    const utilisateur = unUtilisateurJeune()
+
+    it("créé l'événement d'envoi formulaire", async () => {
+      await envoyerFormulaireContactImmersionCommandHandler.monitor(utilisateur)
+
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.OFFRE_IMMERSION_ENVOI_FORMULAIRE,
         utilisateur
       )
     })
