@@ -1,19 +1,25 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { JobHandler } from '../../building-blocks/types/job-handler'
-import { Job } from '../../building-blocks/types/job'
-import { Planificateur, ProcessJobType } from '../../domain/planificateur'
-import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
-import { DateService } from '../../utils/date-service'
+import { JobHandler } from '../../../building-blocks/types/job-handler'
+import { Job } from '../../../building-blocks/types/job'
+import {
+  Planificateur,
+  PlanificateurRepositoryToken,
+  ProcessJobType
+} from '../../../domain/planificateur'
+import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
+import { DateService } from '../../../utils/date-service'
 import { promisify } from 'util'
 import { exec } from 'child_process'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.DUMP_ANALYTICS)
-export class HandleJobDumpForAnalyticsCommandHandler extends JobHandler<Job> {
+export class DumpForAnalyticsJobHandler extends JobHandler<Job> {
   constructor(
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service,
-    private dateService: DateService
+    private dateService: DateService,
+    @Inject(PlanificateurRepositoryToken)
+    private planificateurRepository: Planificateur.Repository
   ) {
     super(Planificateur.JobType.DUMP_ANALYTICS, suiviJobService)
   }
@@ -33,6 +39,14 @@ export class HandleJobDumpForAnalyticsCommandHandler extends JobHandler<Job> {
       this.logger.error(stderr)
       erreur = stderr
     }
+
+    const job: Planificateur.Job<void> = {
+      dateExecution: this.dateService.nowJs(),
+      type: Planificateur.JobType.ENRICHIR_EVENEMENTS_ANALYTICS,
+      contenu: undefined
+    }
+    await this.planificateurRepository.creerJob(job)
+
     return {
       jobType: this.jobType,
       nbErreurs: 0,
