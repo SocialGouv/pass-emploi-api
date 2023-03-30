@@ -17,6 +17,7 @@ import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client'
 import { JeunePoleEmploiAuthorizer } from '../../authorizers/authorize-jeune-pole-emploi'
 import { Core } from '../../../domain/core'
 import { Query } from '../../../building-blocks/types/query'
+import { GetRecherchesSauvegardeesQueryGetter } from '../query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
 
 export interface GetAccueilJeunePoleEmploiQuery extends Query {
   idJeune: string
@@ -33,7 +34,8 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
     private jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer,
     private keycloakClient: KeycloakClient,
     private getDemarchesQueryGetter: GetDemarchesQueryGetter,
-    private getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter
+    private getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter,
+    private getRecherchesSauvegardeesQueryGetter: GetRecherchesSauvegardeesQueryGetter
   ) {
     super('GetAccueilJeunePoleEmploiQueryHandler')
   }
@@ -53,17 +55,21 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
       query.accessToken
     )
 
-    const [resultDemarches, resultRendezVous] = await Promise.all([
-      this.getDemarchesQueryGetter.handle({
-        ...query,
-        tri: GetDemarchesQueryGetter.Tri.parDateFin,
-        idpToken
-      }),
-      this.getRendezVousJeunePoleEmploiQueryGetter.handle({
-        ...query,
-        idpToken
-      })
-    ])
+    const [resultDemarches, resultRendezVous, rechercheSqlModelsAlertes] =
+      await Promise.all([
+        this.getDemarchesQueryGetter.handle({
+          ...query,
+          tri: GetDemarchesQueryGetter.Tri.parDateFin,
+          idpToken
+        }),
+        this.getRendezVousJeunePoleEmploiQueryGetter.handle({
+          ...query,
+          idpToken
+        }),
+        this.getRecherchesSauvegardeesQueryGetter.handle({
+          idJeune: query.idJeune
+        })
+      ])
 
     if (isFailure(resultDemarches)) {
       return resultDemarches
@@ -113,7 +119,7 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
         nombreActionsDemarchesARealiser: nombreDedemarchesARealiser
       },
       prochainRendezVous,
-      mesAlertes: [],
+      mesAlertes: rechercheSqlModelsAlertes,
       mesFavoris: []
     }
     return success(data)

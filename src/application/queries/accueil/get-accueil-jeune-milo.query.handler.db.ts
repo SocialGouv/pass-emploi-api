@@ -17,6 +17,7 @@ import { fromSqlToRendezVousJeuneQueryModel } from '../query-mappers/rendez-vous
 
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
 import { AccueilJeuneMiloQueryModel } from '../query-models/jeunes.milo.query-model'
+import { GetRecherchesSauvegardeesQueryGetter } from '../query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
 
 export interface GetAccueilJeuneMiloQuery extends Query {
   idJeune: string
@@ -28,7 +29,10 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
   GetAccueilJeuneMiloQuery,
   Result<AccueilJeuneMiloQueryModel>
 > {
-  constructor(private jeuneAuthorizer: JeuneAuthorizer) {
+  constructor(
+    private jeuneAuthorizer: JeuneAuthorizer,
+    private getRecherchesSauvegardeesQueryGetter: GetRecherchesSauvegardeesQueryGetter
+  ) {
     super('GetAccueilJeuneMiloQueryHandler')
   }
   async handle(
@@ -41,10 +45,11 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     const dateFinDeSemaine = maintenant.endOf('week')
 
     const [
-      rendezVousModelsCount,
-      rendezVousModelsProchainRdv,
+      rendezVousSqlModelsCount,
+      rendezVousSqlModelsProchainRdv,
       actionSqlModelsARealiser,
-      actionSqlModelsEnRetard
+      actionSqlModelsEnRetard,
+      rechercheSqlModelsAlertes
     ] = await Promise.all([
       RendezVousSqlModel.count({
         where: {
@@ -97,25 +102,28 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
             [Op.in]: [Action.Statut.EN_COURS, Action.Statut.PAS_COMMENCEE]
           }
         }
+      }),
+      this.getRecherchesSauvegardeesQueryGetter.handle({
+        idJeune: query.idJeune
       })
     ])
 
     return success({
       dateDerniereMiseAJour: undefined,
       cetteSemaine: {
-        nombreRendezVous: rendezVousModelsCount,
+        nombreRendezVous: rendezVousSqlModelsCount,
         nombreActionsDemarchesEnRetard: actionSqlModelsEnRetard,
         nombreActionsDemarchesARealiser: actionSqlModelsARealiser
       },
-      prochainRendezVous: rendezVousModelsProchainRdv
+      prochainRendezVous: rendezVousSqlModelsProchainRdv
         ? fromSqlToRendezVousJeuneQueryModel(
-            rendezVousModelsProchainRdv,
+            rendezVousSqlModelsProchainRdv,
             Authentification.Type.JEUNE,
             query.idJeune
           )
         : undefined,
       evenementsAVenir: [],
-      mesAlertes: [],
+      mesAlertes: rechercheSqlModelsAlertes,
       mesFavoris: []
     })
   }

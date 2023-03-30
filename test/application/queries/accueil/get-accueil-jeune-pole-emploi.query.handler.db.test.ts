@@ -22,17 +22,23 @@ import { Core } from '../../../../src/domain/core'
 import Structure = Core.Structure
 import { JeunePoleEmploiAuthorizer } from '../../../../src/application/authorizers/authorize-jeune-pole-emploi'
 import { uneDemarcheQueryModel } from '../../../fixtures/query-models/demarche.query-model.fixtures'
+import { GetRecherchesSauvegardeesQueryGetter } from 'src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
+import { Recherche } from 'src/domain/offre/recherche/recherche'
 
 describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
   let handler: GetAccueilJeunePoleEmploiQueryHandler
   let getDemarchesQueryGetter: StubbedClass<GetDemarchesQueryGetter>
   let getRendezVousJeunePoleEmploiQueryGetter: StubbedClass<GetRendezVousJeunePoleEmploiQueryGetter>
+  let getRecherchesSauvegardeesQueryGetter: StubbedClass<GetRecherchesSauvegardeesQueryGetter>
   let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
   let keycloakClient: StubbedClass<KeycloakClient>
   const idpToken = 'id-token'
 
   beforeEach(() => {
     getDemarchesQueryGetter = stubClass(GetDemarchesQueryGetter)
+    getRecherchesSauvegardeesQueryGetter = stubClass(
+      GetRecherchesSauvegardeesQueryGetter
+    )
     getRendezVousJeunePoleEmploiQueryGetter = stubClass(
       GetRendezVousJeunePoleEmploiQueryGetter
     )
@@ -44,7 +50,8 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
       jeunePoleEmploiAuthorizer,
       keycloakClient,
       getDemarchesQueryGetter,
-      getRendezVousJeunePoleEmploiQueryGetter
+      getRendezVousJeunePoleEmploiQueryGetter,
+      getRecherchesSauvegardeesQueryGetter
     )
   })
 
@@ -87,6 +94,18 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
       date: maintenant.plus({ weeks: 2, day: 1 }).toJSDate()
     })
 
+    const recherche = {
+      id: 'dd2651d1-1ec0-4588-a3d3-26cf4e313e1a',
+      type: Recherche.Type.OFFRES_ALTERNANCE,
+      metier: 'Boulanger',
+      titre: 'Boulanger en alternance',
+      localisation: 'Paris',
+      dateCreation: '2023-01-22T10:00:00.000Z',
+      dateDerniereRecherche: '2023-01-22T10:00:00.000Z',
+      idJeune: 'idJeune',
+      etat: Recherche.Etat.SUCCES
+    }
+
     let result: Result<AccueilJeunePoleEmploiQueryModel>
 
     describe('quand les services externes répondent avec Succès', () => {
@@ -118,6 +137,18 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
               })
             )
 
+          getRecherchesSauvegardeesQueryGetter.handle
+            .withArgs({
+              idJeune: query.idJeune
+            })
+            .resolves([
+              {
+                ...recherche,
+                geometrie: undefined,
+                criteres: undefined
+              }
+            ])
+
           getRendezVousJeunePoleEmploiQueryGetter.handle
             .withArgs({
               ...query,
@@ -147,6 +178,12 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
           expect(
             isSuccess(result) && result.data.cetteSemaine.nombreRendezVous
           ).to.deep.equal(1)
+        })
+        it('retourne un tableau de recherches sauvegardées', async () => {
+          // Then
+          expect(
+            isSuccess(result) && result.data.prochainRendezVous
+          ).to.deep.equal(unRendezVousAujourdhui)
         })
         it('compte les démarches à réaliser et en retard du reste de la semaine', async () => {
           // Then

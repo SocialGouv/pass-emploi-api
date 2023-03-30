@@ -245,6 +245,7 @@ import { ActionMiloHttpRepository } from './infrastructure/repositories/action/a
 import { QualifierActionCommandHandler } from './application/commands/action/qualifier-action.command.handler'
 import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from './application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
 import { GetDemarchesQueryGetter } from './application/queries/query-getters/pole-emploi/get-demarches.query.getter'
+import { GetRecherchesSauvegardeesQueryGetter } from './application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from './application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { HandleJobMettreAJourCodesEvenementsCommandHandler } from './application/commands/jobs/handle-job-mettre-a-jour-codes-evenements.command'
 import { GetIndicateursPourConseillerQueryHandler } from './application/queries/get-indicateurs-pour-conseiller.query.handler.db'
@@ -672,6 +673,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     QualifierActionCommandHandler,
     GetJeuneHomeAgendaPoleEmploiQueryHandler,
     GetDemarchesQueryGetter,
+    GetRecherchesSauvegardeesQueryGetter,
     GetRendezVousJeunePoleEmploiQueryGetter,
     GetIndicateursPourConseillerQueryHandler,
     RafraichirSuggestionPoleEmploiCommandHandler,
