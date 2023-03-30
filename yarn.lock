@@ -2877,6 +2877,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/pg-copy-streams@npm:^1.2.2":
+  version: 1.2.2
+  resolution: "@types/pg-copy-streams@npm:1.2.2"
+  dependencies:
+    "@types/node": "*"
+    "@types/pg": "*"
+  checksum: 601a9295d122a1a7307b4730c5811e71003653d58aa7d1423a0311c09f763f8f2183a5fc82e5fb53375b2d1679c43805f5fe316e88dcae2eaf9ec7c1e0676e5f
+  languageName: node
+  linkType: hard
+
+"@types/pg@npm:*":
+  version: 8.6.6
+  resolution: "@types/pg@npm:8.6.6"
+  dependencies:
+    "@types/node": "*"
+    pg-protocol: "*"
+    pg-types: ^2.2.0
+  checksum: ac145553a8ad2f357feacad1bceaf5d6ce904eb9d66233b84c469a2b4fa3738d4ebdf29b7ea45387be2d07f915fd873a229f90a2f766d7c377afa7c41fbcf8d1
+  languageName: node
+  linkType: hard
+
 "@types/pino-multi-stream@npm:^5.1.3":
   version: 5.1.3
   resolution: "@types/pino-multi-stream@npm:5.1.3"
@@ -9012,6 +9033,7 @@ __metadata:
     "@types/mocha": ^10.0.1
     "@types/multer": ^1.4.7
     "@types/node": ^18.11.10
+    "@types/pg-copy-streams": ^1.2.2
     "@types/pino-multi-stream": ^5.1.3
     "@types/sinon": ^10.0.13
     "@types/sinon-chai": ^3.2.9
@@ -9056,6 +9078,7 @@ __metadata:
     openid-client: 5.4.0
     pg: 8.10.0
     pg-connection-string: 2.5.0
+    pg-copy-streams: ^6.0.5
     pino-http: 8.3.3
     prettier: ^2.8.0
     redis: ^4.5.1
@@ -9436,6 +9459,13 @@ __metadata:
     define-properties: ^1.1.4
     es-abstract: ^1.20.4
   checksum: 0f8c47517e6a9a980241eafe3b73de11e59511883173c2b93d67424a008e47e11b77c80e431ad1d8a806f6108b225a1cab9223e53e555776c612a24297117d28
+  languageName: node
+  linkType: hard
+
+"obuf@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "obuf@npm:1.1.2"
+  checksum: 41a2ba310e7b6f6c3b905af82c275bf8854896e2e4c5752966d64cbcd2f599cfffd5932006bcf3b8b419dfdacebb3a3912d5d94e10f1d0acab59876c8757f27f
   languageName: node
   linkType: hard
 
@@ -9872,6 +9902,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pg-copy-streams@npm:^6.0.5":
+  version: 6.0.5
+  resolution: "pg-copy-streams@npm:6.0.5"
+  dependencies:
+    obuf: ^1.1.2
+  checksum: 45074d8b366a0f572af628cbf5831b834653856f7945b1e11541bc1b81609b464d636d344b6f60b2c6b836328e9b2faa48e1add5f9adc3c6ca4591ebbea96e5d
+  languageName: node
+  linkType: hard
+
 "pg-int8@npm:1.0.1":
   version: 1.0.1
   resolution: "pg-int8@npm:1.0.1"
@@ -9888,14 +9927,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg-protocol@npm:^1.6.0":
+"pg-protocol@npm:*, pg-protocol@npm:^1.6.0":
   version: 1.6.0
   resolution: "pg-protocol@npm:1.6.0"
   checksum: e12662d2de2011e0c3a03f6a09f435beb1025acdc860f181f18a600a5495dc38a69d753bbde1ace279c8c442536af9c1a7c11e1d0fe3fad3aa1348b28d9d2683
   languageName: node
   linkType: hard
 
-"pg-types@npm:^2.1.0":
+"pg-types@npm:^2.1.0, pg-types@npm:^2.2.0":
   version: 2.2.0
   resolution: "pg-types@npm:2.2.0"
   dependencies:
