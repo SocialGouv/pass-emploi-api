@@ -42,7 +42,7 @@ export class DumpForAnalyticsJobHandler extends JobHandler<Job> {
 
     const job: Planificateur.Job<void> = {
       dateExecution: this.dateService.nowJs(),
-      type: Planificateur.JobType.ENRICHIR_EVENEMENTS_ANALYTICS,
+      type: Planificateur.JobType.CHARGER_EVENEMENTS_ANALYTICS,
       contenu: undefined
     }
     await this.planificateurRepository.creerJob(job)
