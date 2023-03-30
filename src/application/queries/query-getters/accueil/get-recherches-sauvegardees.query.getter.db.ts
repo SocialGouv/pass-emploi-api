@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { RechercheSqlModel } from 'src/infrastructure/sequelize/models/recherche.sql-model'
+import { RechercheSqlModel } from '../../../../infrastructure/sequelize/models/recherche.sql-model'
 import { fromSqlToRechercheQueryModel } from '../../query-mappers/recherche.mapper'
 import { RechercheQueryModel } from '../../query-models/recherches.query-model'
 

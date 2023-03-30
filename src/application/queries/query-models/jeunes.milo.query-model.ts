@@ -19,11 +19,6 @@ class ResumeSemaineJeune {
 }
 
 export class AccueilJeuneMiloQueryModel {
-  @ApiProperty({
-    required: false
-  })
-  dateDerniereMiseAJour?: string
-
   @ApiProperty()
   cetteSemaine: ResumeSemaineJeune
 
@@ -33,7 +28,7 @@ export class AccueilJeuneMiloQueryModel {
   @ApiProperty({
     required: false
   })
-  evenementsAVenir?: RendezVousJeuneDetailQueryModel[]
+  evenementsAVenir: RendezVousJeuneDetailQueryModel[]
 
   @ApiProperty()
   mesAlertes: RechercheQueryModel[]
