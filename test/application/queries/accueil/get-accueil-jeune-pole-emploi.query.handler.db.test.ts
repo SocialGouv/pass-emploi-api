@@ -22,8 +22,8 @@ import { Core } from '../../../../src/domain/core'
 import Structure = Core.Structure
 import { JeunePoleEmploiAuthorizer } from '../../../../src/application/authorizers/authorize-jeune-pole-emploi'
 import { uneDemarcheQueryModel } from '../../../fixtures/query-models/demarche.query-model.fixtures'
-import { GetRecherchesSauvegardeesQueryGetter } from 'src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
-import { Recherche } from 'src/domain/offre/recherche/recherche'
+import { GetRecherchesSauvegardeesQueryGetter } from '../../../../src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
+import { Recherche } from '../../../../src/domain/offre/recherche/recherche'
 
 describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
   let handler: GetAccueilJeunePoleEmploiQueryHandler

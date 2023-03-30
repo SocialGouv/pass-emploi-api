@@ -1,114 +1,289 @@
 import { describe } from 'mocha'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 
-import { success } from '../../../../src/building-blocks/types/result'
+import { isSuccess, Result } from '../../../../src/building-blocks/types/result'
 
 import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
-import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/accueil/get-accueil-jeune-milo.query.handler.db'
-import { JeuneAuthorizer } from 'src/application/authorizers/authorize-jeune'
-import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
-import { unRendezVousDto } from 'test/fixtures/sql-models/rendez-vous.sql-model'
-import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
-import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
-import { uneActionDto } from 'test/fixtures/sql-models/action.sql-model'
-import { Action } from 'src/domain/action/action'
-import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
-import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
-import { getDatabase } from 'test/utils/database-for-testing'
-import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
-import { unRendezVousQueryModel } from 'test/fixtures/query-models/rendez-vous.query-model.fixtures'
-import { RechercheSqlModel } from 'src/infrastructure/sequelize/models/recherche.sql-model'
-import { GetRecherchesSauvegardeesQueryGetter } from 'src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
-import { uneRechercheDto } from 'test/fixtures/sql-models/recherche.sql-model'
-import { fromSqlToRechercheQueryModel } from 'src/application/queries/query-mappers/recherche.mapper'
+import { GetAccueilJeuneMiloQueryHandler } from '../../../../src/application/queries/accueil/get-accueil-jeune-milo.query.handler.db'
+import { JeuneAuthorizer } from '../../../../src/application/authorizers/authorize-jeune'
+import {
+  RendezVousDto,
+  RendezVousSqlModel
+} from '../../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { ActionSqlModel } from '../../../../src/infrastructure/sequelize/models/action.sql-model'
+import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
+import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
+import { uneActionDto } from '../../../fixtures/sql-models/action.sql-model'
+import { Action } from '../../../../src/domain/action/action'
+import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
+import { RendezVousJeuneAssociationSqlModel } from '../../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
+import { GetRecherchesSauvegardeesQueryGetter } from '../../../../src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
+import {
+  unRendezVousJeuneDetailQueryModel,
+  unRendezVousQueryModel
+} from '../../../fixtures/query-models/rendez-vous.query-model.fixtures'
+import { AccueilJeuneMiloQueryModel } from '../../../../src/application/queries/query-models/jeunes.milo.query-model'
+import { CodeTypeRendezVous } from '../../../../src/domain/rendez-vous/rendez-vous'
+import { AsSql } from '../../../../src/infrastructure/sequelize/types'
+import { DateTime } from 'luxon'
+import { uneAgenceMiloDTO } from '../../../fixtures/sql-models/agence.sql-model'
+import { AgenceSqlModel } from '../../../../src/infrastructure/sequelize/models/agence.sql-model'
 
 describe('GetAccueilJeuneMiloQueryHandler', () => {
   let handler: GetAccueilJeuneMiloQueryHandler
-  let queryGetter: StubbedClass<GetRecherchesSauvegardeesQueryGetter>
+  let alertesQueryGetter: StubbedClass<GetRecherchesSauvegardeesQueryGetter>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
 
-  beforeEach(async () => {
-    await getDatabase().cleanPG()
+  before(async () => {
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
-    queryGetter = stubClass(GetRecherchesSauvegardeesQueryGetter)
-    handler = new GetAccueilJeuneMiloQueryHandler(jeuneAuthorizer, queryGetter)
+    alertesQueryGetter = stubClass(GetRecherchesSauvegardeesQueryGetter)
+    handler = new GetAccueilJeuneMiloQueryHandler(
+      jeuneAuthorizer,
+      alertesQueryGetter
+    )
   })
 
   describe('handle', () => {
-    it("retourne une page d'accueil MILO", async () => {
-      // Given
-      const query = {
+    let result: Result<AccueilJeuneMiloQueryModel>
+    let query: { idJeune: string; maintenant: string }
+
+    const maintenantString = '2023-03-27T03:24:00'
+    const maintenant = DateTime.fromISO(maintenantString)
+
+    before(async () => {
+      query = {
         idJeune: 'idJeune',
-        maintenant: '2023-03-27T03:24:00'
+        maintenant: maintenantString
       }
 
-      const conseiller = await ConseillerSqlModel.create(unConseillerDto())
+      await AgenceSqlModel.bulkCreate([
+        uneAgenceMiloDTO({ id: 'bonne-agence-id' }),
+        uneAgenceMiloDTO({ id: 'fake-agence-id' })
+      ])
 
+      const conseiller = await ConseillerSqlModel.create(
+        unConseillerDto({ idAgence: 'bonne-agence-id' })
+      )
       await JeuneSqlModel.creer(
         unJeuneDto({
           id: query.idJeune,
           idConseiller: conseiller.id
         })
       )
+    })
+    after(async () => {
+      await AgenceSqlModel.destroy({ truncate: true, cascade: true })
+    })
 
-      const rdv = await RendezVousSqlModel.create(
-        unRendezVousDto({
-          dateSuppression: null,
-          date: new Date('2023-03-28T03:24:00')
-        })
-      )
+    describe('retourne les indicateurs du restant de la semaine', () => {
+      let rendezVousCetteSemaine: RendezVousSqlModel
 
-      await RendezVousJeuneAssociationSqlModel.create({
-        idJeune: query.idJeune,
-        idRendezVous: rdv.id
-      })
-
-      await ActionSqlModel.creer(
-        uneActionDto({
+      before(async () => {
+        // Given
+        const actionARealiserDto = uneActionDto({
           idJeune: query.idJeune,
-          dateEcheance: new Date('2023-03-29T03:24:00'),
+          dateEcheance: maintenant.plus({ days: 2 }).toJSDate(),
           statut: Action.Statut.EN_COURS
         })
-      )
-      await ActionSqlModel.creer(
-        uneActionDto({
+        const actionEnRetardDto = uneActionDto({
           idJeune: query.idJeune,
-          dateEcheance: new Date('2023-03-26T03:24:00'),
+          dateEcheance: maintenant.minus({ days: 1 }).toJSDate(),
           statut: Action.Statut.EN_COURS
         })
-      )
+        await ActionSqlModel.bulkCreate([actionARealiserDto, actionEnRetardDto])
 
-      const recherche = uneRechercheDto({
-        id: 'dd2651d1-1ec0-4588-a3d3-26cf4e313e1a',
-        idJeune: query.idJeune
-      })
-
-      const rechercheSqlModel = await RechercheSqlModel.create(recherche)
-
-      queryGetter.handle.resolves([
-        fromSqlToRechercheQueryModel(rechercheSqlModel)
-      ])
-
-      const result = await handler.handle(query)
-
-      expect(result).to.deep.equal(
-        success({
-          cetteSemaine: {
-            nombreActionsDemarchesARealiser: 1,
-            nombreActionsDemarchesEnRetard: 1,
-            nombreRendezVous: 1
-          },
-          dateDerniereMiseAJour: undefined,
-          evenementsAVenir: [],
-          mesAlertes: [fromSqlToRechercheQueryModel(rechercheSqlModel)],
-          mesFavoris: [],
-          prochainRendezVous: unRendezVousQueryModel({
-            id: rdv.id,
-            date: new Date('2023-03-28T03:24:00')
+        rendezVousCetteSemaine = await RendezVousSqlModel.create(
+          unRendezVousDto({
+            dateSuppression: null,
+            date: maintenant.plus({ days: 2 }).toJSDate()
           })
+        )
+        await RendezVousJeuneAssociationSqlModel.create({
+          idJeune: query.idJeune,
+          idRendezVous: rendezVousCetteSemaine.id
         })
-      )
+      })
+      after(async () => {
+        await ActionSqlModel.destroy({ truncate: true, cascade: true })
+        await RendezVousSqlModel.destroy({ truncate: true, cascade: true })
+      })
+
+      it('compte les rendez-vous', async () => {
+        // When
+        result = await handler.handle(query)
+
+        // Then
+        expect(
+          isSuccess(result) && result.data.cetteSemaine.nombreRendezVous
+        ).to.deep.equal(1)
+      })
+      it('compte les actions en retard', async () => {
+        // When
+        result = await handler.handle(query)
+
+        // Then
+        expect(
+          isSuccess(result) &&
+            result.data.cetteSemaine.nombreActionsDemarchesEnRetard
+        ).to.deep.equal(1)
+      })
+      it('compte les actions à réaliser', async () => {
+        // When
+        result = await handler.handle(query)
+
+        // Then
+        expect(
+          isSuccess(result) &&
+            result.data.cetteSemaine.nombreActionsDemarchesARealiser
+        ).to.deep.equal(1)
+      })
+    })
+
+    describe('retourne le prochain rendez-vous', () => {
+      const dansDeuxSemainesDateJS = maintenant.plus({ week: 2 }).toJSDate()
+      let prochainRendezVousDans2Semaines: RendezVousSqlModel
+
+      before(async () => {
+        // Given
+        prochainRendezVousDans2Semaines = await RendezVousSqlModel.create(
+          unRendezVousDto({
+            dateSuppression: null,
+            date: dansDeuxSemainesDateJS
+          })
+        )
+        await RendezVousJeuneAssociationSqlModel.create({
+          idJeune: query.idJeune,
+          idRendezVous: prochainRendezVousDans2Semaines.id
+        })
+      })
+      after(async () => {
+        await RendezVousSqlModel.destroy({ truncate: true, cascade: true })
+      })
+
+      it('retourne le prochain rendez-vous ', async () => {
+        // When
+        result = await handler.handle(query)
+
+        // Then
+        expect(
+          isSuccess(result) && result.data.prochainRendezVous
+        ).to.deep.equal(
+          unRendezVousQueryModel({
+            id: prochainRendezVousDans2Semaines.id,
+            date: dansDeuxSemainesDateJS
+          })
+        )
+      })
+    })
+
+    describe('retourne les 3 prochains événements à venir', () => {
+      let evenementAVenir1: AsSql<RendezVousDto>
+      let evenementAVenir2: AsSql<RendezVousDto>
+      let evenementAVenir3: AsSql<RendezVousDto>
+      let evenementPasse: AsSql<RendezVousDto>
+      let evenementAVenirAutreAgence: AsSql<RendezVousDto>
+      let evenementAVenir4HorsPage: AsSql<RendezVousDto>
+
+      before(async () => {
+        // Given
+        evenementAVenir1 = unRendezVousDto({
+          date: maintenant.plus({ day: 1 }).toJSDate(),
+          type: CodeTypeRendezVous.ATELIER,
+          idAgence: 'bonne-agence-id'
+        })
+        evenementAVenir2 = unRendezVousDto({
+          date: maintenant.plus({ day: 3 }).toJSDate(),
+          type: CodeTypeRendezVous.ATELIER,
+          idAgence: 'bonne-agence-id'
+        })
+        evenementAVenir3 = unRendezVousDto({
+          date: maintenant.plus({ day: 4 }).toJSDate(),
+          type: CodeTypeRendezVous.ATELIER,
+          idAgence: 'bonne-agence-id'
+        })
+        evenementPasse = unRendezVousDto({
+          date: maintenant.minus({ day: 1 }).toJSDate(),
+          type: CodeTypeRendezVous.ATELIER,
+          idAgence: 'bonne-agence-id'
+        })
+        evenementAVenirAutreAgence = unRendezVousDto({
+          date: maintenant.plus({ day: 2 }).toJSDate(),
+          type: CodeTypeRendezVous.ATELIER,
+          idAgence: 'fake-agence-id'
+        })
+        evenementAVenir4HorsPage = unRendezVousDto({
+          date: maintenant.plus({ day: 5 }).toJSDate(),
+          type: CodeTypeRendezVous.ATELIER,
+          idAgence: 'bonne-agence-id'
+        })
+        await RendezVousSqlModel.bulkCreate([
+          evenementPasse,
+          evenementAVenir1,
+          evenementAVenirAutreAgence,
+          evenementAVenir2,
+          evenementAVenir3,
+          evenementAVenir4HorsPage
+        ])
+      })
+      after(() => {
+        RendezVousSqlModel.destroy({ truncate: true, cascade: true })
+      })
+
+      it('retourne les 3 prochains événements à venir', async () => {
+        // When
+        result = await handler.handle(query)
+
+        // Then
+        expect(isSuccess(result) && result.data.evenementsAVenir).to.deep.equal(
+          [
+            unRendezVousJeuneDetailQueryModel({
+              id: evenementAVenir1.id,
+              date: maintenant.plus({ day: 1 }).toJSDate(),
+              type: {
+                code: CodeTypeRendezVous.ATELIER,
+                label: 'Atelier'
+              },
+              title: 'rdv',
+              modality: 'modalite'
+            }),
+            unRendezVousJeuneDetailQueryModel({
+              id: evenementAVenir2.id,
+              date: maintenant.plus({ day: 3 }).toJSDate(),
+              type: {
+                code: CodeTypeRendezVous.ATELIER,
+                label: 'Atelier'
+              },
+              title: 'rdv',
+              modality: 'modalite'
+            }),
+            unRendezVousJeuneDetailQueryModel({
+              id: evenementAVenir3.id,
+              date: maintenant.plus({ day: 4 }).toJSDate(),
+              type: {
+                code: CodeTypeRendezVous.ATELIER,
+                label: 'Atelier'
+              },
+              title: 'rdv',
+              modality: 'modalite'
+            })
+          ]
+        )
+      })
+    })
+
+    it('appelle la query pour récupérer les 3 dernières alertes (recherches sauvegardées)', async () => {
+      // Given
+      alertesQueryGetter.handle.resolves([])
+
+      // When
+      result = await handler.handle(query)
+
+      // Then
+      expect(
+        isSuccess(result) && alertesQueryGetter.handle
+      ).to.have.been.calledOnceWithExactly({ idJeune: query.idJeune })
     })
   })
 

@@ -43,7 +43,6 @@ describe('JeunesMiloController', () => {
     const idJeune = '1'
     const maintenant = '2023-03-03'
     const accueilJeuneQueryModel: AccueilJeuneMiloQueryModel = {
-      dateDerniereMiseAJour: undefined,
       cetteSemaine: {
         nombreRendezVous: 1,
         nombreActionsDemarchesEnRetard: 1,
@@ -65,8 +64,6 @@ describe('JeunesMiloController', () => {
         )
         .resolves(success(accueilJeuneQueryModel))
       const {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        dateDerniereMiseAJour,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         prochainRendezVous,
         ...accueilJeuneQueryModelResume

@@ -1,17 +1,17 @@
 import {
   GetRecherchesSauvegardeesQuery,
   GetRecherchesSauvegardeesQueryGetter
-} from 'src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
-import { fromSqlToRechercheQueryModel } from 'src/application/queries/query-mappers/recherche.mapper'
-import { Recherche } from 'src/domain/offre/recherche/recherche'
-import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
-import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
-import { RechercheSqlModel } from 'src/infrastructure/sequelize/models/recherche.sql-model'
-import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
-import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
-import { uneRechercheDto } from 'test/fixtures/sql-models/recherche.sql-model'
-import { expect } from 'test/utils'
-import { getDatabase } from 'test/utils/database-for-testing'
+} from '../../../../../src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
+import { fromSqlToRechercheQueryModel } from '../../../../../src/application/queries/query-mappers/recherche.mapper'
+import { Recherche } from '../../../../../src/domain/offre/recherche/recherche'
+import { ConseillerSqlModel } from '../../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { RechercheSqlModel } from '../../../../../src/infrastructure/sequelize/models/recherche.sql-model'
+import { unConseillerDto } from '../../../../fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from '../../../../fixtures/sql-models/jeune.sql-model'
+import { uneRechercheDto } from '../../../../fixtures/sql-models/recherche.sql-model'
+import { expect } from '../../../../utils'
+import { getDatabase } from '../../../../utils/database-for-testing'
 
 describe('GetRecherchesSauvegardeesQueryGetter', () => {
   let getRecherchesSauvegardeesQueryGetter: GetRecherchesSauvegardeesQueryGetter
@@ -62,6 +62,7 @@ describe('GetRecherchesSauvegardeesQueryGetter', () => {
 
       await ConseillerSqlModel.create(conseiller)
       await JeuneSqlModel.create(jeune)
+
       const recherche_1_sqlModel = await RechercheSqlModel.create(recherche_1)
       const recherche_2_sqlModel = await RechercheSqlModel.create(recherche_2)
       await RechercheSqlModel.create(recherche_3)
