@@ -12,8 +12,6 @@ import { EvenementEngagementHebdoSqlModel } from '../../../src/infrastructure/se
 import { Core } from '../../../src/domain/core'
 import { SuiviJobSqlModel } from '../../../src/infrastructure/sequelize/models/suivi-job.sql-model'
 import { Planificateur } from '../../../src/domain/planificateur'
-import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 
 describe('HandleJobNettoyerLesDonneesCommandHandler', () => {
   let handleJobNettoyerLesDonneesCommandHandler: HandleJobNettoyerLesDonneesCommandHandler
@@ -32,7 +30,7 @@ describe('HandleJobNettoyerLesDonneesCommandHandler', () => {
   })
 
   describe('archives', () => {
-    it('supprime les jeunes archivés depuis plus de 2 ans', async () => {
+    it('supprime les archives de plus de 2 ans', async () => {
       // Given
       await ArchiveJeuneSqlModel.create({
         idJeune: 'idJeuneASupprimer',
@@ -62,31 +60,6 @@ describe('HandleJobNettoyerLesDonneesCommandHandler', () => {
       const archives = await ArchiveJeuneSqlModel.findAll()
       expect(archives).to.have.length(1)
       expect(archives[0].idJeune).to.equal('idJeuneAGarder')
-    })
-
-    it('supprime les rdvs archivés depuis plus de 6 mois', async () => {
-      // Given
-      await RendezVousSqlModel.create(
-        unRendezVousDto({
-          titre: 'unRdvASupprimer',
-          dateSuppression: uneDatetime().minus({ months: 6, day: 1 }).toJSDate()
-        })
-      )
-
-      await RendezVousSqlModel.create(
-        unRendezVousDto({
-          titre: 'unRdvAGarder',
-          dateSuppression: null
-        })
-      )
-
-      // When
-      await handleJobNettoyerLesDonneesCommandHandler.handle()
-
-      // Then
-      const archives = await RendezVousSqlModel.findAll()
-      expect(archives).to.have.length(1)
-      expect(archives[0].titre).to.equal('unRdvAGarder')
     })
   })
 

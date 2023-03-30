@@ -10,7 +10,6 @@ import { EvenementEngagementHebdoSqlModel } from '../../infrastructure/sequelize
 import { LogApiPartenaireSqlModel } from '../../infrastructure/sequelize/models/log-api-partenaire.sql-model'
 import { SuiviJobSqlModel } from '../../infrastructure/sequelize/models/suivi-job.sql-model'
 import { DateService } from '../../utils/date-service'
-import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.NETTOYER_LES_DONNEES)
@@ -26,22 +25,13 @@ export class HandleJobNettoyerLesDonneesCommandHandler extends JobHandler<Job> {
   async handle(): Promise<SuiviJob> {
     const maintenant = this.dateService.now()
     let nbErreurs = 0
-    let nombreJeunesArchivesSupprimees = -1
-    let nombreRdvArchivesSupprimees = -1
+    let nombreArchivesSupprimees = -1
     let nombreLogsApiSupprimees = -1
     let nombreSuiviJobsSupprimees = -1
 
     try {
-      nombreJeunesArchivesSupprimees = await ArchiveJeuneSqlModel.destroy({
+      nombreArchivesSupprimees = await ArchiveJeuneSqlModel.destroy({
         where: dateArchivageSuperieureADeuxAns(maintenant)
-      })
-    } catch (_e) {
-      nbErreurs++
-    }
-
-    try {
-      nombreRdvArchivesSupprimees = await RendezVousSqlModel.destroy({
-        where: dateArchivageSuperieureASixMois(maintenant)
       })
     } catch (_e) {
       nbErreurs++
@@ -79,8 +69,7 @@ export class HandleJobNettoyerLesDonneesCommandHandler extends JobHandler<Job> {
       dateExecution: maintenant,
       tempsExecution: DateService.calculerTempsExecution(maintenant),
       resultat: {
-        nombreJeunesArchivesSupprimees: nombreJeunesArchivesSupprimees,
-        nombreRdvArchivesSupprimees: nombreRdvArchivesSupprimees,
+        nombreArchivesSupprimees,
         nombreLogsApiSupprimees,
         nombreEvenementsEngagementSupprimees: nombreSuiviJobsSupprimees
       }
@@ -91,12 +80,6 @@ export class HandleJobNettoyerLesDonneesCommandHandler extends JobHandler<Job> {
 function dateArchivageSuperieureADeuxAns(maintenant: DateTime): WhereOptions {
   return {
     dateArchivage: { [Op.lt]: maintenant.minus({ years: 2 }).toJSDate() }
-  }
-}
-
-function dateArchivageSuperieureASixMois(maintenant: DateTime): WhereOptions {
-  return {
-    dateSuppression: { [Op.lt]: maintenant.minus({ months: 6 }).toJSDate() }
   }
 }
 
