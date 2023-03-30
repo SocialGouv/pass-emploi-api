@@ -3,6 +3,7 @@ version: '3.7'
 
 volumes:
   api-db-data:
+  analytics-db-data:
   redis-db-data:
 
 services:
@@ -17,7 +18,19 @@ services:
       POSTGRES_DB: passemploidb
     volumes:
       - api-db-data:/var/lib/postgresql
-    
+
+  analyticsdb:
+    image: postgis/postgis:14-3.2-alpine
+    container_name: analyticsdb
+    ports:
+      - "55433:5432"
+    environment:
+      POSTGRES_USER: analytics
+      POSTGRES_PASSWORD: analytics
+      POSTGRES_DB: analytics
+    volumes:
+      - analytics-db-data:/var/lib/postgresql
+
   redisdb:
     image: redis:7-alpine
     ports:

@@ -29,11 +29,9 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     const connexion = await createSequelizeForAnalytics()
     await this.mettreAJourLeSchema(connexion)
     await this.dropperLesIndex(connexion)
-    await Promise.all([
-      this.ajouterLesAgencesConseiller(connexion),
-      this.ajouterLesAgencesJeune(connexion),
-      this.determinerLaSemaine(connexion)
-    ])
+    await this.ajouterLesAgencesConseiller(connexion)
+    await this.ajouterLesAgencesJeune(connexion)
+    await this.determinerLaSemaineALaFinDuTraitement(connexion)
     await this.indexerLesColonnes(connexion)
 
     const jobRechargerLesVues: Planificateur.Job<void> = {
@@ -42,6 +40,8 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
       contenu: undefined
     }
     await this.planificateurRepository.creerJob(jobRechargerLesVues)
+
+    await connexion.close()
 
     return {
       jobType: this.jobType,
@@ -55,11 +55,11 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
 
   private async mettreAJourLeSchema(connexion: Sequelize): Promise<void> {
     await connexion.query(`
-      ALTER TABLE evenement_engagement 
-          ADD COLUMN IF NOT EXISTS "semaine" DATE,
-          ADD COLUMN IF NOT EXISTS "agence" varchar,
-          ADD COLUMN IF NOT EXISTS "departement" varchar,
-          ADD COLUMN IF NOT EXISTS "region" varchar;
+      ALTER TABLE evenement_engagement
+        ADD COLUMN IF NOT EXISTS "semaine"     DATE,
+        ADD COLUMN IF NOT EXISTS "agence"      varchar,
+        ADD COLUMN IF NOT EXISTS "departement" varchar,
+        ADD COLUMN IF NOT EXISTS "region"      varchar;
     `)
   }
 
@@ -85,20 +85,21 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     connexion: Sequelize
   ): Promise<void> {
     await connexion.query(`
-      UPDATE evenement_engagement
-      SET agence=subquery.nom_agence,
-          departement=subquery.code_departement,
-          region=subquery.nom_region
-      FROM (select
-              evenement_engagement.id,
-              a.nom_agence,
-              a.code_departement,
-              a.nom_region
-            from evenement_engagement
-                   left join conseiller c on evenement_engagement.id_utilisateur = c.id
-                   left join agence a on c.id_agence = a.id
-            where type_utilisateur='CONSEILLER') as subquery
-      WHERE evenement_engagement.id = subquery.id;
+        UPDATE evenement_engagement
+        SET agence=subquery.nom_agence,
+            departement=subquery.code_departement,
+            region=subquery.nom_region
+        FROM (select conseiller.id,
+                     nom_agence,
+                     code_departement,
+                     nom_region
+              from conseiller
+                       left join agence on conseiller.id_agence = agence.id
+              where id_agence is not null) as subquery
+        WHERE evenement_engagement.id_utilisateur = subquery.id
+          and evenement_engagement.type_utilisateur = 'CONSEILLER'
+          and evenement_engagement.agence is null
+          and evenement_engagement.semaine is null;
     `)
   }
 
@@ -108,22 +109,26 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
         SET agence=subquery.nom_agence,
             departement=subquery.code_departement,
             region=subquery.nom_region
-        FROM (select evenement_engagement.id,
-                     a.nom_agence,
-                     a.code_departement,
-                     a.nom_region
-              from evenement_engagement
-                       left join jeune j on evenement_engagement.id_utilisateur = j.id
-                       left join conseiller c on j.id_conseiller = c.id
-                       left join agence a on c.id_agence = a.id
-              where type_utilisateur = 'JEUNE') as subquery
-        WHERE evenement_engagement.id = subquery.id;
+        FROM (select jeune.id,
+                     nom_agence,
+                     code_departement,
+                     nom_region
+              from jeune
+                       left join conseiller on jeune.id_conseiller = conseiller.id
+                       left join agence on conseiller.id_agence = agence.id
+              where id_agence is not null) as subquery
+        WHERE evenement_engagement.id_utilisateur = subquery.id
+          and evenement_engagement.type_utilisateur = 'JEUNE'
+          and evenement_engagement.agence is null
+          and  evenement_engagement.semaine is null;
     `)
   }
 
-  private async determinerLaSemaine(connexion: Sequelize): Promise<void> {
+  private async determinerLaSemaineALaFinDuTraitement(
+    connexion: Sequelize
+  ): Promise<void> {
     await connexion.query(`update evenement_engagement
                            set semaine = date_trunc('week', date_evenement)
-                           where true;`)
+                           where semaine is null;`)
   }
 }
