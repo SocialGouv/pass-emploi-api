@@ -18,15 +18,21 @@ import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { getDatabase } from 'test/utils/database-for-testing'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { unRendezVousQueryModel } from 'test/fixtures/query-models/rendez-vous.query-model.fixtures'
+import { RechercheSqlModel } from 'src/infrastructure/sequelize/models/recherche.sql-model'
+import { GetRecherchesSauvegardeesQueryGetter } from 'src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
+import { uneRechercheDto } from 'test/fixtures/sql-models/recherche.sql-model'
+import { fromSqlToRechercheQueryModel } from 'src/application/queries/query-mappers/recherche.mapper'
 
 describe('GetAccueilJeuneMiloQueryHandler', () => {
   let handler: GetAccueilJeuneMiloQueryHandler
+  let queryGetter: StubbedClass<GetRecherchesSauvegardeesQueryGetter>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
-    handler = new GetAccueilJeuneMiloQueryHandler(jeuneAuthorizer)
+    queryGetter = stubClass(GetRecherchesSauvegardeesQueryGetter)
+    handler = new GetAccueilJeuneMiloQueryHandler(jeuneAuthorizer, queryGetter)
   })
 
   describe('handle', () => {
@@ -73,6 +79,17 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
         })
       )
 
+      const recherche = uneRechercheDto({
+        id: 'dd2651d1-1ec0-4588-a3d3-26cf4e313e1a',
+        idJeune: query.idJeune
+      })
+
+      const rechercheSqlModel = await RechercheSqlModel.create(recherche)
+
+      queryGetter.handle.resolves([
+        fromSqlToRechercheQueryModel(rechercheSqlModel)
+      ])
+
       const result = await handler.handle(query)
 
       expect(result).to.deep.equal(
@@ -84,7 +101,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
           },
           dateDerniereMiseAJour: undefined,
           evenementsAVenir: [],
-          mesAlertes: [],
+          mesAlertes: [fromSqlToRechercheQueryModel(rechercheSqlModel)],
           mesFavoris: [],
           prochainRendezVous: unRendezVousQueryModel({
             id: rdv.id,

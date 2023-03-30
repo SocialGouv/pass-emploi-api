@@ -7,6 +7,7 @@ import { Authentification } from '../../domain/authentification'
 import { RechercheSqlModel } from '../../infrastructure/sequelize/models/recherche.sql-model'
 import { ConseillerAgenceAuthorizer } from '../authorizers/authorize-conseiller-agence'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { fromSqlToRechercheQueryModel } from './query-mappers/recherche.mapper'
 import { RechercheQueryModel } from './query-models/recherches.query-model'
 
 export interface GetRecherchesQuery extends Query {
@@ -58,19 +59,5 @@ export class GetRecherchesQueryHandler extends QueryHandler<
 
   async monitor(): Promise<void> {
     return
-  }
-}
-
-function fromSqlToRechercheQueryModel(
-  rechercheSql: RechercheSqlModel
-): RechercheQueryModel {
-  return {
-    id: rechercheSql.id,
-    titre: rechercheSql.titre,
-    type: rechercheSql.type,
-    metier: rechercheSql.metier ?? undefined,
-    localisation: rechercheSql.localisation ?? undefined,
-    criteres: rechercheSql.criteres ?? undefined,
-    geometrie: rechercheSql.geometrie ?? undefined
   }
 }
