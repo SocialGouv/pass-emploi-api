@@ -34,35 +34,47 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
 
   async handle(): Promise<SuiviJob> {
     let erreur
+    let nombreDevemementsCharges
+    let stats
     const maintenant = this.dateService.now()
-
     const connexionSource = await getConnexionToDBSource()
     const connexionTarget = await getConnexionToDBTarget()
 
-    await this.mettreAJourLeSchema(connexionTarget.client)
-    await this.indexerLesColonnes(connexionTarget.client)
-    await this.ajouterLesNouveauxEvenements(
-      connexionSource.client,
-      connexionTarget.client
-    )
+    try {
+      await this.mettreAJourLeSchema(connexionTarget.client)
+      await this.indexerLesColonnes(connexionTarget.client)
+      nombreDevemementsCharges = await this.ajouterLesNouveauxEvenements(
+        connexionSource.client,
+        connexionTarget.client
+      )
+      stats = await this.recupererLeCompteDesEvenementsSurLesDeuxBases(
+        connexionSource.client,
+        connexionTarget.client
+      )
 
-    const jobEnrichirLesEvenements: Planificateur.Job<void> = {
-      dateExecution: this.dateService.nowJs(),
-      type: Planificateur.JobType.ENRICHIR_EVENEMENTS_ANALYTICS,
-      contenu: undefined
-    }
-    await this.planificateurRepository.creerJob(jobEnrichirLesEvenements)
-
-    await connexionSource.close()
-    await connexionTarget.close()
-
-    return {
-      jobType: this.jobType,
-      nbErreurs: 0,
-      succes: erreur ? false : true,
-      dateExecution: maintenant,
-      tempsExecution: DateService.calculerTempsExecution(maintenant),
-      resultat: {}
+      const jobEnrichirLesEvenements: Planificateur.Job<void> = {
+        dateExecution: this.dateService.nowJs(),
+        type: Planificateur.JobType.ENRICHIR_EVENEMENTS_ANALYTICS,
+        contenu: undefined
+      }
+      await this.planificateurRepository.creerJob(jobEnrichirLesEvenements)
+    } catch (e) {
+      erreur = e
+      throw e
+    } finally {
+      await connexionSource.close()
+      await connexionTarget.close()
+      return {
+        jobType: this.jobType,
+        nbErreurs: 0,
+        succes: erreur ? false : true,
+        dateExecution: maintenant,
+        tempsExecution: DateService.calculerTempsExecution(maintenant),
+        resultat: {
+          nombreDevemementsCharges,
+          stats
+        }
+      }
     }
   }
 
@@ -101,11 +113,25 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
   private async ajouterLesNouveauxEvenements(
     clientSource: PoolClient,
     clientTarget: PoolClient
-  ): Promise<void> {
+  ): Promise<number> {
     this.logger.log('Ajout des nouveaux événements')
     const dateDernierEvenementCharge = await this.getDateDernierEvenementCharge(
       clientTarget
     )
+
+    const nombreDEvenementACharger = await this.getNombreDEvenementACharger(
+      clientSource,
+      dateDernierEvenementCharge
+    )
+
+    if (nombreDEvenementACharger > 500000) {
+      this.logger.error(
+        `Trop d'événements à charger (${nombreDEvenementACharger})`
+      )
+      throw new Error(
+        `Trop d'événements à charger (${nombreDEvenementACharger})`
+      )
+    }
 
     const streamCopyTo = await clientSource.query(
       copyTo(
@@ -127,11 +153,12 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
       )
     )
     await pipeline(streamCopyTo, streamCopyFrom)
+    return nombreDEvenementACharger
   }
 
   private async getDateDernierEvenementCharge(
     clientTarget: PoolClient
-  ): Promise<number> {
+  ): Promise<string> {
     this.logger.log('Récupération du dernier événement chargé')
     const result = await clientTarget.query(
       `SELECT to_char(MAX(date_evenement), 'YYYY-MM-DD"T"HH24:MI:SSOF') as max
@@ -140,7 +167,52 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
 
     const dateDernierEvenementCharge =
       result.rows[0].max ?? '2000-01-01T00:00:00'
+
     this.logger.log(dateDernierEvenementCharge)
     return dateDernierEvenementCharge
   }
+
+  private async getNombreDEvenementACharger(
+    clientSource: PoolClient,
+    dateDernierEvenementCharge: string
+  ): Promise<number> {
+    this.logger.log("Récupération du nombre d'événements à charger")
+    const result = await clientSource.query(
+      `SELECT count(*) as compte
+       from evenement_engagement
+       where date_evenement > '${dateDernierEvenementCharge}';`
+    )
+    return result.rows[0].compte ?? 0
+  }
+
+  private async recupererLeCompteDesEvenementsSurLesDeuxBases(
+    clientSource: PoolClient,
+    clientTarget: PoolClient
+  ): Promise<Stats> {
+    this.logger.log("Récupération du nombre d'événements sur les deux bases")
+    const resultSource = await clientSource.query(
+      `SELECT count(*) as comptesource
+       from evenement_engagement;`
+    )
+    const nombreEvenementsSource = resultSource.rows[0].comptesource
+
+    const resultTarget = await clientTarget.query(
+      `SELECT count(*) as comptetarget
+       from evenement_engagement;`
+    )
+    const nombreEvenementsTarget = resultTarget.rows[0].comptetarget
+    return {
+      nombreEvenementsSource,
+      nombreEvenementsTarget,
+      difference:
+        Number(nombreEvenementsSource ?? '0') -
+        Number(nombreEvenementsTarget ?? '0')
+    }
+  }
+}
+
+interface Stats {
+  nombreEvenementsSource: number | undefined
+  nombreEvenementsTarget: number | undefined
+  difference: number
 }

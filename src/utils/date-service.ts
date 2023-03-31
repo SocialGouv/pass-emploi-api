@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 
+export const JOUR_DE_LA_SEMAINE_LUNDI = 1
+
 @Injectable()
 export class DateService {
   now(): DateTime {
