@@ -22,11 +22,10 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     const maintenant = this.dateService.now()
     const connexion = await createSequelizeForAnalytics()
     await this.mettreAJourLeSchema(connexion)
-    await this.dropperLesIndex(connexion)
+    await this.indexerLesColonnes(connexion)
     await this.ajouterLesAgencesConseiller(connexion)
     await this.ajouterLesAgencesJeune(connexion)
     await this.determinerLaSemaineALaFinDuTraitement(connexion)
-    await this.indexerLesColonnes(connexion)
 
     await connexion.close()
 
@@ -41,6 +40,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
   }
 
   private async mettreAJourLeSchema(connexion: Sequelize): Promise<void> {
+    this.logger.log('Mise à jour du schéma')
     await connexion.query(`
       ALTER TABLE evenement_engagement
         ADD COLUMN IF NOT EXISTS "semaine"     DATE,
@@ -50,27 +50,20 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     `)
   }
 
-  private async dropperLesIndex(connexion: Sequelize): Promise<void> {
-    await connexion.query(`
-      drop index if exists evenement_engagement_semaine_index;
-      drop index if exists evenement_engagement_agence_index;
-      drop index if exists evenement_engagement_departement_index;
-      drop index if exists evenement_engagement_region_index;
-    `)
-  }
-
   private async indexerLesColonnes(connexion: Sequelize): Promise<void> {
+    this.logger.log('Indexation des colonnes')
     await connexion.query(`
-      create index evenement_engagement_semaine_index on evenement_engagement (semaine);
-      create index evenement_engagement_agence_index on evenement_engagement (agence);
-      create index evenement_engagement_departement_index on evenement_engagement (departement);
-      create index evenement_engagement_region_index on evenement_engagement (region);
+      create index if not exists evenement_engagement_semaine_index on evenement_engagement (semaine);
+      create index if not exists evenement_engagement_agence_index on evenement_engagement (agence);
+      create index if not exists evenement_engagement_departement_index on evenement_engagement (departement);
+      create index if not exists evenement_engagement_region_index on evenement_engagement (region);
     `)
   }
 
   private async ajouterLesAgencesConseiller(
     connexion: Sequelize
   ): Promise<void> {
+    this.logger.log('Ajout des agences des conseillers')
     await connexion.query(`
         UPDATE evenement_engagement
         SET agence=subquery.nom_agence,
@@ -91,6 +84,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
   }
 
   private async ajouterLesAgencesJeune(connexion: Sequelize): Promise<void> {
+    this.logger.log('Ajout des agences des jeunes')
     await connexion.query(`
         UPDATE evenement_engagement
         SET agence=subquery.nom_agence,
@@ -114,6 +108,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
   private async determinerLaSemaineALaFinDuTraitement(
     connexion: Sequelize
   ): Promise<void> {
+    this.logger.log('Détermination de la semaine')
     await connexion.query(`update evenement_engagement
                            set semaine = date_trunc('week', date_evenement)
                            where semaine is null;`)
