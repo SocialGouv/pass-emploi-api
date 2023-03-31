@@ -67,6 +67,7 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
   }
 
   private async mettreAJourLeSchema(clientTarget: PoolClient): Promise<void> {
+    this.logger.log('Mise à jour du schéma de la base de données cible')
     await clientTarget.query(`
       CREATE TABLE IF NOT EXISTS evenement_engagement
       (
@@ -84,6 +85,7 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
   }
 
   private async indexerLesColonnes(clientTarget: PoolClient): Promise<void> {
+    this.logger.log('Indexation des colonnes')
     await clientTarget.query(`
       create index if not exists evenement_engagement_date_evenement_index on evenement_engagement (date_evenement);
       create index if not exists evenement_engagement_categorie_index on evenement_engagement (categorie);
@@ -100,14 +102,14 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
     clientSource: PoolClient,
     clientTarget: PoolClient
   ): Promise<void> {
-    const dernierEvenementCharge = await this.getDernierEvenementCharge(
+    this.logger.log('Ajout des nouveaux événements')
+    const dateDernierEvenementCharge = await this.getDateDernierEvenementCharge(
       clientTarget
     )
-    this.logger.log(`dernier id evenement chargé: ${dernierEvenementCharge}`)
 
     const streamCopyTo = await clientSource.query(
       copyTo(
-        `COPY (SELECT * FROM evenement_engagement WHERE id>${dernierEvenementCharge}) TO STDOUT WITH NULL '\\LA_VALEUR_NULL'`
+        `COPY (SELECT * FROM evenement_engagement WHERE date_evenement>'${dateDernierEvenementCharge}') TO STDOUT WITH NULL '\\LA_VALEUR_NULL'`
       )
     )
 
@@ -127,13 +129,18 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
     await pipeline(streamCopyTo, streamCopyFrom)
   }
 
-  private async getDernierEvenementCharge(
+  private async getDateDernierEvenementCharge(
     clientTarget: PoolClient
   ): Promise<number> {
+    this.logger.log('Récupération du dernier événement chargé')
     const result = await clientTarget.query(
-      `SELECT MAX(id) as max
+      `SELECT to_char(MAX(date_evenement), 'YYYY-MM-DD"T"HH24:MI:SSOF') as max
        from evenement_engagement;`
     )
-    return result.rows[0].max ?? 0
+
+    const dateDernierEvenementCharge =
+      result.rows[0].max ?? '2000-01-01T00:00:00'
+    this.logger.log(dateDernierEvenementCharge)
+    return dateDernierEvenementCharge
   }
 }
