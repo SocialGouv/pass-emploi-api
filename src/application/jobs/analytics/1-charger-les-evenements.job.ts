@@ -32,7 +32,7 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
     super(Planificateur.JobType.CHARGER_EVENEMENTS_ANALYTICS, suiviJobService)
   }
 
-  async handle(_job: Planificateur.Job): Promise<SuiviJob> {
+  async handle(): Promise<SuiviJob> {
     let erreur
     const maintenant = this.dateService.now()
 

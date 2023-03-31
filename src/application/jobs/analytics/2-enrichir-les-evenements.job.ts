@@ -1,10 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
-import {
-  Planificateur,
-  PlanificateurRepositoryToken,
-  ProcessJobType
-} from '../../../domain/planificateur'
+import { Planificateur, ProcessJobType } from '../../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
 import { createSequelizeForAnalytics } from '../../../infrastructure/sequelize/connector-analytics'
@@ -16,14 +12,12 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
   constructor(
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service,
-    private dateService: DateService,
-    @Inject(PlanificateurRepositoryToken)
-    private planificateurRepository: Planificateur.Repository
+    private dateService: DateService
   ) {
     super(Planificateur.JobType.ENRICHIR_EVENEMENTS_ANALYTICS, suiviJobService)
   }
 
-  async handle(_job: Planificateur.Job): Promise<SuiviJob> {
+  async handle(): Promise<SuiviJob> {
     let erreur
     const maintenant = this.dateService.now()
     const connexion = await createSequelizeForAnalytics()
@@ -33,13 +27,6 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     await this.ajouterLesAgencesJeune(connexion)
     await this.determinerLaSemaineALaFinDuTraitement(connexion)
     await this.indexerLesColonnes(connexion)
-
-    const jobRechargerLesVues: Planificateur.Job<void> = {
-      dateExecution: this.dateService.nowJs(),
-      type: Planificateur.JobType.CHARGER_LES_VUES_ANALYTICS,
-      contenu: undefined
-    }
-    await this.planificateurRepository.creerJob(jobRechargerLesVues)
 
     await connexion.close()
 
