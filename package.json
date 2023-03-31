@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "engines": {
-    "npm": "9.6.2",
+    "npm": "9.6.3",
     "yarn": "3.5.0",
     "node": "18.12.1"
   },
