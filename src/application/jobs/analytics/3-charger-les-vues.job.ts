@@ -18,7 +18,7 @@ export class ChargerLesVuesJobHandler extends JobHandler<Planificateur.Job> {
     super(Planificateur.JobType.CHARGER_LES_VUES_ANALYTICS, suiviJobService)
   }
 
-  async handle(_job: Planificateur.Job): Promise<SuiviJob> {
+  async handle(): Promise<SuiviJob> {
     let erreur
     const maintenant = this.dateService.now()
     const semaine = maintenant.startOf('week').minus({ week: 1 })
@@ -93,77 +93,77 @@ export class ChargerLesVuesJobHandler extends JobHandler<Planificateur.Job> {
        where semaine != '${semaineFormattee}';`
     )
     await connexion.query(`
-        insert into fonctionnalites_conseiller(semaine,
-                                               categorie,
-                                               action,
-                                               nom,
-                                               structure,
-                                               nb_ae,
-                                               nb_user_total,
-                                               nb_user_cat,
-                                               nb_user_cat_action,
-                                               nb_user_cat_action_nom)
-        SELECT table_nom.semaine,
-               table_nom.categorie,
-               table_nom.action,
-               table_nom.nom,
-               table_nom.structure,
-               NULLIF(MIN(nb_ae), 0)           as nb_ae,
-               SUM(nb_users_tot)               as nb_users,
-               NULLIF(MIN(nb_users_cat), 0)    as nb_users_cat,
-               NULLIF(MIN(nb_users_action), 0) as nb_users_action,
-               NULLIF(MIN(nb_users_nom), 0)    as nb_users_nom
-        FROM (SELECT COUNT(distinct id_utilisateur) as nb_users_nom,
-                     semaine,
-                     categorie,
-                     action,
-                     nom,
-                     structure
-              FROM evenement_engagement
-              where structure is not null
-                and structure != 'PASS_EMPLOI'
-                and type_utilisateur = '${typeUtilisateur}'
-                and semaine = '${semaineFormattee}'
-              GROUP BY semaine, structure, categorie, action, nom) as table_nom
-                 INNER JOIN (SELECT COUNT(distinct id_utilisateur) as nb_users_cat,
-                                    semaine,
-                                    structure,
-                                    categorie
-                             FROM evenement_engagement
-                             where structure is not null
-                               and structure != 'PASS_EMPLOI'
-                               and type_utilisateur = '${typeUtilisateur}'
-                               and semaine = '${semaineFormattee}'
-                             GROUP BY semaine, structure, categorie) as table_cat
-                            ON table_nom.semaine = table_cat.semaine and table_nom.structure = table_cat.structure and
-                               table_nom.categorie = table_cat.categorie
-                 INNER JOIN (SELECT COUNT(distinct id_utilisateur) as nb_users_action,
-                                    semaine,
-                                    structure,
-                                    categorie,
-                                    action
-                             FROM evenement_engagement
-                             where structure is not null
-                               and structure != 'PASS_EMPLOI'
-                               and type_utilisateur = '${typeUtilisateur}'
-                               and semaine = '${semaineFormattee}'
-                             GROUP BY semaine, structure, categorie, action) as table_action
-                            ON table_nom.semaine = table_action.semaine and
-                               table_nom.structure = table_action.structure and
-                               table_nom.categorie = table_action.categorie and table_nom.action = table_action.action
-                 INNER JOIN (SELECT count(*)                       as nb_ae,
-                                    COUNT(distinct id_utilisateur) as nb_users_tot,
-                                    semaine,
-                                    structure
-                             FROM evenement_engagement
-                             where structure is not null
-                               and structure != 'PASS_EMPLOI'
-                               and type_utilisateur = '${typeUtilisateur}'
-                               and semaine = '${semaineFormattee}'
-                             GROUP BY semaine, structure) as table_tot
-                            ON table_nom.semaine = table_nom.semaine and table_nom.structure = table_tot.structure
-        GROUP BY table_nom.semaine, table_nom.structure, table_nom.categorie, table_nom.action, table_nom.nom
-        ORDER BY table_nom.categorie, table_nom.action, table_nom.nom, table_nom.structure
+      insert into fonctionnalites_conseiller(semaine,
+                                             categorie,
+                                             action,
+                                             nom,
+                                             structure,
+                                             nb_ae,
+                                             nb_user_total,
+                                             nb_user_cat,
+                                             nb_user_cat_action,
+                                             nb_user_cat_action_nom)
+      SELECT table_nom.semaine,
+             table_nom.categorie,
+             table_nom.action,
+             table_nom.nom,
+             table_nom.structure,
+             NULLIF(MIN(nb_ae), 0)           as nb_ae,
+             SUM(nb_users_tot)               as nb_users,
+             NULLIF(MIN(nb_users_cat), 0)    as nb_users_cat,
+             NULLIF(MIN(nb_users_action), 0) as nb_users_action,
+             NULLIF(MIN(nb_users_nom), 0)    as nb_users_nom
+      FROM (SELECT COUNT(distinct id_utilisateur) as nb_users_nom,
+                   semaine,
+                   categorie,
+                   action,
+                   nom,
+                   structure
+            FROM evenement_engagement
+            where structure is not null
+              and structure != 'PASS_EMPLOI'
+              and type_utilisateur = '${typeUtilisateur}'
+              and semaine = '${semaineFormattee}'
+            GROUP BY semaine, structure, categorie, action, nom) as table_nom
+             INNER JOIN (SELECT COUNT(distinct id_utilisateur) as nb_users_cat,
+                                semaine,
+                                structure,
+                                categorie
+                         FROM evenement_engagement
+                         where structure is not null
+                           and structure != 'PASS_EMPLOI'
+                           and type_utilisateur = '${typeUtilisateur}'
+                           and semaine = '${semaineFormattee}'
+                         GROUP BY semaine, structure, categorie) as table_cat
+                        ON table_nom.semaine = table_cat.semaine and table_nom.structure = table_cat.structure and
+                           table_nom.categorie = table_cat.categorie
+             INNER JOIN (SELECT COUNT(distinct id_utilisateur) as nb_users_action,
+                                semaine,
+                                structure,
+                                categorie,
+                                action
+                         FROM evenement_engagement
+                         where structure is not null
+                           and structure != 'PASS_EMPLOI'
+                           and type_utilisateur = '${typeUtilisateur}'
+                           and semaine = '${semaineFormattee}'
+                         GROUP BY semaine, structure, categorie, action) as table_action
+                        ON table_nom.semaine = table_action.semaine and
+                           table_nom.structure = table_action.structure and
+                           table_nom.categorie = table_action.categorie and table_nom.action = table_action.action
+             INNER JOIN (SELECT count(*)                       as nb_ae,
+                                COUNT(distinct id_utilisateur) as nb_users_tot,
+                                semaine,
+                                structure
+                         FROM evenement_engagement
+                         where structure is not null
+                           and structure != 'PASS_EMPLOI'
+                           and type_utilisateur = '${typeUtilisateur}'
+                           and semaine = '${semaineFormattee}'
+                         GROUP BY semaine, structure) as table_tot
+                        ON table_nom.semaine = table_nom.semaine and table_nom.structure = table_tot.structure
+      GROUP BY table_nom.semaine, table_nom.structure, table_nom.categorie, table_nom.action, table_nom.nom
+      ORDER BY table_nom.categorie, table_nom.action, table_nom.nom, table_nom.structure
     `)
   }
 }
