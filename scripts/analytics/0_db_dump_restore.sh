@@ -4,10 +4,9 @@ echo "dump cej db and restore to another"
 
 #DUMP_RESTORE_DB_SOURCE=
 #DUMP_RESTORE_DB_TARGET=
-#DUMP_RESTORE_DB_FORCE=
 
-if [[ $APP != "pa-back-prod" ]] && [[ $DUMP_RESTORE_DB_FORCE != 'true' ]]; then
-  echo "error: must run only on prod"
+if [[ $DUMP_RESTORE_DB_TARGET == *"pa_back_pro_817"* ]]; then
+  echo "Error: Target must not be production"
   exit 1
 fi
 
