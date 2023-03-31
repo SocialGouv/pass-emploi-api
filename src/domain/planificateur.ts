@@ -175,12 +175,6 @@ export const listeCronJobs: Planificateur.CronJob[] = [
     type: Planificateur.JobType.DUMP_ANALYTICS,
     expression: '30 2 * * *',
     description: 'Tous les jours à 2h30. Dump de la DB vers analytics.'
-  },
-  {
-    type: Planificateur.JobType.CHARGER_LES_VUES_ANALYTICS,
-    expression: '0 2 * * 1',
-    description:
-      'Tous les lundi à 2h AM. Calcule les vues de la semaine passée.'
   }
 ]
 

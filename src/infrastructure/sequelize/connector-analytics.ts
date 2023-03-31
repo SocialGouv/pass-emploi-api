@@ -34,7 +34,7 @@ export async function createSequelizeForAnalytics(): Promise<Sequelize> {
 
 export async function getConnexionToDBSource(): Promise<PgConnexion> {
   // eslint-disable-next-line no-process-env
-  const databaseUrl = process.env.DATABASE_URL as string
+  const databaseUrl = process.env.DUMP_RESTORE_DB_SOURCE as string
   return getPGConnexion(databaseUrl)
 }
 

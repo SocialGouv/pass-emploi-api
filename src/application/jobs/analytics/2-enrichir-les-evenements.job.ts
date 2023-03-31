@@ -1,8 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
-import { Planificateur, ProcessJobType } from '../../../domain/planificateur'
+import {
+  Planificateur,
+  PlanificateurRepositoryToken,
+  ProcessJobType
+} from '../../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
-import { DateService } from '../../../utils/date-service'
+import {
+  DateService,
+  JOUR_DE_LA_SEMAINE_LUNDI
+} from '../../../utils/date-service'
 import { createSequelizeForAnalytics } from '../../../infrastructure/sequelize/connector-analytics'
 import { Sequelize } from 'sequelize-typescript'
 
@@ -12,7 +19,9 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
   constructor(
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service,
-    private dateService: DateService
+    private dateService: DateService,
+    @Inject(PlanificateurRepositoryToken)
+    private planificateurRepository: Planificateur.Repository
   ) {
     super(Planificateur.JobType.ENRICHIR_EVENEMENTS_ANALYTICS, suiviJobService)
   }
@@ -28,6 +37,15 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     await this.determinerLaSemaineALaFinDuTraitement(connexion)
 
     await connexion.close()
+
+    if (maintenant.weekday === JOUR_DE_LA_SEMAINE_LUNDI) {
+      const jobCalculerLesVues: Planificateur.Job<void> = {
+        dateExecution: this.dateService.nowJs(),
+        type: Planificateur.JobType.CHARGER_LES_VUES_ANALYTICS,
+        contenu: undefined
+      }
+      await this.planificateurRepository.creerJob(jobCalculerLesVues)
+    }
 
     return {
       jobType: this.jobType,
@@ -65,43 +83,43 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
   ): Promise<void> {
     this.logger.log('Ajout des agences des conseillers')
     await connexion.query(`
-        UPDATE evenement_engagement
-        SET agence=subquery.nom_agence,
-            departement=subquery.code_departement,
-            region=subquery.nom_region
-        FROM (select conseiller.id,
-                     nom_agence,
-                     code_departement,
-                     nom_region
-              from conseiller
-                       left join agence on conseiller.id_agence = agence.id
-              where id_agence is not null) as subquery
-        WHERE evenement_engagement.id_utilisateur = subquery.id
-          and evenement_engagement.type_utilisateur = 'CONSEILLER'
-          and evenement_engagement.agence is null
-          and evenement_engagement.semaine is null;
+      UPDATE evenement_engagement
+      SET agence=subquery.nom_agence,
+          departement=subquery.code_departement,
+          region=subquery.nom_region
+      FROM (select conseiller.id,
+                   nom_agence,
+                   code_departement,
+                   nom_region
+            from conseiller
+                   left join agence on conseiller.id_agence = agence.id
+            where id_agence is not null) as subquery
+      WHERE evenement_engagement.id_utilisateur = subquery.id
+        and evenement_engagement.type_utilisateur = 'CONSEILLER'
+        and evenement_engagement.agence is null
+        and evenement_engagement.semaine is null;
     `)
   }
 
   private async ajouterLesAgencesJeune(connexion: Sequelize): Promise<void> {
     this.logger.log('Ajout des agences des jeunes')
     await connexion.query(`
-        UPDATE evenement_engagement
-        SET agence=subquery.nom_agence,
-            departement=subquery.code_departement,
-            region=subquery.nom_region
-        FROM (select jeune.id,
-                     nom_agence,
-                     code_departement,
-                     nom_region
-              from jeune
-                       left join conseiller on jeune.id_conseiller = conseiller.id
-                       left join agence on conseiller.id_agence = agence.id
-              where id_agence is not null) as subquery
-        WHERE evenement_engagement.id_utilisateur = subquery.id
-          and evenement_engagement.type_utilisateur = 'JEUNE'
-          and evenement_engagement.agence is null
-          and  evenement_engagement.semaine is null;
+      UPDATE evenement_engagement
+      SET agence=subquery.nom_agence,
+          departement=subquery.code_departement,
+          region=subquery.nom_region
+      FROM (select jeune.id,
+                   nom_agence,
+                   code_departement,
+                   nom_region
+            from jeune
+                   left join conseiller on jeune.id_conseiller = conseiller.id
+                   left join agence on conseiller.id_agence = agence.id
+            where id_agence is not null) as subquery
+      WHERE evenement_engagement.id_utilisateur = subquery.id
+        and evenement_engagement.type_utilisateur = 'JEUNE'
+        and evenement_engagement.agence is null
+        and evenement_engagement.semaine is null;
     `)
   }
 
