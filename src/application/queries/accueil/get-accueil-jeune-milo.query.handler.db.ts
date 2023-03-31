@@ -124,7 +124,10 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     query: GetAccueilJeuneMiloQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.structure === Core.Structure.MILO) {
+    if (
+      utilisateur.structure === Core.Structure.MILO ||
+      utilisateur.structure === Core.Structure.PASS_EMPLOI
+    ) {
       return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
     }
     return failure(new DroitsInsuffisants())
