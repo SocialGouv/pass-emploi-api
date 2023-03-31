@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
-import { Job } from '../../../building-blocks/types/job'
 import {
   Planificateur,
   PlanificateurRepositoryToken,
@@ -13,7 +12,7 @@ import { exec } from 'child_process'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.DUMP_ANALYTICS)
-export class DumpForAnalyticsJobHandler extends JobHandler<Job> {
+export class DumpForAnalyticsJobHandler extends JobHandler<Planificateur.Job> {
   constructor(
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service,
@@ -40,12 +39,12 @@ export class DumpForAnalyticsJobHandler extends JobHandler<Job> {
       erreur = stderr
     }
 
-    const job: Planificateur.Job<void> = {
+    const jobChargementAnalytics: Planificateur.Job<void> = {
       dateExecution: this.dateService.nowJs(),
       type: Planificateur.JobType.CHARGER_EVENEMENTS_ANALYTICS,
       contenu: undefined
     }
-    await this.planificateurRepository.creerJob(job)
+    await this.planificateurRepository.creerJob(jobChargementAnalytics)
 
     return {
       jobType: this.jobType,
