@@ -3,7 +3,7 @@ import { Offre } from '../../../domain/offre/offre'
 
 export class ContactImmersionQueryModel {
   @ApiProperty()
-  modeDeContact?: Offre.Immersion.MethodeDeContact
+  modeDeContact: Offre.Immersion.MethodeDeContact
 }
 
 export class LocalisationQueryModel {
