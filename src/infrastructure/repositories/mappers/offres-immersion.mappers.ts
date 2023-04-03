@@ -98,6 +98,6 @@ export function buildContact(
   return {
     modeDeContact: offreImmpersionDto.contactMode
       ? fromContactMode[offreImmpersionDto.contactMode]
-      : undefined
+      : Offre.Immersion.MethodeDeContact.INCONNU
   }
 }
