@@ -1,15 +1,13 @@
 import { Sequelize } from 'sequelize-typescript'
-import { DateTime } from 'luxon'
 
 export async function chargerLaVueFonctionnalite(
   connexion: Sequelize,
-  semaine: DateTime
+  semaine: string
 ): Promise<void> {
-  const semaineFormattee = `${semaine.toFormat('yyyy-MM-dd')}`
   await connexion.query(
     `DELETE
      from analytics_fonctionnalites
-     where semaine != '${semaineFormattee}';`
+     where semaine = '${semaine}';`
   )
   await connexion.query(`
     insert into analytics_fonctionnalites(semaine,
@@ -51,7 +49,7 @@ export async function chargerLaVueFonctionnalite(
           FROM evenement_engagement
           where structure is not null
             and structure != 'PASS_EMPLOI'
-            and semaine = '${semaineFormattee}'
+            and semaine = '${semaine}'
           GROUP BY semaine, structure, categorie, action, nom, type_utilisateur) as table_nom
            INNER JOIN (SELECT COUNT(distinct id_utilisateur) as nb_users_action,
                               count(*)                       as nb_ae_action,
@@ -63,7 +61,7 @@ export async function chargerLaVueFonctionnalite(
                        FROM evenement_engagement
                        where structure is not null
                          and structure != 'PASS_EMPLOI'
-                         and semaine = '${semaineFormattee}'
+                         and semaine = '${semaine}'
                        GROUP BY semaine, structure, categorie, action, type_utilisateur) as table_action
                       ON table_nom.semaine = table_action.semaine and
                          table_nom.structure = table_action.structure and
@@ -77,7 +75,7 @@ export async function chargerLaVueFonctionnalite(
                        FROM evenement_engagement
                        where structure is not null
                          and structure != 'PASS_EMPLOI'
-                         and semaine = '${semaineFormattee}'
+                         and semaine = '${semaine}'
                        GROUP BY semaine, structure, categorie, type_utilisateur) as table_cat
                       ON table_nom.semaine = table_cat.semaine and table_nom.structure = table_cat.structure and
                          table_nom.categorie = table_cat.categorie
@@ -89,7 +87,7 @@ export async function chargerLaVueFonctionnalite(
                        FROM evenement_engagement
                        where structure is not null
                          and structure != 'PASS_EMPLOI'
-                         and semaine = '${semaineFormattee}'
+                         and semaine = '${semaine}'
                        GROUP BY semaine, structure, type_utilisateur) as table_tot
                       ON table_nom.semaine = table_nom.semaine and table_nom.structure = table_tot.structure
     GROUP BY table_nom.semaine, table_nom.structure, table_nom.categorie, table_nom.action, table_nom.nom,

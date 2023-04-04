@@ -7,32 +7,40 @@ import { createSequelizeForAnalytics } from '../../../infrastructure/sequelize/c
 import { migrate } from './vues/3-0-migrate-schema'
 import { chargerLaVueFonctionnalite } from './vues/3-1-vue-fonctionnalites'
 import { chargerLaVueEngagement } from './vues/3-2-vue-engagement'
+import { QueryTypes } from 'sequelize'
 
 @Injectable()
-@ProcessJobType(Planificateur.JobType.CHARGER_LES_VUES_ANALYTICS)
-export class ChargerLesVuesJobHandler extends JobHandler<Planificateur.Job> {
+@ProcessJobType(Planificateur.JobType.INITIALISER_LES_VUES)
+export class InitialiserLesVuesJobHandler extends JobHandler<Planificateur.Job> {
   constructor(
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service,
     private dateService: DateService
   ) {
-    super(Planificateur.JobType.CHARGER_LES_VUES_ANALYTICS, suiviJobService)
+    super(Planificateur.JobType.INITIALISER_LES_VUES, suiviJobService)
   }
 
   async handle(): Promise<SuiviJob> {
     let erreur
     const maintenant = this.dateService.now()
-    const semaine = maintenant
-      .startOf('week')
-      .minus({ week: 1 })
-      .toFormat('yyyy-MM-dd')
     const connexion = await createSequelizeForAnalytics()
     this.logger.log('Migrer le schéma des vues analytics')
     await migrate(connexion)
-    this.logger.log('Charger la vue fonctionnalité')
-    await chargerLaVueFonctionnalite(connexion, semaine)
-    this.logger.log('Charger la vue engagement')
-    await chargerLaVueEngagement(connexion, semaine, this.logger)
+
+    const semaines = (await connexion.query(
+      `SELECT distinct(semaine) from evenement_engagement ORDER BY semaine;`,
+      { raw: true, type: QueryTypes.SELECT }
+    )) as Array<{ semaine: string }>
+
+    for (const raw of semaines) {
+      this.logger.log(
+        'Charger la vue fonctionnalité de la semaine ' + raw.semaine
+      )
+      await chargerLaVueFonctionnalite(connexion, raw.semaine)
+      this.logger.log('Charger la vue engagement de la semaine ' + raw.semaine)
+      await chargerLaVueEngagement(connexion, raw.semaine, this.logger)
+    }
+
     await connexion.close()
 
     return {

@@ -321,6 +321,7 @@ import { DumpForAnalyticsJobHandler } from './application/jobs/analytics/0-dump-
 import { EnrichirEvenementsJobHandler } from './application/jobs/analytics/2-enrichir-les-evenements.job'
 import { ChargerLesVuesJobHandler } from './application/jobs/analytics/3-charger-les-vues.job'
 import { ChargerEvenementsJobHandler } from './application/jobs/analytics/1-charger-les-evenements.job'
+import { InitialiserLesVuesJobHandler } from './application/jobs/analytics/initialiser-les-vues.job'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -739,7 +740,8 @@ export const JobHandlerProviders = [
   DumpForAnalyticsJobHandler,
   ChargerEvenementsJobHandler,
   EnrichirEvenementsJobHandler,
-  ChargerLesVuesJobHandler
+  ChargerLesVuesJobHandler,
+  InitialiserLesVuesJobHandler
 ]
 
 @Module(buildModuleMetadata())
