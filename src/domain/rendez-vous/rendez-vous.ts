@@ -225,7 +225,7 @@ export namespace RendezVous {
   }
 
   function isDateRendezVousValide(date: string): boolean {
-    const dateIlYAUnAn = DateTime.now().minus({ year: 1 })
+    const dateIlYAUnAn = DateTime.now().minus({ year: 1, day: 1 })
     const dateDansDeuxAns = DateTime.now().plus({ year: 2 })
     const rdvDate = DateTime.fromISO(date)
     return (

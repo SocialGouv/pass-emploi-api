@@ -15,18 +15,21 @@ import { Planificateur } from '../../../src/domain/planificateur'
 
 describe('HandleJobNettoyerLesDonneesCommandHandler', () => {
   let handleJobNettoyerLesDonneesCommandHandler: HandleJobNettoyerLesDonneesCommandHandler
-  let dateSevice: StubbedClass<DateService>
+  let dateService: StubbedClass<DateService>
   let suiviJobService: StubbedType<SuiviJob.Service>
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
     const sandbox: SinonSandbox = createSandbox()
-    dateSevice = stubClass(DateService)
-    dateSevice.now.returns(uneDatetime())
+    dateService = stubClass(DateService)
+    dateService.now.returns(uneDatetime())
     suiviJobService = stubInterface(sandbox)
 
     handleJobNettoyerLesDonneesCommandHandler =
-      new HandleJobNettoyerLesDonneesCommandHandler(dateSevice, suiviJobService)
+      new HandleJobNettoyerLesDonneesCommandHandler(
+        dateService,
+        suiviJobService
+      )
   })
 
   describe('archives', () => {

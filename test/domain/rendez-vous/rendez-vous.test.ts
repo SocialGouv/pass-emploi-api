@@ -19,6 +19,7 @@ import {
   unJeuneDuRendezVous,
   unRendezVous
 } from '../../fixtures/rendez-vous.fixture'
+import { DateTime } from 'luxon'
 
 describe('Rendez-vous', () => {
   const id = '26279b34-318a-45e4-a8ad-514a1090462c'
@@ -258,7 +259,7 @@ describe('Rendez-vous', () => {
               idsJeunes: ['1'],
               idConseiller: '41',
               commentaire: '',
-              date: new Date('2020-09-20 10:27:21').toISOString(),
+              date: DateTime.now().plus({ year: 2 }).toJSDate().toISOString(),
               duree: 10
             }
             const conseiller = unConseiller()
@@ -277,7 +278,10 @@ describe('Rendez-vous', () => {
               idsJeunes: ['1'],
               idConseiller: '41',
               commentaire: '',
-              date: new Date('2026-09-20 10:27:21').toISOString(),
+              date: DateTime.now()
+                .minus({ year: 1, day: 1 })
+                .toJSDate()
+                .toISOString(),
               duree: 10
             }
             const conseiller = unConseiller()
