@@ -1,0 +1,159 @@
+import { Sequelize } from 'sequelize-typescript'
+import { DateTime } from 'luxon'
+import { Logger } from '@nestjs/common'
+
+export async function chargerLaVueEngagement(
+  connexion: Sequelize,
+  semaine: DateTime,
+  logger: Logger
+): Promise<void> {
+  const semaineFormattee = `${semaine.toFormat('yyyy-MM-dd')}`
+  logger.log(
+    `Suppression des données de la semaine ${semaineFormattee} de la vue analytics_engagement`
+  )
+  await connexion.query(
+    `DELETE
+     from analytics_engagement
+     where semaine != '${semaineFormattee}';`
+  )
+
+  logger.log('Insertion des utilisateurs des 2 derniers mois')
+  await connexion.query(
+    `insert into analytics_engagement(semaine,
+                                      structure,
+                                      type_utilisateur,
+                                      region,
+                                      departement,
+                                      nombre_utilisateurs_2_mois)
+     SELECT '${semaineFormattee}',
+            structure,
+            type_utilisateur,
+            region,
+            departement,
+            count(distinct id_utilisateur) as nombre_utilisateurs_2_mois
+     from evenement_engagement
+     where date_evenement > '${semaineFormattee}'::timestamp + interval '1 week' - interval '2 months'
+     group by structure, type_utilisateur, departement, region
+     order by structure, type_utilisateur, region, departement;`
+  )
+
+  logger.log('Insertion des utilisateurs engagés')
+  await connexion.query(
+    `update analytics_engagement
+     SET nombre_utilisateurs_engages_2_jours_dans_la_semaine = subquery.nombre_utilisateurs_engages_2_jours_dans_la_semaine
+     FROM (SELECT count(distinct x.id_utilisateur) as nombre_utilisateurs_engages_2_jours_dans_la_semaine,
+                  x.departement,
+                  x.semaine,
+                  x.region,
+                  x.structure,
+                  x.type_utilisateur
+           FROM (SELECT count(distinct jour) as nb_day_ae,
+                        semaine,
+                        departement,
+                        region,
+                        structure,
+                        type_utilisateur,
+                        id_utilisateur
+                 FROM evenement_engagement
+                 WHERE semaine = '${semaineFormattee}'
+                 GROUP BY semaine, id_utilisateur, semaine, departement, region, structure, type_utilisateur) x
+           WHERE nb_day_ae >= 2
+           GROUP BY x.semaine, x.departement, x.region, x.structure, x.type_utilisateur) as subquery
+     WHERE analytics_engagement.semaine = '${semaineFormattee}'
+       AND analytics_engagement.departement = subquery.departement
+       AND analytics_engagement.region = subquery.region
+       AND analytics_engagement.structure = subquery.structure
+       AND analytics_engagement.type_utilisateur = subquery.type_utilisateur;`
+  )
+
+  logger.log('Insertion des utilisateurs actifs 3 semaines sur 6')
+  await connexion.query(
+    `update analytics_engagement
+     SET nb_actifs_3_semaines_sur_6 = subquery.nb_actifs_3_semaines_sur_6
+     FROM (SELECT structure,
+                  type_utilisateur,
+                  region,
+                  departement,
+                  count(*) as nb_actifs_3_semaines_sur_6
+           FROM (SELECT count(distinct week_ae) as nb_week,
+                        id_utilisateur,
+                        structure,
+                        type_utilisateur,
+                        region,
+                        departement
+                 FROM (SELECT count(distinct jour) as nb_day_ae,
+                              semaine              as week_ae,
+                              structure,
+                              type_utilisateur,
+                              region,
+                              departement,
+                              id_utilisateur
+                       FROM evenement_engagement
+                       WHERE date_evenement >= '${semaineFormattee}'::timestamp - interval '5 weeks'
+                       GROUP BY week_ae, id_utilisateur, structure, region, departement, type_utilisateur) ee
+                 WHERE nb_day_ae >= 2
+                 GROUP BY id_utilisateur, structure, region, departement, type_utilisateur) x
+           WHERE nb_week >= 3
+           GROUP BY structure, type_utilisateur, region, departement
+           ORDER BY structure, type_utilisateur, region, departement) as subquery
+     WHERE analytics_engagement.semaine = '${semaineFormattee}'
+       AND analytics_engagement.departement = subquery.departement
+       AND analytics_engagement.region = subquery.region
+       AND analytics_engagement.structure = subquery.structure
+       AND analytics_engagement.type_utilisateur = subquery.type_utilisateur;`
+  )
+
+  logger.log('Insertion des utilisateurs actifs 4 semaines sur 6')
+  await connexion.query(
+    `update analytics_engagement
+     SET nb_actifs_4_semaines_sur_6 = subquery.nb_actifs_4_semaines_sur_6
+     FROM (SELECT structure,
+                  type_utilisateur,
+                  region,
+                  departement,
+                  count(*) as nb_actifs_4_semaines_sur_6
+           FROM (SELECT count(distinct week_ae) as nb_week,
+                        id_utilisateur,
+                        structure,
+                        type_utilisateur,
+                        region,
+                        departement
+                 FROM (SELECT count(distinct jour) as nb_day_ae,
+                              semaine              as week_ae,
+                              structure,
+                              type_utilisateur,
+                              region,
+                              departement,
+                              id_utilisateur
+                       FROM evenement_engagement
+                       WHERE date_evenement >= '${semaineFormattee}'::timestamp - interval '5 weeks'
+                       GROUP BY week_ae, id_utilisateur, structure, region, departement, type_utilisateur) ee
+                 WHERE nb_day_ae >= 2
+                 GROUP BY id_utilisateur, structure, region, departement, type_utilisateur) x
+           WHERE nb_week >= 4
+           GROUP BY structure, type_utilisateur, region, departement
+           ORDER BY structure, type_utilisateur, region, departement) as subquery
+     WHERE analytics_engagement.semaine = '${semaineFormattee}'
+       AND analytics_engagement.departement = subquery.departement
+       AND analytics_engagement.region = subquery.region
+       AND analytics_engagement.structure = subquery.structure
+       AND analytics_engagement.type_utilisateur = subquery.type_utilisateur;`
+  )
+
+  logger.log('Remplacer les null par des 0')
+  await connexion.query(
+    `
+        UPDATE analytics_engagement
+        SET nombre_utilisateurs_engages_2_jours_dans_la_semaine = 0
+        WHERE nombre_utilisateurs_engages_2_jours_dans_la_semaine IS NULL;
+
+        UPDATE analytics_engagement
+        SET nb_actifs_3_semaines_sur_6 = 0
+        WHERE analytics_engagement.nb_actifs_3_semaines_sur_6 IS NULL;
+
+        UPDATE analytics_engagement
+        SET nb_actifs_4_semaines_sur_6 = 0
+        WHERE analytics_engagement.nb_actifs_4_semaines_sur_6 IS NULL;
+    `
+  )
+}
