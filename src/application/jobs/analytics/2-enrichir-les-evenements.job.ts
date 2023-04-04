@@ -34,11 +34,11 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     await this.indexerLesColonnes(connexion)
     await this.ajouterLesAgencesConseiller(connexion)
     await this.ajouterLesAgencesJeune(connexion)
-    await this.determinerLaSemaineALaFinDuTraitement(connexion)
+    await this.determinerLaSemaineEtLeJourALaFinDuTraitement(connexion)
 
     await connexion.close()
 
-    if (maintenant.weekday === JOUR_DE_LA_SEMAINE_LUNDI) {
+    if (maintenant.weekday === JOUR_DE_LA_SEMAINE_LUNDI && false) {
       const jobCalculerLesVues: Planificateur.Job<void> = {
         dateExecution: this.dateService.nowJs(),
         type: Planificateur.JobType.CHARGER_LES_VUES_ANALYTICS,
@@ -50,7 +50,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     return {
       jobType: this.jobType,
       nbErreurs: 0,
-      succes: erreur ? false : true,
+      succes: !erreur,
       dateExecution: maintenant,
       tempsExecution: DateService.calculerTempsExecution(maintenant),
       resultat: {}
@@ -62,6 +62,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     await connexion.query(`
       ALTER TABLE evenement_engagement
         ADD COLUMN IF NOT EXISTS "semaine"     DATE,
+        ADD COLUMN IF NOT EXISTS "jour"        DATE,
         ADD COLUMN IF NOT EXISTS "agence"      varchar,
         ADD COLUMN IF NOT EXISTS "departement" varchar,
         ADD COLUMN IF NOT EXISTS "region"      varchar;
@@ -72,6 +73,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     this.logger.log('Indexation des colonnes')
     await connexion.query(`
       create index if not exists evenement_engagement_semaine_index on evenement_engagement (semaine);
+      create index if not exists evenement_engagement_jour_index on evenement_engagement (jour);
       create index if not exists evenement_engagement_agence_index on evenement_engagement (agence);
       create index if not exists evenement_engagement_departement_index on evenement_engagement (departement);
       create index if not exists evenement_engagement_region_index on evenement_engagement (region);
@@ -123,12 +125,13 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     `)
   }
 
-  private async determinerLaSemaineALaFinDuTraitement(
+  private async determinerLaSemaineEtLeJourALaFinDuTraitement(
     connexion: Sequelize
   ): Promise<void> {
-    this.logger.log('Détermination de la semaine')
+    this.logger.log('Détermination de la semaine et du jour')
     await connexion.query(`update evenement_engagement
-                           set semaine = date_trunc('week', date_evenement)
+                           set semaine = date_trunc('week', date_evenement),
+                               jour    = date_trunc('day', date_evenement)
                            where semaine is null;`)
   }
 }
