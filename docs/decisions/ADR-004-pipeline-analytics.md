@@ -6,7 +6,7 @@
 ## Contexte
 
 Pour analyser l'utilisation de l'application nous avons des traces d'événements d'engagement.
-Afin de les analyses un dump total de la DB est fait tous les jours sur une bases dédiés aux analytics.
+Afin de les analyser un dump total de la DB est fait tous les jours sur une base dédiée aux analytics.
 Ensuite des dataviz sont faites avec metabase.
 
 ## Définition du problème
@@ -34,5 +34,5 @@ Mettre en place une pipeline de type ELT qui va :
 
 ### Impacts Négatifs
 - complexité de la pipeline à maintenir
-- les requêtes pour les vues sont velues
+- les requêtes pour les vues sont complexes et leur connaissance doit être partagée par les développeurs et les analyseurs
 
