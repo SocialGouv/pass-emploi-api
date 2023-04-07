@@ -43,6 +43,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     })
 
     const dateFinDeSemaine = maintenant.endOf('week')
+    const { idJeune } = query
 
     const [
       rendezVousSqlModelsCount,
@@ -51,60 +52,16 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       actionSqlModelsEnRetard,
       rechercheSqlModelsAlertes
     ] = await Promise.all([
-      RendezVousSqlModel.count({
-        where: {
-          dateSuppression: null,
-          date: {
-            [Op.between]: [maintenant.toJSDate(), dateFinDeSemaine.toJSDate()]
-          }
-        },
-        include: [
-          {
-            model: JeuneSqlModel,
-            where: {
-              id: query.idJeune
-            }
-          }
-        ]
-      }),
-      RendezVousSqlModel.findOne({
-        where: {
-          dateSuppression: null,
-          date: { [Op.gte]: maintenant.toJSDate() }
-        },
-        order: [['date', 'ASC']],
-        include: [
-          {
-            model: JeuneSqlModel,
-            where: {
-              id: query.idJeune
-            },
-            include: [ConseillerSqlModel]
-          }
-        ]
-      }),
-      ActionSqlModel.count({
-        where: {
-          id_jeune: query.idJeune,
-          dateEcheance: {
-            [Op.between]: [maintenant.toJSDate(), dateFinDeSemaine.toJSDate()]
-          },
-          statut: {
-            [Op.in]: [Action.Statut.EN_COURS, Action.Statut.PAS_COMMENCEE]
-          }
-        }
-      }),
-      ActionSqlModel.count({
-        where: {
-          id_jeune: query.idJeune,
-          dateEcheance: { [Op.lte]: maintenant.toJSDate() },
-          statut: {
-            [Op.in]: [Action.Statut.EN_COURS, Action.Statut.PAS_COMMENCEE]
-          }
-        }
-      }),
+      this.countRendezVousSemaine(maintenant, dateFinDeSemaine, idJeune),
+      this.prochainRendezVous(maintenant, idJeune),
+      this.countActionsDeLaSemaineARealiser(
+        idJeune,
+        maintenant,
+        dateFinDeSemaine
+      ),
+      this.countActionsEnRetard(idJeune, maintenant),
       this.getRecherchesSauvegardeesQueryGetter.handle({
-        idJeune: query.idJeune
+        idJeune
       })
     ])
 
@@ -119,7 +76,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
         ? fromSqlToRendezVousJeuneQueryModel(
             rendezVousSqlModelsProchainRdv,
             Authentification.Type.JEUNE,
-            query.idJeune
+            idJeune
           )
         : undefined,
       evenementsAVenir: [],
@@ -143,5 +100,83 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
 
   async monitor(): Promise<void> {
     return
+  }
+
+  private countActionsEnRetard(
+    idJeune: string,
+    maintenant: DateTime
+  ): Promise<number> {
+    return ActionSqlModel.count({
+      where: {
+        id_jeune: idJeune,
+        dateEcheance: { [Op.lte]: maintenant.toJSDate() },
+        statut: {
+          [Op.in]: [Action.Statut.EN_COURS, Action.Statut.PAS_COMMENCEE]
+        }
+      }
+    })
+  }
+
+  private countActionsDeLaSemaineARealiser(
+    idJeune: string,
+    maintenant: DateTime,
+    dateFinDeSemaine: DateTime
+  ): Promise<number> {
+    return ActionSqlModel.count({
+      where: {
+        id_jeune: idJeune,
+        dateEcheance: {
+          [Op.between]: [maintenant.toJSDate(), dateFinDeSemaine.toJSDate()]
+        },
+        statut: {
+          [Op.in]: [Action.Statut.EN_COURS, Action.Statut.PAS_COMMENCEE]
+        }
+      }
+    })
+  }
+
+  private prochainRendezVous(
+    maintenant: DateTime,
+    idJeune: string
+  ): Promise<RendezVousSqlModel | null> {
+    return RendezVousSqlModel.findOne({
+      where: {
+        dateSuppression: null,
+        date: { [Op.gte]: maintenant.toJSDate() }
+      },
+      order: [['date', 'ASC']],
+      include: [
+        {
+          model: JeuneSqlModel,
+          where: {
+            id: idJeune
+          },
+          include: [ConseillerSqlModel]
+        }
+      ]
+    })
+  }
+
+  private async countRendezVousSemaine(
+    maintenant: DateTime,
+    dateFinDeSemaine: DateTime,
+    idJeune: string
+  ): Promise<number> {
+    return RendezVousSqlModel.count({
+      where: {
+        dateSuppression: null,
+        date: {
+          [Op.between]: [maintenant.toJSDate(), dateFinDeSemaine.toJSDate()]
+        }
+      },
+      include: [
+        {
+          model: JeuneSqlModel,
+          where: {
+            id: idJeune
+          }
+        }
+      ]
+    })
   }
 }

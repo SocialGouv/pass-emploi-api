@@ -1,7 +1,11 @@
 import { describe } from 'mocha'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 
-import { success } from '../../../../src/building-blocks/types/result'
+import {
+  isSuccess,
+  Result,
+  success
+} from '../../../../src/building-blocks/types/result'
 
 import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
 import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/accueil/get-accueil-jeune-milo.query.handler.db'
@@ -22,6 +26,7 @@ import { RechercheSqlModel } from 'src/infrastructure/sequelize/models/recherche
 import { GetRecherchesSauvegardeesQueryGetter } from 'src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
 import { uneRechercheDto } from 'test/fixtures/sql-models/recherche.sql-model'
 import { fromSqlToRechercheQueryModel } from 'src/application/queries/query-mappers/recherche.mapper'
+import { AccueilJeuneMiloQueryModel } from '../../../../src/application/queries/query-models/jeunes.milo.query-model'
 
 describe('GetAccueilJeuneMiloQueryHandler', () => {
   let handler: GetAccueilJeuneMiloQueryHandler
@@ -36,9 +41,13 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
   })
 
   describe('handle', () => {
-    it("retourne une page d'accueil MILO", async () => {
-      // Given
-      const query = {
+    let result: Result<AccueilJeuneMiloQueryModel>
+    let query: { idJeune: string; maintenant: string }
+    let unRendezVousAujourdhui: RendezVousSqlModel
+    let rechercheSqlModel: RechercheSqlModel
+
+    beforeEach(async () => {
+      query = {
         idJeune: 'idJeune',
         maintenant: '2023-03-27T03:24:00'
       }
@@ -52,7 +61,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
         })
       )
 
-      const rdv = await RendezVousSqlModel.create(
+      unRendezVousAujourdhui = await RendezVousSqlModel.create(
         unRendezVousDto({
           dateSuppression: null,
           date: new Date('2023-03-28T03:24:00')
@@ -61,7 +70,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
 
       await RendezVousJeuneAssociationSqlModel.create({
         idJeune: query.idJeune,
-        idRendezVous: rdv.id
+        idRendezVous: unRendezVousAujourdhui.id
       })
 
       await ActionSqlModel.creer(
@@ -84,14 +93,18 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
         idJeune: query.idJeune
       })
 
-      const rechercheSqlModel = await RechercheSqlModel.create(recherche)
+      rechercheSqlModel = await RechercheSqlModel.create(recherche)
 
       queryGetter.handle.resolves([
         fromSqlToRechercheQueryModel(rechercheSqlModel)
       ])
 
-      const result = await handler.handle(query)
+      result = await handler.handle(query)
+    })
 
+    //beforeEach(async () => {})
+
+    it("retourne une page d'accueil MILO", async () => {
       expect(result).to.deep.equal(
         success({
           cetteSemaine: {
@@ -104,11 +117,55 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
           mesAlertes: [fromSqlToRechercheQueryModel(rechercheSqlModel)],
           mesFavoris: [],
           prochainRendezVous: unRendezVousQueryModel({
-            id: rdv.id,
+            id: unRendezVousAujourdhui.id,
             date: new Date('2023-03-28T03:24:00')
           })
         })
       )
+    })
+
+    it('retourne le prochain rendez-vous ', () => {
+      // Then
+      expect(isSuccess(result) && result.data.prochainRendezVous).to.deep.equal(
+        unRendezVousQueryModel({
+          id: unRendezVousAujourdhui.id,
+          date: new Date('2023-03-28T03:24:00')
+        })
+      )
+    })
+
+    it('compte les rendez-vous du reste de la semaine', async () => {
+      // Then
+      expect(
+        isSuccess(result) && result.data.cetteSemaine.nombreRendezVous
+      ).to.deep.equal(1)
+    })
+
+    it('retourne un tableau de recherches sauvegardées', async () => {
+      // Then
+      expect(isSuccess(result) && result.data.prochainRendezVous).to.deep.equal(
+        unRendezVousQueryModel({
+          id: unRendezVousAujourdhui.id,
+          date: new Date('2023-03-28T03:24:00')
+        })
+      )
+    })
+
+    it('compte les démarches en retard de la semaine', async () => {
+      // Then
+      expect(
+        isSuccess(result) &&
+          result.data.cetteSemaine.nombreActionsDemarchesEnRetard
+      ).to.deep.equal(1)
+    })
+
+    it('compte les démarches à réaliser de la semaine', () => {
+      // Then
+
+      expect(
+        isSuccess(result) &&
+          result.data.cetteSemaine.nombreActionsDemarchesARealiser
+      ).to.deep.equal(1)
     })
   })
 
