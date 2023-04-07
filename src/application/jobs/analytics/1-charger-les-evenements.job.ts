@@ -64,16 +64,16 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
     } finally {
       await connexionSource.close()
       await connexionTarget.close()
-      return {
-        jobType: this.jobType,
-        nbErreurs: 0,
-        succes: erreur ? false : true,
-        dateExecution: maintenant,
-        tempsExecution: DateService.calculerTempsExecution(maintenant),
-        resultat: {
-          nombreDevemementsCharges,
-          stats
-        }
+    }
+    return {
+      jobType: this.jobType,
+      nbErreurs: 0,
+      succes: erreur ? false : true,
+      dateExecution: maintenant,
+      tempsExecution: DateService.calculerTempsExecution(maintenant),
+      resultat: {
+        nombreDevemementsCharges,
+        stats
       }
     }
   }
