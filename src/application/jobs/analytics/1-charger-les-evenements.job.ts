@@ -182,7 +182,7 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
        from evenement_engagement
        where date_evenement > '${dateDernierEvenementCharge}';`
     )
-    return result.rows[0].compte ?? 0
+    return Number(result.rows[0].compte ?? '0')
   }
 
   private async recupererLeCompteDesEvenementsSurLesDeuxBases(
@@ -194,19 +194,19 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
       `SELECT count(*) as comptesource
        from evenement_engagement;`
     )
-    const nombreEvenementsSource = resultSource.rows[0].comptesource
+    const nombreEvenementsSource = Number(
+      resultSource.rows[0].comptesource ?? '0'
+    )
 
-    const resultTarget = await clientTarget.query(
+    const { rows } = await clientTarget.query(
       `SELECT count(*) as comptetarget
        from evenement_engagement;`
     )
-    const nombreEvenementsTarget = resultTarget.rows[0].comptetarget
+    const nombreEvenementsTarget = Number(rows[0].comptetarget ?? '0')
     return {
       nombreEvenementsSource,
       nombreEvenementsTarget,
-      difference:
-        Number(nombreEvenementsSource ?? '0') -
-        Number(nombreEvenementsTarget ?? '0')
+      difference: nombreEvenementsSource - nombreEvenementsTarget
     }
   }
 }
