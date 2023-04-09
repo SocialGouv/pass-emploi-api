@@ -109,7 +109,7 @@
     "pino-http": "8.3.3",
     "reflect-metadata": "^0.1.13",
     "remove-accents": "0.4.4",
-    "rimraf": "4.4.1",
+    "rimraf": "5.0.0",
     "rxjs": "7.8.0",
     "sequelize": "6.30.0",
     "sequelize-cli": "6.6.0",
