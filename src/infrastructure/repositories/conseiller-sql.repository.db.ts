@@ -102,6 +102,10 @@ export class ConseillerSqlRepository implements Conseiller.Repository {
       { where: { id: idconseiller } }
     )
   }
+
+  async delete(idConseiller: string): Promise<void> {
+    await ConseillerSqlModel.destroy({ where: { id: idConseiller } })
+  }
 }
 
 export function fromSqlConseillerToAggregate(

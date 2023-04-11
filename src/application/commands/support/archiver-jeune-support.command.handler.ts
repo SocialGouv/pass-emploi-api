@@ -79,7 +79,7 @@ export class ArchiverJeuneSupportCommandHandler extends CommandHandler<
     }
     await this.archiveJeuneRepository.archiver(metadonneesArchive)
 
-    await this.authentificationRepository.deleteJeuneIdp(command.idJeune)
+    await this.authentificationRepository.deleteUtilisateurIdp(command.idJeune)
     await this.jeuneRepository.supprimer(command.idJeune)
     await this.chatRepository.supprimerChat(command.idJeune)
 

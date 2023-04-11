@@ -203,7 +203,7 @@ describe('JeuneSqlRepository', () => {
     })
   })
 
-  describe('findAllJeunesByConseiller', () => {
+  describe('findAllJeunesByIdsAndConseiller', () => {
     const conseiller = unConseiller({ id: 'test' })
     const conseiller3 = unConseiller({ id: 'test3' })
     const jeune1Id = '1'
@@ -237,7 +237,7 @@ describe('JeuneSqlRepository', () => {
     describe('quand les jeunes existent', () => {
       it('retourne la liste des jeunes', async () => {
         // When
-        const result = await jeuneSqlRepository.findAllJeunesByConseiller(
+        const result = await jeuneSqlRepository.findAllJeunesByIdsAndConseiller(
           [jeune1Id, jeune2Id, jeune3Id],
           conseiller.id
         )
@@ -252,7 +252,7 @@ describe('JeuneSqlRepository', () => {
     describe("quand aucun jeune n'existe", () => {
       it('retourne une liste vide', async () => {
         // When
-        const result = await jeuneSqlRepository.findAllJeunesByConseiller(
+        const result = await jeuneSqlRepository.findAllJeunesByIdsAndConseiller(
           ['FAUX_ID'],
           conseiller.id
         )

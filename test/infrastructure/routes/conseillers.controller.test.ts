@@ -1,10 +1,5 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
 import { CreateRendezVousCommandHandler } from 'src/application/commands/create-rendez-vous.command.handler'
-import {
-  CreerSuperviseursCommand,
-  CreerSuperviseursCommandHandler
-} from 'src/application/commands/creer-superviseurs.command.handler'
-import { DeleteSuperviseursCommandHandler } from 'src/application/commands/delete-superviseurs.command.handler'
 import { RecupererJeunesDuConseillerCommandHandler } from 'src/application/commands/recuperer-jeunes-du-conseiller.command.handler'
 import { GetJeuneMiloByDossierQueryHandler } from 'src/application/queries/get-jeune-milo-by-dossier.query.handler.db'
 import { GetAllRendezVousConseillerQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
@@ -16,6 +11,7 @@ import * as request from 'supertest'
 import { uneDatetime, uneDatetimeAvecOffset } from 'test/fixtures/date.fixture'
 import { unRendezVousConseillerFutursEtPassesQueryModel } from 'test/fixtures/rendez-vous.fixture'
 import { CreateActionCommandHandler } from '../../../src/application/commands/action/create-action.command.handler'
+import { DeleteConseillerCommandHandler } from '../../../src/application/commands/conseiller/delete-conseiller.command.handler'
 import {
   CreerJeuneMiloCommand,
   CreerJeuneMiloCommandHandler
@@ -31,9 +27,9 @@ import {
 import { SendNotificationsNouveauxMessagesCommandHandler } from '../../../src/application/commands/send-notifications-nouveaux-messages.command.handler'
 import { GetConseillerByEmailQueryHandler } from '../../../src/application/queries/get-conseiller-by-email.query.handler.db'
 import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
-import { GetJeunesIdentitesQueryHandler } from '../../../src/application/queries/get-jeunes-identites.query.handler.db'
 import { GetIndicateursPourConseillerQueryHandler } from '../../../src/application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { GetJeunesByConseillerQueryHandler } from '../../../src/application/queries/get-jeunes-by-conseiller.query.handler.db'
+import { GetJeunesIdentitesQueryHandler } from '../../../src/application/queries/get-jeunes-identites.query.handler.db'
 import {
   DossierExisteDejaError,
   DroitsInsuffisants,
@@ -62,7 +58,7 @@ import { unJeune } from '../../fixtures/jeune.fixture'
 import { unDossierMilo } from '../../fixtures/milo.fixture'
 import { detailConseillerQueryModel } from '../../fixtures/query-models/conseiller.query-model.fixtures'
 import { unJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
-import { expect, StubbedClass } from '../../utils'
+import { StubbedClass, expect } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
@@ -76,8 +72,7 @@ describe('ConseillersController', () => {
   let getAllRendezVousConseillerQueryHandler: StubbedClass<GetAllRendezVousConseillerQueryHandler>
   let createRendezVousCommandHandler: StubbedClass<CreateRendezVousCommandHandler>
   let creerJeuneMiloCommandHandler: StubbedClass<CreerJeuneMiloCommandHandler>
-  let creerSuperviseursCommandHandler: StubbedClass<CreerSuperviseursCommandHandler>
-  let deleteSuperviseursCommandHandler: StubbedClass<DeleteSuperviseursCommandHandler>
+  let deleteConseillerCommandHandler: StubbedClass<DeleteConseillerCommandHandler>
   let modifierConseillerCommandHandler: StubbedClass<ModifierConseillerCommandHandler>
   let recupererJeunesDuConseillerCommandHandler: StubbedClass<RecupererJeunesDuConseillerCommandHandler>
   let modifierJeuneDuConseillerCommandHandler: StubbedClass<ModifierJeuneDuConseillerCommandHandler>
@@ -107,8 +102,7 @@ describe('ConseillersController', () => {
     )
     createRendezVousCommandHandler = app.get(CreateRendezVousCommandHandler)
     creerJeuneMiloCommandHandler = app.get(CreerJeuneMiloCommandHandler)
-    creerSuperviseursCommandHandler = app.get(CreerSuperviseursCommandHandler)
-    deleteSuperviseursCommandHandler = app.get(DeleteSuperviseursCommandHandler)
+    deleteConseillerCommandHandler = app.get(DeleteConseillerCommandHandler)
     modifierConseillerCommandHandler = app.get(ModifierConseillerCommandHandler)
     recupererJeunesDuConseillerCommandHandler = app.get(
       RecupererJeunesDuConseillerCommandHandler
@@ -120,6 +114,24 @@ describe('ConseillersController', () => {
       GetIndicateursPourConseillerQueryHandler
     )
     getIdentitesJeunesQueryHandler = app.get(GetJeunesIdentitesQueryHandler)
+  })
+
+  describe('DELETE /conseillers/:idConseiller', () => {
+    it('supprime le conseiller', async () => {
+      //Given
+      deleteConseillerCommandHandler.execute
+        .withArgs({ idConseiller: 'id-conseiller' }, unUtilisateurDecode())
+        .resolves(emptySuccess())
+
+      //When
+      await request(app.getHttpServer())
+        .delete(`/conseillers/id-conseiller`)
+        .set('authorization', unHeaderAuthorization())
+        //Then
+        .expect(HttpStatus.NO_CONTENT)
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('delete', '/conseillers/whatever')
   })
 
   describe('GET /conseillers?email', () => {
@@ -950,114 +962,6 @@ describe('ConseillersController', () => {
       'get',
       '/conseillers/milo/dossiers/2'
     )
-  })
-
-  describe('POST /conseillers/superviseurs', () => {
-    describe('quand le payload est valide', () => {
-      it('renvoie 201', async () => {
-        // Given
-        const command: CreerSuperviseursCommand = {
-          superviseurs: [
-            { email: 'test@octo.com', structure: Core.Structure.MILO }
-          ]
-        }
-
-        creerSuperviseursCommandHandler.execute
-          .withArgs(command, unUtilisateurDecode())
-          .resolves(emptySuccess())
-
-        // When - Then
-        await request(app.getHttpServer())
-          .post('/conseillers/superviseurs')
-          .send(command)
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.CREATED)
-      })
-    })
-    describe("quand le payload n'est pas valide", () => {
-      it('renvoie 400 quand le champ email est pas bon', async () => {
-        // Given
-        const payload = {
-          superviseurs: [{ email: 'test', structure: Core.Structure.MILO }]
-        }
-
-        // When - Then
-        await request(app.getHttpServer())
-          .post('/conseillers/superviseurs')
-          .send(payload)
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-      it('renvoie 400 quand le superviseur est incomplet', async () => {
-        // Given
-        const payload = {
-          superviseurs: [{ email: 'test@octo.com' }]
-        }
-
-        // When - Then
-        await request(app.getHttpServer())
-          .post('/conseillers/superviseurs')
-          .send(payload)
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-    })
-
-    ensureUserAuthenticationFailsIfInvalid('get', '/conseillers/superviseurs')
-  })
-
-  describe('DELETE /conseillers/superviseurs', () => {
-    describe('quand le payload est valide', () => {
-      it('renvoie 201', async () => {
-        // Given
-        const command: CreerSuperviseursCommand = {
-          superviseurs: [
-            { email: 'test@octo.com', structure: Core.Structure.MILO }
-          ]
-        }
-
-        deleteSuperviseursCommandHandler.execute
-          .withArgs(command, unUtilisateurDecode())
-          .resolves(emptySuccess())
-
-        // When - Then
-        await request(app.getHttpServer())
-          .delete('/conseillers/superviseurs')
-          .send(command)
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.NO_CONTENT)
-      })
-    })
-    describe("quand le payload n'est pas valide", () => {
-      it('renvoie 400 quand le champ email est pas bon', async () => {
-        // Given
-        const payload = {
-          superviseurs: [{ email: 'test', structure: Core.Structure.MILO }]
-        }
-
-        // When - Then
-        await request(app.getHttpServer())
-          .delete('/conseillers/superviseurs')
-          .send(payload)
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-      it('renvoie 400 quand le superviseur est incomplet', async () => {
-        // Given
-        const payload = {
-          superviseurs: [{ email: 'test@octo.com' }]
-        }
-
-        // When - Then
-        await request(app.getHttpServer())
-          .delete('/conseillers/superviseurs')
-          .send(payload)
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-    })
-
-    ensureUserAuthenticationFailsIfInvalid('get', '/conseillers/superviseurs')
   })
 
   describe('PUT /conseillers/{idConseiller}', () => {

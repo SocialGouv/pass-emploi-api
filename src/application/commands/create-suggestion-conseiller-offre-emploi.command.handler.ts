@@ -63,7 +63,7 @@ export class CreateSuggestionConseillerOffreEmploiCommandHandler extends Command
       )
     }
 
-    const jeunes = await this.jeuneRepository.findAllJeunesByConseiller(
+    const jeunes = await this.jeuneRepository.findAllJeunesByIdsAndConseiller(
       command.idsJeunes,
       command.idConseiller
     )

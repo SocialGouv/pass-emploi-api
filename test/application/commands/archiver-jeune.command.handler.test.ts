@@ -107,7 +107,7 @@ describe('ArchiverJeuneCommandHandler', () => {
 
       it('supprime son compte keycloak', () => {
         expect(
-          authentificationRepository.deleteJeuneIdp
+          authentificationRepository.deleteUtilisateurIdp
         ).to.have.been.calledWithExactly('idJeune')
       })
 

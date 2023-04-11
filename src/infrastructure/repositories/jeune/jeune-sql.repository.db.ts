@@ -93,7 +93,16 @@ export class JeuneSqlRepository implements Jeune.Repository {
     ])
   }
 
-  async findAllJeunesByConseiller(
+  async findAllJeunesByConseiller(idConseiller: string): Promise<Jeune[]> {
+    const jeunesSqlModel = await JeuneSqlModel.findAll({
+      where: {
+        idConseiller
+      }
+    })
+    return jeunesSqlModel.map(fromSqlToJeune)
+  }
+
+  async findAllJeunesByIdsAndConseiller(
     idsJeunes: string[],
     idConseiller: string
   ): Promise<Jeune[]> {

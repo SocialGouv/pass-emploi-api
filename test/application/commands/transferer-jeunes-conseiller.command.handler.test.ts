@@ -133,7 +133,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             conseiller: conseillerSourceDuJeune,
             conseillerInitial: undefined
           })
-          jeuneRepository.findAllJeunesByConseiller
+          jeuneRepository.findAllJeunesByIdsAndConseiller
             .withArgs(command.idsJeunes, command.idConseillerSource)
             .resolves([jeune1, jeune2])
 
@@ -215,7 +215,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
               }
             })
 
-            jeuneRepository.findAllJeunesByConseiller
+            jeuneRepository.findAllJeunesByIdsAndConseiller
               .withArgs(command.idsJeunes, command.idConseillerSource)
               .resolves([jeune])
 
@@ -255,7 +255,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
               }
             })
 
-            jeuneRepository.findAllJeunesByConseiller
+            jeuneRepository.findAllJeunesByIdsAndConseiller
               .withArgs(command.idsJeunes, command.idConseillerSource)
               .resolves([jeune])
 
@@ -294,7 +294,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
               }
             })
 
-            jeuneRepository.findAllJeunesByConseiller
+            jeuneRepository.findAllJeunesByIdsAndConseiller
               .withArgs(command.idsJeunes, command.idConseillerSource)
               .resolves([jeune])
 
@@ -352,7 +352,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             conseiller: conseillerSourceDuJeune,
             conseillerInitial: undefined
           })
-          jeuneRepository.findAllJeunesByConseiller
+          jeuneRepository.findAllJeunesByIdsAndConseiller
             .withArgs(command.idsJeunes, command.idConseillerSource)
             .resolves([jeuneQuiVientANantes])
 
@@ -394,7 +394,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
               .onSecondCall()
               .resolves(conseillerCible)
 
-            jeuneRepository.findAllJeunesByConseiller.resolves([
+            jeuneRepository.findAllJeunesByIdsAndConseiller.resolves([
               unJeune(),
               unJeune()
             ])
@@ -440,7 +440,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
               .onSecondCall()
               .resolves(conseillerCible)
 
-            jeuneRepository.findAllJeunesByConseiller.resolves([
+            jeuneRepository.findAllJeunesByIdsAndConseiller.resolves([
               unJeune(),
               unJeune()
             ])
@@ -500,7 +500,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
         describe("quand un des jeunes n'existe pas ou n'est pas suivi par le conseiller source", () => {
           it('retourne une failure', async () => {
             // Given
-            jeuneRepository.findAllJeunesByConseiller
+            jeuneRepository.findAllJeunesByIdsAndConseiller
               .withArgs(command.idsJeunes, command.idConseillerSource)
               .resolves([unJeune()])
 
