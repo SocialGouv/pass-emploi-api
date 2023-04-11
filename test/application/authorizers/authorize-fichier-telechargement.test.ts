@@ -36,7 +36,7 @@ describe('FichierTelechargementAuthorizer', () => {
       fichierRepository.getFichierMetadata
         .withArgs(idFichier)
         .resolves(unFichierMetadata({ idsJeunes: [idJeuneDuConseiller] }))
-      jeuneRepository.findAllJeunesByConseiller
+      jeuneRepository.findAllJeunesByIdsAndConseiller
         .withArgs([idJeuneDuConseiller], utilisateur.id)
         .resolves([unJeune()])
 
@@ -58,7 +58,7 @@ describe('FichierTelechargementAuthorizer', () => {
           idCreateur: utilisateur.id
         })
       )
-      jeuneRepository.findAllJeunesByConseiller.resolves([])
+      jeuneRepository.findAllJeunesByIdsAndConseiller.resolves([])
 
       // When
       const result = await fichierTelechargementAuthorizer.authorize(
@@ -79,7 +79,7 @@ describe('FichierTelechargementAuthorizer', () => {
           idCreateur: 'un-autre-createur'
         })
       )
-      jeuneRepository.findAllJeunesByConseiller
+      jeuneRepository.findAllJeunesByIdsAndConseiller
         .withArgs([idJeuneDuConseiller], utilisateur.id)
         .resolves([])
 

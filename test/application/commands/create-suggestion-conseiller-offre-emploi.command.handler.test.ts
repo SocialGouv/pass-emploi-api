@@ -96,7 +96,7 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
           criteres
         }
 
-        jeuneRepository.findAllJeunesByConseiller.resolves([
+        jeuneRepository.findAllJeunesByIdsAndConseiller.resolves([
           unJeune({
             id: idJeuneTrouve,
             conseiller: unConseiller({ id: idConseiller })
@@ -121,7 +121,7 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
         // Given
         const idConseiller = 'id-conseiller'
         const idJeune = 'id-jeune'
-        jeuneRepository.findAllJeunesByConseiller.resolves([
+        jeuneRepository.findAllJeunesByIdsAndConseiller.resolves([
           unJeune({
             id: idJeune,
             conseiller: unConseiller({ id: idConseiller })
@@ -161,7 +161,7 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
         // Given
         const idConseiller = 'id-conseiller'
         const idJeune = 'id-jeune'
-        jeuneRepository.findAllJeunesByConseiller.resolves([
+        jeuneRepository.findAllJeunesByIdsAndConseiller.resolves([
           unJeune({
             id: idJeune,
             conseiller: unConseiller({ id: idConseiller })

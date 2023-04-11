@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   HttpCode,
   HttpStatus,
   Param,
@@ -34,6 +35,9 @@ import {
   TransfererJeunesPayload
 } from './validation/support.inputs'
 import { TransfererJeunesConseillerCommandHandler } from '../../application/commands/transferer-jeunes-conseiller.command.handler'
+import { CreerSuperviseursCommandHandler } from '../../application/commands/creer-superviseurs.command.handler'
+import { DeleteSuperviseursCommandHandler } from '../../application/commands/delete-superviseurs.command.handler'
+import { SuperviseursPayload } from './validation/conseillers.inputs'
 
 @ApiOAuth2([])
 @Controller('support')
@@ -44,7 +48,9 @@ export class SupportController {
     private mettreAJourLesJeunesCejPeCommandHandler: MettreAJourLesJeunesCejPeCommandHandler,
     private updateAgenceCommandHandler: UpdateAgenceConseillerCommandHandler,
     private archiverJeuneSupportCommandHandler: ArchiverJeuneSupportCommandHandler,
-    private transfererJeunesConseillerCommandHandler: TransfererJeunesConseillerCommandHandler
+    private transfererJeunesConseillerCommandHandler: TransfererJeunesConseillerCommandHandler,
+    private readonly creerSuperviseursCommandHandler: CreerSuperviseursCommandHandler,
+    private readonly deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler
   ) {}
 
   @Post('jdd')
@@ -150,6 +156,41 @@ export class SupportController {
       },
       utilisateur
     )
+    handleFailure(result)
+  }
+
+  @ApiOperation({
+    summary: 'Ajoute des droits de supervision à des conseillers.',
+    description: 'Autorisé pour le support.'
+  })
+  @Post('superviseurs')
+  async postSuperviseurs(
+    @Body() superviseursPayload: SuperviseursPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result = await this.creerSuperviseursCommandHandler.execute(
+      { superviseurs: superviseursPayload.superviseurs },
+      utilisateur
+    )
+
+    handleFailure(result)
+  }
+
+  @ApiOperation({
+    summary: 'Supprime des droits de supervision à des conseillers.',
+    description: 'Autorisé pour le support.'
+  })
+  @Delete('superviseurs')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteSuperviseurs(
+    @Body() superviseursPayload: SuperviseursPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result = await this.deleteSuperviseursCommandHandler.execute(
+      { superviseurs: superviseursPayload.superviseurs },
+      utilisateur
+    )
+
     handleFailure(result)
   }
 }

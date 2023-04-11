@@ -33,7 +33,7 @@ export class FichierTelechargementAuthorizer {
       }
       if (utilisateur.type === Authentification.Type.CONSEILLER) {
         const jeunesDuFichier =
-          await this.jeuneRepository.findAllJeunesByConseiller(
+          await this.jeuneRepository.findAllJeunesByIdsAndConseiller(
             fichierMetadata.idsJeunes,
             utilisateur.id
           )

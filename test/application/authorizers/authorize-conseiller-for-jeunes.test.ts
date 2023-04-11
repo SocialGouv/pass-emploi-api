@@ -39,7 +39,7 @@ describe('AuthorizeConseillerForJeunes', () => {
     it('retourne une failure', async () => {
       // Given
       const utilisateur = unUtilisateurConseiller()
-      jeuneRepository.findAllJeunesByConseiller
+      jeuneRepository.findAllJeunesByIdsAndConseiller
         .withArgs(['1'], utilisateur.id)
         .resolves([])
 
@@ -55,7 +55,7 @@ describe('AuthorizeConseillerForJeunes', () => {
     it('retourne une success', async () => {
       // Given
       const utilisateur = unUtilisateurConseiller()
-      jeuneRepository.findAllJeunesByConseiller
+      jeuneRepository.findAllJeunesByIdsAndConseiller
         .withArgs(['1'], utilisateur.id)
         .resolves([unJeune()])
 

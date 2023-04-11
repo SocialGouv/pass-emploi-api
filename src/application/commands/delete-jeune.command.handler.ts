@@ -83,7 +83,7 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
       idPartenaire: jeune.idPartenaire
     }
 
-    await this.authentificationRepository.deleteJeuneIdp(idJeune)
+    await this.authentificationRepository.deleteUtilisateurIdp(idJeune)
     await this.jeuneRepository.supprimer(idJeune)
     await this.chatRepository.supprimerChat(idJeune)
 

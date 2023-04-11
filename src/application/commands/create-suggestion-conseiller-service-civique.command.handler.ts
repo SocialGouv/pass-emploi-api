@@ -56,7 +56,7 @@ export class CreateSuggestionConseillerServiceCiviqueCommandHandler extends Comm
   async handle(
     command: CreateSuggestionConseillerServiceCiviqueCommand
   ): Promise<Result<void>> {
-    const jeunes = await this.jeuneRepository.findAllJeunesByConseiller(
+    const jeunes = await this.jeuneRepository.findAllJeunesByIdsAndConseiller(
       command.idsJeunes,
       command.idConseiller
     )

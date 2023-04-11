@@ -42,6 +42,8 @@ export namespace Conseiller {
       idconseiller: string,
       dateVerification: Date
     ): Promise<void>
+
+    delete(idConseiller: string): Promise<void>
   }
 
   export function modifierAgence(
