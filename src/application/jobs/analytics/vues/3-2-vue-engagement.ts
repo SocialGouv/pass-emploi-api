@@ -30,7 +30,7 @@ export async function chargerLaVueEngagement(
             departement,
             count(distinct id_utilisateur) as nombre_utilisateurs_2_mois
      from evenement_engagement
-     where date_evenement > '${semaine}'::timestamp + interval '1 week' - interval '2 months'
+     where semaine > '${semaine}'::date + interval '1 week' - interval '2 months'
      group by structure, type_utilisateur, departement, region
      order by structure, type_utilisateur, region, departement;`
   )
@@ -87,7 +87,7 @@ export async function chargerLaVueEngagement(
                               departement,
                               id_utilisateur
                        FROM evenement_engagement
-                       WHERE date_evenement >= '${semaine}'::timestamp - interval '5 weeks'
+                       WHERE semaine >= '${semaine}'::date - interval '5 weeks'
                        GROUP BY week_ae, id_utilisateur, structure, region, departement, type_utilisateur) ee
                  WHERE nb_day_ae >= 2
                  GROUP BY id_utilisateur, structure, region, departement, type_utilisateur) x
@@ -124,7 +124,7 @@ export async function chargerLaVueEngagement(
                               departement,
                               id_utilisateur
                        FROM evenement_engagement
-                       WHERE date_evenement >= '${semaine}'::timestamp - interval '5 weeks'
+                       WHERE semaine >= '${semaine}'::date - interval '5 weeks'
                        GROUP BY week_ae, id_utilisateur, structure, region, departement, type_utilisateur) ee
                  WHERE nb_day_ae >= 2
                  GROUP BY id_utilisateur, structure, region, departement, type_utilisateur) x
