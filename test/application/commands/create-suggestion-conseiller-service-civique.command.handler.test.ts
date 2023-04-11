@@ -96,7 +96,9 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
           criteres
         }
 
-        jeuneRepository.findAllJeunesByConseiller.resolves([idJeuneTrouve])
+        jeuneRepository.findAllJeunesByIdsAndConseiller.resolves([
+          idJeuneTrouve
+        ])
 
         // When
         const result =
@@ -116,7 +118,7 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
         // Given
         const idConseiller = 'id-conseiller'
         const idJeune = 'id-jeune'
-        jeuneRepository.findAllJeunesByConseiller.resolves([
+        jeuneRepository.findAllJeunesByIdsAndConseiller.resolves([
           unJeune({
             id: idJeune,
             conseiller: unConseiller({ id: idConseiller })

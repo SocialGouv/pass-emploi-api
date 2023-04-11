@@ -102,7 +102,7 @@ describe('ArchiverJeuneSupportCommandHandler', () => {
           archivageJeuneRepository.archiver
         ).to.have.been.calledWithExactly(metadonneesArchive)
         expect(
-          authentificationRepository.deleteJeuneIdp
+          authentificationRepository.deleteUtilisateurIdp
         ).to.have.been.calledWithExactly('idJeune')
         expect(jeuneRepository.supprimer).to.have.been.calledWithExactly(
           'idJeune'

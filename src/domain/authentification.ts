@@ -64,7 +64,7 @@ export namespace Authentification {
       utilisateur: Partial<Authentification.Utilisateur>
     ): Promise<void>
 
-    deleteJeuneIdp(idJeune: string): Promise<void>
+    deleteUtilisateurIdp(idJeune: string): Promise<void>
   }
 
   @Injectable()

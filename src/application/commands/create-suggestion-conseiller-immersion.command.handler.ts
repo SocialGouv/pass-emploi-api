@@ -55,7 +55,7 @@ export class CreateSuggestionConseillerImmersionCommandHandler extends CommandHa
   async handle(
     command: CreateSuggestionConseillerImmersionCommand
   ): Promise<Result<void>> {
-    const jeunes = await this.jeuneRepository.findAllJeunesByConseiller(
+    const jeunes = await this.jeuneRepository.findAllJeunesByIdsAndConseiller(
       command.idsJeunes,
       command.idConseiller
     )

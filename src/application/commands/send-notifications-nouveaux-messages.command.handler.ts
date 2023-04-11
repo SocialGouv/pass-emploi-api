@@ -29,7 +29,7 @@ export class SendNotificationsNouveauxMessagesCommandHandler extends CommandHand
   async handle(
     command: SendNotificationsNouveauxMessagesCommand
   ): Promise<Result> {
-    const jeunes = await this.jeuneRepository.findAllJeunesByConseiller(
+    const jeunes = await this.jeuneRepository.findAllJeunesByIdsAndConseiller(
       command.idsJeunes,
       command.idConseiller
     )

@@ -58,7 +58,7 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
     const [conseillerSource, conseillerCible, jeunes] = await Promise.all([
       this.conseillerRepository.get(command.idConseillerSource),
       this.conseillerRepository.get(command.idConseillerCible),
-      this.jeuneRepository.findAllJeunesByConseiller(
+      this.jeuneRepository.findAllJeunesByIdsAndConseiller(
         command.idsJeunes,
         command.idConseillerSource
       )

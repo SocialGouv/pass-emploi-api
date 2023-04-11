@@ -44,7 +44,7 @@ describe('SendNotificationsNouveauxMessagesCommandHandler', () => {
           idConseiller: jeune1.conseiller.id
         }
         const jeunes = [jeune1, jeune2]
-        jeuneRepository.findAllJeunesByConseiller
+        jeuneRepository.findAllJeunesByIdsAndConseiller
           .withArgs(command.idsJeunes, command.idConseiller)
           .resolves(jeunes)
 

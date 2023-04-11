@@ -23,7 +23,7 @@ export class AuthorizeConseillerForJeunes {
       return failure(new DroitsInsuffisants())
     }
 
-    const jeunes = await this.jeuneRepository.findAllJeunesByConseiller(
+    const jeunes = await this.jeuneRepository.findAllJeunesByIdsAndConseiller(
       idsJeunes,
       utilisateur.id
     )

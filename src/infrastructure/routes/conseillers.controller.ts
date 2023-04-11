@@ -25,6 +25,7 @@ import {
   CreateActionCommand,
   CreateActionCommandHandler
 } from '../../application/commands/action/create-action.command.handler'
+import { DeleteConseillerCommandHandler } from '../../application/commands/conseiller/delete-conseiller.command.handler'
 import {
   CreateListeDeDiffusionCommand,
   CreateListeDeDiffusionCommandHandler
@@ -38,8 +39,6 @@ import {
   CreerJeuneMiloCommandHandler
 } from '../../application/commands/creer-jeune-milo.command.handler'
 import { CreerJeunePoleEmploiCommandHandler } from '../../application/commands/creer-jeune-pole-emploi.command.handler'
-import { CreerSuperviseursCommandHandler } from '../../application/commands/creer-superviseurs.command.handler'
-import { DeleteSuperviseursCommandHandler } from '../../application/commands/delete-superviseurs.command.handler'
 import { ModifierConseillerCommandHandler } from '../../application/commands/modifier-conseiller.command.handler'
 import { ModifierJeuneDuConseillerCommandHandler } from '../../application/commands/modifier-jeune-du-conseiller.command.handler'
 import { RecupererJeunesDuConseillerCommandHandler } from '../../application/commands/recuperer-jeunes-du-conseiller.command.handler'
@@ -47,24 +46,24 @@ import {
   SendNotificationsNouveauxMessagesCommand,
   SendNotificationsNouveauxMessagesCommandHandler
 } from '../../application/commands/send-notifications-nouveaux-messages.command.handler'
+import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from '../../application/queries/action/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
 import { GetConseillerByEmailQueryHandler } from '../../application/queries/get-conseiller-by-email.query.handler.db'
 import { GetDetailConseillerQueryHandler } from '../../application/queries/get-detail-conseiller.query.handler.db'
 import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
-import { GetJeunesIdentitesQueryHandler } from '../../application/queries/get-jeunes-identites.query.handler.db'
 import {
   GetIndicateursPourConseillerExclusionQuery,
   GetIndicateursPourConseillerQueryHandler
 } from '../../application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { GetJeuneMiloByDossierQueryHandler } from '../../application/queries/get-jeune-milo-by-dossier.query.handler.db'
 import { GetJeunesByConseillerQueryHandler } from '../../application/queries/get-jeunes-by-conseiller.query.handler.db'
-import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from '../../application/queries/action/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
+import { GetJeunesIdentitesQueryHandler } from '../../application/queries/get-jeunes-identites.query.handler.db'
 import { DetailConseillerQueryModel } from '../../application/queries/query-models/conseillers.query-model'
 import { IndicateursPourConseillerQueryModel } from '../../application/queries/query-models/indicateurs-pour-conseiller.query-model'
 import {
   DetailJeuneConseillerQueryModel,
   DetailJeuneQueryModel,
-  JeuneQueryModel,
   IdentiteJeuneQueryModel,
+  JeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from '../../application/queries/query-models/jeunes.query-model'
 import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
@@ -75,9 +74,9 @@ import {
   ErreurHttp
 } from '../../building-blocks/types/domain-error'
 import {
+  Result,
   isFailure,
-  isSuccess,
-  Result
+  isSuccess
 } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
@@ -96,8 +95,7 @@ import {
   GetIdentitesJeunesQueryParams,
   GetIndicateursPourConseillerQueryParams,
   GetRendezVousConseillerQueryParams,
-  PutJeuneDuConseillerPayload,
-  SuperviseursPayload
+  PutJeuneDuConseillerPayload
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
 
@@ -119,15 +117,33 @@ export class ConseillersController {
     private readonly getDossierMiloJeuneQueryHandler: GetDossierMiloJeuneQueryHandler,
     private readonly getJeuneMiloByDossierQueryHandler: GetJeuneMiloByDossierQueryHandler,
     private readonly creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler,
-    private readonly creerSuperviseursCommandHandler: CreerSuperviseursCommandHandler,
-    private readonly deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler,
     private readonly modifierConseillerCommandHandler: ModifierConseillerCommandHandler,
     private readonly recupererJeunesDuConseillerCommandHandler: RecupererJeunesDuConseillerCommandHandler,
     private readonly modifierJeuneDuConseillerCommandHandler: ModifierJeuneDuConseillerCommandHandler,
     private readonly getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler,
     private readonly createListeDeDiffusionCommandHandler: CreateListeDeDiffusionCommandHandler,
-    private readonly getIdentitesJeunesQueryHandler: GetJeunesIdentitesQueryHandler
+    private readonly getIdentitesJeunesQueryHandler: GetJeunesIdentitesQueryHandler,
+    private readonly deleteConseillerCommandHandler: DeleteConseillerCommandHandler
   ) {}
+
+  @ApiOperation({
+    summary: 'Supprime un conseiller.',
+    description: 'Autorisé pour un conseiller.'
+  })
+  @Delete(':idConseiller')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteConseiller(
+    @Param('idConseiller') idConseiller: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result = await this.deleteConseillerCommandHandler.execute(
+      {
+        idConseiller
+      },
+      utilisateur
+    )
+    handleFailure(result)
+  }
 
   @ApiOperation({
     summary: 'Récupère un conseiller par email',
@@ -456,41 +472,6 @@ export class ConseillersController {
       return result.data
     }
     throw handleFailure(result)
-  }
-
-  @ApiOperation({
-    summary: 'Ajoute des droits de supervision à des conseillers',
-    description: 'Autorisé pour un utilisateur support'
-  })
-  @Post('superviseurs')
-  async postSuperviseurs(
-    @Body() superviseursPayload: SuperviseursPayload,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    const result = await this.creerSuperviseursCommandHandler.execute(
-      { superviseurs: superviseursPayload.superviseurs },
-      utilisateur
-    )
-
-    handleFailure(result)
-  }
-
-  @ApiOperation({
-    summary: 'Supprime des droits de supervision à des conseillers',
-    description: 'Autorisé pour un utilisateur support'
-  })
-  @Delete('superviseurs')
-  @HttpCode(204)
-  async deleteSuperviseurs(
-    @Body() superviseursPayload: SuperviseursPayload,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    const result = await this.deleteSuperviseursCommandHandler.execute(
-      { superviseurs: superviseursPayload.superviseurs },
-      utilisateur
-    )
-
-    handleFailure(result)
   }
 
   @ApiOperation({

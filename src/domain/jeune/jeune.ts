@@ -78,7 +78,9 @@ export namespace Jeune {
 
     save(jeune: Jeune): Promise<void>
 
-    findAllJeunesByConseiller(
+    findAllJeunesByConseiller(idConseiller: string): Promise<Jeune[]>
+
+    findAllJeunesByIdsAndConseiller(
       idsJeunes: string[],
       idConseiller: string
     ): Promise<Jeune[]>

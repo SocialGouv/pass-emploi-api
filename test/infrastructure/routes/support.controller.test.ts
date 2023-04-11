@@ -20,10 +20,18 @@ import {
   TransfererJeunesConseillerCommand,
   TransfererJeunesConseillerCommandHandler
 } from '../../../src/application/commands/transferer-jeunes-conseiller.command.handler'
+import {
+  CreerSuperviseursCommandHandler,
+  CreerSuperviseursCommand
+} from '../../../src/application/commands/creer-superviseurs.command.handler'
+import { DeleteSuperviseursCommandHandler } from '../../../src/application/commands/delete-superviseurs.command.handler'
+import { Core } from '../../../src/domain/core'
 
 describe('SupportController', () => {
   let archiverJeuneSupportCommandHandler: StubbedClass<ArchiverJeuneSupportCommandHandler>
   let updateAgenceCommandHandler: StubbedClass<UpdateAgenceConseillerCommandHandler>
+  let creerSuperviseursCommandHandler: StubbedClass<CreerSuperviseursCommandHandler>
+  let deleteSuperviseursCommandHandler: StubbedClass<DeleteSuperviseursCommandHandler>
   let transfererJeunesConseillerCommandHandler: StubbedClass<TransfererJeunesConseillerCommandHandler>
   let app: INestApplication
 
@@ -33,6 +41,8 @@ describe('SupportController', () => {
       ArchiverJeuneSupportCommandHandler
     )
     updateAgenceCommandHandler = app.get(UpdateAgenceConseillerCommandHandler)
+    creerSuperviseursCommandHandler = app.get(CreerSuperviseursCommandHandler)
+    deleteSuperviseursCommandHandler = app.get(DeleteSuperviseursCommandHandler)
     transfererJeunesConseillerCommandHandler = app.get(
       TransfererJeunesConseillerCommandHandler
     )
@@ -179,5 +189,113 @@ describe('SupportController', () => {
     })
 
     ensureUserAuthenticationFailsIfInvalid('POST', '/support/transferer-jeunes')
+  })
+
+  describe('POST /support/superviseurs', () => {
+    describe('quand le payload est valide', () => {
+      it('renvoie 201', async () => {
+        // Given
+        const command: CreerSuperviseursCommand = {
+          superviseurs: [
+            { email: 'test@octo.com', structure: Core.Structure.MILO }
+          ]
+        }
+
+        creerSuperviseursCommandHandler.execute
+          .withArgs(command, unUtilisateurDecode())
+          .resolves(emptySuccess())
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/support/superviseurs')
+          .send(command)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.CREATED)
+      })
+    })
+    describe("quand le payload n'est pas valide", () => {
+      it('renvoie 400 quand le champ email est pas bon', async () => {
+        // Given
+        const payload = {
+          superviseurs: [{ email: 'test', structure: Core.Structure.MILO }]
+        }
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/support/superviseurs')
+          .send(payload)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+      it('renvoie 400 quand le superviseur est incomplet', async () => {
+        // Given
+        const payload = {
+          superviseurs: [{ email: 'test@octo.com' }]
+        }
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/support/superviseurs')
+          .send(payload)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('get', '/conseillers/superviseurs')
+  })
+
+  describe('DELETE /support/superviseurs', () => {
+    describe('quand le payload est valide', () => {
+      it('renvoie 201', async () => {
+        // Given
+        const command: CreerSuperviseursCommand = {
+          superviseurs: [
+            { email: 'test@octo.com', structure: Core.Structure.MILO }
+          ]
+        }
+
+        deleteSuperviseursCommandHandler.execute
+          .withArgs(command, unUtilisateurDecode())
+          .resolves(emptySuccess())
+
+        // When - Then
+        await request(app.getHttpServer())
+          .delete('/support/superviseurs')
+          .send(command)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.NO_CONTENT)
+      })
+    })
+    describe("quand le payload n'est pas valide", () => {
+      it('renvoie 400 quand le champ email est pas bon', async () => {
+        // Given
+        const payload = {
+          superviseurs: [{ email: 'test', structure: Core.Structure.MILO }]
+        }
+
+        // When - Then
+        await request(app.getHttpServer())
+          .delete('/support/superviseurs')
+          .send(payload)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+      it('renvoie 400 quand le superviseur est incomplet', async () => {
+        // Given
+        const payload = {
+          superviseurs: [{ email: 'test@octo.com' }]
+        }
+
+        // When - Then
+        await request(app.getHttpServer())
+          .delete('/support/superviseurs')
+          .send(payload)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('get', '/conseillers/superviseurs')
   })
 })

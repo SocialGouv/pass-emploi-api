@@ -140,8 +140,8 @@ export class AuthentificationSqlRepository
     )
   }
 
-  async deleteJeuneIdp(idJeune: string): Promise<void> {
-    await this.keycloakClient.deleteUserByIdUser(idJeune)
-    this.logger.log(`jeune ${idJeune} supprimé de keycloak`)
+  async deleteUtilisateurIdp(idUtilisateur: string): Promise<void> {
+    await this.keycloakClient.deleteUserByIdUser(idUtilisateur)
+    this.logger.log(`Utilisateur ${idUtilisateur} supprimé de keycloak`)
   }
 }
