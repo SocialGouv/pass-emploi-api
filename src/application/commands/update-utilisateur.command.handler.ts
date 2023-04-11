@@ -55,25 +55,24 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       email: command.email?.toLocaleLowerCase()
     }
     if (commandSanitized.type === Authentification.Type.CONSEILLER) {
-      if (commandSanitized.structure === Core.Structure.PASS_EMPLOI) {
-        return this.authentificationConseillerPassEmploi(commandSanitized)
-      }
-      if (commandSanitized.structure === Core.Structure.POLE_EMPLOI) {
-        return this.authentificationConseillerSSO(commandSanitized)
-      }
-      if (commandSanitized.structure === Core.Structure.MILO) {
-        return this.authentificationConseillerSSO(commandSanitized)
+      switch (commandSanitized.structure) {
+        case Core.Structure.PASS_EMPLOI:
+          return this.authentificationConseillerPassEmploi(commandSanitized)
+        case Core.Structure.MILO:
+        case Core.Structure.POLE_EMPLOI:
+        case Core.Structure.POLE_EMPLOI_BRSA:
+          return this.authentificationConseillerSSO(commandSanitized)
       }
     }
     if (commandSanitized.type === Authentification.Type.JEUNE) {
-      if (commandSanitized.structure === Core.Structure.PASS_EMPLOI) {
-        return this.authentificationJeunePassEmploi(commandSanitized)
-      }
-      if (commandSanitized.structure === Core.Structure.POLE_EMPLOI) {
-        return this.authentificationJeunePoleEmploi(commandSanitized)
-      }
-      if (commandSanitized.structure === Core.Structure.MILO) {
-        return this.authentificationJeuneMilo(commandSanitized)
+      switch (commandSanitized.structure) {
+        case Core.Structure.PASS_EMPLOI:
+          return this.authentificationJeunePassEmploi(commandSanitized)
+        case Core.Structure.MILO:
+          return this.authentificationJeuneMilo(commandSanitized)
+        case Core.Structure.POLE_EMPLOI:
+        case Core.Structure.POLE_EMPLOI_BRSA:
+          return this.authentificationJeunePoleEmploi(commandSanitized)
       }
     }
     return failure(
