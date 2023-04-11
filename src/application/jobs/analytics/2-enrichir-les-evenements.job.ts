@@ -38,7 +38,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
 
     await connexion.close()
 
-    if (maintenant.weekday === JOUR_DE_LA_SEMAINE_LUNDI && false) {
+    if (maintenant.weekday === JOUR_DE_LA_SEMAINE_LUNDI) {
       const jobCalculerLesVues: Planificateur.Job<void> = {
         dateExecution: this.dateService.nowJs(),
         type: Planificateur.JobType.CHARGER_LES_VUES_ANALYTICS,
