@@ -30,6 +30,10 @@ import { AsSql } from '../../../../src/infrastructure/sequelize/types'
 import { DateTime } from 'luxon'
 import { uneAgenceMiloDTO } from '../../../fixtures/sql-models/agence.sql-model'
 import { AgenceSqlModel } from '../../../../src/infrastructure/sequelize/models/agence.sql-model'
+import { FavoriOffreEmploiSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-emploi.sql-model'
+import { FavoriOffreImmersionQueryModel } from 'src/application/queries/query-models/offres-immersion.query-model'
+import { unFavoriOffreEmploi } from 'test/fixtures/sql-models/favoris.sql-model'
+import { Offre } from 'src/domain/offre/offre'
 
 describe('GetAccueilJeuneMiloQueryHandler', () => {
   let handler: GetAccueilJeuneMiloQueryHandler
@@ -270,6 +274,82 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
             })
           ]
         )
+      })
+    })
+
+    describe('retourne 3 favoris', () => {
+      let favoriSql1: FavoriOffreEmploiSqlModel
+      let favoriSql2: FavoriOffreEmploiSqlModel
+      let favoriSql3: FavoriOffreEmploiSqlModel
+      let favoriSql4: FavoriOffreEmploiSqlModel
+
+      before(async () => {
+        // Given
+        favoriSql1 = await FavoriOffreEmploiSqlModel.create(
+          unFavoriOffreEmploi({
+            idJeune: query.idJeune,
+            idOffre: "1",
+            id: 1
+          })
+        )
+        favoriSql2 = await FavoriOffreEmploiSqlModel.create(
+          unFavoriOffreEmploi({
+            idJeune: query.idJeune,
+            idOffre: "2",
+            id: 2
+          })
+        )
+        favoriSql3 = await FavoriOffreEmploiSqlModel.create(
+          unFavoriOffreEmploi({
+            idJeune: query.idJeune,
+            idOffre: "3",
+            id: 3
+          })
+        )
+        favoriSql4 = await FavoriOffreEmploiSqlModel.create(
+          unFavoriOffreEmploi({
+            idJeune: query.idJeune,
+            idOffre: "4",
+            id: 4
+          })
+        )
+      })
+
+      after(() => {
+        FavoriOffreEmploiSqlModel.destroy({ truncate: true, cascade: true })
+      })
+
+      it('retourne 3 favoris', async () => {
+        // When
+        result = await handler.handle(query)
+
+        // Then
+        expect(isSuccess(result) && result.data.mesFavoris).to.deep.equal([
+          {
+            idOffre: "1",
+            titre: "",
+            type: Offre.Favori.Type.EMPLOI,
+            organisation: "bc",
+            localisation: undefined,
+            tags: ["aa", "2 ans"]
+          },
+          {
+            idOffre: "2",
+            titre: "",
+            type: Offre.Favori.Type.EMPLOI,
+            organisation: "bc",
+            localisation: undefined,
+            tags: ["aa", "2 ans"]
+          },
+          {
+            idOffre: "3",
+            titre: "",
+            type: Offre.Favori.Type.EMPLOI,
+            organisation: "bc",
+            localisation: undefined,
+            tags: ["aa", "2 ans"]
+          },
+        ])
       })
     })
 
