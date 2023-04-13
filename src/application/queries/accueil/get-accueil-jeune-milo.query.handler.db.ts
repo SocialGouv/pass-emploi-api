@@ -25,6 +25,8 @@ import { ConseillerSqlModel } from '../../../infrastructure/sequelize/models/con
 import { AccueilJeuneMiloQueryModel } from '../query-models/jeunes.milo.query-model'
 import { GetRecherchesSauvegardeesQueryGetter } from '../query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
 import { TYPES_ANIMATIONS_COLLECTIVES } from '../../../domain/rendez-vous/rendez-vous'
+import { FavoriOffreEmploiSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-emploi.sql-model'
+import { fromOffreEmploiSqlToFavorisQueryModel } from '../query-mappers/favoris.mappers'
 
 export interface GetAccueilJeuneMiloQuery extends Query {
   idJeune: string
@@ -66,7 +68,8 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       actionSqlModelsARealiser,
       actionSqlModelsEnRetard,
       evenementSqlModelAVenir,
-      recherchesQueryModels
+      recherchesQueryModels,
+      mesFavorisSqlModels,
     ] = await Promise.all([
       this.countRendezVousSemaine(maintenant, dateFinDeSemaine, idJeune),
       this.prochainRendezVous(maintenant, idJeune),
@@ -79,7 +82,8 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       this.evenementsAVenir(jeuneSqlModel, maintenant),
       this.getRecherchesSauvegardeesQueryGetter.handle({
         idJeune
-      })
+      }),
+      this.mesFavoris(idJeune),
     ])
 
     return success({
@@ -103,7 +107,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
         )
       ),
       mesAlertes: recherchesQueryModels,
-      mesFavoris: []
+      mesFavoris: mesFavorisSqlModels.map(fromOffreEmploiSqlToFavorisQueryModel)
     })
   }
 
@@ -216,6 +220,17 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
         }
       },
       order: [['date', 'ASC']],
+      limit: 3
+    })
+  }
+
+  private mesFavoris(
+    idJeune: string
+  ): Promise<FavoriOffreEmploiSqlModel[]> {
+    return FavoriOffreEmploiSqlModel.findAll({
+      where: {
+        idJeune
+      },
       limit: 3
     })
   }
