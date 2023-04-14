@@ -24,7 +24,7 @@ import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import { getDatabase } from '../../../utils/database-for-testing'
 
-describe('GetFavorisJeunePourConseillerQueryHandler', () => {
+describe('GetFavorisJeuneQueryHandler', () => {
   let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let getFavorisJeuneQueryHandler: GetFavorisJeuneQueryHandler
@@ -96,7 +96,8 @@ describe('GetFavorisJeunePourConseillerQueryHandler', () => {
         type: Offre.Favori.Type.EMPLOI,
         organisation: 'poi-entreprise',
         localisation: undefined,
-        tags: ['aa', '2 ans']
+        tags: ['aa', '2 ans'],
+        dateCreation: undefined
       }
       const favoriOffreAlternance: FavorisQueryModel = {
         idOffre: 'poi-id-offre-2',
@@ -104,7 +105,8 @@ describe('GetFavorisJeunePourConseillerQueryHandler', () => {
         type: Offre.Favori.Type.ALTERNANCE,
         organisation: 'poi-entreprise',
         localisation: undefined,
-        tags: ['aa', '2 ans']
+        tags: ['aa', '2 ans'],
+        dateCreation: undefined
       }
       const listeAttendue = [favoriOffreEmploi, favoriOffreAlternance]
 
@@ -146,7 +148,8 @@ describe('GetFavorisJeunePourConseillerQueryHandler', () => {
         type: Offre.Favori.Type.IMMERSION,
         organisation: 'poi-etablissement',
         localisation: 'marseille',
-        tags: ['patisserie']
+        tags: ['patisserie'],
+        dateCreation: undefined
       }
       const favoriOffreImmersion2: FavorisQueryModel = {
         idOffre: 'poi-id-offre',
@@ -154,7 +157,8 @@ describe('GetFavorisJeunePourConseillerQueryHandler', () => {
         type: Offre.Favori.Type.IMMERSION,
         organisation: 'poi-etablissement',
         localisation: 'marseille',
-        tags: ['patisserie']
+        tags: ['patisserie'],
+        dateCreation: undefined
       }
       const listeAttendue = [favoriOffreImmersion1, favoriOffreImmersion2]
 
@@ -183,7 +187,8 @@ describe('GetFavorisJeunePourConseillerQueryHandler', () => {
         type: Offre.Favori.Type.SERVICE_CIVIQUE,
         organisation: undefined,
         localisation: undefined,
-        tags: ['infra']
+        tags: ['infra'],
+        dateCreation: undefined
       }
       const listeAttendue = [favoriOffreServiceCivique]
 
