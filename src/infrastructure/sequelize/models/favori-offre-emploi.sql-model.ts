@@ -61,4 +61,7 @@ export class FavoriOffreEmploiSqlModel extends Model {
     type: DataType.STRING
   })
   communeLocalisation: string | null
+
+  @Column({ field: 'date_creation', type: DataType.DATE })
+  dateCreation: Date | null
 }

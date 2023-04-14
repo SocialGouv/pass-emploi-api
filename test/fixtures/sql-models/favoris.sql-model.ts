@@ -17,7 +17,8 @@ export function unFavoriOffreEmploi(
     isAlternance: null,
     nomLocalisation: null,
     codePostalLocalisation: null,
-    communeLocalisation: null
+    communeLocalisation: null,
+    dateCreation: null
   }
 
   return { ...defaults, ...args }
@@ -34,7 +35,8 @@ export function unFavoriOffreEngagement(
     domaine: 'infra',
     ville: null,
     organisation: null,
-    dateDeDebut: null
+    dateDeDebut: null,
+    dateCreation: null
   }
 
   return { ...defaults, ...args }
@@ -50,7 +52,8 @@ export function unFavoriOffreImmersion(
     metier: 'boulanger',
     ville: '',
     nomEtablissement: '',
-    secteurActivite: 'patisserie'
+    secteurActivite: 'patisserie',
+    dateCreation: null
   }
 
   return { ...defaults, ...args }

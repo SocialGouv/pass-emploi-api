@@ -14,13 +14,13 @@ import {
 } from '../query-mappers/favoris.mappers'
 import { FavorisQueryModel } from '../query-models/favoris.query-model'
 
-interface GetFavorisJeunePourConseillerQuery {
+interface GetFavorisJeuneQuery {
   idJeune: string
 }
 
 @Injectable()
 export class GetFavorisJeuneQueryHandler extends QueryHandler<
-  GetFavorisJeunePourConseillerQuery,
+  GetFavorisJeuneQuery,
   FavorisQueryModel[]
 > {
   constructor(
@@ -31,7 +31,7 @@ export class GetFavorisJeuneQueryHandler extends QueryHandler<
   }
 
   async authorize(
-    query: GetFavorisJeunePourConseillerQuery,
+    query: GetFavorisJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
@@ -43,9 +43,7 @@ export class GetFavorisJeuneQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
   }
 
-  async handle(
-    query: GetFavorisJeunePourConseillerQuery
-  ): Promise<FavorisQueryModel[]> {
+  async handle(query: GetFavorisJeuneQuery): Promise<FavorisQueryModel[]> {
     const [
       listeFavorisOffresEmploi,
       listeFavorisOffresImmersion,

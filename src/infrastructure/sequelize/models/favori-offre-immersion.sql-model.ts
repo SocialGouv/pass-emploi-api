@@ -35,4 +35,7 @@ export class FavoriOffreImmersionSqlModel extends Model {
   @Column({ field: 'nom_etablissement' }) nomEtablissement: string
 
   @Column({ field: 'secteur_activite' }) secteurActivite: string
+
+  @Column({ field: 'date_creation', type: DataType.DATE })
+  dateCreation: Date | null
 }

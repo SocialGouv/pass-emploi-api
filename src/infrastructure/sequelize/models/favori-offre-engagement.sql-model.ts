@@ -41,4 +41,7 @@ export class FavoriOffreEngagementSqlModel extends Model {
   @Column({ field: 'date_de_debut', type: DataType.STRING }) dateDeDebut:
     | string
     | null
+
+  @Column({ field: 'date_creation', type: DataType.DATE })
+  dateCreation: Date | null
 }

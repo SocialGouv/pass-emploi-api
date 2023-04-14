@@ -25,8 +25,7 @@ import { ConseillerSqlModel } from '../../../infrastructure/sequelize/models/con
 import { AccueilJeuneMiloQueryModel } from '../query-models/jeunes.milo.query-model'
 import { GetRecherchesSauvegardeesQueryGetter } from '../query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
 import { TYPES_ANIMATIONS_COLLECTIVES } from '../../../domain/rendez-vous/rendez-vous'
-import { FavoriOffreEmploiSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-emploi.sql-model'
-import { fromOffreEmploiSqlToFavorisQueryModel } from '../query-mappers/favoris.mappers'
+import { GetFavorisAccueilQueryGetter } from '../query-getters/accueil/get-favoris.query.getter.db'
 
 export interface GetAccueilJeuneMiloQuery extends Query {
   idJeune: string
@@ -40,7 +39,8 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
 > {
   constructor(
     private jeuneAuthorizer: JeuneAuthorizer,
-    private getRecherchesSauvegardeesQueryGetter: GetRecherchesSauvegardeesQueryGetter
+    private getRecherchesSauvegardeesQueryGetter: GetRecherchesSauvegardeesQueryGetter,
+    private getFavorisAccueilQueryGetter: GetFavorisAccueilQueryGetter
   ) {
     super('GetAccueilJeuneMiloQueryHandler')
   }
@@ -69,7 +69,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       actionSqlModelsEnRetard,
       evenementSqlModelAVenir,
       recherchesQueryModels,
-      mesFavorisSqlModels,
+      favorisQueryModels
     ] = await Promise.all([
       this.countRendezVousSemaine(maintenant, dateFinDeSemaine, idJeune),
       this.prochainRendezVous(maintenant, idJeune),
@@ -83,7 +83,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       this.getRecherchesSauvegardeesQueryGetter.handle({
         idJeune
       }),
-      this.mesFavoris(idJeune),
+      this.getFavorisAccueilQueryGetter.handle({ idJeune })
     ])
 
     return success({
@@ -107,7 +107,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
         )
       ),
       mesAlertes: recherchesQueryModels,
-      mesFavoris: mesFavorisSqlModels.map(fromOffreEmploiSqlToFavorisQueryModel)
+      mesFavoris: favorisQueryModels
     })
   }
 
@@ -220,17 +220,6 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
         }
       },
       order: [['date', 'ASC']],
-      limit: 3
-    })
-  }
-
-  private mesFavoris(
-    idJeune: string
-  ): Promise<FavoriOffreEmploiSqlModel[]> {
-    return FavoriOffreEmploiSqlModel.findAll({
-      where: {
-        idJeune
-      },
       limit: 3
     })
   }
