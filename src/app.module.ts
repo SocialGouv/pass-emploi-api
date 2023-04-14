@@ -323,6 +323,7 @@ import { ChargerLesVuesJobHandler } from './application/jobs/analytics/3-charger
 import { ChargerEvenementsJobHandler } from './application/jobs/analytics/1-charger-les-evenements.job'
 import { InitialiserLesVuesJobHandler } from './application/jobs/analytics/initialiser-les-vues.job'
 import { DeleteConseillerCommandHandler } from './application/commands/conseiller/delete-conseiller.command.handler'
+import { GetFavorisAccueilQueryGetter } from './application/queries/query-getters/accueil/get-favoris.query.getter.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -711,7 +712,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     ArchiverJeuneSupportCommandHandler,
     GetDiagorienteMetiersFavorisQueryHandler,
     GetJeunesIdentitesQueryHandler,
-    DeleteConseillerCommandHandler
+    DeleteConseillerCommandHandler,
+    GetFavorisAccueilQueryGetter
   ]
 }
 

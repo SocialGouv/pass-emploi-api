@@ -11,7 +11,7 @@ export interface GetRecherchesSauvegardeesQuery {
 export class GetRecherchesSauvegardeesQueryGetter {
   private logger: Logger
   constructor() {
-    this.logger = new Logger('GetDemarchesQueryGetter')
+    this.logger = new Logger('GetRecherchesSauvegardeesQueryGetter')
   }
 
   async handle(

@@ -24,12 +24,14 @@ import { JeunePoleEmploiAuthorizer } from '../../../../src/application/authorize
 import { uneDemarcheQueryModel } from '../../../fixtures/query-models/demarche.query-model.fixtures'
 import { GetRecherchesSauvegardeesQueryGetter } from '../../../../src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
 import { Recherche } from '../../../../src/domain/offre/recherche/recherche'
+import { GetFavorisAccueilQueryGetter } from '../../../../src/application/queries/query-getters/accueil/get-favoris.query.getter.db'
 
 describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
   let handler: GetAccueilJeunePoleEmploiQueryHandler
   let getDemarchesQueryGetter: StubbedClass<GetDemarchesQueryGetter>
   let getRendezVousJeunePoleEmploiQueryGetter: StubbedClass<GetRendezVousJeunePoleEmploiQueryGetter>
   let getRecherchesSauvegardeesQueryGetter: StubbedClass<GetRecherchesSauvegardeesQueryGetter>
+  let getFavorisQueryGetter: StubbedClass<GetFavorisAccueilQueryGetter>
   let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
   let keycloakClient: StubbedClass<KeycloakClient>
   const idpToken = 'id-token'
@@ -39,6 +41,7 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
     getRecherchesSauvegardeesQueryGetter = stubClass(
       GetRecherchesSauvegardeesQueryGetter
     )
+    getFavorisQueryGetter = stubClass(GetFavorisAccueilQueryGetter)
     getRendezVousJeunePoleEmploiQueryGetter = stubClass(
       GetRendezVousJeunePoleEmploiQueryGetter
     )
@@ -51,13 +54,19 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
       keycloakClient,
       getDemarchesQueryGetter,
       getRendezVousJeunePoleEmploiQueryGetter,
-      getRecherchesSauvegardeesQueryGetter
+      getRecherchesSauvegardeesQueryGetter,
+      getFavorisQueryGetter
     )
   })
 
   describe('handle', () => {
     const maintenantString = '2023-03-28T12:00:00.000Z'
     const maintenant = DateTime.fromISO(maintenantString)
+    const query: GetAccueilJeunePoleEmploiQuery = {
+      idJeune: 'idJeune',
+      maintenant: maintenantString,
+      accessToken: 'accessToken'
+    }
 
     const demarcheEnCoursEnRetard = uneDemarcheQueryModel({
       dateFin: maintenant.minus({ day: 1 }).toISO(),
@@ -112,12 +121,6 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
       describe('mapping et filtres', () => {
         beforeEach(async () => {
           // Given
-          const query: GetAccueilJeunePoleEmploiQuery = {
-            idJeune: 'idJeune',
-            maintenant: maintenantString,
-            accessToken: 'accessToken'
-          }
-
           getDemarchesQueryGetter.handle
             .withArgs({
               ...query,
@@ -137,18 +140,6 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
               })
             )
 
-          getRecherchesSauvegardeesQueryGetter.handle
-            .withArgs({
-              idJeune: query.idJeune
-            })
-            .resolves([
-              {
-                ...recherche,
-                geometrie: undefined,
-                criteres: undefined
-              }
-            ])
-
           getRendezVousJeunePoleEmploiQueryGetter.handle
             .withArgs({
               ...query,
@@ -163,6 +154,24 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
                 ]
               })
             )
+
+          getRecherchesSauvegardeesQueryGetter.handle
+            .withArgs({
+              idJeune: query.idJeune
+            })
+            .resolves([
+              {
+                ...recherche,
+                geometrie: undefined,
+                criteres: undefined
+              }
+            ])
+
+          getFavorisQueryGetter.handle
+            .withArgs({
+              idJeune: query.idJeune
+            })
+            .resolves([])
 
           // When
           result = await handler.handle(query)
@@ -179,12 +188,6 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
             isSuccess(result) && result.data.cetteSemaine.nombreRendezVous
           ).to.deep.equal(1)
         })
-        it('retourne un tableau de recherches sauvegardées', async () => {
-          // Then
-          expect(
-            isSuccess(result) && result.data.prochainRendezVous
-          ).to.deep.equal(unRendezVousAujourdhui)
-        })
         it('compte les démarches à réaliser et en retard du reste de la semaine', async () => {
           // Then
           expect(
@@ -196,18 +199,24 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
               result.data.cetteSemaine.nombreActionsDemarchesARealiser
           ).to.deep.equal(2)
         })
+        it('appelle la query pour récupérer les 3 dernières alertes', async () => {
+          // Then
+          expect(
+            isSuccess(result) && getRecherchesSauvegardeesQueryGetter.handle
+          ).to.have.been.calledOnceWithExactly({ idJeune: query.idJeune })
+        })
+        it('appelle la query pour récupérer les 3 derniers favoris', async () => {
+          // Then
+          expect(
+            isSuccess(result) && getFavorisQueryGetter.handle
+          ).to.have.been.calledOnceWithExactly({ idJeune: query.idJeune })
+        })
       })
     })
 
     describe('quand les démarches sont en échec', () => {
       it("retourne l'échec", async () => {
         // Given
-        const query: GetAccueilJeunePoleEmploiQuery = {
-          idJeune: 'idJeune',
-          maintenant: maintenantString,
-          accessToken: 'accessToken'
-        }
-
         getDemarchesQueryGetter.handle.resolves(
           failure(new ErreurHttp('Erreur', 500))
         )
@@ -223,12 +232,6 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
     describe('quand les rendez vous sont en échec', () => {
       it("retourne l'échec", async () => {
         // Given
-        const query: GetAccueilJeunePoleEmploiQuery = {
-          idJeune: 'idJeune',
-          maintenant: maintenantString,
-          accessToken: 'accessToken'
-        }
-
         getDemarchesQueryGetter.handle.resolves(success({ queryModel: [] }))
         getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
           failure(new ErreurHttp('Erreur', 418))

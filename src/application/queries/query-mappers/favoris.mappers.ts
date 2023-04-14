@@ -3,6 +3,7 @@ import { FavorisQueryModel } from '../query-models/favoris.query-model'
 import { FavoriOffreImmersionSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 import { FavoriOffreEngagementSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-engagement.sql-model'
 import { Offre } from '../../../domain/offre/offre'
+import { DateService } from '../../../utils/date-service'
 
 export function fromOffreEmploiSqlToFavorisQueryModel(
   offre: FavoriOffreEmploiSqlModel
@@ -19,6 +20,9 @@ export function fromOffreEmploiSqlToFavorisQueryModel(
       : Offre.Favori.Type.EMPLOI,
     organisation: offre.nomEntreprise ?? undefined,
     localisation: offre.nomLocalisation ?? undefined,
+    dateCreation: offre.dateCreation
+      ? DateService.fromJSDateToISOString(offre.dateCreation)
+      : undefined,
     tags
   }
 }
@@ -32,6 +36,9 @@ export function fromOffreImmersionSqlToFavorisQueryModel(
     type: Offre.Favori.Type.IMMERSION,
     organisation: offre.nomEtablissement,
     localisation: offre.ville,
+    dateCreation: offre.dateCreation
+      ? DateService.fromJSDateToISOString(offre.dateCreation)
+      : undefined,
     tags: [offre.secteurActivite]
   }
 }
@@ -49,6 +56,9 @@ export function fromOffreServiceCiviqueSqlToFavorisQueryModel(
     type: Offre.Favori.Type.SERVICE_CIVIQUE,
     organisation: offre.organisation ?? undefined,
     localisation: offre.ville ?? undefined,
+    dateCreation: offre.dateCreation
+      ? DateService.fromJSDateToISOString(offre.dateCreation)
+      : undefined,
     tags
   }
 }
