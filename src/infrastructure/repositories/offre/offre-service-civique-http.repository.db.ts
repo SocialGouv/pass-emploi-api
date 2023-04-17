@@ -2,11 +2,14 @@ import { Injectable } from '@nestjs/common'
 import { FavoriOffreEngagementSqlModel } from '../../sequelize/models/favori-offre-engagement.sql-model'
 import { fromSqlToOffreServiceCivique } from '../mappers/service-civique.mapper'
 import { Offre } from '../../../domain/offre/offre'
+import { DateService } from '../../../utils/date-service'
 
 @Injectable()
 export class OffreServiceCiviqueHttpSqlRepository
   implements Offre.Favori.ServiceCivique.Repository
 {
+  constructor(private readonly dateService: DateService) {}
+
   async get(
     idJeune: string,
     idOffre: string
@@ -36,7 +39,8 @@ export class OffreServiceCiviqueHttpSqlRepository
       titre: offre.titre,
       ville: offre.ville,
       organisation: offre.organisation,
-      dateDeDebut: offre.dateDeDebut
+      dateDeDebut: offre.dateDeDebut,
+      dateCreation: this.dateService.nowJs()
     })
   }
 

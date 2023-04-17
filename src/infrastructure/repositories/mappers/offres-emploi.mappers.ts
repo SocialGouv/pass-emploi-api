@@ -40,7 +40,8 @@ export function toOffresEmploiQueryModel(
 
 export function toFavoriOffreEmploiSqlModel(
   idJeune: string,
-  offreEmploi: Offre.Favori.Emploi
+  offreEmploi: Offre.Favori.Emploi,
+  dateCreation: Date
 ): Partial<FavoriOffreEmploiSqlModel> {
   return {
     idJeune: idJeune,
@@ -52,7 +53,8 @@ export function toFavoriOffreEmploiSqlModel(
     nomLocalisation: offreEmploi.localisation?.nom || null,
     codePostalLocalisation: offreEmploi.localisation?.codePostal || null,
     communeLocalisation: offreEmploi.localisation?.commune || null,
-    isAlternance: offreEmploi.alternance
+    isAlternance: offreEmploi.alternance,
+    dateCreation
   }
 }
 
