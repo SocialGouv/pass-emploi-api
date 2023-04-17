@@ -31,7 +31,7 @@ import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
-import { expect, stubClass } from '../../utils'
+import { expect, StubbedClass, stubClass } from '../../utils'
 import { unCommentaire } from '../../fixtures/action.fixture'
 import {
   CommentaireDto,
@@ -41,9 +41,12 @@ import {
   DatabaseForTesting,
   getDatabase
 } from '../../utils/database-for-testing'
+import { DateService } from '../../../src/utils/date-service'
 
 describe('ArchiveJeuneSqlRepository', () => {
   let database: DatabaseForTesting
+  let dateService: StubbedClass<DateService>
+
   let rechercheSqlRepository: RechercheSqlRepository
   const firebaseClient = stubClass(FirebaseClient)
   firebaseClient.getChat.resolves([])
@@ -69,15 +72,24 @@ describe('ArchiveJeuneSqlRepository', () => {
 
   beforeEach(async () => {
     await database.cleanPG()
+    dateService = stubClass(DateService)
   })
 
   describe('archiver', () => {
     let archiveJeuneSql: ArchiveJeuneSqlModel | null
     let metadonnees: ArchiveJeune.Metadonnees
-    const offresEmploiHttpSqlRepository = new OffresEmploiHttpSqlRepository()
-    const offresImmersionRepository = new FavorisOffresImmersionSqlRepository()
+
+    dateService = stubClass(DateService)
+    dateService.nowJs.returns(new Date('2023-04-17T12:00:00Z'))
+
+    const offresEmploiHttpSqlRepository = new OffresEmploiHttpSqlRepository(
+      dateService
+    )
+    const offresImmersionRepository = new FavorisOffresImmersionSqlRepository(
+      dateService
+    )
     const offreServiceCiviqueHttpSqlRepository =
-      new OffreServiceCiviqueHttpSqlRepository()
+      new OffreServiceCiviqueHttpSqlRepository(dateService)
 
     beforeEach(async () => {
       // Given

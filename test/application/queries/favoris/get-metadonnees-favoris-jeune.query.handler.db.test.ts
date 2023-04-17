@@ -22,13 +22,15 @@ import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
+import { DateService } from '../../../../src/utils/date-service'
 
 describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
   let getMetadonneesFavorisJeuneQueryHandler: GetMetadonneesFavorisJeuneQueryHandler
   let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
-  let recherchesSauvegardeesRepository: RechercheSqlRepository
+  let dateService: StubbedClass<DateService>
 
+  let recherchesSauvegardeesRepository: RechercheSqlRepository
   before(() => {
     databaseForTesting = getDatabase()
   })
@@ -39,6 +41,8 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
       databaseForTesting.sequelize
     )
     conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
+    dateService = stubClass(DateService)
+    dateService.nowJs.returns(new Date('2023-04-17T12:00:00Z'))
 
     getMetadonneesFavorisJeuneQueryHandler =
       new GetMetadonneesFavorisJeuneQueryHandler(conseillerAgenceAuthorizer)
@@ -69,7 +73,7 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
           ville: 'poi-ville'
         }
         const offreImmersionRepository =
-          new FavorisOffresImmersionSqlRepository()
+          new FavorisOffresImmersionSqlRepository(dateService)
         await offreImmersionRepository.save(idJeune, uneOffreImmersion)
 
         const query = {
@@ -112,7 +116,7 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
           titre: 'poi-titre'
         }
         const offreServiceCiviqueRepository =
-          new OffreServiceCiviqueHttpSqlRepository()
+          new OffreServiceCiviqueHttpSqlRepository(dateService)
         await offreServiceCiviqueRepository.save(
           idJeune,
           uneOffreServiceCivique
@@ -157,7 +161,9 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
           typeContrat: 'poi-type-contrat',
           alternance: true
         }
-        const offreEmploiRepository = new OffresEmploiHttpSqlRepository()
+        const offreEmploiRepository = new OffresEmploiHttpSqlRepository(
+          dateService
+        )
         await offreEmploiRepository.save(idJeune, uneOffreAlternance)
 
         const query = {
@@ -197,7 +203,9 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
           titre: 'poi-titre',
           typeContrat: 'poi-type-contrat'
         }
-        const offreEmploiRepository = new OffresEmploiHttpSqlRepository()
+        const offreEmploiRepository = new OffresEmploiHttpSqlRepository(
+          dateService
+        )
         await offreEmploiRepository.save(idJeune, uneOffreEmploi)
 
         const query = {

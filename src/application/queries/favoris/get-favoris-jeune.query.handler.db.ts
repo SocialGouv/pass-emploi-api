@@ -27,7 +27,7 @@ export class GetFavorisJeuneQueryHandler extends QueryHandler<
     private jeuneAuthorizer: JeuneAuthorizer,
     private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer
   ) {
-    super('GetFavorisJeunePourConseillerQueryHandler')
+    super('GetFavorisJeuneQueryHandler')
   }
 
   async authorize(

@@ -5,18 +5,24 @@ import {
 import { AsSql } from '../../../../src/infrastructure/sequelize/types'
 import { uneOffreServiceCivique } from '../../../fixtures/offre-service-civique.fixture'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
-import { expect } from '../../../utils'
+import { expect, StubbedClass, stubClass } from '../../../utils'
 import { OffreServiceCiviqueHttpSqlRepository } from '../../../../src/infrastructure/repositories/offre/offre-service-civique-http.repository.db'
 import { Offre } from '../../../../src/domain/offre/offre'
 import { getDatabase } from '../../../utils/database-for-testing'
+import { DateService } from '../../../../src/utils/date-service'
 
 describe('OffreServiceCiviqueHttpSqlRepository', () => {
   let offreServiceCiviqueHttpSqlRepository: OffreServiceCiviqueHttpSqlRepository
+  let dateService: StubbedClass<DateService>
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
+
+    dateService = stubClass(DateService)
+    dateService.nowJs.returns(new Date('2023-04-17T12:00:00Z'))
+
     offreServiceCiviqueHttpSqlRepository =
-      new OffreServiceCiviqueHttpSqlRepository()
+      new OffreServiceCiviqueHttpSqlRepository(dateService)
   })
 
   describe('getFavori', () => {

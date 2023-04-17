@@ -5,16 +5,24 @@ import { FavoriOffreEmploiSqlModel } from '../../../../src/infrastructure/sequel
 import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
-import { expect } from '../../../utils'
+import { expect, StubbedClass, stubClass } from '../../../utils'
 import { uneOffreEmploi } from '../../../fixtures/offre-emploi.fixture'
 import { getDatabase } from '../../../utils/database-for-testing'
+import { DateService } from '../../../../src/utils/date-service'
 
 describe('OffresEmploiHttpSqlRepository', () => {
   let offresEmploiHttpSqlRepository: OffresEmploiHttpSqlRepository
+  let dateService: StubbedClass<DateService>
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
-    offresEmploiHttpSqlRepository = new OffresEmploiHttpSqlRepository()
+
+    dateService = stubClass(DateService)
+    dateService.nowJs.returns(new Date('2023-04-17T12:00:00Z'))
+
+    offresEmploiHttpSqlRepository = new OffresEmploiHttpSqlRepository(
+      dateService
+    )
   })
 
   describe('.saveAsFavori', () => {
