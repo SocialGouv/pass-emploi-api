@@ -8,13 +8,22 @@ import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/mod
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { Immersion } from '../../../../src/domain/offre/favori/offre-immersion'
 import { getDatabase } from '../../../utils/database-for-testing'
+import { StubbedClass, stubClass } from '../../../utils'
+import { DateService } from '../../../../src/utils/date-service'
 
 describe('OffresImmersionHttpSqlRepository', () => {
   let offresImmersionHttpSqlRepository: FavorisOffresImmersionSqlRepository
+  let dateService: StubbedClass<DateService>
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
-    offresImmersionHttpSqlRepository = new FavorisOffresImmersionSqlRepository()
+
+    dateService = stubClass(DateService)
+    dateService.nowJs.returns(new Date('2023-04-17T12:00:00Z'))
+
+    offresImmersionHttpSqlRepository = new FavorisOffresImmersionSqlRepository(
+      dateService
+    )
   })
   describe('.saveAsFavori', () => {
     describe("quand le favori n'existe pas", () => {

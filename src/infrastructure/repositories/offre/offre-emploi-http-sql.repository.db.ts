@@ -5,11 +5,14 @@ import {
   toOffreEmploi
 } from '../mappers/offres-emploi.mappers'
 import { Offre } from '../../../domain/offre/offre'
+import { DateService } from '../../../utils/date-service'
 
 @Injectable()
 export class OffresEmploiHttpSqlRepository
   implements Offre.Favori.Emploi.Repository
 {
+  constructor(private readonly dateService: DateService) {}
+
   async get(
     idJeune: string,
     idOffreEmploi: string
@@ -27,8 +30,9 @@ export class OffresEmploiHttpSqlRepository
   }
 
   async save(idJeune: string, offreEmploi: Offre.Favori.Emploi): Promise<void> {
+    const maintenantJs = this.dateService.nowJs()
     await FavoriOffreEmploiSqlModel.create(
-      toFavoriOffreEmploiSqlModel(idJeune, offreEmploi)
+      toFavoriOffreEmploiSqlModel(idJeune, offreEmploi, maintenantJs)
     )
   }
 

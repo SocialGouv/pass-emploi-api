@@ -12,15 +12,22 @@ import { GetFavorisOffresEmploiJeuneQueryHandler } from '../../../src/applicatio
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import { Offre } from '../../../src/domain/offre/offre'
 import { getDatabase } from '../../utils/database-for-testing'
+import { DateService } from '../../../src/utils/date-service'
 
 describe('GetFavorisOffresEmploiJeuneQueryHandler', () => {
   let offresEmploiHttpSqlRepository: Offre.Favori.Emploi.Repository
   let getFavorisOffresEmploiJeuneQueryHandler: GetFavorisOffresEmploiJeuneQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
+  let dateService: StubbedClass<DateService>
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
-    offresEmploiHttpSqlRepository = new OffresEmploiHttpSqlRepository()
+
+    dateService = stubClass(DateService)
+    dateService.nowJs.returns(new Date('2023-04-17T12:00:00Z'))
+    offresEmploiHttpSqlRepository = new OffresEmploiHttpSqlRepository(
+      dateService
+    )
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     getFavorisOffresEmploiJeuneQueryHandler =
       new GetFavorisOffresEmploiJeuneQueryHandler(jeuneAuthorizer)

@@ -16,11 +16,13 @@ import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
+import { DateService } from '../../../src/utils/date-service'
 
 describe('GetFavorisOffresImmersionJeuneQueryHandler', () => {
   const idJeune = 'ABCDE'
   let getFavorisOffresImmersionJeuneQueryHandler: GetFavorisOffresImmersionJeuneQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
+  let dateService: StubbedClass<DateService>
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
@@ -32,7 +34,11 @@ describe('GetFavorisOffresImmersionJeuneQueryHandler', () => {
         idConseiller: 'ZIDANE'
       })
     )
-    const offresImmersionRepository = new FavorisOffresImmersionSqlRepository()
+    dateService = stubClass(DateService)
+    dateService.nowJs.returns(new Date('2023-04-17T12:00:00Z'))
+    const offresImmersionRepository = new FavorisOffresImmersionSqlRepository(
+      dateService
+    )
     await offresImmersionRepository.save(idJeune, unFavoriOffreImmersion())
 
     jeuneAuthorizer = stubClass(JeuneAuthorizer)

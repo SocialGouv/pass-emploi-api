@@ -63,6 +63,7 @@ export class GetFavorisAccueilQueryGetter {
         )
       )
       .sort(comparerFavorisParDateCreationOuTitre)
+      .slice(0, 3)
   }
 }
 

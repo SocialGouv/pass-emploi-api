@@ -2,11 +2,14 @@ import { Injectable } from '@nestjs/common'
 import { FavoriOffreImmersionSqlModel } from '../../sequelize/models/favori-offre-immersion.sql-model'
 import { fromSqlToFavorisOffreImmersion } from '../mappers/offres-immersion.mappers'
 import { Offre } from '../../../domain/offre/offre'
+import { DateService } from '../../../utils/date-service'
 
 @Injectable()
 export class FavorisOffresImmersionSqlRepository
   implements Offre.Favori.Immersion.Repository
 {
+  constructor(private readonly dateService: DateService) {}
+
   async get(
     idJeune: string,
     idOffreImmersion: string
@@ -33,7 +36,8 @@ export class FavorisOffresImmersionSqlRepository
       metier: offreImmersion.metier,
       nomEtablissement: offreImmersion.nomEtablissement,
       secteurActivite: offreImmersion.secteurActivite,
-      ville: offreImmersion.ville
+      ville: offreImmersion.ville,
+      dateCreation: this.dateService.nowJs()
     })
   }
 
