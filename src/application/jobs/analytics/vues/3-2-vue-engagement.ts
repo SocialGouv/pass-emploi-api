@@ -26,11 +26,11 @@ export async function chargerLaVueEngagement(
      SELECT '${semaine}',
             structure,
             type_utilisateur,
-            region,
-            departement,
+            COALESCE(region, 'NON RENSEIGNE') AS region,
+            COALESCE(departement, 'NON RENSEIGNE') AS departement,
             count(distinct id_utilisateur) as nombre_utilisateurs_2_mois
      from evenement_engagement
-     where semaine > '${semaine}'::date + interval '1 week' - interval '2 months'
+     where date_evenement between '${semaine}'::timestamp - interval '2 months' and '${semaine}'::timestamp + interval '1 week'
      group by structure, type_utilisateur, departement, region
      order by structure, type_utilisateur, region, departement;`
   )
@@ -40,15 +40,15 @@ export async function chargerLaVueEngagement(
     `update analytics_engagement
      SET nombre_utilisateurs_engages_2_jours_dans_la_semaine = subquery.nombre_utilisateurs_engages_2_jours_dans_la_semaine
      FROM (SELECT count(distinct x.id_utilisateur) as nombre_utilisateurs_engages_2_jours_dans_la_semaine,
-                  x.departement,
                   x.semaine,
+                  x.departement,
                   x.region,
                   x.structure,
                   x.type_utilisateur
            FROM (SELECT count(distinct jour) as nb_day_ae,
                         semaine,
-                        departement,
-                        region,
+                        COALESCE(region, 'NON RENSEIGNE') AS region,
+                        COALESCE(departement, 'NON RENSEIGNE') AS departement,
                         structure,
                         type_utilisateur,
                         id_utilisateur
@@ -83,11 +83,11 @@ export async function chargerLaVueEngagement(
                               semaine              as week_ae,
                               structure,
                               type_utilisateur,
-                              region,
-                              departement,
+                              COALESCE(region, 'NON RENSEIGNE') AS region,
+                              COALESCE(departement, 'NON RENSEIGNE') AS departement,
                               id_utilisateur
                        FROM evenement_engagement
-                       WHERE semaine >= '${semaine}'::date - interval '5 weeks'
+                       WHERE date_evenement between '${semaine}'::timestamp - interval '5 week' and '${semaine}'::timestamp + interval '1 week'
                        GROUP BY week_ae, id_utilisateur, structure, region, departement, type_utilisateur) ee
                  WHERE nb_day_ae >= 2
                  GROUP BY id_utilisateur, structure, region, departement, type_utilisateur) x
@@ -120,11 +120,11 @@ export async function chargerLaVueEngagement(
                               semaine              as week_ae,
                               structure,
                               type_utilisateur,
-                              region,
-                              departement,
+                              COALESCE(region, 'NON RENSEIGNE') AS region,
+                              COALESCE(departement, 'NON RENSEIGNE') AS departement,
                               id_utilisateur
                        FROM evenement_engagement
-                       WHERE semaine >= '${semaine}'::date - interval '5 weeks'
+                       WHERE date_evenement between '${semaine}'::timestamp - interval '5 week' and '${semaine}'::timestamp + interval '1 week'
                        GROUP BY week_ae, id_utilisateur, structure, region, departement, type_utilisateur) ee
                  WHERE nb_day_ae >= 2
                  GROUP BY id_utilisateur, structure, region, departement, type_utilisateur) x
