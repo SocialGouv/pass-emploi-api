@@ -41,3 +41,11 @@ export class AccueilJeunePoleEmploiQueryModel {
   @ApiPropertyOptional()
   mesFavoris: FavorisQueryModel[]
 }
+
+export class CVPoleEmploiQueryModel {
+  @ApiProperty()
+  titre: string
+
+  @ApiProperty()
+  url: string
+}
