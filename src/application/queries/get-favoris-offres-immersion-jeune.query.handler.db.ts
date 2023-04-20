@@ -9,7 +9,7 @@ import {
   fromSqlToFavorisOffresImmersionIdsQueryModels
 } from '../../infrastructure/repositories/mappers/offres-immersion.mappers'
 import { FavoriOffreImmersionSqlModel } from '../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
-import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import {
   FavoriOffreImmersionIdQueryModel,
   FavoriOffreImmersionQueryModel
@@ -43,7 +43,7 @@ export class GetFavorisOffresImmersionJeuneQueryHandler extends QueryHandler<
     query: GetFavorisOffresImmersionJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

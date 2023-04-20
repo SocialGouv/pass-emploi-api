@@ -1,7 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { Jeune } from 'src/domain/jeune/jeune'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import {
   UpdateJeuneConfigurationApplicationCommand,
   UpdateJeuneConfigurationApplicationCommandHandler
@@ -132,7 +132,7 @@ describe('UpdateJeuneConfigurationApplicationCommand', () => {
       )
 
       // Then
-      expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
         command.idJeune,
         utilisateur
       )

@@ -13,7 +13,7 @@ import { ConseillerSqlModel } from '../../../infrastructure/sequelize/models/con
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { DateService } from '../../../utils/date-service'
-import { JeuneAuthorizer } from '../../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { fromSqlToRendezVousJeuneQueryModel } from '../query-mappers/rendez-vous-milo.mappers'
 import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-model'
 
@@ -79,7 +79,7 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
         utilisateur
       )
     }
-    return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async monitor(

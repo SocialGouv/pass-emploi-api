@@ -10,7 +10,7 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { Offre } from '../../domain/offre/offre'
 
 export interface AddFavoriOffreImmersionCommand extends Command {
@@ -56,7 +56,7 @@ export class AddFavoriOffreImmersionCommandHandler extends CommandHandler<
     command: AddFavoriOffreImmersionCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorizeJeune(command.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {

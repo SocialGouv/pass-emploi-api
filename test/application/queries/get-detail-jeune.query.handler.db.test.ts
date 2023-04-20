@@ -16,7 +16,7 @@ import { uneAutreDate, uneDate } from 'test/fixtures/date.fixture'
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { testConfig } from 'test/utils/module-for-testing'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import {
   GetDetailJeuneQuery,
   GetDetailJeuneQueryHandler
@@ -414,10 +414,10 @@ describe('GetDetailJeuneQueryHandler', () => {
       }
 
       // When
-      await jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
+      await jeuneAuthorizer.authorize(query.idJeune, utilisateur)
 
       // Then
-      expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
         query.idJeune,
         utilisateur
       )

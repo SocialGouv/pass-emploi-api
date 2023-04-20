@@ -1,6 +1,6 @@
 import { describe } from 'mocha'
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import {
   GetJeuneHomeAgendaPoleEmploiQuery,
   GetJeuneHomeAgendaPoleEmploiQueryHandler
@@ -22,12 +22,13 @@ import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.quer
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import { Demarche } from '../../../src/domain/demarche'
 import { Cached } from '../../../src/building-blocks/types/query'
+import { Core } from '../../../src/domain/core'
 
 describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
   let handler: GetJeuneHomeAgendaPoleEmploiQueryHandler
   let getDemarchesQueryGetter: StubbedClass<GetDemarchesQueryGetter>
   let getRendezVousJeunePoleEmploiQueryGetter: StubbedClass<GetRendezVousJeunePoleEmploiQueryGetter>
-  let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
+  let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let keycloakClient: StubbedClass<KeycloakClient>
   const idpToken = 'id-token'
 
@@ -38,12 +39,12 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
     )
     keycloakClient = stubClass(KeycloakClient)
     keycloakClient.exchangeTokenPoleEmploiJeune.resolves(idpToken)
-    jeunePoleEmploiAuthorizer = stubClass(JeunePoleEmploiAuthorizer)
+    jeuneAuthorizer = stubClass(JeuneAuthorizer)
 
     handler = new GetJeuneHomeAgendaPoleEmploiQueryHandler(
       getDemarchesQueryGetter,
       getRendezVousJeunePoleEmploiQueryGetter,
-      jeunePoleEmploiAuthorizer,
+      jeuneAuthorizer,
       keycloakClient
     )
   })
@@ -477,9 +478,11 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
       handler.authorize(query, unUtilisateurJeune())
 
       // Then
-      expect(
-        jeunePoleEmploiAuthorizer.authorize
-      ).to.have.been.calledWithExactly(query.idJeune, unUtilisateurJeune())
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+        query.idJeune,
+        unUtilisateurJeune(),
+        Core.structuresPoleEmploiBRSA
+      )
     })
   })
 })

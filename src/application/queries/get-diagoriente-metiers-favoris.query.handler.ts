@@ -13,7 +13,7 @@ import {
 import { Authentification } from '../../domain/authentification'
 import { JeunesRepositoryToken, Jeune } from '../../domain/jeune/jeune'
 import { DiagorienteClient } from '../../infrastructure/clients/diagoriente-client'
-import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 
 class MetiersFavorisQueryModel {
   @ApiProperty()
@@ -93,7 +93,7 @@ export class GetDiagorienteMetiersFavorisQueryHandler extends QueryHandler<
     query: GetDiagorienteMetiersFavorisQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

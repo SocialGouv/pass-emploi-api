@@ -9,7 +9,7 @@ import {
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Authentification } from '../../domain/authentification'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
-import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface UpdateJeunePreferencesCommand extends Command {
@@ -50,7 +50,7 @@ export class UpdateJeunePreferencesCommandHandler extends CommandHandler<
     command: UpdateJeunePreferencesCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorizeJeune(command.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {

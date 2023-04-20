@@ -11,7 +11,7 @@ import { ActionSqlModel } from '../../../infrastructure/sequelize/models/action.
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
 import { ConseillerAgenceAuthorizer } from '../../authorizers/authorize-conseiller-agence'
-import { JeuneAuthorizer } from '../../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { ActionQueryModel } from '../query-models/actions.query-model'
 
 const OFFSET_PAR_DEFAUT = 0
@@ -156,7 +156,7 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
         utilisateur
       )
     }
-    return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

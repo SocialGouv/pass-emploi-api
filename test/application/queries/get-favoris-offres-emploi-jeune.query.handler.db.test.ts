@@ -9,7 +9,7 @@ import {
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { OffresEmploiHttpSqlRepository } from '../../../src/infrastructure/repositories/offre/offre-emploi-http-sql.repository.db'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from '../../../src/application/queries/get-favoris-offres-emploi-jeune.query.handler.db'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { Offre } from '../../../src/domain/offre/offre'
 import { getDatabase } from '../../utils/database-for-testing'
 import { DateService } from '../../../src/utils/date-service'

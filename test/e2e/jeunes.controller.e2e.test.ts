@@ -16,7 +16,7 @@ import {
 import { unJeune } from '../fixtures/jeune.fixture'
 import { GetDemarchesQueryGetter } from '../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
-import { JeunePoleEmploiAuthorizer } from '../../src/application/authorizers/authorize-jeune-pole-emploi'
+import { JeuneAuthorizer } from '../../src/application/authorizers/jeune-authorizer'
 import { KeycloakClient } from '../../src/infrastructure/clients/keycloak-client'
 import { createSandbox } from 'sinon'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
@@ -33,7 +33,7 @@ import { DateTime } from 'luxon'
 
 describe('JeunesControllerE2E', () => {
   let getJeuneHomeAgendaPoleEmploiQueryHandler: GetJeuneHomeAgendaPoleEmploiQueryHandler
-  let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
+  let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let keycloakClient: StubbedClass<KeycloakClient>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
@@ -53,7 +53,7 @@ describe('JeunesControllerE2E', () => {
     idService = stubClass(IdService)
     idService.uuid.returns('9903de8a-76fc-44c0-b049-480d7ec2ee10')
 
-    jeunePoleEmploiAuthorizer = stubClass(JeunePoleEmploiAuthorizer)
+    jeuneAuthorizer = stubClass(JeuneAuthorizer)
     keycloakClient = stubClass(KeycloakClient)
     jeuneRepository = stubInterface(createSandbox())
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
@@ -77,7 +77,7 @@ describe('JeunesControllerE2E', () => {
       new GetJeuneHomeAgendaPoleEmploiQueryHandler(
         getDemarchesQueryGetter,
         getRendezVousJeunePoleEmploiQueryGetter,
-        jeunePoleEmploiAuthorizer,
+        jeuneAuthorizer,
         keycloakClient
       )
 
@@ -108,7 +108,7 @@ describe('JeunesControllerE2E', () => {
 
     it('retourne la home agenda du jeune', async () => {
       // Given
-      jeunePoleEmploiAuthorizer.authorize.resolves(emptySuccess())
+      jeuneAuthorizer.authorize.resolves(emptySuccess())
       keycloakClient.exchangeTokenPoleEmploiJeune.resolves('idpToken')
       jeuneRepository.get.resolves(jeune)
 

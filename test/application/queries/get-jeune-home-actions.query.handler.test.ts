@@ -4,7 +4,7 @@ import {
   GetActionsJeuneQueryHandler
 } from '../../../src/application/queries/action/get-actions-jeune.query.handler.db'
 import { GetCampagneQueryModel } from '../../../src/application/queries/query-getters/get-campagne.query.getter'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { GetJeuneHomeActionsQueryHandler } from '../../../src/application/queries/get-jeune-home-actions.query.handler'
 import { uneActionQueryModelFromDomain } from '../../fixtures/query-models/action.query-model.fixtures'
 import { uneCampagneQueryModel } from '../../fixtures/campagne.fixture'
@@ -79,7 +79,7 @@ describe('GetJeuneHomeActionsQueryHandler', () => {
       )
 
       // Then
-      expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
         'idJeune',
         unUtilisateurJeune()
       )

@@ -6,7 +6,7 @@ import { FavoriOffreEmploiSqlModel } from '../../../infrastructure/sequelize/mod
 import { FavoriOffreEngagementSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-engagement.sql-model'
 import { FavoriOffreImmersionSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 import { ConseillerAgenceAuthorizer } from '../../authorizers/authorize-conseiller-agence'
-import { JeuneAuthorizer } from '../../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import {
   fromOffreEmploiSqlToFavorisQueryModel,
   fromOffreImmersionSqlToFavorisQueryModel,
@@ -40,7 +40,7 @@ export class GetFavorisJeuneQueryHandler extends QueryHandler<
         utilisateur
       )
     }
-    return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async handle(query: GetFavorisJeuneQuery): Promise<FavorisQueryModel[]> {

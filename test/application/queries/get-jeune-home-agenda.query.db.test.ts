@@ -19,7 +19,7 @@ import { uneActionDto } from 'test/fixtures/sql-models/action.sql-model'
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { ConseillerAgenceAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-agence'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { ActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
 import { RendezVousJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
 import { Core } from '../../../src/domain/core'
@@ -223,7 +223,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
       it('appelle l’authorizer idoine', async () => {
         // Given
         const jeune = unJeune()
-        jeuneAuthorizer.authorizeJeune
+        jeuneAuthorizer.authorize
           .withArgs(jeune.id, unUtilisateurJeune({ id: jeune.id }))
           .resolves(emptySuccess())
 

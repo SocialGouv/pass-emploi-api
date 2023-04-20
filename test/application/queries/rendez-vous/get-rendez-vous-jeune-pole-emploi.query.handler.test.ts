@@ -1,4 +1,4 @@
-import { JeunePoleEmploiAuthorizer } from '../../../../src/application/authorizers/authorize-jeune-pole-emploi'
+import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import {
   GetRendezVousJeunePoleEmploiQuery,
   GetRendezVousJeunePoleEmploiQueryHandler
@@ -12,19 +12,19 @@ import Periode = RendezVous.Periode
 
 describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   let queryGetter: StubbedClass<GetRendezVousJeunePoleEmploiQueryGetter>
-  let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
+  let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let getRendezVousJeunePoleEmploiQueryHandler: GetRendezVousJeunePoleEmploiQueryHandler
   let evenementService: StubbedClass<EvenementService>
 
   beforeEach(() => {
     queryGetter = stubClass(GetRendezVousJeunePoleEmploiQueryGetter)
-    jeunePoleEmploiAuthorizer = stubClass(JeunePoleEmploiAuthorizer)
+    jeuneAuthorizer = stubClass(JeuneAuthorizer)
     evenementService = stubClass(EvenementService)
 
     getRendezVousJeunePoleEmploiQueryHandler =
       new GetRendezVousJeunePoleEmploiQueryHandler(
         queryGetter,
-        jeunePoleEmploiAuthorizer,
+        jeuneAuthorizer,
         evenementService
       )
   })
@@ -62,7 +62,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         utilisateur
       )
       // Then
-      expect(jeunePoleEmploiAuthorizer.authorize).to.have.been.calledWith(
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWith(
         query.idJeune,
         utilisateur
       )

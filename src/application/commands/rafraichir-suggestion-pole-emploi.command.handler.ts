@@ -7,13 +7,14 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Inject, Injectable } from '@nestjs/common'
-import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
 import {
   Suggestion,
   SuggestionsPoleEmploiRepositoryToken
 } from '../../domain/offre/recherche/suggestion/suggestion'
 import { SuggestionPoleEmploiService } from '../../domain/offre/recherche/suggestion/pole-emploi.service'
+import { Core } from '../../domain/core'
 
 export interface RafraichirSuggestionPoleEmploiCommand extends Command {
   idJeune: string
@@ -26,7 +27,7 @@ export class RafraichirSuggestionPoleEmploiCommandHandler extends CommandHandler
   void
 > {
   constructor(
-    private jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer,
+    private jeuneAuthorizer: JeuneAuthorizer,
     private suggestionFactory: Suggestion.Factory,
     private suggestionPoleEmploiService: SuggestionPoleEmploiService,
     @Inject(SuggestionsPoleEmploiRepositoryToken)
@@ -68,9 +69,10 @@ export class RafraichirSuggestionPoleEmploiCommandHandler extends CommandHandler
     command: RafraichirSuggestionPoleEmploiCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeunePoleEmploiAuthorizer.authorize(
+    return this.jeuneAuthorizer.authorize(
       command.idJeune,
-      utilisateur
+      utilisateur,
+      Core.structuresPoleEmploiBRSA
     )
   }
 

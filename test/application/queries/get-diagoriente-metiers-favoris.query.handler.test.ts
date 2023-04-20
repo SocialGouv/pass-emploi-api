@@ -9,7 +9,7 @@ import {
   failure,
   success
 } from 'src/building-blocks/types/result'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import {
   CompteDiagorienteInvalideError,
   ErreurHttp,

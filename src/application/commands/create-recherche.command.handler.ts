@@ -9,7 +9,7 @@ import {
   Recherche,
   RecherchesRepositoryToken
 } from '../../domain/offre/recherche/recherche'
-import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { DateService } from '../../utils/date-service'
 
@@ -64,7 +64,7 @@ export class CreateRechercheCommandHandler extends CommandHandler<
     command: CreateRechercheCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorizeJeune(command.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
   }
 
   async monitor(

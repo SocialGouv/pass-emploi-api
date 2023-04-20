@@ -1,7 +1,7 @@
 import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import { GetAnimationsCollectivesJeuneQueryHandler } from '../../../../src/application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
-import { JeuneAuthorizer } from '../../../../src/application/authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
@@ -53,7 +53,7 @@ describe('GetAnimationsCollectivesJeuneQueryHandler', () => {
       )
 
       // Then
-      expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
         query.idJeune,
         utilisateur
       )

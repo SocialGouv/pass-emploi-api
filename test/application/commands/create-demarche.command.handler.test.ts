@@ -3,7 +3,7 @@ import {
   CreateDemarcheCommandHandler
 } from '../../../src/application/commands/create-demarche.command.handler'
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { Demarche } from '../../../src/domain/demarche'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
@@ -18,10 +18,11 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { uneDemarche } from '../../fixtures/demarche.fixture'
+import { Core } from '../../../src/domain/core'
 
 describe('CreateDemarcheCommandHandler', () => {
   let createDemarcheCommandHandler: CreateDemarcheCommandHandler
-  let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
+  let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let evenementService: StubbedClass<EvenementService>
   let demarcheFactory: StubbedClass<Demarche.Factory>
   let demarcheRepository: StubbedType<Demarche.Repository>
@@ -45,13 +46,13 @@ describe('CreateDemarcheCommandHandler', () => {
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
-    jeunePoleEmploiAuthorizer = stubClass(JeunePoleEmploiAuthorizer)
+    jeuneAuthorizer = stubClass(JeuneAuthorizer)
     evenementService = stubClass(EvenementService)
     demarcheFactory = stubClass(Demarche.Factory)
     demarcheRepository = stubInterface(sandbox)
 
     createDemarcheCommandHandler = new CreateDemarcheCommandHandler(
-      jeunePoleEmploiAuthorizer,
+      jeuneAuthorizer,
       evenementService,
       demarcheFactory,
       demarcheRepository
@@ -116,9 +117,11 @@ describe('CreateDemarcheCommandHandler', () => {
       await createDemarcheCommandHandler.authorize(command, utilisateur)
 
       // Then
-      expect(
-        jeunePoleEmploiAuthorizer.authorize
-      ).to.have.been.calledWithExactly(command.idJeune, utilisateur)
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+        command.idJeune,
+        utilisateur,
+        Core.structuresPoleEmploiBRSA
+      )
     })
   })
 

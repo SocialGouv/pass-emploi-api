@@ -17,7 +17,7 @@ import { Notification } from '../../../domain/notification/notification'
 import { PlanificateurService } from '../../../domain/planificateur'
 import { buildError } from '../../../utils/logger.module'
 import { ConseillerAuthorizer } from '../../authorizers/authorize-conseiller'
-import { JeuneAuthorizer } from '../../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 
 export interface CreateActionCommand extends Command {
   idJeune: Jeune.Id
@@ -80,7 +80,7 @@ export class CreateActionCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.JEUNE) {
-      return this.jeuneAuthorizer.authorizeJeune(command.idJeune, utilisateur)
+      return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
     } else {
       return this.conseillerAuthorizer.authorize(
         command.idCreateur,

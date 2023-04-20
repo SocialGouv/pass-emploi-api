@@ -4,9 +4,10 @@ import { GetCampagneQueryModel } from './query-getters/get-campagne.query.getter
 import { isFailure, Result, success } from '../../building-blocks/types/result'
 import { Cached, Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { Authentification } from '../../domain/authentification'
 import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
+import { Core } from '../../domain/core'
 
 export interface GetJeuneHomeDemarchesQuery extends Query {
   idJeune: string
@@ -21,7 +22,7 @@ export class GetJeuneHomeDemarchesQueryHandler extends QueryHandler<
   constructor(
     private getActionsJeunePoleEmploiQueryGetter: GetDemarchesQueryGetter,
     private getCampagneQueryModel: GetCampagneQueryModel,
-    private jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer
+    private jeuneAuthorizer: JeuneAuthorizer
   ) {
     super('GetJeuneHomeDemarchesQueryHandler')
   }
@@ -55,7 +56,11 @@ export class GetJeuneHomeDemarchesQueryHandler extends QueryHandler<
     query: GetJeuneHomeDemarchesQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeunePoleEmploiAuthorizer.authorize(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(
+      query.idJeune,
+      utilisateur,
+      Core.structuresPoleEmploiBRSA
+    )
   }
 
   async monitor(): Promise<void> {

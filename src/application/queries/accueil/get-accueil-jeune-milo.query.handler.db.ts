@@ -1,31 +1,28 @@
 import { Injectable } from '@nestjs/common'
-import {
-  DroitsInsuffisants,
-  NonTrouveError
-} from '../../../building-blocks/types/domain-error'
-import { failure, Result, success } from '../../../building-blocks/types/result'
+import { NonTrouveError } from '../../../building-blocks/types/domain-error'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
+import { Result, failure, success } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
 import { Core } from '../../../domain/core'
-import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { ActionSqlModel } from '../../../infrastructure/sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
+import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 
 import { DateTime } from 'luxon'
 import { Op } from 'sequelize'
 import { Action } from '../../../domain/action/action'
-import { JeuneAuthorizer } from '../../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import {
   fromSqlToRendezVousDetailJeuneQueryModel,
   fromSqlToRendezVousJeuneQueryModel
 } from '../query-mappers/rendez-vous-milo.mappers'
 
-import { ConseillerSqlModel } from '../../../infrastructure/sequelize/models/conseiller.sql-model'
-import { AccueilJeuneMiloQueryModel } from '../query-models/jeunes.milo.query-model'
-import { GetRecherchesSauvegardeesQueryGetter } from '../query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
 import { TYPES_ANIMATIONS_COLLECTIVES } from '../../../domain/rendez-vous/rendez-vous'
+import { ConseillerSqlModel } from '../../../infrastructure/sequelize/models/conseiller.sql-model'
 import { GetFavorisAccueilQueryGetter } from '../query-getters/accueil/get-favoris.query.getter.db'
+import { GetRecherchesSauvegardeesQueryGetter } from '../query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
+import { AccueilJeuneMiloQueryModel } from '../query-models/jeunes.milo.query-model'
 
 export interface GetAccueilJeuneMiloQuery extends Query {
   idJeune: string
@@ -115,13 +112,11 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     query: GetAccueilJeuneMiloQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (
-      utilisateur.structure === Core.Structure.MILO ||
-      utilisateur.structure === Core.Structure.PASS_EMPLOI
-    ) {
-      return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
-    }
-    return failure(new DroitsInsuffisants())
+    return this.jeuneAuthorizer.authorize(
+      query.idJeune,
+      utilisateur,
+      Core.structuresMiloPassEmploi
+    )
   }
 
   async monitor(): Promise<void> {

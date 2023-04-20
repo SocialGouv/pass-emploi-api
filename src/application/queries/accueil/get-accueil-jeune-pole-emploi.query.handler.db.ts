@@ -1,24 +1,22 @@
+import { Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
+import { Query } from '../../../building-blocks/types/query'
+import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import {
-  failure,
   isFailure,
   Result,
   success
 } from '../../../building-blocks/types/result'
-import { Injectable } from '@nestjs/common'
-import { QueryHandler } from '../../../building-blocks/types/query-handler'
-import { GetDemarchesQueryGetter } from '../query-getters/pole-emploi/get-demarches.query.getter'
-import { AccueilJeunePoleEmploiQueryModel } from '../query-models/jeunes.pole-emploi.query-model'
-import { DateTime } from 'luxon'
-import { Demarche } from '../../../domain/demarche'
-import { DroitsInsuffisants } from '../../../building-blocks/types/domain-error'
-import { GetRendezVousJeunePoleEmploiQueryGetter } from '../query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { Authentification } from '../../../domain/authentification'
-import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client'
-import { JeunePoleEmploiAuthorizer } from '../../authorizers/authorize-jeune-pole-emploi'
 import { Core } from '../../../domain/core'
-import { Query } from '../../../building-blocks/types/query'
-import { GetRecherchesSauvegardeesQueryGetter } from '../query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
+import { Demarche } from '../../../domain/demarche'
+import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client'
+import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { GetFavorisAccueilQueryGetter } from '../query-getters/accueil/get-favoris.query.getter.db'
+import { GetRecherchesSauvegardeesQueryGetter } from '../query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
+import { GetDemarchesQueryGetter } from '../query-getters/pole-emploi/get-demarches.query.getter'
+import { GetRendezVousJeunePoleEmploiQueryGetter } from '../query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
+import { AccueilJeunePoleEmploiQueryModel } from '../query-models/jeunes.pole-emploi.query-model'
 
 export interface GetAccueilJeunePoleEmploiQuery extends Query {
   idJeune: string
@@ -32,7 +30,7 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
   Result<AccueilJeunePoleEmploiQueryModel>
 > {
   constructor(
-    private jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer,
+    private jeuneAuthorizer: JeuneAuthorizer,
     private keycloakClient: KeycloakClient,
     private getDemarchesQueryGetter: GetDemarchesQueryGetter,
     private getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter,
@@ -138,13 +136,11 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
     query: GetAccueilJeunePoleEmploiQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.structure === Core.Structure.POLE_EMPLOI) {
-      return this.jeunePoleEmploiAuthorizer.authorize(
-        query.idJeune,
-        utilisateur
-      )
-    }
-    return failure(new DroitsInsuffisants())
+    return this.jeuneAuthorizer.authorize(
+      query.idJeune,
+      utilisateur,
+      Core.structuresPoleEmploiBRSA
+    )
   }
 
   async monitor(): Promise<void> {

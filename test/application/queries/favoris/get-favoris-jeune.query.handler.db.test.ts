@@ -1,5 +1,5 @@
 import { ConseillerAgenceAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-agence'
-import { JeuneAuthorizer } from '../../../../src/application/authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import { GetFavorisJeuneQueryHandler } from '../../../../src/application/queries/favoris/get-favoris-jeune.query.handler.db'
 import { FavorisQueryModel } from '../../../../src/application/queries/query-models/favoris.query-model'
 import { Core } from '../../../../src/domain/core'
