@@ -10,12 +10,17 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { DroitsInsuffisants } from '../../../src/building-blocks/types/domain-error'
-import { AccueilJeunePoleEmploiQueryModel } from '../../../src/application/queries/query-models/jeunes.pole-emploi.query-model'
+import {
+  AccueilJeunePoleEmploiQueryModel,
+  CVPoleEmploiQueryModel
+} from '../../../src/application/queries/query-models/jeunes.pole-emploi.query-model'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import * as request from 'supertest'
+import { GetCVPoleEmploiQueryHandler } from '../../../src/application/queries/get-cv-pole-emploi.query.handler'
 
 describe('JeunesPoleEmploiController', () => {
   let getAccueilJeunePoleEmploiQueryHandler: StubbedClass<GetAccueilJeunePoleEmploiQueryHandler>
+  let getCVPoleEmploiQueryHandler: StubbedClass<GetCVPoleEmploiQueryHandler>
   let jwtService: StubbedClass<JwtService>
   let app: INestApplication
 
@@ -24,6 +29,7 @@ describe('JeunesPoleEmploiController', () => {
     getAccueilJeunePoleEmploiQueryHandler = app.get(
       GetAccueilJeunePoleEmploiQueryHandler
     )
+    getCVPoleEmploiQueryHandler = app.get(GetCVPoleEmploiQueryHandler)
     jwtService = app.get(JwtService)
   })
 
@@ -94,5 +100,25 @@ describe('JeunesPoleEmploiController', () => {
       'get',
       '/jeunes/1/pole-emploi/accueil?maintenant=2022-08-17T12%3A00%3A30%2B02%3A00'
     )
+  })
+
+  describe('GET /jeunes/:idJeune/pole-emplpoi/cv', () => {
+    it('renvoie la liste des CVs du jeune', async () => {
+      // Given
+      const idJeune = 'un-id-jeune'
+      const listeCvQueryModel: CVPoleEmploiQueryModel[] = [
+        { titre: 'un-titre', url: 'un-url' }
+      ]
+      getCVPoleEmploiQueryHandler.execute.resolves(success(listeCvQueryModel))
+
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/pole-emploi/cv`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.OK)
+        .expect(listeCvQueryModel)
+    })
+    ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1/pole-emploi/cv')
   })
 })

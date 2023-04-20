@@ -183,6 +183,29 @@ describe('PoleEmploiPartenaireClient', () => {
     })
   })
 
+  describe('getDocuments', () => {
+    it('fait un appel http get', async () => {
+      // Given
+      nock(PARTENAIRE_BASE_URL)
+        .get('/peconnect-telecharger-cv-realisation/v1/piecesjointes')
+        .reply(
+          200,
+          'https://entreprise.pe-qvr.fr/docnums/portfolio-usager/G1tE02iVu0cVk9L4I2fdTp0uDICAaJuZ/CVTest.pdf?Expires=1680785474&Signature=wRUu4iakc%2BFRJDPA37BYbM%2BbyNA%3D'
+        )
+        .isDone()
+
+      // When
+      const response = await poleEmploiPartenaireClient.getDocuments(tokenJeune)
+
+      // Then
+      expect(response).to.deep.equal(
+        success(
+          'https://entreprise.pe-qvr.fr/docnums/portfolio-usager/G1tE02iVu0cVk9L4I2fdTp0uDICAaJuZ/CVTest.pdf?Expires=1680785474&Signature=wRUu4iakc%2BFRJDPA37BYbM%2BbyNA%3D'
+        )
+      )
+    })
+  })
+
   describe('getRendezVous', () => {
     it('fait un appel http get avec les bons paramètres', async () => {
       // Given

@@ -14,6 +14,7 @@ import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import { Demarche } from '../../domain/demarche'
 import { suggestionsPEInMemory } from '../repositories/dto/pole-emploi.in-memory.dto'
 import {
+  DocumentPoleEmploiDto,
   DemarcheDto,
   PrestationDto,
   RendezVousPoleEmploiDto,
@@ -52,6 +53,10 @@ interface PoleEmploiPartenaireClientI {
     tokenDuJeune: string,
     idVisio: string
   ): Promise<ResultApi<string>>
+
+  getDocuments(
+    tokenDuJeune: string
+  ): Promise<ResultApi<DocumentPoleEmploiDto[]>>
 
   updateDemarche(
     demarcheModifiee: Demarche.Modifiee,
@@ -132,6 +137,16 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
 
     return this.get<string>(
       `peconnect-gerer-prestations/v1/lien-visio/rendez-vous/${idVisio}`,
+      tokenDuJeune
+    )
+  }
+
+  getDocuments(
+    tokenDuJeune: string
+  ): Promise<ResultApi<DocumentPoleEmploiDto[]>> {
+    this.logger.log('Récupération des documents du jeune')
+    return this.get<DocumentPoleEmploiDto[]>(
+      'peconnect-telecharger-cv-realisation/v1/piecesjointes',
       tokenDuJeune
     )
   }

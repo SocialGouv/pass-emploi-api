@@ -232,3 +232,14 @@ export function toEtat(statut: Demarche.Statut): DemarcheDtoEtat {
       return DemarcheDtoEtat.AC
   }
 }
+
+export interface DocumentPoleEmploiDto {
+  titre: string
+  nomFichier: string
+  format: string
+  url: string
+  type: {
+    libelle: string
+    code: string
+  }
+}
