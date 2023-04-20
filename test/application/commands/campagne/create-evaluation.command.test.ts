@@ -6,7 +6,7 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import { Campagne } from '../../../../src/domain/campagne'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
-import { JeuneAuthorizer } from '../../../../src/application/authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import { SinonSandbox } from 'sinon'
 import { unJeune } from '../../../fixtures/jeune.fixture'
 import {
@@ -105,7 +105,7 @@ describe('CreateEvaluationCommandHandler', () => {
       )
 
       // Then
-      expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
         command.idJeune,
         unUtilisateurJeune()
       )

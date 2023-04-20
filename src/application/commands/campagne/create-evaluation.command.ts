@@ -6,7 +6,7 @@ import {
   isFailure,
   Result
 } from '../../../building-blocks/types/result'
-import { JeuneAuthorizer } from '../../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { Campagne, CampagneRepositoryToken } from '../../../domain/campagne'
 import { Inject } from '@nestjs/common'
 import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
@@ -40,7 +40,7 @@ export class CreateEvaluationCommandHandler extends CommandHandler<
     command: CreateEvaluationCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorizeJeune(command.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
   }
 
   async handle(command: CreateEvaluationCommand): Promise<Result> {

@@ -1,5 +1,5 @@
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { success } from '../../../src/building-blocks/types/result'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { GetPreferencesJeuneQueryHandler } from '../../../src/application/queries/get-preferences-jeune.handler.db'
@@ -79,7 +79,7 @@ describe('GetPreferencesJeuneQueryHandler', () => {
       )
 
       // Then
-      expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
         'idJeune',
         unUtilisateurJeune()
       )

@@ -2,7 +2,7 @@ import { expect, StubbedClass, stubClass } from '../../utils'
 import { GetCampagneQueryModel } from '../../../src/application/queries/query-getters/get-campagne.query.getter'
 import { uneCampagneQueryModel } from '../../fixtures/campagne.fixture'
 import { GetJeuneHomeDemarchesQueryHandler } from '../../../src/application/queries/get-jeune-home-demarches.query.handler'
-import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { desDemarchesQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
@@ -10,11 +10,12 @@ import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { GetDemarchesQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { JeuneHomeDemarcheQueryModel } from '../../../src/application/queries/query-models/home-jeune.query-model'
 import { Cached } from '../../../src/building-blocks/types/query'
+import { Core } from '../../../src/domain/core'
 
 describe('GetJeuneHomeDemarchesQueryHandler', () => {
   let getActionsJeunePoleEmploiQueryGetter: StubbedClass<GetDemarchesQueryGetter>
   let getCampagneQueryModel: StubbedClass<GetCampagneQueryModel>
-  let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
+  let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let getJeuneHomeDemarchesQueryHandler: GetJeuneHomeDemarchesQueryHandler
 
   const campagneQueryModel = uneCampagneQueryModel()
@@ -23,12 +24,12 @@ describe('GetJeuneHomeDemarchesQueryHandler', () => {
   beforeEach(() => {
     getActionsJeunePoleEmploiQueryGetter = stubClass(GetDemarchesQueryGetter)
     getCampagneQueryModel = stubClass(GetCampagneQueryModel)
-    jeunePoleEmploiAuthorizer = stubClass(JeunePoleEmploiAuthorizer)
+    jeuneAuthorizer = stubClass(JeuneAuthorizer)
 
     getJeuneHomeDemarchesQueryHandler = new GetJeuneHomeDemarchesQueryHandler(
       getActionsJeunePoleEmploiQueryGetter,
       getCampagneQueryModel,
-      jeunePoleEmploiAuthorizer
+      jeuneAuthorizer
     )
   })
 
@@ -104,9 +105,11 @@ describe('GetJeuneHomeDemarchesQueryHandler', () => {
       )
 
       // Then
-      expect(
-        jeunePoleEmploiAuthorizer.authorize
-      ).to.have.been.calledWithExactly('idJeune', unUtilisateurJeune())
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+        'idJeune',
+        unUtilisateurJeune(),
+        Core.structuresPoleEmploiBRSA
+      )
     })
   })
 })

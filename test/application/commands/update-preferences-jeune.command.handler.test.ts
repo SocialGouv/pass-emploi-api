@@ -3,7 +3,7 @@ import {
   UpdateJeunePreferencesCommandHandler
 } from '../../../src/application/commands/update-preferences-jeune.command.handler'
 import { Jeune } from '../../../src/domain/jeune/jeune'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { createSandbox } from 'sinon'
@@ -43,7 +43,7 @@ describe('UpdateJeunePreferencesCommandHandler', () => {
       await updateJeunePreferencesCommandHandler.authorize(command, utilisateur)
 
       // Then
-      expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
         'idDeJohn',
         utilisateur
       )

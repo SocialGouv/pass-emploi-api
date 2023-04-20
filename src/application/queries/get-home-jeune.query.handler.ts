@@ -4,7 +4,7 @@ import { Authentification } from '../../domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
-import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { JeuneHomeQueryModel } from './query-models/home-jeune.query-model'
 
 export interface GetHomeJeune extends Query {
@@ -30,7 +30,7 @@ export class GetHomeJeuneHandler extends QueryHandler<
     query: GetHomeJeune,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

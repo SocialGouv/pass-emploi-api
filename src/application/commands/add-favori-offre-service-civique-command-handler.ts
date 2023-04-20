@@ -10,7 +10,7 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { OffreServiceCiviqueRepositoryToken } from '../../domain/offre/favori/offre-service-civique'
-import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { Offre } from '../../domain/offre/offre'
 
 export interface AddFavoriServiceCiviqueCommand extends Command {
@@ -56,7 +56,7 @@ export class AddFavoriOffreServiceCiviqueCommandHandler extends CommandHandler<
     command: AddFavoriServiceCiviqueCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorizeJeune(command.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {

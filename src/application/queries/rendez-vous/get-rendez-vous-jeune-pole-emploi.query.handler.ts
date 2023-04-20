@@ -5,9 +5,10 @@ import { Evenement, EvenementService } from '../../../domain/evenement'
 import { RendezVous } from '../../../domain/rendez-vous/rendez-vous'
 import { Cached, Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
-import { JeunePoleEmploiAuthorizer } from '../../authorizers/authorize-jeune-pole-emploi'
+import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-model'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
+import { Core } from '../../../domain/core'
 
 export interface GetRendezVousJeunePoleEmploiQuery extends Query {
   idJeune: string
@@ -22,7 +23,7 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
 > {
   constructor(
     private getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter,
-    private jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer,
+    private jeuneAuthorizer: JeuneAuthorizer,
     private evenementService: EvenementService
   ) {
     super('GetRendezVousJeunePoleEmploiQueryHandler')
@@ -38,7 +39,11 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
     query: GetRendezVousJeunePoleEmploiQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeunePoleEmploiAuthorizer.authorize(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(
+      query.idJeune,
+      utilisateur,
+      Core.structuresPoleEmploiBRSA
+    )
   }
 
   async monitor(

@@ -14,7 +14,7 @@ import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/consei
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { ConseillerAgenceAuthorizer } from '../authorizers/authorize-conseiller-agence'
-import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { fromSqlToRendezVousJeuneQueryModel } from './query-mappers/rendez-vous-milo.mappers'
 import { ActionQueryModel } from './query-models/actions.query-model'
 import { JeuneHomeSuiviQueryModel } from './query-models/home-jeune-suivi.query-model'
@@ -77,7 +77,7 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
         utilisateur
       )
     }
-    return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

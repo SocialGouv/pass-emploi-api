@@ -1,5 +1,5 @@
 import { RafraichirSuggestionPoleEmploiCommandHandler } from '../../../src/application/commands/rafraichir-suggestion-pole-emploi.command.handler'
-import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { Suggestion } from '../../../src/domain/offre/recherche/suggestion/suggestion'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
@@ -13,10 +13,11 @@ import {
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { SuggestionPoleEmploiService } from '../../../src/domain/offre/recherche/suggestion/pole-emploi.service'
+import { Core } from '../../../src/domain/core'
 
 describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
   let handler: RafraichirSuggestionPoleEmploiCommandHandler
-  let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
+  let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let suggestionFactory: StubbedClass<Suggestion.Factory>
   let suggestionPoleEmploiService: StubbedClass<SuggestionPoleEmploiService>
   let suggestionPoleEmploiRepository: StubbedType<Suggestion.PoleEmploi.Repository>
@@ -24,13 +25,13 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
 
   beforeEach(() => {
     const sandbox = createSandbox()
-    jeunePoleEmploiAuthorizer = stubClass(JeunePoleEmploiAuthorizer)
+    jeuneAuthorizer = stubClass(JeuneAuthorizer)
     suggestionFactory = stubClass(Suggestion.Factory)
     suggestionPoleEmploiService = stubClass(SuggestionPoleEmploiService)
     suggestionPoleEmploiRepository = stubInterface(sandbox)
     keycloakClient = stubClass(KeycloakClient)
     handler = new RafraichirSuggestionPoleEmploiCommandHandler(
-      jeunePoleEmploiAuthorizer,
+      jeuneAuthorizer,
       suggestionFactory,
       suggestionPoleEmploiService,
       suggestionPoleEmploiRepository,
@@ -50,9 +51,11 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
       )
 
       // Then
-      expect(
-        jeunePoleEmploiAuthorizer.authorize
-      ).to.have.been.calledOnceWithExactly('idJeune', unUtilisateurJeune())
+      expect(jeuneAuthorizer.authorize).to.have.been.calledOnceWithExactly(
+        'idJeune',
+        unUtilisateurJeune(),
+        Core.structuresPoleEmploiBRSA
+      )
     })
   })
 

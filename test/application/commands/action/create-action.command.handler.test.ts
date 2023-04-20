@@ -5,7 +5,7 @@ import { Evenement, EvenementService } from 'src/domain/evenement'
 import { PlanificateurService } from 'src/domain/planificateur'
 import { stubClassSandbox } from 'test/utils/types'
 import { ConseillerAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller'
-import { JeuneAuthorizer } from '../../../../src/application/authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import {
   CreateActionCommand,
   CreateActionCommandHandler
@@ -214,7 +214,7 @@ describe('CreateActionCommandHandler', () => {
         await createActionCommandHandler.authorize(command, utilisateur)
 
         // Then
-        expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
+        expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
           action.idJeune,
           utilisateur
         )

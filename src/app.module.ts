@@ -11,8 +11,7 @@ import { AuthorizeConseillerForJeunes } from './application/authorizers/authoriz
 import { FavoriOffresEmploiAuthorizer } from './application/authorizers/authorize-favori-offres-emploi'
 import { FavoriOffreServiceCiviqueAuthorizer } from './application/authorizers/authorize-favori-offres-engagement'
 import { FavoriOffresImmersionAuthorizer } from './application/authorizers/authorize-favori-offres-immersion'
-import { JeuneAuthorizer } from './application/authorizers/authorize-jeune'
-import { JeunePoleEmploiAuthorizer } from './application/authorizers/authorize-jeune-pole-emploi'
+import { JeuneAuthorizer } from './application/authorizers/jeune-authorizer'
 import { RechercheAuthorizer } from './application/authorizers/authorize-recherche'
 import { RendezVousAuthorizer } from './application/authorizers/authorize-rendezvous'
 import { SupportAuthorizer } from './application/authorizers/authorize-support'
@@ -573,7 +572,6 @@ export function buildQueryCommandsProviders(): Provider[] {
     JeuneAuthorizer,
     RechercheAuthorizer,
     ConseillerForJeuneAuthorizer,
-    JeunePoleEmploiAuthorizer,
     RendezVousAuthorizer,
     SupportAuthorizer,
     SuggestionAuthorizer,

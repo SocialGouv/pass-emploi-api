@@ -2,6 +2,7 @@ import { RendezVousPoleEmploiDto } from '../../../../src/infrastructure/clients/
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import { fromRendezVousDtoToRendezVousQueryModel } from '../../../../src/application/queries/query-mappers/rendez-vous-pole-emploi.mappers'
 import { IdService } from '../../../../src/utils/id-service'
+import { Core } from '../../../../src/domain/core'
 
 describe('RendezVousPrestationMappers', () => {
   let idService: StubbedClass<IdService>
@@ -61,7 +62,8 @@ describe('RendezVousPrestationMappers', () => {
           label: 'Entretien individuel conseiller'
         },
         visio: true,
-        lienVisio: 'lien'
+        lienVisio: 'lien',
+        source: Core.Structure.POLE_EMPLOI
       })
     })
     it('retourne un RendezVousConseillerQueryModel avec la modalité agence, et le conseiller', async () => {

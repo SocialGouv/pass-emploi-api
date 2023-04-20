@@ -5,7 +5,7 @@ import { isSuccess, Result } from '../../../../src/building-blocks/types/result'
 
 import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
 import { GetAccueilJeuneMiloQueryHandler } from '../../../../src/application/queries/accueil/get-accueil-jeune-milo.query.handler.db'
-import { JeuneAuthorizer } from '../../../../src/application/authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import {
   RendezVousDto,
   RendezVousSqlModel
@@ -31,6 +31,7 @@ import { DateTime } from 'luxon'
 import { uneAgenceMiloDTO } from '../../../fixtures/sql-models/agence.sql-model'
 import { AgenceSqlModel } from '../../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { GetFavorisAccueilQueryGetter } from '../../../../src/application/queries/query-getters/accueil/get-favoris.query.getter.db'
+import { Core } from '../../../../src/domain/core'
 
 describe('GetAccueilJeuneMiloQueryHandler', () => {
   let handler: GetAccueilJeuneMiloQueryHandler
@@ -316,9 +317,10 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       handler.authorize(query, unUtilisateurJeune())
 
       // Then
-      expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
         query.idJeune,
-        unUtilisateurJeune()
+        unUtilisateurJeune(),
+        Core.structuresMiloPassEmploi
       )
     })
   })

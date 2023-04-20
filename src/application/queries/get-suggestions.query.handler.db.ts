@@ -2,7 +2,7 @@ import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { Injectable } from '@nestjs/common'
 import { SuggestionQueryModel } from './query-models/suggestion.query-model'
 import { SuggestionSqlModel } from '../../infrastructure/sequelize/models/suggestion.sql-model'
@@ -57,6 +57,6 @@ export class GetSuggestionsQueryHandler extends QueryHandler<
     query: GetSuggestionsQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 }

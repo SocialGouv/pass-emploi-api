@@ -6,7 +6,7 @@ import { Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { RechercheSqlModel } from '../../infrastructure/sequelize/models/recherche.sql-model'
 import { ConseillerAgenceAuthorizer } from '../authorizers/authorize-conseiller-agence'
-import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { fromSqlToRechercheQueryModel } from './query-mappers/recherche.mapper'
 import { RechercheQueryModel } from './query-models/recherches.query-model'
 
@@ -54,7 +54,7 @@ export class GetRecherchesQueryHandler extends QueryHandler<
         utilisateur
       )
     }
-    return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

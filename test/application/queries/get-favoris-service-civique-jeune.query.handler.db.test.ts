@@ -1,4 +1,4 @@
-import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../../src/application/queries/get-favoris-service-civique-jeune.query.handler.db'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
@@ -38,7 +38,7 @@ describe('getDetailServiceCiviqueQueryHandler', () => {
       )
 
       // Then
-      expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWith(
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWith(
         idJeune,
         utilisateur
       )

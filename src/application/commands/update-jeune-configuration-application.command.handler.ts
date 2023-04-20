@@ -13,7 +13,7 @@ import {
   JeuneConfigurationApplicationRepositoryToken,
   JeunesRepositoryToken
 } from '../../domain/jeune/jeune'
-import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { ConfigurationApplication } from '../../domain/jeune/configuration-application'
 
 export interface UpdateJeuneConfigurationApplicationCommand extends Command {
@@ -63,7 +63,7 @@ export class UpdateJeuneConfigurationApplicationCommandHandler extends CommandHa
     command: UpdateJeuneConfigurationApplicationCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorizeJeune(command.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

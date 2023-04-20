@@ -3,7 +3,7 @@ import { Result, success } from '../../../building-blocks/types/result'
 import { RendezVousJeuneDetailQueryModel } from '../query-models/rendez-vous.query-model'
 import { Query } from '../../../building-blocks/types/query'
 import { Authentification } from '../../../domain/authentification'
-import { JeuneAuthorizer } from '../../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { DateTime } from 'luxon'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { Op, Sequelize } from 'sequelize'
@@ -30,7 +30,7 @@ export class GetAnimationsCollectivesJeuneQueryHandler extends QueryHandler<
     query: GetAnimationsCollectivesJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async handle(

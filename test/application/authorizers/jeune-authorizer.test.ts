@@ -1,13 +1,14 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
 import { emptySuccess, failure } from 'src/building-blocks/types/result'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
 import { createSandbox, expect } from '../../utils'
+import { Core } from '../../../src/domain/core'
 
 describe('JeuneAuthorizer', () => {
   let jeuneRepository: StubbedType<Jeune.Repository>
@@ -20,6 +21,48 @@ describe('JeuneAuthorizer', () => {
   })
 
   describe('authorize', () => {
+    describe("quand l'utilisateur est de la mauvaise strucutre", () => {
+      it('retourne un echec', async () => {
+        // Given
+        const utilisateur = unUtilisateurJeune({
+          id: 'jeune-id',
+          structure: Core.Structure.POLE_EMPLOI_BRSA
+        })
+
+        jeuneRepository.existe.withArgs('jeune-id').resolves(true)
+
+        // When
+        const result = await jeuneAuthorizer.authorize(
+          'jeune-id',
+          utilisateur,
+          Core.structuresPoleEmploi
+        )
+
+        // Then
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
+      })
+    })
+    describe("quand l'utilisateur est de la bonne strucutre", () => {
+      it('retourne un success', async () => {
+        // Given
+        const utilisateur = unUtilisateurJeune({
+          id: 'jeune-id',
+          structure: Core.Structure.POLE_EMPLOI_BRSA
+        })
+
+        jeuneRepository.existe.withArgs('jeune-id').resolves(true)
+
+        // When
+        const result = await jeuneAuthorizer.authorize(
+          'jeune-id',
+          utilisateur,
+          Core.structuresPoleEmploiBRSA
+        )
+
+        // Then
+        expect(result).to.deep.equal(emptySuccess())
+      })
+    })
     describe('quand le jeune idoine est connecté', () => {
       it('retourne un success', async () => {
         // Given
@@ -28,10 +71,7 @@ describe('JeuneAuthorizer', () => {
         jeuneRepository.existe.withArgs('jeune-id').resolves(true)
 
         // When
-        const result = await jeuneAuthorizer.authorizeJeune(
-          'jeune-id',
-          utilisateur
-        )
+        const result = await jeuneAuthorizer.authorize('jeune-id', utilisateur)
 
         // Then
         expect(result).to.deep.equal(emptySuccess())
@@ -45,10 +85,7 @@ describe('JeuneAuthorizer', () => {
         jeuneRepository.existe.withArgs('jeune-id').resolves(true)
 
         // When
-        const result = await jeuneAuthorizer.authorizeJeune(
-          'jeune-id',
-          utilisateur
-        )
+        const result = await jeuneAuthorizer.authorize('jeune-id', utilisateur)
 
         // Then
         expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
@@ -61,7 +98,7 @@ describe('JeuneAuthorizer', () => {
           jeuneRepository.existe.withArgs('id').resolves(true)
 
           // When
-          const result = await jeuneAuthorizer.authorizeJeune('id', utilisateur)
+          const result = await jeuneAuthorizer.authorize('id', utilisateur)
 
           // Then
           expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
@@ -77,10 +114,7 @@ describe('JeuneAuthorizer', () => {
         jeuneRepository.existe.withArgs('jeune-id').resolves(false)
 
         // When
-        const result = await jeuneAuthorizer.authorizeJeune(
-          'jeune-id',
-          utilisateur
-        )
+        const result = await jeuneAuthorizer.authorize('jeune-id', utilisateur)
 
         // Then
         expect(result).to.deep.equal(failure(new DroitsInsuffisants()))

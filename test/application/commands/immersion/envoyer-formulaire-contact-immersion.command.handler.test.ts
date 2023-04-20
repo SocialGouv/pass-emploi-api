@@ -1,4 +1,3 @@
-import { JeuneAuthorizer } from 'src/application/authorizers/authorize-jeune'
 import {
   EnvoyerFormulaireContactImmersionCommand,
   EnvoyerFormulaireContactImmersionCommandHandler
@@ -8,6 +7,7 @@ import { Evenement, EvenementService } from 'src/domain/evenement'
 import { ImmersionClient } from 'src/infrastructure/clients/immersion-client'
 import { unUtilisateurJeune } from 'test/fixtures/authentification.fixture'
 import { expect, StubbedClass, stubClass } from 'test/utils'
+import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 
 describe('EnvoyerFormulaireContactImmersionCommandHandler', () => {
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
@@ -89,7 +89,7 @@ describe('EnvoyerFormulaireContactImmersionCommandHandler', () => {
       )
 
       // Then
-      expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
         'idJeune',
         utilisateur
       )

@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import { JeuneAuthorizer } from 'src/application/authorizers/authorize-jeune'
 import { CommandHandler } from 'src/building-blocks/types/command-handler'
 import { Result } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
@@ -8,6 +7,7 @@ import {
   FormulaireImmersionPayload,
   ImmersionClient
 } from 'src/infrastructure/clients/immersion-client'
+import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 
 export interface EnvoyerFormulaireContactImmersionCommand {
   idJeune: string
@@ -38,7 +38,7 @@ export class EnvoyerFormulaireContactImmersionCommandHandler extends CommandHand
     command: EnvoyerFormulaireContactImmersionCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorizeJeune(command.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
   }
 
   async handle(

@@ -2,6 +2,7 @@ import { PrestationDto } from '../../../../src/infrastructure/clients/dto/pole-e
 import { fromPrestationDtoToRendezVousQueryModel } from '../../../../src/application/queries/query-mappers/rendez-vous-prestation.mappers'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import { IdService } from '../../../../src/utils/id-service'
+import { Core } from '../../../../src/domain/core'
 
 describe('RendezVousPrestationMappers', () => {
   let idService: StubbedClass<IdService>
@@ -49,11 +50,6 @@ describe('RendezVousPrestationMappers', () => {
         isLocaleDate: true,
         duration: 0,
         id: 'random-id',
-        jeune: {
-          id: 'ABCDE',
-          nom: 'Doe',
-          prenom: 'John'
-        },
         modality: 'par visio',
         theme: undefined,
         telephone: undefined,
@@ -67,7 +63,8 @@ describe('RendezVousPrestationMappers', () => {
           label: 'Prestation'
         },
         visio: true,
-        lienVisio: undefined
+        lienVisio: undefined,
+        source: Core.Structure.POLE_EMPLOI
       })
     })
     it('retourne un RendezVousConseillerQueryModel avec la durée en heures', async () => {

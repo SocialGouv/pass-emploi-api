@@ -7,6 +7,7 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Core, estUtilisateurDeLaStructure } from '../../domain/core'
 
 @Injectable()
 export class JeuneAuthorizer {
@@ -15,18 +16,21 @@ export class JeuneAuthorizer {
     private jeuneRepository: Jeune.Repository
   ) {}
 
-  async authorizeJeune(
+  async authorize(
     idJeune: string,
-    utilisateur: Authentification.Utilisateur
+    utilisateur: Authentification.Utilisateur,
+    structuresAutorisees?: Core.Structure[]
   ): Promise<Result> {
-    const jeune = await this.jeuneRepository.existe(idJeune)
+    if (estUtilisateurDeLaStructure(utilisateur, structuresAutorisees)) {
+      const jeune = await this.jeuneRepository.existe(idJeune)
 
-    if (jeune && utilisateur) {
-      if (
-        utilisateur.type === Authentification.Type.JEUNE &&
-        utilisateur.id === idJeune
-      ) {
-        return emptySuccess()
+      if (jeune && utilisateur) {
+        if (
+          utilisateur.type === Authentification.Type.JEUNE &&
+          utilisateur.id === idJeune
+        ) {
+          return emptySuccess()
+        }
       }
     }
 

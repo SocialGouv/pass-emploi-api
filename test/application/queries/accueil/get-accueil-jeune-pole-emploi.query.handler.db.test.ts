@@ -20,7 +20,7 @@ import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../../src/applica
 import { KeycloakClient } from '../../../../src/infrastructure/clients/keycloak-client'
 import { Core } from '../../../../src/domain/core'
 import Structure = Core.Structure
-import { JeunePoleEmploiAuthorizer } from '../../../../src/application/authorizers/authorize-jeune-pole-emploi'
+import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import { uneDemarcheQueryModel } from '../../../fixtures/query-models/demarche.query-model.fixtures'
 import { GetRecherchesSauvegardeesQueryGetter } from '../../../../src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
 import { Recherche } from '../../../../src/domain/offre/recherche/recherche'
@@ -32,7 +32,7 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
   let getRendezVousJeunePoleEmploiQueryGetter: StubbedClass<GetRendezVousJeunePoleEmploiQueryGetter>
   let getRecherchesSauvegardeesQueryGetter: StubbedClass<GetRecherchesSauvegardeesQueryGetter>
   let getFavorisQueryGetter: StubbedClass<GetFavorisAccueilQueryGetter>
-  let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
+  let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let keycloakClient: StubbedClass<KeycloakClient>
   const idpToken = 'id-token'
 
@@ -47,10 +47,10 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
     )
     keycloakClient = stubClass(KeycloakClient)
     keycloakClient.exchangeTokenPoleEmploiJeune.resolves(idpToken)
-    jeunePoleEmploiAuthorizer = stubClass(JeunePoleEmploiAuthorizer)
+    jeuneAuthorizer = stubClass(JeuneAuthorizer)
 
     handler = new GetAccueilJeunePoleEmploiQueryHandler(
-      jeunePoleEmploiAuthorizer,
+      jeuneAuthorizer,
       keycloakClient,
       getDemarchesQueryGetter,
       getRendezVousJeunePoleEmploiQueryGetter,
@@ -262,11 +262,10 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
       )
 
       // Then
-      expect(
-        jeunePoleEmploiAuthorizer.authorize
-      ).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
         query.idJeune,
-        unUtilisateurJeune({ structure: Structure.POLE_EMPLOI })
+        unUtilisateurJeune({ structure: Structure.POLE_EMPLOI }),
+        Core.structuresPoleEmploiBRSA
       )
     })
   })
