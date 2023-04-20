@@ -10,7 +10,7 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { OffresEmploiRepositoryToken } from '../../domain/offre/favori/offre-emploi'
-import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { Offre } from '../../domain/offre/offre'
 
 export interface AddFavoriOffreEmploiCommand extends Command {
@@ -52,7 +52,7 @@ export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
     command: AddFavoriOffreEmploiCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorizeJeune(command.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
   }
 
   async monitor(

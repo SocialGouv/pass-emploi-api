@@ -8,7 +8,7 @@ import { PoleEmploiPartenaireClient } from 'src/infrastructure/clients/pole-empl
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import { unJeune } from 'test/fixtures/jeune.fixture'
-import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import {
   GetJeuneHomeAgendaPoleEmploiQuery,
   GetJeuneHomeAgendaPoleEmploiQueryHandler
@@ -34,7 +34,7 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
   })
 
   let getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter
-  let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
+  let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
 
   beforeEach(() => {
     sandbox = createSandbox()
@@ -74,7 +74,7 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
     handler = new GetJeuneHomeAgendaPoleEmploiQueryHandler(
       getDemarchesQueryGetter,
       getRendezVousJeunePoleEmploiQueryGetter,
-      jeunePoleEmploiAuthorizer,
+      jeuneAuthorizer,
       keycloakClient
     )
   })

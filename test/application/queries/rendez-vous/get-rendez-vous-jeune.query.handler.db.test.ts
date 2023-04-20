@@ -3,7 +3,7 @@ import { SinonSandbox } from 'sinon'
 import { ConseillerAgenceAuthorizer } from 'src/application/authorizers/authorize-conseiller-agence'
 import { Core } from 'src/domain/core'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
-import { JeuneAuthorizer } from '../../../../src/application/authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import {
   GetRendezVousJeuneQuery,
   GetRendezVousJeuneQueryHandler
@@ -343,7 +343,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
       )
 
       // Then
-      expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
         jeune1.id,
         utilisateur
       )

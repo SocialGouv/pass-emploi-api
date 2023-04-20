@@ -6,7 +6,7 @@ import { Jeune } from '../../domain/jeune/jeune'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Core } from '../../domain/core'
-import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { ServiceCiviqueQueryModel } from './query-models/service-civique.query-model'
 import { FavoriOffreEngagementSqlModel } from '../../infrastructure/sequelize/models/favori-offre-engagement.sql-model'
 import {
@@ -48,7 +48,7 @@ export class GetFavorisServiceCiviqueJeuneQueryHandler extends QueryHandler<
     query: GetFavorisOffresEngagementJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

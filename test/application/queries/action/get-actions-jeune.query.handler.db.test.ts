@@ -3,7 +3,7 @@ import { SinonSandbox } from 'sinon'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { failure, isSuccess } from 'src/building-blocks/types/result'
 import { uneAction } from 'test/fixtures/action.fixture'
-import { JeuneAuthorizer } from '../../../../src/application/authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import {
   GetActionsJeuneQuery,
   GetActionsJeuneQueryHandler
@@ -751,7 +751,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
         await getActionsByJeuneQueryHandler.authorize(query, utilisateur)
 
         // Then
-        expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
+        expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
           'id-jeune',
           utilisateur
         )

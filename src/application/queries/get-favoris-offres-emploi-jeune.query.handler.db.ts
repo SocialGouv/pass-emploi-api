@@ -3,7 +3,7 @@ import { Authentification } from '../../domain/authentification'
 import { Jeune } from '../../domain/jeune/jeune'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import {
   FavoriOffreEmploiIdQueryModel,
   OffreEmploiResumeQueryModel
@@ -41,7 +41,7 @@ export class GetFavorisOffresEmploiJeuneQueryHandler extends QueryHandler<
     query: GetFavorisJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

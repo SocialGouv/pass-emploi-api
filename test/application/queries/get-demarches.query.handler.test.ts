@@ -2,23 +2,24 @@ import {
   GetDemarchesQuery,
   GetDemarchesQueryHandler
 } from 'src/application/queries/get-demarches.query.handler'
-import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { GetDemarchesQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
+import { Core } from '../../../src/domain/core'
 
 describe('GetDemarchesQueryHandler', () => {
-  let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
+  let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let getDemarchesQueryGetter: StubbedClass<GetDemarchesQueryGetter>
   let getDemarchesQueryHandler: GetDemarchesQueryHandler
 
   before(() => {
     getDemarchesQueryGetter = stubClass(GetDemarchesQueryGetter)
-    jeunePoleEmploiAuthorizer = stubClass(JeunePoleEmploiAuthorizer)
+    jeuneAuthorizer = stubClass(JeuneAuthorizer)
 
     getDemarchesQueryHandler = new GetDemarchesQueryHandler(
       getDemarchesQueryGetter,
-      jeunePoleEmploiAuthorizer
+      jeuneAuthorizer
     )
   })
 
@@ -51,9 +52,10 @@ describe('GetDemarchesQueryHandler', () => {
       // When
       await getDemarchesQueryHandler.authorize(query, utilisateur)
       // Then
-      expect(jeunePoleEmploiAuthorizer.authorize).to.have.been.calledWith(
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
         query.idJeune,
-        utilisateur
+        utilisateur,
+        Core.structuresPoleEmploiBRSA
       )
     })
   })

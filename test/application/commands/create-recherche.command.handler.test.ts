@@ -1,6 +1,5 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { JeuneAuthorizer } from 'src/application/authorizers/authorize-jeune'
 import { success } from 'src/building-blocks/types/result'
 import { IdService } from 'src/utils/id-service'
 import {
@@ -13,6 +12,7 @@ import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { DateService } from '../../../src/utils/date-service'
 import { uneDatetime } from '../../fixtures/date.fixture'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 
 describe('CreateRechercheCommandHandler', () => {
   let rechercheRepository: StubbedType<Recherche.Repository>

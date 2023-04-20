@@ -6,10 +6,11 @@ import { isFailure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Demarche } from '../../domain/demarche'
 import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
-import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from './query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { JeuneHomeAgendaPoleEmploiQueryModel } from './query-models/home-jeune-suivi.query-model'
+import { Core } from '../../domain/core'
 
 export interface GetJeuneHomeAgendaPoleEmploiQuery extends Query {
   idJeune: string
@@ -25,7 +26,7 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
   constructor(
     private getDemarchesQueryGetter: GetDemarchesQueryGetter,
     private getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter,
-    private jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer,
+    private jeuneAuthorizer: JeuneAuthorizer,
     private keycloakClient: KeycloakClient
   ) {
     super('GetJeuneHomeAgendaPoleEmploiQueryHandler')
@@ -99,7 +100,11 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
     query: GetJeuneHomeAgendaPoleEmploiQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeunePoleEmploiAuthorizer.authorize(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(
+      query.idJeune,
+      utilisateur,
+      Core.structuresPoleEmploiBRSA
+    )
   }
 
   async monitor(): Promise<void> {

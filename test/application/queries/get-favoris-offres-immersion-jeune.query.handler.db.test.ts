@@ -1,4 +1,4 @@
-import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { GetFavorisOffresImmersionJeuneQueryHandler } from '../../../src/application/queries/get-favoris-offres-immersion-jeune.query.handler.db'
 import {
   FavoriOffreImmersionIdQueryModel,
@@ -95,7 +95,7 @@ describe('GetFavorisOffresImmersionJeuneQueryHandler', () => {
       )
 
       // Then
-      expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
         idJeune,
         unUtilisateurJeune()
       )

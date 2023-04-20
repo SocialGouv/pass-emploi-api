@@ -1,6 +1,6 @@
 import { GetSuggestionsQueryHandler } from '../../../src/application/queries/get-suggestions.query.handler.db'
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { SuggestionSqlModel } from '../../../src/infrastructure/sequelize/models/suggestion.sql-model'
 import { uneSuggestion } from '../../fixtures/suggestion.fixture'
@@ -114,7 +114,7 @@ describe('GetSuggestionsQueryHandler', () => {
       await queryHandler.authorize({ idJeune: 'idJeune' }, unUtilisateurJeune())
 
       // Then
-      expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
         'idJeune',
         unUtilisateurJeune()
       )

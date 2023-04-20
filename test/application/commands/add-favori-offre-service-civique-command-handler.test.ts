@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { createSandbox } from 'sinon'
 import {
@@ -87,7 +87,7 @@ describe('AddFavoriOffreServiceCiviqueCommandHandler', () => {
     it('autorise un jeune', async () => {
       // Given
       const utilisateur = unUtilisateurJeune()
-      jeuneAuthorizer.authorizeJeune
+      jeuneAuthorizer.authorize
         .withArgs(command.idJeune, utilisateur)
         .resolves(emptySuccess())
 

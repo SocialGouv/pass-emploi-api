@@ -11,7 +11,7 @@ import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-m
 import { SituationsMiloSqlModel } from '../../infrastructure/sequelize/models/situations-milo.sql-model'
 import { TransfertConseillerSqlModel } from '../../infrastructure/sequelize/models/transfert-conseiller.sql-model'
 import { ConseillerAgenceAuthorizer } from '../authorizers/authorize-conseiller-agence'
-import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { fromSqlToDetailJeuneQueryModel } from './query-mappers/jeune.mappers'
 import { DetailJeuneQueryModel } from './query-models/jeunes.query-model'
 
@@ -67,7 +67,7 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
         utilisateur
       )
     }
-    return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {
