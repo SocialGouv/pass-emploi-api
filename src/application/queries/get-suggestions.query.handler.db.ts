@@ -38,6 +38,7 @@ export class GetSuggestionsQueryHandler extends QueryHandler<
       id: suggestionSql.id,
       titre: suggestionSql.titre,
       type: suggestionSql.type,
+      source: suggestionSql.source,
       metier: suggestionSql.metier,
       localisation: suggestionSql.localisation,
       dateCreation: DateService.fromJSDateToISOString(

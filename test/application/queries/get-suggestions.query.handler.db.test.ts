@@ -99,6 +99,7 @@ describe('GetSuggestionsQueryHandler', () => {
         id: 'f781ae20-8838-49c7-aa2e-9b224318fb65',
         titre: 'Petrisseur',
         type: Offre.Recherche.Type.OFFRES_EMPLOI,
+        source: suggestion.source,
         metier: 'Boulanger',
         localisation: 'Lille',
         dateCreation: uneDatetime().toISO(),
