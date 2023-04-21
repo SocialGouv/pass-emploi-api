@@ -41,6 +41,7 @@ import { uneRecherche } from '../../fixtures/recherche.fixture'
 import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
+import Suggestion = Recherche.Suggestion
 
 describe('RecherchesController', () => {
   let createRechercheCommandHandler: StubbedClass<CreateRechercheCommandHandler>
@@ -352,6 +353,7 @@ describe('RecherchesController', () => {
       id: 'f781ae20-8838-49c7-aa2e-9b224318fb65',
       titre: 'Petrisseur',
       type: Offre.Recherche.Type.OFFRES_EMPLOI,
+      source: Suggestion.Source.CONSEILLER,
       metier: 'Boulanger',
       localisation: 'Lille',
       dateCreation: uneDatetime().toISO(),

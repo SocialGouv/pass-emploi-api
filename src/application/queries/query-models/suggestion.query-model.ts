@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Offre } from '../../../domain/offre/offre'
+import { Suggestion } from '../../../domain/offre/recherche/suggestion/suggestion'
 
 export class SuggestionQueryModel {
   @ApiProperty()
@@ -8,6 +9,8 @@ export class SuggestionQueryModel {
   titre: string
   @ApiProperty({ enum: Offre.Recherche.Type })
   type: Offre.Recherche.Type
+  @ApiProperty({ enum: Suggestion.Source })
+  source: Suggestion.Source
   @ApiProperty()
   metier?: string
   @ApiProperty()
