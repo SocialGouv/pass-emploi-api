@@ -90,7 +90,7 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
       await addFavoriOffreEmploiCommandHandler.authorize(command, utilisateur)
 
       // Then
-      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         'idJeune',
         utilisateur
       )

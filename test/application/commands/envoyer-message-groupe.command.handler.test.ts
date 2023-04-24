@@ -5,7 +5,6 @@ import {
 } from '../../../src/application/commands/envoyer-message-groupe.command.handler'
 import { Chat } from '../../../src/domain/chat'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { AuthorizeConseillerForJeunes } from '../../../src/application/authorizers/authorize-conseiller-for-jeunes'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { Notification } from '../../../src/domain/notification/notification'
@@ -14,17 +13,18 @@ import { unJeune } from '../../fixtures/jeune.fixture'
 import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { uneListeDeDiffusion } from '../../fixtures/liste-de-diffusion.fixture'
 import { uneDatetime } from '../../fixtures/date.fixture'
-import { AuthorizeListeDeDiffusion } from '../../../src/application/authorizers/authorize-liste-de-diffusion'
+import { ListeDeDiffusionAuthorizer } from '../../../src/application/authorizers/liste-de-diffusion-authorizer'
 import {
   emptySuccess,
   failure
 } from '../../../src/building-blocks/types/result'
 import { DroitsInsuffisants } from '../../../src/building-blocks/types/domain-error'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 
 describe('EnvoyerMessageGroupeCommandHandler', () => {
   let envoyerMessageGroupeCommandHandler: EnvoyerMessageGroupeCommandHandler
-  let authorizeConseillerForJeunes: StubbedClass<AuthorizeConseillerForJeunes>
-  let authorizeListeDeDiffusion: StubbedClass<AuthorizeListeDeDiffusion>
+  let authorizeConseillerForJeunes: StubbedClass<ConseillerAuthorizer>
+  let authorizeListeDeDiffusion: StubbedClass<ListeDeDiffusionAuthorizer>
   let evenementService: StubbedClass<EvenementService>
   let notificationService: StubbedClass<Notification.Service>
   let chatRepository: StubbedType<Chat.Repository>
@@ -36,8 +36,8 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
     chatRepository = stubInterface(sandbox)
     jeuneRepository = stubInterface(sandbox)
     listeDeDiffusionRepository = stubInterface(sandbox)
-    authorizeConseillerForJeunes = stubClass(AuthorizeConseillerForJeunes)
-    authorizeListeDeDiffusion = stubClass(AuthorizeListeDeDiffusion)
+    authorizeConseillerForJeunes = stubClass(ConseillerAuthorizer)
+    authorizeListeDeDiffusion = stubClass(ListeDeDiffusionAuthorizer)
     evenementService = stubClass(EvenementService)
     notificationService = stubClass(Notification.Service)
     envoyerMessageGroupeCommandHandler = new EnvoyerMessageGroupeCommandHandler(
@@ -377,7 +377,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
         idConseiller: '41'
       }
       const utilisateur = unUtilisateurConseiller()
-      authorizeConseillerForJeunes.authorize
+      authorizeConseillerForJeunes.autoriserConseillerPourSesJeunes
         .withArgs(['jeune-1', 'jeune-2'], utilisateur)
         .resolves(emptySuccess())
 
@@ -399,7 +399,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
         idConseiller: '41'
       }
       const utilisateur = unUtilisateurConseiller()
-      authorizeListeDeDiffusion.authorize
+      authorizeListeDeDiffusion.autoriserConseillerPourSaListeDeDiffusion
         .withArgs('liste-1', utilisateur)
         .resolves(emptySuccess())
 
@@ -422,7 +422,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
         idConseiller: '41'
       }
       const utilisateur = unUtilisateurConseiller()
-      authorizeListeDeDiffusion.authorize
+      authorizeListeDeDiffusion.autoriserConseillerPourSaListeDeDiffusion
         .withArgs('liste-1', utilisateur)
         .resolves(emptySuccess())
         .withArgs('liste-2', utilisateur)

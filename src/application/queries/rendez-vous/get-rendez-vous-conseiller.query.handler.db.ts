@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Authentification } from '../../../domain/authentification'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
-import { ConseillerAuthorizer } from '../../authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { RendezVousConseillerFutursEtPassesQueryModel } from '../query-models/rendez-vous.query-model'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { Op, Sequelize } from 'sequelize'
@@ -109,7 +109,10 @@ export class GetAllRendezVousConseillerQueryHandler extends QueryHandler<
     query: GetAllRendezVousConseiller,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAuthorizer.authorize(query.idConseiller, utilisateur)
+    return this.conseillerAuthorizer.autoriserLeConseiller(
+      query.idConseiller,
+      utilisateur
+    )
   }
 
   async monitor(): Promise<void> {

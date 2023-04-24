@@ -1,6 +1,5 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { createSandbox, SinonSandbox } from 'sinon'
-import { AuthorizeConseillerForJeunes } from '../../../src/application/authorizers/authorize-conseiller-for-jeunes'
 import {
   CreateListeDeDiffusionCommand,
   CreateListeDeDiffusionCommandHandler
@@ -15,11 +14,12 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { expect, StubbedClass, stubClass } from '../../utils'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 
 describe('CreateListeDeDiffusionCommandHandler', () => {
   let sandbox: SinonSandbox
   let createListeDeDiffusionCommandHandler: CreateListeDeDiffusionCommandHandler
-  let conseillerForJeunesAuthorizer: StubbedClass<AuthorizeConseillerForJeunes>
+  let conseillerForJeunesAuthorizer: StubbedClass<ConseillerAuthorizer>
   let listeDeDiffusionRepository: StubbedType<Conseiller.ListeDeDiffusion.Repository>
   let listeDeDiffusionFactory: StubbedClass<Conseiller.ListeDeDiffusion.Factory>
   let chatRepository: StubbedType<Chat.Repository>
@@ -27,7 +27,7 @@ describe('CreateListeDeDiffusionCommandHandler', () => {
 
   beforeEach(() => {
     sandbox = createSandbox()
-    conseillerForJeunesAuthorizer = stubClass(AuthorizeConseillerForJeunes)
+    conseillerForJeunesAuthorizer = stubClass(ConseillerAuthorizer)
     listeDeDiffusionRepository = stubInterface(sandbox)
     listeDeDiffusionFactory = stubClass(Conseiller.ListeDeDiffusion.Factory)
     chatRepository = stubInterface(sandbox)
@@ -60,7 +60,7 @@ describe('CreateListeDeDiffusionCommandHandler', () => {
 
       // Then
       expect(
-        conseillerForJeunesAuthorizer.authorize
+        conseillerForJeunesAuthorizer.autoriserConseillerPourSesJeunes
       ).to.have.been.calledWithExactly(idsBeneficiaires, utilisateur)
     })
   })

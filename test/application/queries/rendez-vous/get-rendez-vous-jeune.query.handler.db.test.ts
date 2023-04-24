@@ -1,6 +1,5 @@
 import { stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { ConseillerAgenceAuthorizer } from 'src/application/authorizers/authorize-conseiller-agence'
 import { Core } from 'src/domain/core'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
@@ -31,11 +30,12 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import { getDatabase } from '../../../utils/database-for-testing'
 import { testConfig } from '../../../utils/module-for-testing'
 import { stubClassSandbox } from '../../../utils/types'
+import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 
 describe('GetRendezVousJeuneQueryHandler', () => {
   let dateService: StubbedClass<DateService>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
   let getRendezVousQueryHandler: GetRendezVousJeuneQueryHandler
   let evenementService: StubbedClass<EvenementService>
   let sandbox: SinonSandbox
@@ -55,7 +55,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
     dateService = stubInterface(sandbox)
     dateService.nowJs.returns(maintenant.toJSDate())
     dateService.nowAtMidnightJs.returns(aujourdhuiMinuit.toJSDate())
-    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
   })
 
@@ -343,7 +343,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
       )
 
       // Then
-      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         jeune1.id,
         utilisateur
       )
@@ -364,7 +364,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
 
       // Then
       expect(
-        conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence
+        conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo
       ).to.have.been.calledWithExactly(jeune1.id, conseiller)
     })
   })

@@ -10,7 +10,7 @@ import { fromSqlToActionQueryModel } from '../../../infrastructure/repositories/
 import { ActionSqlModel } from '../../../infrastructure/sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
-import { ConseillerAgenceAuthorizer } from '../../authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from '../../authorizers/conseiller-inter-agence-authorizer'
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { ActionQueryModel } from '../query-models/actions.query-model'
 
@@ -48,7 +48,7 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
     private jeuneAuthorizer: JeuneAuthorizer,
-    private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer
+    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer
   ) {
     super('GetActionsJeuneQueryHandler')
   }
@@ -151,12 +151,12 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      return this.conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence(
+      return this.conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo(
         query.idJeune,
         utilisateur
       )
     }
-    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.autoriserLeJeune(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

@@ -1,5 +1,5 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { ActionAuthorizer } from '../../../src/application/authorizers/authorize-action'
+import { ActionAuthorizer } from '../../../src/application/authorizers/action-authorizer'
 import { DroitsInsuffisants } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
@@ -23,7 +23,7 @@ describe('ActionAuthorizer', () => {
     actionAuthorizer = new ActionAuthorizer(actionRepository)
   })
 
-  describe('authorize', () => {
+  describe('autoriserPourUneAction', () => {
     describe("quand c'est un jeune et que l'action est à lui", () => {
       it('retourne un success', async () => {
         // Given
@@ -35,7 +35,10 @@ describe('ActionAuthorizer', () => {
           .resolves(conseillerEtJeune)
 
         // When
-        const result = await actionAuthorizer.authorize(idAction, utilisateur)
+        const result = await actionAuthorizer.autoriserPourUneAction(
+          idAction,
+          utilisateur
+        )
 
         // Then
         expect(result).to.deep.equal(emptySuccess())
@@ -52,7 +55,10 @@ describe('ActionAuthorizer', () => {
           .resolves(conseillerEtJeune)
 
         // When
-        const result = await actionAuthorizer.authorize(idAction, utilisateur)
+        const result = await actionAuthorizer.autoriserPourUneAction(
+          idAction,
+          utilisateur
+        )
 
         // Then
         expect(result).to.deep.equal(emptySuccess())
@@ -69,7 +75,10 @@ describe('ActionAuthorizer', () => {
           .resolves(action)
 
         // When
-        const result = await actionAuthorizer.authorize(idAction, utilisateur)
+        const result = await actionAuthorizer.autoriserPourUneAction(
+          idAction,
+          utilisateur
+        )
 
         // Then
         expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
@@ -85,7 +94,10 @@ describe('ActionAuthorizer', () => {
           .resolves({ idConseiller: 'un autre conseiller' })
 
         // When
-        const result = await actionAuthorizer.authorize(idAction, utilisateur)
+        const result = await actionAuthorizer.autoriserPourUneAction(
+          idAction,
+          utilisateur
+        )
 
         // Then
         expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
@@ -99,7 +111,10 @@ describe('ActionAuthorizer', () => {
         actionRepository.get.withArgs(idAction).resolves(undefined)
 
         // When
-        const result = await actionAuthorizer.authorize(idAction, utilisateur)
+        const result = await actionAuthorizer.autoriserPourUneAction(
+          idAction,
+          utilisateur
+        )
 
         // Then
         expect(result).to.deep.equal(failure(new DroitsInsuffisants()))

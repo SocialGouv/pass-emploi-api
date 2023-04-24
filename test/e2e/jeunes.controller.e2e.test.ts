@@ -108,7 +108,7 @@ describe('JeunesControllerE2E', () => {
 
     it('retourne la home agenda du jeune', async () => {
       // Given
-      jeuneAuthorizer.authorize.resolves(emptySuccess())
+      jeuneAuthorizer.autoriserLeJeune.resolves(emptySuccess())
       keycloakClient.exchangeTokenPoleEmploiJeune.resolves('idpToken')
       jeuneRepository.get.resolves(jeune)
 

@@ -25,7 +25,7 @@ import {
   RendezVousRepositoryToken
 } from '../../domain/rendez-vous/rendez-vous'
 import { buildError } from '../../utils/logger.module'
-import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
+import { RendezVousAuthorizer } from '../authorizers/rendezvous-authorizer'
 import { HistoriqueRendezVousRepositoryToken } from '../../domain/rendez-vous/historique'
 
 export interface UpdateRendezVousCommand extends Command {
@@ -225,7 +225,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     command: UpdateRendezVousCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.rendezVousAuthorizer.authorizeConseiller(
+    return this.rendezVousAuthorizer.autoriserConseillerPourUnRendezVousAvecAuMoinsUnJeune(
       command.idRendezVous,
       utilisateur
     )

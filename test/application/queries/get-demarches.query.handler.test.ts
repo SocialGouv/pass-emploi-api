@@ -52,7 +52,7 @@ describe('GetDemarchesQueryHandler', () => {
       // When
       await getDemarchesQueryHandler.authorize(query, utilisateur)
       // Then
-      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         query.idJeune,
         utilisateur,
         Core.structuresPoleEmploiBRSA

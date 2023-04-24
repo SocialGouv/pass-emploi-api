@@ -39,7 +39,7 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
     query: GetRendezVousJeunePoleEmploiQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorize(
+    return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
       Core.structuresPoleEmploiBRSA

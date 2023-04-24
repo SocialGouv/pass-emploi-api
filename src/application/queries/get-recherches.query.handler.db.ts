@@ -5,7 +5,7 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { RechercheSqlModel } from '../../infrastructure/sequelize/models/recherche.sql-model'
-import { ConseillerAgenceAuthorizer } from '../authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from '../authorizers/conseiller-inter-agence-authorizer'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { fromSqlToRechercheQueryModel } from './query-mappers/recherche.mapper'
 import { RechercheQueryModel } from './query-models/recherches.query-model'
@@ -22,7 +22,7 @@ export class GetRecherchesQueryHandler extends QueryHandler<
 > {
   constructor(
     private jeuneAuthorizer: JeuneAuthorizer,
-    private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer
+    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer
   ) {
     super('GetRecherchesQueryHandler')
   }
@@ -49,12 +49,12 @@ export class GetRecherchesQueryHandler extends QueryHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      return this.conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgenceAvecPartageFavoris(
+      return this.conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMiloAvecPartageFavoris(
         query.idJeune,
         utilisateur
       )
     }
-    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.autoriserLeJeune(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

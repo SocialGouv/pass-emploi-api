@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { RendezVousAuthorizer } from 'src/application/authorizers/authorize-rendezvous'
+import { RendezVousAuthorizer } from 'src/application/authorizers/rendezvous-authorizer'
 import {
   UpdateRendezVousCommand,
   UpdateRendezVousCommandHandler
@@ -383,7 +383,7 @@ describe('UpdateRendezVousCommandHandler', () => {
 
       // Then
       expect(
-        rendezVousAuthorizer.authorizeConseiller
+        rendezVousAuthorizer.autoriserConseillerPourUnRendezVousAvecAuMoinsUnJeune
       ).to.have.been.calledWithExactly(command.idRendezVous, utilisateur)
     })
   })

@@ -1,4 +1,3 @@
-import { ConseillerAgenceAuthorizer } from 'src/application/authorizers/authorize-conseiller-agence'
 import { Core } from 'src/domain/core'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import {
@@ -23,11 +22,12 @@ import {
   getDatabase
 } from '../../../utils/database-for-testing'
 import { DateService } from '../../../../src/utils/date-service'
+import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 
 describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
   let getMetadonneesFavorisJeuneQueryHandler: GetMetadonneesFavorisJeuneQueryHandler
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
   let dateService: StubbedClass<DateService>
 
   let recherchesSauvegardeesRepository: RechercheSqlRepository
@@ -40,7 +40,7 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
     recherchesSauvegardeesRepository = new RechercheSqlRepository(
       databaseForTesting.sequelize
     )
-    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
     dateService = stubClass(DateService)
     dateService.nowJs.returns(new Date('2023-04-17T12:00:00Z'))
 
@@ -325,7 +325,7 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
 
         // Then
         expect(
-          conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence
+          conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo
         ).to.have.been.calledWithExactly('id-jeune', utilisateur)
       })
     })

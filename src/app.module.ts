@@ -4,17 +4,15 @@ import { Module, ModuleMetadata, Provider } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { APP_GUARD } from '@nestjs/core'
 import { TerminusModule } from '@nestjs/terminus'
-import { ActionAuthorizer } from './application/authorizers/authorize-action'
-import { ConseillerAuthorizer } from './application/authorizers/authorize-conseiller'
-import { ConseillerForJeuneAuthorizer } from './application/authorizers/authorize-conseiller-for-jeune'
-import { AuthorizeConseillerForJeunes } from './application/authorizers/authorize-conseiller-for-jeunes'
-import { FavoriOffresEmploiAuthorizer } from './application/authorizers/authorize-favori-offres-emploi'
-import { FavoriOffreServiceCiviqueAuthorizer } from './application/authorizers/authorize-favori-offres-engagement'
-import { FavoriOffresImmersionAuthorizer } from './application/authorizers/authorize-favori-offres-immersion'
+import { ActionAuthorizer } from './application/authorizers/action-authorizer'
+import { ConseillerAuthorizer } from './application/authorizers/conseiller-authorizer'
+import { FavoriOffresEmploiAuthorizer } from './application/authorizers/favori-offres-emploi-authorizer'
+import { FavoriOffreServiceCiviqueAuthorizer } from './application/authorizers/favori-offres-engagement-authorizer'
+import { FavoriOffresImmersionAuthorizer } from './application/authorizers/favori-offres-immersion-authorizer'
 import { JeuneAuthorizer } from './application/authorizers/jeune-authorizer'
-import { RechercheAuthorizer } from './application/authorizers/authorize-recherche'
-import { RendezVousAuthorizer } from './application/authorizers/authorize-rendezvous'
-import { SupportAuthorizer } from './application/authorizers/authorize-support'
+import { RechercheAuthorizer } from './application/authorizers/recherche-authorizer'
+import { RendezVousAuthorizer } from './application/authorizers/rendezvous-authorizer'
+import { SupportAuthorizer } from './application/authorizers/support-authorizer'
 import { AddFavoriOffreEmploiCommandHandler } from './application/commands/add-favori-offre-emploi.command.handler'
 import { AddFavoriOffreServiceCiviqueCommandHandler } from './application/commands/add-favori-offre-service-civique-command-handler'
 import { AddFavoriOffreImmersionCommandHandler } from './application/commands/add-favori-offre-immersion.command.handler'
@@ -214,7 +212,7 @@ import { RechercherTypesDemarcheQueryHandler } from './application/queries/reche
 import { FilesController } from './infrastructure/routes/fichiers.controller'
 import { TelechargerFichierQueryHandler } from './application/queries/telecharger-fichier.query.handler'
 import { SupprimerFichierCommandHandler } from './application/commands/supprimer-fichier.command.handler'
-import { FichierTelechargementAuthorizer } from './application/authorizers/authorize-fichier-telechargement'
+import { FichierAuthorizer } from './application/authorizers/fichier-authorizer'
 import { FindAllOffresEmploiQueryGetter } from './application/queries/query-getters/find-all-offres-emploi.query.getter'
 import { FindAllOffresImmersionQueryGetter } from './application/queries/query-getters/find-all-offres-immersion.query.getter'
 import { FindAllOffresServicesCiviqueQueryGetter } from './application/queries/query-getters/find-all-offres-services-civique.query.getter'
@@ -232,7 +230,6 @@ import { GetFavorisJeuneQueryHandler } from './application/queries/favoris/get-f
 import { GetMetadonneesFavorisJeuneQueryHandler } from './application/queries/favoris/get-metadonnees-favoris-jeune.query.handler.db'
 import { HandleJobRappelActionCommandHandler } from './application/commands/jobs/handle-job-rappel-action.command'
 import { AddCommentaireActionCommandHandler } from './application/commands/action/add-commentaire-action.command.handler'
-import { FichierSuppressionAuthorizer } from './application/authorizers/authorize-fichier-suppression'
 import { ModifierJeuneDuConseillerCommandHandler } from './application/commands/modifier-jeune-du-conseiller.command.handler'
 import { CommentaireActionSqlRepositoryDb } from './infrastructure/repositories/action/commentaire-action-sql.repository.db'
 import { GetCommentairesActionQueryHandler } from './application/queries/action/get-commentaires-action.query.handler.db'
@@ -261,7 +258,7 @@ import { GetSuggestionsQueryHandler } from './application/queries/get-suggestion
 import { SuggestionPoleEmploiService } from './domain/offre/recherche/suggestion/pole-emploi.service'
 import { RefuserSuggestionCommandHandler } from './application/commands/refuser-suggestion.command.handler'
 import { CreateRechercheFromSuggestionCommandHandler } from './application/commands/create-recherche-from-suggestion.command.handler'
-import { SuggestionAuthorizer } from './application/authorizers/authorize-suggestion'
+import { SuggestionAuthorizer } from './application/authorizers/suggestion-authorizer'
 import { GetMetiersRomeQueryHandler } from './application/queries/get-metiers-rome.query.handler.db'
 import { CreateSuggestionConseillerOffreEmploiCommandHandler } from './application/commands/create-suggestion-conseiller-offre-emploi.command.handler'
 import { CreateSuggestionConseillerServiceCiviqueCommandHandler } from './application/commands/create-suggestion-conseiller-service-civique.command.handler'
@@ -269,7 +266,7 @@ import { CreateSuggestionConseillerImmersionCommandHandler } from './application
 import { ReferentielsControllerV2 } from './infrastructure/routes/v2/referentiels.controller.v2'
 import { EtablissementsController } from './infrastructure/routes/etablissements.controller'
 import { EtablissementsControllerV2 } from './infrastructure/routes/v2/etablissements.controller.v2'
-import { ConseillerAgenceAuthorizer } from './application/authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from './application/authorizers/conseiller-inter-agence-authorizer'
 import { AnimationCollectiveSqlRepository } from './infrastructure/repositories/rendez-vous/animation-collective-sql.repository.db'
 import { HistoriqueRendezVousRepositorySql } from './infrastructure/repositories/rendez-vous/historique-rendez-vous.repository.db'
 import { CloturerAnimationCollectiveCommandHandler } from './application/commands/cloturer-animation-collective.command.handler'
@@ -284,8 +281,7 @@ import { ListeDeDiffusionSqlRepository } from './infrastructure/repositories/con
 import { ListeDeDiffusionRepositoryToken } from './domain/conseiller/liste-de-diffusion'
 import { GetListesDeDiffusionDuConseillerQueryHandler } from './application/queries/get-listes-de-diffusion-du-conseiller.query.handler.db'
 import { ListesDeDiffusionController } from './infrastructure/routes/listes-de-diffusion.controller'
-import { AuthorizeConseillerForJeunesTransferesTemporairement } from './application/authorizers/authorize-conseiller-for-jeunes-transferes'
-import { AuthorizeListeDeDiffusion } from './application/authorizers/authorize-liste-de-diffusion'
+import { ListeDeDiffusionAuthorizer } from './application/authorizers/liste-de-diffusion-authorizer'
 import { UpdateListeDeDiffusionCommandHandler } from './application/commands/update-liste-de-diffusion.command.handler'
 import { GetDetailListeDeDiffusionQueryHandler } from './application/queries/get-detail-liste-de-diffusion.query.handler.db'
 import { HandleJobAgenceAnimationCollectiveCommandHandler } from './application/commands/jobs/handle-job-agence-animation-collective.command.db'
@@ -571,15 +567,12 @@ export function buildQueryCommandsProviders(): Provider[] {
     FavoriOffresImmersionAuthorizer,
     JeuneAuthorizer,
     RechercheAuthorizer,
-    ConseillerForJeuneAuthorizer,
     RendezVousAuthorizer,
     SupportAuthorizer,
     SuggestionAuthorizer,
-    AuthorizeConseillerForJeunes,
-    AuthorizeConseillerForJeunesTransferesTemporairement,
     FavoriOffreServiceCiviqueAuthorizer,
-    ConseillerAgenceAuthorizer,
-    AuthorizeListeDeDiffusion,
+    ConseillerInterAgenceAuthorizer,
+    ListeDeDiffusionAuthorizer,
     GetDetailActionQueryHandler,
     GetDetailJeuneQueryHandler,
     GetJeunesEtablissementV2QueryHandler,
@@ -653,12 +646,11 @@ export function buildQueryCommandsProviders(): Provider[] {
     TeleverserFichierCommandHandler,
     TelechargerFichierQueryHandler,
     SupprimerFichierCommandHandler,
-    FichierTelechargementAuthorizer,
+    FichierAuthorizer,
     FindAllOffresEmploiQueryGetter,
     FindAllOffresImmersionQueryGetter,
     FindAllOffresServicesCiviqueQueryGetter,
     RecupererJeunesDuConseillerCommandHandler,
-    FichierSuppressionAuthorizer,
     ArchiverJeuneCommandHandler,
     GetMotifsSuppressionJeuneQueryHandler,
     PlanifierExecutionCronCommandHandler,

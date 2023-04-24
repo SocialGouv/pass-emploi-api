@@ -134,7 +134,7 @@ describe('UpdateDemarcheCommandHandler', () => {
       await updateDemarcheCommandHandler.authorize(command, utilisateur)
 
       // Then
-      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         command.idJeune,
         utilisateur,
         Core.structuresPoleEmploiBRSA

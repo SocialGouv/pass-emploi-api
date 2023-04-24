@@ -105,7 +105,7 @@ describe('CreateEvaluationCommandHandler', () => {
       )
 
       // Then
-      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         command.idJeune,
         unUtilisateurJeune()
       )

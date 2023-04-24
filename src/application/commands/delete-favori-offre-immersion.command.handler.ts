@@ -10,7 +10,7 @@ import {
 import { Authentification } from '../../domain/authentification'
 import { FavorisOffresImmersionRepositoryToken } from '../../domain/offre/favori/offre-immersion'
 import { Offre } from '../../domain/offre/offre'
-import { FavoriOffresImmersionAuthorizer } from '../authorizers/authorize-favori-offres-immersion'
+import { FavoriOffresImmersionAuthorizer } from '../authorizers/favori-offres-immersion-authorizer'
 
 export interface DeleteFavoriOffreImmersionCommand extends Command {
   idOffreImmersion: string
@@ -53,7 +53,7 @@ export class DeleteFavoriOffreImmersionCommandHandler extends CommandHandler<
     command: DeleteFavoriOffreImmersionCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.favoriOffresImmersionAuthorizer.authorize(
+    return this.favoriOffresImmersionAuthorizer.autoriserLeJeunePourSonOffre(
       command.idJeune,
       command.idOffreImmersion,
       utilisateur

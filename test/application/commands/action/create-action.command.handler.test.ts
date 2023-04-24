@@ -4,7 +4,7 @@ import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { PlanificateurService } from 'src/domain/planificateur'
 import { stubClassSandbox } from 'test/utils/types'
-import { ConseillerAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../../../src/application/authorizers/conseiller-authorizer'
 import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import {
   CreateActionCommand,
@@ -214,7 +214,7 @@ describe('CreateActionCommandHandler', () => {
         await createActionCommandHandler.authorize(command, utilisateur)
 
         // Then
-        expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+        expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
           action.idJeune,
           utilisateur
         )
@@ -240,10 +240,12 @@ describe('CreateActionCommandHandler', () => {
         await createActionCommandHandler.authorize(command, utilisateur)
 
         // Then
-        expect(conseillerAuthorizer.authorize).to.have.been.calledWithExactly(
+        expect(
+          conseillerAuthorizer.autoriserLeConseillerPourSonJeune
+        ).to.have.been.calledWithExactly(
           command.idCreateur,
-          utilisateur,
-          action.idJeune
+          command.idJeune,
+          utilisateur
         )
       })
     })

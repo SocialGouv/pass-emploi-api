@@ -9,17 +9,17 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { ListeDeDiffusion } from '../../../src/domain/conseiller/liste-de-diffusion'
 import { uneListeDeDiffusion } from '../../fixtures/liste-de-diffusion.fixture'
-import { AuthorizeListeDeDiffusion } from '../../../src/application/authorizers/authorize-liste-de-diffusion'
+import { ListeDeDiffusionAuthorizer } from '../../../src/application/authorizers/liste-de-diffusion-authorizer'
 
-describe('AuthorizeListeDeDiffusion', () => {
+describe('autoriserConseillerPourSaListeDeDiffusion', () => {
   let listeDeDiffusionRepository: StubbedType<ListeDeDiffusion.Repository>
-  let conseillerAuthorizer: AuthorizeListeDeDiffusion
+  let conseillerAuthorizer: ListeDeDiffusionAuthorizer
 
   beforeEach(() => {
     const sandbox = createSandbox()
     listeDeDiffusionRepository = stubInterface(sandbox)
 
-    conseillerAuthorizer = new AuthorizeListeDeDiffusion(
+    conseillerAuthorizer = new ListeDeDiffusionAuthorizer(
       listeDeDiffusionRepository
     )
   })
@@ -27,10 +27,11 @@ describe('AuthorizeListeDeDiffusion', () => {
   describe("quand ce n'est pas un conseiller", () => {
     it('retourne une failure', async () => {
       // When
-      const result = await conseillerAuthorizer.authorize(
-        '1',
-        unUtilisateurJeune()
-      )
+      const result =
+        await conseillerAuthorizer.autoriserConseillerPourSaListeDeDiffusion(
+          '1',
+          unUtilisateurJeune()
+        )
 
       // Then
       expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
@@ -46,7 +47,11 @@ describe('AuthorizeListeDeDiffusion', () => {
         .resolves(uneListeDeDiffusion({ idConseiller: 'unAutreConseiller' }))
 
       // When
-      const result = await conseillerAuthorizer.authorize('1', utilisateur)
+      const result =
+        await conseillerAuthorizer.autoriserConseillerPourSaListeDeDiffusion(
+          '1',
+          utilisateur
+        )
 
       // Then
       expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
@@ -60,7 +65,11 @@ describe('AuthorizeListeDeDiffusion', () => {
       listeDeDiffusionRepository.get.withArgs('1').resolves(undefined)
 
       // When
-      const result = await conseillerAuthorizer.authorize('1', utilisateur)
+      const result =
+        await conseillerAuthorizer.autoriserConseillerPourSaListeDeDiffusion(
+          '1',
+          utilisateur
+        )
 
       // Then
       expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
@@ -76,7 +85,11 @@ describe('AuthorizeListeDeDiffusion', () => {
         .resolves(uneListeDeDiffusion({ idConseiller: utilisateur.id }))
 
       // When
-      const result = await conseillerAuthorizer.authorize('1', utilisateur)
+      const result =
+        await conseillerAuthorizer.autoriserConseillerPourSaListeDeDiffusion(
+          '1',
+          utilisateur
+        )
 
       // Then
       expect(result).to.deep.equal(emptySuccess())

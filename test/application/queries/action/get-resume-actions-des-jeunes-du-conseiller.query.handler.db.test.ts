@@ -1,5 +1,5 @@
 import { SinonSandbox } from 'sinon'
-import { ConseillerAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../../../src/application/authorizers/conseiller-authorizer'
 import {
   GetResumeActionsDesJeunesDuConseillerQuery,
   GetResumeActionsDesJeunesDuConseillerQueryHandlerDb
@@ -119,10 +119,9 @@ describe('GetResumeActionsDesJeunesDuConseillerQueryHandler', () => {
       )
 
       // Then
-      expect(conseillerAuthorizer.authorize).to.have.been.calledWithExactly(
-        utilisateur.id,
-        utilisateur
-      )
+      expect(
+        conseillerAuthorizer.autoriserLeConseiller
+      ).to.have.been.calledWithExactly(utilisateur.id, utilisateur)
     })
   })
 })

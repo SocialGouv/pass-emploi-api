@@ -51,7 +51,9 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
       )
 
       // Then
-      expect(jeuneAuthorizer.authorize).to.have.been.calledOnceWithExactly(
+      expect(
+        jeuneAuthorizer.autoriserLeJeune
+      ).to.have.been.calledOnceWithExactly(
         'idJeune',
         unUtilisateurJeune(),
         Core.structuresPoleEmploiBRSA

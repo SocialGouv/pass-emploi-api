@@ -17,10 +17,10 @@ import {
   Conseiller,
   ConseillersRepositoryToken
 } from '../../domain/conseiller/conseiller'
-import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
-import { SupportAuthorizer } from '../authorizers/authorize-support'
+import { SupportAuthorizer } from '../authorizers/support-authorizer'
 
 export interface TransfererJeunesConseillerCommand extends Command {
   idConseillerSource: string
@@ -148,9 +148,11 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
   ): Promise<Result> {
     switch (command.provenanceUtilisateur) {
       case Authentification.Type.CONSEILLER:
-        return this.conseillerAuthorizer.authorizeSuperviseur(utilisateur)
+        return this.conseillerAuthorizer.autoriserConseillerSuperviseur(
+          utilisateur
+        )
       case Authentification.Type.SUPPORT:
-        return this.supportAuthorizer.authorize(utilisateur)
+        return this.supportAuthorizer.autoriserSupport(utilisateur)
     }
   }
 

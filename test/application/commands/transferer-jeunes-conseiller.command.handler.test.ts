@@ -5,7 +5,7 @@ import { Core } from 'src/domain/core'
 import { Jeune } from 'src/domain/jeune/jeune'
 import { RendezVous } from 'src/domain/rendez-vous/rendez-vous'
 import { unJeune } from 'test/fixtures/jeune.fixture'
-import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import {
   TransfererJeunesConseillerCommand,
   TransfererJeunesConseillerCommandHandler
@@ -22,7 +22,7 @@ import {
 import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { SupportAuthorizer } from '../../../src/application/authorizers/authorize-support'
+import { SupportAuthorizer } from '../../../src/application/authorizers/support-authorizer'
 import { Authentification } from '../../../src/domain/authentification'
 import Structure = Core.Structure
 

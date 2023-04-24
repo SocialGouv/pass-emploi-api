@@ -1,4 +1,4 @@
-import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import { ListeDeDiffusionQueryModel } from '../../../src/application/queries/query-models/liste-de-diffusion.query-model'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { GetListesDeDiffusionDuConseillerQueryHandler } from '../../../src/application/queries/get-listes-de-diffusion-du-conseiller.query.handler.db'
@@ -122,7 +122,9 @@ describe('GetListesDeDiffusionDuConseillerQueryHandler', () => {
       )
 
       // Then
-      expect(conseillerAuthorizer.authorize).to.have.been.calledOnceWithExactly(
+      expect(
+        conseillerAuthorizer.autoriserLeConseiller
+      ).to.have.been.calledOnceWithExactly(
         idConseiller,
         unUtilisateurConseiller({ id: idConseiller })
       )

@@ -7,7 +7,7 @@ import { Authentification } from '../../domain/authentification'
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { TransfertConseillerSqlModel } from '../../infrastructure/sequelize/models/transfert-conseiller.sql-model'
-import { ConseillerAgenceAuthorizer } from '../authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from '../authorizers/conseiller-inter-agence-authorizer'
 import { HistoriqueConseillerJeuneQueryModel } from './query-models/jeunes.query-model'
 
 export interface GetConseillersJeuneQuery extends Query {
@@ -19,7 +19,9 @@ export class GetConseillersJeuneQueryHandler extends QueryHandler<
   GetConseillersJeuneQuery,
   Result<HistoriqueConseillerJeuneQueryModel[]>
 > {
-  constructor(private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer) {
+  constructor(
+    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer
+  ) {
     super('GetConseillersJeuneQueryHandler')
   }
 
@@ -106,7 +108,7 @@ export class GetConseillersJeuneQueryHandler extends QueryHandler<
     query: GetConseillersJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence(
+    return this.conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo(
       query.idJeune,
       utilisateur
     )

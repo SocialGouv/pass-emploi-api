@@ -64,7 +64,7 @@ export class CreateRechercheCommandHandler extends CommandHandler<
     command: CreateRechercheCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
+    return this.jeuneAuthorizer.autoriserLeJeune(command.idJeune, utilisateur)
   }
 
   async monitor(

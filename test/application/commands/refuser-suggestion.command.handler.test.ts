@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { SuggestionAuthorizer } from 'src/application/authorizers/authorize-suggestion'
+import { SuggestionAuthorizer } from 'src/application/authorizers/suggestion-authorizer'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import {
   RefuserSuggestionCommand,
@@ -51,9 +51,11 @@ describe('RefuserSuggestionCommandHandler', () => {
       await refuserSuggestionCommandHandler.authorize(command, utilisateur)
 
       // Then
-      expect(suggestionAuthorizer.authorize).to.have.been.calledWithExactly(
-        command.idSuggestion,
+      expect(
+        suggestionAuthorizer.autoriserJeunePourSaSuggestion
+      ).to.have.been.calledWithExactly(
         command.idJeune,
+        command.idSuggestion,
         utilisateur
       )
     })

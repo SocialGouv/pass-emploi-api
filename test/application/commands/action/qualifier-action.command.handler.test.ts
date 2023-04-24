@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { ActionAuthorizer } from '../../../../src/application/authorizers/authorize-action'
+import { ActionAuthorizer } from '../../../../src/application/authorizers/action-authorizer'
 import {
   QualifierActionCommand,
   QualifierActionCommandHandler
@@ -245,10 +245,9 @@ describe('QualifierActionCommandHandler', () => {
       await qualifierActionCommandHandler.authorize(command, utilisateur)
 
       // Then
-      expect(actionAuthorizer.authorize).to.have.been.calledWithExactly(
-        command.idAction,
-        utilisateur
-      )
+      expect(
+        actionAuthorizer.autoriserPourUneAction
+      ).to.have.been.calledWithExactly(command.idAction, utilisateur)
     })
     it('rejette un jeune', async () => {
       // Given
@@ -268,7 +267,7 @@ describe('QualifierActionCommandHandler', () => {
       )
 
       // Then
-      expect(actionAuthorizer.authorize).not.to.have.been.called()
+      expect(actionAuthorizer.autoriserPourUneAction).not.to.have.been.called()
       expect(result._isSuccess).to.be.false()
     })
   })

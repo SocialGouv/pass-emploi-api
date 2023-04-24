@@ -18,7 +18,7 @@ import { uneActionQueryModelSansJeune } from 'test/fixtures/query-models/action.
 import { uneActionDto } from 'test/fixtures/sql-models/action.sql-model'
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
-import { ConseillerAgenceAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from '../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { ActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
 import { RendezVousJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
@@ -41,7 +41,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
   const utilisateurJeune = unUtilisateurJeune()
   let handler: GetJeuneHomeAgendaQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
   const aujourdhuiDimanche = '2022-08-14T12:00:00Z'
   const demain = new Date('2022-08-15T12:00:00Z')
   const apresDemain = new Date('2022-08-16T12:00:00Z')
@@ -50,7 +50,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
   beforeEach(async () => {
     await getDatabase().cleanPG()
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
-    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
     handler = new GetJeuneHomeAgendaQueryHandler(
       jeuneAuthorizer,
       conseillerAgenceAuthorizer,
@@ -223,7 +223,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
       it('appelle l’authorizer idoine', async () => {
         // Given
         const jeune = unJeune()
-        jeuneAuthorizer.authorize
+        jeuneAuthorizer.autoriserLeJeune
           .withArgs(jeune.id, unUtilisateurJeune({ id: jeune.id }))
           .resolves(emptySuccess())
 
@@ -252,7 +252,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
 
         // Then
         expect(
-          conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence
+          conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo
         ).to.have.been.calledWithExactly(jeune.id, utilisateur)
       })
     })

@@ -2,8 +2,7 @@ import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { AuthorizeConseillerForJeunesTransferesTemporairement } from '../../../src/application/authorizers/authorize-conseiller-for-jeunes-transferes'
-import { AuthorizeListeDeDiffusion } from '../../../src/application/authorizers/authorize-liste-de-diffusion'
+import { ListeDeDiffusionAuthorizer } from '../../../src/application/authorizers/liste-de-diffusion-authorizer'
 import {
   UpdateListeDeDiffusionCommand,
   UpdateListeDeDiffusionCommandHandler
@@ -21,22 +20,21 @@ import {
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { uneListeDeDiffusion } from '../../fixtures/liste-de-diffusion.fixture'
 import ListeDeDiffusion = Conseiller.ListeDeDiffusion
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 
 describe('UpdateListeDeDiffusionCommandHandler', () => {
   let listeDeDiffusionRepository: StubbedType<Conseiller.ListeDeDiffusion.Repository>
   let listeDeDiffusionService: StubbedClass<Conseiller.ListeDeDiffusion.Service>
-  let authorizerJeunes: StubbedClass<AuthorizeConseillerForJeunesTransferesTemporairement>
-  let authorizerListe: StubbedClass<AuthorizeListeDeDiffusion>
+  let authorizerJeunes: StubbedClass<ConseillerAuthorizer>
+  let authorizerListe: StubbedClass<ListeDeDiffusionAuthorizer>
   let evenementService: StubbedClass<EvenementService>
   let handler: UpdateListeDeDiffusionCommandHandler
 
   beforeEach(() => {
     listeDeDiffusionRepository = stubInterface(createSandbox())
     listeDeDiffusionService = stubClass(Conseiller.ListeDeDiffusion.Service)
-    authorizerJeunes = stubClass(
-      AuthorizeConseillerForJeunesTransferesTemporairement
-    )
-    authorizerListe = stubClass(AuthorizeListeDeDiffusion)
+    authorizerJeunes = stubClass(ConseillerAuthorizer)
+    authorizerListe = stubClass(ListeDeDiffusionAuthorizer)
     evenementService = stubClass(EvenementService)
     handler = new UpdateListeDeDiffusionCommandHandler(
       authorizerJeunes,
@@ -109,10 +107,10 @@ describe('UpdateListeDeDiffusionCommandHandler', () => {
         idsBeneficiaires: ['1']
       }
       const utilisateur = unUtilisateurConseiller()
-      authorizerJeunes.authorize
+      authorizerJeunes.autoriserConseillerPourSesJeunesTransferes
         .withArgs(command.idsBeneficiaires, utilisateur)
         .resolves(emptySuccess())
-      authorizerListe.authorize
+      authorizerListe.autoriserConseillerPourSaListeDeDiffusion
         .withArgs(command.id, utilisateur)
         .resolves(emptySuccess())
 

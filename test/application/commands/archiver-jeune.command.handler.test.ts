@@ -1,21 +1,21 @@
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { createSandbox } from 'sinon'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import {
   ArchiverJeuneCommand,
   ArchiverJeuneCommandHandler
 } from '../../../src/application/commands/archiver-jeune.command.handler'
-import { Jeune } from '../../../src/domain/jeune/jeune'
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { ArchiveJeune } from '../../../src/domain/archive-jeune'
-import { Chat } from '../../../src/domain/chat'
 import { Authentification } from '../../../src/domain/authentification'
+import { Chat } from '../../../src/domain/chat'
+import { Core } from '../../../src/domain/core'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
-import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
+import { Jeune } from '../../../src/domain/jeune/jeune'
+import { Mail } from '../../../src/domain/mail'
 import { DateService } from '../../../src/utils/date-service'
-import { createSandbox } from 'sinon'
-import { expect, StubbedClass, stubClass } from '../../utils'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { Mail } from '../../../src/domain/mail'
-import { Core } from '../../../src/domain/core'
+import { StubbedClass, expect, stubClass } from '../../utils'
 import Structure = Core.Structure
 
 describe('ArchiverJeuneCommandHandler', () => {
@@ -25,7 +25,7 @@ describe('ArchiverJeuneCommandHandler', () => {
   let chatRepository: StubbedType<Chat.Repository>
   let authentificationRepository: StubbedType<Authentification.Repository>
   let evenementService: StubbedClass<EvenementService>
-  let authorizeConseillerForJeune: StubbedClass<ConseillerForJeuneAuthorizer>
+  let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let dateService: StubbedClass<DateService>
   let mailService: StubbedType<Mail.Service>
 
@@ -38,7 +38,7 @@ describe('ArchiverJeuneCommandHandler', () => {
     chatRepository = stubInterface(sandbox)
     authentificationRepository = stubInterface(sandbox)
     evenementService = stubClass(EvenementService)
-    authorizeConseillerForJeune = stubClass(ConseillerForJeuneAuthorizer)
+    conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     dateService = stubClass(DateService)
     dateService.nowJs.returns(maintenant)
     mailService = stubInterface(sandbox)
@@ -48,7 +48,7 @@ describe('ArchiverJeuneCommandHandler', () => {
       chatRepository,
       authentificationRepository,
       evenementService,
-      authorizeConseillerForJeune,
+      conseillerAuthorizer,
       dateService,
       mailService
     )
@@ -66,7 +66,7 @@ describe('ArchiverJeuneCommandHandler', () => {
 
       // Then
       expect(
-        authorizeConseillerForJeune.authorize
+        conseillerAuthorizer.autoriserConseillerPourSonJeune
       ).to.have.been.calledWithExactly('idJeune', unUtilisateurConseiller())
     })
   })

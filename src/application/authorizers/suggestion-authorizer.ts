@@ -1,38 +1,37 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
 import {
+  Result,
   emptySuccess,
-  failure,
-  Result
+  failure
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { FavorisOffresImmersionRepositoryToken } from '../../domain/offre/favori/offre-immersion'
-import { Offre } from '../../domain/offre/offre'
+import {
+  Suggestion,
+  SuggestionsRepositoryToken
+} from '../../domain/offre/recherche/suggestion/suggestion'
 
 @Injectable()
-export class FavoriOffresImmersionAuthorizer {
+export class SuggestionAuthorizer {
   constructor(
-    @Inject(FavorisOffresImmersionRepositoryToken)
-    private offresImmersionRepository: Offre.Favori.Immersion.Repository
+    @Inject(SuggestionsRepositoryToken)
+    private suggestionRepository: Suggestion.Repository
   ) {}
 
-  async authorize(
+  async autoriserJeunePourSaSuggestion(
     idJeune: string,
-    idOffreImmersion: string,
+    idSuggestion: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    const favori = await this.offresImmersionRepository.get(
-      idJeune,
-      idOffreImmersion
-    )
-
     if (
-      favori &&
-      utilisateur &&
       utilisateur.type === Authentification.Type.JEUNE &&
       utilisateur.id === idJeune
     ) {
-      return emptySuccess()
+      const suggestion = await this.suggestionRepository.get(idSuggestion)
+
+      if (suggestion && suggestion.idJeune === idJeune) {
+        return emptySuccess()
+      }
     }
 
     return failure(new DroitsInsuffisants())

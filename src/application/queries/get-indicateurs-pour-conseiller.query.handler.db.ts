@@ -11,7 +11,7 @@ import { EvenementEngagementHebdoSqlModel } from '../../infrastructure/sequelize
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { DateService } from '../../utils/date-service'
-import { ConseillerAgenceAuthorizer } from '../authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from '../authorizers/conseiller-inter-agence-authorizer'
 import { IndicateursPourConseillerQueryModel } from './query-models/indicateurs-pour-conseiller.query-model'
 
 export interface GetIndicateursPourConseillerQuery extends Query {
@@ -33,7 +33,7 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
 > {
   constructor(
     private dateService: DateService,
-    private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer
+    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer
   ) {
     super('GetIndicateursPourConseillerQueryHandler')
   }
@@ -42,7 +42,7 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
     query: GetIndicateursPourConseillerQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence(
+    return this.conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo(
       query.idJeune,
       utilisateur
     )

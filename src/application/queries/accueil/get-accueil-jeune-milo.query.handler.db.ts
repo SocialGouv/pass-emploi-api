@@ -112,7 +112,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     query: GetAccueilJeuneMiloQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorize(
+    return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
       Core.structuresMiloPassEmploi

@@ -1,19 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { CommandHandler } from '../../building-blocks/types/command-handler'
-import {
-  emptySuccess,
-  failure,
-  Result
-} from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
 import { Command } from '../../building-blocks/types/command'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
-import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
-import { Core } from '../../domain/core'
+import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
   DroitsInsuffisants,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
+import {
+  Result,
+  emptySuccess,
+  failure
+} from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { Core } from '../../domain/core'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 
 export interface ModifierJeuneDuConseillerCommand extends Command {
   idPartenaire: string
@@ -28,7 +28,7 @@ export class ModifierJeuneDuConseillerCommandHandler extends CommandHandler<
   constructor(
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
-    private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer
+    private conseillerAuthorizer: ConseillerAuthorizer
   ) {
     super('ModifierJeuneDuConseillerCommandHandler')
   }
@@ -60,7 +60,7 @@ export class ModifierJeuneDuConseillerCommandHandler extends CommandHandler<
     ) {
       return failure(new DroitsInsuffisants())
     }
-    return this.conseillerForJeuneAuthorizer.authorize(
+    return this.conseillerAuthorizer.autoriserConseillerPourSonJeune(
       command.idJeune,
       utilisateur
     )

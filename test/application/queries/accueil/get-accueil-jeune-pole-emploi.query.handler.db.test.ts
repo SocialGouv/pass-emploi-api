@@ -262,7 +262,7 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
       )
 
       // Then
-      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         query.idJeune,
         unUtilisateurJeune({ structure: Structure.POLE_EMPLOI }),
         Core.structuresPoleEmploiBRSA

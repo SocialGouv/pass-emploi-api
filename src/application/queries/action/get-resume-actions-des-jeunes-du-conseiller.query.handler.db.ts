@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Authentification } from '../../../domain/authentification'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
-import { ConseillerAuthorizer } from '../../authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { ResumeActionsDuJeuneQueryModel } from '../query-models/jeunes.query-model'
 import { QueryTypes, Sequelize } from 'sequelize'
 import { ResumeActionsJeuneDto } from '../../../infrastructure/repositories/jeune/jeune-sql.repository.db'
@@ -55,7 +55,10 @@ export class GetResumeActionsDesJeunesDuConseillerQueryHandlerDb extends QueryHa
     query: GetResumeActionsDesJeunesDuConseillerQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAuthorizer.authorize(query.idConseiller, utilisateur)
+    return this.conseillerAuthorizer.autoriserLeConseiller(
+      query.idConseiller,
+      utilisateur
+    )
   }
 
   async monitor(): Promise<void> {

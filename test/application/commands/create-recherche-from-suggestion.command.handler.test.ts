@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { SuggestionAuthorizer } from 'src/application/authorizers/authorize-suggestion'
+import { SuggestionAuthorizer } from 'src/application/authorizers/suggestion-authorizer'
 import { IdService } from 'src/utils/id-service'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { uneRecherche } from 'test/fixtures/recherche.fixture'
@@ -71,9 +71,11 @@ describe('CreateRechercheFromSuggestionCommandHandler', () => {
       )
 
       // Then
-      expect(suggestionAuthorizer.authorize).to.have.been.calledWithExactly(
-        command.idSuggestion,
+      expect(
+        suggestionAuthorizer.autoriserJeunePourSaSuggestion
+      ).to.have.been.calledWithExactly(
         command.idJeune,
+        command.idSuggestion,
         utilisateur
       )
     })

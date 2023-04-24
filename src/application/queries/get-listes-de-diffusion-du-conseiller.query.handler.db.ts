@@ -5,7 +5,7 @@ import { Authentification } from '../../domain/authentification'
 import { fromSqlToListeDeDiffusionQueryModel } from '../../infrastructure/repositories/mappers/conseillers.mappers'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { ListeDeDiffusionSqlModel } from '../../infrastructure/sequelize/models/liste-de-diffusion.sql-model'
-import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { ListeDeDiffusionQueryModel } from './query-models/liste-de-diffusion.query-model'
 import { Injectable } from '@nestjs/common'
 
@@ -26,7 +26,10 @@ export class GetListesDeDiffusionDuConseillerQueryHandler extends QueryHandler<
     query: GetListesDeDiffusionDuConseillerQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.authorizer.authorize(query.idConseiller, utilisateur)
+    return this.authorizer.autoriserLeConseiller(
+      query.idConseiller,
+      utilisateur
+    )
   }
 
   async handle({

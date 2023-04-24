@@ -10,7 +10,7 @@ import {
   failure
 } from '../../../src/building-blocks/types/result'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { RechercheAuthorizer } from '../../../src/application/authorizers/authorize-recherche'
+import { RechercheAuthorizer } from '../../../src/application/authorizers/recherche-authorizer'
 import { Recherche } from '../../../src/domain/offre/recherche/recherche'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
 import {
@@ -104,7 +104,9 @@ describe('DeleteRechercheCommandHandler', () => {
       await deleteRechercheCommandHandler.authorize(command, utilisateur)
 
       // Then
-      expect(rechercheAuthorizer.authorize).to.have.been.calledWithExactly(
+      expect(
+        rechercheAuthorizer.autoriserLeJeunePourSaRecherche
+      ).to.have.been.calledWithExactly(
         command.idJeune,
         command.idRecherche,
         utilisateur

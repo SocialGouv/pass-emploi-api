@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { createSandbox } from 'sinon'
-import { SupportAuthorizer } from '../../../../src/application/authorizers/authorize-support'
+import { SupportAuthorizer } from '../../../../src/application/authorizers/support-authorizer'
 import {
   ChangementAgenceQueryModel,
   UpdateAgenceConseillerCommand,
@@ -381,7 +381,7 @@ describe('UpdateAgenceConseillerCommandHandler', () => {
   describe('authorize', () => {
     it('autorise le support', async () => {
       // Given
-      authorizeSupport.authorize
+      authorizeSupport.autoriserSupport
         .withArgs(unUtilisateurSupport())
         .resolves(emptySuccess())
       // When
@@ -395,7 +395,7 @@ describe('UpdateAgenceConseillerCommandHandler', () => {
     })
     it('rejette les autres', async () => {
       // Given
-      authorizeSupport.authorize
+      authorizeSupport.autoriserSupport
         .withArgs(unUtilisateurConseiller())
         .resolves(failure(new DroitsInsuffisants()))
       // When

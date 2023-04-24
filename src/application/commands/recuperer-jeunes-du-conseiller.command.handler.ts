@@ -13,7 +13,7 @@ import {
   Conseiller,
   ConseillersRepositoryToken
 } from '../../domain/conseiller/conseiller'
-import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 
 export interface RecupererJeunesDuConseillerCommand extends Command {
@@ -80,7 +80,7 @@ export class RecupererJeunesDuConseillerCommandHandler extends CommandHandler<
     command: RecupererJeunesDuConseillerCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAuthorizer.authorize(
+    return this.conseillerAuthorizer.autoriserLeConseiller(
       command.idConseiller,
       utilisateur
     )

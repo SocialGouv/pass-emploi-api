@@ -38,7 +38,7 @@ export class EnvoyerFormulaireContactImmersionCommandHandler extends CommandHand
     command: EnvoyerFormulaireContactImmersionCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
+    return this.jeuneAuthorizer.autoriserLeJeune(command.idJeune, utilisateur)
   }
 
   async handle(
