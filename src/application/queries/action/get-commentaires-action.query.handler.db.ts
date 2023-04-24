@@ -5,8 +5,8 @@ import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import { Result, success } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
 import { CommentaireSqlModel } from '../../../infrastructure/sequelize/models/commentaire.sql-model'
-import { ActionAuthorizer } from '../../authorizers/authorize-action'
-import { ConseillerAgenceAuthorizer } from '../../authorizers/authorize-conseiller-agence'
+import { ActionAuthorizer } from '../../authorizers/action-authorizer'
+import { ConseillerInterAgenceAuthorizer } from '../../authorizers/conseiller-inter-agence-authorizer'
 import { CommentaireActionQueryModel } from '../query-models/actions.query-model'
 
 export interface GetCommentairesAction extends Query {
@@ -20,7 +20,7 @@ export class GetCommentairesActionQueryHandler extends QueryHandler<
 > {
   constructor(
     private actionAuthorizer: ActionAuthorizer,
-    private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer
+    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer
   ) {
     super('GetCommentairesActionQueryHandler')
   }
@@ -53,12 +53,15 @@ export class GetCommentairesActionQueryHandler extends QueryHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      return this.conseillerAgenceAuthorizer.authorizeConseillerDeLActionDuJeuneOuSonAgence(
+      return this.conseillerAgenceAuthorizer.autoriserConseillerPourUneActionDeSonJeuneOuDUnJeuneDeSonAgenceMilo(
         query.idAction,
         utilisateur
       )
     }
-    return this.actionAuthorizer.authorize(query.idAction, utilisateur)
+    return this.actionAuthorizer.autoriserPourUneAction(
+      query.idAction,
+      utilisateur
+    )
   }
 
   monitor(): Promise<void> {

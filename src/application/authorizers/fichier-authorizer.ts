@@ -10,7 +10,7 @@ import { Fichier, FichierRepositoryToken } from '../../domain/fichier'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 
 @Injectable()
-export class FichierTelechargementAuthorizer {
+export class FichierAuthorizer {
   constructor(
     @Inject(FichierRepositoryToken)
     private fichierRepository: Fichier.Repository,
@@ -18,7 +18,7 @@ export class FichierTelechargementAuthorizer {
     private jeuneRepository: Jeune.Repository
   ) {}
 
-  async authorize(
+  async autoriserTelechargementDuFichier(
     idFichier: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
@@ -44,6 +44,21 @@ export class FichierTelechargementAuthorizer {
         ) {
           return emptySuccess()
         }
+      }
+    }
+    return failure(new DroitsInsuffisants())
+  }
+
+  async autoriserSuppressionDuFichier(
+    idFichier: string,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<Result> {
+    const fichierMetadata = await this.fichierRepository.getFichierMetadata(
+      idFichier
+    )
+    if (fichierMetadata) {
+      if (utilisateur.id === fichierMetadata.idCreateur) {
+        return emptySuccess()
       }
     }
     return failure(new DroitsInsuffisants())

@@ -24,7 +24,7 @@ import {
   RendezVousRepositoryToken
 } from '../../domain/rendez-vous/rendez-vous'
 import { buildError } from '../../utils/logger.module'
-import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
+import { RendezVousAuthorizer } from '../authorizers/rendezvous-authorizer'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 
 export interface DeleteRendezVousCommand extends Command {
@@ -107,7 +107,7 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     command: DeleteRendezVousCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.rendezVousAuthorizer.authorize(
+    return this.rendezVousAuthorizer.autoriserConseillerPourUnRendezVousAvecAuMoinsUnJeune(
       command.idRendezVous,
       utilisateur
     )

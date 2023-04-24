@@ -1,7 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
 import { emptySuccess, failure } from 'src/building-blocks/types/result'
-import { RechercheAuthorizer } from '../../../src/application/authorizers/authorize-recherche'
+import { RechercheAuthorizer } from '../../../src/application/authorizers/recherche-authorizer'
 import { Recherche } from '../../../src/domain/offre/recherche/recherche'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
@@ -17,7 +17,7 @@ describe('RechercheAuthorizer', () => {
     rechercheAuthorizer = new RechercheAuthorizer(rechercheRepository)
   })
 
-  describe('authorize', () => {
+  describe('autoriserLeJeunePourSaRecherche', () => {
     describe('quand la recherche existe et est liée au jeune', () => {
       it('retourne un success', async () => {
         // Given
@@ -29,11 +29,12 @@ describe('RechercheAuthorizer', () => {
           .resolves(true)
 
         // When
-        const result = await rechercheAuthorizer.authorize(
-          utilisateur.id,
-          recherche.id,
-          utilisateur
-        )
+        const result =
+          await rechercheAuthorizer.autoriserLeJeunePourSaRecherche(
+            utilisateur.id,
+            recherche.id,
+            utilisateur
+          )
 
         // Then
         expect(result).to.deep.equal(emptySuccess())
@@ -50,11 +51,12 @@ describe('RechercheAuthorizer', () => {
           .resolves(false)
 
         // When
-        const result = await rechercheAuthorizer.authorize(
-          utilisateur.id,
-          recherche.id,
-          utilisateur
-        )
+        const result =
+          await rechercheAuthorizer.autoriserLeJeunePourSaRecherche(
+            utilisateur.id,
+            recherche.id,
+            utilisateur
+          )
 
         // Then
         expect(result).to.deep.equal(failure(new DroitsInsuffisants()))

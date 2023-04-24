@@ -16,7 +16,7 @@ import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
 import { Notification } from '../../../domain/notification/notification'
 import { PlanificateurService } from '../../../domain/planificateur'
 import { buildError } from '../../../utils/logger.module'
-import { ConseillerAuthorizer } from '../../authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 
 export interface CreateActionCommand extends Command {
@@ -80,12 +80,12 @@ export class CreateActionCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.JEUNE) {
-      return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
+      return this.jeuneAuthorizer.autoriserLeJeune(command.idJeune, utilisateur)
     } else {
-      return this.conseillerAuthorizer.authorize(
+      return this.conseillerAuthorizer.autoriserLeConseillerPourSonJeune(
         command.idCreateur,
-        utilisateur,
-        command.idJeune
+        command.idJeune,
+        utilisateur
       )
     }
   }

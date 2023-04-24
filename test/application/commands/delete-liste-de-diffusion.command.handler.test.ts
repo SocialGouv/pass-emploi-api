@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { createSandbox, SinonSandbox } from 'sinon'
-import { AuthorizeListeDeDiffusion } from '../../../src/application/authorizers/authorize-liste-de-diffusion'
+import { ListeDeDiffusionAuthorizer } from '../../../src/application/authorizers/liste-de-diffusion-authorizer'
 import { DeleteListeDeDiffusionCommandHandler } from '../../../src/application/commands/delete-liste-de-diffusion.command.handler'
 import { Chat } from '../../../src/domain/chat'
 import { Conseiller } from '../../../src/domain/conseiller/conseiller'
@@ -15,14 +15,14 @@ import { expect, StubbedClass, stubClass } from '../../utils'
 describe('DeleteListeDeDiffusionCommandHandler', () => {
   let sandbox: SinonSandbox
   let deleteListeDeDiffusionCommandHandler: DeleteListeDeDiffusionCommandHandler
-  let listeDeDiffusionAuthorizer: StubbedClass<AuthorizeListeDeDiffusion>
+  let listeDeDiffusionAuthorizer: StubbedClass<ListeDeDiffusionAuthorizer>
   let listeDeDiffusionRepository: StubbedType<Conseiller.ListeDeDiffusion.Repository>
   let chatRepository: StubbedType<Chat.Repository>
   let evenementService: StubbedClass<EvenementService>
 
   beforeEach(() => {
     sandbox = createSandbox()
-    listeDeDiffusionAuthorizer = stubClass(AuthorizeListeDeDiffusion)
+    listeDeDiffusionAuthorizer = stubClass(ListeDeDiffusionAuthorizer)
     listeDeDiffusionRepository = stubInterface(sandbox)
     chatRepository = stubInterface(sandbox)
     evenementService = stubClass(EvenementService)
@@ -55,7 +55,7 @@ describe('DeleteListeDeDiffusionCommandHandler', () => {
 
       // Then
       expect(
-        listeDeDiffusionAuthorizer.authorize
+        listeDeDiffusionAuthorizer.autoriserConseillerPourSaListeDeDiffusion
       ).to.have.been.calledWithExactly(listeDeDiffusion.id, utilisateur)
     })
   })

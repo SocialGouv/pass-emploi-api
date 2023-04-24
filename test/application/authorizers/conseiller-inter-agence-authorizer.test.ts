@@ -1,7 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { Jeune } from 'src/domain/jeune/jeune'
 import { unConseillerDuJeune, unJeune } from 'test/fixtures/jeune.fixture'
-import { ConseillerAgenceAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from '../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 import { DroitsInsuffisants } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
@@ -23,7 +23,7 @@ describe('ConseillerAgenceAuthorizer', () => {
   let jeuneRepository: StubbedType<Jeune.Repository>
   let actionRepository: StubbedType<Action.Repository>
   let rendezVousRepository: StubbedType<RendezVous.Repository>
-  let conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer
+  let conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer
 
   beforeEach(() => {
     const sandbox = createSandbox()
@@ -31,7 +31,7 @@ describe('ConseillerAgenceAuthorizer', () => {
     jeuneRepository = stubInterface(sandbox)
     actionRepository = stubInterface(sandbox)
     rendezVousRepository = stubInterface(sandbox)
-    conseillerAgenceAuthorizer = new ConseillerAgenceAuthorizer(
+    conseillerAgenceAuthorizer = new ConseillerInterAgenceAuthorizer(
       conseillerRepository,
       jeuneRepository,
       actionRepository,
@@ -39,7 +39,7 @@ describe('ConseillerAgenceAuthorizer', () => {
     )
   })
 
-  describe('.authorizeConseillerDeLAgence', () => {
+  describe('autoriserConseillerPourUneAgence', () => {
     describe('quand le conseiller est sur le bonne agence', () => {
       it('retourne un success', async () => {
         // Given
@@ -54,7 +54,7 @@ describe('ConseillerAgenceAuthorizer', () => {
 
         // When
         const result =
-          await conseillerAgenceAuthorizer.authorizeConseillerDeLAgence(
+          await conseillerAgenceAuthorizer.autoriserConseillerPourUneAgence(
             'une-agence',
             utilisateur
           )
@@ -77,7 +77,7 @@ describe('ConseillerAgenceAuthorizer', () => {
 
         // When
         const result =
-          await conseillerAgenceAuthorizer.authorizeConseillerDeLAgence(
+          await conseillerAgenceAuthorizer.autoriserConseillerPourUneAgence(
             'une-agence',
             utilisateur
           )
@@ -88,7 +88,7 @@ describe('ConseillerAgenceAuthorizer', () => {
     })
   })
 
-  describe('.authorizeConseillerDuJeuneOuSonAgence', () => {
+  describe('autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo', () => {
     describe('quand aucun conseiller n’a renseigné son agence', () => {
       it('retourne une failure', async () => {
         // Given
@@ -116,7 +116,7 @@ describe('ConseillerAgenceAuthorizer', () => {
 
         // When
         const result =
-          await conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence(
+          await conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo(
             'id-jeune',
             utilisateur
           )
@@ -156,7 +156,7 @@ describe('ConseillerAgenceAuthorizer', () => {
 
         // When
         const result =
-          await conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence(
+          await conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo(
             'id-jeune',
             utilisateur
           )
@@ -194,7 +194,7 @@ describe('ConseillerAgenceAuthorizer', () => {
 
         // When
         const result =
-          await conseillerAgenceAuthorizer.authorizeConseillerDeLActionDuJeuneOuSonAgence(
+          await conseillerAgenceAuthorizer.autoriserConseillerPourUneActionDeSonJeuneOuDUnJeuneDeSonAgenceMilo(
             'id-jeune',
             utilisateur
           )
@@ -234,7 +234,7 @@ describe('ConseillerAgenceAuthorizer', () => {
 
         // When
         const result =
-          await conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence(
+          await conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo(
             'id-jeune',
             utilisateur
           )
@@ -244,7 +244,7 @@ describe('ConseillerAgenceAuthorizer', () => {
     })
   })
 
-  describe('.authorizeConseillerMILOAvecUnJeuneDansLeRendezVous', () => {
+  describe('autoriserConseillerMiloPourUnRdvDeSonAgenceOuAvecUnJeuneDansLeRdv', () => {
     describe('quand le conseiller utilisateur est dans la même agence que le rendez-vous', () => {
       it('valide le conseiller', async () => {
         // Given
@@ -268,7 +268,7 @@ describe('ConseillerAgenceAuthorizer', () => {
 
         // When
         const result =
-          await conseillerAgenceAuthorizer.authorizeConseillerMILOAvecUnJeuneDansLeRendezVous(
+          await conseillerAgenceAuthorizer.autoriserConseillerMiloPourUnRdvDeSonAgenceOuAvecUnJeuneDansLeRdv(
             rendezVous.id,
             utilisateur
           )
@@ -312,7 +312,7 @@ describe('ConseillerAgenceAuthorizer', () => {
 
         // When
         const result =
-          await conseillerAgenceAuthorizer.authorizeConseillerMILOAvecUnJeuneDansLeRendezVous(
+          await conseillerAgenceAuthorizer.autoriserConseillerMiloPourUnRdvDeSonAgenceOuAvecUnJeuneDansLeRdv(
             rendezVous.id,
             utilisateur
           )
@@ -346,7 +346,7 @@ describe('ConseillerAgenceAuthorizer', () => {
 
         // When
         const result =
-          await conseillerAgenceAuthorizer.authorizeConseillerMILOAvecUnJeuneDansLeRendezVous(
+          await conseillerAgenceAuthorizer.autoriserConseillerMiloPourUnRdvDeSonAgenceOuAvecUnJeuneDansLeRdv(
             rendezVous.id,
             utilisateur
           )
@@ -386,7 +386,7 @@ describe('ConseillerAgenceAuthorizer', () => {
 
         // When
         const result =
-          await conseillerAgenceAuthorizer.authorizeConseillerMILOAvecUnJeuneDansLeRendezVous(
+          await conseillerAgenceAuthorizer.autoriserConseillerMiloPourUnRdvDeSonAgenceOuAvecUnJeuneDansLeRdv(
             rendezVous.id,
             utilisateur
           )

@@ -16,21 +16,19 @@ export class JeuneAuthorizer {
     private jeuneRepository: Jeune.Repository
   ) {}
 
-  async authorize(
+  async autoriserLeJeune(
     idJeune: string,
     utilisateur: Authentification.Utilisateur,
     structuresAutorisees?: Core.Structure[]
   ): Promise<Result> {
-    if (estUtilisateurDeLaStructure(utilisateur, structuresAutorisees)) {
+    if (
+      utilisateur.type === Authentification.Type.JEUNE &&
+      estUtilisateurDeLaStructure(utilisateur, structuresAutorisees)
+    ) {
       const jeune = await this.jeuneRepository.existe(idJeune)
 
-      if (jeune && utilisateur) {
-        if (
-          utilisateur.type === Authentification.Type.JEUNE &&
-          utilisateur.id === idJeune
-        ) {
-          return emptySuccess()
-        }
+      if (jeune && utilisateur.id === idJeune) {
+        return emptySuccess()
       }
     }
 

@@ -4,7 +4,7 @@ import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { Fichier } from 'src/domain/fichier'
 import { Jeune } from 'src/domain/jeune/jeune'
 import { unJeune } from 'test/fixtures/jeune.fixture'
-import { FichierTelechargementAuthorizer } from '../../../src/application/authorizers/authorize-fichier-telechargement'
+import { FichierAuthorizer } from '../../../src/application/authorizers/fichier-authorizer'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
@@ -15,19 +15,19 @@ import { createSandbox, expect } from '../../utils'
 describe('FichierTelechargementAuthorizer', () => {
   let fichierRepository: StubbedType<Fichier.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
-  let fichierTelechargementAuthorizer: FichierTelechargementAuthorizer
+  let fichierAuthorizer: FichierAuthorizer
 
   beforeEach(() => {
     const sandbox = createSandbox()
     fichierRepository = stubInterface(sandbox)
     jeuneRepository = stubInterface(sandbox)
-    fichierTelechargementAuthorizer = new FichierTelechargementAuthorizer(
+    fichierAuthorizer = new FichierAuthorizer(
       fichierRepository,
       jeuneRepository
     )
   })
 
-  describe('authorize', () => {
+  describe('autoriserTelechargementDuFichier', () => {
     const idFichier = 'test'
     it('autorise un conseiller quand un de ses jeunes est présent', async () => {
       //Given
@@ -41,7 +41,7 @@ describe('FichierTelechargementAuthorizer', () => {
         .resolves([unJeune()])
 
       // When
-      const result = await fichierTelechargementAuthorizer.authorize(
+      const result = await fichierAuthorizer.autoriserTelechargementDuFichier(
         idFichier,
         utilisateur
       )
@@ -61,7 +61,7 @@ describe('FichierTelechargementAuthorizer', () => {
       jeuneRepository.findAllJeunesByIdsAndConseiller.resolves([])
 
       // When
-      const result = await fichierTelechargementAuthorizer.authorize(
+      const result = await fichierAuthorizer.autoriserTelechargementDuFichier(
         idFichier,
         utilisateur
       )
@@ -84,7 +84,7 @@ describe('FichierTelechargementAuthorizer', () => {
         .resolves([])
 
       // When
-      const result = await fichierTelechargementAuthorizer.authorize(
+      const result = await fichierAuthorizer.autoriserTelechargementDuFichier(
         idFichier,
         utilisateur
       )
@@ -100,7 +100,7 @@ describe('FichierTelechargementAuthorizer', () => {
         .resolves(unFichierMetadata({ idsJeunes: [utilisateur.id] }))
 
       // When
-      const result = await fichierTelechargementAuthorizer.authorize(
+      const result = await fichierAuthorizer.autoriserTelechargementDuFichier(
         idFichier,
         utilisateur
       )
@@ -116,7 +116,7 @@ describe('FichierTelechargementAuthorizer', () => {
         .resolves(unFichierMetadata({ idsJeunes: [] }))
 
       // When
-      const result = await fichierTelechargementAuthorizer.authorize(
+      const result = await fichierAuthorizer.autoriserTelechargementDuFichier(
         idFichier,
         utilisateur
       )
@@ -132,7 +132,44 @@ describe('FichierTelechargementAuthorizer', () => {
         .resolves(undefined)
 
       // When
-      const result = await fichierTelechargementAuthorizer.authorize(
+      const result = await fichierAuthorizer.autoriserTelechargementDuFichier(
+        idFichier,
+        utilisateur
+      )
+
+      // Then
+      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
+    })
+  })
+
+  describe('autoriserSuppressionDuFichier', () => {
+    const idFichier = 'test'
+    it('autorise le créateur du fichier à le supprimer', async () => {
+      //Given
+      const idConseiller = '1'
+      const utilisateur = unUtilisateurConseiller({ id: idConseiller })
+      fichierRepository.getFichierMetadata
+        .withArgs(idFichier)
+        .resolves(unFichierMetadata({ idCreateur: idConseiller }))
+
+      // When
+      const result = await fichierAuthorizer.autoriserSuppressionDuFichier(
+        idFichier,
+        utilisateur
+      )
+
+      // Then
+      expect(result).to.deep.equal(emptySuccess())
+    })
+    it("retourne Droits Insuffisants quand le fichier n'existe pas", async () => {
+      //Given
+      const utilisateur = unUtilisateurJeune()
+      fichierRepository.getFichierMetadata
+        .withArgs(idFichier)
+        .resolves(undefined)
+
+      // When
+      const result = await fichierAuthorizer.autoriserSuppressionDuFichier(
         idFichier,
         utilisateur
       )

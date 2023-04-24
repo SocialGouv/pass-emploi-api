@@ -4,7 +4,7 @@ import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Fichier, FichierRepositoryToken } from '../../domain/fichier'
-import { FichierSuppressionAuthorizer } from '../authorizers/authorize-fichier-suppression'
+import { FichierAuthorizer } from '../authorizers/fichier-authorizer'
 
 export interface SupprimerFichierCommand extends Command {
   idFichier: string
@@ -18,7 +18,7 @@ export class SupprimerFichierCommandHandler extends CommandHandler<
   constructor(
     @Inject(FichierRepositoryToken)
     private fichierRepository: Fichier.Repository,
-    private fichierSuppressionAuthorizer: FichierSuppressionAuthorizer
+    private fichierAuthorizer: FichierAuthorizer
   ) {
     super('SupprimerFichierCommandHandler')
   }
@@ -27,7 +27,7 @@ export class SupprimerFichierCommandHandler extends CommandHandler<
     command: SupprimerFichierCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.fichierSuppressionAuthorizer.authorize(
+    return this.fichierAuthorizer.autoriserSuppressionDuFichier(
       command.idFichier,
       utilisateur
     )

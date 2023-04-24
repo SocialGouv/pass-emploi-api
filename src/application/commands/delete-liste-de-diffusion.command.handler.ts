@@ -7,7 +7,7 @@ import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { Conseiller } from '../../domain/conseiller/conseiller'
 import { ListeDeDiffusionRepositoryToken } from '../../domain/conseiller/liste-de-diffusion'
 import { Evenement, EvenementService } from '../../domain/evenement'
-import { AuthorizeListeDeDiffusion } from '../authorizers/authorize-liste-de-diffusion'
+import { ListeDeDiffusionAuthorizer } from '../authorizers/liste-de-diffusion-authorizer'
 
 export interface DeleteListeDeDiffusionCommand extends Command {
   idListeDeDiffusion: string
@@ -19,7 +19,7 @@ export class DeleteListeDeDiffusionCommandHandler extends CommandHandler<
   void
 > {
   constructor(
-    private authorizeListeDeDiffusion: AuthorizeListeDeDiffusion,
+    private authorizeListeDeDiffusion: ListeDeDiffusionAuthorizer,
     @Inject(ListeDeDiffusionRepositoryToken)
     private listeDeDiffusionRepository: Conseiller.ListeDeDiffusion.Repository,
     @Inject(ChatRepositoryToken)
@@ -33,7 +33,7 @@ export class DeleteListeDeDiffusionCommandHandler extends CommandHandler<
     { idListeDeDiffusion }: DeleteListeDeDiffusionCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.authorizeListeDeDiffusion.authorize(
+    return this.authorizeListeDeDiffusion.autoriserConseillerPourSaListeDeDiffusion(
       idListeDeDiffusion,
       utilisateur
     )

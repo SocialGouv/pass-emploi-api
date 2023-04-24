@@ -1,5 +1,4 @@
 import { SinonSandbox } from 'sinon'
-import { ConseillerAgenceAuthorizer } from 'src/application/authorizers/authorize-conseiller-agence'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { failure, isSuccess, success } from 'src/building-blocks/types/result'
 import { Core } from 'src/domain/core'
@@ -29,16 +28,17 @@ import {
 import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
+import { ConseillerInterAgenceAuthorizer } from '../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 
 describe('GetDetailJeuneQueryHandler', () => {
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
   let getDetailJeuneQueryHandler: GetDetailJeuneQueryHandler
   let sandbox: SinonSandbox
 
   before(() => {
     sandbox = createSandbox()
-    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
 
     getDetailJeuneQueryHandler = new GetDetailJeuneQueryHandler(
@@ -402,7 +402,7 @@ describe('GetDetailJeuneQueryHandler', () => {
 
       // Then
       expect(
-        conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence
+        conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo
       ).to.have.been.calledWithExactly(query.idJeune, utilisateur)
     })
     it("appelle l'authorizer pour le jeune", async () => {
@@ -414,10 +414,10 @@ describe('GetDetailJeuneQueryHandler', () => {
       }
 
       // When
-      await jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+      await jeuneAuthorizer.autoriserLeJeune(query.idJeune, utilisateur)
 
       // Then
-      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         query.idJeune,
         utilisateur
       )

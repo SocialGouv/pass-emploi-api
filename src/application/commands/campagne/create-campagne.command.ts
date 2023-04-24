@@ -7,7 +7,7 @@ import { failure, Result, success } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
 import { Campagne, CampagneRepositoryToken } from '../../../domain/campagne'
 import { Core } from '../../../domain/core'
-import { SupportAuthorizer } from '../../authorizers/authorize-support'
+import { SupportAuthorizer } from '../../authorizers/support-authorizer'
 
 export interface CreateCampagneCommand extends Command {
   nom: string
@@ -32,7 +32,7 @@ export class CreateCampagneCommandHandler extends CommandHandler<
     _command: CreateCampagneCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.supportAuthorizer.authorize(utilisateur)
+    return this.supportAuthorizer.autoriserSupport(utilisateur)
   }
 
   async handle(command: CreateCampagneCommand): Promise<Result<Core.Id>> {

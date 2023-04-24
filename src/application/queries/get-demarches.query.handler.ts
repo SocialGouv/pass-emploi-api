@@ -38,7 +38,7 @@ export class GetDemarchesQueryHandler extends QueryHandler<
     query: GetDemarchesQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorize(
+    return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
       Core.structuresPoleEmploiBRSA

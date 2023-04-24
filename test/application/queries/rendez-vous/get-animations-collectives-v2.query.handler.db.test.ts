@@ -1,4 +1,4 @@
-import { ConseillerAgenceAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
 import { unEtablissementDto } from '../../../fixtures/sql-models/etablissement.sq-model'
@@ -29,7 +29,7 @@ import { GetAnimationsCollectivesV2QueryHandler } from '../../../../src/applicat
 describe('GetAnimationsCollectivesACloreQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
   let queryHandler: GetAnimationsCollectivesV2QueryHandler
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
   let dateService: StubbedClass<DateService>
 
   const datetimeDeBase = uneDatetime()
@@ -48,7 +48,7 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
     dateService = stubClass(DateService)
     dateService.nowJs.returns(datetimeDeBase.toJSDate())
     databaseForTesting = getDatabase()
-    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
     queryHandler = new GetAnimationsCollectivesV2QueryHandler(
       conseillerAgenceAuthorizer,
       dateService
@@ -65,7 +65,7 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
 
       // Then
       expect(
-        conseillerAgenceAuthorizer.authorizeConseillerDeLAgence
+        conseillerAgenceAuthorizer.autoriserConseillerPourUneAgence
       ).to.have.been.calledWithExactly('paris', unUtilisateurConseiller())
     })
   })

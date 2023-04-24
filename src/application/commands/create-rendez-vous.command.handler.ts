@@ -23,7 +23,7 @@ import {
   RendezVousRepositoryToken
 } from '../../domain/rendez-vous/rendez-vous'
 import { buildError } from '../../utils/logger.module'
-import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 
 export interface CreateRendezVousCommand extends Command {
   idsJeunes: string[]
@@ -149,7 +149,7 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
     command: CreateRendezVousCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAuthorizer.authorize(
+    return this.conseillerAuthorizer.autoriserLeConseiller(
       command.idConseiller,
       utilisateur
     )

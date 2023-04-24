@@ -1,5 +1,4 @@
 import { Fichier } from '../../../src/domain/fichier'
-import { AuthorizeConseillerForJeunes } from '../../../src/application/authorizers/authorize-conseiller-for-jeunes'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import {
@@ -20,16 +19,17 @@ import {
   NonTraitableError
 } from '../../../src/building-blocks/types/domain-error'
 import { Authentification } from 'src/domain/authentification'
-import { AuthorizeListeDeDiffusion } from '../../../src/application/authorizers/authorize-liste-de-diffusion'
+import { ListeDeDiffusionAuthorizer } from '../../../src/application/authorizers/liste-de-diffusion-authorizer'
 import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { uneListeDeDiffusion } from '../../fixtures/liste-de-diffusion.fixture'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 
 describe('TeleverserFichierCommandHandler', () => {
   let fichierRepository: StubbedType<Fichier.Repository>
   let listeDeDiffusionRepository: StubbedType<Conseiller.ListeDeDiffusion.Repository>
   let fichierFactory: StubbedClass<Fichier.Factory>
-  let authorizeConseillerForJeunes: StubbedClass<AuthorizeConseillerForJeunes>
-  let authorizeListeDeDiffusion: StubbedClass<AuthorizeListeDeDiffusion>
+  let authorizeConseillerForJeunes: StubbedClass<ConseillerAuthorizer>
+  let authorizeListeDeDiffusion: StubbedClass<ListeDeDiffusionAuthorizer>
   let televerserFichierCommandHandler: TeleverserFichierCommandHandler
 
   const command: TeleverserFichierCommand = {
@@ -51,8 +51,8 @@ describe('TeleverserFichierCommandHandler', () => {
     fichierRepository = stubInterface(sandbox)
     listeDeDiffusionRepository = stubInterface(sandbox)
     fichierFactory = stubClass(Fichier.Factory)
-    authorizeConseillerForJeunes = stubClass(AuthorizeConseillerForJeunes)
-    authorizeListeDeDiffusion = stubClass(AuthorizeListeDeDiffusion)
+    authorizeConseillerForJeunes = stubClass(ConseillerAuthorizer)
+    authorizeListeDeDiffusion = stubClass(ListeDeDiffusionAuthorizer)
     televerserFichierCommandHandler = new TeleverserFichierCommandHandler(
       fichierRepository,
       listeDeDiffusionRepository,
@@ -66,7 +66,7 @@ describe('TeleverserFichierCommandHandler', () => {
     it('autorise un conseiller pour ses jeunes', async () => {
       // Given
       const utilisateur = unUtilisateurConseiller()
-      authorizeConseillerForJeunes.authorize
+      authorizeConseillerForJeunes.autoriserConseillerPourSesJeunes
         .withArgs(command.jeunesIds!, utilisateur)
         .resolves(emptySuccess())
 
@@ -87,7 +87,7 @@ describe('TeleverserFichierCommandHandler', () => {
         listesDeDiffusionIds: ['1']
       }
       const utilisateur = unUtilisateurConseiller()
-      authorizeListeDeDiffusion.authorize
+      authorizeListeDeDiffusion.autoriserConseillerPourSaListeDeDiffusion
         .withArgs('1', utilisateur)
         .resolves(emptySuccess())
 
@@ -107,13 +107,13 @@ describe('TeleverserFichierCommandHandler', () => {
         listesDeDiffusionIds: ['1', '2']
       }
       const utilisateur = unUtilisateurConseiller()
-      authorizeConseillerForJeunes.authorize
+      authorizeConseillerForJeunes.autoriserConseillerPourSesJeunes
         .withArgs(command.jeunesIds!, utilisateur)
         .resolves(emptySuccess())
-      authorizeListeDeDiffusion.authorize
+      authorizeListeDeDiffusion.autoriserConseillerPourSaListeDeDiffusion
         .withArgs('1', utilisateur)
         .resolves(emptySuccess())
-      authorizeListeDeDiffusion.authorize
+      authorizeListeDeDiffusion.autoriserConseillerPourSaListeDeDiffusion
         .withArgs('2', utilisateur)
         .resolves(failure(new DroitsInsuffisants()))
 

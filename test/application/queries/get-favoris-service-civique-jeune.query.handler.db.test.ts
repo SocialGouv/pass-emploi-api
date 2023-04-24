@@ -38,7 +38,7 @@ describe('getDetailServiceCiviqueQueryHandler', () => {
       )
 
       // Then
-      expect(jeuneAuthorizer.authorize).to.have.been.calledWith(
+      expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWith(
         idJeune,
         utilisateur
       )

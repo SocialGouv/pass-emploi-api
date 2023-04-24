@@ -8,12 +8,12 @@ import {
 import { emptySuccess } from '../../../src/building-blocks/types/result'
 import { Fichier } from '../../../src/domain/fichier'
 import { expect, StubbedClass } from '../../utils'
-import { FichierSuppressionAuthorizer } from '../../../src/application/authorizers/authorize-fichier-suppression'
+import { FichierAuthorizer } from '../../../src/application/authorizers/fichier-authorizer'
 
 describe('SupprimerFichierCommandHandler', () => {
   const sandbox = createSandbox()
   let fichierRepository: StubbedType<Fichier.Repository>
-  let fichierSuppressionAuthorizer: StubbedClass<FichierSuppressionAuthorizer>
+  let fichierSuppressionAuthorizer: StubbedClass<FichierAuthorizer>
   let supprimerFichierCommandHandler: SupprimerFichierCommandHandler
 
   const command: SupprimerFichierCommand = {
@@ -22,10 +22,7 @@ describe('SupprimerFichierCommandHandler', () => {
 
   beforeEach(() => {
     fichierRepository = stubInterface(sandbox)
-    fichierSuppressionAuthorizer = stubClassSandbox(
-      FichierSuppressionAuthorizer,
-      sandbox
-    )
+    fichierSuppressionAuthorizer = stubClassSandbox(FichierAuthorizer, sandbox)
     supprimerFichierCommandHandler = new SupprimerFichierCommandHandler(
       fichierRepository,
       fichierSuppressionAuthorizer

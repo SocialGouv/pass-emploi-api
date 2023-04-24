@@ -19,7 +19,7 @@ import {
 } from '../../domain/rendez-vous/rendez-vous'
 
 @Injectable()
-export class ConseillerAgenceAuthorizer {
+export class ConseillerInterAgenceAuthorizer {
   constructor(
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
@@ -31,7 +31,7 @@ export class ConseillerAgenceAuthorizer {
     private rendezVousRepository: RendezVous.Repository
   ) {}
 
-  async authorizeConseillerDeLAgence(
+  async autoriserConseillerPourUneAgence(
     idAgence: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
@@ -45,42 +45,29 @@ export class ConseillerAgenceAuthorizer {
     return failure(new DroitsInsuffisants())
   }
 
-  async authorizeConseillerDuJeuneOuSonAgence(
+  async autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo(
     idJeune: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type == Authentification.Type.CONSEILLER) {
+    if (utilisateur.type === Authentification.Type.CONSEILLER) {
       const jeune = await this.jeuneRepository.get(idJeune)
-      return this.authorizeConseillerDuJeuneOuSonAgenceMILO(utilisateur, jeune)
+      return this.autoriserPourSonJeuneOuUnJeuneDeSonAgenceMilo(
+        utilisateur,
+        jeune
+      )
     }
     return failure(new DroitsInsuffisants())
   }
 
-  async authorizeConseillerDeLActionDuJeuneOuSonAgence(
-    idAction: string,
-    utilisateur: Authentification.Utilisateur
-  ): Promise<Result> {
-    if (utilisateur.type == Authentification.Type.CONSEILLER) {
-      const action = await this.actionRepository.get(idAction)
-      if (action) {
-        return this.authorizeConseillerDuJeuneOuSonAgence(
-          action.idJeune,
-          utilisateur
-        )
-      }
-    }
-    return failure(new DroitsInsuffisants())
-  }
-
-  async authorizeConseillerDuJeuneOuSonAgenceAvecPartageFavoris(
+  async autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMiloAvecPartageFavoris(
     idJeune: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type == Authentification.Type.CONSEILLER) {
+    if (utilisateur.type === Authentification.Type.CONSEILLER) {
       const jeune = await this.jeuneRepository.get(idJeune)
 
       if (jeune && jeune.preferences.partageFavoris) {
-        return this.authorizeConseillerDuJeuneOuSonAgenceMILO(
+        return this.autoriserPourSonJeuneOuUnJeuneDeSonAgenceMilo(
           utilisateur,
           jeune
         )
@@ -89,13 +76,29 @@ export class ConseillerAgenceAuthorizer {
     return failure(new DroitsInsuffisants())
   }
 
-  async authorizeConseillerMILOAvecUnJeuneDansLeRendezVous(
+  async autoriserConseillerPourUneActionDeSonJeuneOuDUnJeuneDeSonAgenceMilo(
+    idAction: string,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<Result> {
+    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+      const action = await this.actionRepository.get(idAction)
+      if (action) {
+        return this.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo(
+          action.idJeune,
+          utilisateur
+        )
+      }
+    }
+    return failure(new DroitsInsuffisants())
+  }
+
+  async autoriserConseillerMiloPourUnRdvDeSonAgenceOuAvecUnJeuneDansLeRdv(
     idRendezVous: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (
       utilisateur.type === Authentification.Type.CONSEILLER &&
-      this.structureConseillerAutorisee(utilisateur.structure)
+      this.structureAutoriseeInterAgence(utilisateur.structure)
     ) {
       const rendezVous = await this.rendezVousRepository.get(idRendezVous)
       const conseillerUtilisateur = await this.conseillerRepository.get(
@@ -119,7 +122,7 @@ export class ConseillerAgenceAuthorizer {
         }
 
         if (
-          conseillerUtilisateur?.agence &&
+          conseillerUtilisateur.agence &&
           rendezVous.jeunes.some(
             jeune =>
               jeune.conseiller?.idAgence === conseillerUtilisateur.agence!.id
@@ -132,11 +135,11 @@ export class ConseillerAgenceAuthorizer {
     return failure(new DroitsInsuffisants())
   }
 
-  structureConseillerAutorisee(structure: Core.Structure): boolean {
-    return [Core.Structure.MILO, Core.Structure.PASS_EMPLOI].includes(structure)
+  structureAutoriseeInterAgence(structure: Core.Structure): boolean {
+    return Core.structuresMiloPassEmploi.includes(structure)
   }
 
-  private async authorizeConseillerDuJeuneOuSonAgenceMILO(
+  private async autoriserPourSonJeuneOuUnJeuneDeSonAgenceMilo(
     utilisateur: Authentification.Utilisateur,
     jeune?: Jeune
   ): Promise<Result> {
@@ -145,7 +148,7 @@ export class ConseillerAgenceAuthorizer {
         return emptySuccess()
       }
       if (
-        this.structureConseillerAutorisee(utilisateur.structure) &&
+        this.structureAutoriseeInterAgence(utilisateur.structure) &&
         jeune.conseiller?.idAgence
       ) {
         const conseillerUtilisateur = await this.conseillerRepository.get(

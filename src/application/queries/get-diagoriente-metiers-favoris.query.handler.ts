@@ -93,7 +93,7 @@ export class GetDiagorienteMetiersFavorisQueryHandler extends QueryHandler<
     query: GetDiagorienteMetiersFavorisQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.autoriserLeJeune(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

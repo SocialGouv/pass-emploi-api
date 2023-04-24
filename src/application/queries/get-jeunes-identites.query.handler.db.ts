@@ -4,7 +4,7 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
-import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { IdentiteJeuneQueryModel } from './query-models/jeunes.query-model'
 
 export interface GetJeunesIdentitesQuery extends Query {
@@ -43,7 +43,10 @@ export class GetJeunesIdentitesQueryHandler extends QueryHandler<
     query: GetJeunesIdentitesQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAuthorizer.authorize(query.idConseiller, utilisateur)
+    return this.conseillerAuthorizer.autoriserLeConseiller(
+      query.idConseiller,
+      utilisateur
+    )
   }
 
   async monitor(): Promise<void> {

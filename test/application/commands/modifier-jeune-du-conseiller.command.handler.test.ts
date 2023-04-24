@@ -2,7 +2,6 @@ import {
   ModifierJeuneDuConseillerCommand,
   ModifierJeuneDuConseillerCommandHandler
 } from '../../../src/application/commands/modifier-jeune-du-conseiller.command.handler'
-import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
@@ -18,10 +17,11 @@ import {
   DroitsInsuffisants,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 
 describe('ModifierJeuneDuConseillerCommandHandler', () => {
   let modifierJeuneDuConseillerCommandHandler: ModifierJeuneDuConseillerCommandHandler
-  let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
+  let conseillerForJeuneAuthorizer: StubbedClass<ConseillerAuthorizer>
   let jeuneRepository: StubbedType<Jeune.Repository>
 
   const jeune = unJeune()
@@ -31,7 +31,7 @@ describe('ModifierJeuneDuConseillerCommandHandler', () => {
   }
 
   beforeEach(() => {
-    conseillerForJeuneAuthorizer = stubClass(ConseillerForJeuneAuthorizer)
+    conseillerForJeuneAuthorizer = stubClass(ConseillerAuthorizer)
     jeuneRepository = stubInterface(createSandbox())
     modifierJeuneDuConseillerCommandHandler =
       new ModifierJeuneDuConseillerCommandHandler(
@@ -46,7 +46,7 @@ describe('ModifierJeuneDuConseillerCommandHandler', () => {
       const conseillerPE = unUtilisateurConseiller({
         structure: Core.Structure.POLE_EMPLOI
       })
-      conseillerForJeuneAuthorizer.authorize
+      conseillerForJeuneAuthorizer.autoriserConseillerPourSonJeune
         .withArgs(jeune.id, conseillerPE)
         .resolves(emptySuccess())
 

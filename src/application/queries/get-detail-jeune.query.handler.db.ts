@@ -10,7 +10,7 @@ import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/consei
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { SituationsMiloSqlModel } from '../../infrastructure/sequelize/models/situations-milo.sql-model'
 import { TransfertConseillerSqlModel } from '../../infrastructure/sequelize/models/transfert-conseiller.sql-model'
-import { ConseillerAgenceAuthorizer } from '../authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from '../authorizers/conseiller-inter-agence-authorizer'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { fromSqlToDetailJeuneQueryModel } from './query-mappers/jeune.mappers'
 import { DetailJeuneQueryModel } from './query-models/jeunes.query-model'
@@ -26,7 +26,7 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
 > {
   constructor(
     private jeuneAuthorizer: JeuneAuthorizer,
-    private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer,
+    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer,
     private configService: ConfigService
   ) {
     super('GetDetailJeuneQueryHandler')
@@ -62,12 +62,12 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      return this.conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence(
+      return this.conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo(
         query.idJeune,
         utilisateur
       )
     }
-    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.autoriserLeJeune(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

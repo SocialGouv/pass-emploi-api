@@ -7,7 +7,7 @@ import {
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { emptySuccess, Result } from '../../building-blocks/types/result'
-import { SupportAuthorizer } from '../authorizers/authorize-support'
+import { SupportAuthorizer } from '../authorizers/support-authorizer'
 
 export interface CreerSuperviseursCommand extends Command {
   superviseurs: Superviseur[]
@@ -35,7 +35,7 @@ export class CreerSuperviseursCommandHandler extends CommandHandler<
     _command: CreerSuperviseursCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.supportAuthorizer.authorize(utilisateur)
+    return this.supportAuthorizer.autoriserSupport(utilisateur)
   }
 
   async monitor(): Promise<void> {

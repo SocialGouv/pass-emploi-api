@@ -1,5 +1,4 @@
 import { DateTime } from 'luxon'
-import { ConseillerAgenceAuthorizer } from 'src/application/authorizers/authorize-conseiller-agence'
 import { Core } from 'src/domain/core'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { uneDate } from 'test/fixtures/date.fixture'
@@ -26,17 +25,18 @@ import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
 import Statut = Action.Statut
+import { ConseillerInterAgenceAuthorizer } from '../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 
 describe('GetIndicateursPourConseillerQueryHandler', () => {
   let getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
   let dateService: StubbedClass<DateService>
   const idConseiller = 'id-conseiller'
   const idJeune = 'id-jeune'
 
   before(async () => {
     dateService = stubClass(DateService)
-    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
     getIndicateursPourConseillerQueryHandler =
       new GetIndicateursPourConseillerQueryHandler(
         dateService,
@@ -508,7 +508,7 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
 
         // Then
         expect(
-          conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence
+          conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo
         ).to.have.been.calledWithExactly('id-jeune', utilisateur)
       })
     })

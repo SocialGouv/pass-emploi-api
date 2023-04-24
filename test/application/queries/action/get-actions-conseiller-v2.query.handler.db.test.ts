@@ -1,4 +1,4 @@
-import { ConseillerAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../../../src/application/authorizers/conseiller-authorizer'
 import { GetActionsConseillerV2QueryHandler } from '../../../../src/application/queries/action/get-actions-conseiller-v2.query.handler.db'
 import { GetActionsConseillerV2QueryModel } from '../../../../src/application/queries/query-models/conseillers.query-model'
 import { Action } from '../../../../src/domain/action/action'
@@ -69,10 +69,9 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
       await queryHandler.authorize(query, utilisateurConseiller)
 
       // Then
-      expect(conseillerAuthorizer.authorize).to.have.been.calledOnceWithExactly(
-        idConseiller,
-        utilisateurConseiller
-      )
+      expect(
+        conseillerAuthorizer.autoriserLeConseiller
+      ).to.have.been.calledOnceWithExactly(idConseiller, utilisateurConseiller)
     })
   })
 

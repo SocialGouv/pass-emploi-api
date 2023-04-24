@@ -20,7 +20,7 @@ import { NonTrouveError } from '../../../building-blocks/types/domain-error'
 import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
 import { Mail, MailServiceToken } from '../../../domain/mail'
 import { DateService } from '../../../utils/date-service'
-import { SupportAuthorizer } from '../../authorizers/authorize-support'
+import { SupportAuthorizer } from '../../authorizers/support-authorizer'
 
 const COMMENTAIRE_SUPPRESSION_SUPPORT =
   "Pour des raisons techniques nous avons procédé à l'archivage de votre compte."
@@ -55,7 +55,7 @@ export class ArchiverJeuneSupportCommandHandler extends CommandHandler<
     _command: ArchiverJeuneSupportCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.authorizeSupport.authorize(utilisateur)
+    return this.authorizeSupport.autoriserSupport(utilisateur)
   }
 
   async handle(command: ArchiverJeuneSupportCommand): Promise<Result> {

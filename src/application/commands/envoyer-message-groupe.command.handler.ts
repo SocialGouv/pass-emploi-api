@@ -18,9 +18,9 @@ import {
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Notification } from '../../domain/notification/notification'
-import { AuthorizeConseillerForJeunes } from '../authorizers/authorize-conseiller-for-jeunes'
-import { AuthorizeListeDeDiffusion } from '../authorizers/authorize-liste-de-diffusion'
+import { ListeDeDiffusionAuthorizer } from '../authorizers/liste-de-diffusion-authorizer'
 import Code = Evenement.Code
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 
 export interface EnvoyerMessageGroupeCommand extends Command {
   idsBeneficiaires?: string[]
@@ -46,8 +46,8 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
     private jeuneRepository: Jeune.Repository,
     @Inject(ListeDeDiffusionRepositoryToken)
     private listeDeDiffusionRepository: Conseiller.ListeDeDiffusion.Repository,
-    private authorizeConseillerForJeunes: AuthorizeConseillerForJeunes,
-    private authorizeListeDeDiffusion: AuthorizeListeDeDiffusion,
+    private conseillerAuthorizer: ConseillerAuthorizer,
+    private authorizeListeDeDiffusion: ListeDeDiffusionAuthorizer,
     private evenementService: EvenementService,
     private notificationService: Notification.Service
   ) {
@@ -145,10 +145,11 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
     }
 
     if (command.idsBeneficiaires) {
-      const result = await this.authorizeConseillerForJeunes.authorize(
-        command.idsBeneficiaires,
-        utilisateur
-      )
+      const result =
+        await this.conseillerAuthorizer.autoriserConseillerPourSesJeunes(
+          command.idsBeneficiaires,
+          utilisateur
+        )
       if (isFailure(result)) {
         return result
       }
@@ -156,10 +157,11 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
 
     if (command.idsListesDeDiffusion) {
       for (const idListe of command.idsListesDeDiffusion) {
-        const result = await this.authorizeListeDeDiffusion.authorize(
-          idListe,
-          utilisateur
-        )
+        const result =
+          await this.authorizeListeDeDiffusion.autoriserConseillerPourSaListeDeDiffusion(
+            idListe,
+            utilisateur
+          )
         if (isFailure(result)) {
           return result
         }

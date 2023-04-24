@@ -6,8 +6,8 @@ import { Authentification } from '../../../domain/authentification'
 import { fromSqlToActionQueryModelWithJeune } from '../../../infrastructure/repositories/mappers/actions.mappers'
 import { ActionSqlModel } from '../../../infrastructure/sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
-import { ActionAuthorizer } from '../../authorizers/authorize-action'
-import { ConseillerAgenceAuthorizer } from '../../authorizers/authorize-conseiller-agence'
+import { ActionAuthorizer } from '../../authorizers/action-authorizer'
+import { ConseillerInterAgenceAuthorizer } from '../../authorizers/conseiller-inter-agence-authorizer'
 import { ActionQueryModel } from '../query-models/actions.query-model'
 
 export interface GetDetailActionQuery extends Query {
@@ -21,7 +21,7 @@ export class GetDetailActionQueryHandler extends QueryHandler<
 > {
   constructor(
     private actionAuthorizer: ActionAuthorizer,
-    private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer
+    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer
   ) {
     super('GetDetailActionQueryHandler')
   }
@@ -47,12 +47,15 @@ export class GetDetailActionQueryHandler extends QueryHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      return this.conseillerAgenceAuthorizer.authorizeConseillerDeLActionDuJeuneOuSonAgence(
+      return this.conseillerAgenceAuthorizer.autoriserConseillerPourUneActionDeSonJeuneOuDUnJeuneDeSonAgenceMilo(
         query.idAction,
         utilisateur
       )
     }
-    return this.actionAuthorizer.authorize(query.idAction, utilisateur)
+    return this.actionAuthorizer.autoriserPourUneAction(
+      query.idAction,
+      utilisateur
+    )
   }
 
   async monitor(): Promise<void> {

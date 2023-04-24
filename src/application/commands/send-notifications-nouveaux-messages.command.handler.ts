@@ -5,7 +5,7 @@ import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Notification } from '../../domain/notification/notification'
-import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 
 export interface SendNotificationsNouveauxMessagesCommand extends Command {
   idsJeunes: string[]
@@ -43,7 +43,7 @@ export class SendNotificationsNouveauxMessagesCommandHandler extends CommandHand
     command: SendNotificationsNouveauxMessagesCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAuthorizer.authorize(
+    return this.conseillerAuthorizer.autoriserLeConseiller(
       command.idConseiller,
       utilisateur
     )

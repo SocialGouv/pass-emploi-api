@@ -69,7 +69,7 @@ export class RafraichirSuggestionPoleEmploiCommandHandler extends CommandHandler
     command: RafraichirSuggestionPoleEmploiCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorize(
+    return this.jeuneAuthorizer.autoriserLeJeune(
       command.idJeune,
       utilisateur,
       Core.structuresPoleEmploiBRSA

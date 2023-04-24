@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { FavoriOffresImmersionAuthorizer } from '../../../src/application/authorizers/authorize-favori-offres-immersion'
+import { FavoriOffresImmersionAuthorizer } from '../../../src/application/authorizers/favori-offres-immersion-authorizer'
 import {
   DeleteFavoriOffreImmersionCommand,
   DeleteFavoriOffreImmersionCommandHandler
@@ -108,7 +108,7 @@ describe('DeleteFavoriOffreImmersionCommandHandler', () => {
 
       // Then
       expect(
-        favoriOffresImmersionAuthorizer.authorize
+        favoriOffresImmersionAuthorizer.autoriserLeJeunePourSonOffre
       ).to.have.been.calledWithExactly(
         command.idJeune,
         command.idOffreImmersion,

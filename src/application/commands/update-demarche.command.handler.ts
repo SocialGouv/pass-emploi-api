@@ -37,7 +37,7 @@ export class UpdateStatutDemarcheCommandHandler extends CommandHandler<
     command: UpdateStatutDemarcheCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorize(
+    return this.jeuneAuthorizer.autoriserLeJeune(
       command.idJeune,
       utilisateur,
       Core.structuresPoleEmploiBRSA

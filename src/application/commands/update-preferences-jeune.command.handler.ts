@@ -50,7 +50,7 @@ export class UpdateJeunePreferencesCommandHandler extends CommandHandler<
     command: UpdateJeunePreferencesCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
+    return this.jeuneAuthorizer.autoriserLeJeune(command.idJeune, utilisateur)
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {

@@ -13,7 +13,7 @@ import { unJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-mode
 import { uneAgenceMiloDTO } from '../../fixtures/sql-models/agence.sql-model'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import { ConseillerAgenceAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from '../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 import {
   DatabaseForTesting,
   getDatabase
@@ -22,7 +22,7 @@ import {
 describe('GetJeunesByEtablissementQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
   let conseillersRepository: StubbedType<Conseiller.Repository>
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
 
   let getJeunesByEtablissementQueryHandler: GetJeunesByEtablissementQueryHandler
   let sandbox: SinonSandbox
@@ -31,7 +31,7 @@ describe('GetJeunesByEtablissementQueryHandler', () => {
     databaseForTesting = getDatabase()
     sandbox = createSandbox()
     conseillersRepository = stubInterface(sandbox)
-    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
 
     getJeunesByEtablissementQueryHandler =
       new GetJeunesByEtablissementQueryHandler(
@@ -127,7 +127,7 @@ describe('GetJeunesByEtablissementQueryHandler', () => {
 
       // Then
       expect(
-        conseillerAgenceAuthorizer.authorizeConseillerDeLAgence
+        conseillerAgenceAuthorizer.autoriserConseillerPourUneAgence
       ).to.have.been.calledWithExactly('paris', unUtilisateurConseiller())
     })
   })

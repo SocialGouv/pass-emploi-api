@@ -16,7 +16,7 @@ import {
   ActionsRepositoryToken
 } from '../../../domain/action/action'
 import { Authentification } from '../../../domain/authentification'
-import { ActionAuthorizer } from '../../authorizers/authorize-action'
+import { ActionAuthorizer } from '../../authorizers/action-authorizer'
 import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
 import { QualificationActionQueryModel } from '../../queries/query-models/actions.query-model'
 import { Evenement, EvenementService } from '../../../domain/evenement'
@@ -119,7 +119,10 @@ export class QualifierActionCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      return this.actionAuthorizer.authorize(command.idAction, utilisateur)
+      return this.actionAuthorizer.autoriserPourUneAction(
+        command.idAction,
+        utilisateur
+      )
     }
     return failure(new DroitsInsuffisants())
   }

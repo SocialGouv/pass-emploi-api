@@ -1,6 +1,6 @@
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import { GetCommentairesActionQueryHandler } from '../../../../src/application/queries/action/get-commentaires-action.query.handler.db'
-import { ActionAuthorizer } from '../../../../src/application/authorizers/authorize-action'
+import { ActionAuthorizer } from '../../../../src/application/authorizers/action-authorizer'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
@@ -23,7 +23,7 @@ import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
-import { ConseillerAgenceAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 import { Core } from '../../../../src/domain/core'
 import { GetDetailActionQuery } from '../../../../src/application/queries/action/get-detail-action.query.handler.db'
 
@@ -35,12 +35,12 @@ describe('GetCommentairesActionQueryHandler', () => {
 
   let getCommentairesActionQueryHandler: GetCommentairesActionQueryHandler
   let actionAuthorizer: StubbedClass<ActionAuthorizer>
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
 
   beforeEach(async () => {
     await databaseForTesting.cleanPG()
     actionAuthorizer = stubClass(ActionAuthorizer)
-    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
     getCommentairesActionQueryHandler = new GetCommentairesActionQueryHandler(
       actionAuthorizer,
       conseillerAgenceAuthorizer
@@ -64,7 +64,7 @@ describe('GetCommentairesActionQueryHandler', () => {
 
         // Then
         expect(
-          conseillerAgenceAuthorizer.authorizeConseillerDeLActionDuJeuneOuSonAgence
+          conseillerAgenceAuthorizer.autoriserConseillerPourUneActionDeSonJeuneOuDUnJeuneDeSonAgenceMilo
         ).to.have.been.calledWithExactly('id-action', utilisateur)
       })
     })
@@ -81,10 +81,9 @@ describe('GetCommentairesActionQueryHandler', () => {
         await getCommentairesActionQueryHandler.authorize(query, utilisateur)
 
         // Then
-        expect(actionAuthorizer.authorize).to.have.been.calledWithExactly(
-          'id-action',
-          utilisateur
-        )
+        expect(
+          actionAuthorizer.autoriserPourUneAction
+        ).to.have.been.calledWithExactly('id-action', utilisateur)
       })
     })
   })

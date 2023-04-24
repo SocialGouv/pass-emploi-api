@@ -14,7 +14,7 @@ import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
 import { stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { ConseillerAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../../../src/application/authorizers/conseiller-authorizer'
 import { GetAllRendezVousConseillerQueryHandler } from '../../../../src/application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
 import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
@@ -192,7 +192,9 @@ describe('GetRendezVousConseillerQueryHandler', () => {
       )
 
       // Then
-      expect(conseillerAuthorizer.authorize).to.have.been.calledWithExactly(
+      expect(
+        conseillerAuthorizer.autoriserLeConseiller
+      ).to.have.been.calledWithExactly(
         'idConseiller',
         unUtilisateurConseiller()
       )

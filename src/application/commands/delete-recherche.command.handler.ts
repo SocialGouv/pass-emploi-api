@@ -11,7 +11,7 @@ import {
   Recherche,
   RecherchesRepositoryToken
 } from '../../domain/offre/recherche/recherche'
-import { RechercheAuthorizer } from '../authorizers/authorize-recherche'
+import { RechercheAuthorizer } from '../authorizers/recherche-authorizer'
 import {
   MauvaiseCommandeError,
   NonTrouveError
@@ -53,7 +53,7 @@ export class DeleteRechercheCommandHandler extends CommandHandler<
     command: DeleteRechercheCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.rechercheAuthorizer.authorize(
+    return this.rechercheAuthorizer.autoriserLeJeunePourSaRecherche(
       command.idJeune,
       command.idRecherche,
       utilisateur

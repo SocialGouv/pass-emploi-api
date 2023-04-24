@@ -62,7 +62,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         utilisateur
       )
       // Then
-      expect(jeuneAuthorizer.authorize).to.have.been.calledWith(
+      expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWith(
         query.idJeune,
         utilisateur
       )

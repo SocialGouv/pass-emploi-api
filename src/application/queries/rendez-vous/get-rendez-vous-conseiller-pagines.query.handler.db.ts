@@ -7,7 +7,7 @@ import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
-import { ConseillerAuthorizer } from '../../authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { fromSqlToRendezVousConseillerQueryModel } from '../query-mappers/rendez-vous-milo.mappers'
 import { RendezVousConseillerQueryModel } from '../query-models/rendez-vous.query-model'
 import { ConfigService } from '@nestjs/config'
@@ -81,7 +81,10 @@ export class GetRendezVousConseillerPaginesQueryHandler extends QueryHandler<
     query: GetRendezVousConseillerPaginesQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAuthorizer.authorize(query.idConseiller, utilisateur)
+    return this.conseillerAuthorizer.autoriserLeConseiller(
+      query.idConseiller,
+      utilisateur
+    )
   }
 
   async monitor(): Promise<void> {

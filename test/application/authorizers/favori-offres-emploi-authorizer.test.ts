@@ -1,7 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
 import { emptySuccess, failure } from 'src/building-blocks/types/result'
-import { FavoriOffresEmploiAuthorizer } from '../../../src/application/authorizers/authorize-favori-offres-emploi'
+import { FavoriOffresEmploiAuthorizer } from '../../../src/application/authorizers/favori-offres-emploi-authorizer'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
 import { createSandbox, expect } from '../../utils'
@@ -19,7 +19,7 @@ describe('FavoriOffresEmploiAuthorizer', () => {
     )
   })
 
-  describe('authorize', () => {
+  describe('autoriserLeJeunePourSonOffre', () => {
     describe('quand le favori existe et est lié au jeune', () => {
       it('retourne un success', async () => {
         // Given
@@ -31,11 +31,12 @@ describe('FavoriOffresEmploiAuthorizer', () => {
           .resolves(offreEmploi)
 
         // When
-        const result = await favoriOffresEmploiAuthorizer.authorize(
-          utilisateur.id,
-          offreEmploi.id,
-          utilisateur
-        )
+        const result =
+          await favoriOffresEmploiAuthorizer.autoriserLeJeunePourSonOffre(
+            utilisateur.id,
+            offreEmploi.id,
+            utilisateur
+          )
 
         // Then
         expect(result).to.deep.equal(emptySuccess())
@@ -52,11 +53,12 @@ describe('FavoriOffresEmploiAuthorizer', () => {
           .resolves(undefined)
 
         // When
-        const result = await favoriOffresEmploiAuthorizer.authorize(
-          utilisateur.id,
-          offreEmploi.id,
-          utilisateur
-        )
+        const result =
+          await favoriOffresEmploiAuthorizer.autoriserLeJeunePourSonOffre(
+            utilisateur.id,
+            offreEmploi.id,
+            utilisateur
+          )
 
         // Then
         expect(result).to.deep.equal(failure(new DroitsInsuffisants()))

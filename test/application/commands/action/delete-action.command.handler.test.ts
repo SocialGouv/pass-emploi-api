@@ -2,7 +2,7 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { describe } from 'mocha'
 import { SinonSandbox } from 'sinon'
 import { Evenement, EvenementService } from 'src/domain/evenement'
-import { ActionAuthorizer } from '../../../../src/application/authorizers/authorize-action'
+import { ActionAuthorizer } from '../../../../src/application/authorizers/action-authorizer'
 import {
   DeleteActionCommand,
   DeleteActionCommandHandler
@@ -134,10 +134,9 @@ describe('DeleteActionCommandHandler', () => {
       await deleteActionCommandHandler.authorize(command, utilisateur)
 
       // Then
-      expect(actionAuthorizer.authorize).to.have.been.calledWithExactly(
-        command.idAction,
-        utilisateur
-      )
+      expect(
+        actionAuthorizer.autoriserPourUneAction
+      ).to.have.been.calledWithExactly(command.idAction, utilisateur)
     })
   })
 

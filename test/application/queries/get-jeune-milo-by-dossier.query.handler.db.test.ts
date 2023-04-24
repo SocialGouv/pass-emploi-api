@@ -1,5 +1,5 @@
 import { SinonSandbox } from 'sinon'
-import { ConseillerAuthorizer } from 'src/application/authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
 import { GetJeuneMiloByDossierQueryHandler } from 'src/application/queries/get-jeune-milo-by-dossier.query.handler.db'
 import { unJeuneQueryModel } from 'test/fixtures/query-models/jeunes.query-model.fixtures'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'

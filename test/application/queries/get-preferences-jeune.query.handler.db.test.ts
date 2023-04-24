@@ -79,7 +79,7 @@ describe('GetPreferencesJeuneQueryHandler', () => {
       )
 
       // Then
-      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         'idJeune',
         unUtilisateurJeune()
       )

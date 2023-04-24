@@ -31,12 +31,12 @@ import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture
 import { GetJeunesEtablissementV2QueryModel } from '../../../src/application/queries/query-models/agence.query-model'
 import { DateService } from '../../../src/utils/date-service'
 import { GetJeunesEtablissementV2QueryHandler } from '../../../src/application/queries/get-jeunes-etablissement-v2.query.handler.db'
-import { ConseillerAgenceAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from '../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 
 describe('GetJeuneEtablissementV2QueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
   let queryHandler: GetJeunesEtablissementV2QueryHandler
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
   let dateService: StubbedClass<DateService>
 
   const datetimeDeBase = uneDatetime()
@@ -59,7 +59,7 @@ describe('GetJeuneEtablissementV2QueryHandler', () => {
     dateService = stubClass(DateService)
     dateService.nowJs.returns(datetimeDeBase.toJSDate())
     databaseForTesting = getDatabase()
-    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
     queryHandler = new GetJeunesEtablissementV2QueryHandler(
       conseillerAgenceAuthorizer,
       databaseForTesting.sequelize
@@ -76,7 +76,7 @@ describe('GetJeuneEtablissementV2QueryHandler', () => {
 
       // Then
       expect(
-        conseillerAgenceAuthorizer.authorizeConseillerDeLAgence
+        conseillerAgenceAuthorizer.autoriserConseillerPourUneAgence
       ).to.have.been.calledWithExactly('paris', unUtilisateurConseiller())
     })
   })

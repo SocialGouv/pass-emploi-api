@@ -1,17 +1,14 @@
+import { Injectable } from '@nestjs/common'
+import { NonTrouveError } from '../../../building-blocks/types/domain-error'
+import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import { failure, Result, success } from '../../../building-blocks/types/result'
-import { RendezVousJeuneDetailQueryModel } from '../query-models/rendez-vous.query-model'
-import { Query } from '../../../building-blocks/types/query'
 import { Authentification } from '../../../domain/authentification'
-import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
+import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
+import { RendezVousAuthorizer } from '../../authorizers/rendezvous-authorizer'
 import { fromSqlToRendezVousDetailJeuneQueryModel } from '../query-mappers/rendez-vous-milo.mappers'
-import { Injectable } from '@nestjs/common'
-import { RendezVousAuthorizer } from '../../authorizers/authorize-rendezvous'
-import {
-  DroitsInsuffisants,
-  NonTrouveError
-} from '../../../building-blocks/types/domain-error'
+import { RendezVousJeuneDetailQueryModel } from '../query-models/rendez-vous.query-model'
 
 export interface GetUnRendezVousJeuneQuery extends Query {
   idRendezVous: string
@@ -31,13 +28,16 @@ export class GetUnRendezVousJeuneQueryHandler extends QueryHandler<
     query: GetUnRendezVousJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (
-      utilisateur.type === Authentification.Type.JEUNE &&
-      utilisateur.id !== query.idJeune
-    ) {
-      return failure(new DroitsInsuffisants())
+    if (utilisateur.type === Authentification.Type.JEUNE) {
+      return this.rendezVousAuthorizer.autoriserJeunePourSonRendezVous(
+        query.idRendezVous,
+        utilisateur
+      )
     }
-    return this.rendezVousAuthorizer.authorize(query.idRendezVous, utilisateur)
+    return this.rendezVousAuthorizer.autoriserConseillerPourUnRendezVousAvecAuMoinsUnJeune(
+      query.idRendezVous,
+      utilisateur
+    )
   }
 
   async handle(

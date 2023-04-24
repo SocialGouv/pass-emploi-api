@@ -2,7 +2,7 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DateTime } from 'luxon'
 import { SinonSandbox } from 'sinon'
 import { failure, success } from 'src/building-blocks/types/result'
-import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import {
   CreateJeuneCommand,
   CreerJeunePoleEmploiCommandHandler
@@ -156,10 +156,9 @@ describe('CreateJeunePoleEmploiCommandHandler', () => {
       await createJeuneCommandHandler.authorize(command, utilisateur)
 
       // Then
-      expect(conseillerAuthorizer.authorize).to.have.been.calledWithExactly(
-        command.idConseiller,
-        utilisateur
-      )
+      expect(
+        conseillerAuthorizer.autoriserLeConseiller
+      ).to.have.been.calledWithExactly(command.idConseiller, utilisateur)
     })
 
     it('rejette un conseiller MILO', async () => {

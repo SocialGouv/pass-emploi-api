@@ -38,7 +38,7 @@ export class CreateDemarcheCommandHandler extends CommandHandler<
     command: CreateDemarcheCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorize(
+    return this.jeuneAuthorizer.autoriserLeJeune(
       command.idJeune,
       utilisateur,
       Core.structuresPoleEmploiBRSA

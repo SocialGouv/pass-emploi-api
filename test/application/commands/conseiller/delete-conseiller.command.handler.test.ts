@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { createSandbox } from 'sinon'
-import { ConseillerAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../../../src/application/authorizers/conseiller-authorizer'
 import {
   DeleteConseillerCommand,
   DeleteConseillerCommandHandler
@@ -57,7 +57,9 @@ describe('DeleteConseillerCommandHandler', () => {
       )
 
       // Then
-      expect(conseillerAuthorizer.authorize).to.have.been.calledWithExactly(
+      expect(
+        conseillerAuthorizer.autoriserLeConseiller
+      ).to.have.been.calledWithExactly(
         'idConseiller',
         unUtilisateurConseiller({ structure: Core.Structure.POLE_EMPLOI_BRSA })
       )

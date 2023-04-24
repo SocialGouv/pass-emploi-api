@@ -1,4 +1,4 @@
-import { ConseillerAgenceAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import { GetFavorisJeuneQueryHandler } from '../../../../src/application/queries/favoris/get-favoris-jeune.query.handler.db'
 import { FavorisQueryModel } from '../../../../src/application/queries/query-models/favoris.query-model'
@@ -25,7 +25,7 @@ import { expect, StubbedClass, stubClass } from '../../../utils'
 import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('GetFavorisJeuneQueryHandler', () => {
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let getFavorisJeuneQueryHandler: GetFavorisJeuneQueryHandler
 
@@ -34,7 +34,7 @@ describe('GetFavorisJeuneQueryHandler', () => {
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
-    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
 
     getFavorisJeuneQueryHandler = new GetFavorisJeuneQueryHandler(
@@ -221,7 +221,7 @@ describe('GetFavorisJeuneQueryHandler', () => {
 
         // Then
         expect(
-          conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgenceAvecPartageFavoris
+          conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMiloAvecPartageFavoris
         ).to.have.been.calledWithExactly('id-jeune', utilisateur)
       })
     })

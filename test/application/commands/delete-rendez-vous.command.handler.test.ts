@@ -1,4 +1,4 @@
-import { RendezVousAuthorizer } from '../../../src/application/authorizers/authorize-rendezvous'
+import { RendezVousAuthorizer } from '../../../src/application/authorizers/rendezvous-authorizer'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
@@ -244,10 +244,9 @@ describe('DeleteRendezVousCommandHandler', () => {
         await deleteRendezVousCommandHandler.authorize(command, utilisateur)
 
         // Then
-        expect(rendezVousAuthorizer.authorize).to.have.been.calledWithExactly(
-          command.idRendezVous,
-          utilisateur
-        )
+        expect(
+          rendezVousAuthorizer.autoriserConseillerPourUnRendezVousAvecAuMoinsUnJeune
+        ).to.have.been.calledWithExactly(command.idRendezVous, utilisateur)
       })
     })
   })
