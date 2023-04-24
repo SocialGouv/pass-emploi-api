@@ -1,27 +1,27 @@
 import { Inject, Injectable } from '@nestjs/common'
-import {
-  ArchiveJeuneRepositoryToken,
-  ArchiveJeune
-} from '../../domain/archive-jeune'
-import { Evenement, EvenementService } from '../../domain/evenement'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
+  Result,
   emptySuccess,
-  failure,
-  Result
+  failure
 } from '../../building-blocks/types/result'
+import {
+  ArchiveJeune,
+  ArchiveJeuneRepositoryToken
+} from '../../domain/archive-jeune'
 import {
   Authentification,
   AuthentificationRepositoryToken
 } from '../../domain/authentification'
+import { Evenement, EvenementService } from '../../domain/evenement'
 
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
-import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
-import { DateService } from '../../utils/date-service'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Mail, MailServiceToken } from '../../domain/mail'
+import { DateService } from '../../utils/date-service'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 
 export interface ArchiverJeuneCommand {
   idJeune: Jeune.Id
@@ -44,7 +44,7 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
     @Inject(AuthentificationRepositoryToken)
     private readonly authentificationRepository: Authentification.Repository,
     private evenementService: EvenementService,
-    private authorizeConseillerForJeune: ConseillerForJeuneAuthorizer,
+    private conseillerAuthorizer: ConseillerAuthorizer,
     private dateService: DateService,
     @Inject(MailServiceToken)
     private readonly mailService: Mail.Service
@@ -56,7 +56,7 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
     command: ArchiverJeuneCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.authorizeConseillerForJeune.authorize(
+    return this.conseillerAuthorizer.autoriserConseillerPourSonJeune(
       command.idJeune,
       utilisateur
     )

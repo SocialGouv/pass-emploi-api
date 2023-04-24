@@ -7,7 +7,7 @@ import { Action } from '../../../domain/action/action'
 import { Authentification } from '../../../domain/authentification'
 import { ActionSqlModel } from '../../../infrastructure/sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
-import { ConseillerAuthorizer } from '../../authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { GetActionsConseillerV2QueryModel } from '../query-models/conseillers.query-model'
 
 const DEFAULT_PAGE = 1
@@ -32,7 +32,10 @@ export class GetActionsConseillerV2QueryHandler extends QueryHandler<
     query: GetActionsConseillerV2Query,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAuthorizer.authorize(query.idConseiller, utilisateur)
+    return this.conseillerAuthorizer.autoriserLeConseiller(
+      query.idConseiller,
+      utilisateur
+    )
   }
 
   async handle(

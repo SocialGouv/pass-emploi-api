@@ -317,7 +317,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       handler.authorize(query, unUtilisateurJeune())
 
       // Then
-      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         query.idJeune,
         unUtilisateurJeune(),
         Core.structuresMiloPassEmploi

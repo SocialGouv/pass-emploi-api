@@ -28,14 +28,14 @@ import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
-import { ConseillerAgenceAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 import { Core } from '../../../../src/domain/core'
 
 describe('GetActionsByJeuneQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
   let actionSqlRepository: Action.Repository
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
   let getActionsByJeuneQueryHandler: GetActionsJeuneQueryHandler
   let sandbox: SinonSandbox
 
@@ -43,7 +43,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
     databaseForTesting = getDatabase()
     sandbox = createSandbox()
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
-    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
     actionSqlRepository = new ActionSqlRepository(new DateService())
     getActionsByJeuneQueryHandler = new GetActionsJeuneQueryHandler(
       databaseForTesting.sequelize,
@@ -733,7 +733,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
 
         // Then
         expect(
-          conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence
+          conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo
         ).to.have.been.calledWithExactly('id-jeune', utilisateur)
       })
     })
@@ -751,7 +751,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
         await getActionsByJeuneQueryHandler.authorize(query, utilisateur)
 
         // Then
-        expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+        expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
           'id-jeune',
           utilisateur
         )

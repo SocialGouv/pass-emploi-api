@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { RendezVousAuthorizer } from 'src/application/authorizers/authorize-rendezvous'
+import { RendezVousAuthorizer } from 'src/application/authorizers/rendezvous-authorizer'
 import {
   CloturerAnimationCollectiveCommand,
   CloturerAnimationCollectiveCommandHandler
@@ -152,7 +152,9 @@ describe('CloturerAnimationCollectiveCommandHandler', () => {
       )
 
       // Then
-      expect(rendezVousAuthorizer.authorize).to.have.been.calledWithExactly(
+      expect(
+        rendezVousAuthorizer.autoriserConseillerPourUnRendezVousAvecAuMoinsUnJeune
+      ).to.have.been.calledWithExactly(
         command.idAnimationCollective,
         utilisateur
       )

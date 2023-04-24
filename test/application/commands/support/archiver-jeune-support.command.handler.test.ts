@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { createSandbox } from 'sinon'
-import { SupportAuthorizer } from '../../../../src/application/authorizers/authorize-support'
+import { SupportAuthorizer } from '../../../../src/application/authorizers/support-authorizer'
 import {
   ArchiverJeuneSupportCommand,
   ArchiverJeuneSupportCommandHandler
@@ -64,7 +64,7 @@ describe('ArchiverJeuneSupportCommandHandler', () => {
       )
 
       // Then
-      expect(authorizeSupport.authorize).to.have.been.calledWithExactly(
+      expect(authorizeSupport.autoriserSupport).to.have.been.calledWithExactly(
         unUtilisateurSupport()
       )
     })

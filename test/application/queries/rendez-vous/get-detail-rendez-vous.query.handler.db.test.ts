@@ -22,12 +22,12 @@ import {
 } from '../../../../src/domain/rendez-vous/rendez-vous'
 import { RendezVousJeuneAssociationSqlModel } from '../../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
-import { RendezVousAuthorizer } from '../../../../src/application/authorizers/authorize-rendezvous'
+import { RendezVousAuthorizer } from '../../../../src/application/authorizers/rendezvous-authorizer'
 import { LogModificationRendezVousSqlModel } from '../../../../src/infrastructure/sequelize/models/log-modification-rendez-vous-sql.model'
 import { DateService } from '../../../../src/utils/date-service'
 import { DateTime } from 'luxon'
 import { getDatabase } from '../../../utils/database-for-testing'
-import { ConseillerAgenceAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 import { Core } from '../../../../src/domain/core'
 
 const queryModel: RendezVousConseillerDetailQueryModel = {
@@ -60,7 +60,7 @@ const queryModel: RendezVousConseillerDetailQueryModel = {
 describe('GetDetailRendezVousQueryHandler', () => {
   let getDetailRendezVousQueryHandler: GetDetailRendezVousQueryHandler
   let rendezVousAuthorizer: StubbedClass<RendezVousAuthorizer>
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
   let dateService: StubbedClass<DateService>
   let sandbox: SinonSandbox
   const maintenant = uneDate()
@@ -69,7 +69,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
     await getDatabase().cleanPG()
     sandbox = createSandbox()
     rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
-    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
     dateService = stubClass(DateService)
     dateService.nowJs.returns(maintenant)
     getDetailRendezVousQueryHandler = new GetDetailRendezVousQueryHandler(
@@ -435,7 +435,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
 
       // Then
       expect(
-        rendezVousAuthorizer.authorizeConseiller
+        rendezVousAuthorizer.autoriserConseillerPourUnRendezVousAvecAuMoinsUnJeune
       ).to.have.been.calledWithExactly('idRdv', utilisateur)
     })
     it("valide l'autorisation quand c’est un conseiller MILO", async () => {
@@ -444,7 +444,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
         id: 'idConseiller',
         structure: Core.Structure.MILO
       })
-      conseillerAgenceAuthorizer.structureConseillerAutorisee.returns(true)
+      conseillerAgenceAuthorizer.structureAutoriseeInterAgence.returns(true)
 
       // When
       await getDetailRendezVousQueryHandler.authorize(
@@ -456,7 +456,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
 
       // Then
       expect(
-        conseillerAgenceAuthorizer.authorizeConseillerMILOAvecUnJeuneDansLeRendezVous
+        conseillerAgenceAuthorizer.autoriserConseillerMiloPourUnRdvDeSonAgenceOuAvecUnJeuneDansLeRdv
       ).to.have.been.calledWithExactly('idRdv', utilisateur)
     })
   })

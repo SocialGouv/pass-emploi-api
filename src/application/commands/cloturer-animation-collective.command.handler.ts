@@ -11,7 +11,7 @@ import {
 import { Authentification } from '../../domain/authentification'
 import { AnimationCollectiveRepositoryToken } from '../../domain/rendez-vous/animation-collective'
 import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
-import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
+import { RendezVousAuthorizer } from '../authorizers/rendezvous-authorizer'
 
 export interface CloturerAnimationCollectiveCommand extends Command {
   idAnimationCollective: string
@@ -64,7 +64,7 @@ export class CloturerAnimationCollectiveCommandHandler extends CommandHandler<
     command: CloturerAnimationCollectiveCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.rendezVousAuthorizer.authorize(
+    return this.rendezVousAuthorizer.autoriserConseillerPourUnRendezVousAvecAuMoinsUnJeune(
       command.idAnimationCollective,
       utilisateur
     )

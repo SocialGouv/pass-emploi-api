@@ -2,7 +2,7 @@ import {
   AddCommentaireActionCommand,
   AddCommentaireActionCommandHandler
 } from '../../../../src/application/commands/action/add-commentaire-action.command.handler'
-import { ActionAuthorizer } from '../../../../src/application/authorizers/authorize-action'
+import { ActionAuthorizer } from '../../../../src/application/authorizers/action-authorizer'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'

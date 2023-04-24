@@ -5,7 +5,7 @@ import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { failure, Result, success } from '../../building-blocks/types/result'
-import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { JeuneQueryModel } from './query-models/jeunes.query-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 
@@ -43,10 +43,9 @@ export class GetJeuneMiloByDossierQueryHandler extends QueryHandler<
     _query: GetJeuneMiloByDossierQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAuthorizer.authorizeConseiller(
-      utilisateur,
+    return this.conseillerAuthorizer.autoriserToutConseiller(utilisateur, [
       Core.Structure.MILO
-    )
+    ])
   }
 
   async monitor(): Promise<void> {

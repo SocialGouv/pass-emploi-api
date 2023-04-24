@@ -9,7 +9,7 @@ import { fromSqlToDetailConseillerQueryModel } from '../../infrastructure/reposi
 import { AgenceSqlModel } from '../../infrastructure/sequelize/models/agence.sql-model'
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
-import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { DetailConseillerQueryModel } from './query-models/conseillers.query-model'
 
 export interface GetConseillerByEmailQuery extends Query {
@@ -57,7 +57,7 @@ export class GetConseillerByEmailQueryHandler extends QueryHandler<
     _query: GetConseillerByEmailQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAuthorizer.authorizeSuperviseur(utilisateur)
+    return this.conseillerAuthorizer.autoriserConseillerSuperviseur(utilisateur)
   }
 
   async monitor(): Promise<void> {

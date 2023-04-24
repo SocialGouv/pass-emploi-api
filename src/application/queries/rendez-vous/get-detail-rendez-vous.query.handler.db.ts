@@ -8,8 +8,8 @@ import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sq
 import { LogModificationRendezVousSqlModel } from '../../../infrastructure/sequelize/models/log-modification-rendez-vous-sql.model'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { DateService } from '../../../utils/date-service'
-import { ConseillerAgenceAuthorizer } from '../../authorizers/authorize-conseiller-agence'
-import { RendezVousAuthorizer } from '../../authorizers/authorize-rendezvous'
+import { ConseillerInterAgenceAuthorizer } from '../../authorizers/conseiller-inter-agence-authorizer'
+import { RendezVousAuthorizer } from '../../authorizers/rendezvous-authorizer'
 import { fromSqlToRendezVousConseillerDetailQueryModel } from '../query-mappers/rendez-vous-milo.mappers'
 import { RendezVousConseillerDetailQueryModel } from '../query-models/rendez-vous.query-model'
 
@@ -24,7 +24,7 @@ export class GetDetailRendezVousQueryHandler extends QueryHandler<
 > {
   constructor(
     private rendezVousAuthorizer: RendezVousAuthorizer,
-    private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer,
+    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer,
     private dateService: DateService
   ) {
     super('GetDetailRendezVousQueryHandler')
@@ -74,16 +74,16 @@ export class GetDetailRendezVousQueryHandler extends QueryHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (
-      this.conseillerAgenceAuthorizer.structureConseillerAutorisee(
+      this.conseillerAgenceAuthorizer.structureAutoriseeInterAgence(
         utilisateur.structure
       )
     ) {
-      return this.conseillerAgenceAuthorizer.authorizeConseillerMILOAvecUnJeuneDansLeRendezVous(
+      return this.conseillerAgenceAuthorizer.autoriserConseillerMiloPourUnRdvDeSonAgenceOuAvecUnJeuneDansLeRdv(
         query.idRendezVous,
         utilisateur
       )
     }
-    return this.rendezVousAuthorizer.authorizeConseiller(
+    return this.rendezVousAuthorizer.autoriserConseillerPourUnRendezVousAvecAuMoinsUnJeune(
       query.idRendezVous,
       utilisateur
     )

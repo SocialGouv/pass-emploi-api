@@ -14,7 +14,7 @@ import {
   Suggestion,
   SuggestionsRepositoryToken
 } from '../../domain/offre/recherche/suggestion/suggestion'
-import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface CreateSuggestionConseillerServiceCiviqueCommand
@@ -47,7 +47,7 @@ export class CreateSuggestionConseillerServiceCiviqueCommandHandler extends Comm
     command: CreateSuggestionConseillerServiceCiviqueCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAuthorizer.authorize(
+    return this.conseillerAuthorizer.autoriserLeConseiller(
       command.idConseiller,
       utilisateur
     )

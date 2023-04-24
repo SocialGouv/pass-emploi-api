@@ -1,6 +1,6 @@
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { createSandbox, SinonSandbox } from 'sinon'
 import { Authentification } from '../../../src/domain/authentification'
@@ -71,10 +71,9 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
       )
 
       // Then
-      expect(conseillerAuthorizer.authorize).to.have.been.calledWithExactly(
-        command.idConseiller,
-        utilisateur
-      )
+      expect(
+        conseillerAuthorizer.autoriserLeConseiller
+      ).to.have.been.calledWithExactly(command.idConseiller, utilisateur)
     })
   })
 

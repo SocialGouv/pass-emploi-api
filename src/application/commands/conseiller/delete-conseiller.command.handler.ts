@@ -22,7 +22,7 @@ import {
 } from '../../../domain/conseiller/conseiller'
 import { Core } from '../../../domain/core'
 import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
-import { ConseillerAuthorizer } from '../../authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 
 export interface DeleteConseillerCommand {
   idConseiller: string
@@ -54,7 +54,7 @@ export class DeleteConseillerCommandHandler extends CommandHandler<
       utilisateur.structure === Core.Structure.POLE_EMPLOI ||
       utilisateur.structure === Core.Structure.POLE_EMPLOI_BRSA
     ) {
-      return this.conseillerAuthorizer.authorize(
+      return this.conseillerAuthorizer.autoriserLeConseiller(
         command.idConseiller,
         utilisateur
       )

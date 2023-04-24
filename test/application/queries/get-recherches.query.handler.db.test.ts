@@ -1,4 +1,4 @@
-import { ConseillerAgenceAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from '../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { GetRecherchesQueryHandler } from '../../../src/application/queries/get-recherches.query.handler.db'
 import { Core } from '../../../src/domain/core'
@@ -30,12 +30,12 @@ describe('GetRecherchesQueryHandler', () => {
 
   let getRecherchesQueryHandler: GetRecherchesQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
 
   beforeEach(async () => {
     await database.cleanPG()
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
-    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
     getRecherchesQueryHandler = new GetRecherchesQueryHandler(
       jeuneAuthorizer,
       conseillerAgenceAuthorizer
@@ -59,7 +59,7 @@ describe('GetRecherchesQueryHandler', () => {
 
         // Then
         expect(
-          conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgenceAvecPartageFavoris
+          conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMiloAvecPartageFavoris
         ).to.have.been.calledWithExactly('id-jeune', utilisateur)
       })
     })

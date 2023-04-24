@@ -100,7 +100,7 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
     query: GetJeuneHomeAgendaPoleEmploiQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorize(
+    return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
       Core.structuresPoleEmploiBRSA

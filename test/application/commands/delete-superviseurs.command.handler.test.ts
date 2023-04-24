@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { SupportAuthorizer } from 'src/application/authorizers/authorize-support'
+import { SupportAuthorizer } from 'src/application/authorizers/support-authorizer'
 import {
   DeleteSuperviseursCommand,
   DeleteSuperviseursCommandHandler

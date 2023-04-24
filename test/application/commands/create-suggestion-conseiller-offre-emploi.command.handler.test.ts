@@ -3,7 +3,7 @@ import {
   CreateSuggestionConseillerOffreEmploiCommandHandler
 } from '../../../src/application/commands/create-suggestion-conseiller-offre-emploi.command.handler'
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { createSandbox, SinonSandbox } from 'sinon'
@@ -71,10 +71,9 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
       )
 
       // Then
-      expect(conseillerAuthorizer.authorize).to.have.been.calledWithExactly(
-        command.idConseiller,
-        utilisateur
-      )
+      expect(
+        conseillerAuthorizer.autoriserLeConseiller
+      ).to.have.been.calledWithExactly(command.idConseiller, utilisateur)
     })
   })
 

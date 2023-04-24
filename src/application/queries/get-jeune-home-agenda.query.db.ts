@@ -13,7 +13,7 @@ import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
-import { ConseillerAgenceAuthorizer } from '../authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from '../authorizers/conseiller-inter-agence-authorizer'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { fromSqlToRendezVousJeuneQueryModel } from './query-mappers/rendez-vous-milo.mappers'
 import { ActionQueryModel } from './query-models/actions.query-model'
@@ -32,7 +32,7 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
 > {
   constructor(
     private jeuneAuthorizer: JeuneAuthorizer,
-    private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer,
+    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer,
     private configuration: ConfigService
   ) {
     super('GetJeuneHomeAgendaQueryHandler')
@@ -72,12 +72,12 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      return this.conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence(
+      return this.conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo(
         query.idJeune,
         utilisateur
       )
     }
-    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.autoriserLeJeune(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

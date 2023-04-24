@@ -9,7 +9,7 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { OffresEmploiRepositoryToken } from '../../domain/offre/favori/offre-emploi'
-import { FavoriOffresEmploiAuthorizer } from '../authorizers/authorize-favori-offres-emploi'
+import { FavoriOffresEmploiAuthorizer } from '../authorizers/favori-offres-emploi-authorizer'
 import { Offre } from '../../domain/offre/offre'
 
 export interface DeleteFavoriOffreEmploiCommand extends Command {
@@ -51,7 +51,7 @@ export class DeleteFavoriOffreEmploiCommandHandler extends CommandHandler<
     command: DeleteFavoriOffreEmploiCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.favoriOffresEmploiAuthorizer.authorize(
+    return this.favoriOffresEmploiAuthorizer.autoriserLeJeunePourSonOffre(
       command.idJeune,
       command.idOffreEmploi,
       utilisateur

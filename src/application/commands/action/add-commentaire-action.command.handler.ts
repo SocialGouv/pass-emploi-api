@@ -2,7 +2,7 @@ import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import { failure, Result, success } from '../../../building-blocks/types/result'
 import { Command } from '../../../building-blocks/types/command'
 import { NonTrouveError } from '../../../building-blocks/types/domain-error'
-import { ActionAuthorizer } from '../../authorizers/authorize-action'
+import { ActionAuthorizer } from '../../authorizers/action-authorizer'
 import { Authentification } from '../../../domain/authentification'
 import {
   Action,
@@ -46,7 +46,10 @@ export class AddCommentaireActionCommandHandler extends CommandHandler<
     command: AddCommentaireActionCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.actionAuthorizer.authorize(command.idAction, utilisateur)
+    return this.actionAuthorizer.autoriserPourUneAction(
+      command.idAction,
+      utilisateur
+    )
   }
 
   async handle(

@@ -29,7 +29,7 @@ import {
   JeuneMilo,
   MiloJeuneRepositoryToken
 } from '../../domain/jeune/jeune.milo'
-import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { IdentiteJeuneQueryModel } from '../queries/query-models/jeunes.query-model'
 
 export interface CreerJeuneMiloCommand extends Command {
@@ -137,7 +137,7 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     ) {
       return failure(new DroitsInsuffisants())
     }
-    return this.conseillerAuthorizer.authorize(
+    return this.conseillerAuthorizer.autoriserLeConseiller(
       command.idConseiller,
       utilisateur
     )

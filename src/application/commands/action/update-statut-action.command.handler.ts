@@ -11,7 +11,7 @@ import {
 } from '../../../building-blocks/types/result'
 import { Action, ActionsRepositoryToken } from '../../../domain/action/action'
 import { Authentification } from '../../../domain/authentification'
-import { ActionAuthorizer } from '../../authorizers/authorize-action'
+import { ActionAuthorizer } from '../../authorizers/action-authorizer'
 
 export interface UpdateStatutActionCommand extends Command {
   idAction: Action.Id
@@ -50,7 +50,10 @@ export class UpdateStatutActionCommandHandler extends CommandHandler<
     command: UpdateStatutActionCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.actionAuthorizer.authorize(command.idAction, utilisateur)
+    return this.actionAuthorizer.autoriserPourUneAction(
+      command.idAction,
+      utilisateur
+    )
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {

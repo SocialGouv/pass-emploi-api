@@ -1,4 +1,4 @@
-import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import { PlanificateurService } from '../../../src/domain/planificateur'
 import {
   unUtilisateurConseiller,
@@ -363,10 +363,9 @@ describe('CreateRendezVousCommandHandler', () => {
       await createRendezVousCommandHandler.authorize(command, utilisateur)
 
       // Then
-      expect(conseillerAuthorizer.authorize).to.have.been.calledWithExactly(
-        command.idConseiller,
-        utilisateur
-      )
+      expect(
+        conseillerAuthorizer.autoriserLeConseiller
+      ).to.have.been.calledWithExactly(command.idConseiller, utilisateur)
     })
   })
 

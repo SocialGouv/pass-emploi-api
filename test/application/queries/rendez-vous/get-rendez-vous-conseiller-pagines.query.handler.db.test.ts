@@ -4,7 +4,7 @@ import {
 } from 'src/application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
 import { isSuccess } from 'src/building-blocks/types/result'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
-import { ConseillerAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../../../src/application/authorizers/conseiller-authorizer'
 import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import {
@@ -231,7 +231,9 @@ describe('GetRendezVousConseillerPaginesQueryHandler', () => {
       )
 
       // Then
-      expect(conseillerAuthorizer.authorize).to.have.been.calledWithExactly(
+      expect(
+        conseillerAuthorizer.autoriserLeConseiller
+      ).to.have.been.calledWithExactly(
         'idConseiller',
         unUtilisateurConseiller()
       )

@@ -1,7 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { Jeune } from 'src/domain/jeune/jeune'
 import { stubClassSandbox } from 'test/utils/types'
-import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import {
   SendNotificationsNouveauxMessagesCommand,
   SendNotificationsNouveauxMessagesCommandHandler
@@ -75,14 +75,12 @@ describe('SendNotificationsNouveauxMessagesCommandHandler', () => {
       )
 
       // Then
-      expect(conseillerAuthorizer.authorize).to.have.been.calledWithExactly(
-        command.idConseiller,
-        utilisateur
-      )
-      expect(conseillerAuthorizer.authorize).to.have.been.calledWithExactly(
-        command.idConseiller,
-        utilisateur
-      )
+      expect(
+        conseillerAuthorizer.autoriserLeConseiller
+      ).to.have.been.calledWithExactly(command.idConseiller, utilisateur)
+      expect(
+        conseillerAuthorizer.autoriserLeConseiller
+      ).to.have.been.calledWithExactly(command.idConseiller, utilisateur)
     })
   })
 })

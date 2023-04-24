@@ -87,7 +87,7 @@ describe('AddFavoriOffreServiceCiviqueCommandHandler', () => {
     it('autorise un jeune', async () => {
       // Given
       const utilisateur = unUtilisateurJeune()
-      jeuneAuthorizer.authorize
+      jeuneAuthorizer.autoriserLeJeune
         .withArgs(command.idJeune, utilisateur)
         .resolves(emptySuccess())
 

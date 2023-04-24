@@ -1,4 +1,4 @@
-import { FavoriOffresEmploiAuthorizer } from '../../../src/application/authorizers/authorize-favori-offres-emploi'
+import { FavoriOffresEmploiAuthorizer } from '../../../src/application/authorizers/favori-offres-emploi-authorizer'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
@@ -108,7 +108,7 @@ describe('DeleteFavoriOffreEmploiCommandHandler', () => {
 
       // Then
       expect(
-        favoriOffresEmploiAuthorizer.authorize
+        favoriOffresEmploiAuthorizer.autoriserLeJeunePourSonOffre
       ).to.have.been.calledWithExactly(
         command.idJeune,
         command.idOffreEmploi,

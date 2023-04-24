@@ -19,7 +19,7 @@ import {
 import { JeuneDuRendezVous } from '../../../domain/rendez-vous/rendez-vous'
 
 import { ApiProperty } from '@nestjs/swagger'
-import { SupportAuthorizer } from '../../authorizers/authorize-support'
+import { SupportAuthorizer } from '../../authorizers/support-authorizer'
 
 enum AgenceTransferee {
   OUI = 'OUI (le conseiller était créateur)',
@@ -89,7 +89,7 @@ export class UpdateAgenceConseillerCommandHandler extends CommandHandler<
     _command: UpdateAgenceConseillerCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.authorizeSupport.authorize(utilisateur)
+    return this.authorizeSupport.autoriserSupport(utilisateur)
   }
   async monitor(): Promise<void> {
     return

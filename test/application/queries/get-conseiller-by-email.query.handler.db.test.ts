@@ -1,4 +1,4 @@
-import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import {
   GetConseillerByEmailQuery,
   GetConseillerByEmailQueryHandler
@@ -130,9 +130,9 @@ describe('GetConseillerByEmailQueryHandler', () => {
       await getConseillerByEmail.authorize(query, utilisateur)
 
       // Then
-      expect(conseillerAuthorizer.authorizeSuperviseur).to.have.been.calledWith(
-        utilisateur
-      )
+      expect(
+        conseillerAuthorizer.autoriserConseillerSuperviseur
+      ).to.have.been.calledWith(utilisateur)
     })
   })
 })

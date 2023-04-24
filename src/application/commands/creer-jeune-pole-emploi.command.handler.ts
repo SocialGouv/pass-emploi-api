@@ -15,7 +15,7 @@ import {
 } from '../../domain/conseiller/conseiller'
 import { Core } from '../../domain/core'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
-import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 
 export interface CreateJeuneCommand extends Command {
   idConseiller: string
@@ -87,7 +87,7 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
     ) {
       return failure(new DroitsInsuffisants())
     }
-    return this.conseillerAuthorizer.authorize(
+    return this.conseillerAuthorizer.autoriserLeConseiller(
       command.idConseiller,
       utilisateur
     )

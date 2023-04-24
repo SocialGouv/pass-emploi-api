@@ -15,9 +15,9 @@ import {
   ListeDeDiffusionRepositoryToken
 } from '../../domain/conseiller/liste-de-diffusion'
 import { Fichier, FichierRepositoryToken } from '../../domain/fichier'
-import { AuthorizeConseillerForJeunes } from '../authorizers/authorize-conseiller-for-jeunes'
-import { AuthorizeListeDeDiffusion } from '../authorizers/authorize-liste-de-diffusion'
+import { ListeDeDiffusionAuthorizer } from '../authorizers/liste-de-diffusion-authorizer'
 import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 
 export interface TeleverserFichierCommand extends Command {
   fichier: {
@@ -49,8 +49,8 @@ export class TeleverserFichierCommandHandler extends CommandHandler<
     @Inject(ListeDeDiffusionRepositoryToken)
     private listeDeDiffusionRepository: Conseiller.ListeDeDiffusion.Repository,
     private fichierFactory: Fichier.Factory,
-    private authorizeConseillerForJeunes: AuthorizeConseillerForJeunes,
-    private authorizeListeDeDiffusion: AuthorizeListeDeDiffusion
+    private conseillerAuthorizer: ConseillerAuthorizer,
+    private authorizeListeDeDiffusion: ListeDeDiffusionAuthorizer
   ) {
     super('TeleverserFichierCommandHandler')
   }
@@ -60,20 +60,22 @@ export class TeleverserFichierCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (command.jeunesIds?.length) {
-      const result = await this.authorizeConseillerForJeunes.authorize(
-        command.jeunesIds,
-        utilisateur
-      )
+      const result =
+        await this.conseillerAuthorizer.autoriserConseillerPourSesJeunes(
+          command.jeunesIds,
+          utilisateur
+        )
       if (isFailure(result)) {
         return result
       }
     }
     if (command.listesDeDiffusionIds?.length) {
       for (const idListe of command.listesDeDiffusionIds) {
-        const result = await this.authorizeListeDeDiffusion.authorize(
-          idListe,
-          utilisateur
-        )
+        const result =
+          await this.authorizeListeDeDiffusion.autoriserConseillerPourSaListeDeDiffusion(
+            idListe,
+            utilisateur
+          )
         if (isFailure(result)) {
           return result
         }

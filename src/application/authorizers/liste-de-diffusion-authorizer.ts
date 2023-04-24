@@ -11,26 +11,23 @@ import ListeDeDiffusion = Conseiller.ListeDeDiffusion
 import { ListeDeDiffusionRepositoryToken } from '../../domain/conseiller/liste-de-diffusion'
 
 @Injectable()
-export class AuthorizeListeDeDiffusion {
+export class ListeDeDiffusionAuthorizer {
   constructor(
     @Inject(ListeDeDiffusionRepositoryToken)
     private repository: ListeDeDiffusion.Repository
   ) {}
 
-  async authorize(
+  async autoriserConseillerPourSaListeDeDiffusion(
     idListe: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type !== Authentification.Type.CONSEILLER) {
-      return failure(new DroitsInsuffisants())
+    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+      const listeDeDiffusion = await this.repository.get(idListe)
+
+      if (listeDeDiffusion?.idConseiller === utilisateur.id) {
+        return emptySuccess()
+      }
     }
-
-    const listeDeDiffusion = await this.repository.get(idListe)
-
-    if (listeDeDiffusion?.idConseiller !== utilisateur.id) {
-      return failure(new DroitsInsuffisants())
-    }
-
-    return emptySuccess()
+    return failure(new DroitsInsuffisants())
   }
 }

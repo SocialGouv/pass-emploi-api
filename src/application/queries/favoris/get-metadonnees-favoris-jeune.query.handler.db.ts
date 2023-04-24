@@ -10,7 +10,7 @@ import { FavoriOffreEngagementSqlModel } from '../../../infrastructure/sequelize
 import { FavoriOffreImmersionSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { RechercheSqlModel } from '../../../infrastructure/sequelize/models/recherche.sql-model'
-import { ConseillerAgenceAuthorizer } from '../../authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from '../../authorizers/conseiller-inter-agence-authorizer'
 import { MetadonneesFavorisQueryModel } from '../query-models/favoris.query-model'
 
 export interface GetMetadonneesFavorisJeuneQuery {
@@ -22,7 +22,9 @@ export class GetMetadonneesFavorisJeuneQueryHandler extends QueryHandler<
   GetMetadonneesFavorisJeuneQuery,
   Result<MetadonneesFavorisQueryModel>
 > {
-  constructor(private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer) {
+  constructor(
+    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer
+  ) {
     super('GetMetadonneesFavorisJeuneQueryHandler')
   }
 
@@ -30,7 +32,7 @@ export class GetMetadonneesFavorisJeuneQueryHandler extends QueryHandler<
     query: GetMetadonneesFavorisJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence(
+    return this.conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo(
       query.idJeune,
       utilisateur
     )

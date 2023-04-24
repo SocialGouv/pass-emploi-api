@@ -1,6 +1,5 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { createSandbox } from 'sinon'
-import { FichierTelechargementAuthorizer } from 'src/application/authorizers/authorize-fichier-telechargement'
 import { ObjectStorageClient } from 'src/infrastructure/clients/object-storage.client'
 import {
   unUtilisateurConseiller,
@@ -17,11 +16,12 @@ import { unFichierMetadata } from '../../fixtures/fichier.fixture'
 import { expect, StubbedClass } from '../../utils'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { RessourceIndisponibleError } from 'src/building-blocks/types/domain-error'
+import { FichierAuthorizer } from '../../../src/application/authorizers/fichier-authorizer'
 
 describe('TelechargerFichierQueryHandler', () => {
   const sandbox = createSandbox()
   let fichierRepository: StubbedType<Fichier.Repository>
-  let fichierAuthorizer: StubbedClass<FichierTelechargementAuthorizer>
+  let fichierAuthorizer: StubbedClass<FichierAuthorizer>
   let objectStorageClient: StubbedClass<ObjectStorageClient>
   let evenementService: StubbedClass<EvenementService>
   let telechargerFichierQueryHandler: TelechargerFichierQueryHandler
@@ -32,10 +32,7 @@ describe('TelechargerFichierQueryHandler', () => {
 
   beforeEach(() => {
     fichierRepository = stubInterface(sandbox)
-    fichierAuthorizer = stubClassSandbox(
-      FichierTelechargementAuthorizer,
-      sandbox
-    )
+    fichierAuthorizer = stubClassSandbox(FichierAuthorizer, sandbox)
     objectStorageClient = stubClassSandbox(ObjectStorageClient, sandbox)
     evenementService = stubClassSandbox(EvenementService, sandbox)
     telechargerFichierQueryHandler = new TelechargerFichierQueryHandler(
@@ -60,10 +57,9 @@ describe('TelechargerFichierQueryHandler', () => {
       await telechargerFichierQueryHandler.authorize({ idFichier }, utilisateur)
 
       // Then
-      expect(fichierAuthorizer.authorize).to.have.been.calledWithExactly(
-        idFichier,
-        utilisateur
-      )
+      expect(
+        fichierAuthorizer.autoriserTelechargementDuFichier
+      ).to.have.been.calledWithExactly(idFichier, utilisateur)
     })
   })
 

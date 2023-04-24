@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Query } from '../../building-blocks/types/query'
 import { ListeDeDiffusionQueryModel } from './query-models/liste-de-diffusion.query-model'
-import { AuthorizeListeDeDiffusion } from '../authorizers/authorize-liste-de-diffusion'
+import { ListeDeDiffusionAuthorizer } from '../authorizers/liste-de-diffusion-authorizer'
 import { Authentification } from '../../domain/authentification'
 import { ListeDeDiffusionSqlModel } from '../../infrastructure/sequelize/models/liste-de-diffusion.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
@@ -19,14 +19,14 @@ export class GetDetailListeDeDiffusionQueryHandler extends QueryHandler<
   GetDetailListeDeDiffusionQuery,
   Result<ListeDeDiffusionQueryModel>
 > {
-  constructor(private listeDiffusionAuthorizer: AuthorizeListeDeDiffusion) {
+  constructor(private listeDiffusionAuthorizer: ListeDeDiffusionAuthorizer) {
     super('GetDetailListeDeDiffusionQueryHandler')
   }
   async authorize(
     query: GetDetailListeDeDiffusionQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.listeDiffusionAuthorizer.authorize(
+    return this.listeDiffusionAuthorizer.autoriserConseillerPourSaListeDeDiffusion(
       query.idListeDeDiffusion,
       utilisateur
     )

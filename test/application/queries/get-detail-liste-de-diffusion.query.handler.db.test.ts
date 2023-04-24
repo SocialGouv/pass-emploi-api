@@ -4,7 +4,7 @@ import {
   GetDetailListeDeDiffusionQuery,
   GetDetailListeDeDiffusionQueryHandler
 } from '../../../src/application/queries/get-detail-liste-de-diffusion.query.handler.db'
-import { AuthorizeListeDeDiffusion } from '../../../src/application/authorizers/authorize-liste-de-diffusion'
+import { ListeDeDiffusionAuthorizer } from '../../../src/application/authorizers/liste-de-diffusion-authorizer'
 import {
   emptySuccess,
   success
@@ -33,12 +33,12 @@ import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetDetailListeDeDiffusionQueryHandler', () => {
-  let listeDiffusionAuthorizer: StubbedClass<AuthorizeListeDeDiffusion>
+  let listeDiffusionAuthorizer: StubbedClass<ListeDeDiffusionAuthorizer>
   let queryHandler: GetDetailListeDeDiffusionQueryHandler
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
-    listeDiffusionAuthorizer = stubClass(AuthorizeListeDeDiffusion)
+    listeDiffusionAuthorizer = stubClass(ListeDeDiffusionAuthorizer)
     queryHandler = new GetDetailListeDeDiffusionQueryHandler(
       listeDiffusionAuthorizer
     )
@@ -50,7 +50,7 @@ describe('GetDetailListeDeDiffusionQueryHandler', () => {
       const query: GetDetailListeDeDiffusionQuery = {
         idListeDeDiffusion: 'id-liste'
       }
-      listeDiffusionAuthorizer.authorize
+      listeDiffusionAuthorizer.autoriserConseillerPourSaListeDeDiffusion
         .withArgs(query.idListeDeDiffusion, unUtilisateurConseiller())
         .resolves(emptySuccess())
 

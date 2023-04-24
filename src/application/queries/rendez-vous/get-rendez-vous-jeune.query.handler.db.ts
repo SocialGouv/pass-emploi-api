@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Op } from 'sequelize'
-import { ConseillerAgenceAuthorizer } from 'src/application/authorizers/authorize-conseiller-agence'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import { Result, success } from '../../../building-blocks/types/result'
@@ -13,6 +12,7 @@ import { ConseillerSqlModel } from '../../../infrastructure/sequelize/models/con
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { DateService } from '../../../utils/date-service'
+import { ConseillerInterAgenceAuthorizer } from '../../authorizers/conseiller-inter-agence-authorizer'
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { fromSqlToRendezVousJeuneQueryModel } from '../query-mappers/rendez-vous-milo.mappers'
 import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-model'
@@ -30,7 +30,7 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
   constructor(
     private dateService: DateService,
     private jeuneAuthorizer: JeuneAuthorizer,
-    private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer,
+    private conseillerAuthorizer: ConseillerInterAgenceAuthorizer,
     private evenementService: EvenementService,
     private configuration: ConfigService
   ) {
@@ -74,12 +74,12 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      return this.conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence(
+      return this.conseillerAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo(
         query.idJeune,
         utilisateur
       )
     }
-    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.autoriserLeJeune(query.idJeune, utilisateur)
   }
 
   async monitor(

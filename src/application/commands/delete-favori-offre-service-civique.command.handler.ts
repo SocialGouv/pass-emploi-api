@@ -9,7 +9,7 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { OffreServiceCiviqueRepositoryToken } from '../../domain/offre/favori/offre-service-civique'
-import { FavoriOffreServiceCiviqueAuthorizer } from '../authorizers/authorize-favori-offres-engagement'
+import { FavoriOffreServiceCiviqueAuthorizer } from '../authorizers/favori-offres-engagement-authorizer'
 import { Offre } from '../../domain/offre/offre'
 
 export interface DeleteFavoriOffreServiceCiviqueCommand extends Command {
@@ -52,7 +52,7 @@ export class DeleteFavoriOffreServiceCiviqueCommandHandler extends CommandHandle
     command: DeleteFavoriOffreServiceCiviqueCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.favoriOffreEngagementAuthorizer.authorize(
+    return this.favoriOffreEngagementAuthorizer.autoriserLeJeunePourSonOffre(
       command.idJeune,
       command.idOffre,
       utilisateur

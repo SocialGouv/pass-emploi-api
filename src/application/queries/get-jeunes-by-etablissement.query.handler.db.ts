@@ -11,7 +11,7 @@ import {
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
-import { ConseillerAgenceAuthorizer } from '../authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from '../authorizers/conseiller-inter-agence-authorizer'
 import { JeuneQueryModel } from './query-models/jeunes.query-model'
 
 export interface GetJeunesByEtablissementQuery extends Query {
@@ -25,8 +25,8 @@ export class GetJeunesByEtablissementQueryHandler extends QueryHandler<
 > {
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
-    @Inject(ConseillerAgenceAuthorizer)
-    private readonly conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer,
+    @Inject(ConseillerInterAgenceAuthorizer)
+    private readonly conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer,
     @Inject(ConseillersRepositoryToken)
     private readonly conseillersRepository: Conseiller.Repository
   ) {
@@ -46,7 +46,7 @@ export class GetJeunesByEtablissementQueryHandler extends QueryHandler<
     { idEtablissement }: GetJeunesByEtablissementQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAgenceAuthorizer.authorizeConseillerDeLAgence(
+    return this.conseillerAgenceAuthorizer.autoriserConseillerPourUneAgence(
       idEtablissement,
       utilisateur
     )

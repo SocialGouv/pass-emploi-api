@@ -18,23 +18,20 @@ export class RechercheAuthorizer {
     private rechercheRepository: Recherche.Repository
   ) {}
 
-  async authorize(
+  async autoriserLeJeunePourSaRecherche(
     idJeune: string,
     idRecherche: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    const rechercheExiste = await this.rechercheRepository.existe(
-      idRecherche,
-      idJeune
-    )
+    if (utilisateur.type === Authentification.Type.JEUNE) {
+      const rechercheExiste = await this.rechercheRepository.existe(
+        idRecherche,
+        idJeune
+      )
 
-    if (
-      rechercheExiste &&
-      utilisateur &&
-      utilisateur.type === Authentification.Type.JEUNE &&
-      utilisateur.id === idJeune
-    ) {
-      return emptySuccess()
+      if (rechercheExiste && utilisateur.id === idJeune) {
+        return emptySuccess()
+      }
     }
 
     return failure(new DroitsInsuffisants())

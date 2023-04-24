@@ -1,6 +1,6 @@
 import { SinonSandbox } from 'sinon'
 import { uneAction, uneActionQualifiee } from 'test/fixtures/action.fixture'
-import { ActionAuthorizer } from '../../../../src/application/authorizers/authorize-action'
+import { ActionAuthorizer } from '../../../../src/application/authorizers/action-authorizer'
 import {
   GetDetailActionQuery,
   GetDetailActionQueryHandler
@@ -27,14 +27,14 @@ import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
-import { ConseillerAgenceAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 import { Core } from '../../../../src/domain/core'
 
 describe('GetDetailActionQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
   let actionSqlRepository: Action.Repository
   let actionAuthorizer: StubbedClass<ActionAuthorizer>
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
   let getDetailActionQueryHandler: GetDetailActionQueryHandler
   let sandbox: SinonSandbox
   const jeune = unJeune()
@@ -43,7 +43,7 @@ describe('GetDetailActionQueryHandler', () => {
     databaseForTesting = getDatabase()
     sandbox = createSandbox()
     actionAuthorizer = stubClass(ActionAuthorizer)
-    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
     actionSqlRepository = new ActionSqlRepository(new DateService())
 
     getDetailActionQueryHandler = new GetDetailActionQueryHandler(
@@ -177,7 +177,7 @@ describe('GetDetailActionQueryHandler', () => {
 
         // Then
         expect(
-          conseillerAgenceAuthorizer.authorizeConseillerDeLActionDuJeuneOuSonAgence
+          conseillerAgenceAuthorizer.autoriserConseillerPourUneActionDeSonJeuneOuDUnJeuneDeSonAgenceMilo
         ).to.have.been.calledWithExactly('id-action', utilisateur)
       })
     })
@@ -194,10 +194,9 @@ describe('GetDetailActionQueryHandler', () => {
         await getDetailActionQueryHandler.authorize(query, utilisateur)
 
         // Then
-        expect(actionAuthorizer.authorize).to.have.been.calledWithExactly(
-          'id-action',
-          utilisateur
-        )
+        expect(
+          actionAuthorizer.autoriserPourUneAction
+        ).to.have.been.calledWithExactly('id-action', utilisateur)
       })
     })
   })

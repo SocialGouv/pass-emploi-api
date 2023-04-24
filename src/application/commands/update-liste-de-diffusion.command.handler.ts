@@ -3,17 +3,17 @@ import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import {
+  Result,
   emptySuccess,
   failure,
-  isFailure,
-  Result
+  isFailure
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Conseiller } from '../../domain/conseiller/conseiller'
 import { ListeDeDiffusionRepositoryToken } from '../../domain/conseiller/liste-de-diffusion'
 import { Evenement, EvenementService } from '../../domain/evenement'
-import { AuthorizeConseillerForJeunesTransferesTemporairement } from '../authorizers/authorize-conseiller-for-jeunes-transferes'
-import { AuthorizeListeDeDiffusion } from '../authorizers/authorize-liste-de-diffusion'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
+import { ListeDeDiffusionAuthorizer } from '../authorizers/liste-de-diffusion-authorizer'
 
 export interface UpdateListeDeDiffusionCommand extends Command {
   id: string
@@ -27,8 +27,8 @@ export class UpdateListeDeDiffusionCommandHandler extends CommandHandler<
   void
 > {
   constructor(
-    private authorizerJeunes: AuthorizeConseillerForJeunesTransferesTemporairement,
-    private authorizerListe: AuthorizeListeDeDiffusion,
+    private conseillerAuthorizer: ConseillerAuthorizer,
+    private listeAuthorizer: ListeDeDiffusionAuthorizer,
     @Inject(ListeDeDiffusionRepositoryToken)
     private listeDeDiffusionRepository: Conseiller.ListeDeDiffusion.Repository,
     private listeDeDiffusionService: Conseiller.ListeDeDiffusion.Service,
@@ -41,19 +41,21 @@ export class UpdateListeDeDiffusionCommandHandler extends CommandHandler<
     command: UpdateListeDeDiffusionCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    const jeunesAutorises = await this.authorizerJeunes.authorize(
-      command.idsBeneficiaires,
-      utilisateur
-    )
+    const jeunesAutorises =
+      await this.conseillerAuthorizer.autoriserConseillerPourSesJeunesTransferes(
+        command.idsBeneficiaires,
+        utilisateur
+      )
 
     if (isFailure(jeunesAutorises)) {
       return jeunesAutorises
     }
 
-    const listeAutorisee = await this.authorizerListe.authorize(
-      command.id,
-      utilisateur
-    )
+    const listeAutorisee =
+      await this.listeAuthorizer.autoriserConseillerPourSaListeDeDiffusion(
+        command.id,
+        utilisateur
+      )
 
     if (isFailure(listeAutorisee)) {
       return listeAutorisee

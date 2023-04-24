@@ -1,7 +1,7 @@
 import { SinonSandbox } from 'sinon'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { failure, success } from 'src/building-blocks/types/result'
-import { ConseillerAgenceAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-agence'
+import { ConseillerInterAgenceAuthorizer } from '../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 import {
   GetConseillersJeuneQuery,
   GetConseillersJeuneQueryHandler
@@ -23,13 +23,13 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetConseillersJeuneQueryHandler', () => {
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
   let getConseillersJeuneQueryHandler: GetConseillersJeuneQueryHandler
   let sandbox: SinonSandbox
 
   before(() => {
     sandbox = createSandbox()
-    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
 
     getConseillersJeuneQueryHandler = new GetConseillersJeuneQueryHandler(
       conseillerAgenceAuthorizer
@@ -219,7 +219,7 @@ describe('GetConseillersJeuneQueryHandler', () => {
 
       // Then
       expect(
-        conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence
+        conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo
       ).to.have.been.calledWithExactly('id-jeune', utilisateur)
     })
   })

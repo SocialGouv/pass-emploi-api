@@ -18,7 +18,7 @@ import {
   Suggestion,
   SuggestionsRepositoryToken
 } from '../../domain/offre/recherche/suggestion/suggestion'
-import { SuggestionAuthorizer } from '../authorizers/authorize-suggestion'
+import { SuggestionAuthorizer } from '../authorizers/suggestion-authorizer'
 
 export interface CreateRechercheFromSuggestionCommand extends Command {
   idJeune: string
@@ -109,9 +109,9 @@ export class CreateRechercheFromSuggestionCommandHandler extends CommandHandler<
     command: CreateRechercheFromSuggestionCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.suggestionAuthorizer.authorize(
-      command.idSuggestion,
+    return this.suggestionAuthorizer.autoriserJeunePourSaSuggestion(
       command.idJeune,
+      command.idSuggestion,
       utilisateur
     )
   }

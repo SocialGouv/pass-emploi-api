@@ -15,7 +15,7 @@ export class ActionAuthorizer {
     private actionRepository: Action.Repository
   ) {}
 
-  async authorize(
+  async autoriserPourUneAction(
     idAction: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {

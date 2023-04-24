@@ -1,30 +1,29 @@
+import { RendezVousAuthorizer } from '../../../../src/application/authorizers/rendezvous-authorizer'
+import { RendezVousJeuneDetailQueryModel } from '../../../../src/application/queries/query-models/rendez-vous.query-model'
 import {
   GetUnRendezVousJeuneQuery,
   GetUnRendezVousJeuneQueryHandler
 } from '../../../../src/application/queries/rendez-vous/get-un-rendez-vous-jeune.query.handler.db'
-import { RendezVousAuthorizer } from '../../../../src/application/authorizers/authorize-rendezvous'
-import { expect, StubbedClass, stubClass } from '../../../utils'
-import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
-import {
-  failure,
-  isSuccess
-} from '../../../../src/building-blocks/types/result'
-import { DroitsInsuffisants } from '../../../../src/building-blocks/types/domain-error'
-import { unEtablissementDto } from '../../../fixtures/sql-models/etablissement.sq-model'
-import { AgenceSqlModel } from '../../../../src/infrastructure/sequelize/models/agence.sql-model'
-import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
-import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
-import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
+import { isSuccess } from '../../../../src/building-blocks/types/result'
 import {
   CodeTypeRendezVous,
   RendezVous
 } from '../../../../src/domain/rendez-vous/rendez-vous'
-import { RendezVousSqlModel } from '../../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { uneDatetime } from '../../../fixtures/date.fixture'
+import { AgenceSqlModel } from '../../../../src/infrastructure/sequelize/models/agence.sql-model'
+import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from '../../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
-import { RendezVousJeuneDetailQueryModel } from '../../../../src/application/queries/query-models/rendez-vous.query-model'
+import { RendezVousSqlModel } from '../../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../../fixtures/authentification.fixture'
+import { uneDatetime } from '../../../fixtures/date.fixture'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
+import { unEtablissementDto } from '../../../fixtures/sql-models/etablissement.sq-model'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
+import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
+import { StubbedClass, expect, stubClass } from '../../../utils'
 import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('GetUnRendezVousJeuneQueryHandler', () => {
@@ -42,12 +41,12 @@ describe('GetUnRendezVousJeuneQueryHandler', () => {
   })
 
   describe('authorize', () => {
-    it('autorise le jeune sur le rendez vous', () => {
+    it('autorise le jeune sur le rendez vous', async () => {
       // Given
       const utilisateur = unUtilisateurJeune({ id: 'idJeune' })
 
       // When
-      getUnRendezVousJeuneQueryHandler.authorize(
+      await getUnRendezVousJeuneQueryHandler.authorize(
         {
           idJeune: 'idJeune',
           idRendezVous: 'idRendezVous'
@@ -56,26 +55,27 @@ describe('GetUnRendezVousJeuneQueryHandler', () => {
       )
 
       // Then
-      expect(rendezVousAuthorizer.authorize).to.have.been.calledWithExactly(
-        'idRendezVous',
-        utilisateur
-      )
+      expect(
+        rendezVousAuthorizer.autoriserJeunePourSonRendezVous
+      ).to.have.been.calledWithExactly('idRendezVous', utilisateur)
     })
-    it("rejette si le jeune demandé n'est pas l'utilisateur", async () => {
+    it('autorise le conseiller sur le rendez vous', async () => {
       // Given
-      const utilisateur = unUtilisateurJeune({ id: 'idJeune' })
+      const utilisateur = unUtilisateurConseiller()
 
       // When
-      const result = await getUnRendezVousJeuneQueryHandler.authorize(
+      await getUnRendezVousJeuneQueryHandler.authorize(
         {
-          idJeune: 'idAutreJeune',
+          idJeune: 'idJeune',
           idRendezVous: 'idRendezVous'
         },
         utilisateur
       )
 
       // Then
-      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
+      expect(
+        rendezVousAuthorizer.autoriserConseillerPourUnRendezVousAvecAuMoinsUnJeune
+      ).to.have.been.calledWithExactly('idRendezVous', utilisateur)
     })
   })
   describe('handle', async () => {

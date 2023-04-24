@@ -8,17 +8,14 @@ export namespace Core {
     POLE_EMPLOI_BRSA = 'POLE_EMPLOI_BRSA'
   }
 
-  export const structuresMilo = [Core.Structure.MILO]
   export const structuresMiloPassEmploi = [
     Core.Structure.MILO,
     Core.Structure.PASS_EMPLOI
   ]
-  export const structuresPoleEmploi = [Core.Structure.POLE_EMPLOI]
   export const structuresPoleEmploiPassEmploi = [
     Core.Structure.POLE_EMPLOI,
     Core.Structure.PASS_EMPLOI
   ]
-  export const structuresBRSA = [Core.Structure.POLE_EMPLOI_BRSA]
   export const structuresPoleEmploiBRSA = [
     Core.Structure.POLE_EMPLOI,
     Core.Structure.POLE_EMPLOI_BRSA
