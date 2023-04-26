@@ -1,25 +1,24 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Evenement, EvenementService } from '../../domain/evenement'
-import { Mail, MailServiceToken } from '../../domain/mail'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import {
-  DroitsInsuffisants,
-  NonTrouveError
-} from '../../building-blocks/types/domain-error'
-import {
+  Result,
   emptySuccess,
-  failure,
-  Result
+  failure
 } from '../../building-blocks/types/result'
 import {
   Authentification,
   AuthentificationRepositoryToken
 } from '../../domain/authentification'
+import { Evenement, EvenementService } from '../../domain/evenement'
+import { Mail, MailServiceToken } from '../../domain/mail'
 
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { Core } from '../../domain/core'
 
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
+import { SupportAuthorizer } from '../authorizers/support-authorizer'
 
 export interface DeleteJeuneCommand {
   idJeune: Jeune.Id
@@ -47,7 +46,9 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
     private evenementService: EvenementService,
     @Inject(MailServiceToken)
     private readonly mailService: Mail.Service,
-    private mailFactory: Mail.Factory
+    private mailFactory: Mail.Factory,
+    private jeuneAuthorizer: JeuneAuthorizer,
+    private supportAuthorizer: SupportAuthorizer
   ) {
     super('DeleteJeuneCommandHandler')
   }
@@ -56,15 +57,10 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
     command: DeleteJeuneCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    const estLeJeune =
-      utilisateur.type === Authentification.Type.JEUNE &&
-      command.idJeune === utilisateur.id
-    const estDuSupport = utilisateur.type === Authentification.Type.SUPPORT
-    if (estLeJeune || estDuSupport) {
-      return emptySuccess()
-    } else {
-      return failure(new DroitsInsuffisants())
+    if (utilisateur.type === Authentification.Type.JEUNE) {
+      return this.jeuneAuthorizer.autoriserLeJeune(command.idJeune, utilisateur)
     }
+    return this.supportAuthorizer.autoriserSupport(utilisateur)
   }
 
   async handle(command: DeleteJeuneCommand): Promise<Result> {

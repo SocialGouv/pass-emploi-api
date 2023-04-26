@@ -17,6 +17,7 @@ import { unJeune } from '../../fixtures/jeune.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { uneSuggestion } from '../../fixtures/suggestion.fixture'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
+import { Core } from '../../../src/domain/core'
 
 describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
   let createSuggestionDuConseillerServiceCiviqueCommandHandler: CreateSuggestionConseillerServiceCiviqueCommandHandler
@@ -73,7 +74,11 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
       // Then
       expect(
         conseillerAuthorizer.autoriserLeConseiller
-      ).to.have.been.calledWithExactly(command.idConseiller, utilisateur)
+      ).to.have.been.calledWithExactly(
+        command.idConseiller,
+        utilisateur,
+        Core.touteStructureSaufBRSA
+      )
     })
   })
 

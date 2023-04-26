@@ -1,15 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import {
-  DroitsInsuffisants,
-  NonTrouveError
-} from '../../building-blocks/types/domain-error'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Query } from '../../building-blocks/types/query'
 import {
+  Result,
   emptySuccess,
   failure,
-  isFailure,
-  Result
+  isFailure
 } from '../../building-blocks/types/result'
 import { Agence, AgenceRepositoryToken } from '../../domain/agence'
 import { Authentification } from '../../domain/authentification'
@@ -17,6 +14,7 @@ import {
   Conseiller,
   ConseillersRepositoryToken
 } from '../../domain/conseiller/conseiller'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 
 export interface ModifierConseillerCommand extends Query {
   idConseiller: string
@@ -33,7 +31,8 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     @Inject(AgenceRepositoryToken)
-    private agencesRepository: Agence.Repository
+    private agencesRepository: Agence.Repository,
+    private readonly conseillerAuthorizer: ConseillerAuthorizer
   ) {
     super('ModifierConseillerCommandHandler')
   }
@@ -49,7 +48,7 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
     if (command.agence?.id) {
       const agence = await this.agencesRepository.get(
         command.agence.id,
-        conseillerActuel.structure
+        Agence.getStructureDeReference(conseillerActuel.structure)
       )
       if (!agence) {
         return failure(new NonTrouveError('Agence', command.agence.id))
@@ -78,13 +77,10 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
     query: ModifierConseillerCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (
-      utilisateur.type === Authentification.Type.CONSEILLER &&
-      utilisateur.id === query.idConseiller
-    ) {
-      return emptySuccess()
-    }
-    return failure(new DroitsInsuffisants())
+    return this.conseillerAuthorizer.autoriserLeConseiller(
+      query.idConseiller,
+      utilisateur
+    )
   }
 
   async monitor(): Promise<void> {

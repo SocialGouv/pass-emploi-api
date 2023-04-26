@@ -1,15 +1,11 @@
-import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { Command } from '../../building-blocks/types/command'
-import { Authentification } from '../../domain/authentification'
-import {
-  emptySuccess,
-  failure,
-  Result
-} from '../../building-blocks/types/result'
 import { Injectable } from '@nestjs/common'
 import * as os from 'os'
+import { Command } from '../../building-blocks/types/command'
+import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { emptySuccess, Result } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
 import { SuiviPeCejSqlModel } from '../../infrastructure/sequelize/models/suivi-pe-cej.sql-model'
-import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
+import { SupportAuthorizer } from '../authorizers/support-authorizer'
 
 export interface MettreAJourLesJeunesCEJPoleEmploiCommand extends Command {
   fichier: Express.Multer.File
@@ -20,14 +16,15 @@ export class MettreAJourLesJeunesCejPeCommandHandler extends CommandHandler<
   MettreAJourLesJeunesCEJPoleEmploiCommand,
   void
 > {
+  constructor(private supportAuthorizer: SupportAuthorizer) {
+    super('MettreAJourLesJeunesCejPeCommandHandler')
+  }
+
   async authorize(
     _command: MettreAJourLesJeunesCEJPoleEmploiCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type !== Authentification.Type.SUPPORT) {
-      return failure(new DroitsInsuffisants())
-    }
-    return emptySuccess()
+    return this.supportAuthorizer.autoriserSupport(utilisateur)
   }
 
   async handle(

@@ -9,7 +9,6 @@ import {
 } from '../../../src/application/commands/creer-jeune-milo.command.handler'
 import {
   DossierExisteDejaError,
-  DroitsInsuffisants,
   EmailExisteDejaError,
   ErreurHttp,
   MauvaiseCommandeError
@@ -30,7 +29,7 @@ import { IdService } from '../../../src/utils/id-service'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { StubbedClass, createSandbox, expect, stubClass } from '../../utils'
 
 describe('CreerJeuneMiloCommandHandler', () => {
   let creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler
@@ -302,30 +301,9 @@ describe('CreerJeuneMiloCommandHandler', () => {
 
       expect(
         conseillerAuthorizer.autoriserLeConseiller
-      ).to.have.been.calledWithExactly(command.idConseiller, utilisateur)
-    })
-    it('rejette un conseiller pole emploi', async () => {
-      // Given
-      const command: CreerJeuneMiloCommand = {
-        idPartenaire: 'idDossier',
-        nom: 'nom',
-        prenom: 'prenom',
-        email: 'email',
-        idConseiller: 'idConseiller'
-      }
-
-      const utilisateur = unUtilisateurConseiller({
-        structure: Core.Structure.POLE_EMPLOI
-      })
-
-      // When
-      const result = await creerJeuneMiloCommandHandler.authorize(
-        command,
-        utilisateur
-      )
-
-      // Then
-      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
+      ).to.have.been.calledWithExactly(command.idConseiller, utilisateur, [
+        Core.Structure.MILO
+      ])
     })
   })
 })

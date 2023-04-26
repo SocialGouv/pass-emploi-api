@@ -16,6 +16,7 @@ import {
 } from '../../domain/offre/recherche/suggestion/suggestion'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { Evenement, EvenementService } from '../../domain/evenement'
+import { Core } from '../../domain/core'
 
 export interface CreateSuggestionConseillerServiceCiviqueCommand
   extends Command {
@@ -49,7 +50,8 @@ export class CreateSuggestionConseillerServiceCiviqueCommandHandler extends Comm
   ): Promise<Result> {
     return this.conseillerAuthorizer.autoriserLeConseiller(
       command.idConseiller,
-      utilisateur
+      utilisateur,
+      Core.touteStructureSaufBRSA
     )
   }
 

@@ -1,28 +1,26 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import {
   ModifierConseillerCommand,
   ModifierConseillerCommandHandler
 } from '../../../src/application/commands/modifier-conseiller.command.handler'
 import {
-  DroitsInsuffisants,
   MauvaiseCommandeError,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
-import { failure, Failure } from '../../../src/building-blocks/types/result'
+import { Failure } from '../../../src/building-blocks/types/result'
 import { Agence } from '../../../src/domain/agence'
 import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { Core } from '../../../src/domain/core'
-import {
-  unUtilisateurConseiller,
-  unUtilisateurJeune
-} from '../../fixtures/authentification.fixture'
-import { createSandbox, expect } from '../../utils'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
+import { StubbedClass, createSandbox, expect, stubClass } from '../../utils'
 import Structure = Core.Structure
 
 describe('ModifierConseillerCommandHandler', () => {
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let agencesRepository: StubbedType<Agence.Repository>
+  let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let modifierConseillerCommandHandler: ModifierConseillerCommandHandler
 
   const conseillerQuiExiste: Conseiller = {
@@ -46,10 +44,11 @@ describe('ModifierConseillerCommandHandler', () => {
     const sandbox = createSandbox()
     conseillerRepository = stubInterface(sandbox)
     agencesRepository = stubInterface(sandbox)
-
+    conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     modifierConseillerCommandHandler = new ModifierConseillerCommandHandler(
       conseillerRepository,
-      agencesRepository
+      agencesRepository,
+      conseillerAuthorizer
     )
   })
 
@@ -207,46 +206,23 @@ describe('ModifierConseillerCommandHandler', () => {
   })
 
   describe('authorize', () => {
-    describe('Quand on est un jeune', () => {
-      it('on reçoit une unauthorized', async () => {
-        // Given
-        const command = {
-          idConseiller: 'id qui existe',
-          agence: {
-            id: 'agence qui existe'
-          }
+    it('autorise le conseiller', async () => {
+      // Given
+      const command = {
+        idConseiller: 'id qui existe',
+        agence: {
+          id: 'agence qui existe'
         }
+      }
+      const utilisateur = unUtilisateurConseiller()
 
-        // When
-        const result = await modifierConseillerCommandHandler.execute(
-          command,
-          unUtilisateurJeune()
-        )
+      // When
+      await modifierConseillerCommandHandler.authorize(command, utilisateur)
 
-        // Then
-        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
-      })
-    })
-
-    describe('Quand on est un conseiller avec le mauvais id', () => {
-      it('on reçoit une unauthorized', async () => {
-        // Given
-        const query = {
-          idConseiller: 'id qui existe',
-          agence: {
-            id: 'agence qui existe'
-          }
-        }
-
-        // When
-        const result = await modifierConseillerCommandHandler.execute(
-          query,
-          unUtilisateurConseiller()
-        )
-
-        // Then
-        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
-      })
+      // Then
+      expect(
+        conseillerAuthorizer.autoriserLeConseiller
+      ).to.have.been.calledOnceWithExactly(command.idConseiller, utilisateur)
     })
   })
 })

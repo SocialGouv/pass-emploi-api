@@ -1,19 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
-import { Authentification } from '../../domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import {
-  emptySuccess,
-  failure,
-  Result
-} from '../../building-blocks/types/result'
+import { Result } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
-import { DossierJeuneMiloQueryModel } from './query-models/milo.query-model'
 import {
   JeuneMilo,
   MiloJeuneRepositoryToken
 } from '../../domain/jeune/jeune.milo'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
+import { DossierJeuneMiloQueryModel } from './query-models/milo.query-model'
 
 export interface GetDossierMiloJeuneQuery extends Query {
   idDossier: string
@@ -26,7 +22,8 @@ export class GetDossierMiloJeuneQueryHandler extends QueryHandler<
 > {
   constructor(
     @Inject(MiloJeuneRepositoryToken)
-    private miloRepository: JeuneMilo.Repository
+    private miloRepository: JeuneMilo.Repository,
+    private readonly conseillerAuthorizer: ConseillerAuthorizer
   ) {
     super('GetDossierMiloJeuneQueryHandler')
   }
@@ -40,13 +37,9 @@ export class GetDossierMiloJeuneQueryHandler extends QueryHandler<
     _query: GetDossierMiloJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (
-      utilisateur.type !== Authentification.Type.CONSEILLER ||
-      utilisateur.structure !== Core.Structure.MILO
-    ) {
-      return failure(new DroitsInsuffisants())
-    }
-    return emptySuccess()
+    return this.conseillerAuthorizer.autoriserToutConseiller(utilisateur, [
+      Core.Structure.MILO
+    ])
   }
 
   async monitor(): Promise<void> {

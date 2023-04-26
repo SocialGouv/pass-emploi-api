@@ -3,15 +3,14 @@ import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
   DossierExisteDejaError,
-  DroitsInsuffisants,
   EmailExisteDejaError,
   MauvaiseCommandeError,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
 import {
+  Result,
   failure,
   isFailure,
-  Result,
   success
 } from '../../building-blocks/types/result'
 import {
@@ -129,17 +128,10 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     command: CreerJeuneMiloCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (
-      !(
-        utilisateur.type === Authentification.Type.CONSEILLER &&
-        utilisateur.structure === Core.Structure.MILO
-      )
-    ) {
-      return failure(new DroitsInsuffisants())
-    }
     return this.conseillerAuthorizer.autoriserLeConseiller(
       command.idConseiller,
-      utilisateur
+      utilisateur,
+      [Core.Structure.MILO]
     )
   }
 

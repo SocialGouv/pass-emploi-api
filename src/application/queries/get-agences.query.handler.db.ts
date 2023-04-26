@@ -1,18 +1,15 @@
 import { Injectable } from '@nestjs/common'
-import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
-import {
-  emptySuccess,
-  failure,
-  Result
-} from '../../building-blocks/types/result'
+import { Op } from 'sequelize'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
+import { Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { AgenceSqlModel } from '../../infrastructure/sequelize/models/agence.sql-model'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { AgenceQueryModel } from './query-models/agence.query-model'
 import Structure = Core.Structure
-import { Op } from 'sequelize'
+import { Agence } from '../../domain/agence'
 
 export interface GetAgenceQuery extends Query {
   structure: Structure
@@ -25,14 +22,14 @@ export class GetAgencesQueryHandler extends QueryHandler<
   GetAgenceQuery,
   AgenceQueryModel[]
 > {
-  constructor() {
+  constructor(private readonly conseillerAuthorizer: ConseillerAuthorizer) {
     super('GetAgencesQueryHandler')
   }
 
   async handle(query: GetAgenceQuery): Promise<AgenceQueryModel[]> {
     const sqlModels = await AgenceSqlModel.findAll({
       where: {
-        structure: query.structure,
+        structure: Agence.getStructureDeReference(query.structure),
         id: {
           [Op.not]: ID_AGENCE_MILO_JDD
         }
@@ -51,13 +48,9 @@ export class GetAgencesQueryHandler extends QueryHandler<
     query: GetAgenceQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (
-      utilisateur.type === Authentification.Type.CONSEILLER &&
-      utilisateur.structure === query.structure
-    ) {
-      return emptySuccess()
-    }
-    return failure(new DroitsInsuffisants())
+    return this.conseillerAuthorizer.autoriserToutConseiller(utilisateur, [
+      query.structure
+    ])
   }
 
   async monitor(): Promise<void> {

@@ -1,22 +1,29 @@
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { SinonSandbox, createSandbox } from 'sinon'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import {
   CreateSuggestionConseillerOffreEmploiCommand,
   CreateSuggestionConseillerOffreEmploiCommandHandler
 } from '../../../src/application/commands/create-suggestion-conseiller-offre-emploi.command.handler'
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { Jeune } from '../../../src/domain/jeune/jeune'
-import { createSandbox, SinonSandbox } from 'sinon'
-import { Authentification } from '../../../src/domain/authentification'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import { Recherche } from '../../../src/domain/offre/recherche/recherche'
-import Suggestion = Recherche.Suggestion
-import { Failure, isFailure } from '../../../src/building-blocks/types/result'
-import { MauvaiseCommandeError } from '../../../src/building-blocks/types/domain-error'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { uneSuggestion } from '../../fixtures/suggestion.fixture'
+import {
+  DroitsInsuffisants,
+  MauvaiseCommandeError
+} from '../../../src/building-blocks/types/domain-error'
+import {
+  Failure,
+  failure,
+  isFailure
+} from '../../../src/building-blocks/types/result'
+import { Core } from '../../../src/domain/core'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
+import { Jeune } from '../../../src/domain/jeune/jeune'
+import { Recherche } from '../../../src/domain/offre/recherche/recherche'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import { unConseiller } from '../../fixtures/conseiller.fixture'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import { uneSuggestion } from '../../fixtures/suggestion.fixture'
+import { StubbedClass, expect, stubClass } from '../../utils'
+import Suggestion = Recherche.Suggestion
 
 describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
   let createSuggestionDuConseillerOffreEmploiCommandHandler: CreateSuggestionConseillerOffreEmploiCommandHandler
@@ -45,15 +52,11 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
   })
 
   describe('authorize', () => {
-    let idConseiller
-    let utilisateur: Authentification.Utilisateur
-    let command: CreateSuggestionConseillerOffreEmploiCommand
-
-    beforeEach(() => {
+    it('autorise le conseiller identifié', async () => {
       // Given
-      idConseiller = 'id-conseiller'
-      utilisateur = unUtilisateurConseiller({ id: idConseiller })
-      command = {
+      const idConseiller = 'id-conseiller'
+      const utilisateur = unUtilisateurConseiller({ id: idConseiller })
+      const command = {
         idConseiller,
         idsJeunes: [],
         localisation: 'Denain',
@@ -62,8 +65,6 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
           commune: '59220'
         }
       }
-    })
-    it('autorise le conseiller identifié', async () => {
       // When
       await createSuggestionDuConseillerOffreEmploiCommandHandler.authorize(
         command,
@@ -74,6 +75,63 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
       expect(
         conseillerAuthorizer.autoriserLeConseiller
       ).to.have.been.calledWithExactly(command.idConseiller, utilisateur)
+    })
+    it('autorise le conseiller BRSA pour une offre', async () => {
+      // Given
+      const idConseiller = 'id-conseiller'
+      const utilisateur = unUtilisateurConseiller({
+        id: idConseiller,
+        structure: Core.Structure.POLE_EMPLOI_BRSA
+      })
+      const command = {
+        idConseiller,
+        idsJeunes: [],
+        localisation: 'Denain',
+        criteres: {
+          q: 'Petrisseur',
+          commune: '59220'
+        }
+      }
+      // When
+      await createSuggestionDuConseillerOffreEmploiCommandHandler.authorize(
+        command,
+        utilisateur
+      )
+
+      // Then
+      expect(
+        conseillerAuthorizer.autoriserLeConseiller
+      ).to.have.been.calledWithExactly(command.idConseiller, utilisateur)
+    })
+    it('rejette un conseiller BRSA pour une alternance', async () => {
+      // Given
+      const idConseiller = 'id-conseiller'
+      const utilisateur = unUtilisateurConseiller({
+        id: idConseiller,
+        structure: Core.Structure.POLE_EMPLOI_BRSA
+      })
+      const command = {
+        idConseiller,
+        idsJeunes: [],
+        localisation: 'Denain',
+        criteres: {
+          q: 'Petrisseur',
+          commune: '59220',
+          alternance: true
+        }
+      }
+      // When
+      const result =
+        await createSuggestionDuConseillerOffreEmploiCommandHandler.authorize(
+          command,
+          utilisateur
+        )
+
+      // Then
+      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
+      expect(
+        conseillerAuthorizer.autoriserLeConseiller
+      ).not.to.have.been.called()
     })
   })
 

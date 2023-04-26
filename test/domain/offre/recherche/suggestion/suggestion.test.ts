@@ -15,6 +15,7 @@ import {
 import { describe } from 'mocha'
 import { DateTime } from 'luxon'
 import { MauvaiseCommandeError } from '../../../../../src/building-blocks/types/domain-error'
+import { Core } from '../../../../../src/domain/core'
 
 describe('Suggestion', () => {
   let factory: Recherche.Suggestion.Factory
@@ -46,7 +47,8 @@ describe('Suggestion', () => {
         // When
         const suggestion = factory.buildListeSuggestionsOffresFromPoleEmploi(
           [suggestionPESurUnDepartement],
-          'ABCDE'
+          'ABCDE',
+          Core.Structure.MILO
         )
 
         // Then
@@ -89,7 +91,8 @@ describe('Suggestion', () => {
         // When
         const suggestion = factory.buildListeSuggestionsOffresFromPoleEmploi(
           [suggestionPESurUneCommune],
-          'ABCDE'
+          'ABCDE',
+          Core.Structure.MILO
         )
 
         // Then
@@ -175,6 +178,74 @@ describe('Suggestion', () => {
         ]
         expect(suggestion).to.deep.equal(expected)
       })
+      it("crée les suggestions offre d'emploi, immersion sauf service civique quand le jeune est BRSA", () => {
+        // Given
+        const suggestionPESurUneCommune = uneSuggestionPE()
+
+        // When
+        const suggestion = factory.buildListeSuggestionsOffresFromPoleEmploi(
+          [suggestionPESurUneCommune],
+          'ABCDE',
+          Core.Structure.POLE_EMPLOI_BRSA
+        )
+
+        // Then
+        const expected: Recherche.Suggestion[] = [
+          {
+            criteres: {
+              commune: '59220',
+              departement: undefined,
+              q: 'Petrisseur',
+              rayon: 10
+            },
+            informations: {
+              titre: 'Petrisseur',
+              localisation: 'test',
+              metier: 'Boulanger'
+            },
+            dateCreation: uneDatetime(),
+            dateRafraichissement: uneDatetime(),
+            id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
+            idFonctionnel: {
+              typeRecherche: Recherche.Type.OFFRES_EMPLOI,
+              typeLocalisation: suggestionPESurUneCommune.localisation.type,
+              codeLocalisation: suggestionPESurUneCommune.localisation.code,
+              rayon: Recherche.DISTANCE_PAR_DEFAUT,
+              codeRome: suggestionPESurUneCommune.codeRome!
+            },
+            idJeune: 'ABCDE',
+            type: Recherche.Type.OFFRES_EMPLOI,
+            source: Recherche.Suggestion.Source.POLE_EMPLOI
+          },
+          {
+            criteres: {
+              lat: 1,
+              lon: 1,
+              distance: 10,
+              rome: 'D1104'
+            },
+            informations: {
+              titre: 'Petrisseur',
+              localisation: 'test',
+              metier: 'Boulanger'
+            },
+            dateCreation: uneDatetime(),
+            dateRafraichissement: uneDatetime(),
+            id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
+            idFonctionnel: {
+              typeRecherche: Recherche.Type.OFFRES_IMMERSION,
+              typeLocalisation: suggestionPESurUneCommune.localisation.type,
+              codeLocalisation: suggestionPESurUneCommune.localisation.code,
+              rayon: Recherche.DISTANCE_PAR_DEFAUT,
+              codeRome: suggestionPESurUneCommune.codeRome!
+            },
+            idJeune: 'ABCDE',
+            type: Recherche.Type.OFFRES_IMMERSION,
+            source: Recherche.Suggestion.Source.POLE_EMPLOI
+          }
+        ]
+        expect(suggestion).to.deep.equal(expected)
+      })
     })
     describe("quand c'est une suggestion sur une commune sans métier", () => {
       it('crée la suggestion service civique', () => {
@@ -188,7 +259,8 @@ describe('Suggestion', () => {
         // When
         const suggestion = factory.buildListeSuggestionsOffresFromPoleEmploi(
           [suggestionPESurUneCommune],
-          'ABCDE'
+          'ABCDE',
+          Core.Structure.MILO
         )
 
         // Then
@@ -237,7 +309,8 @@ describe('Suggestion', () => {
         // When
         const suggestion = factory.buildListeSuggestionsOffresFromPoleEmploi(
           [suggestionPESurUneCommune],
-          'ABCDE'
+          'ABCDE',
+          Core.Structure.MILO
         )
 
         // Then
