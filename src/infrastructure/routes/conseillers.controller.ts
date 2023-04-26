@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -69,10 +68,7 @@ import {
 import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
 import { RendezVousConseillerFutursEtPassesQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
 import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
-import {
-  EmailExisteDejaError,
-  ErreurHttp
-} from '../../building-blocks/types/domain-error'
+import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import {
   Result,
   isFailure,
@@ -243,9 +239,6 @@ export class ConseillersController {
       },
       utilisateur
     )
-    if (isFailure(result) && result.error.code === EmailExisteDejaError.CODE) {
-      throw new BadRequestException(result.error)
-    }
 
     if (isSuccess(result)) {
       const jeune = result.data
@@ -257,7 +250,7 @@ export class ConseillersController {
       }
     }
 
-    throw new RuntimeException()
+    throw handleFailure(result)
   }
 
   @ApiOperation({

@@ -1,23 +1,20 @@
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { createSandbox } from 'sinon'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import {
   ModifierJeuneDuConseillerCommand,
   ModifierJeuneDuConseillerCommandHandler
 } from '../../../src/application/commands/modifier-jeune-du-conseiller.command.handler'
-import { Jeune } from '../../../src/domain/jeune/jeune'
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { createSandbox } from 'sinon'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import { Core } from '../../../src/domain/core'
+import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure
 } from '../../../src/building-blocks/types/result'
-import {
-  DroitsInsuffisants,
-  NonTrouveError
-} from '../../../src/building-blocks/types/domain-error'
-import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
+import { Core } from '../../../src/domain/core'
+import { Jeune } from '../../../src/domain/jeune/jeune'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import { StubbedClass, expect, stubClass } from '../../utils'
 
 describe('ModifierJeuneDuConseillerCommandHandler', () => {
   let modifierJeuneDuConseillerCommandHandler: ModifierJeuneDuConseillerCommandHandler
@@ -51,28 +48,19 @@ describe('ModifierJeuneDuConseillerCommandHandler', () => {
         .resolves(emptySuccess())
 
       // When
-      const result = await modifierJeuneDuConseillerCommandHandler.authorize(
+      await modifierJeuneDuConseillerCommandHandler.authorize(
         command,
         conseillerPE
       )
 
       // Then
-      expect(result).to.deep.equal(emptySuccess())
-    })
-    it('rejette les autres', async () => {
-      // Given
-      const conseillerPE = unUtilisateurConseiller({
-        structure: Core.Structure.MILO
-      })
-
-      // When
-      const result = await modifierJeuneDuConseillerCommandHandler.authorize(
-        command,
-        conseillerPE
+      expect(
+        conseillerForJeuneAuthorizer.autoriserConseillerPourSonJeune
+      ).to.have.been.calledOnceWithExactly(
+        command.idJeune,
+        conseillerPE,
+        Core.structuresPoleEmploiBRSAPassEmploi
       )
-
-      // Then
-      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
     })
   })
 

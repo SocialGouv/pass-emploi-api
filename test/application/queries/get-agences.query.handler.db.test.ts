@@ -1,88 +1,40 @@
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import { GetAgencesQueryHandler } from '../../../src/application/queries/get-agences.query.handler.db'
 import { Core } from '../../../src/domain/core'
-import {
-  unUtilisateurConseiller,
-  unUtilisateurJeune
-} from '../../fixtures/authentification.fixture'
-import { expect } from '../../utils'
-import { Authentification } from '../../../src/domain/authentification'
-import { emptySuccess, failure } from 'src/building-blocks/types/result'
-import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
 import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import { StubbedClass, expect, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
 import Structure = Core.Structure
 
 describe('GetAgencesQueryHandler', () => {
+  let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
+  let handler: GetAgencesQueryHandler
+
   beforeEach(async () => {
     await getDatabase().cleanPG()
+    conseillerAuthorizer = stubClass(ConseillerAuthorizer)
+    handler = new GetAgencesQueryHandler(conseillerAuthorizer)
   })
 
   describe('authorize', () => {
-    const handler = new GetAgencesQueryHandler()
+    it("autorise l'utilisateur conseiller de la bonne structure", async () => {
+      // When
+      await handler.authorize(
+        { structure: Structure.MILO },
+        unUtilisateurConseiller()
+      )
 
-    describe("quand l'utilisateur est un jeune", () => {
-      it('doit renvoyer unauthorized', async () => {
-        // When
-        const result = await handler.authorize(
-          { structure: Structure.MILO },
-          unUtilisateurJeune()
-        )
-
-        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
-      })
-    })
-
-    describe("quand l'utilisateur est un support", () => {
-      it('doit renvoyer unauthorized', async () => {
-        // Given
-        const jackieLeSupport: Authentification.Utilisateur = {
-          id: 'ABCDE',
-          idAuthentification: 'id-authentification-jeune',
-          nom: 'Doe',
-          prenom: 'John',
-          type: Authentification.Type.SUPPORT,
-          email: 'john.doe@plop.io',
-          structure: Core.Structure.MILO,
-          dateDerniereConnexion: undefined,
-          roles: []
-        }
-
-        // When
-        const result = await handler.authorize(
-          { structure: Structure.MILO },
-          jackieLeSupport
-        )
-
-        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
-      })
-    })
-
-    describe("quand l'utilisateur est un conseiller", () => {
-      it("doit renvoyer une failure si il n'est pas de la même structure", async () => {
-        // When
-        const result = await handler.authorize(
-          { structure: Structure.MILO },
-          unUtilisateurConseiller({ structure: Structure.POLE_EMPLOI })
-        )
-
-        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
-      })
-
-      it('doit renvoyer un success si il est de la même structure', async () => {
-        // When
-        const result = await handler.authorize(
-          { structure: Structure.MILO },
-          unUtilisateurConseiller({ structure: Structure.MILO })
-        )
-
-        expect(result).to.deep.equal(emptySuccess())
-      })
+      expect(
+        conseillerAuthorizer.autoriserToutConseiller
+      ).to.have.been.calledOnceWithExactly(unUtilisateurConseiller(), [
+        Structure.MILO
+      ])
     })
   })
   describe('handle', () => {
     it("renvoie les agences en filtrant l'agence du CEJ", async () => {
       // Given
-      const handler = new GetAgencesQueryHandler()
       await AgenceSqlModel.bulkCreate([
         {
           id: '9999',
@@ -95,13 +47,15 @@ describe('GetAgencesQueryHandler', () => {
           id: '1',
           nomAgence: 'Agence normale',
           nomRegion: 'Limousin',
-          structure: 'MILO',
+          structure: 'POLE_EMPLOI',
           codeDepartement: 87
         }
       ])
 
       // When
-      const result = await handler.handle({ structure: Structure.MILO })
+      const result = await handler.handle({
+        structure: Structure.POLE_EMPLOI_BRSA
+      })
 
       // Then
       expect(result).to.deep.equal([

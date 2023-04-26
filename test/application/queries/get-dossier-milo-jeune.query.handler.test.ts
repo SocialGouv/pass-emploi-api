@@ -1,30 +1,30 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
-import { emptySuccess, failure } from 'src/building-blocks/types/result'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import {
   GetDossierMiloJeuneQuery,
   GetDossierMiloJeuneQueryHandler
 } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
-import {
-  unUtilisateurConseiller,
-  unUtilisateurJeune
-} from '../../fixtures/authentification.fixture'
-import { unDossierMilo } from '../../fixtures/milo.fixture'
-import { createSandbox, expect } from '../../utils'
+import { Core } from '../../../src/domain/core'
 import { JeuneMilo } from '../../../src/domain/jeune/jeune.milo'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import { unDossierMilo } from '../../fixtures/milo.fixture'
+import { StubbedClass, createSandbox, expect, stubClass } from '../../utils'
 
 describe('GetDossierMiloJeuneQueryHandler', () => {
   let miloRepository: StubbedType<JeuneMilo.Repository>
+  let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let getDossierMiloJeuneQueryHandler: GetDossierMiloJeuneQueryHandler
   let sandbox: SinonSandbox
 
   before(() => {
     sandbox = createSandbox()
     miloRepository = stubInterface(sandbox)
+    conseillerAuthorizer = stubClass(ConseillerAuthorizer)
 
     getDossierMiloJeuneQueryHandler = new GetDossierMiloJeuneQueryHandler(
-      miloRepository
+      miloRepository,
+      conseillerAuthorizer
     )
   })
 
@@ -53,7 +53,7 @@ describe('GetDossierMiloJeuneQueryHandler', () => {
   })
 
   describe('authorize', () => {
-    it("valide quand c'est un conseiller MILO", async () => {
+    it('autorise tout conseiller MILO', async () => {
       // Given
       const utilisateur = unUtilisateurConseiller()
 
@@ -62,30 +62,12 @@ describe('GetDossierMiloJeuneQueryHandler', () => {
       }
 
       // When
-      const result = await getDossierMiloJeuneQueryHandler.authorize(
-        query,
-        utilisateur
-      )
+      await getDossierMiloJeuneQueryHandler.authorize(query, utilisateur)
 
       // Then
-      expect(result).to.deep.equal(emptySuccess())
-    })
-    it("rejette quand c'est un jeune", async () => {
-      // Given
-      const utilisateur = unUtilisateurJeune()
-
-      const query: GetDossierMiloJeuneQuery = {
-        idDossier: '1'
-      }
-
-      // When
-      const result = await getDossierMiloJeuneQueryHandler.authorize(
-        query,
-        utilisateur
-      )
-
-      // Then
-      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
+      expect(
+        conseillerAuthorizer.autoriserToutConseiller
+      ).to.have.been.calledOnceWithExactly(utilisateur, [Core.Structure.MILO])
     })
   })
 })

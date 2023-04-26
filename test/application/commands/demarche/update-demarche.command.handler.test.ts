@@ -1,24 +1,24 @@
 import {
   UpdateStatutDemarcheCommand,
   UpdateStatutDemarcheCommandHandler
-} from '../../../src/application/commands/update-demarche.command.handler'
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
-import { Evenement, EvenementService } from '../../../src/domain/evenement'
-import { Demarche } from '../../../src/domain/demarche'
+} from '../../../../src/application/commands/demarche/update-demarche.command.handler'
+import { expect, StubbedClass, stubClass } from '../../../utils'
+import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
+import { Evenement, EvenementService } from '../../../../src/domain/evenement'
+import { Demarche } from '../../../../src/domain/demarche'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { createSandbox, SinonSandbox } from 'sinon'
-import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import { uneDatetime } from '../../fixtures/date.fixture'
+import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
+import { uneDatetime } from '../../../fixtures/date.fixture'
 import {
   emptySuccess,
   failure,
   isSuccess,
   success
-} from '../../../src/building-blocks/types/result'
-import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
-import { uneDemarche } from '../../fixtures/demarche.fixture'
-import { Core } from '../../../src/domain/core'
+} from '../../../../src/building-blocks/types/result'
+import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
+import { uneDemarche } from '../../../fixtures/demarche.fixture'
+import { Core } from '../../../../src/domain/core'
 
 describe('UpdateDemarcheCommandHandler', () => {
   let updateDemarcheCommandHandler: UpdateStatutDemarcheCommandHandler
@@ -137,7 +137,7 @@ describe('UpdateDemarcheCommandHandler', () => {
       expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         command.idJeune,
         utilisateur,
-        Core.structuresPoleEmploiBRSA
+        [Core.Structure.POLE_EMPLOI]
       )
     })
   })

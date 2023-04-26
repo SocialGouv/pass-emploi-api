@@ -1,31 +1,27 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import {
   DeleteJeuneInactifCommand,
   DeleteJeuneInactifCommandHandler
 } from '../../../src/application/commands/delete-jeune-inactif.command.handler'
 import {
-  DroitsInsuffisants,
   JeuneNonLieAuConseillerError,
   JeunePasInactifError,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
 import {
-  emptySuccess,
-  failure,
   Failure,
-  isFailure,
-  Result
+  Result,
+  emptySuccess,
+  isFailure
 } from '../../../src/building-blocks/types/result'
 import { Chat } from '../../../src/domain/chat'
 import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { Jeune } from '../../../src/domain/jeune/jeune'
-import {
-  unUtilisateurConseiller,
-  unUtilisateurJeune
-} from '../../fixtures/authentification.fixture'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unConseillerDuJeune, unJeune } from '../../fixtures/jeune.fixture'
-import { createSandbox, expect } from '../../utils'
+import { StubbedClass, createSandbox, expect, stubClass } from '../../utils'
 
 describe('DeleteJeuneInactifCommandHandler', () => {
   let conseillerRepository: StubbedType<Conseiller.Repository>
@@ -35,15 +31,19 @@ describe('DeleteJeuneInactifCommandHandler', () => {
   let conseiller: Conseiller
   let jeune: Jeune
   let command: DeleteJeuneInactifCommand
+  let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
+
   beforeEach(() => {
     const sandbox = createSandbox()
     conseillerRepository = stubInterface(sandbox)
     jeuneRepository = stubInterface(sandbox)
     chatRepository = stubInterface(sandbox)
+    conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     commandHandler = new DeleteJeuneInactifCommandHandler(
       conseillerRepository,
       jeuneRepository,
-      chatRepository
+      chatRepository,
+      conseillerAuthorizer
     )
 
     conseiller = unConseiller()
@@ -53,31 +53,22 @@ describe('DeleteJeuneInactifCommandHandler', () => {
     jeuneRepository.get.withArgs('id-jeune').resolves(jeune)
   })
 
-  describe('.authorize', () => {
+  describe('authorize', () => {
     it('autorise un conseiller', async () => {
       // Given
       const utilisateur = unUtilisateurConseiller()
 
       // When
-      const result = await commandHandler.authorize(command, utilisateur)
+      await commandHandler.authorize(command, utilisateur)
 
       // Then
-      expect(result).to.deep.equal(emptySuccess())
-    })
-
-    it('interdit un jeune', async () => {
-      // Given
-      const utilisateur = unUtilisateurJeune()
-
-      // When
-      const result = await commandHandler.authorize(command, utilisateur)
-
-      // Then
-      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
+      expect(
+        conseillerAuthorizer.autoriserToutConseiller
+      ).to.have.been.calledOnceWithExactly(utilisateur)
     })
   })
 
-  describe('.handle', () => {
+  describe('handle', () => {
     it("renvoie une erreur si le conseiller n'existe pas", async () => {
       // When
       const result = await commandHandler.handle({

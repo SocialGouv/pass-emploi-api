@@ -23,9 +23,13 @@ export class ConseillerAuthorizer {
   ) {}
   async autoriserLeConseiller(
     idConseiller: string,
-    utilisateur: Authentification.Utilisateur
+    utilisateur: Authentification.Utilisateur,
+    structuresAutorisees?: Core.Structure[]
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (
+      utilisateur.type === Authentification.Type.CONSEILLER &&
+      estUtilisateurDeLaStructure(utilisateur, structuresAutorisees)
+    ) {
       const conseiller = await this.conseillerRepository.get(idConseiller)
 
       if (conseiller && conseiller.id === utilisateur.id) {
@@ -77,9 +81,13 @@ export class ConseillerAuthorizer {
 
   async autoriserConseillerPourSonJeune(
     idJeune: string,
-    utilisateur: Authentification.Utilisateur
+    utilisateur: Authentification.Utilisateur,
+    structuresAutorisees?: Core.Structure[]
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (
+      utilisateur.type === Authentification.Type.CONSEILLER &&
+      estUtilisateurDeLaStructure(utilisateur, structuresAutorisees)
+    ) {
       const jeune = await this.jeuneRepository.get(idJeune)
 
       if (utilisateur.id === jeune?.conseiller?.id) {

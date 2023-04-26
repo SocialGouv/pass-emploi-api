@@ -1,13 +1,18 @@
 import { Inject } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
 import {
+  DroitsInsuffisants,
+  MauvaiseCommandeError
+} from '../../building-blocks/types/domain-error'
+import {
+  Result,
   emptySuccess,
-  failure,
-  Result
+  failure
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
+import { Core } from '../../domain/core'
+import { Evenement, EvenementService } from '../../domain/evenement'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Recherche } from '../../domain/offre/recherche/recherche'
 import {
@@ -15,7 +20,6 @@ import {
   SuggestionsRepositoryToken
 } from '../../domain/offre/recherche/suggestion/suggestion'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
-import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface CreateSuggestionConseillerOffreEmploiCommand extends Command {
   idConseiller: string
@@ -46,6 +50,12 @@ export class CreateSuggestionConseillerOffreEmploiCommandHandler extends Command
     command: CreateSuggestionConseillerOffreEmploiCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
+    if (
+      utilisateur.structure === Core.Structure.POLE_EMPLOI_BRSA &&
+      command.criteres.alternance
+    ) {
+      return failure(new DroitsInsuffisants())
+    }
     return this.conseillerAuthorizer.autoriserLeConseiller(
       command.idConseiller,
       utilisateur

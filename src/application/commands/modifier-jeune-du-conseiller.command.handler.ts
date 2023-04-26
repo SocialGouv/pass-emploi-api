@@ -1,10 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import {
-  DroitsInsuffisants,
-  NonTrouveError
-} from '../../building-blocks/types/domain-error'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import {
   Result,
   emptySuccess,
@@ -54,15 +51,10 @@ export class ModifierJeuneDuConseillerCommandHandler extends CommandHandler<
     command: ModifierJeuneDuConseillerCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (
-      utilisateur.structure !== Core.Structure.POLE_EMPLOI &&
-      utilisateur.structure !== Core.Structure.PASS_EMPLOI
-    ) {
-      return failure(new DroitsInsuffisants())
-    }
     return this.conseillerAuthorizer.autoriserConseillerPourSonJeune(
       command.idJeune,
-      utilisateur
+      utilisateur,
+      Core.structuresPoleEmploiBRSAPassEmploi
     )
   }
 

@@ -1,16 +1,12 @@
 import { Injectable } from '@nestjs/common'
-import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
-import {
-  emptySuccess,
-  failure,
-  Result
-} from '../../building-blocks/types/result'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
+import { Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { TypeDemarcheDto } from '../../infrastructure/clients/dto/pole-emploi.dto'
 import { PoleEmploiClient } from '../../infrastructure/clients/pole-emploi-client'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { TypesDemarcheQueryModel } from './query-models/types-demarche.query-model'
 
 export interface RechercherDemarcheQuery extends Query {
@@ -22,7 +18,10 @@ export class RechercherTypesDemarcheQueryHandler extends QueryHandler<
   RechercherDemarcheQuery,
   TypesDemarcheQueryModel[]
 > {
-  constructor(private poleEmploiClient: PoleEmploiClient) {
+  constructor(
+    private poleEmploiClient: PoleEmploiClient,
+    private readonly jeuneAuthorizer: JeuneAuthorizer
+  ) {
     super('RechercherTypesDemarcheQueryHandler')
   }
 
@@ -30,13 +29,11 @@ export class RechercherTypesDemarcheQueryHandler extends QueryHandler<
     _query: RechercherDemarcheQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (
-      utilisateur.type === Authentification.Type.JEUNE &&
-      utilisateur.structure === Core.Structure.POLE_EMPLOI
-    ) {
-      return emptySuccess()
-    }
-    return failure(new DroitsInsuffisants())
+    return this.jeuneAuthorizer.autoriserLeJeune(
+      utilisateur.id,
+      utilisateur,
+      Core.structuresPoleEmploiBRSA
+    )
   }
 
   async handle(

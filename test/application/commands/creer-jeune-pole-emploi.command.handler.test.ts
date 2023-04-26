@@ -7,10 +7,7 @@ import {
   CreateJeuneCommand,
   CreerJeunePoleEmploiCommandHandler
 } from '../../../src/application/commands/creer-jeune-pole-emploi.command.handler'
-import {
-  DroitsInsuffisants,
-  EmailExisteDejaError
-} from '../../../src/building-blocks/types/domain-error'
+import { EmailExisteDejaError } from '../../../src/building-blocks/types/domain-error'
 import { Chat } from '../../../src/domain/chat'
 import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { Core } from '../../../src/domain/core'
@@ -158,30 +155,11 @@ describe('CreateJeunePoleEmploiCommandHandler', () => {
       // Then
       expect(
         conseillerAuthorizer.autoriserLeConseiller
-      ).to.have.been.calledWithExactly(command.idConseiller, utilisateur)
-    })
-
-    it('rejette un conseiller MILO', async () => {
-      // Given
-      const command: CreateJeuneCommand = {
-        firstName: 'Kenji',
-        lastName: 'Lefameux',
-        email: 'kenji.lefameur@poleemploi.fr',
-        idConseiller: conseiller.id
-      }
-
-      const utilisateur = unUtilisateurConseiller({
-        structure: Core.Structure.MILO
-      })
-
-      // When
-      const result = await createJeuneCommandHandler.authorize(
-        command,
-        utilisateur
+      ).to.have.been.calledWithExactly(
+        command.idConseiller,
+        utilisateur,
+        Core.structuresPoleEmploiBRSA
       )
-
-      // Then
-      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
     })
   })
 })

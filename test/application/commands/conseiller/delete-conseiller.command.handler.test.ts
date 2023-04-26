@@ -5,10 +5,7 @@ import {
   DeleteConseillerCommand,
   DeleteConseillerCommandHandler
 } from '../../../../src/application/commands/conseiller/delete-conseiller.command.handler'
-import {
-  DroitsInsuffisants,
-  MauvaiseCommandeError
-} from '../../../../src/building-blocks/types/domain-error'
+import { MauvaiseCommandeError } from '../../../../src/building-blocks/types/domain-error'
 import { failure } from '../../../../src/building-blocks/types/result'
 import { Authentification } from '../../../../src/domain/authentification'
 import { Conseiller } from '../../../../src/domain/conseiller/conseiller'
@@ -16,9 +13,9 @@ import { Core } from '../../../../src/domain/core'
 import { Evenement, EvenementService } from '../../../../src/domain/evenement'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
 import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
-import { StubbedClass, expect, stubClass } from '../../../utils'
 import { unConseiller } from '../../../fixtures/conseiller.fixture'
 import { unJeune } from '../../../fixtures/jeune.fixture'
+import { StubbedClass, expect, stubClass } from '../../../utils'
 
 describe('DeleteConseillerCommandHandler', () => {
   let deleteConseillerCommandHandler: DeleteConseillerCommandHandler
@@ -61,22 +58,9 @@ describe('DeleteConseillerCommandHandler', () => {
         conseillerAuthorizer.autoriserLeConseiller
       ).to.have.been.calledWithExactly(
         'idConseiller',
-        unUtilisateurConseiller({ structure: Core.Structure.POLE_EMPLOI_BRSA })
+        unUtilisateurConseiller({ structure: Core.Structure.POLE_EMPLOI_BRSA }),
+        Core.structuresPoleEmploiBRSA
       )
-    })
-    it("n'autorise pas un conseiller non PE", async () => {
-      // Given
-      const command: DeleteConseillerCommand = {
-        idConseiller: 'idConseiller'
-      }
-      // When
-      const result = await deleteConseillerCommandHandler.authorize(
-        command,
-        unUtilisateurConseiller({ structure: Core.Structure.MILO })
-      )
-
-      // Then
-      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
     })
   })
 
