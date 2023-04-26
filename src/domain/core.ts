@@ -20,6 +20,11 @@ export namespace Core {
     Core.Structure.POLE_EMPLOI,
     Core.Structure.POLE_EMPLOI_BRSA
   ]
+  export const touteStructureSaufBRSA = [
+    Core.Structure.MILO,
+    Core.Structure.PASS_EMPLOI,
+    Core.Structure.POLE_EMPLOI
+  ]
 
   export interface Id {
     id: string

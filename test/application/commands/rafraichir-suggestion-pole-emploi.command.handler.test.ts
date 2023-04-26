@@ -45,7 +45,8 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
       await handler.authorize(
         {
           idJeune: 'idJeune',
-          token: 'token'
+          token: 'token',
+          structure: Core.Structure.MILO
         },
         unUtilisateurJeune()
       )
@@ -76,11 +77,15 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
           .resolves(success([uneSuggestionPE()]))
 
         suggestionFactory.buildListeSuggestionsOffresFromPoleEmploi
-          .withArgs([uneSuggestionPE()], 'idJeune')
+          .withArgs([uneSuggestionPE()], 'idJeune', Core.Structure.MILO)
           .returns([uneSuggestion()])
 
         // When
-        await handler.handle({ idJeune: 'idJeune', token: 'token' })
+        await handler.handle({
+          idJeune: 'idJeune',
+          token: 'token',
+          structure: Core.Structure.MILO
+        })
 
         // Then
         expect(
@@ -99,7 +104,8 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
         // When
         const result = await handler.handle({
           idJeune: 'idJeune',
-          token: 'token'
+          token: 'token',
+          structure: Core.Structure.MILO
         })
 
         // Then

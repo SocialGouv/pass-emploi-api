@@ -163,7 +163,8 @@ export class RecherchesJeunesController {
         await this.rafraichirSuggestionPoleEmploiCommandHandler.execute(
           {
             idJeune,
-            token: accessToken
+            token: accessToken,
+            structure: utilisateur.structure
           },
           utilisateur
         )

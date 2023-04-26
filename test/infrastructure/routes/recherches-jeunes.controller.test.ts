@@ -42,6 +42,7 @@ import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 import Suggestion = Recherche.Suggestion
+import { Core } from '../../../src/domain/core'
 
 describe('RecherchesController', () => {
   let createRechercheCommandHandler: StubbedClass<CreateRechercheCommandHandler>
@@ -387,7 +388,8 @@ describe('RecherchesController', () => {
           ).to.have.been.calledWithExactly(
             {
               idJeune: '1',
-              token: 'coucou'
+              token: 'coucou',
+              structure: Core.Structure.POLE_EMPLOI
             },
             unUtilisateurDecodePoleEmploi()
           )

@@ -13,6 +13,7 @@ import {
   success
 } from '../../../../building-blocks/types/result'
 import { MauvaiseCommandeError } from '../../../../building-blocks/types/domain-error'
+import { Core } from '../../../core'
 
 export interface Suggestion {
   id: string
@@ -98,7 +99,8 @@ export namespace Suggestion {
 
     buildListeSuggestionsOffresFromPoleEmploi(
       suggestionsPoleEmploi: PoleEmploi[],
-      idJeune: string
+      idJeune: string,
+      structureDuJeune: Core.Structure
     ): Suggestion[] {
       const maintenant = this.dateService.now()
       const suggestionsEmploi = suggestionsPoleEmploi
@@ -121,16 +123,20 @@ export namespace Suggestion {
             maintenant
           )
         )
-      const suggestionsServiceCivique = suggestionsPoleEmploi
-        .filter(this.estUneSuggestionServiceCivique.bind(this))
-        .map(suggestionPoleEmploi =>
-          this.creerSuggestionPoleEmploi(
-            suggestionPoleEmploi,
-            Recherche.Type.OFFRES_SERVICES_CIVIQUE,
-            idJeune,
-            maintenant
-          )
-        )
+      const suggestionsServiceCivique = Core.touteStructureSaufBRSA.includes(
+        structureDuJeune
+      )
+        ? suggestionsPoleEmploi
+            .filter(this.estUneSuggestionServiceCivique.bind(this))
+            .map(suggestionPoleEmploi =>
+              this.creerSuggestionPoleEmploi(
+                suggestionPoleEmploi,
+                Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+                idJeune,
+                maintenant
+              )
+            )
+        : []
 
       return [
         ...suggestionsEmploi,
