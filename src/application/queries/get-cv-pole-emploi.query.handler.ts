@@ -8,8 +8,10 @@ import {
   PoleEmploiPartenaireClientToken
 } from '../../infrastructure/clients/pole-emploi-partenaire-client'
 import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
-import { ResultApi } from '../../building-blocks/types/result-api'
 import { DocumentPoleEmploiDto } from '../../infrastructure/clients/dto/pole-emploi.dto'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
+import { Authentification } from '../../domain/authentification'
+import { Core } from '../../domain/core'
 
 export interface GetCVPoleEmploiQuery extends Query {
   idJeune: string
@@ -24,12 +26,20 @@ export class GetCVPoleEmploiQueryHandler extends QueryHandler<
   constructor(
     @Inject(PoleEmploiPartenaireClientToken)
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,
-    private keycloakClient: KeycloakClient
+    private keycloakClient: KeycloakClient,
+    private jeuneAuthorizer: JeuneAuthorizer
   ) {
     super('GetCVPoleEmploiQueryHandler')
   }
-  async authorize(): Promise<Result> {
-    throw new Error('not implemented')
+  async authorize(
+    query: GetCVPoleEmploiQuery,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<Result> {
+    return this.jeuneAuthorizer.autoriserLeJeune(
+      query.idJeune,
+      utilisateur,
+      Core.structuresPoleEmploiBRSA
+    )
   }
 
   async handle(
@@ -39,7 +49,7 @@ export class GetCVPoleEmploiQueryHandler extends QueryHandler<
       query.accessToken
     )
 
-    const documentsPoleEmploiDto: ResultApi<DocumentPoleEmploiDto[]> =
+    const documentsPoleEmploiDto: Result<DocumentPoleEmploiDto[]> =
       await this.poleEmploiPartenaireClient.getDocuments(idpToken)
 
     if (isFailure(documentsPoleEmploiDto)) {

@@ -30,7 +30,12 @@ import {
   ResultApi,
   successApi
 } from '../../building-blocks/types/result-api'
-import { failure, Result, success } from '../../building-blocks/types/result'
+import {
+  failure,
+  isFailure,
+  Result,
+  success
+} from '../../building-blocks/types/result'
 
 const ORIGINE = 'INDIVIDU'
 const DEMARCHES_URL = 'peconnect-demarches/v1/demarches'
@@ -56,7 +61,7 @@ interface PoleEmploiPartenaireClientI {
 
   getDocuments(
     tokenDuJeune: string
-  ): Promise<ResultApi<DocumentPoleEmploiDto[]>>
+  ): Promise<Result<DocumentPoleEmploiDto[] | void>>
 
   updateDemarche(
     demarcheModifiee: Demarche.Modifiee,
@@ -141,14 +146,18 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     )
   }
 
-  getDocuments(
+  async getDocuments(
     tokenDuJeune: string
-  ): Promise<ResultApi<DocumentPoleEmploiDto[]>> {
+  ): Promise<Result<DocumentPoleEmploiDto[]>> {
     this.logger.log('Récupération des documents du jeune')
-    return this.get<DocumentPoleEmploiDto[]>(
+    const result = await this.get<DocumentPoleEmploiDto[]>(
       'peconnect-telecharger-cv-realisation/v1/piecesjointes',
       tokenDuJeune
     )
+    if (isFailure(result)) {
+      return result
+    }
+    return result.data ? result : success([])
   }
 
   async updateDemarche(

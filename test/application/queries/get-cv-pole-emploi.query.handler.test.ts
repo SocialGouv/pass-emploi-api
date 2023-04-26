@@ -6,25 +6,34 @@ import { expect, StubbedClass, stubClass } from '../../utils'
 import { CVPoleEmploiQueryModel } from '../../../src/application/queries/query-models/jeunes.pole-emploi.query-model'
 import { DocumentPoleEmploiDto } from '../../../src/infrastructure/clients/dto/pole-emploi.dto'
 import { PoleEmploiPartenaireClient } from '../../../src/infrastructure/clients/pole-emploi-partenaire-client'
-import { success } from '../../../src/building-blocks/types/result'
+import {
+  emptySuccess,
+  success
+} from '../../../src/building-blocks/types/result'
 import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { failureApi } from '../../../src/building-blocks/types/result-api'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { Core } from '../../../src/domain/core'
 
 describe('GetCVPoleEmploiQueryHandler', () => {
   let getCVPoleEmploiQueryHandler: GetCVPoleEmploiQueryHandler
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
   let keycloakClient: StubbedClass<KeycloakClient>
+  let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
 
   let query: GetCVPoleEmploiQuery
 
   beforeEach(async () => {
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
     keycloakClient = stubClass(KeycloakClient)
+    jeuneAuthorizer = stubClass(JeuneAuthorizer)
 
     getCVPoleEmploiQueryHandler = new GetCVPoleEmploiQueryHandler(
       poleEmploiPartenaireClient,
-      keycloakClient
+      keycloakClient,
+      jeuneAuthorizer
     )
 
     query = {
@@ -92,6 +101,25 @@ describe('GetCVPoleEmploiQueryHandler', () => {
           ErreurHttp
         )
       })
+    })
+  })
+
+  describe('authorize', () => {
+    it('autorise un utilisateur Pôle Emploi', async () => {
+      // Given
+      const utilisateur = unUtilisateurJeune()
+      jeuneAuthorizer.autoriserLeJeune
+        .withArgs(query.idJeune, utilisateur, Core.structuresPoleEmploiBRSA)
+        .resolves(emptySuccess())
+
+      // When
+      const result = await getCVPoleEmploiQueryHandler.authorize(
+        query,
+        utilisateur
+      )
+
+      // Then
+      expect(result._isSuccess).to.be.true()
     })
   })
 })

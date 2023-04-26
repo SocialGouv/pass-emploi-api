@@ -26,6 +26,7 @@ import {
   failureApi,
   successApi
 } from '../../../src/building-blocks/types/result-api'
+import { DocumentPoleEmploiDto } from '../../../src/infrastructure/clients/dto/pole-emploi.dto'
 
 describe('PoleEmploiPartenaireClient', () => {
   let poleEmploiPartenaireClient: PoleEmploiPartenaireClient
@@ -184,25 +185,81 @@ describe('PoleEmploiPartenaireClient', () => {
   })
 
   describe('getDocuments', () => {
-    it('fait un appel http get', async () => {
-      // Given
-      nock(PARTENAIRE_BASE_URL)
-        .get('/peconnect-telecharger-cv-realisation/v1/piecesjointes')
-        .reply(
-          200,
-          'https://entreprise.pe-qvr.fr/docnums/portfolio-usager/G1tE02iVu0cVk9L4I2fdTp0uDICAaJuZ/CVTest.pdf?Expires=1680785474&Signature=wRUu4iakc%2BFRJDPA37BYbM%2BbyNA%3D'
-        )
-        .isDone()
+    describe('quand on reçoit une 200', () => {
+      it('retourne les documents', async () => {
+        // Given
+        const documentsDto: DocumentPoleEmploiDto[] = [
+          {
+            titre: 'CVTest',
+            nomFichier: 'CVTest.pdf',
+            url: 'https://entreprise.pe-qvr.fr/docnums/portfolio-usager/G1tE02iVu0cVk9L4I2fdTp0uDICAaJuZ/CVTest.pdf?Expires=1680785474&Signature=wRUu4iakc%2BFRJDPA37BYbM%2BbyNA%3D',
+            format: 'DOCUMENT',
+            type: {
+              libelle: 'CV',
+              code: 'CV'
+            }
+          },
+          {
+            titre: 'CVTest2',
+            nomFichier: 'aditya-chinchure-ZhQCZjr9fHo-unsplash.jpg',
+            url: 'https://entreprise.pe-qvr.fr/docnums/portfolio-usager/1dTmSWPOPhFUjHy5FtpSoJ9UtqRb0Oat/CVTest2.pdf?Expires=1680785474&Signature=K1qEcZV2lx8a1XYHm2AFAcGD9lA%3D',
+            format: 'DOCUMENT',
+            type: {
+              libelle: 'CV',
+              code: 'CV'
+            }
+          },
+          {
+            titre: 'LM_Test_2',
+            nomFichier: 'david-svihovec-5X2ViX_r0ZA-unsplash.jpg',
+            url: 'https://entreprise.pe-qvr.fr/docnums/portfolio-usager/hyso6KKbs6d46qsKGYuDIzmISIkUkjT3/LM_Test_2.pdf?Expires=1680785474&Signature=R3g2nlipky3WqPbnajwyMxc42AE%3D',
+            format: 'DOCUMENT',
+            type: {
+              libelle: 'Lettre de motivation',
+              code: 'LM'
+            }
+          },
+          {
+            titre: 'LM_Test_3_ aaaaaaaaaaaaaaa aaaaaaaaaaa aaaaaaaaaaa',
+            nomFichier: '20230200057Développeureusefonctionnel.pdf',
+            url: 'https://entreprise.pe-qvr.fr/docnums/portfolio-usager/DXfW3pIr4Z9gXc5H7RKyMZMoF0PzCaNu/LM_Test_3__aaaaaaaaaaaaaaa_aaaaaaaaaaa_aaaaaaaaaaa.pdf?Expires=1680785474&Signature=w3MNPpmGigVEtAeI%2FBrGRdzOB7Q%3D',
+            format: 'DOCUMENT',
+            type: {
+              libelle: 'Lettre de motivation',
+              code: 'LM'
+            }
+          }
+        ]
+        nock(PARTENAIRE_BASE_URL)
+          .get('/peconnect-telecharger-cv-realisation/v1/piecesjointes')
+          .reply(200, documentsDto)
+          .isDone()
 
-      // When
-      const response = await poleEmploiPartenaireClient.getDocuments(tokenJeune)
-
-      // Then
-      expect(response).to.deep.equal(
-        success(
-          'https://entreprise.pe-qvr.fr/docnums/portfolio-usager/G1tE02iVu0cVk9L4I2fdTp0uDICAaJuZ/CVTest.pdf?Expires=1680785474&Signature=wRUu4iakc%2BFRJDPA37BYbM%2BbyNA%3D'
+        // When
+        const response = await poleEmploiPartenaireClient.getDocuments(
+          tokenJeune
         )
-      )
+
+        // Then
+        expect(response).to.deep.equal(success(documentsDto))
+      })
+    })
+    describe('quand on reçoit une 204', () => {
+      it('renvoie une liste vide', async () => {
+        // Given
+        nock(PARTENAIRE_BASE_URL)
+          .get('/peconnect-telecharger-cv-realisation/v1/piecesjointes')
+          .reply(204)
+          .isDone()
+
+        // When
+        const response = await poleEmploiPartenaireClient.getDocuments(
+          tokenJeune
+        )
+
+        // Then
+        expect(response).to.deep.equal(success([]))
+      })
     })
   })
 
