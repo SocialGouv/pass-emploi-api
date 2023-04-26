@@ -1,12 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common'
-import {
-  NonTrouveError,
-  DroitsInsuffisants,
-  EmailExisteDejaError
-} from '../../building-blocks/types/domain-error'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { failure, Result, success } from '../../building-blocks/types/result'
+import {
+  EmailExisteDejaError,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
+import { Result, failure, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import {
@@ -64,7 +63,7 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
         firstName: conseiller.firstName,
         email: conseiller.email
       },
-      structure: Core.Structure.POLE_EMPLOI
+      structure: conseiller.structure
     }
     const nouveauJeune = this.jeuneFactory.creer(jeuneACreer)
     await this.jeuneRepository.save(nouveauJeune)
@@ -79,17 +78,10 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
     command: CreateJeuneCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (
-      !(
-        utilisateur.type === Authentification.Type.CONSEILLER &&
-        utilisateur.structure === Core.Structure.POLE_EMPLOI
-      )
-    ) {
-      return failure(new DroitsInsuffisants())
-    }
     return this.conseillerAuthorizer.autoriserLeConseiller(
       command.idConseiller,
-      utilisateur
+      utilisateur,
+      Core.structuresPoleEmploiBRSA
     )
   }
 

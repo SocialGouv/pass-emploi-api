@@ -1,24 +1,22 @@
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { PoleEmploiClient } from '../../../src/infrastructure/clients/pole-emploi-client'
-import { RechercherTypesDemarcheQueryHandler } from '../../../src/application/queries/rechercher-types-demarche.query.handler'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { TypesDemarcheQueryModel } from '../../../src/application/queries/query-models/types-demarche.query-model'
-import { TypeDemarcheDto } from '../../../src/infrastructure/clients/dto/pole-emploi.dto'
-import {
-  unUtilisateurConseiller,
-  unUtilisateurJeune
-} from '../../fixtures/authentification.fixture'
+import { RechercherTypesDemarcheQueryHandler } from '../../../src/application/queries/rechercher-types-demarche.query.handler'
 import { Core } from '../../../src/domain/core'
-import { emptySuccess, failure } from 'src/building-blocks/types/result'
-import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import { TypeDemarcheDto } from '../../../src/infrastructure/clients/dto/pole-emploi.dto'
+import { PoleEmploiClient } from '../../../src/infrastructure/clients/pole-emploi-client'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { expect, StubbedClass, stubClass } from '../../utils'
 
 describe('RechercherTypesDemarcheQueryHandler', () => {
   let poleEmploiClient: StubbedClass<PoleEmploiClient>
+  let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let rechercherTypesDemarcheQueryHandler: RechercherTypesDemarcheQueryHandler
 
   beforeEach(() => {
     poleEmploiClient = stubClass(PoleEmploiClient)
+    jeuneAuthorizer = stubClass(JeuneAuthorizer)
     rechercherTypesDemarcheQueryHandler =
-      new RechercherTypesDemarcheQueryHandler(poleEmploiClient)
+      new RechercherTypesDemarcheQueryHandler(poleEmploiClient, jeuneAuthorizer)
   })
 
   describe('handle', () => {
@@ -245,34 +243,21 @@ describe('RechercherTypesDemarcheQueryHandler', () => {
 
   describe('authorize', () => {
     it('autorise un jeune pôle emploi', async () => {
+      const utilisateur = unUtilisateurJeune()
       // When
-      const result = await rechercherTypesDemarcheQueryHandler.authorize(
+      await rechercherTypesDemarcheQueryHandler.authorize(
         { recherche: '' },
-        unUtilisateurJeune({ structure: Core.Structure.POLE_EMPLOI })
+        utilisateur
       )
 
       // Then
-      expect(result).to.deep.equal(emptySuccess())
-    })
-    it('rejette un jeune milo', async () => {
-      // When
-      const result = await rechercherTypesDemarcheQueryHandler.authorize(
-        { recherche: '' },
-        unUtilisateurJeune({ structure: Core.Structure.MILO })
+      expect(
+        jeuneAuthorizer.autoriserLeJeune
+      ).to.have.been.calledOnceWithExactly(
+        utilisateur.id,
+        utilisateur,
+        Core.structuresPoleEmploiBRSA
       )
-
-      // Then
-      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
-    })
-    it('rejette un conseiller', async () => {
-      // When
-      const result = await rechercherTypesDemarcheQueryHandler.authorize(
-        { recherche: '' },
-        unUtilisateurConseiller()
-      )
-
-      // Then
-      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
     })
   })
 })

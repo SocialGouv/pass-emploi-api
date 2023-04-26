@@ -12,13 +12,19 @@ export namespace Core {
     Core.Structure.MILO,
     Core.Structure.PASS_EMPLOI
   ]
-  export const structuresPoleEmploiPassEmploi = [
+  export const structuresPoleEmploiBRSAPassEmploi = [
     Core.Structure.POLE_EMPLOI,
+    Core.Structure.POLE_EMPLOI_BRSA,
     Core.Structure.PASS_EMPLOI
   ]
   export const structuresPoleEmploiBRSA = [
     Core.Structure.POLE_EMPLOI,
     Core.Structure.POLE_EMPLOI_BRSA
+  ]
+  export const touteStructureSaufBRSA = [
+    Core.Structure.MILO,
+    Core.Structure.PASS_EMPLOI,
+    Core.Structure.POLE_EMPLOI
   ]
 
   export interface Id {

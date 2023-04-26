@@ -19,6 +19,7 @@ import { Core } from '../../domain/core'
 export interface RafraichirSuggestionPoleEmploiCommand extends Command {
   idJeune: string
   token: string
+  structure: Core.Structure
 }
 
 @Injectable()
@@ -54,7 +55,8 @@ export class RafraichirSuggestionPoleEmploiCommandHandler extends CommandHandler
     const suggestions =
       this.suggestionFactory.buildListeSuggestionsOffresFromPoleEmploi(
         suggestionsPEResult.data,
-        command.idJeune
+        command.idJeune,
+        command.structure
       )
 
     await this.suggestionPoleEmploiService.rafraichir(

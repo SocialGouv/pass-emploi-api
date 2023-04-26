@@ -1,15 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
-  DroitsInsuffisants,
   JeuneNonLieAuConseillerError,
   JeunePasInactifError,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
 import {
+  Result,
   emptySuccess,
-  failure,
-  Result
+  failure
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
@@ -18,6 +17,7 @@ import {
   ConseillersRepositoryToken
 } from '../../domain/conseiller/conseiller'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 
 export interface DeleteJeuneInactifCommand {
   idConseiller: string
@@ -35,7 +35,8 @@ export class DeleteJeuneInactifCommandHandler extends CommandHandler<
     @Inject(JeunesRepositoryToken)
     private readonly jeuneRepository: Jeune.Repository,
     @Inject(ChatRepositoryToken)
-    private readonly chatRepository: Chat.Repository
+    private readonly chatRepository: Chat.Repository,
+    private readonly conseillerAuthorizer: ConseillerAuthorizer
   ) {
     super('DeleteJeuneInactifCommandHandler')
   }
@@ -44,10 +45,7 @@ export class DeleteJeuneInactifCommandHandler extends CommandHandler<
     _command: DeleteJeuneInactifCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type !== Authentification.Type.CONSEILLER) {
-      return failure(new DroitsInsuffisants())
-    }
-    return emptySuccess()
+    return this.conseillerAuthorizer.autoriserToutConseiller(utilisateur)
   }
 
   async handle({

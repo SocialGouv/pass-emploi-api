@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {
-  DroitsInsuffisants,
   MauvaiseCommandeError,
   NonTrouveError
 } from '../../../building-blocks/types/domain-error'
@@ -50,16 +49,11 @@ export class DeleteConseillerCommandHandler extends CommandHandler<
     command: DeleteConseillerCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (
-      utilisateur.structure === Core.Structure.POLE_EMPLOI ||
-      utilisateur.structure === Core.Structure.POLE_EMPLOI_BRSA
-    ) {
-      return this.conseillerAuthorizer.autoriserLeConseiller(
-        command.idConseiller,
-        utilisateur
-      )
-    }
-    return failure(new DroitsInsuffisants())
+    return this.conseillerAuthorizer.autoriserLeConseiller(
+      command.idConseiller,
+      utilisateur,
+      Core.structuresPoleEmploiBRSA
+    )
   }
 
   async handle(command: DeleteConseillerCommand): Promise<Result> {
