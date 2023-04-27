@@ -65,7 +65,9 @@ export async function chargerLaVueFonctionnalite(
                        GROUP BY semaine, structure, categorie, action, type_utilisateur) as table_action
                       ON table_nom.semaine = table_action.semaine and
                          table_nom.structure = table_action.structure and
-                         table_nom.categorie = table_action.categorie and table_nom.action = table_action.action
+                         table_nom.type_utilisateur = table_action.type_utilisateur and
+                         table_nom.categorie = table_action.categorie and
+                         table_nom.action = table_action.action
            INNER JOIN (SELECT COUNT(distinct id_utilisateur) as nb_users_categorie,
                               count(*)                       as nb_ae_categorie,
                               semaine,
@@ -77,7 +79,9 @@ export async function chargerLaVueFonctionnalite(
                          and structure != 'PASS_EMPLOI'
                          and semaine = '${semaine}'
                        GROUP BY semaine, structure, categorie, type_utilisateur) as table_cat
-                      ON table_nom.semaine = table_cat.semaine and table_nom.structure = table_cat.structure and
+                      ON table_nom.semaine = table_cat.semaine and
+                         table_nom.structure = table_cat.structure and
+                         table_nom.type_utilisateur = table_cat.type_utilisateur and
                          table_nom.categorie = table_cat.categorie
            INNER JOIN (SELECT count(*)                       as nb_ae,
                               COUNT(distinct id_utilisateur) as nb_users_tot,
@@ -89,7 +93,9 @@ export async function chargerLaVueFonctionnalite(
                          and structure != 'PASS_EMPLOI'
                          and semaine = '${semaine}'
                        GROUP BY semaine, structure, type_utilisateur) as table_tot
-                      ON table_nom.semaine = table_nom.semaine and table_nom.structure = table_tot.structure
+                      ON table_nom.semaine = table_tot.semaine and
+                         table_nom.structure = table_tot.structure and
+                         table_nom.type_utilisateur = table_tot.type_utilisateur
     GROUP BY table_nom.semaine, table_nom.structure, table_nom.categorie, table_nom.action, table_nom.nom,
              table_nom.type_utilisateur
     ORDER BY table_nom.structure, table_nom.type_utilisateur, table_nom.categorie, table_nom.action, table_nom.nom;
