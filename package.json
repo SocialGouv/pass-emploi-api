@@ -110,7 +110,7 @@
     "reflect-metadata": "^0.1.13",
     "remove-accents": "0.4.4",
     "rimraf": "5.0.0",
-    "rxjs": "7.8.0",
+    "rxjs": "7.8.1",
     "sequelize": "6.31.0",
     "sequelize-cli": "6.6.0",
     "sequelize-typescript": "2.1.5",
