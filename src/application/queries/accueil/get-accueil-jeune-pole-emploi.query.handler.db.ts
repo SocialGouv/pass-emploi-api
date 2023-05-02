@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import {
+  failure,
   isFailure,
   Result,
   success
@@ -17,6 +18,8 @@ import { GetRecherchesSauvegardeesQueryGetter } from '../query-getters/accueil/g
 import { GetDemarchesQueryGetter } from '../query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { AccueilJeunePoleEmploiQueryModel } from '../query-models/jeunes.pole-emploi.query-model'
+import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
+import { NonTrouveError } from '../../../building-blocks/types/domain-error'
 
 export interface GetAccueilJeunePoleEmploiQuery extends Query {
   idJeune: string
@@ -30,6 +33,8 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
   Result<AccueilJeunePoleEmploiQueryModel>
 > {
   constructor(
+    @Inject(JeunesRepositoryToken)
+    private jeuneRepository: Jeune.Repository,
     private jeuneAuthorizer: JeuneAuthorizer,
     private keycloakClient: KeycloakClient,
     private getDemarchesQueryGetter: GetDemarchesQueryGetter,
@@ -43,6 +48,15 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
   async handle(
     query: GetAccueilJeunePoleEmploiQuery
   ): Promise<Result<AccueilJeunePoleEmploiQueryModel>> {
+    const jeune = await this.jeuneRepository.get(query.idJeune)
+    if (!jeune) {
+      return failure(new NonTrouveError('Jeune', query.idJeune))
+    }
+    const idpToken = await this.keycloakClient.exchangeTokenJeune(
+      query.accessToken,
+      jeune.structure
+    )
+
     const dateFinDeSemaine = DateTime.fromISO(query.maintenant, {
       setZone: true
     }).endOf('week')
@@ -50,10 +64,6 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
     const maintenant = DateTime.fromISO(query.maintenant, {
       setZone: true
     })
-
-    const idpToken = await this.keycloakClient.exchangeTokenPoleEmploiJeune(
-      query.accessToken
-    )
 
     const [
       resultDemarches,

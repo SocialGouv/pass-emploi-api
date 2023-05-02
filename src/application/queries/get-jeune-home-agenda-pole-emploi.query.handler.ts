@@ -1,8 +1,13 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { Cached, Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { isFailure, Result, success } from '../../building-blocks/types/result'
+import {
+  failure,
+  isFailure,
+  Result,
+  success
+} from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Demarche } from '../../domain/demarche'
 import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
@@ -11,6 +16,8 @@ import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarch
 import { GetRendezVousJeunePoleEmploiQueryGetter } from './query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { JeuneHomeAgendaPoleEmploiQueryModel } from './query-models/home-jeune-suivi.query-model'
 import { Core } from '../../domain/core'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
 
 export interface GetJeuneHomeAgendaPoleEmploiQuery extends Query {
   idJeune: string
@@ -24,6 +31,8 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
   Result<Cached<JeuneHomeAgendaPoleEmploiQueryModel>>
 > {
   constructor(
+    @Inject(JeunesRepositoryToken)
+    private jeuneRepository: Jeune.Repository,
     private getDemarchesQueryGetter: GetDemarchesQueryGetter,
     private getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter,
     private jeuneAuthorizer: JeuneAuthorizer,
@@ -35,11 +44,16 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
   async handle(
     query: GetJeuneHomeAgendaPoleEmploiQuery
   ): Promise<Result<Cached<JeuneHomeAgendaPoleEmploiQueryModel>>> {
-    const dansDeuxSemaines = query.maintenant.plus({ weeks: 2 })
-
-    const idpToken = await this.keycloakClient.exchangeTokenPoleEmploiJeune(
-      query.accessToken
+    const jeune = await this.jeuneRepository.get(query.idJeune)
+    if (!jeune) {
+      return failure(new NonTrouveError('Jeune', query.idJeune))
+    }
+    const idpToken = await this.keycloakClient.exchangeTokenJeune(
+      query.accessToken,
+      jeune.structure
     )
+
+    const dansDeuxSemaines = query.maintenant.plus({ weeks: 2 })
 
     const [resultDemarches, resultRendezVous] = await Promise.all([
       this.getDemarchesQueryGetter.handle({

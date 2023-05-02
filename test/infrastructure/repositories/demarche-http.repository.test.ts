@@ -21,7 +21,7 @@ describe('DemarcheHttpRepository', () => {
     dateService.now.returns(maintenant)
     dateService.nowJs.returns(maintenant.toJSDate())
     keycloakClient = stubClass(KeycloakClient)
-    keycloakClient.exchangeTokenPoleEmploiJeune.resolves('token')
+    keycloakClient.exchangeTokenJeune.resolves('token')
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
 
     demarcheHttpRepository = new DemarcheHttpRepository(

@@ -54,6 +54,12 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
+    const idpToken =
+      query.idpToken ??
+      (await this.keycloakClient.exchangeTokenJeune(
+        query.accessToken,
+        jeune.structure
+      ))
 
     if (query.periode === RendezVous.Periode.PASSES) {
       return success({
@@ -62,11 +68,6 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
     }
 
     const maintenant = this.dateService.now()
-    const idpToken =
-      query.idpToken ??
-      (await this.keycloakClient.exchangeTokenPoleEmploiJeune(
-        query.accessToken
-      ))
 
     const [responsePrestations, responseRendezVous] = await Promise.all([
       this.poleEmploiPartenaireClient.getPrestations(idpToken, maintenant),

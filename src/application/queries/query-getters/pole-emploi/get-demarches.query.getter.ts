@@ -48,8 +48,9 @@ export class GetDemarchesQueryGetter {
     }
     const idpToken =
       query.idpToken ??
-      (await this.keycloakClient.exchangeTokenPoleEmploiJeune(
-        query.accessToken
+      (await this.keycloakClient.exchangeTokenJeune(
+        query.accessToken,
+        jeune.structure
       ))
 
     const demarchesDto = await this.poleEmploiPartenaireClient.getDemarches(

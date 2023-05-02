@@ -53,7 +53,7 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
     idService.uuid.returns('random-id')
 
     keycloakClient = stubClass(KeycloakClient)
-    keycloakClient.exchangeTokenPoleEmploiJeune.resolves(idpToken)
+    keycloakClient.exchangeTokenJeune.resolves(idpToken)
 
     getDemarchesQueryGetter = new GetDemarchesQueryGetter(
       jeunesRepository,
@@ -72,6 +72,7 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
       )
 
     handler = new GetJeuneHomeAgendaPoleEmploiQueryHandler(
+      jeunesRepository,
       getDemarchesQueryGetter,
       getRendezVousJeunePoleEmploiQueryGetter,
       jeuneAuthorizer,
@@ -95,7 +96,7 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
       await handler.handle(query)
 
       // Then
-      expect(keycloakClient.exchangeTokenPoleEmploiJeune).to.have.callCount(1)
+      expect(keycloakClient.exchangeTokenJeune).to.have.callCount(1)
     })
   })
 })

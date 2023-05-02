@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import { firstValueFrom } from 'rxjs'
+import { Core } from '../../domain/core'
 import { buildError } from '../../utils/logger.module'
 
 @Injectable()
@@ -25,7 +26,27 @@ export class KeycloakClient {
     this.clientSecret = this.configService.get('oidc').clientSecret
   }
 
-  public async exchangeTokenPoleEmploiJeune(bearer: string): Promise<string> {
+  public async exchangeTokenJeune(
+    bearer: string,
+    structure: Core.Structure
+  ): Promise<string> {
+    switch (structure) {
+      case Core.Structure.POLE_EMPLOI:
+        return this.exchangeToken(bearer, 'pe-jeune')
+      case Core.Structure.POLE_EMPLOI_BRSA:
+        return this.exchangeToken(bearer, 'pe-brsa-jeune')
+    }
+    throw new UnauthorizedException({
+      statusCode: 401,
+      code: 'Unauthorized',
+      message: 'token exchange jeune failed'
+    })
+  }
+
+  private async exchangeToken(
+    bearer: string,
+    provider: string
+  ): Promise<string> {
     const url = `${this.issuerUrl}/protocol/openid-connect/token`
     const payload = {
       subject_token: bearer,
@@ -33,7 +54,7 @@ export class KeycloakClient {
       grant_type: 'urn:ietf:params:oauth:grant-type:token-exchange',
       client_id: this.clientId,
       client_secret: this.clientSecret,
-      requested_issuer: 'pe-jeune'
+      requested_issuer: provider
     }
     const headers = { 'Content-Type': 'application/x-www-form-urlencoded' }
     try {
@@ -51,8 +72,8 @@ export class KeycloakClient {
       this.logger.error(buildError('erreur lors du token exchange', e))
       throw new UnauthorizedException({
         statusCode: 401,
-        message: 'Unauthorized',
-        code: 'token_pole_emploi_expired'
+        code: 'Unauthorized',
+        message: 'token_pole_emploi_expired'
       })
     }
   }

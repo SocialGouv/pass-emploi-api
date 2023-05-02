@@ -86,7 +86,10 @@ export class JeunesControllerV2 {
     @AccessToken() accessToken: string,
     @Query() getRendezVousQueryParams?: GetRendezVousJeuneQueryParams
   ): Promise<RendezVousJeuneQueryModelV2> {
-    if (utilisateur.structure === Core.Structure.POLE_EMPLOI && accessToken) {
+    if (
+      Core.structuresPoleEmploiBRSA.includes(utilisateur.structure) &&
+      accessToken
+    ) {
       const result =
         await this.getRendezVousJeunePoleEmploiQueryHandler.execute(
           {

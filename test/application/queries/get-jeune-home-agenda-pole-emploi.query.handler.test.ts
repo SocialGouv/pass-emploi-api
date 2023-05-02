@@ -1,5 +1,5 @@
 import { describe } from 'mocha'
-import { expect, StubbedClass, stubClass } from '../../utils'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import {
   GetJeuneHomeAgendaPoleEmploiQuery,
@@ -23,6 +23,9 @@ import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import { Demarche } from '../../../src/domain/demarche'
 import { Cached } from '../../../src/building-blocks/types/query'
 import { Core } from '../../../src/domain/core'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { Jeune } from '../../../src/domain/jeune/jeune'
 
 describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
   let handler: GetJeuneHomeAgendaPoleEmploiQueryHandler
@@ -30,18 +33,24 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
   let getRendezVousJeunePoleEmploiQueryGetter: StubbedClass<GetRendezVousJeunePoleEmploiQueryGetter>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let keycloakClient: StubbedClass<KeycloakClient>
+  let jeuneRepository: StubbedType<Jeune.Repository>
   const idpToken = 'id-token'
+  const jeune = unJeune()
 
   beforeEach(() => {
+    const sandbox = createSandbox()
     getDemarchesQueryGetter = stubClass(GetDemarchesQueryGetter)
     getRendezVousJeunePoleEmploiQueryGetter = stubClass(
       GetRendezVousJeunePoleEmploiQueryGetter
     )
+    jeuneRepository = stubInterface(sandbox)
+    jeuneRepository.get.resolves(jeune)
     keycloakClient = stubClass(KeycloakClient)
-    keycloakClient.exchangeTokenPoleEmploiJeune.resolves(idpToken)
+    keycloakClient.exchangeTokenJeune.resolves(idpToken)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
 
     handler = new GetJeuneHomeAgendaPoleEmploiQueryHandler(
+      jeuneRepository,
       getDemarchesQueryGetter,
       getRendezVousJeunePoleEmploiQueryGetter,
       jeuneAuthorizer,

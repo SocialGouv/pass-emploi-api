@@ -8,6 +8,7 @@ import {
   PoleEmploiPartenaireClient,
   PoleEmploiPartenaireClientToken
 } from '../clients/pole-emploi-partenaire-client'
+import { Core } from '../../domain/core'
 
 @Injectable()
 export class DemarcheHttpRepository implements Demarche.Repository {
@@ -22,8 +23,9 @@ export class DemarcheHttpRepository implements Demarche.Repository {
     demarcheModifiee: Demarche.Modifiee,
     accessToken: string
   ): Promise<Result<Demarche>> {
-    const token = await this.keycloakClient.exchangeTokenPoleEmploiJeune(
-      accessToken
+    const token = await this.keycloakClient.exchangeTokenJeune(
+      accessToken,
+      Core.Structure.POLE_EMPLOI
     )
     const result = await this.poleEmploiPartenaireClient.updateDemarche(
       demarcheModifiee,
@@ -41,8 +43,9 @@ export class DemarcheHttpRepository implements Demarche.Repository {
     demarche: Demarche.Creee,
     accessToken: string
   ): Promise<Result<Demarche>> {
-    const token = await this.keycloakClient.exchangeTokenPoleEmploiJeune(
-      accessToken
+    const token = await this.keycloakClient.exchangeTokenJeune(
+      accessToken,
+      Core.Structure.POLE_EMPLOI
     )
     const result = await this.poleEmploiPartenaireClient.createDemarche(
       demarche,

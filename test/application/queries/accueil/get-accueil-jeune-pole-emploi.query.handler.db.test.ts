@@ -1,6 +1,6 @@
 import { GetDemarchesQueryGetter } from '../../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { AccueilJeunePoleEmploiQueryModel } from '../../../../src/application/queries/query-models/jeunes.pole-emploi.query-model'
-import { expect, StubbedClass, stubClass } from '../../../utils'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
 import { DateTime } from 'luxon'
 import {
@@ -25,6 +25,9 @@ import { uneDemarcheQueryModel } from '../../../fixtures/query-models/demarche.q
 import { GetRecherchesSauvegardeesQueryGetter } from '../../../../src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
 import { Recherche } from '../../../../src/domain/offre/recherche/recherche'
 import { GetFavorisAccueilQueryGetter } from '../../../../src/application/queries/query-getters/accueil/get-favoris.query.getter.db'
+import { unJeune } from '../../../fixtures/jeune.fixture'
+import { Jeune } from '../../../../src/domain/jeune/jeune'
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 
 describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
   let handler: GetAccueilJeunePoleEmploiQueryHandler
@@ -34,7 +37,9 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
   let getFavorisQueryGetter: StubbedClass<GetFavorisAccueilQueryGetter>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let keycloakClient: StubbedClass<KeycloakClient>
+  let jeuneRepository: StubbedType<Jeune.Repository>
   const idpToken = 'id-token'
+  const jeune = unJeune()
 
   beforeEach(() => {
     getDemarchesQueryGetter = stubClass(GetDemarchesQueryGetter)
@@ -45,11 +50,15 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
     getRendezVousJeunePoleEmploiQueryGetter = stubClass(
       GetRendezVousJeunePoleEmploiQueryGetter
     )
+    const sandbox = createSandbox()
+    jeuneRepository = stubInterface(sandbox)
+    jeuneRepository.get.resolves(jeune)
     keycloakClient = stubClass(KeycloakClient)
-    keycloakClient.exchangeTokenPoleEmploiJeune.resolves(idpToken)
+    keycloakClient.exchangeTokenJeune.resolves(idpToken)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
 
     handler = new GetAccueilJeunePoleEmploiQueryHandler(
+      jeuneRepository,
       jeuneAuthorizer,
       keycloakClient,
       getDemarchesQueryGetter,

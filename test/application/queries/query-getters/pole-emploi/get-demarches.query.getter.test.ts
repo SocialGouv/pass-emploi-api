@@ -52,7 +52,7 @@ describe('GetDemarchesQueryGetter', () => {
     dateService = stubClass(DateService)
     dateService.now.returns(maintenant)
     keycloakClient = stubClass(KeycloakClient)
-    keycloakClient.exchangeTokenPoleEmploiJeune.resolves(idpToken)
+    keycloakClient.exchangeTokenJeune.resolves(idpToken)
 
     getDemarchesQueryGetter = new GetDemarchesQueryGetter(
       jeunesRepository,

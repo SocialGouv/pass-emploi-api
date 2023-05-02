@@ -2,7 +2,7 @@ import {
   GetCVPoleEmploiQuery,
   GetCVPoleEmploiQueryHandler
 } from '../../../src/application/queries/get-cv-pole-emploi.query.handler'
-import { expect, StubbedClass, stubClass } from '../../utils'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { CVPoleEmploiQueryModel } from '../../../src/application/queries/query-models/jeunes.pole-emploi.query-model'
 import { DocumentPoleEmploiDto } from '../../../src/infrastructure/clients/dto/pole-emploi.dto'
 import { PoleEmploiPartenaireClient } from '../../../src/infrastructure/clients/pole-emploi-partenaire-client'
@@ -16,21 +16,31 @@ import { failureApi } from '../../../src/building-blocks/types/result-api'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { Core } from '../../../src/domain/core'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { Jeune } from '../../../src/domain/jeune/jeune'
 
 describe('GetCVPoleEmploiQueryHandler', () => {
   let getCVPoleEmploiQueryHandler: GetCVPoleEmploiQueryHandler
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
   let keycloakClient: StubbedClass<KeycloakClient>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
+  let jeuneRepository: StubbedType<Jeune.Repository>
 
   let query: GetCVPoleEmploiQuery
 
+  const jeune = unJeune()
+
   beforeEach(async () => {
+    const sandbox = createSandbox()
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
     keycloakClient = stubClass(KeycloakClient)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
+    jeuneRepository = stubInterface(sandbox)
+    jeuneRepository.get.resolves(jeune)
 
     getCVPoleEmploiQueryHandler = new GetCVPoleEmploiQueryHandler(
+      jeuneRepository,
       poleEmploiPartenaireClient,
       keycloakClient,
       jeuneAuthorizer
@@ -71,11 +81,11 @@ describe('GetCVPoleEmploiQueryHandler', () => {
           url: unCVPoleEmploiDto.url
         }
 
-        keycloakClient.exchangeTokenPoleEmploiJeune
-          .withArgs(query.accessToken)
-          .resolves('un-idp-token')
+        keycloakClient.exchangeTokenJeune
+          .withArgs(query.accessToken, jeune.structure)
+          .resolves('idpToken')
         poleEmploiPartenaireClient.getDocuments
-          .withArgs('un-idp-token')
+          .withArgs('idpToken')
           .resolves(success([unCVPoleEmploiDto, uneLMPoleEmploiDto]))
 
         // When
@@ -88,7 +98,7 @@ describe('GetCVPoleEmploiQueryHandler', () => {
     describe('quand une erreur client se produit', () => {
       it('renvoie une Failure', async () => {
         // Given
-        keycloakClient.exchangeTokenPoleEmploiJeune.resolves('un-idp-token')
+        keycloakClient.exchangeTokenJeune.resolves('un-idp-token')
         poleEmploiPartenaireClient.getDocuments.resolves(
           failureApi(new ErreurHttp('erreur', 400))
         )

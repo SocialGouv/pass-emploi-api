@@ -9,7 +9,9 @@ export class JeunePoleEmploiSqlRepository
   async findAll(offset: number, limit: number): Promise<Jeune.PoleEmploi[]> {
     const jeunesSqlModel = await JeuneSqlModel.findAll({
       where: {
-        structure: Core.Structure.POLE_EMPLOI,
+        structure: {
+          [Op.in]: Core.structuresPoleEmploiBRSA
+        },
         pushNotificationToken: { [Op.ne]: null },
         idAuthentification: { [Op.ne]: null }
       },

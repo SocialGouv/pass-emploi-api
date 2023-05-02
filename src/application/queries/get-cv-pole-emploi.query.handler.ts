@@ -1,6 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { isFailure, Result, success } from '../../building-blocks/types/result'
+import {
+  failure,
+  isFailure,
+  Result,
+  success
+} from '../../building-blocks/types/result'
 import { Query } from '../../building-blocks/types/query'
 import { CVPoleEmploiQueryModel } from './query-models/jeunes.pole-emploi.query-model'
 import {
@@ -12,6 +17,8 @@ import { DocumentPoleEmploiDto } from '../../infrastructure/clients/dto/pole-emp
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
 
 export interface GetCVPoleEmploiQuery extends Query {
   idJeune: string
@@ -24,6 +31,8 @@ export class GetCVPoleEmploiQueryHandler extends QueryHandler<
   Result<CVPoleEmploiQueryModel[]>
 > {
   constructor(
+    @Inject(JeunesRepositoryToken)
+    private jeuneRepository: Jeune.Repository,
     @Inject(PoleEmploiPartenaireClientToken)
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,
     private keycloakClient: KeycloakClient,
@@ -45,8 +54,13 @@ export class GetCVPoleEmploiQueryHandler extends QueryHandler<
   async handle(
     query: GetCVPoleEmploiQuery
   ): Promise<Result<CVPoleEmploiQueryModel[]>> {
-    const idpToken = await this.keycloakClient.exchangeTokenPoleEmploiJeune(
-      query.accessToken
+    const jeune = await this.jeuneRepository.get(query.idJeune)
+    if (!jeune) {
+      return failure(new NonTrouveError('Jeune', query.idJeune))
+    }
+    const idpToken = await this.keycloakClient.exchangeTokenJeune(
+      query.accessToken,
+      jeune.structure
     )
 
     const documentsPoleEmploiDto: Result<DocumentPoleEmploiDto[]> =

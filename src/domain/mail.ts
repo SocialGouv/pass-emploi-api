@@ -91,7 +91,7 @@ export namespace Mail {
         throw new Error(`Le jeune ${jeune.id} n'a pas de conseiller`)
       }
 
-      if (jeune.structure === Core.Structure.POLE_EMPLOI) {
+      if (Core.structuresPoleEmploiBRSA.includes(jeune.structure)) {
         templateId = parseInt(this.templates.suppressionJeunePE)
       } else {
         templateId = parseInt(this.templates.suppressionJeuneMilo)

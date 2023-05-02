@@ -75,6 +75,7 @@ describe('JeunesControllerE2E', () => {
 
     getJeuneHomeAgendaPoleEmploiQueryHandler =
       new GetJeuneHomeAgendaPoleEmploiQueryHandler(
+        jeuneRepository,
         getDemarchesQueryGetter,
         getRendezVousJeunePoleEmploiQueryGetter,
         jeuneAuthorizer,
@@ -109,7 +110,7 @@ describe('JeunesControllerE2E', () => {
     it('retourne la home agenda du jeune', async () => {
       // Given
       jeuneAuthorizer.autoriserLeJeune.resolves(emptySuccess())
-      keycloakClient.exchangeTokenPoleEmploiJeune.resolves('idpToken')
+      keycloakClient.exchangeTokenJeune.resolves('idpToken')
       jeuneRepository.get.resolves(jeune)
 
       poleEmploiPartenaireClient.getDemarches.resolves(

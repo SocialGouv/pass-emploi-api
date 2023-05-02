@@ -158,7 +158,7 @@ export class RecherchesJeunesController {
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @AccessToken() accessToken: string
   ): Promise<SuggestionQueryModel[]> {
-    if (utilisateur.structure === Core.Structure.POLE_EMPLOI) {
+    if (Core.structuresPoleEmploiBRSA.includes(utilisateur.structure)) {
       const result =
         await this.rafraichirSuggestionPoleEmploiCommandHandler.execute(
           {

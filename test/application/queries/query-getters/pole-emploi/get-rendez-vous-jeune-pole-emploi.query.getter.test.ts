@@ -53,7 +53,7 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
     dateService = stubClass(DateService)
     idService = stubClass(IdService)
     idService.uuid.returns('random-id')
-    keycloakClient.exchangeTokenPoleEmploiJeune.resolves(idpToken)
+    keycloakClient.exchangeTokenJeune.resolves(idpToken)
 
     queryGetter = new GetRendezVousJeunePoleEmploiQueryGetter(
       jeunesRepository,

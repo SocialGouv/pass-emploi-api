@@ -14,23 +14,29 @@ import { failure, success } from '../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { SuggestionPoleEmploiService } from '../../../src/domain/offre/recherche/suggestion/pole-emploi.service'
 import { Core } from '../../../src/domain/core'
+import { Jeune } from '../../../src/domain/jeune/jeune'
+import { unJeune } from '../../fixtures/jeune.fixture'
 
 describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
   let handler: RafraichirSuggestionPoleEmploiCommandHandler
+  let jeuneRepository: StubbedType<Jeune.Repository>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let suggestionFactory: StubbedClass<Suggestion.Factory>
   let suggestionPoleEmploiService: StubbedClass<SuggestionPoleEmploiService>
   let suggestionPoleEmploiRepository: StubbedType<Suggestion.PoleEmploi.Repository>
   let keycloakClient: StubbedClass<KeycloakClient>
+  const jeune = unJeune()
 
   beforeEach(() => {
     const sandbox = createSandbox()
+    jeuneRepository = stubInterface(sandbox)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     suggestionFactory = stubClass(Suggestion.Factory)
     suggestionPoleEmploiService = stubClass(SuggestionPoleEmploiService)
     suggestionPoleEmploiRepository = stubInterface(sandbox)
     keycloakClient = stubClass(KeycloakClient)
     handler = new RafraichirSuggestionPoleEmploiCommandHandler(
+      jeuneRepository,
       jeuneAuthorizer,
       suggestionFactory,
       suggestionPoleEmploiService,
@@ -46,7 +52,7 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
         {
           idJeune: 'idJeune',
           token: 'token',
-          structure: Core.Structure.MILO
+          structure: Core.Structure.POLE_EMPLOI
         },
         unUtilisateurJeune()
       )
@@ -64,8 +70,9 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
 
   describe('handle', () => {
     beforeEach(() => {
-      keycloakClient.exchangeTokenPoleEmploiJeune
-        .withArgs('token')
+      jeuneRepository.get.resolves(jeune)
+      keycloakClient.exchangeTokenJeune
+        .withArgs('token', jeune.structure)
         .resolves('idpToken')
     })
 
