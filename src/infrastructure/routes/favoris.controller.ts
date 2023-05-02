@@ -90,8 +90,8 @@ export class FavorisController {
   ) {}
 
   @ApiOperation({
-    summary: "Récupère tous les favoris d'un jeune.",
-    description: 'Autorisé pour le jeune et son conseiller.'
+    summary: "Récupère tous les favoris d'un jeune",
+    description: 'Autorisé pour le jeune et son conseiller'
   })
   @ApiResponse({
     type: FavorisQueryModel,

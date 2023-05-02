@@ -37,8 +37,8 @@ export class CampagnesController {
 
   @ApiTags('Support')
   @ApiOperation({
-    summary: "Création d'une nouvelle campagne.",
-    description: 'Autorisé pour le support.'
+    summary: "Création d'une nouvelle campagne",
+    description: 'Autorisé pour le support'
   })
   @Post('campagnes')
   async creerCampagne(
@@ -64,8 +64,8 @@ export class CampagnesController {
 
   @ApiTags('Campagnes')
   @ApiOperation({
-    summary: 'Poster une évaluation (réponses à une campagne active).',
-    description: 'Autorisé pour un jeune.'
+    summary: 'Poster une évaluation (réponses à une campagne active)',
+    description: 'Autorisé pour un jeune'
   })
   @Post('jeunes/:idJeune/campagnes/:idCampagne/evaluer')
   @ValidateNested({ each: true })

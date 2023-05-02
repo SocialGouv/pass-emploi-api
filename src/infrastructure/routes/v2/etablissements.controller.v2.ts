@@ -56,8 +56,8 @@ export class EtablissementsControllerV2 {
 
   @ApiOperation({
     summary:
-      "Récupère les jeunes d'un établissement avec des filtres optionnels.",
-    description: "Autorisé pour un conseiller appartenant à l'établissement."
+      "Récupère les jeunes d'un établissement avec des filtres optionnels",
+    description: "Autorisé pour un conseiller appartenant à l'établissement"
   })
   @Get(':idEtablissement/jeunes')
   @ApiResponse({

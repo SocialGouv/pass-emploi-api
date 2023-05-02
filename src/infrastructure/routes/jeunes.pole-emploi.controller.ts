@@ -25,8 +25,9 @@ export class JeunesPoleEmploiController {
 
   @Get(':idJeune/pole-emploi/accueil')
   @ApiOperation({
-    description:
-      "Permet de récupérer les éléments de la page d'accueil d'un jeune Pôle Emploi"
+    summary:
+      "Permet de récupérer les éléments de la page d'accueil d'un jeune Pôle Emploi",
+    description: 'Autorisé pour un jeune Pole Emploi'
   })
   @ApiResponse({
     type: AccueilJeunePoleEmploiQueryModel
@@ -50,7 +51,8 @@ export class JeunesPoleEmploiController {
 
   @Get(':idJeune/pole-emploi/cv')
   @ApiOperation({
-    description: "Permet de récupérer les cvs d'un jeune Pôle Emploi"
+    summary: "Permet de récupérer les cvs d'un jeune Pôle Emploi",
+    description: 'Autorisé pour un jeune Pole Emploi'
   })
   @ApiResponse({
     type: CVPoleEmploiQueryModel,

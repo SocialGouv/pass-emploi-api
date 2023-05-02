@@ -75,8 +75,8 @@ export class ConseillersControllerV2 {
 
   @ApiOperation({
     summary:
-      'Récupère l’ensemble des actions des jeunes du portefeuille du conseiller.',
-    description: 'Autorisé pour le conseiller.'
+      'Récupère l’ensemble des actions des jeunes du portefeuille du conseiller',
+    description: 'Autorisé pour le conseiller'
   })
   @ApiResponse({
     type: GetActionsConseillerV2QueryModel

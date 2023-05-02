@@ -93,8 +93,8 @@ export class SupportController {
 
   @ApiOperation({
     summary:
-      'Attribue une nouvelle agence au conseiller identifié par son ID (ID en base, et pas ID Authentification).',
-    description: 'Autorisé pour le support.'
+      'Attribue une nouvelle agence au conseiller identifié par son ID (ID en base, et pas ID Authentification)',
+    description: 'Autorisé pour le support'
   })
   @Post('changer-agence-conseiller')
   async changerAgenceConseiller(
@@ -117,8 +117,8 @@ export class SupportController {
 
   @ApiOperation({
     summary:
-      'Archive le jeune identifié par son ID (ID en base, et pas ID Authentification).',
-    description: 'Autorisé pour le support.'
+      'Archive le jeune identifié par son ID (ID en base, et pas ID Authentification)',
+    description: 'Autorisé pour le support'
   })
   @Post('archiver-jeune/:idJeune')
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -136,8 +136,8 @@ export class SupportController {
   }
 
   @ApiOperation({
-    summary: 'Transférer les jeunes renseignés d’un conseiller à un autre.',
-    description: 'Autorisé pour le support.'
+    summary: 'Transférer les jeunes renseignés d’un conseiller à un autre',
+    description: 'Autorisé pour le support'
   })
   @Post('transferer-jeunes')
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -160,8 +160,8 @@ export class SupportController {
   }
 
   @ApiOperation({
-    summary: 'Ajoute des droits de supervision à des conseillers.',
-    description: 'Autorisé pour le support.'
+    summary: 'Ajoute des droits de supervision à des conseillers',
+    description: 'Autorisé pour le support'
   })
   @Post('superviseurs')
   async postSuperviseurs(
@@ -177,8 +177,8 @@ export class SupportController {
   }
 
   @ApiOperation({
-    summary: 'Supprime des droits de supervision à des conseillers.',
-    description: 'Autorisé pour le support.'
+    summary: 'Supprime des droits de supervision à des conseillers',
+    description: 'Autorisé pour le support'
   })
   @Delete('superviseurs')
   @HttpCode(HttpStatus.NO_CONTENT)

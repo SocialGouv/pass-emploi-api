@@ -123,8 +123,8 @@ export class ConseillersController {
   ) {}
 
   @ApiOperation({
-    summary: 'Supprime un conseiller.',
-    description: 'Autorisé pour un conseiller.'
+    summary: 'Supprime un conseiller',
+    description: 'Autorisé pour un conseiller'
   })
   @Delete(':idConseiller')
   @HttpCode(HttpStatus.NO_CONTENT)
