@@ -5248,9 +5248,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"elastic-apm-node@npm:3.44.1":
-  version: 3.44.1
-  resolution: "elastic-apm-node@npm:3.44.1"
+"elastic-apm-node@npm:3.45.0":
+  version: 3.45.0
+  resolution: "elastic-apm-node@npm:3.45.0"
   dependencies:
     "@elastic/ecs-pino-format": ^1.2.0
     "@opentelemetry/api": ^1.4.1
@@ -5260,7 +5260,6 @@ __metadata:
     basic-auth: ^2.0.1
     cookie: ^0.5.0
     core-util-is: ^1.0.2
-    debug: ^4.1.1
     elastic-apm-http-client: 11.3.1
     end-of-stream: ^1.4.4
     error-callsites: ^2.0.4
@@ -5278,7 +5277,7 @@ __metadata:
     original-url: ^1.2.3
     pino: ^6.11.2
     relative-microtime: ^2.0.0
-    resolve: ^1.22.1
+    require-in-the-middle: ^7.0.1
     semver: ^6.3.0
     set-cookie-serde: ^1.0.0
     shallow-clone-shim: ^2.0.0
@@ -5286,7 +5285,7 @@ __metadata:
     sql-summary: ^1.0.1
     traverse: ^0.6.6
     unicode-byte-truncate: ^1.0.0
-  checksum: 506a5727485f427b6c58e28fa6bef8982e0b283a68c51f26c3336e016de614899ba390caec521fcc6d7611ba00b08a483ccd097ff0c8b378c42e2e33ae559f19
+  checksum: c4dd321039d97b2edaa64ede534346c6d52b0ec06960da9ee0a657b1bd4e907cd1ce49528d0888b20533f508243bac469b068b4983491bcc10e1f7c1d7eb0f99
   languageName: node
   linkType: hard
 
@@ -9097,7 +9096,7 @@ __metadata:
     dirty-chai: ^2.0.1
     dotenv-cli: ^7.0.0
     dotvault: ^0.0.9
-    elastic-apm-node: 3.44.1
+    elastic-apm-node: 3.45.0
     eslint: 8.39.0
     eslint-config-prettier: ^8.5.0
     eslint-plugin-chai-friendly: ^0.7.2
@@ -10643,6 +10642,17 @@ __metadata:
   version: 2.0.2
   resolution: "require-from-string@npm:2.0.2"
   checksum: a03ef6895445f33a4015300c426699bc66b2b044ba7b670aa238610381b56d3f07c686251740d575e22f4c87531ba662d06937508f0f3c0f1ddc04db3130560b
+  languageName: node
+  linkType: hard
+
+"require-in-the-middle@npm:^7.0.1":
+  version: 7.1.0
+  resolution: "require-in-the-middle@npm:7.1.0"
+  dependencies:
+    debug: ^4.1.1
+    module-details-from-path: ^1.0.3
+    resolve: ^1.22.1
+  checksum: 086e346be2e22277c26de9cc7a9bacea5ec62e360ac825be884c5ec3a852e3530aba3bf77b7f37122cfb431b7450303455ae0e15a2cb635e5cc3b3d12f988363
   languageName: node
   linkType: hard
 
