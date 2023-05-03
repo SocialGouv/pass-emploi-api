@@ -1,7 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Result } from '../building-blocks/types/result'
+import { failure, Result } from '../building-blocks/types/result'
 import { DateService } from '../utils/date-service'
 import { Authentification } from './authentification'
+import {
+  Suggestion,
+  SuggestionsRepositoryToken
+} from './offre/recherche/suggestion/suggestion'
+import {
+  MauvaiseCommandeError,
+  NonTraitableError
+} from '../building-blocks/types/domain-error'
+import { Recherche } from './offre/recherche/recherche'
+import estAcceptee = Suggestion.estAcceptee
+import estRefusee = Suggestion.estRefusee
+import estTraitee = Suggestion.estTraitee
 
 export const EvenementsRepositoryToken = 'EvenementsRepositoryToken'
 
@@ -89,6 +101,22 @@ export namespace Evenement {
     SUGGESTION_ALTERNANCE_REFUSEE = 'SUGGESTION_ALTERNANCE_REFUSEE',
     SUGGESTION_IMMERSION_REFUSEE = 'SUGGESTION_IMMERSION_REFUSEE',
     SUGGESTION_SERVICE_CIVIQUE_REFUSEE = 'SUGGESTION_SERVICE_CIVIQUE_REFUSEE',
+    SUGGESTION_EMPLOI_CONSEILLER_ACCEPTEE = 'SUGGESTION_EMPLOI_CONSEILLER_ACCEPTEE',
+    SUGGESTION_ALTERNANCE_CONSEILLER_ACCEPTEE = 'SUGGESTION_ALTERNANCE_CONSEILLER_ACCEPTEE',
+    SUGGESTION_IMMERSION_CONSEILLER_ACCEPTEE = 'SUGGESTION_IMMERSION_CONSEILLER_ACCEPTEE',
+    SUGGESTION_SERVICE_CIVIQUE_CONSEILLER_ACCEPTEE = 'SUGGESTION_SERVICE_CIVIQUE_CONSEILLER_ACCEPTEE',
+    SUGGESTION_EMPLOI_CONSEILLER_REFUSEE = 'SUGGESTION_EMPLOI_CONSEILLER_REFUSEE',
+    SUGGESTION_ALTERNANCE_CONSEILLER_REFUSEE = 'SUGGESTION_ALTERNANCE_CONSEILLER_REFUSEE',
+    SUGGESTION_IMMERSION_CONSEILLER_REFUSEE = 'SUGGESTION_IMMERSION_CONSEILLER_REFUSEE',
+    SUGGESTION_SERVICE_CIVIQUE_CONSEILLER_REFUSEE = 'SUGGESTION_SERVICE_CIVIQUE_CONSEILLER_REFUSEE',
+    SUGGESTION_EMPLOI_PROFIL_PE_ACCEPTEE = 'SUGGESTION_EMPLOI_PROFIL_PE_ACCEPTEE',
+    SUGGESTION_ALTERNANCE_PROFIL_PE_ACCEPTEE = 'SUGGESTION_ALTERNANCE_PROFIL_PE_ACCEPTEE',
+    SUGGESTION_IMMERSION_PROFIL_PE_ACCEPTEE = 'SUGGESTION_IMMERSION_PROFIL_PE_ACCEPTEE',
+    SUGGESTION_SERVICE_CIVIQUE_PROFIL_PE_ACCEPTEE = 'SUGGESTION_SERVICE_CIVIQUE_PROFIL_PE_ACCEPTEE',
+    SUGGESTION_EMPLOI_PROFIL_PE_REFUSEE = 'SUGGESTION_EMPLOI_PROFIL_PE_REFUSEE',
+    SUGGESTION_ALTERNANCE_PROFIL_PE_REFUSEE = 'SUGGESTION_ALTERNANCE_PROFIL_PE_REFUSEE',
+    SUGGESTION_IMMERSION_PROFIL_PE_REFUSEE = 'SUGGESTION_IMMERSION_PROFIL_PE_REFUSEE',
+    SUGGESTION_SERVICE_CIVIQUE_PROFIL_PE_REFUSEE = 'SUGGESTION_SERVICE_CIVIQUE_PROFIL_PE_REFUSEE',
     RECHERCHE_EMPLOI_SUGGEREE = 'RECHERCHE_EMPLOI_SUGGEREE',
     RECHERCHE_ALTERNANCE_SUGGEREE = 'RECHERCHE_ALTERNANCE_SUGGEREE',
     RECHERCHE_IMMERSION_SUGGEREE = 'RECHERCHE_IMMERSION_SUGGEREE',
@@ -417,43 +445,123 @@ const evenements: {
     action: 'Mise à jour'
   },
   [Evenement.Code.SUGGESTION_EMPLOI_ACCEPTEE]: {
-    categorie: 'Recherche',
+    categorie: 'Suggestion',
     action: 'Accepter',
     nom: 'Emploi'
   },
   [Evenement.Code.SUGGESTION_ALTERNANCE_ACCEPTEE]: {
-    categorie: 'Recherche',
+    categorie: 'Suggestion',
     action: 'Accepter',
     nom: 'Alternance'
   },
   [Evenement.Code.SUGGESTION_IMMERSION_ACCEPTEE]: {
-    categorie: 'Recherche',
+    categorie: 'Suggestion',
     action: 'Accepter',
     nom: 'Immersion'
   },
   [Evenement.Code.SUGGESTION_SERVICE_CIVIQUE_ACCEPTEE]: {
-    categorie: 'Recherche',
+    categorie: 'Suggestion',
     action: 'Accepter',
     nom: 'Service Civique'
   },
   [Evenement.Code.SUGGESTION_EMPLOI_REFUSEE]: {
-    categorie: 'Recherche',
+    categorie: 'Suggestion',
     action: 'Refuser',
     nom: 'Emploi'
   },
   [Evenement.Code.SUGGESTION_ALTERNANCE_REFUSEE]: {
-    categorie: 'Recherche',
+    categorie: 'Suggestion',
     action: 'Refuser',
     nom: 'Alternance'
   },
   [Evenement.Code.SUGGESTION_IMMERSION_REFUSEE]: {
-    categorie: 'Recherche',
+    categorie: 'Suggestion',
     action: 'Refuser',
     nom: 'Immersion'
   },
   [Evenement.Code.SUGGESTION_SERVICE_CIVIQUE_REFUSEE]: {
-    categorie: 'Recherche',
+    categorie: 'Suggestion',
     action: 'Refuser',
+    nom: 'Service Civique'
+  },
+  [Evenement.Code.SUGGESTION_EMPLOI_CONSEILLER_ACCEPTEE]: {
+    categorie: 'Suggestion',
+    action: 'Accepter - Conseiller',
+    nom: 'Emploi'
+  },
+  [Evenement.Code.SUGGESTION_ALTERNANCE_CONSEILLER_ACCEPTEE]: {
+    categorie: 'Suggestion',
+    action: 'Accepter - Conseiller',
+    nom: 'Alternance'
+  },
+  [Evenement.Code.SUGGESTION_IMMERSION_CONSEILLER_ACCEPTEE]: {
+    categorie: 'Suggestion',
+    action: 'Accepter - Conseiller',
+    nom: 'Immersion'
+  },
+  [Evenement.Code.SUGGESTION_SERVICE_CIVIQUE_CONSEILLER_ACCEPTEE]: {
+    categorie: 'Suggestion',
+    action: 'Accepter - Conseiller',
+    nom: 'Service Civique'
+  },
+  [Evenement.Code.SUGGESTION_EMPLOI_CONSEILLER_REFUSEE]: {
+    categorie: 'Suggestion',
+    action: 'Refuser - Conseiller',
+    nom: 'Emploi'
+  },
+  [Evenement.Code.SUGGESTION_ALTERNANCE_CONSEILLER_REFUSEE]: {
+    categorie: 'Suggestion',
+    action: 'Refuser - Conseiller',
+    nom: 'Alternance'
+  },
+  [Evenement.Code.SUGGESTION_IMMERSION_CONSEILLER_REFUSEE]: {
+    categorie: 'Suggestion',
+    action: 'Refuser - Conseiller',
+    nom: 'Immersion'
+  },
+  [Evenement.Code.SUGGESTION_SERVICE_CIVIQUE_CONSEILLER_REFUSEE]: {
+    categorie: 'Recherche',
+    action: 'Refuser - Conseiller',
+    nom: 'Service Civique'
+  },
+  [Evenement.Code.SUGGESTION_EMPLOI_PROFIL_PE_ACCEPTEE]: {
+    categorie: 'Suggestion',
+    action: 'Accepter - Profil PE',
+    nom: 'Emploi'
+  },
+  [Evenement.Code.SUGGESTION_ALTERNANCE_PROFIL_PE_ACCEPTEE]: {
+    categorie: 'Suggestion',
+    action: 'Accepter - Profil PE',
+    nom: 'Alternance'
+  },
+  [Evenement.Code.SUGGESTION_IMMERSION_PROFIL_PE_ACCEPTEE]: {
+    categorie: 'Suggestion',
+    action: 'Accepter - Profil PE',
+    nom: 'Immersion'
+  },
+  [Evenement.Code.SUGGESTION_SERVICE_CIVIQUE_PROFIL_PE_ACCEPTEE]: {
+    categorie: 'Suggestion',
+    action: 'Accepter - Profil PE',
+    nom: 'Service Civique'
+  },
+  [Evenement.Code.SUGGESTION_EMPLOI_PROFIL_PE_REFUSEE]: {
+    categorie: 'Suggestion',
+    action: 'Refuser - Profil PE',
+    nom: 'Emploi'
+  },
+  [Evenement.Code.SUGGESTION_ALTERNANCE_PROFIL_PE_REFUSEE]: {
+    categorie: 'Suggestion',
+    action: 'Refuser - Profil PE',
+    nom: 'Alternance'
+  },
+  [Evenement.Code.SUGGESTION_IMMERSION_PROFIL_PE_REFUSEE]: {
+    categorie: 'Suggestion',
+    action: 'Refuser - Profil PE',
+    nom: 'Immersion'
+  },
+  [Evenement.Code.SUGGESTION_SERVICE_CIVIQUE_PROFIL_PE_REFUSEE]: {
+    categorie: 'Suggestion',
+    action: 'Refuser - Profil PE',
     nom: 'Service Civique'
   },
   [Evenement.Code.RECHERCHE_EMPLOI_SUGGEREE]: {
@@ -503,7 +611,9 @@ export class EvenementService {
   constructor(
     @Inject(EvenementsRepositoryToken)
     private evenementRepository: Evenement.Repository,
-    private dateService: DateService
+    private dateService: DateService,
+    @Inject(SuggestionsRepositoryToken)
+    private suggestionRepository: Suggestion.Repository
   ) {}
 
   async creer(
@@ -520,4 +630,114 @@ export class EvenementService {
       date: this.dateService.nowJs()
     })
   }
+
+  async creerEvenementSuggestion(
+    utilisateur: Authentification.Utilisateur,
+    idSuggestion: string
+  ): Promise<void> {
+    const suggestion = await this.suggestionRepository.get(idSuggestion)
+
+    if (!suggestion) {
+      throw failure(new MauvaiseCommandeError('Suggestion non trouvée'))
+    }
+
+    if (estTraitee(suggestion)) {
+      await this.creer(fromSuggestionToCodeEvenement(suggestion), utilisateur)
+    }
+  }
+}
+
+function fromSuggestionToCodeEvenement(suggestion: Suggestion): Evenement.Code {
+  if (estAcceptee(suggestion)) {
+    switch (suggestion.type) {
+      case Recherche.Type.OFFRES_EMPLOI:
+        {
+          switch (suggestion.source) {
+            case Suggestion.Source.POLE_EMPLOI:
+              return Evenement.Code.SUGGESTION_EMPLOI_PROFIL_PE_ACCEPTEE
+            case Suggestion.Source.CONSEILLER:
+              return Evenement.Code.SUGGESTION_EMPLOI_CONSEILLER_ACCEPTEE
+          }
+        }
+        break
+      case Recherche.Type.OFFRES_IMMERSION:
+        {
+          switch (suggestion.source) {
+            case Suggestion.Source.POLE_EMPLOI:
+              return Evenement.Code.SUGGESTION_IMMERSION_PROFIL_PE_ACCEPTEE
+            case Suggestion.Source.CONSEILLER:
+              return Evenement.Code.SUGGESTION_IMMERSION_CONSEILLER_ACCEPTEE
+          }
+        }
+        break
+      case Recherche.Type.OFFRES_ALTERNANCE:
+        {
+          switch (suggestion.source) {
+            case Suggestion.Source.POLE_EMPLOI:
+              return Evenement.Code.SUGGESTION_ALTERNANCE_PROFIL_PE_ACCEPTEE
+            case Suggestion.Source.CONSEILLER:
+              return Evenement.Code.SUGGESTION_ALTERNANCE_CONSEILLER_ACCEPTEE
+          }
+        }
+        break
+      case Recherche.Type.OFFRES_SERVICES_CIVIQUE:
+        {
+          switch (suggestion.source) {
+            case Suggestion.Source.POLE_EMPLOI:
+              return Evenement.Code
+                .SUGGESTION_SERVICE_CIVIQUE_PROFIL_PE_ACCEPTEE
+            case Suggestion.Source.CONSEILLER:
+              return Evenement.Code
+                .SUGGESTION_SERVICE_CIVIQUE_CONSEILLER_ACCEPTEE
+          }
+        }
+        break
+    }
+  }
+  if (estRefusee(suggestion)) {
+    switch (suggestion.type) {
+      case Recherche.Type.OFFRES_EMPLOI:
+        {
+          switch (suggestion.source) {
+            case Suggestion.Source.POLE_EMPLOI:
+              return Evenement.Code.SUGGESTION_EMPLOI_PROFIL_PE_REFUSEE
+            case Suggestion.Source.CONSEILLER:
+              return Evenement.Code.SUGGESTION_EMPLOI_CONSEILLER_REFUSEE
+          }
+        }
+        break
+      case Recherche.Type.OFFRES_IMMERSION:
+        {
+          switch (suggestion.source) {
+            case Suggestion.Source.POLE_EMPLOI:
+              return Evenement.Code.SUGGESTION_IMMERSION_PROFIL_PE_REFUSEE
+            case Suggestion.Source.CONSEILLER:
+              return Evenement.Code.SUGGESTION_IMMERSION_CONSEILLER_REFUSEE
+          }
+        }
+        break
+      case Recherche.Type.OFFRES_ALTERNANCE:
+        {
+          switch (suggestion.source) {
+            case Suggestion.Source.POLE_EMPLOI:
+              return Evenement.Code.SUGGESTION_ALTERNANCE_PROFIL_PE_REFUSEE
+            case Suggestion.Source.CONSEILLER:
+              return Evenement.Code.SUGGESTION_ALTERNANCE_CONSEILLER_REFUSEE
+          }
+        }
+        break
+      case Recherche.Type.OFFRES_SERVICES_CIVIQUE:
+        {
+          switch (suggestion.source) {
+            case Suggestion.Source.POLE_EMPLOI:
+              return Evenement.Code.SUGGESTION_SERVICE_CIVIQUE_PROFIL_PE_REFUSEE
+            case Suggestion.Source.CONSEILLER:
+              return Evenement.Code
+                .SUGGESTION_SERVICE_CIVIQUE_CONSEILLER_REFUSEE
+          }
+        }
+        break
+    }
+  }
+  throw failure(new NonTraitableError('Suggestion', suggestion.id))
 }
