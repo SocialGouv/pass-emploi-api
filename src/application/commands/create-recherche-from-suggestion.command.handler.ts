@@ -9,7 +9,7 @@ import {
   success
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Evenement, EvenementService } from '../../domain/evenement'
+import { EvenementService } from '../../domain/evenement'
 import {
   Recherche,
   RecherchesRepositoryToken
@@ -71,38 +71,10 @@ export class CreateRechercheFromSuggestionCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur,
     command: CreateRechercheFromSuggestionCommand
   ): Promise<void> {
-    const suggestion = await this.suggestionRepository.get(command.idSuggestion)
-
-    if (!suggestion) {
-      throw failure(new MauvaiseCommandeError('Suggestion non trouvée'))
-    }
-
-    switch (suggestion.type) {
-      case Recherche.Type.OFFRES_EMPLOI:
-        await this.evenementService.creer(
-          Evenement.Code.SUGGESTION_EMPLOI_ACCEPTEE,
-          utilisateur
-        )
-        break
-      case Recherche.Type.OFFRES_ALTERNANCE:
-        await this.evenementService.creer(
-          Evenement.Code.SUGGESTION_ALTERNANCE_ACCEPTEE,
-          utilisateur
-        )
-        break
-      case Recherche.Type.OFFRES_IMMERSION:
-        await this.evenementService.creer(
-          Evenement.Code.SUGGESTION_IMMERSION_ACCEPTEE,
-          utilisateur
-        )
-        break
-      case Recherche.Type.OFFRES_SERVICES_CIVIQUE:
-        await this.evenementService.creer(
-          Evenement.Code.SUGGESTION_SERVICE_CIVIQUE_ACCEPTEE,
-          utilisateur
-        )
-        break
-    }
+    await this.evenementService.creerEvenementSuggestion(
+      utilisateur,
+      command.idSuggestion
+    )
   }
 
   async authorize(

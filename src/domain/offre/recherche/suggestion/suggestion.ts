@@ -90,6 +90,14 @@ export namespace Suggestion {
     return Boolean(suggestion.dateCreationRecherche || suggestion.dateRefus)
   }
 
+  export function estAcceptee(suggestion: Suggestion): boolean {
+    return Boolean(suggestion.dateCreationRecherche)
+  }
+
+  export function estRefusee(suggestion: Suggestion): boolean {
+    return Boolean(suggestion.dateRefus)
+  }
+
   @Injectable()
   export class Factory {
     constructor(

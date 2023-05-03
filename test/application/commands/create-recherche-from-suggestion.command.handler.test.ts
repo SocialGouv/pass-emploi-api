@@ -18,8 +18,7 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { uneSuggestion } from '../../fixtures/suggestion.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { Evenement, EvenementService } from '../../../src/domain/evenement'
-import { Offre } from '../../../src/domain/offre/offre'
+import { EvenementService } from '../../../src/domain/evenement'
 
 describe('CreateRechercheFromSuggestionCommandHandler', () => {
   let createRechercheFromSuggestionCommandHandler: CreateRechercheFromSuggestionCommandHandler
@@ -133,113 +132,26 @@ describe('CreateRechercheFromSuggestionCommandHandler', () => {
   })
 
   describe('monitor', () => {
-    describe('suggestion offre emploi', () => {
-      it('enregistre l‘évènement', async () => {
-        // Given
-        const command: CreateRechercheFromSuggestionCommand = {
-          idJeune: 'id-jeune',
-          idSuggestion: 'id-suggestion'
-        }
-        const suggestion = uneSuggestion({
-          id: command.idSuggestion,
-          idJeune: command.idJeune,
-          type: Offre.Recherche.Type.OFFRES_EMPLOI
-        })
-        suggestionRepository.get.resolves(suggestion)
+    it('enregistre l‘évènement', async () => {
+      // Given
+      const command: CreateRechercheFromSuggestionCommand = {
+        idJeune: 'id-jeune',
+        idSuggestion: 'id-suggestion'
+      }
 
-        // When
-        await createRechercheFromSuggestionCommandHandler.monitor(
-          unUtilisateurDecode(),
-          command
-        )
+      // When
+      await createRechercheFromSuggestionCommandHandler.monitor(
+        unUtilisateurDecode(),
+        command
+      )
 
-        // Then
-        expect(evenementService.creer).to.have.been.calledWithExactly(
-          Evenement.Code.SUGGESTION_EMPLOI_ACCEPTEE,
-          unUtilisateurDecode()
-        )
-      })
-    })
-    describe('suggestion offre alternance', () => {
-      it('enregistre l‘évènement', async () => {
-        // Given
-        const command: CreateRechercheFromSuggestionCommand = {
-          idJeune: 'id-jeune',
-          idSuggestion: 'id-suggestion'
-        }
-        const suggestion = uneSuggestion({
-          id: command.idSuggestion,
-          idJeune: command.idJeune,
-          type: Offre.Recherche.Type.OFFRES_ALTERNANCE
-        })
-        suggestionRepository.get.resolves(suggestion)
-
-        // When
-        await createRechercheFromSuggestionCommandHandler.monitor(
-          unUtilisateurDecode(),
-          command
-        )
-
-        // Then
-        expect(evenementService.creer).to.have.been.calledWithExactly(
-          Evenement.Code.SUGGESTION_ALTERNANCE_ACCEPTEE,
-          unUtilisateurDecode()
-        )
-      })
-    })
-    describe('suggestion offre immersion', () => {
-      it('enregistre l‘évènement', async () => {
-        // Given
-        const command: CreateRechercheFromSuggestionCommand = {
-          idJeune: 'id-jeune',
-          idSuggestion: 'id-suggestion'
-        }
-        const suggestion = uneSuggestion({
-          id: command.idSuggestion,
-          idJeune: command.idJeune,
-          type: Offre.Recherche.Type.OFFRES_IMMERSION
-        })
-        suggestionRepository.get.resolves(suggestion)
-
-        // When
-        await createRechercheFromSuggestionCommandHandler.monitor(
-          unUtilisateurDecode(),
-          command
-        )
-
-        // Then
-        expect(evenementService.creer).to.have.been.calledWithExactly(
-          Evenement.Code.SUGGESTION_IMMERSION_ACCEPTEE,
-          unUtilisateurDecode()
-        )
-      })
-    })
-    describe('suggestion offre service civique', () => {
-      it('enregistre l‘évènement', async () => {
-        // Given
-        const command: CreateRechercheFromSuggestionCommand = {
-          idJeune: 'id-jeune',
-          idSuggestion: 'id-suggestion'
-        }
-        const suggestion = uneSuggestion({
-          id: command.idSuggestion,
-          idJeune: command.idJeune,
-          type: Offre.Recherche.Type.OFFRES_SERVICES_CIVIQUE
-        })
-        suggestionRepository.get.resolves(suggestion)
-
-        // When
-        await createRechercheFromSuggestionCommandHandler.monitor(
-          unUtilisateurDecode(),
-          command
-        )
-
-        // Then
-        expect(evenementService.creer).to.have.been.calledWithExactly(
-          Evenement.Code.SUGGESTION_SERVICE_CIVIQUE_ACCEPTEE,
-          unUtilisateurDecode()
-        )
-      })
+      // Then
+      expect(
+        evenementService.creerEvenementSuggestion
+      ).to.have.been.calledWithExactly(
+        unUtilisateurDecode(),
+        command.idSuggestion
+      )
     })
   })
 })
