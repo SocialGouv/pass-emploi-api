@@ -10,7 +10,7 @@ import {
   emptySuccess,
   failure
 } from '../../../src/building-blocks/types/result'
-import { Core } from '../../../src/domain/core'
+import { Core, estPoleEmploiBRSAPassEmploi } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
@@ -59,7 +59,7 @@ describe('ModifierJeuneDuConseillerCommandHandler', () => {
       ).to.have.been.calledOnceWithExactly(
         command.idJeune,
         conseillerPE,
-        Core.structuresPoleEmploiBRSAPassEmploi
+        estPoleEmploiBRSAPassEmploi(conseillerPE.structure)
       )
     })
   })

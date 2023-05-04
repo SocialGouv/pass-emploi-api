@@ -1,24 +1,24 @@
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import {
   GetCVPoleEmploiQuery,
   GetCVPoleEmploiQueryHandler
 } from '../../../src/application/queries/get-cv-pole-emploi.query.handler'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { CVPoleEmploiQueryModel } from '../../../src/application/queries/query-models/jeunes.pole-emploi.query-model'
-import { DocumentPoleEmploiDto } from '../../../src/infrastructure/clients/dto/pole-emploi.dto'
-import { PoleEmploiPartenaireClient } from '../../../src/infrastructure/clients/pole-emploi-partenaire-client'
+import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   success
 } from '../../../src/building-blocks/types/result'
-import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client'
-import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { failureApi } from '../../../src/building-blocks/types/result-api'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
-import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import { Core } from '../../../src/domain/core'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { estPoleEmploiBRSA } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune/jeune'
+import { DocumentPoleEmploiDto } from '../../../src/infrastructure/clients/dto/pole-emploi.dto'
+import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client'
+import { PoleEmploiPartenaireClient } from '../../../src/infrastructure/clients/pole-emploi-partenaire-client'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import { StubbedClass, createSandbox, expect, stubClass } from '../../utils'
 
 describe('GetCVPoleEmploiQueryHandler', () => {
   let getCVPoleEmploiQueryHandler: GetCVPoleEmploiQueryHandler
@@ -119,7 +119,11 @@ describe('GetCVPoleEmploiQueryHandler', () => {
       // Given
       const utilisateur = unUtilisateurJeune()
       jeuneAuthorizer.autoriserLeJeune
-        .withArgs(query.idJeune, utilisateur, Core.structuresPoleEmploiBRSA)
+        .withArgs(
+          query.idJeune,
+          utilisateur,
+          estPoleEmploiBRSA(utilisateur.structure)
+        )
         .resolves(emptySuccess())
 
       // When

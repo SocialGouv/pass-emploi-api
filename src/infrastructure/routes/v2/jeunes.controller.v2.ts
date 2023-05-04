@@ -7,13 +7,22 @@ import {
   Query
 } from '@nestjs/common'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { DateTime } from 'luxon'
 import {
   GetActionsJeuneQuery,
   GetActionsJeuneQueryHandler
 } from '../../../application/queries/action/get-actions-jeune.query.handler.db'
+import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../../application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
+import { GetJeuneHomeDemarchesQueryHandler } from '../../../application/queries/get-jeune-home-demarches.query.handler'
 import { ListeActionsV2QueryModel } from '../../../application/queries/query-models/actions.query-model'
+import { JeuneHomeAgendaPoleEmploiQueryModelV2 } from '../../../application/queries/query-models/home-jeune-suivi.query-model'
+import { JeuneHomeDemarcheQueryModelV2 } from '../../../application/queries/query-models/home-jeune.query-model'
+import { RendezVousJeuneQueryModelV2 } from '../../../application/queries/query-models/rendez-vous.query-model'
+import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
+import { GetRendezVousJeuneQueryHandler } from '../../../application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
 import { isFailure, isSuccess } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
+import { estPoleEmploiBRSA } from '../../../domain/core'
 import {
   AccessToken,
   Utilisateur
@@ -24,15 +33,6 @@ import {
   GetRendezVousJeuneQueryParams,
   MaintenantQueryParams
 } from '../validation/jeunes.inputs'
-import { RendezVousJeuneQueryModelV2 } from '../../../application/queries/query-models/rendez-vous.query-model'
-import { Core } from '../../../domain/core'
-import { JeuneHomeDemarcheQueryModelV2 } from '../../../application/queries/query-models/home-jeune.query-model'
-import { JeuneHomeAgendaPoleEmploiQueryModelV2 } from '../../../application/queries/query-models/home-jeune-suivi.query-model'
-import { DateTime } from 'luxon'
-import { GetRendezVousJeuneQueryHandler } from '../../../application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
-import { GetJeuneHomeDemarchesQueryHandler } from '../../../application/queries/get-jeune-home-demarches.query.handler'
-import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../../application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
-import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
 
 @Controller('v2/jeunes')
 @ApiOAuth2([])
@@ -86,10 +86,7 @@ export class JeunesControllerV2 {
     @AccessToken() accessToken: string,
     @Query() getRendezVousQueryParams?: GetRendezVousJeuneQueryParams
   ): Promise<RendezVousJeuneQueryModelV2> {
-    if (
-      Core.structuresPoleEmploiBRSA.includes(utilisateur.structure) &&
-      accessToken
-    ) {
+    if (estPoleEmploiBRSA(utilisateur.structure) && accessToken) {
       const result =
         await this.getRendezVousJeunePoleEmploiQueryHandler.execute(
           {

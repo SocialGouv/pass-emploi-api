@@ -1,13 +1,13 @@
+import { Inject, Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import { isFailure, Result } from '../../../building-blocks/types/result'
-import { Inject, Injectable } from '@nestjs/common'
 import { Authentification } from '../../../domain/authentification'
-import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
-import { Evenement, EvenementService } from '../../../domain/evenement'
+import { estPoleEmploi } from '../../../domain/core'
 import { Demarche, DemarcheRepositoryToken } from '../../../domain/demarche'
-import { DateTime } from 'luxon'
-import { Core } from '../../../domain/core'
+import { Evenement, EvenementService } from '../../../domain/evenement'
+import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 
 export interface UpdateStatutDemarcheCommand extends Command {
   idJeune: string
@@ -37,9 +37,11 @@ export class UpdateStatutDemarcheCommandHandler extends CommandHandler<
     command: UpdateStatutDemarcheCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.autoriserLeJeune(command.idJeune, utilisateur, [
-      Core.Structure.POLE_EMPLOI
-    ])
+    return this.jeuneAuthorizer.autoriserLeJeune(
+      command.idJeune,
+      utilisateur,
+      estPoleEmploi(utilisateur.structure)
+    )
   }
 
   async handle(

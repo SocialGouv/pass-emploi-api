@@ -1,23 +1,23 @@
-import { expect, StubbedClass, stubClass } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { SinonSandbox, createSandbox } from 'sinon'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
-import { Jeune } from '../../../src/domain/jeune/jeune'
-import { createSandbox, SinonSandbox } from 'sinon'
-import { Authentification } from '../../../src/domain/authentification'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import { Recherche } from '../../../src/domain/offre/recherche/recherche'
-import Suggestion = Recherche.Suggestion
 import {
   CreateSuggestionConseillerServiceCiviqueCommand,
   CreateSuggestionConseillerServiceCiviqueCommandHandler
 } from '../../../src/application/commands/create-suggestion-conseiller-service-civique.command.handler'
-import { Failure, isFailure } from '../../../src/building-blocks/types/result'
 import { MauvaiseCommandeError } from '../../../src/building-blocks/types/domain-error'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { uneSuggestion } from '../../fixtures/suggestion.fixture'
+import { Failure, isFailure } from '../../../src/building-blocks/types/result'
+import { Authentification } from '../../../src/domain/authentification'
+import { estNonBRSA } from '../../../src/domain/core'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
-import { Core } from '../../../src/domain/core'
+import { Jeune } from '../../../src/domain/jeune/jeune'
+import { Recherche } from '../../../src/domain/offre/recherche/recherche'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import { unConseiller } from '../../fixtures/conseiller.fixture'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import { uneSuggestion } from '../../fixtures/suggestion.fixture'
+import { StubbedClass, expect, stubClass } from '../../utils'
+import Suggestion = Recherche.Suggestion
 
 describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
   let createSuggestionDuConseillerServiceCiviqueCommandHandler: CreateSuggestionConseillerServiceCiviqueCommandHandler
@@ -77,7 +77,7 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
       ).to.have.been.calledWithExactly(
         command.idConseiller,
         utilisateur,
-        Core.touteStructureSaufBRSA
+        estNonBRSA(utilisateur.structure)
       )
     })
   })

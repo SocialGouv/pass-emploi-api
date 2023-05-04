@@ -10,7 +10,6 @@ import {
   Conseiller,
   ConseillersRepositoryToken
 } from '../../domain/conseiller/conseiller'
-import { Core, estUtilisateurDeLaStructure } from '../../domain/core'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 
 @Injectable()
@@ -24,11 +23,11 @@ export class ConseillerAuthorizer {
   async autoriserLeConseiller(
     idConseiller: string,
     utilisateur: Authentification.Utilisateur,
-    structuresAutorisees?: Core.Structure[]
+    structureAutorisee = true
   ): Promise<Result> {
     if (
       utilisateur.type === Authentification.Type.CONSEILLER &&
-      estUtilisateurDeLaStructure(utilisateur, structuresAutorisees)
+      structureAutorisee
     ) {
       const conseiller = await this.conseillerRepository.get(idConseiller)
 
@@ -63,11 +62,11 @@ export class ConseillerAuthorizer {
 
   async autoriserToutConseiller(
     utilisateur: Authentification.Utilisateur,
-    structuresAutorisees?: Core.Structure[]
+    structureAutorisee = true
   ): Promise<Result> {
     if (
       utilisateur.type === Authentification.Type.CONSEILLER &&
-      estUtilisateurDeLaStructure(utilisateur, structuresAutorisees)
+      structureAutorisee
     ) {
       const conseiller = await this.conseillerRepository.get(utilisateur.id)
 
@@ -82,11 +81,11 @@ export class ConseillerAuthorizer {
   async autoriserConseillerPourSonJeune(
     idJeune: string,
     utilisateur: Authentification.Utilisateur,
-    structuresAutorisees?: Core.Structure[]
+    structureAutorisee = true
   ): Promise<Result> {
     if (
       utilisateur.type === Authentification.Type.CONSEILLER &&
-      estUtilisateurDeLaStructure(utilisateur, structuresAutorisees)
+      structureAutorisee
     ) {
       const jeune = await this.jeuneRepository.get(idJeune)
 

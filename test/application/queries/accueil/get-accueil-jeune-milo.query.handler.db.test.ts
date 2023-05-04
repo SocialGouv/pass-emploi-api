@@ -3,35 +3,35 @@ import { expect, StubbedClass, stubClass } from '../../../utils'
 
 import { isSuccess, Result } from '../../../../src/building-blocks/types/result'
 
-import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
-import { GetAccueilJeuneMiloQueryHandler } from '../../../../src/application/queries/accueil/get-accueil-jeune-milo.query.handler.db'
+import { DateTime } from 'luxon'
 import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
+import { GetAccueilJeuneMiloQueryHandler } from '../../../../src/application/queries/accueil/get-accueil-jeune-milo.query.handler.db'
+import { GetFavorisAccueilQueryGetter } from '../../../../src/application/queries/query-getters/accueil/get-favoris.query.getter.db'
+import { GetRecherchesSauvegardeesQueryGetter } from '../../../../src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
+import { AccueilJeuneMiloQueryModel } from '../../../../src/application/queries/query-models/jeunes.milo.query-model'
+import { Action } from '../../../../src/domain/action/action'
+import { estMiloPassEmploi } from '../../../../src/domain/core'
+import { CodeTypeRendezVous } from '../../../../src/domain/rendez-vous/rendez-vous'
+import { ActionSqlModel } from '../../../../src/infrastructure/sequelize/models/action.sql-model'
+import { AgenceSqlModel } from '../../../../src/infrastructure/sequelize/models/agence.sql-model'
+import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { RendezVousJeuneAssociationSqlModel } from '../../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import {
   RendezVousDto,
   RendezVousSqlModel
 } from '../../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { ActionSqlModel } from '../../../../src/infrastructure/sequelize/models/action.sql-model'
-import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
-import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
-import { uneActionDto } from '../../../fixtures/sql-models/action.sql-model'
-import { Action } from '../../../../src/domain/action/action'
-import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
-import { RendezVousJeuneAssociationSqlModel } from '../../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
-import { GetRecherchesSauvegardeesQueryGetter } from '../../../../src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
+import { AsSql } from '../../../../src/infrastructure/sequelize/types'
+import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
 import {
   unRendezVousJeuneDetailQueryModel,
   unRendezVousQueryModel
 } from '../../../fixtures/query-models/rendez-vous.query-model.fixtures'
-import { AccueilJeuneMiloQueryModel } from '../../../../src/application/queries/query-models/jeunes.milo.query-model'
-import { CodeTypeRendezVous } from '../../../../src/domain/rendez-vous/rendez-vous'
-import { AsSql } from '../../../../src/infrastructure/sequelize/types'
-import { DateTime } from 'luxon'
+import { uneActionDto } from '../../../fixtures/sql-models/action.sql-model'
 import { uneAgenceMiloDTO } from '../../../fixtures/sql-models/agence.sql-model'
-import { AgenceSqlModel } from '../../../../src/infrastructure/sequelize/models/agence.sql-model'
-import { GetFavorisAccueilQueryGetter } from '../../../../src/application/queries/query-getters/accueil/get-favoris.query.getter.db'
-import { Core } from '../../../../src/domain/core'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
+import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
 
 describe('GetAccueilJeuneMiloQueryHandler', () => {
   let handler: GetAccueilJeuneMiloQueryHandler
@@ -308,19 +308,20 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
   describe('authorize', () => {
     it('autorise un jeune MILO', () => {
       // Given
+      const utilisateur = unUtilisateurJeune()
       const query = {
         idJeune: 'idJeune',
         maintenant: '2023-12-12'
       }
 
       // When
-      handler.authorize(query, unUtilisateurJeune())
+      handler.authorize(query, utilisateur)
 
       // Then
       expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         query.idJeune,
-        unUtilisateurJeune(),
-        Core.structuresMiloPassEmploi
+        utilisateur,
+        estMiloPassEmploi(utilisateur.structure)
       )
     })
   })

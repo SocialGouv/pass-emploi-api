@@ -1,24 +1,24 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import {
+  Result,
   failure,
   isFailure,
-  Result,
   success
 } from '../../building-blocks/types/result'
-import { Query } from '../../building-blocks/types/query'
-import { CVPoleEmploiQueryModel } from './query-models/jeunes.pole-emploi.query-model'
+import { Authentification } from '../../domain/authentification'
+import { estPoleEmploiBRSA } from '../../domain/core'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { DocumentPoleEmploiDto } from '../../infrastructure/clients/dto/pole-emploi.dto'
+import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
 import {
   PoleEmploiPartenaireClient,
   PoleEmploiPartenaireClientToken
 } from '../../infrastructure/clients/pole-emploi-partenaire-client'
-import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
-import { DocumentPoleEmploiDto } from '../../infrastructure/clients/dto/pole-emploi.dto'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
-import { Authentification } from '../../domain/authentification'
-import { Core } from '../../domain/core'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import { CVPoleEmploiQueryModel } from './query-models/jeunes.pole-emploi.query-model'
 
 export interface GetCVPoleEmploiQuery extends Query {
   idJeune: string
@@ -47,7 +47,7 @@ export class GetCVPoleEmploiQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
-      Core.structuresPoleEmploiBRSA
+      estPoleEmploiBRSA(utilisateur.structure)
     )
   }
 

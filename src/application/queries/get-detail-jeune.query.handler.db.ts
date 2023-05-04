@@ -5,7 +5,7 @@ import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Core } from '../../domain/core'
+import { estMilo } from '../../domain/core'
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { SituationsMiloSqlModel } from '../../infrastructure/sequelize/models/situations-milo.sql-model'
@@ -51,7 +51,7 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
     }
 
     let urlDossier
-    if (jeuneSqlModel.structure === Core.Structure.MILO) {
+    if (estMilo(jeuneSqlModel.structure)) {
       urlDossier = this.configService.get('milo.urlWeb')
     }
     return success(fromSqlToDetailJeuneQueryModel(jeuneSqlModel, urlDossier))

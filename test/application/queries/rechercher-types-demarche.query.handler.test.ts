@@ -1,11 +1,11 @@
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { TypesDemarcheQueryModel } from '../../../src/application/queries/query-models/types-demarche.query-model'
 import { RechercherTypesDemarcheQueryHandler } from '../../../src/application/queries/rechercher-types-demarche.query.handler'
-import { Core } from '../../../src/domain/core'
+import { estPoleEmploiBRSA } from '../../../src/domain/core'
 import { TypeDemarcheDto } from '../../../src/infrastructure/clients/dto/pole-emploi.dto'
 import { PoleEmploiClient } from '../../../src/infrastructure/clients/pole-emploi-client'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import { expect, StubbedClass, stubClass } from '../../utils'
+import { StubbedClass, expect, stubClass } from '../../utils'
 
 describe('RechercherTypesDemarcheQueryHandler', () => {
   let poleEmploiClient: StubbedClass<PoleEmploiClient>
@@ -243,7 +243,9 @@ describe('RechercherTypesDemarcheQueryHandler', () => {
 
   describe('authorize', () => {
     it('autorise un jeune pôle emploi', async () => {
+      // Given
       const utilisateur = unUtilisateurJeune()
+
       // When
       await rechercherTypesDemarcheQueryHandler.authorize(
         { recherche: '' },
@@ -256,7 +258,7 @@ describe('RechercherTypesDemarcheQueryHandler', () => {
       ).to.have.been.calledOnceWithExactly(
         utilisateur.id,
         utilisateur,
-        Core.structuresPoleEmploiBRSA
+        estPoleEmploiBRSA(utilisateur.structure)
       )
     })
   })

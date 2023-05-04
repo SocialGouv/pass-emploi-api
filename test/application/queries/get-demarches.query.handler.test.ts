@@ -3,10 +3,10 @@ import {
   GetDemarchesQueryHandler
 } from 'src/application/queries/get-demarches.query.handler'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
-import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import { expect, StubbedClass, stubClass } from '../../utils'
 import { GetDemarchesQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
-import { Core } from '../../../src/domain/core'
+import { estPoleEmploiBRSA } from '../../../src/domain/core'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { StubbedClass, expect, stubClass } from '../../utils'
 
 describe('GetDemarchesQueryHandler', () => {
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
@@ -55,7 +55,7 @@ describe('GetDemarchesQueryHandler', () => {
       expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         query.idJeune,
         utilisateur,
-        Core.structuresPoleEmploiBRSA
+        estPoleEmploiBRSA(utilisateur.structure)
       )
     })
   })

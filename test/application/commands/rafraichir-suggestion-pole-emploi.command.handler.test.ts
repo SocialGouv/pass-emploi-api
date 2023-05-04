@@ -13,7 +13,7 @@ import {
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { SuggestionPoleEmploiService } from '../../../src/domain/offre/recherche/suggestion/pole-emploi.service'
-import { Core } from '../../../src/domain/core'
+import { Core, estPoleEmploiBRSA } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { unJeune } from '../../fixtures/jeune.fixture'
 
@@ -47,6 +47,9 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
 
   describe('authorize', () => {
     it('autorise un jeune PE', async () => {
+      // Given
+      const utilisateur = unUtilisateurJeune()
+
       // When
       await handler.authorize(
         {
@@ -54,7 +57,7 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
           token: 'token',
           structure: Core.Structure.POLE_EMPLOI
         },
-        unUtilisateurJeune()
+        utilisateur
       )
 
       // Then
@@ -62,8 +65,8 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
         jeuneAuthorizer.autoriserLeJeune
       ).to.have.been.calledOnceWithExactly(
         'idJeune',
-        unUtilisateurJeune(),
-        Core.structuresPoleEmploiBRSA
+        utilisateur,
+        estPoleEmploiBRSA(utilisateur.structure)
       )
     })
   })

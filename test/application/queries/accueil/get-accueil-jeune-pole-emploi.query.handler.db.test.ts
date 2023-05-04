@@ -18,7 +18,7 @@ import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
 import { unRendezVousQueryModel } from '../../../fixtures/query-models/rendez-vous.query-model.fixtures'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { KeycloakClient } from '../../../../src/infrastructure/clients/keycloak-client'
-import { Core } from '../../../../src/domain/core'
+import { Core, estPoleEmploiBRSA } from '../../../../src/domain/core'
 import Structure = Core.Structure
 import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import { uneDemarcheQueryModel } from '../../../fixtures/query-models/demarche.query-model.fixtures'
@@ -258,6 +258,9 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
   describe('authorize', () => {
     it('autorise un jeune PE', () => {
       // Given
+      const utilisateur = unUtilisateurJeune({
+        structure: Structure.POLE_EMPLOI
+      })
       const query: GetAccueilJeunePoleEmploiQuery = {
         idJeune: 'idJeune',
         maintenant: '2023-03-30T15:00:00Z',
@@ -265,16 +268,13 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
       }
 
       // When
-      handler.authorize(
-        query,
-        unUtilisateurJeune({ structure: Structure.POLE_EMPLOI })
-      )
+      handler.authorize(query, utilisateur)
 
       // Then
       expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         query.idJeune,
-        unUtilisateurJeune({ structure: Structure.POLE_EMPLOI }),
-        Core.structuresPoleEmploiBRSA
+        utilisateur,
+        estPoleEmploiBRSA(utilisateur.structure)
       )
     })
   })

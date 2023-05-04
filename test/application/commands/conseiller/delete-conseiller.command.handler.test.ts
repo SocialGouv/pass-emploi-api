@@ -9,7 +9,7 @@ import { MauvaiseCommandeError } from '../../../../src/building-blocks/types/dom
 import { failure } from '../../../../src/building-blocks/types/result'
 import { Authentification } from '../../../../src/domain/authentification'
 import { Conseiller } from '../../../../src/domain/conseiller/conseiller'
-import { Core } from '../../../../src/domain/core'
+import { Core, estPoleEmploiBRSA } from '../../../../src/domain/core'
 import { Evenement, EvenementService } from '../../../../src/domain/evenement'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
 import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
@@ -44,22 +44,22 @@ describe('DeleteConseillerCommandHandler', () => {
   describe('authorize', () => {
     it('autorise un conseiller pour son jeune', async () => {
       // Given
+      const utilisateur = unUtilisateurConseiller({
+        structure: Core.Structure.POLE_EMPLOI_BRSA
+      })
       const command: DeleteConseillerCommand = {
         idConseiller: 'idConseiller'
       }
       // When
-      await deleteConseillerCommandHandler.authorize(
-        command,
-        unUtilisateurConseiller({ structure: Core.Structure.POLE_EMPLOI_BRSA })
-      )
+      await deleteConseillerCommandHandler.authorize(command, utilisateur)
 
       // Then
       expect(
         conseillerAuthorizer.autoriserLeConseiller
       ).to.have.been.calledWithExactly(
         'idConseiller',
-        unUtilisateurConseiller({ structure: Core.Structure.POLE_EMPLOI_BRSA }),
-        Core.structuresPoleEmploiBRSA
+        utilisateur,
+        estPoleEmploiBRSA(utilisateur.structure)
       )
     })
   })

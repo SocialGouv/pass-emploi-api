@@ -27,9 +27,7 @@ describe('GetAgencesQueryHandler', () => {
 
       expect(
         conseillerAuthorizer.autoriserToutConseiller
-      ).to.have.been.calledOnceWithExactly(unUtilisateurConseiller(), [
-        Structure.MILO
-      ])
+      ).to.have.been.calledOnceWithExactly(unUtilisateurConseiller(), true)
     })
   })
   describe('handle', () => {

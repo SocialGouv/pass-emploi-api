@@ -8,6 +8,8 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
+import { estNonBRSA } from '../../domain/core'
+import { Evenement, EvenementService } from '../../domain/evenement'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Recherche } from '../../domain/offre/recherche/recherche'
 import {
@@ -15,8 +17,6 @@ import {
   SuggestionsRepositoryToken
 } from '../../domain/offre/recherche/suggestion/suggestion'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
-import { Evenement, EvenementService } from '../../domain/evenement'
-import { Core } from '../../domain/core'
 
 export interface CreateSuggestionConseillerServiceCiviqueCommand
   extends Command {
@@ -51,7 +51,7 @@ export class CreateSuggestionConseillerServiceCiviqueCommandHandler extends Comm
     return this.conseillerAuthorizer.autoriserLeConseiller(
       command.idConseiller,
       utilisateur,
-      Core.touteStructureSaufBRSA
+      estNonBRSA(utilisateur.structure)
     )
   }
 

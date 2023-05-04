@@ -5,37 +5,33 @@ import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios
 import * as https from 'https'
 import { DateTime } from 'luxon'
 import { firstValueFrom } from 'rxjs'
+import { Op } from 'sequelize'
 import {
   AppelPartenaireResultat,
   Context,
   ContextKey
 } from '../../building-blocks/context'
 import { ErreurHttp } from '../../building-blocks/types/domain-error'
+import { Result, failure, success } from '../../building-blocks/types/result'
+import {
+  ResultApi,
+  failureApi,
+  isSuccessApi,
+  successApi
+} from '../../building-blocks/types/result-api'
+import { Authentification } from '../../domain/authentification'
 import { Demarche } from '../../domain/demarche'
 import { suggestionsPEInMemory } from '../repositories/dto/pole-emploi.in-memory.dto'
+import { LogApiPartenaireSqlModel } from '../sequelize/models/log-api-partenaire.sql-model'
 import {
-  DocumentPoleEmploiDto,
   DemarcheDto,
+  DocumentPoleEmploiDto,
   PrestationDto,
   RendezVousPoleEmploiDto,
   SuggestionDto,
   toEtat
 } from './dto/pole-emploi.dto'
-import { LogApiPartenaireSqlModel } from '../sequelize/models/log-api-partenaire.sql-model'
-import { Op } from 'sequelize'
-import { Authentification } from '../../domain/authentification'
-import {
-  failureApi,
-  isSuccessApi,
-  ResultApi,
-  successApi
-} from '../../building-blocks/types/result-api'
-import {
-  failure,
-  isFailure,
-  Result,
-  success
-} from '../../building-blocks/types/result'
+import { handleAxiosError } from './utils/axios-error-handler'
 
 const ORIGINE = 'INDIVIDU'
 const DEMARCHES_URL = 'peconnect-demarches/v1/demarches'
@@ -93,7 +89,10 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
   async getDemarches(tokenDuJeune: string): Promise<ResultApi<DemarcheDto[]>> {
     this.logger.log('recuperation des demarches du jeune')
 
-    const response = await this.get<DemarcheDto[]>(DEMARCHES_URL, tokenDuJeune)
+    const response = await this.getWithCache<DemarcheDto[]>(
+      DEMARCHES_URL,
+      tokenDuJeune
+    )
 
     if (isSuccessApi(response) && !response.data) {
       return successApi([])
@@ -106,7 +105,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     tokenDuJeune: string
   ): Promise<ResultApi<RendezVousPoleEmploiDto[]>> {
     this.logger.log('recuperation des rendez-vous du jeune')
-    return this.get<RendezVousPoleEmploiDto[]>(
+    return this.getWithCache<RendezVousPoleEmploiDto[]>(
       'peconnect-rendezvousagenda/v1/listerendezvous',
       tokenDuJeune
     )
@@ -127,7 +126,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
       dateRechercheRendezVous.toFormat('yyyy-MM-dd')
     )
 
-    return this.get<PrestationDto[]>(
+    return this.getWithCache<PrestationDto[]>(
       'peconnect-gerer-prestations/v1/rendez-vous',
       tokenDuJeune,
       params
@@ -140,7 +139,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
   ): Promise<ResultApi<string>> {
     this.logger.log('recuperation visio')
 
-    return this.get<string>(
+    return this.getWithCache<string>(
       `peconnect-gerer-prestations/v1/lien-visio/rendez-vous/${idVisio}`,
       tokenDuJeune
     )
@@ -149,15 +148,20 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
   async getDocuments(
     tokenDuJeune: string
   ): Promise<Result<DocumentPoleEmploiDto[]>> {
-    this.logger.log('Récupération des documents du jeune')
-    const result = await this.get<DocumentPoleEmploiDto[]>(
-      'peconnect-telecharger-cv-realisation/v1/piecesjointes',
-      tokenDuJeune
-    )
-    if (isFailure(result)) {
-      return result
+    try {
+      this.logger.log('Récupération des documents du jeune')
+      const response = await this.get<DocumentPoleEmploiDto[]>(
+        'peconnect-telecharger-cv-realisation/v1/piecesjointes',
+        tokenDuJeune
+      )
+      return success(response.data ? response.data : [])
+    } catch (e) {
+      return handleAxiosError(
+        e,
+        this.logger,
+        'La récupération des documents a échoué'
+      )
     }
-    return result.data ? result : success([])
   }
 
   async updateDemarche(
@@ -226,7 +230,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
   async getSuggestionsRecherches(
     token: string
   ): Promise<ResultApi<SuggestionDto[]>> {
-    return this.get<SuggestionDto[]>(
+    return this.getWithCache<SuggestionDto[]>(
       'peconnect-metiersrecherches/v1/metiersrecherches',
       token
     )
@@ -236,20 +240,28 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     suffixUrl: string,
     tokenDuJeune: string,
     params?: URLSearchParams
+  ): Promise<AxiosResponse<T>> {
+    return firstValueFrom(
+      this.httpService.get<T>(`${this.apiUrl}/${suffixUrl}`, {
+        params,
+        headers: { Authorization: `Bearer ${tokenDuJeune}` },
+        httpsAgent:
+          this.configService.get('environment') !== 'prod'
+            ? new https.Agent({
+                rejectUnauthorized: false
+              })
+            : undefined
+      })
+    )
+  }
+
+  private async getWithCache<T>(
+    suffixUrl: string,
+    tokenDuJeune: string,
+    params?: URLSearchParams
   ): Promise<ResultApi<T>> {
     try {
-      const res = await firstValueFrom(
-        this.httpService.get<T>(`${this.apiUrl}/${suffixUrl}`, {
-          params,
-          headers: { Authorization: `Bearer ${tokenDuJeune}` },
-          httpsAgent:
-            this.configService.get('environment') !== 'prod'
-              ? new https.Agent({
-                  rejectUnauthorized: false
-                })
-              : undefined
-        })
-      )
+      const res = await this.get<T>(suffixUrl, tokenDuJeune, params)
       this.ajouterLeRetourAuContexteNode(res)
       return success(res.data)
     } catch (e) {
