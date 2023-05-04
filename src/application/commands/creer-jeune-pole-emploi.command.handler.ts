@@ -12,7 +12,7 @@ import {
   Conseiller,
   ConseillersRepositoryToken
 } from '../../domain/conseiller/conseiller'
-import { Core } from '../../domain/core'
+import { estPoleEmploiBRSA } from '../../domain/core'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 
@@ -81,7 +81,7 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
     return this.conseillerAuthorizer.autoriserLeConseiller(
       command.idConseiller,
       utilisateur,
-      Core.structuresPoleEmploiBRSA
+      estPoleEmploiBRSA(utilisateur.structure)
     )
   }
 

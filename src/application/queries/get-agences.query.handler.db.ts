@@ -48,9 +48,10 @@ export class GetAgencesQueryHandler extends QueryHandler<
     query: GetAgenceQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAuthorizer.autoriserToutConseiller(utilisateur, [
-      query.structure
-    ])
+    return this.conseillerAuthorizer.autoriserToutConseiller(
+      utilisateur,
+      query.structure === utilisateur.structure
+    )
   }
 
   async monitor(): Promise<void> {

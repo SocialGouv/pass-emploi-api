@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common'
-import { Result } from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
 import { Cached, Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
+import { Result } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { estPoleEmploiBRSA } from '../../domain/core'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
-import { DemarcheQueryModel } from './query-models/actions.query-model'
 import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
-import { Core } from '../../domain/core'
+import { DemarcheQueryModel } from './query-models/actions.query-model'
 
 export interface GetDemarchesQuery extends Query {
   idJeune: string
@@ -41,7 +41,7 @@ export class GetDemarchesQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
-      Core.structuresPoleEmploiBRSA
+      estPoleEmploiBRSA(utilisateur.structure)
     )
   }
 

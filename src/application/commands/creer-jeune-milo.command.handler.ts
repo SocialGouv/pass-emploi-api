@@ -22,7 +22,7 @@ import {
   Conseiller,
   ConseillersRepositoryToken
 } from '../../domain/conseiller/conseiller'
-import { Core } from '../../domain/core'
+import { Core, estMilo } from '../../domain/core'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import {
   JeuneMilo,
@@ -131,7 +131,7 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     return this.conseillerAuthorizer.autoriserLeConseiller(
       command.idConseiller,
       utilisateur,
-      [Core.Structure.MILO]
+      estMilo(utilisateur.structure)
     )
   }
 

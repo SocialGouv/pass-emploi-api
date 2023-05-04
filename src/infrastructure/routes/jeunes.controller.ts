@@ -45,7 +45,7 @@ import {
   RendezVousJeuneDetailQueryModel,
   RendezVousJeuneQueryModel
 } from '../../application/queries/query-models/rendez-vous.query-model'
-import { Core } from '../../domain/core'
+import { Core, estPoleEmploiBRSA } from '../../domain/core'
 import { DateService } from '../../utils/date-service'
 import {
   CreateActionCommand,
@@ -396,10 +396,7 @@ export class JeunesController {
     @AccessToken() accessToken: string,
     @Query() getRendezVousQueryParams?: GetRendezVousJeuneQueryParams
   ): Promise<RendezVousJeuneQueryModel[]> {
-    if (
-      Core.structuresPoleEmploiBRSA.includes(utilisateur.structure) &&
-      accessToken
-    ) {
+    if (estPoleEmploiBRSA(utilisateur.structure) && accessToken) {
       const result =
         await this.getRendezVousJeunePoleEmploiQueryHandler.execute(
           {

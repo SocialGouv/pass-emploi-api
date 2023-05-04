@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common'
-import { Authentification } from '../../domain/authentification'
-import { Core } from '../../domain/core'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { failure, Result, success } from '../../building-blocks/types/result'
+import { Result, failure, success } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { estMilo } from '../../domain/core'
+import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { JeuneQueryModel } from './query-models/jeunes.query-model'
-import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 
 export interface GetJeuneMiloByDossierQuery extends Query {
   idDossier: string
@@ -43,9 +43,10 @@ export class GetJeuneMiloByDossierQueryHandler extends QueryHandler<
     _query: GetJeuneMiloByDossierQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAuthorizer.autoriserToutConseiller(utilisateur, [
-      Core.Structure.MILO
-    ])
+    return this.conseillerAuthorizer.autoriserToutConseiller(
+      utilisateur,
+      estMilo(utilisateur.structure)
+    )
   }
 
   async monitor(): Promise<void> {

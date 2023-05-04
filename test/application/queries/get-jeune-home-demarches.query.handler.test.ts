@@ -1,16 +1,16 @@
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { GetCampagneQueryModel } from '../../../src/application/queries/query-getters/get-campagne.query.getter'
-import { uneCampagneQueryModel } from '../../fixtures/campagne.fixture'
-import { GetJeuneHomeDemarchesQueryHandler } from '../../../src/application/queries/get-jeune-home-demarches.query.handler'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
-import { desDemarchesQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
-import { failure, success } from '../../../src/building-blocks/types/result'
-import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
-import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { GetJeuneHomeDemarchesQueryHandler } from '../../../src/application/queries/get-jeune-home-demarches.query.handler'
+import { GetCampagneQueryModel } from '../../../src/application/queries/query-getters/get-campagne.query.getter'
 import { GetDemarchesQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { JeuneHomeDemarcheQueryModel } from '../../../src/application/queries/query-models/home-jeune.query-model'
+import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { Cached } from '../../../src/building-blocks/types/query'
-import { Core } from '../../../src/domain/core'
+import { failure, success } from '../../../src/building-blocks/types/result'
+import { estPoleEmploiBRSA } from '../../../src/domain/core'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { uneCampagneQueryModel } from '../../fixtures/campagne.fixture'
+import { desDemarchesQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
+import { expect, StubbedClass, stubClass } from '../../utils'
 
 describe('GetJeuneHomeDemarchesQueryHandler', () => {
   let getActionsJeunePoleEmploiQueryGetter: StubbedClass<GetDemarchesQueryGetter>
@@ -95,20 +95,22 @@ describe('GetJeuneHomeDemarchesQueryHandler', () => {
 
   describe('authorize', () => {
     it('authorize un jeune PE', async () => {
+      // Given
+      const utilisateur = unUtilisateurJeune()
       // When
       await getJeuneHomeDemarchesQueryHandler.authorize(
         {
           idJeune: 'idJeune',
           accessToken: 'token'
         },
-        unUtilisateurJeune()
+        utilisateur
       )
 
       // Then
       expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         'idJeune',
-        unUtilisateurJeune(),
-        Core.structuresPoleEmploiBRSA
+        utilisateur,
+        estPoleEmploiBRSA(utilisateur.structure)
       )
     })
   })

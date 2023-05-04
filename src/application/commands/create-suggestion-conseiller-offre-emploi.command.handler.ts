@@ -11,7 +11,7 @@ import {
   failure
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Core } from '../../domain/core'
+import { estBRSA } from '../../domain/core'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Recherche } from '../../domain/offre/recherche/recherche'
@@ -50,10 +50,7 @@ export class CreateSuggestionConseillerOffreEmploiCommandHandler extends Command
     command: CreateSuggestionConseillerOffreEmploiCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (
-      utilisateur.structure === Core.Structure.POLE_EMPLOI_BRSA &&
-      command.criteres.alternance
-    ) {
+    if (estBRSA(utilisateur.structure) && command.criteres.alternance) {
       return failure(new DroitsInsuffisants())
     }
     return this.conseillerAuthorizer.autoriserLeConseiller(

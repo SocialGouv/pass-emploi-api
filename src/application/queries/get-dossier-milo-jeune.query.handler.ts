@@ -3,7 +3,7 @@ import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Core } from '../../domain/core'
+import { estMilo } from '../../domain/core'
 import {
   JeuneMilo,
   MiloJeuneRepositoryToken
@@ -37,9 +37,10 @@ export class GetDossierMiloJeuneQueryHandler extends QueryHandler<
     _query: GetDossierMiloJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAuthorizer.autoriserToutConseiller(utilisateur, [
-      Core.Structure.MILO
-    ])
+    return this.conseillerAuthorizer.autoriserToutConseiller(
+      utilisateur,
+      estMilo(utilisateur.structure)
+    )
   }
 
   async monitor(): Promise<void> {

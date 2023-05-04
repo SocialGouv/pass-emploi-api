@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common'
-import { JeuneHomeDemarcheQueryModel } from './query-models/home-jeune.query-model'
-import { GetCampagneQueryModel } from './query-getters/get-campagne.query.getter'
-import { isFailure, Result, success } from '../../building-blocks/types/result'
 import { Cached, Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
+import { isFailure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
+import { estPoleEmploiBRSA } from '../../domain/core'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
+import { GetCampagneQueryModel } from './query-getters/get-campagne.query.getter'
 import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
-import { Core } from '../../domain/core'
+import { JeuneHomeDemarcheQueryModel } from './query-models/home-jeune.query-model'
 
 export interface GetJeuneHomeDemarchesQuery extends Query {
   idJeune: string
@@ -59,7 +59,7 @@ export class GetJeuneHomeDemarchesQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
-      Core.structuresPoleEmploiBRSA
+      estPoleEmploiBRSA(utilisateur.structure)
     )
   }
 

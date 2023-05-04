@@ -8,7 +8,11 @@ import {
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
 import { createSandbox, expect } from '../../utils'
-import { Core } from '../../../src/domain/core'
+import {
+  Core,
+  estMiloPassEmploi,
+  estPoleEmploiBRSA
+} from '../../../src/domain/core'
 
 describe('JeuneAuthorizer', () => {
   let jeuneRepository: StubbedType<Jeune.Repository>
@@ -35,7 +39,7 @@ describe('JeuneAuthorizer', () => {
         const result = await jeuneAuthorizer.autoriserLeJeune(
           'jeune-id',
           utilisateur,
-          Core.structuresMiloPassEmploi
+          estMiloPassEmploi(utilisateur.structure)
         )
 
         // Then
@@ -56,7 +60,7 @@ describe('JeuneAuthorizer', () => {
         const result = await jeuneAuthorizer.autoriserLeJeune(
           'jeune-id',
           utilisateur,
-          Core.structuresPoleEmploiBRSA
+          estPoleEmploiBRSA(utilisateur.structure)
         )
 
         // Then

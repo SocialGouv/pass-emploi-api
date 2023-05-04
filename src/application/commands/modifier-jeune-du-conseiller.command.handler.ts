@@ -8,7 +8,7 @@ import {
   failure
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Core } from '../../domain/core'
+import { estPoleEmploiBRSAPassEmploi } from '../../domain/core'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 
@@ -54,7 +54,7 @@ export class ModifierJeuneDuConseillerCommandHandler extends CommandHandler<
     return this.conseillerAuthorizer.autoriserConseillerPourSonJeune(
       command.idJeune,
       utilisateur,
-      Core.structuresPoleEmploiBRSAPassEmploi
+      estPoleEmploiBRSAPassEmploi(utilisateur.structure)
     )
   }
 

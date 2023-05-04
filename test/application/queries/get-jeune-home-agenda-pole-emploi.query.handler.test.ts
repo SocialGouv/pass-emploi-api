@@ -1,31 +1,31 @@
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { DateTime } from 'luxon'
 import { describe } from 'mocha'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import {
   GetJeuneHomeAgendaPoleEmploiQuery,
   GetJeuneHomeAgendaPoleEmploiQueryHandler
 } from '../../../src/application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
+import { GetDemarchesQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
+import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
+import { JeuneHomeAgendaPoleEmploiQueryModel } from '../../../src/application/queries/query-models/home-jeune-suivi.query-model'
+import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
+import { Cached } from '../../../src/building-blocks/types/query'
 import {
   failure,
   isSuccess,
   Result,
   success
 } from '../../../src/building-blocks/types/result'
-import { DateTime } from 'luxon'
-import { JeuneHomeAgendaPoleEmploiQueryModel } from '../../../src/application/queries/query-models/home-jeune-suivi.query-model'
-import { unRendezVousQueryModel } from '../../fixtures/query-models/rendez-vous.query-model.fixtures'
-import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
-import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import { GetDemarchesQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
-import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
-import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { estPoleEmploiBRSA } from '../../../src/domain/core'
 import { Demarche } from '../../../src/domain/demarche'
-import { Cached } from '../../../src/building-blocks/types/query'
-import { Core } from '../../../src/domain/core'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { Jeune } from '../../../src/domain/jeune/jeune'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
+import { unRendezVousQueryModel } from '../../fixtures/query-models/rendez-vous.query-model.fixtures'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
   let handler: GetJeuneHomeAgendaPoleEmploiQueryHandler
@@ -477,6 +477,7 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
   describe('authorize', () => {
     it('autorise un jeune PE', () => {
       // Given
+      const utilisateur = unUtilisateurJeune()
       const query: GetJeuneHomeAgendaPoleEmploiQuery = {
         idJeune: 'idJeune',
         maintenant: DateTime.now(),
@@ -489,8 +490,8 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
       // Then
       expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         query.idJeune,
-        unUtilisateurJeune(),
-        Core.structuresPoleEmploiBRSA
+        utilisateur,
+        estPoleEmploiBRSA(utilisateur.structure)
       )
     })
   })

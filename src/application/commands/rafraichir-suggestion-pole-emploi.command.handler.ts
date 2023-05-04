@@ -15,7 +15,7 @@ import {
   SuggestionsPoleEmploiRepositoryToken
 } from '../../domain/offre/recherche/suggestion/suggestion'
 import { SuggestionPoleEmploiService } from '../../domain/offre/recherche/suggestion/pole-emploi.service'
-import { Core } from '../../domain/core'
+import { Core, estPoleEmploiBRSA } from '../../domain/core'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 
@@ -84,7 +84,7 @@ export class RafraichirSuggestionPoleEmploiCommandHandler extends CommandHandler
     return this.jeuneAuthorizer.autoriserLeJeune(
       command.idJeune,
       utilisateur,
-      Core.structuresPoleEmploiBRSA
+      estPoleEmploiBRSA(utilisateur.structure)
     )
   }
 

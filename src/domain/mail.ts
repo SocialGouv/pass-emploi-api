@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { ArchiveJeune } from './archive-jeune'
 import { Conseiller } from './conseiller/conseiller'
-import { Core } from './core'
+import { Core, estPoleEmploiBRSA } from './core'
 import { Jeune } from './jeune/jeune'
 import { RendezVous } from './rendez-vous/rendez-vous'
-import { ArchiveJeune } from './archive-jeune'
 
 export const MailServiceToken = 'MailServiceToken'
 export const MailRepositoryToken = 'MailRepositoryToken'
@@ -63,8 +63,8 @@ export namespace Mail {
   }
 
   export interface Repository {
-    findAllContactsConseillerByStructure(
-      structure: Core.Structure
+    findAllContactsConseillerByStructures(
+      structure: Core.Structure[]
     ): Promise<Mail.Contact[]>
 
     countContactsConseillerSansEmail(): Promise<number>
@@ -91,7 +91,7 @@ export namespace Mail {
         throw new Error(`Le jeune ${jeune.id} n'a pas de conseiller`)
       }
 
-      if (Core.structuresPoleEmploiBRSA.includes(jeune.structure)) {
+      if (estPoleEmploiBRSA(jeune.structure)) {
         templateId = parseInt(this.templates.suppressionJeunePE)
       } else {
         templateId = parseInt(this.templates.suppressionJeuneMilo)

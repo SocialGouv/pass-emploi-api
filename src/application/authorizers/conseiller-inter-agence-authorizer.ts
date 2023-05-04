@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
 import {
+  Result,
   emptySuccess,
-  failure,
-  Result
+  failure
 } from '../../building-blocks/types/result'
 import { Action, ActionsRepositoryToken } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
@@ -11,7 +11,7 @@ import {
   Conseiller,
   ConseillersRepositoryToken
 } from '../../domain/conseiller/conseiller'
-import { Core } from '../../domain/core'
+import { Core, estMiloPassEmploi } from '../../domain/core'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import {
   RendezVous,
@@ -136,7 +136,7 @@ export class ConseillerInterAgenceAuthorizer {
   }
 
   structureAutoriseeInterAgence(structure: Core.Structure): boolean {
-    return Core.structuresMiloPassEmploi.includes(structure)
+    return estMiloPassEmploi(structure)
   }
 
   private async autoriserPourSonJeuneOuUnJeuneDeSonAgenceMilo(

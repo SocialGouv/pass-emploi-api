@@ -1,19 +1,19 @@
-import * as _PoleEmploi from './pole-emploi'
-import { Recherche } from '../recherche'
 import { Injectable } from '@nestjs/common'
-import { IdService } from '../../../../utils/id-service'
-import { DateService } from '../../../../utils/date-service'
 import { DateTime } from 'luxon'
+import { DateService } from '../../../../utils/date-service'
+import { IdService } from '../../../../utils/id-service'
+import { Recherche } from '../recherche'
+import * as _PoleEmploi from './pole-emploi'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import * as isEqual from 'lodash.isequal'
+import { MauvaiseCommandeError } from '../../../../building-blocks/types/domain-error'
 import {
   failure,
   Result,
   success
 } from '../../../../building-blocks/types/result'
-import { MauvaiseCommandeError } from '../../../../building-blocks/types/domain-error'
-import { Core } from '../../../core'
+import { Core, estNonBRSA } from '../../../core'
 
 export interface Suggestion {
   id: string
@@ -123,9 +123,7 @@ export namespace Suggestion {
             maintenant
           )
         )
-      const suggestionsServiceCivique = Core.touteStructureSaufBRSA.includes(
-        structureDuJeune
-      )
+      const suggestionsServiceCivique = estNonBRSA(structureDuJeune)
         ? suggestionsPoleEmploi
             .filter(this.estUneSuggestionServiceCivique.bind(this))
             .map(suggestionPoleEmploi =>

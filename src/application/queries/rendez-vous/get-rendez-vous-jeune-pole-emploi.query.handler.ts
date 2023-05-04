@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common'
-import { Result } from '../../../building-blocks/types/result'
-import { Authentification } from '../../../domain/authentification'
-import { Evenement, EvenementService } from '../../../domain/evenement'
-import { RendezVous } from '../../../domain/rendez-vous/rendez-vous'
 import { Cached, Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
+import { Result } from '../../../building-blocks/types/result'
+import { Authentification } from '../../../domain/authentification'
+import { estPoleEmploiBRSA } from '../../../domain/core'
+import { Evenement, EvenementService } from '../../../domain/evenement'
+import { RendezVous } from '../../../domain/rendez-vous/rendez-vous'
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
-import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-model'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
-import { Core } from '../../../domain/core'
+import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-model'
 
 export interface GetRendezVousJeunePoleEmploiQuery extends Query {
   idJeune: string
@@ -42,7 +42,7 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
-      Core.structuresPoleEmploiBRSA
+      estPoleEmploiBRSA(utilisateur.structure)
     )
   }
 

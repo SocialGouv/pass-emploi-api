@@ -32,7 +32,7 @@ import { RechercheQueryModel } from '../../application/queries/query-models/rech
 import { SuggestionQueryModel } from '../../application/queries/query-models/suggestion.query-model'
 import { isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Core } from '../../domain/core'
+import { estPoleEmploiBRSA } from '../../domain/core'
 import { Recherche } from '../../domain/offre/recherche/recherche'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'
@@ -158,7 +158,7 @@ export class RecherchesJeunesController {
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @AccessToken() accessToken: string
   ): Promise<SuggestionQueryModel[]> {
-    if (Core.structuresPoleEmploiBRSA.includes(utilisateur.structure)) {
+    if (estPoleEmploiBRSA(utilisateur.structure)) {
       const result =
         await this.rafraichirSuggestionPoleEmploiCommandHandler.execute(
           {

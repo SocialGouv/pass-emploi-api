@@ -3,7 +3,7 @@ import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Core } from '../../domain/core'
+import { estPoleEmploiBRSA } from '../../domain/core'
 import { TypeDemarcheDto } from '../../infrastructure/clients/dto/pole-emploi.dto'
 import { PoleEmploiClient } from '../../infrastructure/clients/pole-emploi-client'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
@@ -32,7 +32,7 @@ export class RechercherTypesDemarcheQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       utilisateur.id,
       utilisateur,
-      Core.structuresPoleEmploiBRSA
+      estPoleEmploiBRSA(utilisateur.structure)
     )
   }
 

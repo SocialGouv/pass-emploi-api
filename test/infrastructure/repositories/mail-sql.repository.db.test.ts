@@ -46,9 +46,9 @@ describe('MailSqlRepository', () => {
 
         // When
         const actual =
-          await mailSqlRepository.findAllContactsConseillerByStructure(
+          await mailSqlRepository.findAllContactsConseillerByStructures([
             Core.Structure.MILO
-          )
+          ])
 
         // Then
         const expected: Mail.Contact[] = [
@@ -79,9 +79,9 @@ describe('MailSqlRepository', () => {
 
         // When
         const actual =
-          await mailSqlRepository.findAllContactsConseillerByStructure(
+          await mailSqlRepository.findAllContactsConseillerByStructures([
             Core.Structure.MILO
-          )
+          ])
 
         // Then
         expect(actual).to.deep.equal([])
@@ -102,9 +102,9 @@ describe('MailSqlRepository', () => {
 
         // When
         const actual =
-          await mailSqlRepository.findAllContactsConseillerByStructure(
+          await mailSqlRepository.findAllContactsConseillerByStructures([
             Core.Structure.MILO
-          )
+          ])
 
         // Then
         expect(actual).to.deep.equal([])
