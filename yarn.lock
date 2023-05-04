@@ -6187,9 +6187,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-admin@npm:11.7.0":
-  version: 11.7.0
-  resolution: "firebase-admin@npm:11.7.0"
+"firebase-admin@npm:11.8.0":
+  version: 11.8.0
+  resolution: "firebase-admin@npm:11.8.0"
   dependencies:
     "@fastify/busboy": ^1.2.1
     "@firebase/database-compat": ^0.3.4
@@ -6206,7 +6206,7 @@ __metadata:
       optional: true
     "@google-cloud/storage":
       optional: true
-  checksum: 796c7f80eeeaadb6fe9e31b942de99aaab926f5dd0b5eb7ba650c24c3bc6da3ff1f031976e99ecc9ae886f619c0d317345dd20b95c9041feb85c73112636feaa
+  checksum: e7f3596db58bf668702e2a6dfb74071ee112aef5ac3001071079a57fb5ce41aba5a1f398dfac40a40792ac6894e040c3b3cb508dc02d026741eada6672974048
   languageName: node
   linkType: hard
 
@@ -9102,7 +9102,7 @@ __metadata:
     eslint-plugin-chai-friendly: ^0.7.2
     eslint-plugin-mocha: ^10.1.0
     eslint-plugin-prettier: ^4.2.1
-    firebase-admin: 11.7.0
+    firebase-admin: 11.8.0
     geojson: ^0.5.0
     helmet: ^6.0.1
     husky: ^8.0.2
