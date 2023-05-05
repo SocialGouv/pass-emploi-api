@@ -104,7 +104,7 @@ describe('TelechargerFichierQueryHandler', () => {
     })
   })
   describe('monitor', () => {
-    it('envoie un évenement de récuperation d’une piece jointe', async () => {
+    it('envoie un évènement de récuperation d’une piece jointe', async () => {
       // Given
       const utilisateur = unUtilisateurJeune()
 

@@ -253,7 +253,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
 
   describe('monitor', () => {
     describe("quand c'est un jeune", () => {
-      it('envoie un évenement de consultation de la liste des rendez vous sans période', async () => {
+      it('envoie un évènement de consultation de la liste des rendez vous sans période', async () => {
         // Given
         const utilisateur = unUtilisateurJeune({ id: 'sans-periode' })
         const query: GetRendezVousJeuneQuery = {
@@ -268,7 +268,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
           utilisateur
         )
       })
-      it('envoie un évenement de consultation de la liste des rendez vous dans le futur', async () => {
+      it('envoie un évènement de consultation de la liste des rendez vous dans le futur', async () => {
         // Given
         const utilisateur = unUtilisateurJeune({ id: 'periode-futur' })
         const query: GetRendezVousJeuneQuery = {
@@ -283,7 +283,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
           utilisateur
         )
       })
-      it("n'envoie pas un évenement de consultation de la liste des rendez vous dans le passé", async () => {
+      it("n'envoie pas un évènement de consultation de la liste des rendez vous dans le passé", async () => {
         // Given
         const utilisateur = unUtilisateurJeune({ id: 'periode-passe' })
         const query: GetRendezVousJeuneQuery = {
@@ -300,7 +300,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
       })
     })
     describe("quand c'est un conseiller", () => {
-      it("n'envoie pas un évenement de consultation de la liste des rendez vous passés", async () => {
+      it("n'envoie pas un évènement de consultation de la liste des rendez vous passés", async () => {
         // Given
         const utilisateur = unUtilisateurConseiller({ id: 'periode-passe' })
         const query: GetRendezVousJeuneQuery = {
@@ -312,7 +312,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
         // Then
         expect(evenementService.creer).not.to.have.been.called()
       })
-      it("n'envoie pas un évenement de consultation de la liste des rendez vous futurs", async () => {
+      it("n'envoie pas un évènement de consultation de la liste des rendez vous futurs", async () => {
         // Given
         const utilisateur = unUtilisateurConseiller({ id: 'periode-passe' })
         const query: GetRendezVousJeuneQuery = {

@@ -42,16 +42,13 @@ export default () => {
     poleEmploi: {
       url:
         process.env.POLE_EMPLOI_API_BASE_URL ??
-        'https://api.emploi-store.fr/partenaire',
+        'https://api.pole-emploi.io/partenaire',
       loginUrl:
         process.env.POLE_EMPLOI_LOGIN_URL ??
         'https://entreprise.pole-emploi.fr/connexion/oauth2/access_token',
       clientId: process.env.POLE_EMPLOI_CLIENT_ID ?? '',
       clientSecret: process.env.POLE_EMPLOI_CLIENT_SECRET ?? '',
       scope: process.env.POLE_EMPLOI_SCOPE ?? ''
-    },
-    poleEmploiPartenaire: {
-      url: process.env.POLE_EMPLOI_PARTENAIRE_API_BASE_URL
     },
     milo: {
       url: process.env.MILO_API_URL,

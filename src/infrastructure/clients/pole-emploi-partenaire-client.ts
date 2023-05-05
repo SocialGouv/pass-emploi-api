@@ -83,7 +83,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     private context: Context
   ) {
     this.logger = new Logger('PoleEmploiPartenaireClient')
-    this.apiUrl = this.configService.get('poleEmploiPartenaire').url
+    this.apiUrl = this.configService.get('poleEmploi').url
   }
 
   async getDemarches(tokenDuJeune: string): Promise<ResultApi<DemarcheDto[]>> {

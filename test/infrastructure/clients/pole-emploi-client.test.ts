@@ -129,7 +129,7 @@ describe('PoleEmploiClient', () => {
           tokenDate: uneDatetimeDeMoinsDe25Minutes
         }
 
-        nock('https://api.emploi-store.fr/partenaire')
+        nock('https://api.peio.pe-qvr.fr/partenaire')
           .get('/offresdemploi/v2/offres/1')
           .reply(200, {
             resultats: []
@@ -158,7 +158,7 @@ describe('PoleEmploiClient', () => {
           tokenDate: uneDatetimeDeMoinsDe25Minutes
         }
 
-        nock('https://api.emploi-store.fr/partenaire')
+        nock('https://api.peio.pe-qvr.fr/partenaire')
           .get('/offresdemploi/v2/offres/1')
           .reply(400)
           .isDone()
@@ -181,12 +181,12 @@ describe('PoleEmploiClient', () => {
           tokenDate: uneDatetimeDeMoinsDe25Minutes
         }
 
-        nock('https://api.emploi-store.fr/partenaire')
+        nock('https://api.peio.pe-qvr.fr/partenaire')
           .defaultReplyHeaders({ 'retry-after': '1' })
           .get('/offresdemploi/v2/offres/1')
           .reply(429)
           .isDone()
-        nock('https://api.emploi-store.fr/partenaire')
+        nock('https://api.peio.pe-qvr.fr/partenaire')
           .get('/offresdemploi/v2/offres/1')
           .reply(200)
           .isDone()
@@ -207,12 +207,12 @@ describe('PoleEmploiClient', () => {
           tokenDate: uneDatetimeDeMoinsDe25Minutes
         }
 
-        nock('https://api.emploi-store.fr/partenaire')
+        nock('https://api.peio.pe-qvr.fr/partenaire')
           .defaultReplyHeaders({ 'retry-after': '1' })
           .get('/offresdemploi/v2/offres/1')
           .reply(429)
           .isDone()
-        nock('https://api.emploi-store.fr/partenaire')
+        nock('https://api.peio.pe-qvr.fr/partenaire')
           .defaultReplyHeaders({ 'retry-after': '1' })
           .get('/offresdemploi/v2/offres/1')
           .reply(429)
@@ -236,7 +236,7 @@ describe('PoleEmploiClient', () => {
           tokenDate: uneDatetimeDeMoinsDe25Minutes
         }
 
-        nock('https://api.emploi-store.fr/partenaire')
+        nock('https://api.peio.pe-qvr.fr/partenaire')
           .get('/offresdemploi/v2/offres/1')
           .reply(500)
           .isDone()
@@ -258,7 +258,7 @@ describe('PoleEmploiClient', () => {
         tokenDate: uneDatetimeDeMoinsDe25Minutes
       }
 
-      nock('https://api.emploi-store.fr/partenaire')
+      nock('https://api.peio.pe-qvr.fr/partenaire')
         .get('/offresdemploi/v2/offres/1')
         .reply(200, uneOffreEmploiDto())
         .isDone()
@@ -279,7 +279,7 @@ describe('PoleEmploiClient', () => {
         tokenDate: uneDatetimeDeMoinsDe25Minutes
       }
 
-      nock('https://api.emploi-store.fr/partenaire')
+      nock('https://api.peio.pe-qvr.fr/partenaire')
         .get('/offresdemploi/v2/offres/1')
         .reply(400)
         .isDone()
@@ -300,7 +300,7 @@ describe('PoleEmploiClient', () => {
         tokenDate: uneDatetimeDeMoinsDe25Minutes
       }
 
-      nock('https://api.emploi-store.fr/partenaire')
+      nock('https://api.peio.pe-qvr.fr/partenaire')
         .get('/offresdemploi/v2/offres/1')
         .reply(204)
         .isDone()
@@ -321,7 +321,7 @@ describe('PoleEmploiClient', () => {
         tokenDate: uneDatetimeDeMoinsDe25Minutes
       }
 
-      nock('https://api.emploi-store.fr/partenaire')
+      nock('https://api.peio.pe-qvr.fr/partenaire')
         .get('/offresdemploi/v2/offres/1')
         .reply(401)
         .isDone()
@@ -346,7 +346,7 @@ describe('PoleEmploiClient', () => {
         tokenDate: uneDatetimeDeMoinsDe25Minutes
       }
 
-      nock('https://api.emploi-store.fr/partenaire')
+      nock('https://api.peio.pe-qvr.fr/partenaire')
         .get('/offresdemploi/v2/offres/search?param=value')
         .reply(
           200,
@@ -378,7 +378,7 @@ describe('PoleEmploiClient', () => {
         tokenDate: uneDatetimeDeMoinsDe25Minutes
       }
 
-      nock('https://api.emploi-store.fr/partenaire')
+      nock('https://api.peio.pe-qvr.fr/partenaire')
         .get('/offresdemploi/v2/offres/search?param=value')
         .reply(204, undefined, { 'content-range': 'offres 0-149/1811' })
         .isDone()
@@ -413,7 +413,7 @@ describe('PoleEmploiClient', () => {
         dateFinCreation: '2020-10-10'
       }
 
-      nock('https://api.emploi-store.fr/partenaire')
+      nock('https://api.peio.pe-qvr.fr/partenaire')
         .post(
           '/listernotificationspartenaires/v1/notifications/partenaires',
           body
@@ -447,7 +447,7 @@ describe('PoleEmploiClient', () => {
           tokenDate: uneDatetimeDeMoinsDe25Minutes
         }
 
-        nock('https://api.emploi-store.fr/partenaire')
+        nock('https://api.peio.pe-qvr.fr/partenaire')
           .post('/rechercher-demarche/v1/solr/search/demarche', {
             codeUtilisateur: 0,
             motCle: 'salon'
@@ -474,7 +474,7 @@ describe('PoleEmploiClient', () => {
           tokenDate: uneDatetimeDeMoinsDe25Minutes
         }
 
-        nock('https://api.emploi-store.fr/partenaire')
+        nock('https://api.peio.pe-qvr.fr/partenaire')
           .post('/rechercher-demarche/v1/solr/search/demarche', {
             codeUtilisateur: 0,
             motCle: 'salon'
@@ -502,7 +502,7 @@ describe('PoleEmploiClient', () => {
             tokenDate: uneDatetimeDeMoinsDe25Minutes
           }
 
-          nock('https://api.emploi-store.fr/partenaire')
+          nock('https://api.peio.pe-qvr.fr/partenaire')
             .post('/rechercher-demarche/v1/solr/search/demarche', {
               codeUtilisateur: 0,
               motCle: 'salon'

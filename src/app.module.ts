@@ -319,6 +319,8 @@ import { InitialiserLesVuesJobHandler } from './application/jobs/analytics/initi
 import { DeleteConseillerCommandHandler } from './application/commands/conseiller/delete-conseiller.command.handler'
 import { GetFavorisAccueilQueryGetter } from './application/queries/query-getters/accueil/get-favoris.query.getter.db'
 import { GetCVPoleEmploiQueryHandler } from './application/queries/get-cv-pole-emploi.query.handler'
+import { EvenementsEmploiController } from './infrastructure/routes/evenements-emploi.controller'
+import { GetEvenementsEmploiQueryHandler } from './application/queries/get-evenements-emploi.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -353,6 +355,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     RecherchesJeunesController,
     RecherchesConseillersController,
     DiagorienteController,
+    EvenementsEmploiController,
     // Evenements d'engagement
     EvenementsController,
     // Messages
@@ -702,7 +705,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetJeunesIdentitesQueryHandler,
     DeleteConseillerCommandHandler,
     GetFavorisAccueilQueryGetter,
-    GetCVPoleEmploiQueryHandler
+    GetCVPoleEmploiQueryHandler,
+    GetEvenementsEmploiQueryHandler
   ]
 }
 
