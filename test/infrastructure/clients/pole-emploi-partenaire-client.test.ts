@@ -31,7 +31,7 @@ import { DocumentPoleEmploiDto } from '../../../src/infrastructure/clients/dto/p
 describe('PoleEmploiPartenaireClient', () => {
   let poleEmploiPartenaireClient: PoleEmploiPartenaireClient
   const configService = testConfig()
-  const PARTENAIRE_BASE_URL = 'https://api-r.es-qvr.fr/partenaire'
+  const PARTENAIRE_BASE_URL = 'https://api.peio.pe-qvr.fr/partenaire'
   const tokenJeune = 'token'
   let context: StubbedClass<Context>
   const utilisateurJeunePE = unUtilisateurJeune({

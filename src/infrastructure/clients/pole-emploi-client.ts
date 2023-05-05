@@ -18,6 +18,7 @@ import { DateService } from '../../utils/date-service'
 import { buildError } from '../../utils/logger.module'
 import { RateLimiterService } from '../../utils/rate-limiter.service'
 import {
+  EvenementsEmploiDto,
   NotificationDto,
   NotificationsPartenairesDto,
   OffreEmploiDto,
@@ -26,6 +27,7 @@ import {
   TypeRDVPE
 } from '../repositories/dto/pole-emploi.dto'
 import { ListeTypeDemarchesDto, TypeDemarcheDto } from './dto/pole-emploi.dto'
+import { handleAxiosError } from './utils/axios-error-handler'
 
 const CODE_UTILISATEUR = 0
 
@@ -48,6 +50,54 @@ export class PoleEmploiClient {
     this.logger = new Logger('PoleEmploiClient')
     this.inMemoryToken = { token: undefined, tokenDate: undefined }
     this.apiUrl = this.configService.get('poleEmploi').url
+  }
+
+  async getEvenementsEmploi(criteres: {
+    page: number
+    limit: number
+    codePostal: number
+    secteurActivite?: string
+    dateDebut?: string
+    dateFin?: string
+    typeEvenement?: number
+  }): Promise<Result<EvenementsEmploiDto>> {
+    const params = new URLSearchParams()
+    if (criteres.page) {
+      params.append('page', (criteres.page - 1).toString())
+    }
+    if (criteres.limit) {
+      params.append('size', criteres.limit.toString())
+    }
+    const body: {
+      codePostal?: string[]
+      secteurActivite?: string
+      dateDebut?: string
+      dateFin?: string
+      typeEvenement?: string
+    } = {
+      codePostal: criteres.codePostal
+        ? [criteres.codePostal.toString()]
+        : undefined,
+      secteurActivite: criteres.secteurActivite,
+      dateDebut: criteres.dateDebut,
+      dateFin: criteres.dateFin,
+      typeEvenement: criteres.typeEvenement?.toString()
+    }
+
+    try {
+      const response = await this.post<EvenementsEmploiDto | undefined>(
+        'evenements/v1/mee/evenements',
+        body,
+        params
+      )
+      return success(response.data ?? { totalElements: 0, content: [] })
+    } catch (e) {
+      return handleAxiosError(
+        e,
+        this.logger,
+        'La récupération des évènements emploi a échoué'
+      )
+    }
   }
 
   async getOffreEmploi(
@@ -212,7 +262,8 @@ export class PoleEmploiClient {
 
   private async post<T>(
     suffixUrl: string,
-    body?: unknown
+    body?: unknown,
+    params?: URLSearchParams
   ): Promise<AxiosResponse<T>> {
     const token = await this.getToken()
     return firstValueFrom(
@@ -220,7 +271,8 @@ export class PoleEmploiClient {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
-        }
+        },
+        params
       })
     )
   }

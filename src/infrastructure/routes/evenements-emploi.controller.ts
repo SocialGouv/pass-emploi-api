@@ -1,0 +1,54 @@
+import { Controller, Get, Query } from '@nestjs/common'
+import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { isSuccess } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { Utilisateur } from '../decorators/authenticated.decorator'
+import { handleFailure } from './failure.handler'
+import { FindEvenementsEmploiQueryParams } from './validation/evenements-emploi.inputs'
+import {
+  EvenementsEmploiQueryModel,
+  GetEvenementsEmploiQuery,
+  GetEvenementsEmploiQueryHandler
+} from '../../application/queries/get-evenements-emploi.query.handler'
+
+@Controller('evenements-emploi')
+@ApiOAuth2([])
+@ApiTags('Evenements Emploi')
+export class EvenementsEmploiController {
+  constructor(
+    private readonly getEvenementsEmploiQueryHandler: GetEvenementsEmploiQueryHandler
+  ) {}
+
+  @ApiOperation({
+    summary: 'Récupère la liste des evenements emploi',
+    description: 'Ouvert'
+  })
+  @Get()
+  @ApiResponse({
+    type: EvenementsEmploiQueryModel
+  })
+  async getEvenementsEmploi(
+    @Query() findEvenementsEmploiQuery: FindEvenementsEmploiQueryParams,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<EvenementsEmploiQueryModel> {
+    const query: GetEvenementsEmploiQuery = {
+      page: findEvenementsEmploiQuery.page,
+      limit: findEvenementsEmploiQuery.limit,
+      codePostal: findEvenementsEmploiQuery.codePostal,
+      secteurActivite: findEvenementsEmploiQuery.secteurActivite,
+      dateDebut: findEvenementsEmploiQuery.dateDebut,
+      dateFin: findEvenementsEmploiQuery.dateFin,
+      typeEvenement: findEvenementsEmploiQuery.typeEvenement
+    }
+
+    const result = await this.getEvenementsEmploiQueryHandler.execute(
+      query,
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
+  }
+}

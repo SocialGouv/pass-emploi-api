@@ -31,9 +31,6 @@ export const configurationSchema = Joi.object({
     clientSecret: Joi.string().required(),
     scope: Joi.string().required()
   }),
-  poleEmploiPartenaire: Joi.object({
-    url: Joi.string().uri().required()
-  }),
   milo: Joi.object({
     url: Joi.string().uri().required(),
     urlWeb: Joi.string()

@@ -92,15 +92,12 @@ export const testConfig = (): ConfigService => {
       password
     },
     poleEmploi: {
-      url: 'https://api.emploi-store.fr/partenaire',
+      url: 'https://api.peio.pe-qvr.fr/partenaire',
       loginUrl:
         'https://entreprise.pole-emploi.fr/connexion/oauth2/access_token',
       clientId: 'pole-emploi-client-id',
       clientSecret: 'pole-emploi-client-secret',
       scope: 'pole-emploi-scope'
-    },
-    poleEmploiPartenaire: {
-      url: 'https://api-r.es-qvr.fr/partenaire'
     },
     milo: {
       url: 'https://milo.com',

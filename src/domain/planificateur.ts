@@ -133,7 +133,7 @@ export const listeCronJobs: Planificateur.CronJob[] = [
     type: Planificateur.JobType.NETTOYER_LES_DONNEES,
     expression: '0 5 * * *',
     description:
-      "Tous les jours à 5h. Supprime les archives, les logs et les évenements d'engagement hebdo."
+      "Tous les jours à 5h. Supprime les archives, les logs et les évènements d'engagement hebdo."
   },
   {
     type: Planificateur.JobType.MAIL_CONSEILLER_MESSAGES,

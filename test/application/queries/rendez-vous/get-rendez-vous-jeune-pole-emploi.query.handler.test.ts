@@ -70,7 +70,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   })
 
   describe('monitor', () => {
-    it('envoie un évenement de consultation de la liste des rendez vous sans période', async () => {
+    it('envoie un évènement de consultation de la liste des rendez vous sans période', async () => {
       // Given
       const utilisateur = unUtilisateurJeune()
       const query: GetRendezVousJeunePoleEmploiQuery = {
@@ -89,7 +89,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       )
     })
 
-    it('envoie un évenement de consultation de la liste des rendez vous dans le futur', async () => {
+    it('envoie un évènement de consultation de la liste des rendez vous dans le futur', async () => {
       // Given
       const utilisateur = unUtilisateurJeune()
       const query: GetRendezVousJeunePoleEmploiQuery = {
@@ -108,7 +108,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       )
     })
 
-    it("n'envoie pas un évenement de consultation de la liste des rendez vous dans le passé", async () => {
+    it("n'envoie pas un évènement de consultation de la liste des rendez vous dans le passé", async () => {
       // Given
       const utilisateur = unUtilisateurJeune()
       const query: GetRendezVousJeunePoleEmploiQuery = {
