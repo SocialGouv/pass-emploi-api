@@ -117,7 +117,7 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
         criteres: {
           q: 'Petrisseur',
           commune: '59220',
-          alternance: true
+          alternance: 'true'
         }
       }
       // When
@@ -229,7 +229,7 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
           q: 'Petrisseur',
           commune: '59220',
           departement: undefined,
-          alternance: true
+          alternance: 'true'
         }
         const suggestionConseillerCommand = {
           idConseiller,
@@ -295,7 +295,7 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
       const criteres: Recherche.Emploi = {
         q: 'Petrisseur',
         commune: '59220',
-        alternance: true
+        alternance: 'true'
       }
       const command: CreateSuggestionConseillerOffreEmploiCommand = {
         idConseiller: 'un-id-conseiller',

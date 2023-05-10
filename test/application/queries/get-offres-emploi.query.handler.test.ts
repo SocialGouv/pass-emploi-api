@@ -41,7 +41,7 @@ describe('GetOffresEmploiQueryHandler', () => {
           limit: 52,
           q: 'boulanger',
           departement: '75',
-          alternance: true,
+          alternance: 'true',
           experience: [Offre.Emploi.Experience.entreUnEtTroisAns],
           debutantAccepte: false,
           contrat: [Offre.Emploi.Contrat.cdd],
@@ -67,7 +67,7 @@ describe('GetOffresEmploiQueryHandler', () => {
         const getOffresEmploiQuery: GetOffresEmploiQuery = {
           q: 'boulanger',
           departement: '75',
-          alternance: true,
+          alternance: 'true',
           experience: [Offre.Emploi.Experience.entreUnEtTroisAns],
           debutantAccepte: false,
           contrat: [Offre.Emploi.Contrat.cdd],
@@ -96,7 +96,7 @@ describe('GetOffresEmploiQueryHandler', () => {
         const getOffresEmploiQuery: GetOffresEmploiQuery = {
           q: 'boulanger',
           departement: '75',
-          alternance: true,
+          alternance: 'true',
           experience: [Offre.Emploi.Experience.entreUnEtTroisAns],
           contrat: [Offre.Emploi.Contrat.cdd],
           duree: [Offre.Emploi.Duree.tempsPlein]
@@ -121,7 +121,7 @@ describe('GetOffresEmploiQueryHandler', () => {
         const getOffresEmploiQuery: GetOffresEmploiQuery = {
           q: 'boulanger',
           departement: '75',
-          alternance: false,
+          alternance: 'false',
           experience: [Offre.Emploi.Experience.entreUnEtTroisAns],
           contrat: [Offre.Emploi.Contrat.cdd],
           duree: [Offre.Emploi.Duree.tempsPlein]

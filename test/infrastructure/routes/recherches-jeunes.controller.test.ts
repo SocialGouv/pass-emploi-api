@@ -114,7 +114,7 @@ describe('RecherchesController', () => {
           metier: 'Mécanicien',
           criteres: {
             q: 'informatique',
-            alternance: true,
+            alternance: 'true',
             departement: 'Ile-de-France',
             experience: [Offre.Emploi.Experience.moinsdUnAn],
             debutantAccepte: true,
@@ -144,7 +144,7 @@ describe('RecherchesController', () => {
             metier: 'Mécanicien',
             criteres: {
               q: 'informatique',
-              alternance: true,
+              alternance: 'true',
               departement: 'Ile-de-France',
               experience: [Offre.Emploi.Experience.moinsdUnAn],
               debutantAccepte: true,
@@ -272,7 +272,7 @@ describe('RecherchesController', () => {
           type: 'OFFRES_EMPLOI',
           criteres: {
             q: 'informatique',
-            alternance: true,
+            alternance: 'true',
             experience: [Offre.Emploi.Experience.moinsdUnAn],
             debutantAccepte: true,
             contrat: [Offre.Emploi.Contrat.cdi, Offre.Emploi.Contrat.cdd],

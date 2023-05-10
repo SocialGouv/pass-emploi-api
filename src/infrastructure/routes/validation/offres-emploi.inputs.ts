@@ -19,7 +19,7 @@ import { Offre } from '../../../domain/offre/offre'
 interface FindOffresEmploisQuery {
   q?: string
   departement?: string
-  alternance?: boolean
+  alternance?: string
   experience?: Offre.Emploi.Experience[]
   debutantAccepte?: boolean
   contrat?: Offre.Emploi.Contrat[]
@@ -56,11 +56,10 @@ export class FindOffresEmploiQueryParams implements FindOffresEmploisQuery {
   departement?: string
 
   @ApiPropertyOptional()
-  @IsBoolean()
+  @IsString()
   @IsOptional()
-  @IsIn([true, false])
-  @Transform(params => transformStringToBoolean(params, 'alternance'))
-  alternance?: boolean
+  @IsIn(['true', 'false'])
+  alternance?: string
 
   @ApiPropertyOptional({ enum: Offre.Emploi.Experience, isArray: true })
   @IsOptional()
@@ -114,10 +113,10 @@ export class FindOffresEmploiQueryBody implements FindOffresEmploisQuery {
   departement?: string
 
   @ApiPropertyOptional()
-  @IsBoolean()
+  @IsString()
   @IsOptional()
-  @IsIn([true, false])
-  alternance?: boolean
+  @IsIn(['true', 'false'])
+  alternance?: string
 
   @ApiPropertyOptional({ enum: Offre.Emploi.Experience, isArray: true })
   @IsOptional()

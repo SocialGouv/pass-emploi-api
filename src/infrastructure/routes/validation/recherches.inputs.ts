@@ -135,8 +135,8 @@ export class CreateSuggestionOffresEmploiPayload extends CreateSuggestionBase {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsBoolean()
-  alternance?: boolean
+  @IsString()
+  alternance?: string
 }
 
 export class CreateSuggestionImmersionsPayload extends CreateSuggestionBase {

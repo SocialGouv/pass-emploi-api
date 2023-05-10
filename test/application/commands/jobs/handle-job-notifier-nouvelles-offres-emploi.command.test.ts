@@ -149,7 +149,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         const criteres: GetOffresEmploiQuery = {
           q: 'boulanger',
           departement: '75',
-          alternance: false,
+          alternance: 'false',
           experience: [
             Offre.Emploi.Experience.moinsdUnAn,
             Offre.Emploi.Experience.entreUnEtTroisAns,

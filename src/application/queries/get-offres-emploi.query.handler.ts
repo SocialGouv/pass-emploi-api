@@ -13,7 +13,7 @@ export interface GetOffresEmploiQuery extends Query {
   limit?: number
   q?: string
   departement?: string
-  alternance?: boolean
+  alternance?: string
   experience?: Offre.Emploi.Experience[]
   debutantAccepte?: boolean
   contrat?: Offre.Emploi.Contrat[]
@@ -49,7 +49,7 @@ export class GetOffresEmploiQueryHandler extends QueryHandler<
     query: GetOffresEmploiQuery
   ): Promise<void> {
     const evenementType =
-      query.alternance === true
+      query.alternance === 'true'
         ? Evenement.Code.OFFRE_ALTERNANCE_RECHERCHEE
         : Evenement.Code.OFFRE_EMPLOI_RECHERCHEE
     await this.evenementService.creer(evenementType, utilisateur)

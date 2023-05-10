@@ -98,7 +98,7 @@ describe('RecherchesConseillersController', () => {
         localisation: 'paris',
         q: 'Boulanger',
         departement: 'Paris',
-        alternance: true
+        alternance: 'true'
       }
 
       createSuggestionDuConseillerCommandHandler.execute.resolves(
@@ -126,7 +126,7 @@ describe('RecherchesConseillersController', () => {
             q: 'Boulanger',
             departement: 'Paris',
             commune: undefined,
-            alternance: true
+            alternance: 'true'
           }
         },
         unUtilisateurDecode()

@@ -28,7 +28,7 @@ describe('FindAllOffresEmploiQueryGetter', () => {
     const criteres: GetOffresEmploiQuery = {
       page: 1,
       limit: 50,
-      alternance: true,
+      alternance: 'true',
       duree: [Offre.Emploi.Duree.tempsPlein],
       contrat: [Offre.Emploi.Contrat.cdd, Offre.Emploi.Contrat.autre],
       commune: 'Paris',
@@ -78,7 +78,7 @@ describe('FindAllOffresEmploiQueryGetter', () => {
         const criteres: GetOffresEmploiQuery = {
           page: 1,
           limit: 50,
-          alternance: false,
+          alternance: 'false',
           duree: [
             Offre.Emploi.Duree.tempsPlein,
             Offre.Emploi.Duree.tempsPartiel
@@ -93,6 +93,7 @@ describe('FindAllOffresEmploiQueryGetter', () => {
           sort: '1',
           range: '0-49',
           dureeHebdo: '1,2',
+          natureContrat: 'CC,FT,EE,CU,CI,FU,ER,I1,FJ,PS,PR',
           typeContrat: 'CDD,MIS,SAI,DDI',
           commune: '75118'
         })
@@ -111,7 +112,7 @@ describe('FindAllOffresEmploiQueryGetter', () => {
         const criteres: GetOffresEmploiQuery = {
           page: 1,
           limit: 50,
-          alternance: false,
+          alternance: 'false',
           commune: '75118',
           minDateCreation: minDateDeCreation.toISO()
         }
@@ -123,6 +124,7 @@ describe('FindAllOffresEmploiQueryGetter', () => {
         const expectedQueryParams = new URLSearchParams({
           sort: '1',
           range: '0-49',
+          natureContrat: 'CC,FT,EE,CU,CI,FU,ER,I1,FJ,PS,PR',
           commune: '75118',
           minCreationDate: '2020-04-05T10:00:00Z',
           maxCreationDate: '2020-04-06T12:00:00Z'

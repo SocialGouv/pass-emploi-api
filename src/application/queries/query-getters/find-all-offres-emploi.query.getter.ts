@@ -78,8 +78,10 @@ export class FindAllOffresEmploiQueryGetter {
     if (departement) {
       params.append('departement', departement)
     }
-    if (alternance) {
+    if (alternance === 'true') {
       params.append('natureContrat', 'E2,FS')
+    } else if (alternance === 'false') {
+      params.append('natureContrat', 'CC,FT,EE,CU,CI,FU,ER,I1,FJ,PS,PR')
     }
     if (experience) {
       params.append('experience', buildQueryParamFromArray(experience))

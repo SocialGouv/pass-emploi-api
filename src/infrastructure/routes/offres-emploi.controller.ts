@@ -42,7 +42,7 @@ export class OffresEmploiController {
       q: findOffresEmploiQuery.q,
       departement: findOffresEmploiQuery.departement,
       alternance: estBRSA(utilisateur.structure)
-        ? false
+        ? 'false'
         : findOffresEmploiQuery.alternance,
       experience: findOffresEmploiQuery.experience,
       debutantAccepte: findOffresEmploiQuery.debutantAccepte,

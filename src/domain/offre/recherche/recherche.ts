@@ -74,7 +74,7 @@ export namespace Recherche {
   export interface Emploi {
     q?: string
     departement?: string
-    alternance?: boolean
+    alternance?: string
     experience?: Offre.Emploi.Experience[]
     debutantAccepte?: boolean
     contrat?: Offre.Emploi.Contrat[]
