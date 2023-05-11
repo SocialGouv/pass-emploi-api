@@ -77,6 +77,7 @@ describe('GetCVPoleEmploiQueryHandler', () => {
           }
         }
         const unCVQueryModel: CVPoleEmploiQueryModel = {
+          nomFichier: unCVPoleEmploiDto.nomFichier,
           titre: unCVPoleEmploiDto.titre,
           url: unCVPoleEmploiDto.url
         }

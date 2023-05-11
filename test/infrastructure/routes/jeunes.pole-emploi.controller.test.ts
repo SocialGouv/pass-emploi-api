@@ -107,7 +107,7 @@ describe('JeunesPoleEmploiController', () => {
       // Given
       const idJeune = 'un-id-jeune'
       const listeCvQueryModel: CVPoleEmploiQueryModel[] = [
-        { titre: 'un-titre', url: 'un-url' }
+        { nomFichier: 'un-nom-fichier.pdf', titre: 'un-titre', url: 'un-url' }
       ]
       getCVPoleEmploiQueryHandler.execute.resolves(success(listeCvQueryModel))
 
