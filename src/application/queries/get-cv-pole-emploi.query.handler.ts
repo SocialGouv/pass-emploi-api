@@ -90,6 +90,7 @@ function fromCVDtoToCVQueryModel(
   cvDto: DocumentPoleEmploiDto
 ): CVPoleEmploiQueryModel {
   return {
+    nomFichier: cvDto.nomFichier,
     titre: cvDto.titre,
     url: cvDto.url
   }

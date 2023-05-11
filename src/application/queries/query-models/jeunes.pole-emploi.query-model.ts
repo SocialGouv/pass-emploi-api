@@ -48,4 +48,7 @@ export class CVPoleEmploiQueryModel {
 
   @ApiProperty()
   url: string
+
+  @ApiProperty()
+  nomFichier: string
 }
