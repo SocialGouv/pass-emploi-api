@@ -8,12 +8,17 @@ import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { FindAllOffresEmploiQueryGetter } from './query-getters/find-all-offres-emploi.query.getter'
 import { Offre } from '../../domain/offre/offre'
 
+export enum FiltreOffres {
+  ALTERNANCE = 'ALTERNANCE',
+  EMPLOI = 'EMPLOI'
+}
+
 export interface GetOffresEmploiQuery extends Query {
   page?: number
   limit?: number
   q?: string
   departement?: string
-  alternance?: boolean
+  filtreOffres?: FiltreOffres
   experience?: Offre.Emploi.Experience[]
   debutantAccepte?: boolean
   contrat?: Offre.Emploi.Contrat[]
@@ -49,7 +54,7 @@ export class GetOffresEmploiQueryHandler extends QueryHandler<
     query: GetOffresEmploiQuery
   ): Promise<void> {
     const evenementType =
-      query.alternance === true
+      query.filtreOffres === FiltreOffres.ALTERNANCE
         ? Evenement.Code.OFFRE_ALTERNANCE_RECHERCHEE
         : Evenement.Code.OFFRE_EMPLOI_RECHERCHEE
     await this.evenementService.creer(evenementType, utilisateur)
