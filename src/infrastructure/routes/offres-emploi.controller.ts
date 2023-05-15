@@ -5,6 +5,7 @@ import {
   GetDetailOffreEmploiQueryHandler
 } from '../../application/queries/get-detail-offre-emploi.query.handler'
 import {
+  FiltreOffres,
   GetOffresEmploiQuery,
   GetOffresEmploiQueryHandler
 } from '../../application/queries/get-offres-emploi.query.handler'
@@ -41,9 +42,9 @@ export class OffresEmploiController {
       limit: findOffresEmploiQuery.limit,
       q: findOffresEmploiQuery.q,
       departement: findOffresEmploiQuery.departement,
-      alternance: estBRSA(utilisateur.structure)
-        ? 'false'
-        : findOffresEmploiQuery.alternance,
+      filtreOffres: estBRSA(utilisateur.structure)
+        ? FiltreOffres.EMPLOI
+        : filtreOffresEmploi(findOffresEmploiQuery.alternance),
       experience: findOffresEmploiQuery.experience,
       debutantAccepte: findOffresEmploiQuery.debutantAccepte,
       contrat: findOffresEmploiQuery.contrat,
@@ -82,4 +83,12 @@ export class OffresEmploiController {
     }
     throw handleFailure(result)
   }
+}
+
+function filtreOffresEmploi(
+  avecOffresAlternance: string | undefined
+): FiltreOffres | undefined {
+  if (avecOffresAlternance === 'true') return FiltreOffres.ALTERNANCE
+  else if (avecOffresAlternance === 'false') return FiltreOffres.EMPLOI
+  else return undefined
 }

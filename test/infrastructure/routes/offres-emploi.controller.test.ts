@@ -7,6 +7,7 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { expect, StubbedClass } from '../../utils'
 import {
+  FiltreOffres,
   GetOffresEmploiQuery,
   GetOffresEmploiQueryHandler
 } from '../../../src/application/queries/get-offres-emploi.query.handler'
@@ -66,7 +67,7 @@ describe('OffresEmploiController', () => {
           limit: 50,
           q: 'informatique',
           departement: undefined,
-          alternance: 'true',
+          filtreOffres: FiltreOffres.ALTERNANCE,
           experience: [Offre.Emploi.Experience.moinsdUnAn],
           debutantAccepte: true,
           contrat: [Offre.Emploi.Contrat.cdi, Offre.Emploi.Contrat.cdd],
@@ -110,7 +111,7 @@ describe('OffresEmploiController', () => {
           page: '1',
           limit: '50',
           q: 'informatique',
-          alternance: 'true',
+          alternance: 'false',
           experience: [Offre.Emploi.Experience.moinsdUnAn],
           debutantAccepte: 'true',
           contrat: [Offre.Emploi.Contrat.cdi, Offre.Emploi.Contrat.cdd],
@@ -123,7 +124,7 @@ describe('OffresEmploiController', () => {
           limit: 50,
           q: 'informatique',
           departement: undefined,
-          alternance: 'false',
+          filtreOffres: FiltreOffres.EMPLOI,
           experience: [Offre.Emploi.Experience.moinsdUnAn],
           debutantAccepte: true,
           contrat: [Offre.Emploi.Contrat.cdi, Offre.Emploi.Contrat.cdd],
