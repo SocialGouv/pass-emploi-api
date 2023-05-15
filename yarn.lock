@@ -9164,7 +9164,7 @@ __metadata:
     nyc: ^15.1.0
     openid-client: 5.4.2
     pg: 8.10.0
-    pg-connection-string: 2.5.0
+    pg-connection-string: 2.6.0
     pg-copy-streams: ^6.0.5
     pino-http: 8.3.3
     prettier: ^2.8.0
@@ -9982,10 +9982,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg-connection-string@npm:2.5.0, pg-connection-string@npm:^2.5.0":
-  version: 2.5.0
-  resolution: "pg-connection-string@npm:2.5.0"
-  checksum: a6f3a068f7c9416a5b33a326811caf0dfaaee045c225b7c628b4c9b4e9a2b25bdd12a21e4c48940e1000ea223a4e608ca122d2ff3dd08c8b1db0fc9f5705133a
+"pg-connection-string@npm:2.6.0, pg-connection-string@npm:^2.5.0":
+  version: 2.6.0
+  resolution: "pg-connection-string@npm:2.6.0"
+  checksum: 0262452638163c0b875495cfb82e363061cc8d560d3162143b1dfb63f70a666c7c52ba37e78054a3476de9a627faeec75f65445ba6fe065db068317ec84d3df8
   languageName: node
   linkType: hard
 
