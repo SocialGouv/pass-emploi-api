@@ -1,3 +1,39 @@
+export interface EvenementEmploiDto {
+  totalElements: number
+  content: EvenementEmploiDetailDto[]
+}
+
+export interface EvenementEmploiDetailDto {
+  id: number
+  ville: string
+  codePostal: string
+  codeInsee: string
+  longitude: number
+  latitude: number
+  description: string
+  heureDebut: string
+  heureFin: string
+  timezone: string
+  operations?: string[]
+  diplomes?: null
+  objectifs: string[]
+  publics: string[]
+  type: string
+  benefices?: string[]
+  modalites: string[]
+  deroulement?: string
+  nombrePlaceTotalDistance: number
+  nombrePlaceTotalPresentiel: number
+  nombreInscritDistance: number
+  nombreInscritPresentiel: number
+  dateEvenement: string
+  titre: string
+  codesRome: string[]
+  multisectoriel: boolean
+  offresId?: string[]
+  urlDetailEvenement: string
+}
+
 export interface OffreEmploiDto {
   id: string
   intitule: string

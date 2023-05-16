@@ -165,6 +165,7 @@ import { JeunesController } from './infrastructure/routes/jeunes.controller'
 import { JeunesMiloController } from './infrastructure/routes/jeunes.milo.controller'
 import { JeunesControllerV2 } from './infrastructure/routes/v2/jeunes.controller.v2'
 import { ConseillersControllerV2 } from './infrastructure/routes/v2/conseillers.controller.v2'
+import { EvenementsEmploiController } from './infrastructure/routes/evenements-emploi.controller'
 import { OffresEmploiController } from './infrastructure/routes/offres-emploi.controller'
 import { OffresImmersionController } from './infrastructure/routes/offres-immersion.controller'
 import { RecherchesJeunesController } from './infrastructure/routes/recherches-jeunes.controller'
@@ -320,6 +321,7 @@ import { InitialiserLesVuesJobHandler } from './application/jobs/analytics/initi
 import { DeleteConseillerCommandHandler } from './application/commands/conseiller/delete-conseiller.command.handler'
 import { GetFavorisAccueilQueryGetter } from './application/queries/query-getters/accueil/get-favoris.query.getter.db'
 import { GetCVPoleEmploiQueryHandler } from './application/queries/get-cv-pole-emploi.query.handler'
+import { GetEvenementsEmploiQueryHandler } from './application/queries/get-evenements-emploi.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -347,6 +349,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     EtablissementsController,
     EtablissementsControllerV2,
     // Recherche
+    EvenementsEmploiController,
     OffresEmploiController,
     OffresImmersionController,
     ServicesCiviqueController,
@@ -587,6 +590,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetFavorisOffresEmploiJeuneQueryHandler,
     GetFavorisOffresImmersionJeuneQueryHandler,
     GetHomeJeuneHandler,
+    GetEvenementsEmploiQueryHandler,
     GetOffresEmploiQueryHandler,
     GetOffresImmersionQueryHandler,
     GetDetailOffreImmersionQueryHandler,

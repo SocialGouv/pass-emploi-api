@@ -18,6 +18,7 @@ import { DateService } from '../../utils/date-service'
 import { buildError } from '../../utils/logger.module'
 import { RateLimiterService } from '../../utils/rate-limiter.service'
 import {
+  EvenementEmploiDto,
   NotificationDto,
   NotificationsPartenairesDto,
   OffreEmploiDto,
@@ -48,6 +49,26 @@ export class PoleEmploiClient {
     this.logger = new Logger('PoleEmploiClient')
     this.inMemoryToken = { token: undefined, tokenDate: undefined }
     this.apiUrl = this.configService.get('poleEmploi').url
+  }
+
+  async getEvenementsEmploi(
+    body?: unknown,
+    params?: unknown
+  ): Promise<EvenementEmploiDto> {
+    const result = await this.post<EvenementEmploiDto | undefined>(
+      'evenements/v1/mee/evenements',
+      body,
+      params
+    )
+
+    if (!result.data || result.data.totalElements === 0) {
+      return {
+        totalElements: 0,
+        content: []
+      }
+    }
+
+    return result.data
   }
 
   async getOffreEmploi(
@@ -212,7 +233,8 @@ export class PoleEmploiClient {
 
   private async post<T>(
     suffixUrl: string,
-    body?: unknown
+    body?: unknown,
+    params?: unknown
   ): Promise<AxiosResponse<T>> {
     const token = await this.getToken()
     return firstValueFrom(
@@ -220,7 +242,8 @@ export class PoleEmploiClient {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
-        }
+        },
+        params: params ? params : null
       })
     )
   }
