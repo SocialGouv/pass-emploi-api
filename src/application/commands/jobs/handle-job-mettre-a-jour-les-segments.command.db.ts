@@ -26,7 +26,7 @@ enum SEGMENTS {
   JEUNES_MILO = 'JEUNES_MILO',
   JEUNES_POLE_EMPLOI = 'JEUNES_POLE_EMPLOI',
   JEUNES_PASS_EMPLOI = 'JEUNES_PASS_EMPLOI',
-  JEUNES_POLE_EMPLOI_BRSA = 'BENEFICIAIRE_POLE_EMPLOI_BRSA'
+  JEUNES_POLE_EMPLOI_BRSA = 'JEUNES_POLE_EMPLOI_BRSA'
 }
 
 @Injectable()
@@ -142,7 +142,7 @@ export class HandleJobMettreAJourLesSegmentsCommandHandler extends JobHandler<Jo
       },
       {
         segment_label: SEGMENTS.JEUNES_POLE_EMPLOI_BRSA,
-        display_name: 'Bénéficiaire POLE EMPLOI BRSA'
+        display_name: 'Jeunes POLE EMPLOI BRSA'
       }
     ]
     metadatas.forEach(metadata => {
@@ -178,25 +178,18 @@ export class HandleJobMettreAJourLesSegmentsCommandHandler extends JobHandler<Jo
   }
 
   private buildSegmentJeune(structure: Core.Structure): SEGMENTS {
-    let segment: SEGMENTS
     switch (structure) {
       case Core.Structure.POLE_EMPLOI:
-        segment = SEGMENTS.JEUNES_POLE_EMPLOI
-        break
+        return SEGMENTS.JEUNES_POLE_EMPLOI
       case Core.Structure.MILO:
-        segment = SEGMENTS.JEUNES_MILO
-        break
+        return SEGMENTS.JEUNES_MILO
       case Core.Structure.PASS_EMPLOI:
-        segment = SEGMENTS.JEUNES_PASS_EMPLOI
-        break
+        return SEGMENTS.JEUNES_PASS_EMPLOI
       case Core.Structure.POLE_EMPLOI_BRSA:
-        segment = SEGMENTS.JEUNES_POLE_EMPLOI_BRSA
-        break
+        return SEGMENTS.JEUNES_POLE_EMPLOI_BRSA
+      default:
+        throw new Error(`Unknown structure ${structure}`)
     }
-    if (segment) {
-      return segment
-    }
-    throw new Error(`Unknown structure ${structure}`)
   }
 
   async handleSegmentCampagneNonRepondue(
