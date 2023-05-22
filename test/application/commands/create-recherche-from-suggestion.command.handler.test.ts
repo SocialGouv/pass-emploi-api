@@ -9,6 +9,7 @@ import {
   CreateRechercheFromSuggestionCommandHandler
 } from '../../../src/application/commands/create-recherche-from-suggestion.command.handler'
 import { success } from '../../../src/building-blocks/types/result'
+import { EvenementService } from '../../../src/domain/evenement'
 import { Recherche } from '../../../src/domain/offre/recherche/recherche'
 import { Suggestion } from '../../../src/domain/offre/recherche/suggestion/suggestion'
 import { DateService } from '../../../src/utils/date-service'
@@ -17,8 +18,7 @@ import {
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
 import { uneSuggestion } from '../../fixtures/suggestion.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { EvenementService } from '../../../src/domain/evenement'
+import { StubbedClass, createSandbox, expect, stubClass } from '../../utils'
 
 describe('CreateRechercheFromSuggestionCommandHandler', () => {
   let createRechercheFromSuggestionCommandHandler: CreateRechercheFromSuggestionCommandHandler
@@ -102,6 +102,63 @@ describe('CreateRechercheFromSuggestionCommandHandler', () => {
           metier: suggestionAcceptee.informations.metier,
           localisation: suggestionAcceptee.informations.localisation,
           criteres: suggestionAcceptee.criteres,
+          idJeune: command.idJeune,
+          dateCreation: dateCreationRecherche,
+          dateDerniereRecherche: dateCreationRecherche
+        })
+
+        suggestionRepository.get.resolves(suggestion)
+        suggestionFactory.accepter.returns(success(suggestionAcceptee))
+        rechercheFactory.buildRechercheFromSuggestion.returns(recherche)
+
+        // When
+        const result = await createRechercheFromSuggestionCommandHandler.handle(
+          command
+        )
+
+        // Then
+        expect(
+          rechercheFactory.buildRechercheFromSuggestion
+        ).to.have.been.calledWithExactly(suggestionAcceptee)
+        expect(rechercheRepository.save).to.have.been.calledWithExactly(
+          recherche
+        )
+        expect(suggestionRepository.save).to.have.been.calledWithExactly(
+          suggestionAcceptee
+        )
+        expect(result).to.deep.equal(success(recherche))
+      })
+
+      it('avec des critères, crée une recherche à partir de la suggestion', async () => {
+        // Given
+        const criteres = {
+          metier: 'metier',
+          localisation: 'localisation',
+          distance: 10
+        }
+
+        const command = {
+          idJeune: 'id-jeune',
+          idSuggestion: 'id-suggestion',
+          criteres: criteres
+        }
+
+        const suggestion = uneSuggestion({
+          id: command.idSuggestion,
+          idJeune: command.idJeune
+        })
+        const suggestionAcceptee = {
+          ...suggestion,
+          dateCreationRecherche: dateCreationRecherche,
+          idRecherche
+        }
+        const recherche = uneRecherche({
+          id: idRecherche,
+          type: suggestionAcceptee.type,
+          titre: suggestionAcceptee.informations.titre,
+          metier: suggestionAcceptee.informations.metier,
+          localisation: suggestionAcceptee.informations.localisation,
+          criteres: criteres,
           idJeune: command.idJeune,
           dateCreation: dateCreationRecherche,
           dateDerniereRecherche: dateCreationRecherche

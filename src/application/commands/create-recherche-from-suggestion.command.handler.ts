@@ -23,6 +23,7 @@ import { SuggestionAuthorizer } from '../authorizers/suggestion-authorizer'
 export interface CreateRechercheFromSuggestionCommand extends Command {
   idJeune: string
   idSuggestion: string
+  criteres?: Recherche.Immersion | Recherche.Emploi | Recherche.ServiceCivique
 }
 
 @Injectable()
@@ -58,7 +59,8 @@ export class CreateRechercheFromSuggestionCommandHandler extends CommandHandler<
     }
 
     const recherche = this.rechercheFactory.buildRechercheFromSuggestion(
-      suggestionAccepteeResult.data
+      suggestionAccepteeResult.data,
+      command.criteres
     )
 
     await this.rechercheRepository.save(recherche)

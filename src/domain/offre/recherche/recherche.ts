@@ -103,14 +103,17 @@ export namespace Recherche {
 
   @Injectable()
   export class Factory {
-    buildRechercheFromSuggestion(suggestion: Suggestion.Acceptee): Recherche {
+    buildRechercheFromSuggestion(
+      suggestion: Suggestion.Acceptee,
+      critere?: Immersion | Emploi | ServiceCivique
+    ): Recherche {
       return {
         id: suggestion.idRecherche,
         type: suggestion.type,
         titre: suggestion.informations.titre,
         metier: suggestion.informations.metier,
         localisation: suggestion.informations.localisation,
-        criteres: suggestion.criteres,
+        criteres: critere ?? suggestion.criteres,
         idJeune: suggestion.idJeune,
         dateCreation: suggestion.dateCreationRecherche,
         dateDerniereRecherche: suggestion.dateCreationRecherche,
