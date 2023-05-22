@@ -119,7 +119,7 @@ describe('CreateRechercheFromSuggestionCommandHandler', () => {
         // Then
         expect(
           rechercheFactory.buildRechercheFromSuggestion
-        ).to.have.been.calledWithExactly(suggestionAcceptee)
+        ).to.have.been.calledWithExactly(suggestionAcceptee, undefined)
         expect(rechercheRepository.save).to.have.been.calledWithExactly(
           recherche
         )
@@ -132,9 +132,10 @@ describe('CreateRechercheFromSuggestionCommandHandler', () => {
       it('avec des critères, crée une recherche à partir de la suggestion', async () => {
         // Given
         const criteres = {
-          metier: 'metier',
-          localisation: 'localisation',
-          distance: 10
+          q: 'Boulanger',
+          commune: '78530',
+          departement: undefined,
+          rayon: 10
         }
 
         const command = {
@@ -176,7 +177,7 @@ describe('CreateRechercheFromSuggestionCommandHandler', () => {
         // Then
         expect(
           rechercheFactory.buildRechercheFromSuggestion
-        ).to.have.been.calledWithExactly(suggestionAcceptee)
+        ).to.have.been.calledWithExactly(suggestionAcceptee, criteres)
         expect(rechercheRepository.save).to.have.been.calledWithExactly(
           recherche
         )
