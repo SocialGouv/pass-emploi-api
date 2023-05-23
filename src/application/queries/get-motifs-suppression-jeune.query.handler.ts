@@ -21,8 +21,16 @@ export class GetMotifsSuppressionJeuneQueryHandler extends QueryHandler<
   async handle(
     _query: Query
   ): Promise<Result<MotifSuppressionJeuneQueryModel[]>> {
+    // TODO : faire le filter en fonction de la structure pour ne remonter que les motifs qui vont bien au conseiller
+    console.log('---------------------nouveaux----------------------------')
+    Object.values(ArchiveJeune.MotifsSuppression).map(motif => {
+      console.log(ArchiveJeune.motifsDeSuppression[motif].motif)
+    })
+
+    console.log('---------------------anciens----------------------------')
     return success(
       Object.values(ArchiveJeune.MotifSuppression).map(motif => {
+        console.log(motif)
         return {
           motif,
           description: ArchiveJeune.mapMotifSuppressionDescription[motif]
