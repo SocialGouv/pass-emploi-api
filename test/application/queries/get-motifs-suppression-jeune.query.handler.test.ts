@@ -2,7 +2,10 @@ import { expect } from 'chai'
 import { SinonSandbox } from 'sinon'
 import { GetMotifsSuppressionJeuneQueryHandler } from '../../../src/application/queries/get-motifs-suppression-jeune.query.handler'
 import { success } from '../../../src/building-blocks/types/result'
-import { unUtilisateurQueryModel } from '../../fixtures/query-models/authentification.query-model.fixtures'
+import {
+  unUtilisateurBRSAQueryModel,
+  unUtilisateurQueryModel
+} from '../../fixtures/query-models/authentification.query-model.fixtures'
 import { createSandbox } from '../../utils'
 
 describe('GetMotifsSuppressionJeuneQueryHandler', () => {
@@ -20,7 +23,7 @@ describe('GetMotifsSuppressionJeuneQueryHandler', () => {
   })
 
   describe('handle', () => {
-    it('renvoie la liste des motifs', async () => {
+    it('renvoie la liste des motifs pour un conseiller CEJ', async () => {
       // Given - When
       const result = await getMotifsSuppressionJeuneQueryHandler.handle(
         unUtilisateurQueryModel()
@@ -51,6 +54,46 @@ describe('GetMotifsSuppressionJeuneQueryHandler', () => {
           },
           { motif: 'Déménagement', description: undefined },
           { motif: 'Changement de conseiller', description: undefined },
+          { motif: 'Autre', description: 'Champ libre' }
+        ])
+      )
+    })
+
+    it('renvoie la liste des motifs pour un conseiller BRSA', async () => {
+      // Given - When
+      const result = await getMotifsSuppressionJeuneQueryHandler.handle(
+        unUtilisateurBRSAQueryModel()
+      )
+
+      // Then
+      expect(result).to.deep.equal(
+        success([
+          {
+            motif: 'Emploi durable (plus de 6 mois)',
+            description:
+              'CDI, CDD de plus de 6 mois dont alternance, titularisation dans la fonction publique'
+          },
+          {
+            motif: 'Cessation d’inscription',
+            description: undefined
+          },
+          {
+            motif: 'Changement d’accompagnement (autre modalité ou dispositif)',
+            description: undefined
+          },
+          {
+            motif: 'Sortie du dispositif à l’origine du conseiller',
+            description: undefined
+          },
+          {
+            motif: 'Sortie du dispositif à l’origine du bénéficiaire',
+            description: undefined
+          },
+          { motif: 'Déménagement', description: undefined },
+          {
+            motif: 'Déménagement dans un territoire hors expérimentation',
+            description: undefined
+          },
           { motif: 'Autre', description: 'Champ libre' }
         ])
       )

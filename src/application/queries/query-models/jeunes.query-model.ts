@@ -212,7 +212,7 @@ export class PreferencesJeuneQueryModel {
 
 export class MotifSuppressionJeuneQueryModel {
   @ApiProperty()
-  motif: ArchiveJeune.MotifSuppression
+  motif: string
   @ApiProperty({ required: false })
   description?: string
 }

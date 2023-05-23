@@ -2,22 +2,27 @@ import { UtilisateurQueryModel } from '../../../src/application/queries/query-mo
 import { Authentification } from '../../../src/domain/authentification'
 import { Core } from '../../../src/domain/core'
 
-export const unUtilisateurQueryModel = (): UtilisateurQueryModel => ({
-  id: '1',
-  nom: 'Tavernier',
-  prenom: 'Nils',
-  type: Authentification.Type.CONSEILLER,
-  email: 'nils.tavernier@passemploi.com',
-  structure: Core.Structure.MILO,
-  roles: []
-})
+export function unUtilisateurQueryModel(
+  overrides: Partial<UtilisateurQueryModel> = {}
+): UtilisateurQueryModel {
+  const defaults: UtilisateurQueryModel = {
+    id: '1',
+    nom: 'Tavernier',
+    prenom: 'Nils',
+    type: Authentification.Type.CONSEILLER,
+    email: 'nils.tavernier@passemploi.com',
+    structure: Core.Structure.MILO,
+    roles: []
+  }
+  return { ...defaults, ...overrides }
+}
 
-export const unUtilisateurSansEmailQueryModel = (): UtilisateurQueryModel => ({
-  id: '1',
-  nom: 'Tavernier',
-  prenom: 'Nils',
-  type: Authentification.Type.CONSEILLER,
-  email: undefined,
-  structure: Core.Structure.MILO,
-  roles: []
-})
+export const unUtilisateurSansEmailQueryModel = (): UtilisateurQueryModel =>
+  unUtilisateurQueryModel({
+    email: undefined
+  })
+
+export const unUtilisateurBRSAQueryModel = (): UtilisateurQueryModel =>
+  unUtilisateurQueryModel({
+    structure: Core.Structure.POLE_EMPLOI_BRSA
+  })
