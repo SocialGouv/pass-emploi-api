@@ -42,6 +42,8 @@ import {
   getDatabase
 } from '../../utils/database-for-testing'
 import { DateService } from '../../../src/utils/date-service'
+import { failure } from '../../../src/building-blocks/types/result'
+import { MauvaiseCommandeError } from '../../../src/building-blocks/types/domain-error'
 
 describe('ArchiveJeuneSqlRepository', () => {
   let database: DatabaseForTesting
@@ -167,6 +169,28 @@ describe('ArchiveJeuneSqlRepository', () => {
       archiveJeuneSql = await ArchiveJeuneSqlModel.findOne({
         where: { idJeune: jeuneDto.id }
       })
+    })
+
+    it("failure quand le jeune n'existe plus", async () => {
+      // Given
+      metadonnees = {
+        idJeune: 'introuvable',
+        motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE,
+        commentaire: 'Il a loupé un rdv',
+        nomJeune: jeuneDto.nom,
+        prenomJeune: jeuneDto.prenom,
+        structure: jeuneDto.structure,
+        email: jeuneDto.email!,
+        dateArchivage: new Date('2022-07-05T09:23:00Z')
+      }
+
+      // When
+      const result = await archiveJeuneSqlRepository.archiver(metadonnees)
+
+      // Then
+      expect(result).to.deep.equal(
+        failure(new MauvaiseCommandeError('Jeune déjà supprimé'))
+      )
     })
 
     it('crée une archive avec les métadonnées', () => {

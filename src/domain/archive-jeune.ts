@@ -2,6 +2,7 @@ import { CodeTypeRendezVous } from './rendez-vous/rendez-vous'
 import { Recherche } from './offre/recherche/recherche'
 import { Offre } from './offre/offre'
 import { Core } from './core'
+import { Result } from '../building-blocks/types/result'
 
 export const ArchiveJeuneRepositoryToken = 'ArchiveJeune.Repository'
 
@@ -104,7 +105,7 @@ export namespace ArchiveJeune {
   }
 
   export interface Repository {
-    archiver(metadonnes: ArchiveJeune.Metadonnees): Promise<void>
+    archiver(metadonnes: ArchiveJeune.Metadonnees): Promise<Result>
     getIdsArchivesBefore(date: Date): Promise<number[]>
     delete(idArchive: number): Promise<void>
   }

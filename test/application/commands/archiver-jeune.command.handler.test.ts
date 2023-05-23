@@ -17,6 +17,7 @@ import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { StubbedClass, expect, stubClass } from '../../utils'
 import Structure = Core.Structure
+import { emptySuccess } from '../../../src/building-blocks/types/result'
 
 describe('ArchiverJeuneCommandHandler', () => {
   let archiverJeuneCommandHandler: ArchiverJeuneCommandHandler
@@ -82,6 +83,7 @@ describe('ArchiverJeuneCommandHandler', () => {
 
       beforeEach(async () => {
         // Given
+        archivageJeuneRepository.archiver.resolves(emptySuccess())
         jeuneRepository.get.withArgs('idJeune').resolves(jeune)
 
         // When

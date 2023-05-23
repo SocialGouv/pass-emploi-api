@@ -3,7 +3,8 @@ import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
   Result,
   emptySuccess,
-  failure
+  failure,
+  isFailure
 } from '../../building-blocks/types/result'
 import {
   ArchiveJeune,
@@ -79,7 +80,12 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
       commentaire: command.commentaire,
       dateArchivage: this.dateService.nowJs()
     }
-    await this.archiveJeuneRepository.archiver(metadonneesArchive)
+    const resultArchiver = await this.archiveJeuneRepository.archiver(
+      metadonneesArchive
+    )
+    if (isFailure(resultArchiver)) {
+      return resultArchiver
+    }
 
     await this.authentificationRepository.deleteUtilisateurIdp(command.idJeune)
     await this.jeuneRepository.supprimer(command.idJeune)

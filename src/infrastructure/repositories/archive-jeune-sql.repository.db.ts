@@ -1,5 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { Op } from 'sequelize'
+import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
+import {
+  Result,
+  emptySuccess,
+  failure,
+  isFailure,
+  success
+} from '../../building-blocks/types/result'
 import { Action } from '../../domain/action/action'
 import { ArchiveJeune } from '../../domain/archive-jeune'
 import { FirebaseClient } from '../clients/firebase-client'
@@ -23,8 +31,11 @@ import { fromSqlToOffreServiceCivique } from './mappers/service-civique.mapper'
 export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
   constructor(private firebaseClient: FirebaseClient) {}
 
-  async archiver(metadonnees: ArchiveJeune.Metadonnees): Promise<void> {
-    const archive = await this.construire(metadonnees)
+  async archiver(metadonnees: ArchiveJeune.Metadonnees): Promise<Result> {
+    const archiveResult = await this.construire(metadonnees)
+    if (isFailure(archiveResult)) {
+      return archiveResult
+    }
 
     await ArchiveJeuneSqlModel.create({
       idJeune: metadonnees.idJeune,
@@ -35,8 +46,9 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
       motif: metadonnees.motif,
       commentaire: metadonnees.commentaire ?? null,
       dateArchivage: metadonnees.dateArchivage,
-      donnees: archive
+      donnees: archiveResult.data
     })
+    return emptySuccess()
   }
 
   async delete(idArchive: number): Promise<void> {
@@ -62,7 +74,7 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
 
   private async construire(
     metadonnes: ArchiveJeune.Metadonnees
-  ): Promise<ArchiveJeune | undefined> {
+  ): Promise<Result<ArchiveJeune>> {
     const idJeune = metadonnes.idJeune
 
     const messages = await this.firebaseClient.getChat(idJeune)
@@ -86,7 +98,7 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
     })
 
     if (!jeuneSqlModel) {
-      return undefined
+      return failure(new MauvaiseCommandeError('Jeune déjà supprimé'))
     }
 
     const rdv = await RendezVousSqlModel.findAll({
@@ -124,16 +136,18 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
       where: { idJeune }
     })
 
-    return this.mapToArchiveJeune(
-      jeuneSqlModel,
-      metadonnes,
-      rdv,
-      actions,
-      favorisOffreEmploi,
-      favorisOffreImmersion,
-      favorisOffreEngagement,
-      recherches,
-      messages
+    return success(
+      this.mapToArchiveJeune(
+        jeuneSqlModel,
+        metadonnes,
+        rdv,
+        actions,
+        favorisOffreEmploi,
+        favorisOffreImmersion,
+        favorisOffreEngagement,
+        recherches,
+        messages
+      )
     )
   }
 
