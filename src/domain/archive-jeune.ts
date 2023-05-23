@@ -2,6 +2,7 @@ import { CodeTypeRendezVous } from './rendez-vous/rendez-vous'
 import { Recherche } from './offre/recherche/recherche'
 import { Offre } from './offre/offre'
 import { Core } from './core'
+import Structure = Core.Structure
 import { Result } from '../building-blocks/types/result'
 
 export const ArchiveJeuneRepositoryToken = 'ArchiveJeune.Repository'
@@ -55,6 +56,123 @@ export namespace ArchiveJeune {
     'Limite d’âge atteinte':
       "Motif valable uniquement à partir de la fin du premier mois des 26 ans. A noter : dans le cas oû le jeune est considéré en tant que travailleur handicapé, l'âge passe à 30 ans.",
     Autre: 'Champ libre'
+  }
+
+  export enum MotifsSuppression {
+    EMPLOI_DURABLE = 'EMPLOI_DURABLE',
+    EMPLOI_COURT = 'EMPLOI_COURT',
+    CONTRAT_ARRIVE_A_ECHEANCE = 'CONTRAT_ARRIVE_A_ECHEANCE',
+    LIMITE_AGE = 'LIMITE_AGE',
+    DEMANDE_DU_JEUNE = 'DEMANDE_DU_JEUNE',
+    NON_RESPECT_OU_ABANDON = 'NON_RESPECT_OU_ABANDON',
+    DEMENAGEMENT = 'DEMENAGEMENT',
+    CHANGEMENT_CONSEILLER = 'CHANGEMENT_CONSEILLER',
+    AUTRE = 'AUTRE',
+
+    // todo : déja présent dans les anciens motifs de suppression
+    // Reprise d’emploi durable (+ de 6 mois)
+    // Déménagement
+    // Autre
+
+    // todo : nouveaux
+    // Cessation d’inscription
+    // Changement d’accompagnement (autre modalité ou dispositif)
+    // Déménagement dans un territoire hors expérimentation
+
+    DEMANDE_DU_BENEFICIAIRE_BRSA = 'DEMANDE_DU_BENEFICIAIRE_BRSA',
+    DEMANDE_DU_CONSEILLER = 'DEMANDE_DU_CONSEILLER',
+    CESSATION_INSCRIPTION = 'CESSATION_INSCRIPTION',
+    CHANGEMENT_ACCOMPAGNEMENT = 'CHANGEMENT_ACCOMPAGNEMENT',
+    DEMENAGEMENT_TERRITOIRE_HORS_EXPERIMENTATION = 'DEMENAGEMENT_TERRITOIRE_HORS_EXPERIMENTATION'
+  }
+
+  export const motifsDeSuppression: {
+    [key in ArchiveJeune.MotifsSuppression]: {
+      motif: string
+      structures: Core.Structure[]
+      description?: string
+    }
+  } = {
+    [MotifsSuppression.EMPLOI_DURABLE]: {
+      motif: 'Emploi durable (plus de 6 mois)',
+      structures: [
+        Structure.PASS_EMPLOI,
+        Structure.POLE_EMPLOI,
+        Structure.MILO,
+        Structure.POLE_EMPLOI_BRSA
+      ],
+      description:
+        'CDI, CDD de plus de 6 mois dont alternance, titularisation dans la fonction publique'
+    },
+    [MotifsSuppression.EMPLOI_COURT]: {
+      motif: 'Emploi court (moins de 6 mois)',
+      structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI, Structure.MILO]
+    },
+    [MotifsSuppression.CONTRAT_ARRIVE_A_ECHEANCE]: {
+      motif: 'Contrat arrivé à échéance',
+      structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI, Structure.MILO]
+    },
+    [MotifsSuppression.CESSATION_INSCRIPTION]: {
+      motif: 'Cessation d’inscription',
+      structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI_BRSA]
+    },
+    [MotifsSuppression.LIMITE_AGE]: {
+      motif: 'Limite d’âge atteinte',
+      structures: [
+        Structure.PASS_EMPLOI,
+        Structure.POLE_EMPLOI,
+        Structure.MILO
+      ],
+      description:
+        "Motif valable uniquement à partir de la fin du premier mois des 26 ans. A noter : dans le cas oû le jeune est considéré en tant que travailleur handicapé, l'âge passe à 30 ans."
+    },
+    [MotifsSuppression.CHANGEMENT_ACCOMPAGNEMENT]: {
+      motif: 'Changement d’accompagnement (autre modalité ou dispositif)',
+      structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI_BRSA]
+    },
+    [MotifsSuppression.DEMANDE_DU_JEUNE]: {
+      motif: 'Demande du jeune de sortir du dispositif',
+      structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI, Structure.MILO]
+    },
+    [MotifsSuppression.DEMANDE_DU_CONSEILLER]: {
+      motif: 'Sortie du dispositif à l’origine du conseiller',
+      structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI_BRSA]
+    },
+    [MotifsSuppression.DEMANDE_DU_BENEFICIAIRE_BRSA]: {
+      motif: 'Sortie du dispositif à l’origine du bénéficiaire',
+      structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI_BRSA]
+    },
+    [MotifsSuppression.NON_RESPECT_OU_ABANDON]: {
+      motif: 'Non respect des engagements ou abandon',
+      structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI, Structure.MILO]
+    },
+    [MotifsSuppression.DEMENAGEMENT]: {
+      motif: 'Déménagement',
+      structures: [
+        Structure.PASS_EMPLOI,
+        Structure.POLE_EMPLOI,
+        Structure.MILO,
+        Structure.POLE_EMPLOI_BRSA
+      ]
+    },
+    [MotifsSuppression.DEMENAGEMENT_TERRITOIRE_HORS_EXPERIMENTATION]: {
+      motif: 'Déménagement dans un territoire hors expérimentation',
+      structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI_BRSA]
+    },
+    [MotifsSuppression.CHANGEMENT_CONSEILLER]: {
+      motif: 'Changement de conseiller',
+      structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI, Structure.MILO]
+    },
+    [MotifsSuppression.AUTRE]: {
+      motif: 'Autre',
+      structures: [
+        Structure.PASS_EMPLOI,
+        Structure.POLE_EMPLOI,
+        Structure.MILO,
+        Structure.POLE_EMPLOI_BRSA
+      ],
+      description: 'Champ libre'
+    }
   }
 
   export interface Metadonnees {
