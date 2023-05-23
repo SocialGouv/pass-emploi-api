@@ -8,7 +8,12 @@ import {
 import { Injectable } from '@nestjs/common'
 import { ArchiveJeune } from '../../domain/archive-jeune'
 import { MotifSuppressionJeuneQueryModel } from './query-models/jeunes.query-model'
+import { Core } from '../../domain/core'
+import Structure = Core.Structure
 
+export interface GetMotifsSuppressionQuery extends Query {
+  structure: Structure
+}
 @Injectable()
 export class GetMotifsSuppressionJeuneQueryHandler extends QueryHandler<
   Query,
@@ -19,21 +24,24 @@ export class GetMotifsSuppressionJeuneQueryHandler extends QueryHandler<
   }
 
   async handle(
-    _query: Query
+    query: GetMotifsSuppressionQuery
   ): Promise<Result<MotifSuppressionJeuneQueryModel[]>> {
-    // TODO : faire le filter en fonction de la structure pour ne remonter que les motifs qui vont bien au conseiller
-    console.log('---------------------nouveaux----------------------------')
-    Object.values(ArchiveJeune.MotifsSuppression).map(motif => {
-      console.log(ArchiveJeune.motifsDeSuppression[motif].motif)
+    const structureConseiller = query.structure
+
+    const motifsDeSuppression: string[] = Object.values(
+      ArchiveJeune.MotifsSuppression
+    ).filter(unMotif => {
+      const { structures } = ArchiveJeune.motifsDeSuppression[unMotif]
+      return structures.includes(structureConseiller)
     })
 
-    console.log('---------------------anciens----------------------------')
     return success(
-      Object.values(ArchiveJeune.MotifSuppression).map(motif => {
-        console.log(motif)
+      motifsDeSuppression.map((unMotif: ArchiveJeune.MotifsSuppression) => {
+        const { motif, description } = ArchiveJeune.motifsDeSuppression[unMotif]
+
         return {
           motif,
-          description: ArchiveJeune.mapMotifSuppressionDescription[motif]
+          description
         }
       })
     )
