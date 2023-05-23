@@ -37,27 +37,33 @@ export class SuggestionPeHttpRepository
     const suggestions: Suggestion.PoleEmploi[] = []
 
     for (const suggestionDto of suggestionsDtoResult.data) {
-      if (laSuggestionAUneCommune(suggestionDto)) {
-        const suggestion = toSuggestionPoleEmploi(suggestionDto)
+      if (laSuggestionAUneLocalisation(suggestionDto))
+        if (laSuggestionAUneCommune(suggestionDto)) {
+          const suggestion = toSuggestionPoleEmploi(suggestionDto)
 
-        const codeCommune = suggestionDto.mobilites![0].lieu.code
-        const commune = await CommuneSqlModel.findOne({
-          where: {
-            code: codeCommune
-          }
-        })
-        suggestion.localisation.lat = Number(commune?.latitude)
-        suggestion.localisation.lon = Number(commune?.longitude)
-        suggestions.push(suggestion)
-      } else if (laSuggestionAUnDepartement(suggestionDto)) {
-        suggestions.push(toSuggestionPoleEmploi(suggestionDto))
-      }
+          const codeCommune = suggestionDto.mobilites![0].lieu.code
+          const commune = await CommuneSqlModel.findOne({
+            where: {
+              code: codeCommune
+            }
+          })
+          suggestion.localisation.lat = Number(commune?.latitude)
+          suggestion.localisation.lon = Number(commune?.longitude)
+          suggestions.push(suggestion)
+        } else if (laSuggestionAUnDepartement(suggestionDto)) {
+          suggestions.push(toSuggestionPoleEmploi(suggestionDto))
+        }
     }
 
     return success(suggestions)
   }
 }
 
+function laSuggestionAUneLocalisation(suggestion: SuggestionDto): boolean {
+  return Boolean(
+    suggestion.mobilites?.length && suggestion.mobilites[0]?.lieu?.libelle
+  )
+}
 function laSuggestionAUneCommune(suggestion: SuggestionDto): boolean {
   return Boolean(
     suggestion.mobilites?.length &&
