@@ -8,7 +8,12 @@ import {
 import { Injectable } from '@nestjs/common'
 import { ArchiveJeune } from '../../domain/archive-jeune'
 import { MotifSuppressionJeuneQueryModel } from './query-models/jeunes.query-model'
+import { Core } from '../../domain/core'
+import Structure = Core.Structure
 
+export interface GetMotifsSuppressionQuery extends Query {
+  structure: Structure
+}
 @Injectable()
 export class GetMotifsSuppressionJeuneQueryHandler extends QueryHandler<
   Query,
@@ -19,15 +24,15 @@ export class GetMotifsSuppressionJeuneQueryHandler extends QueryHandler<
   }
 
   async handle(
-    _query: Query
+    query: GetMotifsSuppressionQuery
   ): Promise<Result<MotifSuppressionJeuneQueryModel[]>> {
     return success(
-      Object.values(ArchiveJeune.MotifSuppression).map(motif => {
-        return {
-          motif,
-          description: ArchiveJeune.mapMotifSuppressionDescription[motif]
-        }
-      })
+      Object.values(ArchiveJeune.motifsSuppression)
+        .filter(motif => motif.structures.includes(query.structure))
+        .map(motif => ({
+          motif: motif.motif,
+          description: motif.description
+        }))
     )
   }
 

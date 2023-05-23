@@ -1,6 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { JeuneMilo } from '../../../domain/jeune/jeune.milo'
-import { ArchiveJeune } from '../../../domain/archive-jeune'
 import { Jeune } from '../../../domain/jeune/jeune'
 
 class SituationQueryModel {
@@ -212,7 +211,7 @@ export class PreferencesJeuneQueryModel {
 
 export class MotifSuppressionJeuneQueryModel {
   @ApiProperty()
-  motif: ArchiveJeune.MotifSuppression
+  motif: string
   @ApiProperty({ required: false })
   description?: string
 }

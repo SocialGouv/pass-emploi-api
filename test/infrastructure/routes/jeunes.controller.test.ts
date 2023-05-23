@@ -693,7 +693,9 @@ describe('JeunesController', () => {
       await request(app.getHttpServer())
         .post(`/jeunes/id-jeune/archiver`)
         .set('authorization', unHeaderAuthorization())
-        .send({ motif: ArchiveJeune.MotifSuppression.AUTRE })
+        .send({
+          motif: ArchiveJeune.MotifSuppression.AUTRE
+        })
         //Then
         .expect(HttpStatus.BAD_REQUEST)
     })

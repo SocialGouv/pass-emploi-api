@@ -263,7 +263,6 @@ import { GetMetiersRomeQueryHandler } from './application/queries/get-metiers-ro
 import { CreateSuggestionConseillerOffreEmploiCommandHandler } from './application/commands/create-suggestion-conseiller-offre-emploi.command.handler'
 import { CreateSuggestionConseillerServiceCiviqueCommandHandler } from './application/commands/create-suggestion-conseiller-service-civique.command.handler'
 import { CreateSuggestionConseillerImmersionCommandHandler } from './application/commands/create-suggestion-conseiller-immersion.command.handler'
-import { ReferentielsControllerV2 } from './infrastructure/routes/v2/referentiels.controller.v2'
 import { EtablissementsController } from './infrastructure/routes/etablissements.controller'
 import { EtablissementsControllerV2 } from './infrastructure/routes/v2/etablissements.controller.v2'
 import { ConseillerInterAgenceAuthorizer } from './application/authorizers/conseiller-inter-agence-authorizer'
@@ -362,7 +361,6 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     FilesController,
     // Referentiels
     ReferentielsController,
-    ReferentielsControllerV2,
     // Campagnes
     CampagnesController,
     // Autre
