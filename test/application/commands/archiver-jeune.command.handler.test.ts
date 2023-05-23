@@ -60,7 +60,10 @@ describe('ArchiverJeuneCommandHandler', () => {
       // Given
       const command: ArchiverJeuneCommand = {
         idJeune: 'idJeune',
-        motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE
+        motif:
+          ArchiveJeune.motifsDeSuppression[
+            ArchiveJeune.MotifsSuppression.CONTRAT_ARRIVE_A_ECHEANCE
+          ].motif
       }
       // When
       archiverJeuneCommandHandler.authorize(command, unUtilisateurConseiller())
@@ -76,7 +79,10 @@ describe('ArchiverJeuneCommandHandler', () => {
     describe('quand le jeune existe', () => {
       const command: ArchiverJeuneCommand = {
         idJeune: 'idJeune',
-        motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE,
+        motif:
+          ArchiveJeune.motifsDeSuppression[
+            ArchiveJeune.MotifsSuppression.CONTRAT_ARRIVE_A_ECHEANCE
+          ].motif,
         commentaire: 'un commentaire'
       }
       const jeune = unJeune()

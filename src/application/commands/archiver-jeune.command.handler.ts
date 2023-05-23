@@ -26,7 +26,7 @@ import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 
 export interface ArchiverJeuneCommand {
   idJeune: Jeune.Id
-  motif: ArchiveJeune.MotifSuppression
+  motif: string
   commentaire?: string
 }
 
