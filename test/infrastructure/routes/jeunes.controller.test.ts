@@ -639,7 +639,10 @@ describe('JeunesController', () => {
       archiverJeuneCommandHandler.execute
         .withArgs({
           idJeune: 'id-jeune',
-          motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE,
+          motif:
+            ArchiveJeune.motifsDeSuppression[
+              ArchiveJeune.MotifsSuppression.CONTRAT_ARRIVE_A_ECHEANCE
+            ].motif,
           commentaire: undefined
         })
         .resolves(emptySuccess())
@@ -649,7 +652,10 @@ describe('JeunesController', () => {
         .post(`/jeunes/id-jeune/archiver`)
         .set('authorization', unHeaderAuthorization())
         .send({
-          motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE
+          motif:
+            ArchiveJeune.motifsDeSuppression[
+              ArchiveJeune.MotifsSuppression.CONTRAT_ARRIVE_A_ECHEANCE
+            ].motif
         })
         //Then
         .expect(HttpStatus.NO_CONTENT)
@@ -666,7 +672,10 @@ describe('JeunesController', () => {
         .post(`/jeunes/id-jeune/archiver`)
         .set('authorization', unHeaderAuthorization())
         .send({
-          motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE
+          motif:
+            ArchiveJeune.motifsDeSuppression[
+              ArchiveJeune.MotifsSuppression.CONTRAT_ARRIVE_A_ECHEANCE
+            ].motif
         })
         //Then
         .expect(HttpStatus.FORBIDDEN)
@@ -693,7 +702,12 @@ describe('JeunesController', () => {
       await request(app.getHttpServer())
         .post(`/jeunes/id-jeune/archiver`)
         .set('authorization', unHeaderAuthorization())
-        .send({ motif: ArchiveJeune.MotifSuppression.AUTRE })
+        .send({
+          motif:
+            ArchiveJeune.motifsDeSuppression[
+              ArchiveJeune.MotifsSuppression.AUTRE
+            ].motif
+        })
         //Then
         .expect(HttpStatus.BAD_REQUEST)
     })
@@ -707,7 +721,10 @@ describe('JeunesController', () => {
         .post(`/jeunes/id-jeune/archiver`)
         .set('authorization', unHeaderAuthorization())
         .send({
-          motif: ArchiveJeune.MotifSuppression.AUTRE,
+          motif:
+            ArchiveJeune.motifsDeSuppression[
+              ArchiveJeune.MotifsSuppression.AUTRE
+            ].motif,
           commentaire: 'test'
         })
         //Then

@@ -155,7 +155,10 @@ describe('ArchiveJeuneSqlRepository', () => {
 
       metadonnees = {
         idJeune: jeuneDto.id,
-        motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE,
+        motif:
+          ArchiveJeune.motifsDeSuppression[
+            ArchiveJeune.MotifsSuppression.CONTRAT_ARRIVE_A_ECHEANCE
+          ].motif,
         commentaire: 'Il a loupé un rdv',
         nomJeune: jeuneDto.nom,
         prenomJeune: jeuneDto.prenom,
@@ -175,7 +178,10 @@ describe('ArchiveJeuneSqlRepository', () => {
       // Given
       metadonnees = {
         idJeune: 'introuvable',
-        motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE,
+        motif:
+          ArchiveJeune.motifsDeSuppression[
+            ArchiveJeune.MotifsSuppression.CONTRAT_ARRIVE_A_ECHEANCE
+          ].motif,
         commentaire: 'Il a loupé un rdv',
         nomJeune: jeuneDto.nom,
         prenomJeune: jeuneDto.prenom,

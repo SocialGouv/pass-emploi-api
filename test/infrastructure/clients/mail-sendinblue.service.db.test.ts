@@ -84,7 +84,10 @@ describe('MailSendinblueService', () => {
       const jeune = unJeune()
       const command = {
         jeune,
-        motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE,
+        motif:
+          ArchiveJeune.motifsDeSuppression[
+            ArchiveJeune.MotifsSuppression.CONTRAT_ARRIVE_A_ECHEANCE
+          ].motif,
         commentaireMotif: 'test'
       }
       const mailDataDtoAttendu: MailDataDto = {

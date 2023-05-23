@@ -48,16 +48,6 @@ export namespace ArchiveJeune {
   }
   export type MotifSuppressionSupport = 'Support'
 
-  export const mapMotifSuppressionDescription: Partial<
-    Record<MotifSuppression, string>
-  > = {
-    'Emploi durable (plus de 6 mois)':
-      'CDI, CDD de plus de 6 mois dont alternance, titularisation dans la fonction publique',
-    'Limite d’âge atteinte':
-      "Motif valable uniquement à partir de la fin du premier mois des 26 ans. A noter : dans le cas oû le jeune est considéré en tant que travailleur handicapé, l'âge passe à 30 ans.",
-    Autre: 'Champ libre'
-  }
-
   export enum MotifsSuppression {
     EMPLOI_DURABLE = 'EMPLOI_DURABLE',
     EMPLOI_COURT = 'EMPLOI_COURT',
@@ -170,7 +160,7 @@ export namespace ArchiveJeune {
     prenomJeune: string
     nomJeune: string
     structure: Core.Structure
-    motif: MotifSuppression | MotifSuppressionSupport
+    motif: string | MotifSuppressionSupport
     commentaire?: string
     dateArchivage: Date
   }
