@@ -113,10 +113,12 @@ export class ReferentielsController {
     type: MotifSuppressionJeuneQueryModel,
     isArray: true
   })
-  async getMotifsSuppressionJeune(): Promise<
-    MotifSuppressionJeuneQueryModel[]
-  > {
-    const result = await this.getMotifsSuppressionJeuneQueryHandler.execute({})
+  async getMotifsSuppressionJeune(
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<MotifSuppressionJeuneQueryModel[]> {
+    const result = await this.getMotifsSuppressionJeuneQueryHandler.execute({
+      structure: utilisateur.structure
+    })
     if (isSuccess(result)) {
       return result.data
     }
