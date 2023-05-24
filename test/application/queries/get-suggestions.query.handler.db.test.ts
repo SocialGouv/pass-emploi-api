@@ -12,6 +12,7 @@ import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { Offre } from '../../../src/domain/offre/offre'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { getDatabase } from '../../utils/database-for-testing'
+import { Suggestion } from 'src/domain/offre/recherche/suggestion/suggestion'
 
 describe('GetSuggestionsQueryHandler', () => {
   let queryHandler: GetSuggestionsQueryHandler
@@ -27,8 +28,84 @@ describe('GetSuggestionsQueryHandler', () => {
   })
 
   describe('handle', () => {
+    it('retourne toutes les suggestions quand avecDiagoriente est true', async () => {
+      // Given
+
+      const suggestion = uneSuggestion()
+      const suggestionDiagoriente = uneSuggestion({
+        id: 'abc1ae20-8838-a9c7-aa2e-ab2243a8fb6a',
+        source: Suggestion.Source.DIAGORIENTE,
+        informations: {
+          titre: 'Petrisseur'
+        }
+      })
+
+      await SuggestionSqlModel.bulkCreate([
+        {
+          id: suggestion.id,
+          idJeune: suggestion.idJeune,
+          idFonctionnel: Buffer.from(
+            JSON.stringify(suggestion.idFonctionnel)
+          ).toString('base64'),
+          type: suggestion.type,
+          source: suggestion.source,
+          dateCreation: suggestion.dateCreation,
+          dateRafraichissement: suggestion.dateRafraichissement,
+          criteres: suggestion.criteres,
+          titre: suggestion.informations.titre,
+          metier: suggestion.informations.metier,
+          localisation: suggestion.informations.localisation
+        },
+        {
+          id: suggestionDiagoriente.id,
+          idJeune: suggestionDiagoriente.idJeune,
+          idFonctionnel: Buffer.from(
+            JSON.stringify(suggestionDiagoriente.idFonctionnel)
+          ).toString('base64'),
+          type: suggestionDiagoriente.type,
+          source: suggestionDiagoriente.source,
+          dateCreation: suggestionDiagoriente.dateCreation,
+          dateRafraichissement: suggestionDiagoriente.dateRafraichissement,
+          titre: suggestionDiagoriente.informations.titre
+        }
+      ])
+
+      // When
+      const suggestions = await queryHandler.handle({
+        idJeune: suggestion.idJeune,
+        avecDiagoriente: true
+      })
+
+      const queryModel: SuggestionQueryModel[] = [
+        {
+          id: suggestion.id,
+          titre: 'Petrisseur',
+          type: Offre.Recherche.Type.OFFRES_EMPLOI,
+          source: suggestion.source,
+          metier: 'Boulanger',
+          localisation: 'Lille',
+          dateCreation: uneDatetime().toISO(),
+          dateRafraichissement: uneDatetime().toISO()
+        },
+        {
+          id: suggestionDiagoriente.id,
+          titre: 'Petrisseur',
+          type: Offre.Recherche.Type.OFFRES_EMPLOI,
+          source: suggestionDiagoriente.source,
+          dateCreation: uneDatetime().toISO(),
+          dateRafraichissement: uneDatetime().toISO(),
+          metier: undefined,
+          localisation: undefined
+        }
+      ]
+
+      // Then
+
+      expect(suggestions).to.deep.equal(queryModel)
+    })
     it("retourne les suggestions non traitées d'un jeune", async () => {
       // Given
+
       const suggestion = uneSuggestion()
       const suggestionAcceptee = uneSuggestion({
         id: 'f781ae20-8838-49c7-aa2e-9b224318fb66',
@@ -91,7 +168,8 @@ describe('GetSuggestionsQueryHandler', () => {
 
       // When
       const suggestions = await queryHandler.handle({
-        idJeune: suggestion.idJeune
+        idJeune: suggestion.idJeune,
+        avecDiagoriente: false
       })
 
       // Then
@@ -112,7 +190,10 @@ describe('GetSuggestionsQueryHandler', () => {
   describe('authorize', () => {
     it('autorise un jeune', async () => {
       // When
-      await queryHandler.authorize({ idJeune: 'idJeune' }, unUtilisateurJeune())
+      await queryHandler.authorize(
+        { idJeune: 'idJeune', avecDiagoriente: false },
+        unUtilisateurJeune()
+      )
 
       // Then
       expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
