@@ -372,7 +372,10 @@ describe('RecherchesController', () => {
             emptySuccess()
           )
           getSuggestionsQueryHandler.execute
-            .withArgs({ idJeune: '1' }, unUtilisateurDecodePoleEmploi())
+            .withArgs(
+              { idJeune: '1', avecDiagoriente: false },
+              unUtilisateurDecodePoleEmploi()
+            )
             .resolves([queryModel])
 
           // When
@@ -389,7 +392,8 @@ describe('RecherchesController', () => {
             {
               idJeune: '1',
               token: 'coucou',
-              structure: Core.Structure.POLE_EMPLOI
+              structure: Core.Structure.POLE_EMPLOI,
+              avecDiagoriente: false
             },
             unUtilisateurDecodePoleEmploi()
           )
@@ -419,7 +423,10 @@ describe('RecherchesController', () => {
         it('ne rafraichit pas les suggestions et renvoie les suggestions', async () => {
           // Given
           getSuggestionsQueryHandler.execute
-            .withArgs({ idJeune: '1' }, unUtilisateurDecode())
+            .withArgs(
+              { idJeune: '1', avecDiagoriente: false },
+              unUtilisateurDecode()
+            )
             .resolves([queryModel])
 
           // When
