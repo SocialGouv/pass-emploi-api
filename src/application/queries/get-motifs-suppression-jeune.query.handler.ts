@@ -26,24 +26,13 @@ export class GetMotifsSuppressionJeuneQueryHandler extends QueryHandler<
   async handle(
     query: GetMotifsSuppressionQuery
   ): Promise<Result<MotifSuppressionJeuneQueryModel[]>> {
-    const structureConseiller = query.structure
-
-    const motifsDeSuppression: string[] = Object.values(
-      ArchiveJeune.MotifsSuppression
-    ).filter(unMotif => {
-      const { structures } = ArchiveJeune.motifsDeSuppression[unMotif]
-      return structures.includes(structureConseiller)
-    })
-
     return success(
-      motifsDeSuppression.map((unMotif: ArchiveJeune.MotifsSuppression) => {
-        const { motif, description } = ArchiveJeune.motifsDeSuppression[unMotif]
-
-        return {
-          motif,
-          description
-        }
-      })
+      Object.values(ArchiveJeune.motifsSuppression)
+        .filter(motif => motif.structures.includes(query.structure))
+        .map(motif => ({
+          motif: motif.motif,
+          description: motif.description
+        }))
     )
   }
 

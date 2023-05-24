@@ -50,7 +50,9 @@ export namespace Mail {
 
     envoyerEmailJeuneArchive(
       jeune: Jeune,
-      motif: string | ArchiveJeune.MotifSuppressionSupport,
+      motif:
+        | ArchiveJeune.MotifSuppression
+        | ArchiveJeune.MotifSuppressionSupport,
       commentaire?: string
     ): Promise<void>
 

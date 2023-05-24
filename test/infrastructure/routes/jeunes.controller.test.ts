@@ -639,10 +639,7 @@ describe('JeunesController', () => {
       archiverJeuneCommandHandler.execute
         .withArgs({
           idJeune: 'id-jeune',
-          motif:
-            ArchiveJeune.motifsDeSuppression[
-              ArchiveJeune.MotifsSuppression.CONTRAT_ARRIVE_A_ECHEANCE
-            ].motif,
+          motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE,
           commentaire: undefined
         })
         .resolves(emptySuccess())
@@ -652,10 +649,7 @@ describe('JeunesController', () => {
         .post(`/jeunes/id-jeune/archiver`)
         .set('authorization', unHeaderAuthorization())
         .send({
-          motif:
-            ArchiveJeune.motifsDeSuppression[
-              ArchiveJeune.MotifsSuppression.CONTRAT_ARRIVE_A_ECHEANCE
-            ].motif
+          motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE
         })
         //Then
         .expect(HttpStatus.NO_CONTENT)
@@ -672,10 +666,7 @@ describe('JeunesController', () => {
         .post(`/jeunes/id-jeune/archiver`)
         .set('authorization', unHeaderAuthorization())
         .send({
-          motif:
-            ArchiveJeune.motifsDeSuppression[
-              ArchiveJeune.MotifsSuppression.CONTRAT_ARRIVE_A_ECHEANCE
-            ].motif
+          motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE
         })
         //Then
         .expect(HttpStatus.FORBIDDEN)
@@ -703,10 +694,7 @@ describe('JeunesController', () => {
         .post(`/jeunes/id-jeune/archiver`)
         .set('authorization', unHeaderAuthorization())
         .send({
-          motif:
-            ArchiveJeune.motifsDeSuppression[
-              ArchiveJeune.MotifsSuppression.AUTRE
-            ].motif
+          motif: ArchiveJeune.MotifSuppression.AUTRE
         })
         //Then
         .expect(HttpStatus.BAD_REQUEST)
@@ -721,10 +709,7 @@ describe('JeunesController', () => {
         .post(`/jeunes/id-jeune/archiver`)
         .set('authorization', unHeaderAuthorization())
         .send({
-          motif:
-            ArchiveJeune.motifsDeSuppression[
-              ArchiveJeune.MotifsSuppression.AUTRE
-            ].motif,
+          motif: ArchiveJeune.MotifSuppression.AUTRE,
           commentaire: 'test'
         })
         //Then
