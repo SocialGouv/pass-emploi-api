@@ -79,8 +79,8 @@ function fromSqlToSuggestion(suggestionSql: SuggestionSqlModel): Suggestion {
     criteres: suggestionSql.criteres ?? undefined,
     informations: {
       titre: suggestionSql.titre,
-      metier: suggestionSql.metier,
-      localisation: suggestionSql.localisation
+      metier: suggestionSql.metier ?? undefined,
+      localisation: suggestionSql.localisation ?? undefined
     }
   }
 }

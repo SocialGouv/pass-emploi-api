@@ -8,9 +8,11 @@ import { SuggestionQueryModel } from './query-models/suggestion.query-model'
 import { SuggestionSqlModel } from '../../infrastructure/sequelize/models/suggestion.sql-model'
 import { Op } from 'sequelize'
 import { DateService } from '../../utils/date-service'
+import { Suggestion } from 'src/domain/offre/recherche/suggestion/suggestion'
 
 export interface GetSuggestionsQuery extends Query {
   idJeune: string
+  avecDiagoriente: boolean
 }
 
 @Injectable()
@@ -23,6 +25,10 @@ export class GetSuggestionsQueryHandler extends QueryHandler<
   }
 
   async handle(query: GetSuggestionsQuery): Promise<SuggestionQueryModel[]> {
+    const sources = query.avecDiagoriente
+      ? [Suggestion.Source.POLE_EMPLOI, Suggestion.Source.DIAGORIENTE]
+      : [Suggestion.Source.POLE_EMPLOI]
+
     const suggestionsSql = await SuggestionSqlModel.findAll({
       where: {
         idJeune: query.idJeune,
@@ -31,7 +37,8 @@ export class GetSuggestionsQueryHandler extends QueryHandler<
         },
         dateRefus: {
           [Op.eq]: null
-        }
+        },
+        source: sources
       }
     })
     return suggestionsSql.map(suggestionSql => ({
@@ -39,8 +46,8 @@ export class GetSuggestionsQueryHandler extends QueryHandler<
       titre: suggestionSql.titre,
       type: suggestionSql.type,
       source: suggestionSql.source,
-      metier: suggestionSql.metier,
-      localisation: suggestionSql.localisation,
+      metier: suggestionSql.metier ?? undefined,
+      localisation: suggestionSql.localisation ?? undefined,
       dateCreation: DateService.fromJSDateToISOString(
         suggestionSql.dateCreation
       ),

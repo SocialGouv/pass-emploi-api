@@ -10,7 +10,7 @@ import {
   Post,
   Query
 } from '@nestjs/common'
-import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiOAuth2, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CreateRechercheFromSuggestionCommandHandler } from '../../application/commands/create-recherche-from-suggestion.command.handler'
 import {
   CreateRechercheCommand,
@@ -42,6 +42,7 @@ import {
   CreateRechercheServiceCiviquePayload,
   GetRecherchesQueryParams
 } from './validation/recherches.inputs'
+import { FindSuggestionsQueryParams } from './validation/suggestions-inputs'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
@@ -153,18 +154,22 @@ export class RecherchesJeunesController {
     type: SuggestionQueryModel,
     isArray: true
   })
+  @ApiQuery({ name: 'avecDiagoriente', required: false, type: 'boolean' })
   async getSuggestions(
-    @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
-    @AccessToken() accessToken: string
+    @AccessToken() accessToken: string,
+    @Param('idJeune') idJeune: string,
+    @Query() findSuggestionsQueryParams: FindSuggestionsQueryParams
   ): Promise<SuggestionQueryModel[]> {
+    const avecDiagoriente = findSuggestionsQueryParams.avecDiagoriente ?? false
     if (estPoleEmploiBRSA(utilisateur.structure)) {
       const result =
         await this.rafraichirSuggestionPoleEmploiCommandHandler.execute(
           {
             idJeune,
             token: accessToken,
-            structure: utilisateur.structure
+            structure: utilisateur.structure,
+            avecDiagoriente
           },
           utilisateur
         )
@@ -173,7 +178,11 @@ export class RecherchesJeunesController {
         throw handleFailure(result)
       }
     }
-    return this.getSuggestionsQueryHandler.execute({ idJeune }, utilisateur)
+
+    return this.getSuggestionsQueryHandler.execute(
+      { idJeune, avecDiagoriente },
+      utilisateur
+    )
   }
 
   @Post('recherches/suggestions/:idSuggestion/accepter')
