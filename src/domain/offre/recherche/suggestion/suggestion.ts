@@ -14,6 +14,7 @@ import {
   success
 } from '../../../../building-blocks/types/result'
 import { Core, estNonBRSA } from '../../../core'
+import { Diagoriente } from './diagoriente'
 
 export interface Suggestion {
   id: string
@@ -22,8 +23,8 @@ export interface Suggestion {
   type: Recherche.Type
   informations: {
     titre: string
-    metier: string
-    localisation: string
+    metier?: string
+    localisation?: string
   }
   criteres?: Recherche.Emploi | Recherche.Immersion | Recherche.ServiceCivique
   dateCreation: DateTime
@@ -58,14 +59,15 @@ export namespace Suggestion {
 
   export enum Source {
     POLE_EMPLOI = 'POLE_EMPLOI',
-    CONSEILLER = 'CONSEILLER'
+    CONSEILLER = 'CONSEILLER',
+    DIAGORIENTE = 'DIAGORIENTE'
   }
 
   export interface IdFonctionnel {
     typeRecherche: Recherche.Type
     codeRome: string | null
-    typeLocalisation: Suggestion.TypeLocalisation
-    codeLocalisation: string
+    typeLocalisation?: Suggestion.TypeLocalisation
+    codeLocalisation?: string
     rayon: number
   }
 
@@ -104,6 +106,65 @@ export namespace Suggestion {
       private idService: IdService,
       private dateService: DateService
     ) {}
+
+    buildListeSuggestionsOffresFromDiagoriente(
+      suggestionsDiagoriente: Diagoriente[],
+      idJeune: string
+    ): Suggestion[] {
+      const maintenant = this.dateService.now()
+      const suggestions = suggestionsDiagoriente.map(suggestion => {
+        return [
+          this.creerSuggestionDiagoriente(
+            suggestion,
+            Recherche.Type.OFFRES_EMPLOI,
+            idJeune,
+            maintenant
+          ),
+          this.creerSuggestionDiagoriente(
+            suggestion,
+            Recherche.Type.OFFRES_IMMERSION,
+            idJeune,
+            maintenant
+          )
+        ]
+      })
+      return suggestions.flat()
+    }
+
+    private creerSuggestionDiagoriente(
+      suggestionDiagoriente: Diagoriente,
+      type: Recherche.Type,
+      idJeune: string,
+      maintenant: DateTime
+    ): Suggestion {
+      return {
+        id: this.idService.uuid(),
+        idJeune,
+        dateCreation: maintenant,
+        dateRafraichissement: maintenant,
+        idFonctionnel: this.construireIdFonctionnelDiagoriente(
+          suggestionDiagoriente,
+          type
+        ),
+        type: type,
+        source: Suggestion.Source.DIAGORIENTE,
+        informations: {
+          titre: suggestionDiagoriente.tag.title
+        },
+        criteres: undefined
+      }
+    }
+
+    private construireIdFonctionnelDiagoriente(
+      suggestion: Diagoriente,
+      type: Recherche.Type
+    ): Suggestion.IdFonctionnel {
+      return {
+        typeRecherche: type,
+        codeRome: suggestion.tag.code,
+        rayon: Recherche.DISTANCE_PAR_DEFAUT
+      }
+    }
 
     buildListeSuggestionsOffresFromPoleEmploi(
       suggestionsPoleEmploi: PoleEmploi[],
@@ -206,7 +267,7 @@ export namespace Suggestion {
     }
 
     private creerSuggestionPoleEmploi(
-      suggestionPoleEmploi: PoleEmploi,
+      suggestion: PoleEmploi,
       type: Recherche.Type,
       idJeune: string,
       maintenant: DateTime
@@ -216,24 +277,18 @@ export namespace Suggestion {
         idJeune,
         dateCreation: maintenant,
         dateRafraichissement: maintenant,
-        idFonctionnel: this.construireIdFonctionnel(suggestionPoleEmploi, type),
+        idFonctionnel: this.construireIdFonctionnelPoleEmploi(suggestion, type),
         type: type,
         source: Suggestion.Source.POLE_EMPLOI,
         informations: {
-          ...this.construireTitreEtMetierSuggestionPoleEmploi(
-            suggestionPoleEmploi,
-            type
-          ),
-          localisation: suggestionPoleEmploi.localisation.libelle
+          ...this.construireTitreEtMetierSuggestionPoleEmploi(suggestion, type),
+          localisation: suggestion.localisation.libelle
         },
-        criteres: this.construireCriteresSuggestionsPoleEmploi(
-          suggestionPoleEmploi,
-          type
-        )
+        criteres: this.construireCriteresSuggestionsPoleEmploi(suggestion, type)
       }
     }
 
-    private construireIdFonctionnel(
+    private construireIdFonctionnelPoleEmploi(
       suggestionPoleEmploi: PoleEmploi,
       type: Recherche.Type
     ): Suggestion.IdFonctionnel {

@@ -18,11 +18,13 @@ import { SuggestionPoleEmploiService } from '../../domain/offre/recherche/sugges
 import { Core, estPoleEmploiBRSA } from '../../domain/core'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { DiagorienteClient } from 'src/infrastructure/clients/diagoriente-client'
 
 export interface RafraichirSuggestionPoleEmploiCommand extends Command {
   idJeune: string
   token: string
   structure: Core.Structure
+  avecDiagoriente?: boolean
 }
 
 @Injectable()
@@ -36,6 +38,7 @@ export class RafraichirSuggestionPoleEmploiCommandHandler extends CommandHandler
     private jeuneAuthorizer: JeuneAuthorizer,
     private suggestionFactory: Suggestion.Factory,
     private suggestionPoleEmploiService: SuggestionPoleEmploiService,
+    private readonly diagorienteClient: DiagorienteClient,
     @Inject(SuggestionsPoleEmploiRepositoryToken)
     private suggestionPoleEmploiRepository: Suggestion.PoleEmploi.Repository,
     private keycloakClient: KeycloakClient
@@ -55,22 +58,35 @@ export class RafraichirSuggestionPoleEmploiCommandHandler extends CommandHandler
       jeune.structure
     )
 
-    const suggestionsPEResult =
-      await this.suggestionPoleEmploiRepository.findAll(idpToken)
+    const [suggestionsPEResult, metiersFavorisDiagorienteResult] =
+      await Promise.all([
+        this.suggestionPoleEmploiRepository.findAll(idpToken),
+        this.diagorienteClient.getMetiersFavoris(jeune.id)
+      ])
 
     if (isFailure(suggestionsPEResult)) {
       return suggestionsPEResult
     }
 
-    const suggestions =
+    if (isFailure(metiersFavorisDiagorienteResult)) {
+      return metiersFavorisDiagorienteResult
+    }
+
+    const suggestionsPE =
       this.suggestionFactory.buildListeSuggestionsOffresFromPoleEmploi(
         suggestionsPEResult.data,
         command.idJeune,
         command.structure
       )
 
+    const suggestionsDiagoriente =
+      this.suggestionFactory.buildListeSuggestionsOffresFromDiagoriente(
+        metiersFavorisDiagorienteResult.data.data.userByPartner.favorites,
+        command.idJeune
+      )
+
     await this.suggestionPoleEmploiService.rafraichir(
-      suggestions,
+      [...suggestionsPE, ...suggestionsDiagoriente],
       command.idJeune
     )
 
