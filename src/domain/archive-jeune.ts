@@ -35,20 +35,7 @@ export interface ArchiveJeune {
 }
 
 export namespace ArchiveJeune {
-  export enum MotifSuppression {
-    EMPLOI_DURABLE = 'Emploi durable (plus de 6 mois)',
-    EMPLOI_COURT = 'Emploi court (moins de 6 mois)',
-    CONTRAT_ARRIVE_A_ECHEANCE = 'Contrat arrivé à échéance',
-    LIMITE_AGE = 'Limite d’âge atteinte',
-    DEMANDE_DU_JEUNE = 'Demande du jeune de sortir du dispositif',
-    NON_RESPECT_OU_ABANDON = 'Non respect des engagements ou abandon',
-    DEMENAGEMENT = 'Déménagement',
-    CHANGEMENT_CONSEILLER = 'Changement de conseiller',
-    AUTRE = 'Autre'
-  }
-  export type MotifSuppressionSupport = 'Support'
-
-  export enum MotifsSuppression {
+  export enum CodeMotifSuppression {
     EMPLOI_DURABLE = 'EMPLOI_DURABLE',
     EMPLOI_COURT = 'EMPLOI_COURT',
     CONTRAT_ARRIVE_A_ECHEANCE = 'CONTRAT_ARRIVE_A_ECHEANCE',
@@ -64,16 +51,35 @@ export namespace ArchiveJeune {
     CHANGEMENT_CONSEILLER = 'CHANGEMENT_CONSEILLER',
     AUTRE = 'AUTRE'
   }
+  export enum MotifSuppression {
+    EMPLOI_DURABLE = 'Emploi durable (plus de 6 mois)',
+    EMPLOI_COURT = 'Emploi court (moins de 6 mois)',
+    CONTRAT_ARRIVE_A_ECHEANCE = 'Contrat arrivé à échéance',
+    CESSATION_INSCRIPTION = 'Cessation d’inscription',
+    LIMITE_AGE = 'Limite d’âge atteinte',
+    CHANGEMENT_ACCOMPAGNEMENT = 'Changement d’accompagnement (autre modalité ou dispositif)',
+    DEMANDE_DU_JEUNE = 'Demande du jeune de sortir du dispositif',
+    DEMANDE_DU_CONSEILLER = 'Sortie du dispositif à l’origine du conseiller',
+    DEMANDE_DU_BENEFICIAIRE_BRSA = 'Sortie du dispositif à l’origine du bénéficiaire',
+    NON_RESPECT_OU_ABANDON = 'Non respect des engagements ou abandon',
+    DEMENAGEMENT = 'Déménagement',
+    DEMENAGEMENT_TERRITOIRE_HORS_EXPERIMENTATION = 'Déménagement dans un territoire hors expérimentation',
+    CHANGEMENT_CONSEILLER = 'Changement de conseiller',
+    AUTRE = 'Autre'
+  }
 
-  export const motifsDeSuppression: {
-    [key in ArchiveJeune.MotifsSuppression]: {
-      motif: string
+  export type MotifSuppressionSupport = 'Support'
+
+  export const motifsSuppression: Record<
+    CodeMotifSuppression,
+    {
+      motif: MotifSuppression
       structures: Core.Structure[]
       description?: string
     }
-  } = {
-    [MotifsSuppression.EMPLOI_DURABLE]: {
-      motif: 'Emploi durable (plus de 6 mois)',
+  > = {
+    [CodeMotifSuppression.EMPLOI_DURABLE]: {
+      motif: MotifSuppression.EMPLOI_DURABLE,
       structures: [
         Structure.PASS_EMPLOI,
         Structure.POLE_EMPLOI,
@@ -83,20 +89,20 @@ export namespace ArchiveJeune {
       description:
         'CDI, CDD de plus de 6 mois dont alternance, titularisation dans la fonction publique'
     },
-    [MotifsSuppression.EMPLOI_COURT]: {
-      motif: 'Emploi court (moins de 6 mois)',
+    [CodeMotifSuppression.EMPLOI_COURT]: {
+      motif: MotifSuppression.EMPLOI_COURT,
       structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI, Structure.MILO]
     },
-    [MotifsSuppression.CONTRAT_ARRIVE_A_ECHEANCE]: {
-      motif: 'Contrat arrivé à échéance',
+    [CodeMotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE]: {
+      motif: MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE,
       structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI, Structure.MILO]
     },
-    [MotifsSuppression.CESSATION_INSCRIPTION]: {
-      motif: 'Cessation d’inscription',
+    [CodeMotifSuppression.CESSATION_INSCRIPTION]: {
+      motif: MotifSuppression.CESSATION_INSCRIPTION,
       structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI_BRSA]
     },
-    [MotifsSuppression.LIMITE_AGE]: {
-      motif: 'Limite d’âge atteinte',
+    [CodeMotifSuppression.LIMITE_AGE]: {
+      motif: MotifSuppression.LIMITE_AGE,
       structures: [
         Structure.PASS_EMPLOI,
         Structure.POLE_EMPLOI,
@@ -105,28 +111,28 @@ export namespace ArchiveJeune {
       description:
         "Motif valable uniquement à partir de la fin du premier mois des 26 ans. A noter : dans le cas oû le jeune est considéré en tant que travailleur handicapé, l'âge passe à 30 ans."
     },
-    [MotifsSuppression.CHANGEMENT_ACCOMPAGNEMENT]: {
-      motif: 'Changement d’accompagnement (autre modalité ou dispositif)',
+    [CodeMotifSuppression.CHANGEMENT_ACCOMPAGNEMENT]: {
+      motif: MotifSuppression.CHANGEMENT_ACCOMPAGNEMENT,
       structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI_BRSA]
     },
-    [MotifsSuppression.DEMANDE_DU_JEUNE]: {
-      motif: 'Demande du jeune de sortir du dispositif',
+    [CodeMotifSuppression.DEMANDE_DU_JEUNE]: {
+      motif: MotifSuppression.DEMANDE_DU_JEUNE,
       structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI, Structure.MILO]
     },
-    [MotifsSuppression.DEMANDE_DU_CONSEILLER]: {
-      motif: 'Sortie du dispositif à l’origine du conseiller',
+    [CodeMotifSuppression.DEMANDE_DU_CONSEILLER]: {
+      motif: MotifSuppression.DEMANDE_DU_CONSEILLER,
       structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI_BRSA]
     },
-    [MotifsSuppression.DEMANDE_DU_BENEFICIAIRE_BRSA]: {
-      motif: 'Sortie du dispositif à l’origine du bénéficiaire',
+    [CodeMotifSuppression.DEMANDE_DU_BENEFICIAIRE_BRSA]: {
+      motif: MotifSuppression.DEMANDE_DU_BENEFICIAIRE_BRSA,
       structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI_BRSA]
     },
-    [MotifsSuppression.NON_RESPECT_OU_ABANDON]: {
-      motif: 'Non respect des engagements ou abandon',
+    [CodeMotifSuppression.NON_RESPECT_OU_ABANDON]: {
+      motif: MotifSuppression.NON_RESPECT_OU_ABANDON,
       structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI, Structure.MILO]
     },
-    [MotifsSuppression.DEMENAGEMENT]: {
-      motif: 'Déménagement',
+    [CodeMotifSuppression.DEMENAGEMENT]: {
+      motif: MotifSuppression.DEMENAGEMENT,
       structures: [
         Structure.PASS_EMPLOI,
         Structure.POLE_EMPLOI,
@@ -134,16 +140,16 @@ export namespace ArchiveJeune {
         Structure.POLE_EMPLOI_BRSA
       ]
     },
-    [MotifsSuppression.DEMENAGEMENT_TERRITOIRE_HORS_EXPERIMENTATION]: {
-      motif: 'Déménagement dans un territoire hors expérimentation',
+    [CodeMotifSuppression.DEMENAGEMENT_TERRITOIRE_HORS_EXPERIMENTATION]: {
+      motif: MotifSuppression.DEMENAGEMENT_TERRITOIRE_HORS_EXPERIMENTATION,
       structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI_BRSA]
     },
-    [MotifsSuppression.CHANGEMENT_CONSEILLER]: {
-      motif: 'Changement de conseiller',
+    [CodeMotifSuppression.CHANGEMENT_CONSEILLER]: {
+      motif: MotifSuppression.CHANGEMENT_CONSEILLER,
       structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI, Structure.MILO]
     },
-    [MotifsSuppression.AUTRE]: {
-      motif: 'Autre',
+    [CodeMotifSuppression.AUTRE]: {
+      motif: MotifSuppression.AUTRE,
       structures: [
         Structure.PASS_EMPLOI,
         Structure.POLE_EMPLOI,
@@ -160,7 +166,7 @@ export namespace ArchiveJeune {
     prenomJeune: string
     nomJeune: string
     structure: Core.Structure
-    motif: string | MotifSuppressionSupport
+    motif: MotifSuppression | MotifSuppressionSupport
     commentaire?: string
     dateArchivage: Date
   }
