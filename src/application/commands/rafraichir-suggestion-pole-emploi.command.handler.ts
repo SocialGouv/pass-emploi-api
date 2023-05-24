@@ -18,11 +18,13 @@ import { SuggestionPoleEmploiService } from '../../domain/offre/recherche/sugges
 import { Core, estPoleEmploiBRSA } from '../../domain/core'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { DiagorienteClient } from 'src/infrastructure/clients/diagoriente-client'
 
 export interface RafraichirSuggestionPoleEmploiCommand extends Command {
   idJeune: string
   token: string
   structure: Core.Structure
+  avecDiagoriente: boolean
 }
 
 @Injectable()
@@ -36,6 +38,7 @@ export class RafraichirSuggestionPoleEmploiCommandHandler extends CommandHandler
     private jeuneAuthorizer: JeuneAuthorizer,
     private suggestionFactory: Suggestion.Factory,
     private suggestionPoleEmploiService: SuggestionPoleEmploiService,
+    private readonly diagorienteClient: DiagorienteClient,
     @Inject(SuggestionsPoleEmploiRepositoryToken)
     private suggestionPoleEmploiRepository: Suggestion.PoleEmploi.Repository,
     private keycloakClient: KeycloakClient
@@ -47,6 +50,7 @@ export class RafraichirSuggestionPoleEmploiCommandHandler extends CommandHandler
     command: RafraichirSuggestionPoleEmploiCommand
   ): Promise<Result> {
     const jeune = await this.jeuneRepository.get(command.idJeune)
+    let suggestionsDiagoriente: Suggestion[] = []
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', command.idJeune))
     }
@@ -62,7 +66,27 @@ export class RafraichirSuggestionPoleEmploiCommandHandler extends CommandHandler
       return suggestionsPEResult
     }
 
-    const suggestions =
+    if (command.avecDiagoriente) {
+      const metiersFavorisDiagorienteResult =
+        await this.diagorienteClient.getMetiersFavoris(jeune.id)
+
+      if (isFailure(metiersFavorisDiagorienteResult)) {
+        return metiersFavorisDiagorienteResult
+      }
+
+      const metiersFavorisDiagoriente =
+        metiersFavorisDiagorienteResult.data.data.userByPartner.favorites.filter(
+          favori => favori.favorited
+        )
+
+      suggestionsDiagoriente =
+        this.suggestionFactory.buildListeSuggestionsOffresFromDiagoriente(
+          metiersFavorisDiagoriente,
+          command.idJeune
+        )
+    }
+
+    const suggestionsPE =
       this.suggestionFactory.buildListeSuggestionsOffresFromPoleEmploi(
         suggestionsPEResult.data,
         command.idJeune,
@@ -70,7 +94,7 @@ export class RafraichirSuggestionPoleEmploiCommandHandler extends CommandHandler
       )
 
     await this.suggestionPoleEmploiService.rafraichir(
-      suggestions,
+      [...suggestionsPE, ...suggestionsDiagoriente],
       command.idJeune
     )
 
