@@ -42,6 +42,7 @@ export namespace Evenement {
     ANIMATION_COLLECTIVE_SUPPRIMEE = 'ANIMATION_COLLECTIVE_SUPPRIMEE',
     ANIMATION_COLLECTIVE_AFFICHEE = 'ANIMATION_COLLECTIVE_AFFICHEE',
     ANIMATION_COLLECTIVE_PARTAGEE = 'ANIMATION_COLLECTIVE_PARTAGEE',
+    CV_PE_TELECHARGE = 'CV_PE_TELECHARGE',
     COMPTE_SUPPRIME = 'COMPTE_SUPPRIME',
     COMPTE_ARCHIVE = 'COMPTE_ARCHIVE',
     LISTE_DIFFUSION_CREEE = 'LISTE_DIFFUSION_CREEE',
@@ -321,6 +322,11 @@ const evenements: {
   [Evenement.Code.OFFRE_POSTULEE]: {
     categorie: 'Offre',
     action: 'Postuler'
+  },
+  [Evenement.Code.CV_PE_TELECHARGE]: {
+    categorie: 'Offre',
+    action: 'Téléchargement CV',
+    nom: 'PE'
   },
   [Evenement.Code.MESSAGE_ENVOYE]: { categorie: 'Message', action: 'Envoi' },
   [Evenement.Code.MESSAGE_ENVOYE_MULTIPLE_MANUEL]: {
