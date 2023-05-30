@@ -117,7 +117,7 @@ describe('PoleEmploiClient', () => {
       expect(token).to.equal('un-token')
     })
   })
-  describe('get', () => {
+  describe('getWithRetry', () => {
     describe("quand l'appel est OK", () => {
       it('fait un http get avec les bons paramètres et renvoie un succes', async () => {
         // Given
@@ -137,7 +137,9 @@ describe('PoleEmploiClient', () => {
           .isDone()
 
         // When
-        const result = await poleEmploiClient.get('offresdemploi/v2/offres/1')
+        const result = await poleEmploiClient.getWithRetry(
+          'offresdemploi/v2/offres/1'
+        )
 
         // Then
         expect(result._isSuccess).to.be.true()
@@ -164,7 +166,9 @@ describe('PoleEmploiClient', () => {
           .isDone()
 
         // When
-        const result = await poleEmploiClient.get('offresdemploi/v2/offres/1')
+        const result = await poleEmploiClient.getWithRetry(
+          'offresdemploi/v2/offres/1'
+        )
 
         // Then
         expect(result).to.deep.equal(
@@ -192,7 +196,9 @@ describe('PoleEmploiClient', () => {
           .isDone()
 
         // When
-        const result = await poleEmploiClient.get('offresdemploi/v2/offres/1')
+        const result = await poleEmploiClient.getWithRetry(
+          'offresdemploi/v2/offres/1'
+        )
 
         // Then
         expect(result._isSuccess).to.be.true()
@@ -219,7 +225,9 @@ describe('PoleEmploiClient', () => {
           .isDone()
 
         // When
-        const result = await poleEmploiClient.get('offresdemploi/v2/offres/1')
+        const result = await poleEmploiClient.getWithRetry(
+          'offresdemploi/v2/offres/1'
+        )
 
         // Then
         expect(result).to.deep.equal(
@@ -242,7 +250,7 @@ describe('PoleEmploiClient', () => {
           .isDone()
 
         await expect(
-          poleEmploiClient.get('offresdemploi/v2/offres/1')
+          poleEmploiClient.getWithRetry('offresdemploi/v2/offres/1')
         ).to.be.rejected()
       })
     })
@@ -395,6 +403,57 @@ describe('PoleEmploiClient', () => {
           resultats: []
         })
       )
+    })
+  })
+  describe('getEvenementsEmploi', () => {
+    it('récupère les évènements', async () => {
+      // Given
+      const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
+        minutes: 20
+      })
+      poleEmploiClient.inMemoryToken = {
+        token: 'test-token',
+        tokenDate: uneDatetimeDeMoinsDe25Minutes
+      }
+      nock('https://api.peio.pe-qvr.fr/partenaire')
+        .post('/evenements/v1/mee/evenements?page=0&size=10')
+        .reply(200, { totalElements: 0, content: [] })
+        .isDone()
+
+      // When
+      const evenementsEmploi = await poleEmploiClient.getEvenementsEmploi({
+        page: 1,
+        limit: 10,
+        codePostal: 75001
+      })
+
+      // Then
+      expect(evenementsEmploi).to.deep.equal(
+        success({ totalElements: 0, content: [] })
+      )
+    })
+  })
+  describe('getEvenementEmploi', () => {
+    it("récupère l'évènement", async () => {
+      // Given
+      const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
+        minutes: 20
+      })
+      poleEmploiClient.inMemoryToken = {
+        token: 'test-token',
+        tokenDate: uneDatetimeDeMoinsDe25Minutes
+      }
+      const id = '123'
+      nock('https://api.peio.pe-qvr.fr/partenaire')
+        .get(`/evenements/v1/mee/evenement/${id}`)
+        .reply(200, { id: 123 })
+        .isDone()
+
+      // When
+      const evenementEmploi = await poleEmploiClient.getEvenementEmploi(id)
+
+      // Then
+      expect(evenementEmploi).to.deep.equal(success({ id: 123 }))
     })
   })
   describe('getNotificationsRendezVous', () => {

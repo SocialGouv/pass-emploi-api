@@ -4,12 +4,15 @@ import { ConfigService } from '@nestjs/config'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import { DateTime } from 'luxon'
 import { firstValueFrom } from 'rxjs'
-import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import {
+  ErreurHttp,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
+import {
+  Result,
   failure,
   isFailure,
   isSuccess,
-  Result,
   success
 } from '../../building-blocks/types/result'
 import { Notification } from '../../domain/notification/notification'
@@ -18,6 +21,7 @@ import { DateService } from '../../utils/date-service'
 import { buildError } from '../../utils/logger.module'
 import { RateLimiterService } from '../../utils/rate-limiter.service'
 import {
+  EvenementEmploiDto,
   EvenementsEmploiDto,
   NotificationDto,
   NotificationsPartenairesDto,
@@ -100,10 +104,32 @@ export class PoleEmploiClient {
     }
   }
 
+  async getEvenementEmploi(
+    idEvenement: string
+  ): Promise<Result<EvenementEmploiDto>> {
+    try {
+      const response = await this.get<EvenementEmploiDto>(
+        `evenements/v1/mee/evenement/${idEvenement}`
+      )
+      if (!response.data) {
+        return failure(
+          new NonTrouveError(`évènement emploi ${idEvenement} non trouvé`)
+        )
+      }
+      return success(response.data)
+    } catch (e) {
+      return handleAxiosError(
+        e,
+        this.logger,
+        `La récupération de l'évènement emploi ${idEvenement} a échoué`
+      )
+    }
+  }
+
   async getOffreEmploi(
     idOffreEmploi: string
   ): Promise<Result<OffreEmploiDto | undefined>> {
-    const result = await this.get<OffreEmploiDto | undefined>(
+    const result = await this.getWithRetry<OffreEmploiDto | undefined>(
       `offresdemploi/v2/offres/${idOffreEmploi}`
     )
     if (isSuccess(result)) {
@@ -118,7 +144,7 @@ export class PoleEmploiClient {
   async getOffresEmploi(
     params?: URLSearchParams
   ): Promise<Result<OffresEmploiDtoWithTotal>> {
-    const result = await this.get<OffresEmploiDto | undefined>(
+    const result = await this.getWithRetry<OffresEmploiDto | undefined>(
       'offresdemploi/v2/offres/search',
       params
     )
@@ -212,7 +238,7 @@ export class PoleEmploiClient {
     }
   }
 
-  async get<T>(
+  async getWithRetry<T>(
     suffixUrl: string,
     params?: unknown,
     secondesAAttendre?: number
@@ -223,13 +249,7 @@ export class PoleEmploiClient {
       )
     }
 
-    const token = await this.getToken()
-    return firstValueFrom(
-      this.httpService.get<T>(`${this.apiUrl}/${suffixUrl}`, {
-        params,
-        headers: { Authorization: `Bearer ${token}` }
-      })
-    )
+    return this.get<T>(suffixUrl, params)
       .then(res => success(res))
       .catch(e => {
         this.logger.error(e)
@@ -242,7 +262,7 @@ export class PoleEmploiClient {
           e.response?.headers['retry-after']
         ) {
           this.logger.log('Retry de la requête')
-          return this.get<T>(
+          return this.getWithRetry<T>(
             suffixUrl,
             params,
             parseInt(e.response?.headers['retry-after'])
@@ -260,6 +280,18 @@ export class PoleEmploiClient {
       })
   }
 
+  private async get<T>(
+    suffixUrl: string,
+    params?: unknown
+  ): Promise<AxiosResponse<T>> {
+    const token = await this.getToken()
+    return firstValueFrom(
+      this.httpService.get<T>(`${this.apiUrl}/${suffixUrl}`, {
+        params,
+        headers: { Authorization: `Bearer ${token}` }
+      })
+    )
+  }
   private async post<T>(
     suffixUrl: string,
     body?: unknown,
