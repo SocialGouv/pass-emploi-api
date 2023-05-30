@@ -321,6 +321,7 @@ import { GetFavorisAccueilQueryGetter } from './application/queries/query-getter
 import { GetCVPoleEmploiQueryHandler } from './application/queries/get-cv-pole-emploi.query.handler'
 import { EvenementsEmploiController } from './infrastructure/routes/evenements-emploi.controller'
 import { GetEvenementsEmploiQueryHandler } from './application/queries/get-evenements-emploi.query.handler'
+import { GetEvenementEmploiQueryHandler } from './application/queries/get-evenement-emploi.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -706,7 +707,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     DeleteConseillerCommandHandler,
     GetFavorisAccueilQueryGetter,
     GetCVPoleEmploiQueryHandler,
-    GetEvenementsEmploiQueryHandler
+    GetEvenementsEmploiQueryHandler,
+    GetEvenementEmploiQueryHandler
   ]
 }
 

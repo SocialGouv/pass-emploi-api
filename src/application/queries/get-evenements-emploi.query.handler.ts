@@ -19,19 +19,19 @@ class EvenementEmploiQueryModel {
   @ApiProperty({ required: true })
   id: number
   @ApiProperty({ required: false })
-  ville: string
+  ville?: string
   @ApiProperty({ required: false })
-  codePostal: string
+  codePostal?: string
   @ApiProperty({ required: false })
-  titre: string
+  titre?: string
   @ApiProperty({ required: false })
-  typeEvenement: string
+  typeEvenement?: string
   @ApiProperty({ required: false })
-  dateEvenement: string
+  dateEvenement?: string
   @ApiProperty({ required: false })
-  heureDebut: string
+  heureDebut?: string
   @ApiProperty({ required: false })
-  heureFin: string
+  heureFin?: string
 }
 export class EvenementsEmploiQueryModel {
   @ApiProperty({
