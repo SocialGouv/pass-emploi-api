@@ -66,7 +66,7 @@ describe('GetEvenementEmploiQueryHandler', () => {
       // Then
       expect(result).to.deep.equal(
         success({
-          id: 11111,
+          id: '11111',
           ville: 'Paris',
           codePostal: '75012',
           longitude: 2.16,

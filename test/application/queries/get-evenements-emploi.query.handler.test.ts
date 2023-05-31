@@ -83,7 +83,7 @@ describe('GetEvenementsEmploiQueryHandler', () => {
             pagination: { page: 1, limit: 10, total: 1 },
             results: [
               {
-                id: 11111,
+                id: '11111',
                 ville: 'Paris',
                 codePostal: '75012',
                 titre: 'Atelier',

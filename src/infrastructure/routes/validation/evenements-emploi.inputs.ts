@@ -60,7 +60,7 @@ export class FindEvenementsEmploiQueryParams {
   @IsIn([13, 14, 15, 16, 17, 18, 31, 32])
   typeEvenement?: number
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ description: 'values = [1: ADIST, 2: ENPHY]' })
   @IsOptional()
   @IsNotEmpty()
   @IsNumber()

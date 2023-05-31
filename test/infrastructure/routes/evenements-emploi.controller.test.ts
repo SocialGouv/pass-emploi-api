@@ -80,7 +80,7 @@ describe('EvenementsEmploiController', () => {
       // Given
       const idEvenement = '123'
       const evenementQueryModel: EvenementEmploiDetailQueryModel = {
-        id: Number(idEvenement)
+        id: idEvenement
       }
       getEvenementEmploiQueryHandler.execute.resolves(
         success(evenementQueryModel)
