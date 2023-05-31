@@ -57,7 +57,8 @@ describe('EvenementsEmploiController', () => {
           secteurActivite: undefined,
           dateDebut: undefined,
           dateFin: undefined,
-          typeEvenement: undefined
+          typeEvenement: undefined,
+          modalite: undefined
         })
         .resolves(success(result))
 
