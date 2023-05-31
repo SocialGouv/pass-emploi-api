@@ -64,6 +64,7 @@ export class PoleEmploiClient {
     dateDebut?: string
     dateFin?: string
     typeEvenement?: number
+    modalite?: string
   }): Promise<Result<EvenementsEmploiDto>> {
     const params = new URLSearchParams()
     if (criteres.page) {
@@ -78,6 +79,7 @@ export class PoleEmploiClient {
       dateDebut?: string
       dateFin?: string
       typeEvenement?: string
+      modalite?: string
     } = {
       codePostal: criteres.codePostal
         ? [criteres.codePostal.toString()]
@@ -85,7 +87,8 @@ export class PoleEmploiClient {
       secteurActivite: criteres.secteurActivite,
       dateDebut: criteres.dateDebut,
       dateFin: criteres.dateFin,
-      typeEvenement: criteres.typeEvenement?.toString()
+      typeEvenement: criteres.typeEvenement?.toString(),
+      modalite: criteres.modalite
     }
 
     try {

@@ -43,7 +43,8 @@ export class EvenementsEmploiController {
       secteurActivite: findEvenementsEmploiQuery.secteurActivite,
       dateDebut: findEvenementsEmploiQuery.dateDebut,
       dateFin: findEvenementsEmploiQuery.dateFin,
-      typeEvenement: findEvenementsEmploiQuery.typeEvenement
+      typeEvenement: findEvenementsEmploiQuery.typeEvenement,
+      modalite: findEvenementsEmploiQuery.modalite
     }
 
     const result = await this.getEvenementsEmploiQueryHandler.execute(

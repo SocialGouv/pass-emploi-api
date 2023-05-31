@@ -59,4 +59,13 @@ export class FindEvenementsEmploiQueryParams {
   @Transform(params => transformStringToInteger(params, 'typeEvenement'))
   @IsIn([13, 14, 15, 16, 17, 18, 31, 32])
   typeEvenement?: number
+
+  @ApiPropertyOptional({
+    description: 'values = [ADIST: à distance, ENPHY: en physique]'
+  })
+  @IsOptional()
+  @IsNotEmpty()
+  @IsNumber()
+  @IsIn(['ADIST', 'ENPHY'])
+  modalite?: string
 }

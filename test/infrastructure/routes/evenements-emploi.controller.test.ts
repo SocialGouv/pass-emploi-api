@@ -57,7 +57,8 @@ describe('EvenementsEmploiController', () => {
           secteurActivite: undefined,
           dateDebut: undefined,
           dateFin: undefined,
-          typeEvenement: undefined
+          typeEvenement: undefined,
+          modalite: undefined
         })
         .resolves(success(result))
 
@@ -79,7 +80,7 @@ describe('EvenementsEmploiController', () => {
       // Given
       const idEvenement = '123'
       const evenementQueryModel: EvenementEmploiDetailQueryModel = {
-        id: Number(idEvenement)
+        id: idEvenement
       }
       getEvenementEmploiQueryHandler.execute.resolves(
         success(evenementQueryModel)

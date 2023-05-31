@@ -12,7 +12,7 @@ import { PoleEmploiClient } from '../../infrastructure/clients/pole-emploi-clien
 
 export class EvenementEmploiDetailQueryModel {
   @ApiProperty({ required: true })
-  id: number
+  id: string
   @ApiProperty({ required: false })
   ville?: string
   @ApiProperty({ required: false })
@@ -74,7 +74,7 @@ export class GetEvenementEmploiQueryHandler extends QueryHandler<
     }
 
     return success({
-      id: resultEvenement.data.id,
+      id: resultEvenement.data.id.toString(),
       ville: resultEvenement.data.ville,
       codePostal: resultEvenement.data.codePostal,
       longitude: resultEvenement.data.longitude,

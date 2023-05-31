@@ -17,7 +17,7 @@ const PAGE_PAR_DEFAUT = 1
 
 class EvenementEmploiQueryModel {
   @ApiProperty({ required: true })
-  id: number
+  id: string
   @ApiProperty({ required: false })
   ville?: string
   @ApiProperty({ required: false })
@@ -54,6 +54,7 @@ export interface GetEvenementsEmploiQuery extends Query {
   dateDebut?: string
   dateFin?: string
   typeEvenement?: number
+  modalite?: string
 }
 
 @Injectable()
@@ -90,7 +91,7 @@ export class GetEvenementsEmploiQueryHandler extends QueryHandler<
     return success({
       pagination: { page, limit, total: resultEvenements.data.totalElements },
       results: resultEvenements.data.content.map(evenement => ({
-        id: evenement.id,
+        id: evenement.id.toString(),
         ville: evenement.ville,
         codePostal: evenement.codePostal,
         titre: evenement.titre,
