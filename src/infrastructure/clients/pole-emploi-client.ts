@@ -32,7 +32,6 @@ import {
 } from '../repositories/dto/pole-emploi.dto'
 import { ListeTypeDemarchesDto, TypeDemarcheDto } from './dto/pole-emploi.dto'
 import { handleAxiosError } from './utils/axios-error-handler'
-import { Modalite } from '../../application/queries/get-evenements-emploi.query.handler'
 
 const CODE_UTILISATEUR = 0
 
@@ -65,7 +64,7 @@ export class PoleEmploiClient {
     dateDebut?: string
     dateFin?: string
     typeEvenement?: number
-    modalite?: Modalite
+    modalite?: string
   }): Promise<Result<EvenementsEmploiDto>> {
     const params = new URLSearchParams()
     if (criteres.page) {
@@ -80,7 +79,7 @@ export class PoleEmploiClient {
       dateDebut?: string
       dateFin?: string
       typeEvenement?: string
-      modalite?: Modalite
+      modalite?: string
     } = {
       codePostal: criteres.codePostal
         ? [criteres.codePostal.toString()]

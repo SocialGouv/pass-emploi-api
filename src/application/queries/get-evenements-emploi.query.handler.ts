@@ -46,11 +46,6 @@ export class EvenementsEmploiQueryModel {
   results: EvenementEmploiQueryModel[]
 }
 
-export enum Modalite {
-  ADIST = 'ADIST',
-  ENPHY = 'ENPHY'
-}
-
 export interface GetEvenementsEmploiQuery extends Query {
   page?: number
   limit?: number
@@ -59,7 +54,7 @@ export interface GetEvenementsEmploiQuery extends Query {
   dateDebut?: string
   dateFin?: string
   typeEvenement?: number
-  modalite?: Modalite
+  modalite?: string
 }
 
 @Injectable()

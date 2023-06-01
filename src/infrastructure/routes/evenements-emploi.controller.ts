@@ -8,8 +8,7 @@ import { FindEvenementsEmploiQueryParams } from './validation/evenements-emploi.
 import {
   EvenementsEmploiQueryModel,
   GetEvenementsEmploiQuery,
-  GetEvenementsEmploiQueryHandler,
-  Modalite
+  GetEvenementsEmploiQueryHandler
 } from '../../application/queries/get-evenements-emploi.query.handler'
 import {
   EvenementEmploiDetailQueryModel,
@@ -46,8 +45,6 @@ export class EvenementsEmploiController {
       dateFin: findEvenementsEmploiQuery.dateFin,
       typeEvenement: findEvenementsEmploiQuery.typeEvenement,
       modalite: findEvenementsEmploiQuery.modalite
-        ? mapToCodeModalite(findEvenementsEmploiQuery.modalite)
-        : undefined
     }
 
     const result = await this.getEvenementsEmploiQueryHandler.execute(
@@ -82,10 +79,4 @@ export class EvenementsEmploiController {
     }
     throw handleFailure(result)
   }
-}
-function mapToCodeModalite(value: number): Modalite | undefined {
-  if (value === 1) return Modalite.ADIST
-  if (value === 2) return Modalite.ENPHY
-
-  return undefined
 }
