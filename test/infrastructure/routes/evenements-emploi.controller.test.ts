@@ -39,7 +39,7 @@ describe('EvenementsEmploiController', () => {
       const queryParams: FindEvenementsEmploiQueryParams = {
         page: 1,
         limit: 10,
-        codePostal: 75012
+        codePostal: '75012'
       }
 
       const result = {

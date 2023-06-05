@@ -59,7 +59,7 @@ export class PoleEmploiClient {
   async getEvenementsEmploi(criteres: {
     page: number
     limit: number
-    codePostal: number
+    codePostal: string
     secteurActivite?: string
     dateDebut?: string
     dateFin?: string
@@ -74,16 +74,14 @@ export class PoleEmploiClient {
       params.append('size', criteres.limit.toString())
     }
     const body: {
-      codePostal?: string[]
+      codePostal: string[]
       secteurActivite?: string
       dateDebut?: string
       dateFin?: string
       typeEvenement?: string
       modalite?: string
     } = {
-      codePostal: criteres.codePostal
-        ? [criteres.codePostal.toString()]
-        : undefined,
+      codePostal: [criteres.codePostal],
       secteurActivite: criteres.secteurActivite,
       dateDebut: criteres.dateDebut,
       dateFin: criteres.dateFin,

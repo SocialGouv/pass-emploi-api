@@ -30,7 +30,7 @@ describe('GetEvenementsEmploiQueryHandler', () => {
       it('retourne toutes les offres', async () => {
         // Given
         const query: GetEvenementsEmploiQuery = {
-          codePostal: 75009
+          codePostal: '75009'
         }
 
         poleEmploiClient.getEvenementsEmploi
