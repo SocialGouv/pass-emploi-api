@@ -28,6 +28,7 @@ import { ListeDeDiffusionJeuneAssociationSqlModel } from './liste-de-diffusion-j
 import { SuiviJobSqlModel } from './suivi-job.sql-model'
 import { SuiviPeCejSqlModel } from './suivi-pe-cej.sql-model'
 import { EvenementEngagementHebdoSqlModel } from './evenement-engagement-hebdo.sql-model'
+import { StructureMiloSqlModel } from './structure-milo.sql-model'
 
 export const sqlModels = [
   ConseillerSqlModel,
@@ -59,5 +60,6 @@ export const sqlModels = [
   LogModificationRendezVousSqlModel,
   ListeDeDiffusionSqlModel,
   ListeDeDiffusionJeuneAssociationSqlModel,
-  SuiviPeCejSqlModel
+  SuiviPeCejSqlModel,
+  StructureMiloSqlModel
 ]

@@ -322,6 +322,11 @@ import { GetCVPoleEmploiQueryHandler } from './application/queries/get-cv-pole-e
 import { EvenementsEmploiController } from './infrastructure/routes/evenements-emploi.controller'
 import { GetEvenementsEmploiQueryHandler } from './application/queries/get-evenements-emploi.query.handler'
 import { GetEvenementEmploiQueryHandler } from './application/queries/get-evenement-emploi.query.handler'
+import { GetSessionsMiloQueryHandler } from './application/queries/milo/get-sessions.milo.query.handler'
+import { MiloClient } from './infrastructure/clients/milo-client'
+import { ConseillerMiloRepositoryToken } from './domain/milo/conseiller.milo'
+import { ConseillerMiloSqlRepository } from './infrastructure/repositories/milo/conseiller.milo.repository.db'
+import { ConseillersMiloController } from './infrastructure/routes/conseillers.milo.controller'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -345,6 +350,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     JeunesControllerV2,
     ConseillersController,
     ConseillersControllerV2,
+    ConseillersMiloController,
     RendezVousController,
     EtablissementsController,
     EtablissementsControllerV2,
@@ -384,6 +390,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     ChatCryptoService,
     RateLimiterService,
     PoleEmploiClient,
+    MiloClient,
     ImmersionClient,
     EngagementClient,
     ObjectStorageClient,
@@ -428,6 +435,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     {
       provide: ConseillersRepositoryToken,
       useClass: ConseillerSqlRepository
+    },
+    {
+      provide: ConseillerMiloRepositoryToken,
+      useClass: ConseillerMiloSqlRepository
     },
     {
       provide: OffresEmploiRepositoryToken,
@@ -708,7 +719,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetFavorisAccueilQueryGetter,
     GetCVPoleEmploiQueryHandler,
     GetEvenementsEmploiQueryHandler,
-    GetEvenementEmploiQueryHandler
+    GetEvenementEmploiQueryHandler,
+    GetSessionsMiloQueryHandler
   ]
 }
 

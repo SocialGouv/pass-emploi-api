@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import { firstValueFrom } from 'rxjs'
-import { Core } from '../../domain/core'
+import { Core, estMilo, estPoleEmploiBRSA } from '../../domain/core'
 import { buildError } from '../../utils/logger.module'
 
 @Injectable()
@@ -26,15 +26,30 @@ export class KeycloakClient {
     this.clientSecret = this.configService.get('oidc').clientSecret
   }
 
+  public async exchangeTokenConseiller(
+    bearer: string,
+    structure: Core.Structure
+  ): Promise<string> {
+    switch (structure) {
+      case Core.Structure.MILO:
+        return this.exchangeToken(bearer, 'similo-conseiller', structure)
+    }
+    throw new UnauthorizedException({
+      statusCode: 401,
+      code: 'Unauthorized',
+      message: 'token exchange conseiller failed'
+    })
+  }
+
   public async exchangeTokenJeune(
     bearer: string,
     structure: Core.Structure
   ): Promise<string> {
     switch (structure) {
       case Core.Structure.POLE_EMPLOI:
-        return this.exchangeToken(bearer, 'pe-jeune')
+        return this.exchangeToken(bearer, 'pe-jeune', structure)
       case Core.Structure.POLE_EMPLOI_BRSA:
-        return this.exchangeToken(bearer, 'pe-brsa-jeune')
+        return this.exchangeToken(bearer, 'pe-brsa-jeune', structure)
     }
     throw new UnauthorizedException({
       statusCode: 401,
@@ -45,7 +60,8 @@ export class KeycloakClient {
 
   private async exchangeToken(
     bearer: string,
-    provider: string
+    provider: string,
+    structure: Core.Structure
   ): Promise<string> {
     const url = `${this.issuerUrl}/protocol/openid-connect/token`
     const payload = {
@@ -70,10 +86,18 @@ export class KeycloakClient {
       return result.access_token
     } catch (e) {
       this.logger.error(buildError('erreur lors du token exchange', e))
+
+      let message = 'token_expired'
+      if (estPoleEmploiBRSA(structure)) {
+        message = 'token_pole_emploi_expired'
+      } else if (estMilo(structure)) {
+        message = 'token_milo_expired'
+      }
+
       throw new UnauthorizedException({
         statusCode: 401,
         code: 'Unauthorized',
-        message: 'token_pole_emploi_expired'
+        message
       })
     }
   }

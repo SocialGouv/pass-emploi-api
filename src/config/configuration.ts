@@ -56,6 +56,13 @@ export default () => {
       apiKeyCreerJeune: process.env.MILO_JEUNE_API_KEY,
       apiKeyEvents: process.env.MILO_EVENTS_API_KEY,
       apiKeyDetailRendezVous: process.env.MILO_RENDEZ_VOUS_API_KEY,
+      apiKeyInstanceSessionLecture: process.env.MILO_INSTANCE_SESSION_LECTURE_API_KEY,
+      apiKeyInstanceSessionEcritureConseiller: process.env.MILO_INSTANCE_SESSION_ECRITURE_CONSEILLER_API_KEY,
+      apiKeyInstanceSessionAnnulationJeune: process.env.MILO_INSTANCE_SESSION_ANNULATION_JEUNE_API_KEY,
+      apiKeySessionDetailConseiller: process.env.MILO_SESSION_DETAIL_CONSEILLER_API_KEY,
+      apiKeySessionsListeJeune: process.env.MILO_SESSIONS_LISTE_JEUNE_API_KEY,
+      apiKeySessionsListeConseiller: process.env.MILO_SESSIONS_LISTE_CONSEILLER_API_KEY,
+      apiKeyUtilisateurs: process.env.MILO_UTILISATEURS_API_KEY,
       urlWeb: process.env.MILO_WEB_URL
     },
     immersion: {

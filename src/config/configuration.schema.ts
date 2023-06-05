@@ -39,7 +39,14 @@ export const configurationSchema = Joi.object({
     apiKeyDossier: Joi.string().required(),
     apiKeyCreerJeune: Joi.string().required(),
     apiKeyEvents: Joi.string().required(),
-    apiKeyDetailRendezVous: Joi.string().required()
+    apiKeyDetailRendezVous: Joi.string().required(),
+    apiKeyInstanceSessionLecture: Joi.string().required(),
+    apiKeyInstanceSessionEcritureConseiller: Joi.string().required(),
+    apiKeyInstanceSessionAnnulationJeune: Joi.string().required(),
+    apiKeySessionDetailConseiller: Joi.string().required(),
+    apiKeySessionsListeJeune: Joi.string().required(),
+    apiKeySessionsListeConseiller: Joi.string().required(),
+    apiKeyUtilisateurs: Joi.string().required()
   }),
   immersion: {
     url: Joi.string().uri().required(),
