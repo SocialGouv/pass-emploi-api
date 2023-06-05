@@ -14,14 +14,14 @@ import { Result } from '../../../building-blocks/types/result'
 import { generateSourceRendezVousCondition } from '../../../config/feature-flipping'
 import { ConfigService } from '@nestjs/config'
 
-export interface GetAllRendezVousConseiller extends Query {
+export interface GetAllRendezVousConseillerQuery extends Query {
   idConseiller: string
   presenceConseiller?: boolean
 }
 
 @Injectable()
 export class GetAllRendezVousConseillerQueryHandler extends QueryHandler<
-  GetAllRendezVousConseiller,
+  GetAllRendezVousConseillerQuery,
   RendezVousConseillerFutursEtPassesQueryModel
 > {
   constructor(
@@ -34,7 +34,7 @@ export class GetAllRendezVousConseillerQueryHandler extends QueryHandler<
   }
 
   async handle(
-    query: GetAllRendezVousConseiller
+    query: GetAllRendezVousConseillerQuery
   ): Promise<RendezVousConseillerFutursEtPassesQueryModel> {
     const maintenant = this.dateService.nowJs()
 
@@ -106,7 +106,7 @@ export class GetAllRendezVousConseillerQueryHandler extends QueryHandler<
   }
 
   async authorize(
-    query: GetAllRendezVousConseiller,
+    query: GetAllRendezVousConseillerQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     return this.conseillerAuthorizer.autoriserLeConseiller(

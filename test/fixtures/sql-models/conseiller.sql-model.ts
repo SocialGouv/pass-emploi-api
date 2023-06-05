@@ -18,7 +18,8 @@ export function unConseillerDto(
     dateDerniereConnexion: null,
     idAgence: undefined,
     nomManuelAgence: undefined,
-    notificationsSonores: false
+    notificationsSonores: false,
+    idStructureMilo: null
   }
 
   return { ...defaults, ...args }

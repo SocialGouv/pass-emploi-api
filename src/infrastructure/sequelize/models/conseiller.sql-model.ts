@@ -12,6 +12,7 @@ import { Core } from '../../../domain/core'
 import { AsSql } from '../types'
 import { JeuneSqlModel } from './jeune.sql-model'
 import { AgenceSqlModel } from './agence.sql-model'
+import { StructureMiloSqlModel } from './structure-milo.sql-model'
 
 export class ConseillerDto extends Model {
   @PrimaryKey
@@ -82,6 +83,13 @@ export class ConseillerDto extends Model {
   })
   nomManuelAgence?: string
 
+  @ForeignKey(() => StructureMiloSqlModel)
+  @Column({
+    field: 'id_structure_milo',
+    type: DataType.STRING
+  })
+  idStructureMilo?: string | null
+
   @Column({
     field: 'notifications_sonores',
     type: DataType.BOOLEAN
@@ -99,6 +107,9 @@ export class ConseillerSqlModel extends ConseillerDto {
 
   @BelongsTo(() => AgenceSqlModel, 'id_agence')
   agence?: AgenceSqlModel
+
+  @BelongsTo(() => StructureMiloSqlModel, 'id_structure_milo')
+  structureMilo?: StructureMiloSqlModel
 
   static async creer(conseillerDto: AsSql<ConseillerDto>): Promise<void> {
     await ConseillerSqlModel.create(conseillerDto)
