@@ -27,9 +27,8 @@ export class FindEvenementsEmploiQueryParams {
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
-  @Transform(params => transformStringToInteger(params, 'codePostal'))
-  codePostal: number
+  @IsString()
+  codePostal: string
 
   @ApiPropertyOptional()
   @IsOptional()

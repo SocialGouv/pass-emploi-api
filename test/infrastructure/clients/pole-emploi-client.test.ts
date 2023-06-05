@@ -424,7 +424,7 @@ describe('PoleEmploiClient', () => {
       const evenementsEmploi = await poleEmploiClient.getEvenementsEmploi({
         page: 1,
         limit: 10,
-        codePostal: 75001
+        codePostal: '75001'
       })
 
       // Then

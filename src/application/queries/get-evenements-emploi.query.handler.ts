@@ -49,7 +49,7 @@ export class EvenementsEmploiQueryModel {
 export interface GetEvenementsEmploiQuery extends Query {
   page?: number
   limit?: number
-  codePostal: number
+  codePostal: string
   secteurActivite?: string
   dateDebut?: string
   dateFin?: string
