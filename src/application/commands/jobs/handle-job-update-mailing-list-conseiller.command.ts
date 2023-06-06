@@ -50,9 +50,9 @@ export class HandleJobUpdateMailingListConseillerCommandHandler extends JobHandl
         Core.Structure.MILO
       ])
     const contactsPoleEmploi =
-      await this.mailRepository.findAllContactsConseillerByStructures(
-        Core.structuresPoleEmploiBRSA
-      )
+      await this.mailRepository.findAllContactsConseillerByStructures([
+        Core.Structure.POLE_EMPLOI
+      ])
     await this.mailService.mettreAJourMailingList(
       contactsMilo,
       parseInt(this.mailingLists.milo)
