@@ -25,6 +25,7 @@ export class FindAllOffresImmersionQueryGetter {
     params.append('latitude', query.lat.toString())
     params.append('distance_km', distanceAvecDefault)
     params.append('sortedBy', 'date')
+    params.append('voluntaryToImmersion', 'true')
 
     try {
       const response = await this.immersionClient.get<

@@ -58,6 +58,7 @@ describe('', () => {
         params.append('latitude', query.location.lat.toString())
         params.append('distance_km', query.distance_km.toString())
         params.append('sortedBy', 'date')
+        params.append('voluntaryToImmersion', 'true')
 
         immersionClient.get.withArgs('v1/immersion-offers').resolves(response)
 
