@@ -64,7 +64,7 @@ export class FindEvenementsEmploiQueryParams {
   })
   @IsOptional()
   @IsNotEmpty()
-  @IsNumber()
+  @IsString()
   @IsIn(['ADIST', 'ENPHY'])
   modalite?: string
 }
