@@ -3,9 +3,22 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async transaction => {
-      await queryInterface.sequelize.query(
-        `ALTER TABLE suggestion ALTER COLUMN metier DROP NOT NULL;
-        ALTER TABLE suggestion ALTER COLUMN localisation DROP NOT NULL;`,
+      await queryInterface.changeColumn(
+        'suggestion',
+        'metier',
+        {
+          type: Sequelize.STRING,
+          allowNull: true
+        },
+        { transaction }
+      )
+      await queryInterface.changeColumn(
+        'suggestion',
+        'localisation',
+        {
+          type: Sequelize.STRING,
+          allowNull: true
+        },
         { transaction }
       )
     })
@@ -14,8 +27,28 @@ module.exports = {
   async down(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async transaction => {
       await queryInterface.sequelize.query(
-        `ALTER TABLE suggestion ALTER COLUMN metier SET NOT NULL;
-        ALTER TABLE suggestion ALTER COLUMN localisation SET NOT NULL;`,
+        `UPDATE suggestion SET metier = 'NULL', localisation = 'NULL' WHERE metier IS NULL OR localisation IS NULL`,
+        {
+          type: Sequelize.QueryTypes.UPDATE,
+          transaction
+        }
+      )
+      await queryInterface.changeColumn(
+        'suggestion',
+        'metier',
+        {
+          type: Sequelize.STRING,
+          allowNull: false
+        },
+        { transaction }
+      )
+      await queryInterface.changeColumn(
+        'suggestion',
+        'localisation',
+        {
+          type: Sequelize.STRING,
+          allowNull: false
+        },
         { transaction }
       )
     })
