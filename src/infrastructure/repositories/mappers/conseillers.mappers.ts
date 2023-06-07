@@ -26,6 +26,11 @@ export function fromSqlToDetailConseillerQueryModel(
       id: undefined,
       nom: conseillerSqlModel.nomManuelAgence
     }
+  } else if (conseillerSqlModel.structureMilo) {
+    conseiller.agence = {
+      id: conseillerSqlModel.structureMilo.id,
+      nom: conseillerSqlModel.structureMilo.nomOfficiel
+    }
   }
   return conseiller
 }

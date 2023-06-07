@@ -1,40 +1,58 @@
 import { Injectable } from '@nestjs/common'
-import { Authentification } from '../../domain/authentification'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
-import { DetailConseillerQueryModel } from './query-models/conseillers.query-model'
-import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
+import { Result, failure, success } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { Conseiller } from '../../domain/conseiller/conseiller'
+import { Core, estMilo } from '../../domain/core'
 import { fromSqlToDetailConseillerQueryModel } from '../../infrastructure/repositories/mappers/conseillers.mappers'
 import { AgenceSqlModel } from '../../infrastructure/sequelize/models/agence.sql-model'
+import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
-import { Result } from '../../building-blocks/types/result'
+import { StructureMiloSqlModel } from '../../infrastructure/sequelize/models/structure-milo.sql-model'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
+import { DetailConseillerQueryModel } from './query-models/conseillers.query-model'
 
 export interface GetDetailConseillerQuery extends Query {
   idConseiller: string
+  structure: Core.Structure
+  token: string
 }
 
 @Injectable()
 export class GetDetailConseillerQueryHandler extends QueryHandler<
   GetDetailConseillerQuery,
-  DetailConseillerQueryModel | undefined
+  Result<DetailConseillerQueryModel>
 > {
-  constructor(private conseillerAuthorizer: ConseillerAuthorizer) {
+  constructor(
+    private conseillerAuthorizer: ConseillerAuthorizer,
+    private conseillerMiloService: Conseiller.Milo.Service
+  ) {
     super('GetDetailConseillerQueryHandler')
   }
 
   async handle(
     query: GetDetailConseillerQuery
-  ): Promise<DetailConseillerQueryModel | undefined> {
+  ): Promise<Result<DetailConseillerQueryModel>> {
+    if (estMilo(query.structure)) {
+      await this.conseillerMiloService.recupererEtMettreAJourStructure(
+        query.idConseiller,
+        query.token
+      )
+    }
+
     const conseillerSqlModel = await ConseillerSqlModel.findByPk(
       query.idConseiller,
       {
-        include: [AgenceSqlModel]
+        include: [
+          estMilo(query.structure) ? StructureMiloSqlModel : AgenceSqlModel
+        ]
       }
     )
 
     if (!conseillerSqlModel) {
-      return undefined
+      return failure(new NonTrouveError('Conseiller', query.idConseiller))
     }
 
     const jeuneARecuperer = await JeuneSqlModel.findOne({
@@ -42,9 +60,11 @@ export class GetDetailConseillerQueryHandler extends QueryHandler<
       attributes: ['id']
     })
 
-    return fromSqlToDetailConseillerQueryModel(
-      conseillerSqlModel,
-      Boolean(Boolean(jeuneARecuperer))
+    return success(
+      fromSqlToDetailConseillerQueryModel(
+        conseillerSqlModel,
+        Boolean(jeuneARecuperer)
+      )
     )
   }
   async authorize(

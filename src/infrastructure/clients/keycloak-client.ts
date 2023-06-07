@@ -26,19 +26,8 @@ export class KeycloakClient {
     this.clientSecret = this.configService.get('oidc').clientSecret
   }
 
-  public async exchangeTokenConseiller(
-    bearer: string,
-    structure: Core.Structure
-  ): Promise<string> {
-    switch (structure) {
-      case Core.Structure.MILO:
-        return this.exchangeToken(bearer, 'similo-conseiller', structure)
-    }
-    throw new UnauthorizedException({
-      statusCode: 401,
-      code: 'Unauthorized',
-      message: 'token exchange conseiller failed'
-    })
+  public async exchangeTokenConseillerMilo(bearer: string): Promise<string> {
+    return this.exchangeToken(bearer, 'similo-conseiller', Core.Structure.MILO)
   }
 
   public async exchangeTokenJeune(

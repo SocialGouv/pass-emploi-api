@@ -397,6 +397,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     ObjectStorageClient,
     Action.Factory,
     Action.Commentaire.Factory,
+    Conseiller.Milo.Factory,
+    Conseiller.Milo.Service,
     Mail.Factory,
     Authentification.Factory,
     Campagne.Factory,

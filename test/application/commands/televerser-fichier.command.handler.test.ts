@@ -1,28 +1,27 @@
-import { Fichier } from '../../../src/domain/fichier'
-import { expect, StubbedClass, stubClass } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { createSandbox } from 'sinon'
+import { Authentification } from 'src/domain/authentification'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
+import { ListeDeDiffusionAuthorizer } from '../../../src/application/authorizers/liste-de-diffusion-authorizer'
 import {
   TeleverserFichierCommand,
   TeleverserFichierCommandHandler
 } from '../../../src/application/commands/televerser-fichier.command.handler'
-import { createSandbox } from 'sinon'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import {
+  DroitsInsuffisants,
+  MauvaiseCommandeError
+} from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
   success
 } from '../../../src/building-blocks/types/result'
-import { unFichier } from '../../fixtures/fichier.fixture'
-import {
-  DroitsInsuffisants,
-  MauvaiseCommandeError,
-  NonTraitableError
-} from '../../../src/building-blocks/types/domain-error'
-import { Authentification } from 'src/domain/authentification'
-import { ListeDeDiffusionAuthorizer } from '../../../src/application/authorizers/liste-de-diffusion-authorizer'
 import { Conseiller } from '../../../src/domain/conseiller/conseiller'
+import { Fichier } from '../../../src/domain/fichier'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import { unFichier } from '../../fixtures/fichier.fixture'
 import { uneListeDeDiffusion } from '../../fixtures/liste-de-diffusion.fixture'
-import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
+import { expect, StubbedClass, stubClass } from '../../utils'
 
 describe('TeleverserFichierCommandHandler', () => {
   let fichierRepository: StubbedType<Fichier.Repository>
@@ -188,7 +187,7 @@ describe('TeleverserFichierCommandHandler', () => {
       describe("quand le fichier n'est pas valide", () => {
         it('retourne une failure', async () => {
           // Given
-          const echec = failure(new NonTraitableError('Fichier', '1'))
+          const echec = failure(new MauvaiseCommandeError('Fichier'))
           fichierFactory.creer
             .withArgs({ ...command, jeunesIds: command.jeunesIds! })
             .returns(echec)

@@ -2,44 +2,69 @@ import { HttpService } from '@nestjs/axios'
 import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
-import { Result, failure, success } from '../../building-blocks/types/result'
-import { handleAxiosError } from './utils/axios-error-handler'
-import { KeycloakClient } from './keycloak-client'
-import { Core } from '../../domain/core'
 import { ErreurHttp } from '../../building-blocks/types/domain-error'
-import { SessionConseillerListeDto } from './dto/milo.dto'
+import {
+  Result,
+  failure,
+  isFailure,
+  success
+} from '../../building-blocks/types/result'
+import {
+  SessionConseillerMiloListeDto,
+  StructureConseillerMiloDto
+} from './dto/milo.dto'
+import { handleAxiosError } from './utils/axios-error-handler'
 
 @Injectable()
 export class MiloClient {
   private readonly apiUrl: string
   private readonly apiKeySessionsListeConseiller: string
+  private readonly apiKeyUtilisateurs: string
   private logger: Logger
 
   constructor(
     private httpService: HttpService,
-    private configService: ConfigService,
-    private keycloakClient: KeycloakClient
+    private configService: ConfigService
   ) {
     this.logger = new Logger('MiloClient')
     this.apiUrl = this.configService.get('milo').url
     this.apiKeySessionsListeConseiller =
       this.configService.get('milo').apiKeySessionsListeConseiller
+    this.apiKeyUtilisateurs = this.configService.get('milo').apiKeyUtilisateurs
   }
 
   async getSessionsConseiller(
-    token: string,
+    idpToken: string,
     idStructure: string
-  ): Promise<Result<SessionConseillerListeDto>> {
-    const idpToken = await this.keycloakClient.exchangeTokenConseiller(
-      token,
-      Core.Structure.MILO
-    )
-
-    return this.get<SessionConseillerListeDto>(
+  ): Promise<Result<SessionConseillerMiloListeDto>> {
+    return this.get<SessionConseillerMiloListeDto>(
       `structures/${idStructure}/sessions`,
       this.apiKeySessionsListeConseiller,
       idpToken
     )
+  }
+
+  async getStructureConseiller(
+    idpToken: string
+  ): Promise<Result<StructureConseillerMiloDto>> {
+    const resultStructures = await this.get<StructureConseillerMiloDto[]>(
+      `utilisateurs/moi/structures`,
+      this.apiKeyUtilisateurs,
+      idpToken
+    )
+
+    if (isFailure(resultStructures)) {
+      return resultStructures
+    }
+    const structurePrincipale = resultStructures.data.find(
+      structureMilo => structureMilo.principale
+    )
+    if (!structurePrincipale) {
+      return failure(
+        new ErreurHttp('Structure Milo principale introuvable', 404)
+      )
+    }
+    return success(structurePrincipale)
   }
 
   private async get<T>(
