@@ -1,10 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { NonTrouveError } from '../../../building-blocks/types/domain-error'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import {
   Result,
-  failure,
   isFailure,
   success
 } from '../../../building-blocks/types/result'
@@ -12,9 +10,10 @@ import { Authentification } from '../../../domain/authentification'
 import { Conseiller } from '../../../domain/conseiller/conseiller'
 import { estMilo } from '../../../domain/core'
 import { ConseillerMiloRepositoryToken } from '../../../domain/milo/conseiller.milo'
+import { SessionConseillerDetailDto } from '../../../infrastructure/clients/dto/milo.dto'
+import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client'
 import { MiloClient } from '../../../infrastructure/clients/milo-client'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
-import { SessionConseillerDetailDto } from '../../../infrastructure/clients/dto/milo.dto'
 
 export class SessionConseillerMiloQueryModel {
   id: string
@@ -41,7 +40,8 @@ export class GetSessionsMiloQueryHandler extends QueryHandler<
     private miloClient: MiloClient,
     @Inject(ConseillerMiloRepositoryToken)
     private conseillerRepository: Conseiller.Milo.Repository,
-    private conseillerAuthorizer: ConseillerAuthorizer
+    private conseillerAuthorizer: ConseillerAuthorizer,
+    private keycloakClient: KeycloakClient
   ) {
     super('GetSessionsMiloQueryHandler')
   }
@@ -49,14 +49,20 @@ export class GetSessionsMiloQueryHandler extends QueryHandler<
   async handle(
     query: GetSessionsMiloQuery
   ): Promise<Result<SessionConseillerMiloQueryModel[]>> {
-    const conseiller = await this.conseillerRepository.get(query.idConseiller)
-    if (!conseiller) {
-      return failure(new NonTrouveError('Conseiller Milo', query.idConseiller))
+    const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
+      query.token
+    )
+
+    const resultConseiller = await this.conseillerRepository.get(
+      query.idConseiller
+    )
+    if (isFailure(resultConseiller)) {
+      return resultConseiller
     }
 
     const result = await this.miloClient.getSessionsConseiller(
-      query.token,
-      conseiller.idStructure
+      idpToken,
+      resultConseiller.data.idStructure
     )
     if (isFailure(result)) {
       return result

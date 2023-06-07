@@ -13,6 +13,16 @@ export class NonTrouveError implements DomainError {
   }
 }
 
+export class ConseillerMiloSansStructure implements DomainError {
+  static CODE = 'CONSEILLER_MILO_SANS_STRUCTURE'
+  readonly code: string = ConseillerMiloSansStructure.CODE
+  readonly message: string
+
+  constructor(critereRecherche = '') {
+    this.message = `Conseiller Milo ${critereRecherche} sans structure`
+  }
+}
+
 export class CampagneNonActive implements DomainError {
   static CODE = 'CAMPAGNE_NON_ACTIVE'
   readonly code: string = CampagneNonActive.CODE

@@ -78,7 +78,7 @@ import { Action } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { DateService } from '../../utils/date-service'
-import { Utilisateur } from '../decorators/authenticated.decorator'
+import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'
 import { CreateActionPayload } from './validation/actions.inputs'
 import {
@@ -178,22 +178,23 @@ export class ConseillersController {
   })
   async getDetailConseiller(
     @Param('idConseiller') idConseiller: string,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string
   ): Promise<DetailConseillerQueryModel> {
-    const queryModel = await this.getDetailConseillerQueryHandler.execute(
+    const result = await this.getDetailConseillerQueryHandler.execute(
       {
-        idConseiller
+        idConseiller,
+        structure: utilisateur.structure,
+        token: accessToken
       },
       utilisateur
     )
-    if (queryModel) {
-      return queryModel
+
+    if (isSuccess(result)) {
+      return result.data
     }
 
-    throw new HttpException(
-      `Conseiller ${idConseiller} not found`,
-      HttpStatus.NOT_FOUND
-    )
+    throw handleFailure(result)
   }
 
   @ApiOperation({

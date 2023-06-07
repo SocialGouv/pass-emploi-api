@@ -61,8 +61,10 @@ import { unJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-mode
 import { StubbedClass, expect } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
+import { GetDetailConseillerQueryHandler } from '../../../src/application/queries/get-detail-conseiller.query.handler.db'
 
 describe('ConseillersController', () => {
+  let getDetailConseillerQueryHandler: StubbedClass<GetDetailConseillerQueryHandler>
   let getConseillerByEmailQueryHandler: StubbedClass<GetConseillerByEmailQueryHandler>
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
   let getJeunesByConseillerQueryHandler: StubbedClass<GetJeunesByConseillerQueryHandler>
@@ -85,6 +87,7 @@ describe('ConseillersController', () => {
 
   before(async () => {
     app = await getApplicationWithStubbedDependencies()
+    getDetailConseillerQueryHandler = app.get(GetDetailConseillerQueryHandler)
     getConseillerByEmailQueryHandler = app.get(GetConseillerByEmailQueryHandler)
     createActionCommandHandler = app.get(CreateActionCommandHandler)
     getJeunesByConseillerQueryHandler = app.get(
@@ -175,6 +178,34 @@ describe('ConseillersController', () => {
       'get',
       '/conseillers?email=conseiller@email.fr'
     )
+  })
+
+  describe('GET /conseillers/id', () => {
+    it("renvoie les infos du conseiller s'il existe ", async () => {
+      // Given
+      const queryModel = detailConseillerQueryModel()
+      getDetailConseillerQueryHandler.execute.resolves(success(queryModel))
+
+      // When - Then
+      await request(app.getHttpServer())
+        .get('/conseillers/123')
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+        .expect(queryModel)
+
+      expect(
+        getDetailConseillerQueryHandler.execute
+      ).to.have.been.calledOnceWithExactly(
+        {
+          idConseiller: '123',
+          structure: Core.Structure.MILO,
+          token: 'coucou'
+        },
+        unUtilisateurDecode()
+      )
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('get', '/conseillers/123')
   })
 
   describe('GET /conseillers/:idConseiller/jeunes', () => {

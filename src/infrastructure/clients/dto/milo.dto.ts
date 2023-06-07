@@ -23,8 +23,15 @@ export interface SessionConseillerDetailDto {
   }
 }
 
-export interface SessionConseillerListeDto {
+export interface SessionConseillerMiloListeDto {
   page: number
   nbSessions: number
   sessions: SessionConseillerDetailDto[]
+}
+
+export interface StructureConseillerMiloDto {
+  id: number
+  nomOfficiel: string
+  nomUsuel: string
+  principale: boolean
 }

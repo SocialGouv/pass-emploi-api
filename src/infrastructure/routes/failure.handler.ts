@@ -11,6 +11,7 @@ import {
   CampagneExisteDejaError,
   CampagneNonActive,
   CompteDiagorienteInvalideError,
+  ConseillerMiloSansStructure,
   ConseillerSansAgenceError,
   DateNonAutoriseeError,
   DossierExisteDejaError,
@@ -45,6 +46,7 @@ export function handleFailure(result: Result): void {
       case CampagneExisteDejaError.CODE:
       case JeuneNonLieALAgenceError.CODE:
       case ConseillerSansAgenceError.CODE:
+      case ConseillerMiloSansStructure.CODE:
         throw new BadRequestException(result.error, result.error.message)
       case RessourceIndisponibleError.CODE:
         throw new GoneException(result.error.message)

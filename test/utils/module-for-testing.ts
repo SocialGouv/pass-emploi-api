@@ -102,9 +102,19 @@ export const testConfig = (): ConfigService => {
     milo: {
       url: 'https://milo.com',
       urlWeb: 'https://milo.com',
-      apiKeyDossier: 'apiKeyRecupererDossier',
+      apiKeyDossier: 'apiKeyDossier',
       apiKeyCreerJeune: 'apiKeyCreerJeune',
-      apiKeyEvents: 'apiKeyEvents'
+      apiKeyEvents: 'apiKeyEvents',
+      apiKeyDetailRendezVous: 'apiKeyDetailRendezVous',
+      apiKeyInstanceSessionLecture: 'apiKeyInstanceSessionLecture',
+      apiKeyInstanceSessionEcritureConseiller:
+        'apiKeyInstanceSessionEcritureConseiller',
+      apiKeyInstanceSessionAnnulationJeune:
+        'apiKeyInstanceSessionAnnulationJeune',
+      apiKeySessionDetailConseiller: 'apiKeySessionDetailConseiller',
+      apiKeySessionsListeJeune: 'apiKeySessionsListeJeune',
+      apiKeySessionsListeConseiller: 'apiKeySessionsListeConseiller',
+      apiKeyUtilisateurs: 'apiKeyUtilisateurs'
     },
     redis: {
       // eslint-disable-next-line no-process-env

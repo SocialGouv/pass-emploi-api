@@ -1,6 +1,6 @@
 import { HandleJobAgenceAnimationCollectiveCommandHandler } from '../../../../src/application/commands/jobs/handle-job-agence-animation-collective.command.db'
 import { AgenceSqlModel } from '../../../../src/infrastructure/sequelize/models/agence.sql-model'
-import { uneAgenceMiloDTO } from '../../../fixtures/sql-models/agence.sql-model'
+import { uneAgenceMiloDto } from '../../../fixtures/sql-models/agence.sql-model'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import {
@@ -33,7 +33,7 @@ describe('HandleJobAgenceAnimationCollectiveCommand', () => {
   let atelierAvecAgenceARemplir: AsSql<RendezVousDto>
   let atelierSansAgenceARemplir: AsSql<RendezVousDto>
   let rendezVousIndividuel: AsSql<RendezVousDto>
-  const agenceNantes = uneAgenceMiloDTO({ id: '1', nomAgence: 'Nantes' })
+  const agenceNantes = uneAgenceMiloDto({ id: '1', nomAgence: 'Nantes' })
 
   beforeEach(async () => {
     await database.cleanPG()

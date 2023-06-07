@@ -28,7 +28,7 @@ import {
   unRendezVousQueryModel
 } from '../../../fixtures/query-models/rendez-vous.query-model.fixtures'
 import { uneActionDto } from '../../../fixtures/sql-models/action.sql-model'
-import { uneAgenceMiloDTO } from '../../../fixtures/sql-models/agence.sql-model'
+import { uneAgenceMiloDto } from '../../../fixtures/sql-models/agence.sql-model'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
@@ -64,8 +64,8 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       }
 
       await AgenceSqlModel.bulkCreate([
-        uneAgenceMiloDTO({ id: 'bonne-agence-id' }),
-        uneAgenceMiloDTO({ id: 'fake-agence-id' })
+        uneAgenceMiloDto({ id: 'bonne-agence-id' }),
+        uneAgenceMiloDto({ id: 'fake-agence-id' })
       ])
 
       const conseiller = await ConseillerSqlModel.create(

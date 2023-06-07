@@ -10,7 +10,7 @@ import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
-import { uneAgenceMiloDTO } from '../../fixtures/sql-models/agence.sql-model'
+import { uneAgenceMiloDto } from '../../fixtures/sql-models/agence.sql-model'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { ConseillerInterAgenceAuthorizer } from '../../../src/application/authorizers/conseiller-inter-agence-authorizer'
@@ -54,9 +54,9 @@ describe('GetJeunesByEtablissementQueryHandler', () => {
 
     it("retourne les jeunes d'un établissement", async () => {
       // Given
-      await AgenceSqlModel.create(uneAgenceMiloDTO({ id: idEtablissement }))
+      await AgenceSqlModel.create(uneAgenceMiloDto({ id: idEtablissement }))
       await AgenceSqlModel.create(
-        uneAgenceMiloDTO({ id: 'autre-etablissement' })
+        uneAgenceMiloDto({ id: 'autre-etablissement' })
       )
 
       await ConseillerSqlModel.creer(
