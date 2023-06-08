@@ -143,20 +143,14 @@ export class EvenementEmploiCodePostalMapper {
   private readonly codePostalToCodePostauxAssocies: Map<string, string[]>
 
   constructor() {
-    this.codePostalToCodePostauxAssocies = this.initCodePostauxMap()
+    this.codePostalToCodePostauxAssocies = new Map<string, string[]>(
+      Object.values(villesToCodePostauxAssocies).flatMap(codePostaux =>
+        codePostaux.map(codePostal => [codePostal, codePostaux])
+      )
+    )
   }
 
   getCodePostauxAssocies(codePostal: string): string[] {
     return this.codePostalToCodePostauxAssocies.get(codePostal) ?? [codePostal]
-  }
-
-  private initCodePostauxMap(): Map<string, string[]> {
-    const codePostalToCodePostauxAssocies = new Map<string, string[]>()
-    Object.entries(villesToCodePostauxAssocies).forEach(([_, codePostaux]) => {
-      codePostaux.forEach(codePostal => {
-        codePostalToCodePostauxAssocies.set(codePostal, codePostaux)
-      })
-    })
-    return codePostalToCodePostauxAssocies
   }
 }
