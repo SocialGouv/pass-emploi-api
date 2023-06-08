@@ -5,19 +5,15 @@ import { PoleEmploiClient } from 'src/infrastructure/clients/pole-emploi-client'
 import { DateService } from 'src/utils/date-service'
 import { RateLimiterService } from 'src/utils/rate-limiter.service'
 import { expect, stubClass } from 'test/utils'
-import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
-import {
-  failure,
-  isSuccess,
-  success
-} from '../../../src/building-blocks/types/result'
-import { desNotificationsDunJeunePoleEmploi } from '../../fixtures/notification.fixture'
+import { ErreurHttp } from 'src/building-blocks/types/domain-error'
+import { failure, isSuccess, success } from 'src/building-blocks/types/result'
+import { desNotificationsDunJeunePoleEmploi } from 'test/fixtures/notification.fixture'
 import {
   notificationsRDVPEDto,
   uneOffreEmploiDto
-} from '../../fixtures/offre-emploi.fixture'
-import { desTypesDemarchesDto } from '../../fixtures/pole-emploi.dto.fixture'
-import { testConfig } from '../../utils/module-for-testing'
+} from 'test/fixtures/offre-emploi.fixture'
+import { desTypesDemarchesDto } from 'test/fixtures/pole-emploi.dto.fixture'
+import { testConfig } from 'test/utils/module-for-testing'
 
 describe('PoleEmploiClient', () => {
   let poleEmploiClient: PoleEmploiClient
@@ -424,7 +420,7 @@ describe('PoleEmploiClient', () => {
       const evenementsEmploi = await poleEmploiClient.getEvenementsEmploi({
         page: 1,
         limit: 10,
-        codePostal: '75001'
+        codePostaux: ['75001']
       })
 
       // Then
