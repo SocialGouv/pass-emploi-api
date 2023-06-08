@@ -7,19 +7,19 @@ import { firstValueFrom } from 'rxjs'
 import {
   ErreurHttp,
   NonTrouveError
-} from '../../building-blocks/types/domain-error'
+} from 'src/building-blocks/types/domain-error'
 import {
   Result,
   failure,
   isFailure,
   isSuccess,
   success
-} from '../../building-blocks/types/result'
-import { Notification } from '../../domain/notification/notification'
-import { desTypeDemarchesDtosMock } from '../../fixtures/types-demarches.fixture'
-import { DateService } from '../../utils/date-service'
-import { buildError } from '../../utils/logger.module'
-import { RateLimiterService } from '../../utils/rate-limiter.service'
+} from 'src/building-blocks/types/result'
+import { Notification } from 'src/domain/notification/notification'
+import { desTypeDemarchesDtosMock } from 'src/fixtures/types-demarches.fixture'
+import { DateService } from 'src/utils/date-service'
+import { buildError } from 'src/utils/logger.module'
+import { RateLimiterService } from 'src/utils/rate-limiter.service'
 import {
   EvenementEmploiDto,
   EvenementsEmploiDto,
@@ -59,7 +59,7 @@ export class PoleEmploiClient {
   async getEvenementsEmploi(criteres: {
     page: number
     limit: number
-    codePostal: string
+    codePostaux: string[]
     secteurActivite?: string
     dateDebut?: string
     dateFin?: string
@@ -74,14 +74,14 @@ export class PoleEmploiClient {
       params.append('size', criteres.limit.toString())
     }
     const body: {
-      codePostal: string[]
+      codePostaux: string[]
       secteurActivite?: string
       dateDebut?: string
       dateFin?: string
       typeEvenement?: string
       modalite?: string
     } = {
-      codePostal: [criteres.codePostal],
+      codePostaux: criteres.codePostaux,
       secteurActivite: criteres.secteurActivite,
       dateDebut: criteres.dateDebut,
       dateFin: criteres.dateFin,

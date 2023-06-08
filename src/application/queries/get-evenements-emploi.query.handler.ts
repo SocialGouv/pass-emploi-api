@@ -1,16 +1,17 @@
 import { Injectable } from '@nestjs/common'
 import { ApiProperty } from '@nestjs/swagger'
-import { Query } from '../../building-blocks/types/query'
-import { QueryHandler } from '../../building-blocks/types/query-handler'
+import { Query } from 'src/building-blocks/types/query'
+import { QueryHandler } from 'src/building-blocks/types/query-handler'
 import {
   Result,
   emptySuccess,
   isFailure,
   success
-} from '../../building-blocks/types/result'
-import { PoleEmploiClient } from '../../infrastructure/clients/pole-emploi-client'
-import { DateService } from '../../utils/date-service'
+} from 'src/building-blocks/types/result'
+import { PoleEmploiClient } from 'src/infrastructure/clients/pole-emploi-client'
+import { DateService } from 'src/utils/date-service'
 import { PaginationQueryModel } from './query-models/common/pagination.query-model'
+import { EvenementEmploiCodePostalMapper } from 'src/application/queries/query-mappers/evenement-emploi-code-postal.mapper'
 
 const NOMBRE_EVENEMENTS_MAX = 10
 const PAGE_PAR_DEFAUT = 1
@@ -62,7 +63,10 @@ export class GetEvenementsEmploiQueryHandler extends QueryHandler<
   GetEvenementsEmploiQuery,
   Result<EvenementsEmploiQueryModel>
 > {
-  constructor(private poleEmploiClient: PoleEmploiClient) {
+  constructor(
+    private poleEmploiClient: PoleEmploiClient,
+    private codePostalMapper: EvenementEmploiCodePostalMapper
+  ) {
     super('GetEvenementsEmploiQueryHandler')
   }
 
@@ -74,6 +78,9 @@ export class GetEvenementsEmploiQueryHandler extends QueryHandler<
 
     const resultEvenements = await this.poleEmploiClient.getEvenementsEmploi({
       ...query,
+      codePostaux: this.codePostalMapper.getCodePostauxAssocies(
+        query.codePostal
+      ),
       page,
       limit,
       dateDebut: DateService.fromStringToDateTime(query.dateDebut)
