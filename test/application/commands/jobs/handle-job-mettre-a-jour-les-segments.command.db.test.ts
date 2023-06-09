@@ -210,7 +210,7 @@ describe('HandleJobMettreAJourLesSegmentsCommandHandler', () => {
 
         expect(result.succes).to.equal(true)
         expect(result.resultat).to.deep.equal({
-          nbCampagnesNonRepondues: 4,
+          nbCampagnesNonRepondues: 3,
           nbJeunes: 5
         })
       })

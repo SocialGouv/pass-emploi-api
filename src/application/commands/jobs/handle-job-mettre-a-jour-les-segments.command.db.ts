@@ -86,7 +86,7 @@ export class HandleJobMettreAJourLesSegmentsCommandHandler extends JobHandler<Jo
     }
   }
 
-  async fetchJeunesInstanceIdNayantPasReponduAUneCampagneActive(): Promise<
+  async fetchJeunesNonBRSAInstanceIdNayantPasReponduAUneCampagneActive(): Promise<
     RawJeune[]
   > {
     const sqlCampagneEnCours = `select id
@@ -103,6 +103,7 @@ export class HandleJobMettreAJourLesSegmentsCommandHandler extends JobHandler<Jo
     const sql = `select instance_id, structure
                      from jeune
                      where instance_id is not null
+                       and structure <> 'POLE_EMPLOI_BRSA'
                        and id not in (select id_jeune
                                       from reponse_campagne
                                       where id_campagne in
@@ -196,7 +197,7 @@ export class HandleJobMettreAJourLesSegmentsCommandHandler extends JobHandler<Jo
     segments: Map<string, string[]>
   ): Promise<number> {
     const jeunes: RawJeune[] =
-      await this.fetchJeunesInstanceIdNayantPasReponduAUneCampagneActive()
+      await this.fetchJeunesNonBRSAInstanceIdNayantPasReponduAUneCampagneActive()
     jeunes.forEach(jeune => {
       this.addOrSetSegment(
         segments,
