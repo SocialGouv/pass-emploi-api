@@ -15,6 +15,7 @@ import {
 } from '../../../../building-blocks/types/result'
 import { Core, estNonBRSA } from '../../../core'
 import { Diagoriente } from './diagoriente'
+import { DiagorienteInformationsPayload } from 'src/infrastructure/routes/validation/suggestions-inputs'
 
 export interface Suggestion {
   id: string
@@ -341,6 +342,35 @@ export namespace Suggestion {
         case Recherche.Type.OFFRES_SERVICES_CIVIQUE:
           return 'Recherche de service civique'
       }
+    }
+
+    construireCriteresSuggestionsDiagoriente(
+      suggestionDiagoriente: Suggestion,
+      locationDiagoriente: DiagorienteInformationsPayload
+    ): Recherche.Emploi | Recherche.Immersion {
+      if (suggestionDiagoriente.type === Recherche.Type.OFFRES_EMPLOI) {
+        return {
+          commune:
+            locationDiagoriente.location.type === TypeLocalisation.COMMUNE
+              ? locationDiagoriente.location.code
+              : undefined,
+          departement:
+            locationDiagoriente.location.type === TypeLocalisation.DEPARTEMENT
+              ? locationDiagoriente.location.code
+              : undefined,
+          rayon: locationDiagoriente.rayon ?? Recherche.DISTANCE_PAR_DEFAUT
+        }
+      } else if (
+        suggestionDiagoriente.type === Recherche.Type.OFFRES_IMMERSION
+      ) {
+        return {
+          rome: suggestionDiagoriente.idFonctionnel!.codeRome!,
+          lat: locationDiagoriente.location.latitude!,
+          lon: locationDiagoriente.location.longitude!,
+          distance: locationDiagoriente.rayon ?? Recherche.DISTANCE_PAR_DEFAUT
+        }
+      }
+      throw new Error('Type de recherche non traité')
     }
 
     private construireCriteresSuggestionsPoleEmploi(

@@ -42,7 +42,10 @@ import {
   CreateRechercheServiceCiviquePayload,
   GetRecherchesQueryParams
 } from './validation/recherches.inputs'
-import { FindSuggestionsQueryParams } from './validation/suggestions-inputs'
+import {
+  DiagorienteInformationsPayload,
+  FindSuggestionsQueryParams
+} from './validation/suggestions-inputs'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
@@ -189,13 +192,22 @@ export class RecherchesJeunesController {
   async accepterSuggestion(
     @Param('idJeune') idJeune: string,
     @Param('idSuggestion') idSuggestion: string,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @Body() diagorientePayload?: DiagorienteInformationsPayload
   ): Promise<RechercheQueryModel> {
     const result =
       await this.createRechercheFromSuggestionCommandHandler.execute(
         {
           idJeune,
-          idSuggestion
+          idSuggestion,
+          location:
+            diagorientePayload && diagorientePayload.location
+              ? diagorientePayload.location
+              : undefined,
+          rayon:
+            diagorientePayload && diagorientePayload.rayon
+              ? diagorientePayload.rayon
+              : undefined
         },
         utilisateur
       )

@@ -477,6 +477,45 @@ describe('RecherchesController', () => {
           .expect(HttpStatus.CREATED)
           .expect(rechercheQueryModel)
       })
+      it('crée la recherche diagoriente correspondante', async () => {
+        // Given
+        const idSuggestion = 'id-suggestion'
+        const recherche = uneRecherche({
+          criteres: {
+            commune: '75012',
+            rayon: 19
+          }
+        })
+        createRechercheFromSuggestionCommandHandler.execute.resolves(
+          success(recherche)
+        )
+
+        const rechercheQueryModel: RechercheQueryModel = {
+          id: recherche.id,
+          titre: recherche.titre,
+          type: recherche.type,
+          metier: recherche.metier,
+          localisation: recherche.localisation,
+          criteres: recherche.criteres
+        }
+
+        // When
+        await request(app.getHttpServer())
+          .post(`/jeunes/1/recherches/suggestions/${idSuggestion}/accepter`)
+          .send({
+            location: {
+              code: '75012',
+              type: Suggestion.TypeLocalisation.COMMUNE,
+              latitude: 10.0,
+              longitude: 10.0
+            },
+            rayon: 20
+          })
+          .set('authorization', unHeaderAuthorization())
+          // Then
+          .expect(HttpStatus.CREATED)
+          .expect(rechercheQueryModel)
+      })
       ensureUserAuthenticationFailsIfInvalid(
         'post',
         '/jeunes/1/recherches/suggestions/123/accepter'

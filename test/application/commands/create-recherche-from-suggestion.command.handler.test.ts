@@ -19,6 +19,7 @@ import {
 import { uneSuggestion } from '../../fixtures/suggestion.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { EvenementService } from '../../../src/domain/evenement'
+import { Offre } from 'src/domain/offre/offre'
 
 describe('CreateRechercheFromSuggestionCommandHandler', () => {
   let createRechercheFromSuggestionCommandHandler: CreateRechercheFromSuggestionCommandHandler
@@ -82,7 +83,7 @@ describe('CreateRechercheFromSuggestionCommandHandler', () => {
 
   describe('handle', () => {
     describe('quand la suggestion est acceptée', () => {
-      it('crée une recherche à partir de la suggestion', async () => {
+      it('crée une recherche POLE EMPLOI à partir de la suggestion', async () => {
         // Given
         const command = { idJeune: 'id-jeune', idSuggestion: 'id-suggestion' }
 
@@ -117,6 +118,145 @@ describe('CreateRechercheFromSuggestionCommandHandler', () => {
         )
 
         // Then
+        expect(
+          rechercheFactory.buildRechercheFromSuggestion
+        ).to.have.been.calledWithExactly(suggestionAcceptee)
+        expect(rechercheRepository.save).to.have.been.calledWithExactly(
+          recherche
+        )
+        expect(suggestionRepository.save).to.have.been.calledWithExactly(
+          suggestionAcceptee
+        )
+        expect(result).to.deep.equal(success(recherche))
+      })
+      it('crée une recherche DIAGORIENTE à partir de la suggestion et une payload avec rayon', async () => {
+        // Given
+        const payload = {
+          location: {
+            type: Suggestion.TypeLocalisation.COMMUNE,
+            latitude: 10,
+            longitude: 5,
+            code: '75012'
+          },
+          rayon: 10
+        }
+        const command = {
+          idJeune: 'id-jeune',
+          idSuggestion: 'id-suggestion',
+          ...payload
+        }
+
+        const suggestion = uneSuggestion({
+          id: command.idSuggestion,
+          idJeune: command.idJeune,
+          source: Suggestion.Source.DIAGORIENTE
+        })
+        const criteresDiagoriente = { commune: '75012', rayon: 10 }
+        const suggestionAcceptee = {
+          ...suggestion,
+          criteres: criteresDiagoriente,
+          dateCreationRecherche: dateCreationRecherche,
+          idRecherche
+        }
+        const recherche = uneRecherche({
+          id: idRecherche,
+          type: suggestionAcceptee.type,
+          titre: suggestionAcceptee.informations.titre,
+          metier: suggestionAcceptee.informations.metier,
+          localisation: suggestionAcceptee.informations.localisation,
+          criteres: suggestionAcceptee.criteres,
+          idJeune: command.idJeune,
+          dateCreation: dateCreationRecherche,
+          dateDerniereRecherche: dateCreationRecherche
+        })
+
+        suggestionRepository.get.resolves(suggestion)
+        suggestionFactory.accepter.returns(success(suggestionAcceptee))
+        rechercheFactory.buildRechercheFromSuggestion.returns(recherche)
+
+        // When
+        const result = await createRechercheFromSuggestionCommandHandler.handle(
+          command
+        )
+
+        // Then
+        expect(
+          suggestionFactory.construireCriteresSuggestionsDiagoriente
+        ).to.have.been.calledOnceWithExactly(suggestion, payload)
+        expect(
+          rechercheFactory.buildRechercheFromSuggestion
+        ).to.have.been.calledWithExactly(suggestionAcceptee)
+        expect(rechercheRepository.save).to.have.been.calledWithExactly(
+          recherche
+        )
+        expect(suggestionRepository.save).to.have.been.calledWithExactly(
+          suggestionAcceptee
+        )
+        expect(result).to.deep.equal(success(recherche))
+      })
+      it('crée une recherche DIAGORIENTE à partir de la suggestion et une payload sans rayon', async () => {
+        // Given
+        const payload = {
+          location: {
+            type: Suggestion.TypeLocalisation.DEPARTEMENT,
+            latitude: 10,
+            longitude: 5,
+            code: '75012'
+          }
+        }
+        const command = {
+          idJeune: 'id-jeune',
+          idSuggestion: 'id-suggestion',
+          location: payload.location
+        }
+
+        const suggestion = uneSuggestion({
+          id: command.idSuggestion,
+          idJeune: command.idJeune,
+          source: Suggestion.Source.DIAGORIENTE,
+          type: Offre.Recherche.Type.OFFRES_IMMERSION
+        })
+
+        const criteresDiagoriente = {
+          rome: suggestion.idFonctionnel!.codeRome!,
+          lat: payload.location.latitude,
+          lon: payload.location.longitude,
+          distance: Recherche.DISTANCE_PAR_DEFAUT
+        }
+        const suggestionAcceptee = {
+          ...suggestion,
+          criteres: criteresDiagoriente,
+          dateCreationRecherche: dateCreationRecherche,
+          idRecherche
+        }
+        const recherche = uneRecherche({
+          id: idRecherche,
+          type: suggestionAcceptee.type,
+          titre: suggestionAcceptee.informations.titre,
+          metier: suggestionAcceptee.informations.metier,
+          localisation: suggestionAcceptee.informations.localisation,
+          criteres: suggestionAcceptee.criteres,
+          idJeune: command.idJeune,
+          dateCreation: dateCreationRecherche,
+          dateDerniereRecherche: dateCreationRecherche
+        })
+
+        suggestionRepository.get.resolves(suggestion)
+        suggestionFactory.accepter.returns(success(suggestionAcceptee))
+        rechercheFactory.buildRechercheFromSuggestion.returns(recherche)
+
+        // When
+        const result = await createRechercheFromSuggestionCommandHandler.handle(
+          command
+        )
+
+        // Then
+        expect(
+          suggestionFactory.construireCriteresSuggestionsDiagoriente
+        ).to.have.been.calledOnceWithExactly(suggestion, {
+          location: payload.location,
+          rayon: undefined
+        })
         expect(
           rechercheFactory.buildRechercheFromSuggestion
         ).to.have.been.calledWithExactly(suggestionAcceptee)
