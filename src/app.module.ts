@@ -327,7 +327,7 @@ import { MiloClient } from './infrastructure/clients/milo-client'
 import { ConseillerMiloRepositoryToken } from './domain/milo/conseiller.milo'
 import { ConseillerMiloSqlRepository } from './infrastructure/repositories/milo/conseiller.milo.repository.db'
 import { ConseillersMiloController } from './infrastructure/routes/conseillers.milo.controller'
-import { EvenementEmploiCodePostalMapper } from 'src/application/queries/query-mappers/evenement-emploi-code-postal.mapper'
+import { EvenementEmploiCodePostalQueryGetter } from 'src/application/queries/query-getters/evenement-emploi-code-postal.query.getter'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -421,7 +421,6 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     RendezVousMilo.Factory,
     BigqueryClient,
     DiagorienteClient,
-    EvenementEmploiCodePostalMapper,
     {
       provide: APP_GUARD,
       useClass: OidcAuthGuard
@@ -722,7 +721,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetCVPoleEmploiQueryHandler,
     GetEvenementsEmploiQueryHandler,
     GetEvenementEmploiQueryHandler,
-    GetSessionsMiloQueryHandler
+    GetSessionsMiloQueryHandler,
+    EvenementEmploiCodePostalQueryGetter
   ]
 }
 

@@ -11,7 +11,7 @@ import {
 import { PoleEmploiClient } from 'src/infrastructure/clients/pole-emploi-client'
 import { DateService } from 'src/utils/date-service'
 import { PaginationQueryModel } from './query-models/common/pagination.query-model'
-import { EvenementEmploiCodePostalMapper } from 'src/application/queries/query-mappers/evenement-emploi-code-postal.mapper'
+import { EvenementEmploiCodePostalQueryGetter } from 'src/application/queries/query-getters/evenement-emploi-code-postal.query.getter'
 
 const NOMBRE_EVENEMENTS_MAX = 10
 const PAGE_PAR_DEFAUT = 1
@@ -65,7 +65,7 @@ export class GetEvenementsEmploiQueryHandler extends QueryHandler<
 > {
   constructor(
     private poleEmploiClient: PoleEmploiClient,
-    private codePostalMapper: EvenementEmploiCodePostalMapper
+    private codePostalQueryGetter: EvenementEmploiCodePostalQueryGetter
   ) {
     super('GetEvenementsEmploiQueryHandler')
   }
@@ -78,7 +78,7 @@ export class GetEvenementsEmploiQueryHandler extends QueryHandler<
 
     const resultEvenements = await this.poleEmploiClient.getEvenementsEmploi({
       ...query,
-      codePostaux: this.codePostalMapper.getCodePostauxAssocies(
+      codePostaux: this.codePostalQueryGetter.getCodePostauxAssocies(
         query.codePostal
       ),
       page,

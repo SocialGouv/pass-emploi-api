@@ -139,7 +139,7 @@ const villesToCodePostauxAssocies: Record<
 }
 
 @Injectable()
-export class EvenementEmploiCodePostalMapper {
+export class EvenementEmploiCodePostalQueryGetter {
   private readonly codePostalToCodePostauxAssocies: Map<string, string[]>
 
   constructor() {

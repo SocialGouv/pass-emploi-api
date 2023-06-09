@@ -6,22 +6,22 @@ import {
   GetEvenementsEmploiQueryHandler
 } from 'src/application/queries/get-evenements-emploi.query.handler'
 import { success } from 'src/building-blocks/types/result'
-import { EvenementEmploiCodePostalMapper } from 'src/application/queries/query-mappers/evenement-emploi-code-postal.mapper'
+import { EvenementEmploiCodePostalQueryGetter } from 'src/application/queries/query-getters/evenement-emploi-code-postal.query.getter'
 
 describe('GetEvenementsEmploiQueryHandler', () => {
   let getEvenementsEmploiQueryHandler: GetEvenementsEmploiQueryHandler
   let sandbox: SinonSandbox
   let poleEmploiClient: StubbedClass<PoleEmploiClient>
-  let codePostalMapper: StubbedClass<EvenementEmploiCodePostalMapper>
+  let codePostalQueryGetter: StubbedClass<EvenementEmploiCodePostalQueryGetter>
 
   before(() => {
     sandbox = createSandbox()
     poleEmploiClient = stubClass(PoleEmploiClient)
-    codePostalMapper = stubClass(EvenementEmploiCodePostalMapper)
+    codePostalQueryGetter = stubClass(EvenementEmploiCodePostalQueryGetter)
 
     getEvenementsEmploiQueryHandler = new GetEvenementsEmploiQueryHandler(
       poleEmploiClient,
-      codePostalMapper
+      codePostalQueryGetter
     )
   })
 
@@ -37,7 +37,7 @@ describe('GetEvenementsEmploiQueryHandler', () => {
           codePostal: '75001'
         }
 
-        codePostalMapper.getCodePostauxAssocies
+        codePostalQueryGetter.getCodePostauxAssocies
           .withArgs('75001')
           .returns(['75001', '75012'])
 
