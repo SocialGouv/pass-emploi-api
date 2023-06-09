@@ -14,7 +14,7 @@ export interface GetCampagneQuery extends Query {
 }
 
 @Injectable()
-export class GetCampagneQueryModel {
+export class GetCampagneQueryGetter {
   constructor(private dateService: DateService) {}
 
   async handle(

@@ -202,7 +202,7 @@ import { CampagneSqlRepository } from './infrastructure/repositories/campagne-sq
 import { CreateCampagneCommandHandler } from './application/commands/campagne/create-campagne.command'
 import { GetJeuneHomeDemarchesQueryHandler } from './application/queries/get-jeune-home-demarches.query.handler'
 import { GetJeuneHomeActionsQueryHandler } from './application/queries/get-jeune-home-actions.query.handler'
-import { GetCampagneQueryModel } from './application/queries/query-getters/get-campagne.query.getter'
+import { GetCampagneQueryGetter } from './application/queries/query-getters/get-campagne.query.getter'
 import { CreateEvaluationCommandHandler } from './application/commands/campagne/create-evaluation.command'
 import { DemarcheHttpRepository } from './infrastructure/repositories/demarche-http.repository'
 import { Demarche, DemarcheRepositoryToken } from './domain/demarche'
@@ -654,7 +654,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateCampagneCommandHandler,
     GetJeuneHomeDemarchesQueryHandler,
     GetJeuneHomeActionsQueryHandler,
-    GetCampagneQueryModel,
+    GetCampagneQueryGetter,
     CreateEvaluationCommandHandler,
     UpdateStatutDemarcheCommandHandler,
     CreateDemarcheCommandHandler,
