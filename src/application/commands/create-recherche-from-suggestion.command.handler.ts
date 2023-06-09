@@ -19,10 +19,13 @@ import {
   SuggestionsRepositoryToken
 } from '../../domain/offre/recherche/suggestion/suggestion'
 import { SuggestionAuthorizer } from '../authorizers/suggestion-authorizer'
+import { DiagorienteLocation } from 'src/domain/offre/recherche/suggestion/diagoriente'
 
 export interface CreateRechercheFromSuggestionCommand extends Command {
   idJeune: string
   idSuggestion: string
+  location?: DiagorienteLocation
+  rayon?: number
 }
 
 @Injectable()
@@ -46,10 +49,25 @@ export class CreateRechercheFromSuggestionCommandHandler extends CommandHandler<
   async handle(
     command: CreateRechercheFromSuggestionCommand
   ): Promise<Result<Recherche>> {
-    const suggestion = await this.suggestionRepository.get(command.idSuggestion)
+    let suggestion = await this.suggestionRepository.get(command.idSuggestion)
 
     if (!suggestion) {
       return failure(new MauvaiseCommandeError('Suggestion non trouvée'))
+    }
+    if (suggestion.source === Suggestion.Source.DIAGORIENTE) {
+      if (!command.location) {
+        return failure(
+          new MauvaiseCommandeError(
+            'La localisation est nécessaire pour une suggestion DIAGORIENTE'
+          )
+        )
+      }
+      const criteresDiagoriente =
+        this.suggestionFactory.construireCriteresSuggestionsDiagoriente(
+          suggestion,
+          { location: command.location, rayon: command.rayon ?? undefined }
+        )
+      suggestion = { ...suggestion, criteres: criteresDiagoriente }
     }
 
     const suggestionAccepteeResult = this.suggestionFactory.accepter(suggestion)

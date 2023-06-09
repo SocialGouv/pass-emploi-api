@@ -16,6 +16,7 @@ import { describe } from 'mocha'
 import { DateTime } from 'luxon'
 import { MauvaiseCommandeError } from '../../../../../src/building-blocks/types/domain-error'
 import { Core } from '../../../../../src/domain/core'
+import { Offre } from 'src/domain/offre/offre'
 
 describe('Suggestion', () => {
   let factory: Recherche.Suggestion.Factory
@@ -386,6 +387,57 @@ describe('Suggestion', () => {
 
       // Then
       expect(equivalentes).to.be.false()
+    })
+  })
+
+  describe('construireCriteresSuggestionsDiagoriente', () => {
+    it('retourne un critère de type OFFRE IMMERSION"', () => {
+      const suggestion = uneSuggestion({
+        source: Suggestion.Source.DIAGORIENTE,
+        type: Offre.Recherche.Type.OFFRES_IMMERSION
+      })
+      const locationDiagoriente = {
+        location: {
+          type: Suggestion.TypeLocalisation.DEPARTEMENT,
+          latitude: 10,
+          longitude: 5,
+          code: '75012'
+        }
+      }
+      const criteres = factory.construireCriteresSuggestionsDiagoriente(
+        suggestion,
+        locationDiagoriente
+      )
+      expect(criteres).to.deep.equal({
+        rome: suggestion.idFonctionnel!.codeRome!,
+        lat: locationDiagoriente.location.latitude,
+        lon: locationDiagoriente.location.longitude,
+        distance: Recherche.DISTANCE_PAR_DEFAUT
+      })
+    })
+    it('retourne un critère de type OFFRE EMPLOI"', () => {
+      const suggestion = uneSuggestion({
+        source: Suggestion.Source.DIAGORIENTE,
+        type: Offre.Recherche.Type.OFFRES_EMPLOI
+      })
+      const locationDiagoriente = {
+        location: {
+          type: Suggestion.TypeLocalisation.COMMUNE,
+          latitude: 10,
+          longitude: 5,
+          code: '75012'
+        },
+        rayon: 15
+      }
+      const criteres = factory.construireCriteresSuggestionsDiagoriente(
+        suggestion,
+        locationDiagoriente
+      )
+      expect(criteres).to.deep.equal({
+        commune: '75012',
+        rayon: 15,
+        departement: undefined
+      })
     })
   })
 
