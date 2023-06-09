@@ -74,14 +74,14 @@ export class PoleEmploiClient {
       params.append('size', criteres.limit.toString())
     }
     const body: {
-      codePostaux: string[]
+      codePostal: string[]
       secteurActivite?: string
       dateDebut?: string
       dateFin?: string
       typeEvenement?: string
       modalite?: string
     } = {
-      codePostaux: criteres.codePostaux,
+      codePostal: criteres.codePostaux,
       secteurActivite: criteres.secteurActivite,
       dateDebut: criteres.dateDebut,
       dateFin: criteres.dateFin,
