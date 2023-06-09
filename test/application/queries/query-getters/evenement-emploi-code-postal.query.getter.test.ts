@@ -1,8 +1,8 @@
-import { EvenementEmploiCodePostalMapper } from 'src/application/queries/query-mappers/evenement-emploi-code-postal.mapper'
+import { EvenementEmploiCodePostalQueryGetter } from 'src/application/queries/query-getters/evenement-emploi-code-postal.query.getter'
 import { expect } from 'test/utils'
 
-describe('EvenementEmploiCodePostalMapper', () => {
-  const mapper = new EvenementEmploiCodePostalMapper()
+describe('EvenementEmploiCodePostalQueryGetter', () => {
+  const mapper = new EvenementEmploiCodePostalQueryGetter()
 
   it("pour le code postal d'une ville qui n'a qu'un seul code postal retourne un tableau avec uniquement ce code postal", () => {
     // Given
