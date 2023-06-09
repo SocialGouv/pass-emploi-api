@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common'
-import { JeuneHomeActionQueryModel } from './query-models/home-jeune.query-model'
-import { GetCampagneQueryModel } from './query-getters/get-campagne.query.getter'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Authentification } from '../../domain/authentification'
-import { GetActionsJeuneQueryHandler } from './action/get-actions-jeune.query.handler.db'
-import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { isSuccess, Result } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { estBRSA } from '../../domain/core'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
+import { GetActionsJeuneQueryHandler } from './action/get-actions-jeune.query.handler.db'
+import { GetCampagneQueryGetter } from './query-getters/get-campagne.query.getter'
+import { CampagneQueryModel } from './query-models/campagne.query-model'
+import { JeuneHomeActionQueryModel } from './query-models/home-jeune.query-model'
 
 export interface GetJeuneHomeActionsQuery extends Query {
   idJeune: string
@@ -19,25 +21,31 @@ export class GetJeuneHomeActionsQueryHandler extends QueryHandler<
 > {
   constructor(
     private getActionsByJeuneQueryHandler: GetActionsJeuneQueryHandler,
-    private getCampagneQueryModel: GetCampagneQueryModel,
+    private getCampagneQueryGetter: GetCampagneQueryGetter,
     private jeuneAuthorizer: JeuneAuthorizer
   ) {
     super('GetJeuneHomeActionsQueryHandler')
   }
 
   async handle(
-    query: GetJeuneHomeActionsQuery
+    query: GetJeuneHomeActionsQuery,
+    utilisateur: Authentification.Utilisateur
   ): Promise<JeuneHomeActionQueryModel> {
+    const getCampagne = (): Promise<CampagneQueryModel | undefined> =>
+      estBRSA(utilisateur.structure)
+        ? Promise.resolve(undefined)
+        : this.getCampagneQueryGetter.handle(query)
+
     const [actionsJeuneResult, campagne] = await Promise.all([
       this.getActionsByJeuneQueryHandler.handle(query),
-      this.getCampagneQueryModel.handle(query)
+      getCampagne()
     ])
 
     return {
       actions: isSuccess(actionsJeuneResult)
         ? actionsJeuneResult.data.actions
         : [],
-      campagne: campagne
+      campagne
     }
   }
 

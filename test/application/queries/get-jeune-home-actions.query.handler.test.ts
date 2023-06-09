@@ -1,19 +1,21 @@
-import { expect, StubbedClass, stubClass } from '../../utils'
+import { success } from 'src/building-blocks/types/result'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import {
   ActionsJeuneQueryModel,
   GetActionsJeuneQueryHandler
 } from '../../../src/application/queries/action/get-actions-jeune.query.handler.db'
-import { GetCampagneQueryModel } from '../../../src/application/queries/query-getters/get-campagne.query.getter'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { GetJeuneHomeActionsQueryHandler } from '../../../src/application/queries/get-jeune-home-actions.query.handler'
-import { uneActionQueryModelFromDomain } from '../../fixtures/query-models/action.query-model.fixtures'
-import { uneCampagneQueryModel } from '../../fixtures/campagne.fixture'
+import { GetCampagneQueryGetter } from '../../../src/application/queries/query-getters/get-campagne.query.getter'
+import { Core } from '../../../src/domain/core'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import { success } from 'src/building-blocks/types/result'
+import { uneCampagneQueryModel } from '../../fixtures/campagne.fixture'
+import { uneActionQueryModelFromDomain } from '../../fixtures/query-models/action.query-model.fixtures'
+import { expect, StubbedClass, stubClass } from '../../utils'
+import Structure = Core.Structure
 
 describe('GetJeuneHomeActionsQueryHandler', () => {
   let getActionsByJeuneQueryHandler: StubbedClass<GetActionsJeuneQueryHandler>
-  let getCampagneQueryModel: StubbedClass<GetCampagneQueryModel>
+  let getCampagneQueryGetter: StubbedClass<GetCampagneQueryGetter>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let getJeuneHomeActionsQueryHandler: GetJeuneHomeActionsQueryHandler
 
@@ -22,18 +24,18 @@ describe('GetJeuneHomeActionsQueryHandler', () => {
 
   beforeEach(() => {
     getActionsByJeuneQueryHandler = stubClass(GetActionsJeuneQueryHandler)
-    getCampagneQueryModel = stubClass(GetCampagneQueryModel)
+    getCampagneQueryGetter = stubClass(GetCampagneQueryGetter)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
 
     getJeuneHomeActionsQueryHandler = new GetJeuneHomeActionsQueryHandler(
       getActionsByJeuneQueryHandler,
-      getCampagneQueryModel,
+      getCampagneQueryGetter,
       jeuneAuthorizer
     )
   })
 
   describe('handle', () => {
-    it('appelle les actions et campagne et les retourne', async () => {
+    beforeEach(async () => {
       // Given
       const actionsByJeuneOutput: ActionsJeuneQueryModel = {
         actions: actionsQueryModel,
@@ -53,19 +55,41 @@ describe('GetJeuneHomeActionsQueryHandler', () => {
         .withArgs({ idJeune: 'idJeune' })
         .resolves(success(actionsByJeuneOutput))
 
-      getCampagneQueryModel.handle
+      getCampagneQueryGetter.handle
         .withArgs({ idJeune: 'idJeune' })
         .resolves(campagneQueryModel)
+    })
 
+    it('appelle les actions et la campagne en cours et les retourne', async () => {
       // When
-      const home = await getJeuneHomeActionsQueryHandler.handle({
-        idJeune: 'idJeune'
-      })
+      const home = await getJeuneHomeActionsQueryHandler.handle(
+        {
+          idJeune: 'idJeune'
+        },
+        unUtilisateurJeune()
+      )
 
       // Then
       expect(home).to.deep.equal({
         actions: actionsQueryModel,
         campagne: campagneQueryModel
+      })
+    })
+
+    it('ne récupère pas la campagne en cours pour un bénéficiaire BRSA', async () => {
+      // When
+      const home = await getJeuneHomeActionsQueryHandler.handle(
+        {
+          idJeune: 'idJeune'
+        },
+        unUtilisateurJeune({ structure: Structure.POLE_EMPLOI_BRSA })
+      )
+
+      // Then
+      expect(getCampagneQueryGetter.handle).not.to.have.been.called()
+      expect(home).to.deep.equal({
+        actions: actionsQueryModel,
+        campagne: undefined
       })
     })
   })

@@ -3,10 +3,11 @@ import { Cached, Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { isFailure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { estPoleEmploiBRSA } from '../../domain/core'
+import { estBRSA, estPoleEmploiBRSA } from '../../domain/core'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
-import { GetCampagneQueryModel } from './query-getters/get-campagne.query.getter'
+import { GetCampagneQueryGetter } from './query-getters/get-campagne.query.getter'
 import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
+import { CampagneQueryModel } from './query-models/campagne.query-model'
 import { JeuneHomeDemarcheQueryModel } from './query-models/home-jeune.query-model'
 
 export interface GetJeuneHomeDemarchesQuery extends Query {
@@ -21,21 +22,27 @@ export class GetJeuneHomeDemarchesQueryHandler extends QueryHandler<
 > {
   constructor(
     private getActionsJeunePoleEmploiQueryGetter: GetDemarchesQueryGetter,
-    private getCampagneQueryModel: GetCampagneQueryModel,
+    private getCampagneQueryGetter: GetCampagneQueryGetter,
     private jeuneAuthorizer: JeuneAuthorizer
   ) {
     super('GetJeuneHomeDemarchesQueryHandler')
   }
 
   async handle(
-    query: GetJeuneHomeDemarchesQuery
+    query: GetJeuneHomeDemarchesQuery,
+    utilisateur: Authentification.Utilisateur
   ): Promise<Result<Cached<JeuneHomeDemarcheQueryModel>>> {
+    const getCampagne = (): Promise<CampagneQueryModel | undefined> =>
+      estBRSA(utilisateur.structure)
+        ? Promise.resolve(undefined)
+        : this.getCampagneQueryGetter.handle({ idJeune: query.idJeune })
+
     const [demarches, campagne] = await Promise.all([
       this.getActionsJeunePoleEmploiQueryGetter.handle({
         ...query,
         tri: GetDemarchesQueryGetter.Tri.parSatutEtDateFin
       }),
-      this.getCampagneQueryModel.handle({ idJeune: query.idJeune })
+      getCampagne()
     ])
 
     if (isFailure(demarches)) {

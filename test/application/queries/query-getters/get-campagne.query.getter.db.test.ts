@@ -1,7 +1,7 @@
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import { DateService } from '../../../../src/utils/date-service'
 import {
-  GetCampagneQueryModel,
+  GetCampagneQueryGetter,
   questionsInMemory
 } from '../../../../src/application/queries/query-getters/get-campagne.query.getter'
 import { CampagneSqlModel } from '../../../../src/infrastructure/sequelize/models/campagne.sql-model'
@@ -10,13 +10,13 @@ import { ReponseCampagneSqlModel } from '../../../../src/infrastructure/sequeliz
 import { Campagne } from '../../../../src/domain/campagne'
 import { getDatabase } from '../../../utils/database-for-testing'
 
-describe('GetCampagneQueryModel', () => {
+describe('GetCampagneQueryGetter', () => {
   beforeEach(async () => {
     await getDatabase().cleanPG()
   })
 
   let dateService: StubbedClass<DateService>
-  let getCampagneQueryModel: GetCampagneQueryModel
+  let getCampagneQueryGetter: GetCampagneQueryGetter
   const maintenant = DateTime.fromISO('2022-05-17T03:24:00')
   const idCampagnePassee = 'f59ca6cc-6a7b-4db9-845f-1e39e86ef6cb'
   const questions = questionsInMemory()
@@ -42,13 +42,13 @@ describe('GetCampagneQueryModel', () => {
       reponse2: '4'
     })
 
-    getCampagneQueryModel = new GetCampagneQueryModel(dateService)
+    getCampagneQueryGetter = new GetCampagneQueryGetter(dateService)
   })
 
   describe('quand il ny a pas de campagne en cours', () => {
     it('retourne undefined', async () => {
       // When
-      const campagne = await getCampagneQueryModel.handle({
+      const campagne = await getCampagneQueryGetter.handle({
         idJeune: 'idJeune'
       })
 
@@ -77,7 +77,7 @@ describe('GetCampagneQueryModel', () => {
     describe("quand le jeune n'a répondu à rien", () => {
       it('retourne la campagne', async () => {
         // When
-        const campagne = await getCampagneQueryModel.handle({
+        const campagne = await getCampagneQueryGetter.handle({
           idJeune: 'idJeune'
         })
 
@@ -106,7 +106,7 @@ describe('GetCampagneQueryModel', () => {
         })
 
         // When
-        const campagne = await getCampagneQueryModel.handle({
+        const campagne = await getCampagneQueryGetter.handle({
           idJeune: 'idJeune'
         })
 
@@ -136,7 +136,7 @@ describe('GetCampagneQueryModel', () => {
         })
 
         // When
-        const campagne = await getCampagneQueryModel.handle({
+        const campagne = await getCampagneQueryGetter.handle({
           idJeune: 'idJeune'
         })
 

@@ -1,20 +1,21 @@
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { GetJeuneHomeDemarchesQueryHandler } from '../../../src/application/queries/get-jeune-home-demarches.query.handler'
-import { GetCampagneQueryModel } from '../../../src/application/queries/query-getters/get-campagne.query.getter'
+import { GetCampagneQueryGetter } from '../../../src/application/queries/query-getters/get-campagne.query.getter'
 import { GetDemarchesQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { JeuneHomeDemarcheQueryModel } from '../../../src/application/queries/query-models/home-jeune.query-model'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { Cached } from '../../../src/building-blocks/types/query'
 import { failure, success } from '../../../src/building-blocks/types/result'
-import { estPoleEmploiBRSA } from '../../../src/domain/core'
+import { Core, estPoleEmploiBRSA } from '../../../src/domain/core'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { uneCampagneQueryModel } from '../../fixtures/campagne.fixture'
 import { desDemarchesQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
 import { expect, StubbedClass, stubClass } from '../../utils'
+import Structure = Core.Structure
 
 describe('GetJeuneHomeDemarchesQueryHandler', () => {
   let getActionsJeunePoleEmploiQueryGetter: StubbedClass<GetDemarchesQueryGetter>
-  let getCampagneQueryModel: StubbedClass<GetCampagneQueryModel>
+  let getCampagneQueryGetter: StubbedClass<GetCampagneQueryGetter>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let getJeuneHomeDemarchesQueryHandler: GetJeuneHomeDemarchesQueryHandler
 
@@ -23,12 +24,12 @@ describe('GetJeuneHomeDemarchesQueryHandler', () => {
 
   beforeEach(() => {
     getActionsJeunePoleEmploiQueryGetter = stubClass(GetDemarchesQueryGetter)
-    getCampagneQueryModel = stubClass(GetCampagneQueryModel)
+    getCampagneQueryGetter = stubClass(GetCampagneQueryGetter)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
 
     getJeuneHomeDemarchesQueryHandler = new GetJeuneHomeDemarchesQueryHandler(
       getActionsJeunePoleEmploiQueryGetter,
-      getCampagneQueryModel,
+      getCampagneQueryGetter,
       jeuneAuthorizer
     )
   })
@@ -45,22 +46,25 @@ describe('GetJeuneHomeDemarchesQueryHandler', () => {
           })
           .resolves(failure(new ErreurHttp("C'est cassé", 400)))
 
-        getCampagneQueryModel.handle
+        getCampagneQueryGetter.handle
           .withArgs({ idJeune: 'idJeune' })
           .resolves(campagneQueryModel)
 
         // When
-        const home = await getJeuneHomeDemarchesQueryHandler.handle({
-          idJeune: 'idJeune',
-          accessToken: 'token'
-        })
+        const home = await getJeuneHomeDemarchesQueryHandler.handle(
+          {
+            idJeune: 'idJeune',
+            accessToken: 'token'
+          },
+          unUtilisateurJeune()
+        )
 
         // Then
         expect(home).to.deep.equal(failure(new ErreurHttp("C'est cassé", 400)))
       })
     })
     describe("quand c'est en succès", () => {
-      it('retourne la campagne et les démarches', async () => {
+      beforeEach(async () => {
         // Given
         getActionsJeunePoleEmploiQueryGetter.handle
           .withArgs({
@@ -70,21 +74,48 @@ describe('GetJeuneHomeDemarchesQueryHandler', () => {
           })
           .resolves(success({ queryModel: demarchesQueryModel }))
 
-        getCampagneQueryModel.handle
+        getCampagneQueryGetter.handle
           .withArgs({ idJeune: 'idJeune' })
           .resolves(campagneQueryModel)
+      })
 
+      it('retourne la campagne et les démarches', async () => {
         // When
-        const home = await getJeuneHomeDemarchesQueryHandler.handle({
-          idJeune: 'idJeune',
-          accessToken: 'token'
-        })
+        const home = await getJeuneHomeDemarchesQueryHandler.handle(
+          {
+            idJeune: 'idJeune',
+            accessToken: 'token'
+          },
+          unUtilisateurJeune()
+        )
 
         // Then
         const data: Cached<JeuneHomeDemarcheQueryModel> = {
           queryModel: {
             actions: demarchesQueryModel,
             campagne: campagneQueryModel
+          },
+          dateDuCache: undefined
+        }
+        expect(home).to.deep.equal(success(data))
+      })
+
+      it('ne récupère pas la campagne pour un bénéficiaire BRSA', async () => {
+        // When
+        const home = await getJeuneHomeDemarchesQueryHandler.handle(
+          {
+            idJeune: 'idJeune',
+            accessToken: 'token'
+          },
+          unUtilisateurJeune({ structure: Structure.POLE_EMPLOI_BRSA })
+        )
+
+        // Then
+        expect(getCampagneQueryGetter.handle).not.to.have.been.called()
+        const data: Cached<JeuneHomeDemarcheQueryModel> = {
+          queryModel: {
+            actions: demarchesQueryModel,
+            campagne: undefined
           },
           dateDuCache: undefined
         }
