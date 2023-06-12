@@ -21,7 +21,6 @@ import {
 
 describe('GetJeunesByEtablissementQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
-  let conseillersRepository: StubbedType<Conseiller.Repository>
   let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
 
   let getJeunesByEtablissementQueryHandler: GetJeunesByEtablissementQueryHandler
@@ -30,15 +29,10 @@ describe('GetJeunesByEtablissementQueryHandler', () => {
   before(async () => {
     databaseForTesting = getDatabase()
     sandbox = createSandbox()
-    conseillersRepository = stubInterface(sandbox)
     conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
 
     getJeunesByEtablissementQueryHandler =
-      new GetJeunesByEtablissementQueryHandler(
-        databaseForTesting.sequelize,
-        conseillerAgenceAuthorizer,
-        conseillersRepository
-      )
+      new GetJeunesByEtablissementQueryHandler(conseillerAgenceAuthorizer)
   })
 
   beforeEach(async () => {

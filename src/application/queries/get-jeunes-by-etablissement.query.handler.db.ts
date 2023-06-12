@@ -1,16 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common'
-import { Sequelize } from 'sequelize'
+import { Injectable } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result, success } from '../../building-blocks/types/result'
-import {
-  Conseiller,
-  ConseillersRepositoryToken
-} from '../../domain/conseiller/conseiller'
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
-import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
 import { ConseillerInterAgenceAuthorizer } from '../authorizers/conseiller-inter-agence-authorizer'
 import { JeuneQueryModel } from './query-models/jeunes.query-model'
 
@@ -24,11 +18,7 @@ export class GetJeunesByEtablissementQueryHandler extends QueryHandler<
   Result<JeuneQueryModel[]>
 > {
   constructor(
-    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
-    @Inject(ConseillerInterAgenceAuthorizer)
-    private readonly conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer,
-    @Inject(ConseillersRepositoryToken)
-    private readonly conseillersRepository: Conseiller.Repository
+    private readonly conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer
   ) {
     super('GetJeunesByEtablissementQueryHandler')
   }
