@@ -8,6 +8,7 @@ import {
   uneSessionConseillerListeDto
 } from '../../fixtures/milo-dto.fixture'
 import { success } from '../../../src/building-blocks/types/result'
+import { DateTime } from 'luxon'
 
 describe('MiloClient', () => {
   const configService = testConfig()
@@ -26,14 +27,18 @@ describe('MiloClient', () => {
       const idStructure = '1'
 
       nock(MILO_BASE_URL)
-        .get(`/operateurs/structures/${idStructure}/sessions`)
+        .get(
+          `/operateurs/structures/${idStructure}/sessions?dateDebutRecherche=2023-06-01&dateFinRecherche=2023-06-30`
+        )
         .reply(200, uneSessionConseillerListeDto)
         .isDone()
 
       // When
       const result = await miloClient.getSessionsConseiller(
         idpToken,
-        idStructure
+        idStructure,
+        DateTime.fromISO('2023-06-01T14:00:00'),
+        DateTime.fromISO('2023-06-30T14:00:00')
       )
       // Then
       expect(result).to.deep.equal(success(uneSessionConseillerListeDto))
