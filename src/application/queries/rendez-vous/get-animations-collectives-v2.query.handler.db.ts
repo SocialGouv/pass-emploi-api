@@ -8,7 +8,7 @@ import { Authentification } from '../../../domain/authentification'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { DateService } from '../../../utils/date-service'
-import { ConseillerInterAgenceAuthorizer } from '../../authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../../authorizers/conseiller-inter-structure-milo-authorizer'
 import { GetAnimationCollectiveV2QueryModel } from '../query-models/rendez-vous.query-model'
 
 const NOMBRE_ANIMATIONS_COLLECTIVES_MAX = 10
@@ -27,7 +27,7 @@ export class GetAnimationsCollectivesV2QueryHandler extends QueryHandler<
   Result<GetAnimationCollectiveV2QueryModel>
 > {
   constructor(
-    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer,
+    private conseillerAgenceAuthorizer: ConseillerInterStructureMiloAuthorizer,
     private dateService: DateService
   ) {
     super('GetAnimationsCollectivesQueryHandler')
@@ -116,7 +116,7 @@ export class GetAnimationsCollectivesV2QueryHandler extends QueryHandler<
     query: GetAnimationsCollectivesV2Query,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAgenceAuthorizer.autoriserConseillerPourUneAgence(
+    return this.conseillerAgenceAuthorizer.autoriserConseillerPourUneStructureMilo(
       query.idEtablissement,
       utilisateur
     )

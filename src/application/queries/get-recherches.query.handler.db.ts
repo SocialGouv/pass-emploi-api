@@ -5,7 +5,7 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { RechercheSqlModel } from '../../infrastructure/sequelize/models/recherche.sql-model'
-import { ConseillerInterAgenceAuthorizer } from '../authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../authorizers/conseiller-inter-structure-milo-authorizer'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { fromSqlToRechercheQueryModel } from './query-mappers/recherche.mapper'
 import { RechercheQueryModel } from './query-models/recherches.query-model'
@@ -22,7 +22,7 @@ export class GetRecherchesQueryHandler extends QueryHandler<
 > {
   constructor(
     private jeuneAuthorizer: JeuneAuthorizer,
-    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer
+    private conseillerAgenceAuthorizer: ConseillerInterStructureMiloAuthorizer
   ) {
     super('GetRecherchesQueryHandler')
   }

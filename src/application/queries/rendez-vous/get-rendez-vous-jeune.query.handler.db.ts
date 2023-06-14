@@ -12,7 +12,7 @@ import { ConseillerSqlModel } from '../../../infrastructure/sequelize/models/con
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { DateService } from '../../../utils/date-service'
-import { ConseillerInterAgenceAuthorizer } from '../../authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../../authorizers/conseiller-inter-structure-milo-authorizer'
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { fromSqlToRendezVousJeuneQueryModel } from '../query-mappers/rendez-vous-milo.mappers'
 import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-model'
@@ -30,7 +30,7 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
   constructor(
     private dateService: DateService,
     private jeuneAuthorizer: JeuneAuthorizer,
-    private conseillerAuthorizer: ConseillerInterAgenceAuthorizer,
+    private conseillerAuthorizer: ConseillerInterStructureMiloAuthorizer,
     private evenementService: EvenementService,
     private configuration: ConfigService
   ) {

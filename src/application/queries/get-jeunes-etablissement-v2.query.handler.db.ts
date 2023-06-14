@@ -7,7 +7,7 @@ import { Authentification } from '../../domain/authentification'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { Situation } from '../../infrastructure/sequelize/models/situations-milo.sql-model'
 import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
-import { ConseillerInterAgenceAuthorizer } from '../authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../authorizers/conseiller-inter-structure-milo-authorizer'
 import { GetJeunesEtablissementV2QueryModel } from './query-models/agence.query-model'
 
 interface JeuneEtablissementRawSql extends JeuneSqlModel {
@@ -38,7 +38,7 @@ export class GetJeunesEtablissementV2QueryHandler extends QueryHandler<
   Result<GetJeunesEtablissementV2QueryModel>
 > {
   constructor(
-    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer,
+    private conseillerAgenceAuthorizer: ConseillerInterStructureMiloAuthorizer,
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
   ) {
     super('GetJeunesEtablissementV2QueryHandler')
@@ -112,7 +112,7 @@ export class GetJeunesEtablissementV2QueryHandler extends QueryHandler<
     { idEtablissement }: GetJeunesEtablissementV2Query,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAgenceAuthorizer.autoriserConseillerPourUneAgence(
+    return this.conseillerAgenceAuthorizer.autoriserConseillerPourUneStructureMilo(
       idEtablissement,
       utilisateur
     )

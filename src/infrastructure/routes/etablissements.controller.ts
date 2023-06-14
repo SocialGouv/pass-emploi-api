@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CloturerAnimationCollectiveCommandHandler } from '../../application/commands/cloturer-animation-collective.command.handler'
 import { GetAnimationsCollectivesQueryHandler } from '../../application/queries/rendez-vous/get-animations-collectives.query.handler.db'
-import { GetJeunesByEtablissementQueryHandler } from '../../application/queries/get-jeunes-by-etablissement.query.handler.db'
+import { GetJeunesByStructureMiloQueryHandler } from '../../application/queries/get-jeunes-by-structure-milo.query.handler.db'
 import { JeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
 import {
   AnimationCollectiveQueryModel,
@@ -24,7 +24,7 @@ export class EtablissementsController {
   constructor(
     private readonly cloturerAnimationCollectiveCommandHandler: CloturerAnimationCollectiveCommandHandler,
     private readonly getAnimationsCollectivesQueryHandler: GetAnimationsCollectivesQueryHandler,
-    private readonly getJeunesEtablissementQueryHandler: GetJeunesByEtablissementQueryHandler
+    private readonly getJeunesEtablissementQueryHandler: GetJeunesByStructureMiloQueryHandler
   ) {}
 
   @ApiOperation({
@@ -99,7 +99,7 @@ export class EtablissementsController {
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<JeuneQueryModel[]> {
     const result = await this.getJeunesEtablissementQueryHandler.execute(
-      { idEtablissement },
+      { idStructureMilo: idEtablissement },
       utilisateur
     )
 

@@ -5,7 +5,7 @@ import { Authentification } from '../../../domain/authentification'
 import { FavoriOffreEmploiSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-emploi.sql-model'
 import { FavoriOffreEngagementSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-engagement.sql-model'
 import { FavoriOffreImmersionSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
-import { ConseillerInterAgenceAuthorizer } from '../../authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../../authorizers/conseiller-inter-structure-milo-authorizer'
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import {
   fromOffreEmploiSqlToFavorisQueryModel,
@@ -25,7 +25,7 @@ export class GetFavorisJeuneQueryHandler extends QueryHandler<
 > {
   constructor(
     private jeuneAuthorizer: JeuneAuthorizer,
-    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer
+    private conseillerAgenceAuthorizer: ConseillerInterStructureMiloAuthorizer
   ) {
     super('GetFavorisJeuneQueryHandler')
   }

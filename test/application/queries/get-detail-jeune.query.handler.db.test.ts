@@ -28,17 +28,19 @@ import {
 import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
-import { ConseillerInterAgenceAuthorizer } from '../../../src/application/authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../../../src/application/authorizers/conseiller-inter-structure-milo-authorizer'
 
 describe('GetDetailJeuneQueryHandler', () => {
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterStructureMiloAuthorizer>
   let getDetailJeuneQueryHandler: GetDetailJeuneQueryHandler
   let sandbox: SinonSandbox
 
   before(() => {
     sandbox = createSandbox()
-    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(
+      ConseillerInterStructureMiloAuthorizer
+    )
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
 
     getDetailJeuneQueryHandler = new GetDetailJeuneQueryHandler(

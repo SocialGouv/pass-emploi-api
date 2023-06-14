@@ -22,12 +22,12 @@ import {
   getDatabase
 } from '../../../utils/database-for-testing'
 import { DateService } from '../../../../src/utils/date-service'
-import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-structure-milo-authorizer'
 
 describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
   let getMetadonneesFavorisJeuneQueryHandler: GetMetadonneesFavorisJeuneQueryHandler
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterStructureMiloAuthorizer>
   let dateService: StubbedClass<DateService>
 
   let recherchesSauvegardeesRepository: RechercheSqlRepository
@@ -40,7 +40,7 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
     recherchesSauvegardeesRepository = new RechercheSqlRepository(
       databaseForTesting.sequelize
     )
-    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterStructureMiloAuthorizer)
     dateService = stubClass(DateService)
     dateService.nowJs.returns(new Date('2023-04-17T12:00:00Z'))
 

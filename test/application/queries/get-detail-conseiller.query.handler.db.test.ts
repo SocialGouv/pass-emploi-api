@@ -18,7 +18,7 @@ import { StubbedClass, createSandbox, expect, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
-import { uneStructureMiloDto } from '../../fixtures/sql-models/structureMilo.sql-model'
+import { uneStructureMiloDto } from '../../fixtures/sql-models/structure-milo.sql-model'
 import { StructureMiloSqlModel } from '../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
 
 const token = 'un-token'

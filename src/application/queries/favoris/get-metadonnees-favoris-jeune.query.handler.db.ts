@@ -10,7 +10,7 @@ import { FavoriOffreEngagementSqlModel } from '../../../infrastructure/sequelize
 import { FavoriOffreImmersionSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { RechercheSqlModel } from '../../../infrastructure/sequelize/models/recherche.sql-model'
-import { ConseillerInterAgenceAuthorizer } from '../../authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../../authorizers/conseiller-inter-structure-milo-authorizer'
 import { MetadonneesFavorisQueryModel } from '../query-models/favoris.query-model'
 
 export interface GetMetadonneesFavorisJeuneQuery {
@@ -23,7 +23,7 @@ export class GetMetadonneesFavorisJeuneQueryHandler extends QueryHandler<
   Result<MetadonneesFavorisQueryModel>
 > {
   constructor(
-    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer
+    private conseillerAgenceAuthorizer: ConseillerInterStructureMiloAuthorizer
   ) {
     super('GetMetadonneesFavorisJeuneQueryHandler')
   }

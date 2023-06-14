@@ -1,11 +1,12 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { Jeune } from 'src/domain/jeune/jeune'
 import { unConseillerDuJeune, unJeune } from 'test/fixtures/jeune.fixture'
-import { ConseillerInterAgenceAuthorizer } from '../../../src/application/authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../../../src/application/authorizers/conseiller-inter-structure-milo-authorizer'
 import { DroitsInsuffisants } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
-  failure
+  failure,
+  success
 } from '../../../src/building-blocks/types/result'
 import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
@@ -17,45 +18,50 @@ import {
   unJeuneDuRendezVous,
   unRendezVous
 } from '../../fixtures/rendez-vous.fixture'
+import { unConseillerMilo } from '../../fixtures/conseiller-milo.fixture'
 
 describe('ConseillerAgenceAuthorizer', () => {
   let conseillerRepository: StubbedType<Conseiller.Repository>
+  let conseillerMiloRepository: StubbedType<Conseiller.Milo.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let actionRepository: StubbedType<Action.Repository>
   let rendezVousRepository: StubbedType<RendezVous.Repository>
-  let conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer
+  let conseillerAgenceAuthorizer: ConseillerInterStructureMiloAuthorizer
 
   beforeEach(() => {
     const sandbox = createSandbox()
     conseillerRepository = stubInterface(sandbox)
+    conseillerMiloRepository = stubInterface(sandbox)
     jeuneRepository = stubInterface(sandbox)
     actionRepository = stubInterface(sandbox)
     rendezVousRepository = stubInterface(sandbox)
-    conseillerAgenceAuthorizer = new ConseillerInterAgenceAuthorizer(
+    conseillerAgenceAuthorizer = new ConseillerInterStructureMiloAuthorizer(
       conseillerRepository,
+      conseillerMiloRepository,
       jeuneRepository,
       actionRepository,
       rendezVousRepository
     )
   })
 
-  describe('autoriserConseillerPourUneAgence', () => {
-    describe('quand le conseiller est sur le bonne agence', () => {
+  describe('autoriserConseillerPourUneStructureMilo', () => {
+    describe('quand le conseiller est sur la bonne structure Milo', () => {
       it('retourne un success', async () => {
         // Given
-        const conseiller = unConseiller({
-          agence: {
-            id: 'une-agence'
-          }
+        const idStructure = 'une-structure-milo'
+        const conseiller = unConseillerMilo({
+          idStructure
         })
         const utilisateur = unUtilisateurConseiller({ id: conseiller.id })
 
-        conseillerRepository.get.withArgs(conseiller.id).resolves(conseiller)
+        conseillerMiloRepository.get
+          .withArgs(conseiller.id)
+          .resolves(success(conseiller))
 
         // When
         const result =
-          await conseillerAgenceAuthorizer.autoriserConseillerPourUneAgence(
-            'une-agence',
+          await conseillerAgenceAuthorizer.autoriserConseillerPourUneStructureMilo(
+            idStructure,
             utilisateur
           )
 
@@ -63,22 +69,23 @@ describe('ConseillerAgenceAuthorizer', () => {
         expect(result).to.deep.equal(emptySuccess())
       })
     })
-    describe('quand le conseiller est sur une autre agence', () => {
+    describe('quand le conseiller est sur une autre structure Milo', () => {
       it('retourne une failure', async () => {
         // Given
-        const conseiller = unConseiller({
-          agence: {
-            id: 'un-autre-etablissement'
-          }
+        const idStructure = 'une-structure-milo'
+        const conseiller = unConseillerMilo({
+          idStructure
         })
         const utilisateur = unUtilisateurConseiller({ id: conseiller.id })
 
-        conseillerRepository.get.withArgs(conseiller.id).resolves(conseiller)
+        conseillerMiloRepository.get
+          .withArgs(conseiller.id)
+          .resolves(success(conseiller))
 
         // When
         const result =
-          await conseillerAgenceAuthorizer.autoriserConseillerPourUneAgence(
-            'une-agence',
+          await conseillerAgenceAuthorizer.autoriserConseillerPourUneStructureMilo(
+            'une-autre-structure',
             utilisateur
           )
 

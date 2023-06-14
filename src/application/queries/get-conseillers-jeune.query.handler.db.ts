@@ -7,7 +7,7 @@ import { Authentification } from '../../domain/authentification'
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { TransfertConseillerSqlModel } from '../../infrastructure/sequelize/models/transfert-conseiller.sql-model'
-import { ConseillerInterAgenceAuthorizer } from '../authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../authorizers/conseiller-inter-structure-milo-authorizer'
 import { HistoriqueConseillerJeuneQueryModel } from './query-models/jeunes.query-model'
 
 export interface GetConseillersJeuneQuery extends Query {
@@ -20,7 +20,7 @@ export class GetConseillersJeuneQueryHandler extends QueryHandler<
   Result<HistoriqueConseillerJeuneQueryModel[]>
 > {
   constructor(
-    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer
+    private conseillerAgenceAuthorizer: ConseillerInterStructureMiloAuthorizer
   ) {
     super('GetConseillersJeuneQueryHandler')
   }

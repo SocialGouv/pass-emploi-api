@@ -13,7 +13,7 @@ import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
-import { ConseillerInterAgenceAuthorizer } from '../authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../authorizers/conseiller-inter-structure-milo-authorizer'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { fromSqlToRendezVousJeuneQueryModel } from './query-mappers/rendez-vous-milo.mappers'
 import { ActionQueryModel } from './query-models/actions.query-model'
@@ -32,7 +32,7 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
 > {
   constructor(
     private jeuneAuthorizer: JeuneAuthorizer,
-    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer,
+    private conseillerAgenceAuthorizer: ConseillerInterStructureMiloAuthorizer,
     private configuration: ConfigService
   ) {
     super('GetJeuneHomeAgendaQueryHandler')

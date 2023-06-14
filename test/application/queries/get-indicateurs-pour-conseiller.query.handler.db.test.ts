@@ -25,18 +25,20 @@ import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
 import Statut = Action.Statut
-import { ConseillerInterAgenceAuthorizer } from '../../../src/application/authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../../../src/application/authorizers/conseiller-inter-structure-milo-authorizer'
 
 describe('GetIndicateursPourConseillerQueryHandler', () => {
   let getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterStructureMiloAuthorizer>
   let dateService: StubbedClass<DateService>
   const idConseiller = 'id-conseiller'
   const idJeune = 'id-jeune'
 
   before(async () => {
     dateService = stubClass(DateService)
-    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(
+      ConseillerInterStructureMiloAuthorizer
+    )
     getIndicateursPourConseillerQueryHandler =
       new GetIndicateursPourConseillerQueryHandler(
         dateService,

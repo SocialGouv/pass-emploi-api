@@ -49,7 +49,7 @@ import { UpdateUtilisateurCommandHandler } from './application/commands/update-u
 import { TeleverserFichierCommandHandler } from './application/commands/televerser-fichier.command.handler'
 import { GetActionsPredefiniesQueryHandler } from './application/queries/action/get-actions-predefinies.query.handler'
 import { GetJeunesIdentitesQueryHandler } from './application/queries/get-jeunes-identites.query.handler.db'
-import { GetJeunesByEtablissementQueryHandler } from './application/queries/get-jeunes-by-etablissement.query.handler.db'
+import { GetJeunesByStructureMiloQueryHandler } from './application/queries/get-jeunes-by-structure-milo.query.handler.db'
 import { Context } from './building-blocks/context'
 import { GetActionsJeuneQueryHandler } from './application/queries/action/get-actions-jeune.query.handler.db'
 import { GetChatSecretsQueryHandler } from './application/queries/get-chat-secrets.query.handler'
@@ -265,7 +265,7 @@ import { CreateSuggestionConseillerServiceCiviqueCommandHandler } from './applic
 import { CreateSuggestionConseillerImmersionCommandHandler } from './application/commands/create-suggestion-conseiller-immersion.command.handler'
 import { EtablissementsController } from './infrastructure/routes/etablissements.controller'
 import { EtablissementsControllerV2 } from './infrastructure/routes/v2/etablissements.controller.v2'
-import { ConseillerInterAgenceAuthorizer } from './application/authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from './application/authorizers/conseiller-inter-structure-milo-authorizer'
 import { AnimationCollectiveSqlRepository } from './infrastructure/repositories/rendez-vous/animation-collective-sql.repository.db'
 import { HistoriqueRendezVousRepositorySql } from './infrastructure/repositories/rendez-vous/historique-rendez-vous.repository.db'
 import { CloturerAnimationCollectiveCommandHandler } from './application/commands/cloturer-animation-collective.command.handler'
@@ -587,7 +587,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     SupportAuthorizer,
     SuggestionAuthorizer,
     FavoriOffreServiceCiviqueAuthorizer,
-    ConseillerInterAgenceAuthorizer,
+    ConseillerInterStructureMiloAuthorizer,
     ListeDeDiffusionAuthorizer,
     GetDetailActionQueryHandler,
     GetDetailJeuneQueryHandler,
@@ -698,7 +698,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetActionsPredefiniesQueryHandler,
     GetAnimationsCollectivesQueryHandler,
     GetAnimationsCollectivesV2QueryHandler,
-    GetJeunesByEtablissementQueryHandler,
+    GetJeunesByStructureMiloQueryHandler,
     GetAccueilJeuneMiloQueryHandler,
     GetAccueilJeunePoleEmploiQueryHandler,
     CloturerAnimationCollectiveCommandHandler,

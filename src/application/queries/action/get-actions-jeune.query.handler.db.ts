@@ -10,7 +10,7 @@ import { fromSqlToActionQueryModel } from '../../../infrastructure/repositories/
 import { ActionSqlModel } from '../../../infrastructure/sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
-import { ConseillerInterAgenceAuthorizer } from '../../authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../../authorizers/conseiller-inter-structure-milo-authorizer'
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { ActionQueryModel } from '../query-models/actions.query-model'
 
@@ -48,7 +48,7 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
     private jeuneAuthorizer: JeuneAuthorizer,
-    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer
+    private conseillerAgenceAuthorizer: ConseillerInterStructureMiloAuthorizer
   ) {
     super('GetActionsJeuneQueryHandler')
   }

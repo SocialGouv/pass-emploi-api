@@ -27,14 +27,14 @@ import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
-import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-structure-milo-authorizer'
 import { Core } from '../../../../src/domain/core'
 
 describe('GetDetailActionQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
   let actionSqlRepository: Action.Repository
   let actionAuthorizer: StubbedClass<ActionAuthorizer>
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterStructureMiloAuthorizer>
   let getDetailActionQueryHandler: GetDetailActionQueryHandler
   let sandbox: SinonSandbox
   const jeune = unJeune()
@@ -43,7 +43,7 @@ describe('GetDetailActionQueryHandler', () => {
     databaseForTesting = getDatabase()
     sandbox = createSandbox()
     actionAuthorizer = stubClass(ActionAuthorizer)
-    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterStructureMiloAuthorizer)
     actionSqlRepository = new ActionSqlRepository(new DateService())
 
     getDetailActionQueryHandler = new GetDetailActionQueryHandler(

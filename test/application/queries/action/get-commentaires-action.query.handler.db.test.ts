@@ -23,7 +23,7 @@ import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
-import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-structure-milo-authorizer'
 import { Core } from '../../../../src/domain/core'
 import { GetDetailActionQuery } from '../../../../src/application/queries/action/get-detail-action.query.handler.db'
 
@@ -35,12 +35,12 @@ describe('GetCommentairesActionQueryHandler', () => {
 
   let getCommentairesActionQueryHandler: GetCommentairesActionQueryHandler
   let actionAuthorizer: StubbedClass<ActionAuthorizer>
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterStructureMiloAuthorizer>
 
   beforeEach(async () => {
     await databaseForTesting.cleanPG()
     actionAuthorizer = stubClass(ActionAuthorizer)
-    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterStructureMiloAuthorizer)
     getCommentairesActionQueryHandler = new GetCommentairesActionQueryHandler(
       actionAuthorizer,
       conseillerAgenceAuthorizer

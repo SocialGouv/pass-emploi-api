@@ -1,7 +1,7 @@
 import { SinonSandbox } from 'sinon'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { failure, success } from 'src/building-blocks/types/result'
-import { ConseillerInterAgenceAuthorizer } from '../../../src/application/authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../../../src/application/authorizers/conseiller-inter-structure-milo-authorizer'
 import {
   GetConseillersJeuneQuery,
   GetConseillersJeuneQueryHandler
@@ -23,13 +23,15 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetConseillersJeuneQueryHandler', () => {
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterStructureMiloAuthorizer>
   let getConseillersJeuneQueryHandler: GetConseillersJeuneQueryHandler
   let sandbox: SinonSandbox
 
   before(() => {
     sandbox = createSandbox()
-    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(
+      ConseillerInterStructureMiloAuthorizer
+    )
 
     getConseillersJeuneQueryHandler = new GetConseillersJeuneQueryHandler(
       conseillerAgenceAuthorizer

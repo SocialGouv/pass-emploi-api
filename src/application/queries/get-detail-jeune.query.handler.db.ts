@@ -10,7 +10,7 @@ import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/consei
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { SituationsMiloSqlModel } from '../../infrastructure/sequelize/models/situations-milo.sql-model'
 import { TransfertConseillerSqlModel } from '../../infrastructure/sequelize/models/transfert-conseiller.sql-model'
-import { ConseillerInterAgenceAuthorizer } from '../authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../authorizers/conseiller-inter-structure-milo-authorizer'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { fromSqlToDetailJeuneQueryModel } from './query-mappers/jeune.mappers'
 import { DetailJeuneQueryModel } from './query-models/jeunes.query-model'
@@ -26,7 +26,7 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
 > {
   constructor(
     private jeuneAuthorizer: JeuneAuthorizer,
-    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer,
+    private conseillerAgenceAuthorizer: ConseillerInterStructureMiloAuthorizer,
     private configService: ConfigService
   ) {
     super('GetDetailJeuneQueryHandler')

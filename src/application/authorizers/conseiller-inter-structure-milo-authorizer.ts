@@ -3,7 +3,8 @@ import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
 import {
   Result,
   emptySuccess,
-  failure
+  failure,
+  isSuccess
 } from '../../building-blocks/types/result'
 import { Action, ActionsRepositoryToken } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
@@ -11,18 +12,21 @@ import {
   Conseiller,
   ConseillersRepositoryToken
 } from '../../domain/conseiller/conseiller'
-import { Core, estMiloPassEmploi } from '../../domain/core'
+import { Core, estMilo, estMiloPassEmploi } from '../../domain/core'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import {
   RendezVous,
   RendezVousRepositoryToken
 } from '../../domain/rendez-vous/rendez-vous'
+import { ConseillerMiloRepositoryToken } from '../../domain/milo/conseiller.milo'
 
 @Injectable()
-export class ConseillerInterAgenceAuthorizer {
+export class ConseillerInterStructureMiloAuthorizer {
   constructor(
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
+    @Inject(ConseillerMiloRepositoryToken)
+    private conseillerMiloRepository: Conseiller.Milo.Repository,
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     @Inject(ActionsRepositoryToken)
@@ -31,14 +35,20 @@ export class ConseillerInterAgenceAuthorizer {
     private rendezVousRepository: RendezVous.Repository
   ) {}
 
-  async autoriserConseillerPourUneAgence(
-    idAgence: string,
+  async autoriserConseillerPourUneStructureMilo(
+    idStructureMilo: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      const conseiller = await this.conseillerRepository.get(utilisateur.id)
+    if (
+      utilisateur.type === Authentification.Type.CONSEILLER &&
+      estMilo(utilisateur.structure)
+    ) {
+      const conseiller = await this.conseillerMiloRepository.get(utilisateur.id)
 
-      if (conseiller?.agence?.id === idAgence) {
+      if (
+        isSuccess(conseiller) &&
+        conseiller.data.idStructure === idStructureMilo
+      ) {
         return emptySuccess()
       }
     }

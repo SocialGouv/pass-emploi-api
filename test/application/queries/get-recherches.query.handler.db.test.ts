@@ -1,4 +1,4 @@
-import { ConseillerInterAgenceAuthorizer } from '../../../src/application/authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../../../src/application/authorizers/conseiller-inter-structure-milo-authorizer'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { GetRecherchesQueryHandler } from '../../../src/application/queries/get-recherches.query.handler.db'
 import { Core } from '../../../src/domain/core'
@@ -30,12 +30,12 @@ describe('GetRecherchesQueryHandler', () => {
 
   let getRecherchesQueryHandler: GetRecherchesQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterStructureMiloAuthorizer>
 
   beforeEach(async () => {
     await database.cleanPG()
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
-    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterStructureMiloAuthorizer)
     getRecherchesQueryHandler = new GetRecherchesQueryHandler(
       jeuneAuthorizer,
       conseillerAgenceAuthorizer

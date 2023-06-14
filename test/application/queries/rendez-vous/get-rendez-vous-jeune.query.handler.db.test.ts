@@ -30,12 +30,12 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import { getDatabase } from '../../../utils/database-for-testing'
 import { testConfig } from '../../../utils/module-for-testing'
 import { stubClassSandbox } from '../../../utils/types'
-import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-structure-milo-authorizer'
 
 describe('GetRendezVousJeuneQueryHandler', () => {
   let dateService: StubbedClass<DateService>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterStructureMiloAuthorizer>
   let getRendezVousQueryHandler: GetRendezVousJeuneQueryHandler
   let evenementService: StubbedClass<EvenementService>
   let sandbox: SinonSandbox
@@ -55,7 +55,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
     dateService = stubInterface(sandbox)
     dateService.nowJs.returns(maintenant.toJSDate())
     dateService.nowAtMidnightJs.returns(aujourdhuiMinuit.toJSDate())
-    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterStructureMiloAuthorizer)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
   })
 

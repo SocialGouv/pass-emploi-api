@@ -6,7 +6,7 @@ import { Result, success } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
 import { CommentaireSqlModel } from '../../../infrastructure/sequelize/models/commentaire.sql-model'
 import { ActionAuthorizer } from '../../authorizers/action-authorizer'
-import { ConseillerInterAgenceAuthorizer } from '../../authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../../authorizers/conseiller-inter-structure-milo-authorizer'
 import { CommentaireActionQueryModel } from '../query-models/actions.query-model'
 
 export interface GetCommentairesAction extends Query {
@@ -20,7 +20,7 @@ export class GetCommentairesActionQueryHandler extends QueryHandler<
 > {
   constructor(
     private actionAuthorizer: ActionAuthorizer,
-    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer
+    private conseillerAgenceAuthorizer: ConseillerInterStructureMiloAuthorizer
   ) {
     super('GetCommentairesActionQueryHandler')
   }

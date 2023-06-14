@@ -7,7 +7,7 @@ import { fromSqlToActionQueryModelWithJeune } from '../../../infrastructure/repo
 import { ActionSqlModel } from '../../../infrastructure/sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { ActionAuthorizer } from '../../authorizers/action-authorizer'
-import { ConseillerInterAgenceAuthorizer } from '../../authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../../authorizers/conseiller-inter-structure-milo-authorizer'
 import { ActionQueryModel } from '../query-models/actions.query-model'
 
 export interface GetDetailActionQuery extends Query {
@@ -21,7 +21,7 @@ export class GetDetailActionQueryHandler extends QueryHandler<
 > {
   constructor(
     private actionAuthorizer: ActionAuthorizer,
-    private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer
+    private conseillerAgenceAuthorizer: ConseillerInterStructureMiloAuthorizer
   ) {
     super('GetDetailActionQueryHandler')
   }

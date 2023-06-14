@@ -27,7 +27,7 @@ import { LogModificationRendezVousSqlModel } from '../../../../src/infrastructur
 import { DateService } from '../../../../src/utils/date-service'
 import { DateTime } from 'luxon'
 import { getDatabase } from '../../../utils/database-for-testing'
-import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-structure-milo-authorizer'
 import { Core } from '../../../../src/domain/core'
 
 const queryModel: RendezVousConseillerDetailQueryModel = {
@@ -60,7 +60,7 @@ const queryModel: RendezVousConseillerDetailQueryModel = {
 describe('GetDetailRendezVousQueryHandler', () => {
   let getDetailRendezVousQueryHandler: GetDetailRendezVousQueryHandler
   let rendezVousAuthorizer: StubbedClass<RendezVousAuthorizer>
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterStructureMiloAuthorizer>
   let dateService: StubbedClass<DateService>
   let sandbox: SinonSandbox
   const maintenant = uneDate()
@@ -69,7 +69,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
     await getDatabase().cleanPG()
     sandbox = createSandbox()
     rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
-    conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerInterStructureMiloAuthorizer)
     dateService = stubClass(DateService)
     dateService.nowJs.returns(maintenant)
     getDetailRendezVousQueryHandler = new GetDetailRendezVousQueryHandler(

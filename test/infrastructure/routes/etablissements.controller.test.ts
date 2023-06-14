@@ -3,7 +3,7 @@ import { DateTime } from 'luxon'
 import * as request from 'supertest'
 import { CloturerAnimationCollectiveCommandHandler } from '../../../src/application/commands/cloturer-animation-collective.command.handler'
 import { GetAnimationsCollectivesQueryHandler } from '../../../src/application/queries/rendez-vous/get-animations-collectives.query.handler.db'
-import { GetJeunesByEtablissementQueryHandler } from '../../../src/application/queries/get-jeunes-by-etablissement.query.handler.db'
+import { GetJeunesByStructureMiloQueryHandler } from '../../../src/application/queries/get-jeunes-by-structure-milo.query.handler.db'
 import {
   emptySuccess,
   success
@@ -18,7 +18,7 @@ import { getApplicationWithStubbedDependencies } from '../../utils/module-for-te
 
 describe('EtablissementsController', () => {
   let getAnimationsCollectivesQueryHandler: StubbedClass<GetAnimationsCollectivesQueryHandler>
-  let getJeunesEtablissementQueryHandler: StubbedClass<GetJeunesByEtablissementQueryHandler>
+  let getJeunesEtablissementQueryHandler: StubbedClass<GetJeunesByStructureMiloQueryHandler>
   let cloturerAnimationCollectiveCommandHandler: StubbedClass<CloturerAnimationCollectiveCommandHandler>
   let app: INestApplication
 
@@ -28,7 +28,7 @@ describe('EtablissementsController', () => {
       GetAnimationsCollectivesQueryHandler
     )
     getJeunesEtablissementQueryHandler = app.get(
-      GetJeunesByEtablissementQueryHandler
+      GetJeunesByStructureMiloQueryHandler
     )
     cloturerAnimationCollectiveCommandHandler = app.get(
       CloturerAnimationCollectiveCommandHandler
@@ -77,7 +77,7 @@ describe('EtablissementsController', () => {
       getJeunesEtablissementQueryHandler.execute
         .withArgs(
           {
-            idEtablissement: '75114'
+            idStructureMilo: '75114'
           },
           unUtilisateurDecode()
         )
