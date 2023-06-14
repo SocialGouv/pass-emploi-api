@@ -172,7 +172,8 @@ export const testConfig = (): ConfigService => {
     },
     features: {
       rendezVousMilo: true,
-      notifierRendezVousMilo: true
+      notifierRendezVousMilo: true,
+      recupererStructureMilo: true
     },
     oidc: {}
   })

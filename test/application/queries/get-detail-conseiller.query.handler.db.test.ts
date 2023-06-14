@@ -20,6 +20,7 @@ import { failure, success } from '../../../src/building-blocks/types/result'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { uneStructureMiloDto } from '../../fixtures/sql-models/structureMilo.sql-model'
 import { StructureMiloSqlModel } from '../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
+import { testConfig } from '../../utils/module-for-testing'
 
 const token = 'un-token'
 
@@ -36,7 +37,8 @@ describe('GetDetailConseillerQueryHandler', () => {
 
     getDetailConseillerQueryHandler = new GetDetailConseillerQueryHandler(
       conseillerAuthorizer,
-      conseillerMiloService
+      conseillerMiloService,
+      testConfig()
     )
   })
 

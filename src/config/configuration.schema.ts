@@ -142,6 +142,7 @@ export const configurationSchema = Joi.object({
   version: Joi.string().required(),
   features: Joi.object({
     rendezVousMilo: Joi.boolean(),
-    notifierRendezVousMilo: Joi.boolean()
+    notifierRendezVousMilo: Joi.boolean(),
+    recupererStructureMilo: Joi.boolean()
   })
 })

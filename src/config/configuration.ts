@@ -180,6 +180,7 @@ export default () => {
     features: {
       rendezVousMilo: process.env.FEATURE_RDV_MILO === 'true',
       notifierRendezVousMilo: process.env.FEATURE_NOTIFIER_RDV_MILO === 'true',
+      recupererStructureMilo: process.env.FEATURE_RECUPERER_STRUCTURE_MILO === 'true',
     }
   }
   return Joi.attempt(configuration, configurationSchema)

@@ -13,6 +13,7 @@ import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-m
 import { StructureMiloSqlModel } from '../../infrastructure/sequelize/models/structure-milo.sql-model'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { DetailConseillerQueryModel } from './query-models/conseillers.query-model'
+import { ConfigService } from '@nestjs/config'
 
 export interface GetDetailConseillerQuery extends Query {
   idConseiller: string
@@ -27,7 +28,8 @@ export class GetDetailConseillerQueryHandler extends QueryHandler<
 > {
   constructor(
     private conseillerAuthorizer: ConseillerAuthorizer,
-    private conseillerMiloService: Conseiller.Milo.Service
+    private conseillerMiloService: Conseiller.Milo.Service,
+    private configService: ConfigService
   ) {
     super('GetDetailConseillerQueryHandler')
   }
@@ -35,7 +37,11 @@ export class GetDetailConseillerQueryHandler extends QueryHandler<
   async handle(
     query: GetDetailConseillerQuery
   ): Promise<Result<DetailConseillerQueryModel>> {
-    if (estMilo(query.structure)) {
+    const FT_RECUPERER_STRUCTURE_MILO = this.configService.get(
+      'features.recupererStructureMilo'
+    )
+
+    if (estMilo(query.structure) && FT_RECUPERER_STRUCTURE_MILO) {
       await this.conseillerMiloService.recupererEtMettreAJourStructure(
         query.idConseiller,
         query.token
