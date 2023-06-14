@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
-import { isFailure, Result } from '../../../building-blocks/types/result'
+import { Result, isFailure } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
-import { estPoleEmploi } from '../../../domain/core'
+import { estPoleEmploiBRSA } from '../../../domain/core'
 import { Demarche, DemarcheRepositoryToken } from '../../../domain/demarche'
 import { Evenement, EvenementService } from '../../../domain/evenement'
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
@@ -40,7 +40,7 @@ export class UpdateStatutDemarcheCommandHandler extends CommandHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       command.idJeune,
       utilisateur,
-      estPoleEmploi(utilisateur.structure)
+      estPoleEmploiBRSA(utilisateur.structure)
     )
   }
 

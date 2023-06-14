@@ -12,7 +12,7 @@ import {
   isSuccess,
   success
 } from '../../../../src/building-blocks/types/result'
-import { estPoleEmploi } from '../../../../src/domain/core'
+import { estPoleEmploiBRSA } from '../../../../src/domain/core'
 import { Demarche } from '../../../../src/domain/demarche'
 import { Evenement, EvenementService } from '../../../../src/domain/evenement'
 import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
@@ -120,7 +120,7 @@ describe('UpdateDemarcheCommandHandler', () => {
   })
 
   describe('authorize', () => {
-    it('autorise les jeunes pole emploi', async () => {
+    it('autorise les jeunes pole emploi et BRSA', async () => {
       // Given
       const command: UpdateStatutDemarcheCommand = {
         idJeune: 'idJeune',
@@ -137,7 +137,7 @@ describe('UpdateDemarcheCommandHandler', () => {
       expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         command.idJeune,
         utilisateur,
-        estPoleEmploi(utilisateur.structure)
+        estPoleEmploiBRSA(utilisateur.structure)
       )
     })
   })
