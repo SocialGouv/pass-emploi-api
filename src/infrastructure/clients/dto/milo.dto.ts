@@ -1,25 +1,27 @@
-// Pour l'instant c'est le même DTO peu importe l'api jeune / conseiller - liste / détail
-// Ça évoluera par la suite et on split / nommera les nouveaux dtos comme il faut
+export enum OffreTypeCode {
+  WORKSHOP = 'WORKSHOP',
+  COLLECTIVE_INFORMATION = 'COLLECTIVE_INFORMATION'
+}
 
 export interface SessionConseillerDetailDto {
   session: {
     id: number
-    nom: string // 255 car. max
-    dateHeureDebut: string // yyyy-MM-dd HH:mm:SS - utilisé pour le tri et comme paramètre de filtre
-    dateHeureFin: string // yyyy-MM-dd HH:mm:SS"
-    dateMaxInscription: string | null //yyyy-MM-dd
-    animateur: string // au format "Prénom Nom"
-    lieu: string // 255 car. max
+    nom: string
+    dateHeureDebut: string
+    dateHeureFin: string
+    dateMaxInscription: string | null
+    animateur: string
+    lieu: string
     nbPlacesDisponibles: number | null
-    commentaire: string | null // 255 car. max
+    commentaire: string | null
   }
   offre: {
     id: number
     nom: string
-    theme: string // 255 car. max
-    type: 'WORKSHOP' | 'COLLECTIVE_INFORMATION'
-    description: string | null // 500 car. max
-    nomPartenaire: string | null // 255 car. max
+    theme: string
+    type: OffreTypeCode
+    description: string | null
+    nomPartenaire: string | null
   }
 }
 

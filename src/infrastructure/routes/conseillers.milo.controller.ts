@@ -1,13 +1,13 @@
-import { Controller, Get, Param } from '@nestjs/common'
+import { Controller, Get, Param, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import {
-  GetSessionsMiloQueryHandler,
-  SessionConseillerMiloQueryModel
-} from '../../application/queries/milo/get-sessions.milo.query.handler'
+import { GetSessionsMiloQueryHandler } from '../../application/queries/milo/get-sessions.milo.query.handler'
 import { isSuccess } from '../../building-blocks/types/result'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'
 import { Authentification } from '../../domain/authentification'
+import { GetSessionsQueryParams } from './validation/conseiller-milo.inputs'
+import { DateService } from '../../utils/date-service'
+import { SessionConseillerMiloQueryModel } from '../../application/queries/query-models/sessions.milo.query.model'
 
 @Controller('conseillers/milo')
 @ApiOAuth2([])
@@ -29,12 +29,19 @@ export class ConseillersMiloController {
   async getSessions(
     @Param('idConseiller') idConseiller: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
-    @AccessToken() accessToken: string
+    @AccessToken() accessToken: string,
+    @Query() getSessionsQueryParams: GetSessionsQueryParams
   ): Promise<SessionConseillerMiloQueryModel[]> {
     const result = await this.getSessionsMiloQueryHandler.execute(
       {
         idConseiller,
-        token: accessToken
+        token: accessToken,
+        dateDebut: DateService.fromStringToLocaleDateTime(
+          getSessionsQueryParams.dateDebut
+        ),
+        dateFin: DateService.fromStringToLocaleDateTime(
+          getSessionsQueryParams.dateFin
+        )
       },
       utilisateur
     )

@@ -14,6 +14,7 @@ import {
   StructureConseillerMiloDto
 } from './dto/milo.dto'
 import { handleAxiosError } from './utils/axios-error-handler'
+import { DateTime } from 'luxon'
 
 @Injectable()
 export class MiloClient {
@@ -35,12 +36,28 @@ export class MiloClient {
 
   async getSessionsConseiller(
     idpToken: string,
-    idStructure: string
+    idStructure: string,
+    dateDebut?: DateTime,
+    dateFin?: DateTime
   ): Promise<Result<SessionConseillerMiloListeDto>> {
+    const params = new URLSearchParams()
+    if (dateDebut)
+      params.append(
+        'dateDebutRecherche',
+        dateDebut.toFormat('yyyy-MM-dd').toString()
+      )
+    if (dateFin)
+      params.append(
+        'dateFinRecherche',
+        dateFin.toFormat('yyyy-MM-dd').toString()
+      )
+
+    // L'api ne renvoie que 50 sessions max par appel au delà, une pagination doit être mise en place. (voir doc 06/23)
     return this.get<SessionConseillerMiloListeDto>(
       `structures/${idStructure}/sessions`,
       this.apiKeySessionsListeConseiller,
-      idpToken
+      idpToken,
+      params
     )
   }
 
@@ -70,11 +87,13 @@ export class MiloClient {
   private async get<T>(
     suffixUrl: string,
     apiKey: string,
-    idpToken: string
+    idpToken: string,
+    params?: URLSearchParams
   ): Promise<Result<T>> {
     try {
       const response = await firstValueFrom(
         this.httpService.get<T>(`${this.apiUrl}/operateurs/${suffixUrl}`, {
+          params,
           headers: {
             Authorization: `Bearer ${idpToken}`,
             'X-Gravitee-Api-Key': apiKey,

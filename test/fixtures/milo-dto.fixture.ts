@@ -1,4 +1,5 @@
 import {
+  OffreTypeCode,
   SessionConseillerMiloListeDto,
   StructureConseillerMiloDto
 } from '../../src/infrastructure/clients/dto/milo.dto'
@@ -23,7 +24,7 @@ export const uneSessionConseillerListeDto: SessionConseillerMiloListeDto = {
         id: 1,
         nom: 'Une-offre',
         theme: 'Un-theme',
-        type: 'WORKSHOP',
+        type: 'WORKSHOP' as OffreTypeCode,
         description: 'Une-Desc',
         nomPartenaire: 'Un-partenaire'
       }

@@ -43,7 +43,9 @@ describe('ConseillersMiloController', () => {
         ).to.have.been.calledOnceWithExactly(
           {
             idConseiller: 'id-conseiller',
-            token: 'coucou'
+            token: 'coucou',
+            dateDebut: undefined,
+            dateFin: undefined
           },
           unUtilisateurDecode()
         )

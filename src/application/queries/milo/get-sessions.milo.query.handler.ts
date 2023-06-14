@@ -10,25 +10,18 @@ import { Authentification } from '../../../domain/authentification'
 import { Conseiller } from '../../../domain/conseiller/conseiller'
 import { estMilo } from '../../../domain/core'
 import { ConseillerMiloRepositoryToken } from '../../../domain/milo/conseiller.milo'
-import { SessionConseillerDetailDto } from '../../../infrastructure/clients/dto/milo.dto'
 import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client'
 import { MiloClient } from '../../../infrastructure/clients/milo-client'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
+import { mapSessionDtoToQueryModel } from '../query-mappers/milo.mappers'
+import { DateTime } from 'luxon'
+import { SessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
 
-export class SessionConseillerMiloQueryModel {
-  id: string
-  nom: string
-  dateHeureDebut: string
-  dateHeureFin: string
-  dateMaxInscription: string
-  animateur: string
-  lieu: string
-  nbPlacesDisponibles: number
-  commentaire: string
-}
 export interface GetSessionsMiloQuery extends Query {
   idConseiller: string
   token: string
+  dateDebut?: DateTime
+  dateFin?: DateTime
 }
 
 @Injectable()
@@ -62,7 +55,9 @@ export class GetSessionsMiloQueryHandler extends QueryHandler<
 
     const result = await this.miloClient.getSessionsConseiller(
       idpToken,
-      resultConseiller.data.idStructure
+      resultConseiller.data.idStructure,
+      query.dateDebut,
+      query.dateFin
     )
     if (isFailure(result)) {
       return result
@@ -83,21 +78,5 @@ export class GetSessionsMiloQueryHandler extends QueryHandler<
 
   async monitor(): Promise<void> {
     return
-  }
-}
-
-function mapSessionDtoToQueryModel(
-  sessionDto: SessionConseillerDetailDto
-): SessionConseillerMiloQueryModel {
-  return {
-    id: sessionDto.session.id.toString(),
-    nom: sessionDto.session.nom,
-    dateHeureDebut: sessionDto.session.dateHeureDebut,
-    dateHeureFin: sessionDto.session.dateHeureFin,
-    dateMaxInscription: sessionDto.session.dateMaxInscription!,
-    animateur: sessionDto.session.animateur,
-    lieu: sessionDto.session.lieu,
-    nbPlacesDisponibles: sessionDto.session.nbPlacesDisponibles!,
-    commentaire: sessionDto.session.commentaire!
   }
 }
