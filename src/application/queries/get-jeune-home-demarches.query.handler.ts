@@ -52,7 +52,7 @@ export class GetJeuneHomeDemarchesQueryHandler extends QueryHandler<
     const data: Cached<JeuneHomeDemarcheQueryModel> = {
       queryModel: {
         actions: demarches.data.queryModel,
-        campagne: campagne
+        campagne
       },
       dateDuCache: demarches.data.dateDuCache
     }
