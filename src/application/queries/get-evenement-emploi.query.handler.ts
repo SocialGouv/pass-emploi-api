@@ -9,6 +9,8 @@ import {
   success
 } from '../../building-blocks/types/result'
 import { PoleEmploiClient } from '../../infrastructure/clients/pole-emploi-client'
+import { Authentification } from '../../domain/authentification'
+import { Evenement, EvenementService } from '../../domain/evenement'
 
 export class EvenementEmploiDetailQueryModel {
   @ApiProperty({ required: true })
@@ -58,7 +60,10 @@ export class GetEvenementEmploiQueryHandler extends QueryHandler<
   GetEvenementEmploiQuery,
   Result<EvenementEmploiDetailQueryModel>
 > {
-  constructor(private poleEmploiClient: PoleEmploiClient) {
+  constructor(
+    private poleEmploiClient: PoleEmploiClient,
+    private evenementService: EvenementService
+  ) {
     super('GetEvenementEmploiQueryHandler')
   }
 
@@ -99,7 +104,10 @@ export class GetEvenementEmploiQueryHandler extends QueryHandler<
     return emptySuccess()
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creer(
+      Evenement.Code.EVENEMENT_EXTERNE_DETAIL,
+      utilisateur
+    )
   }
 }

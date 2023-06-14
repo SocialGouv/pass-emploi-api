@@ -12,6 +12,8 @@ import { PoleEmploiClient } from 'src/infrastructure/clients/pole-emploi-client'
 import { DateService } from 'src/utils/date-service'
 import { PaginationQueryModel } from './query-models/common/pagination.query-model'
 import { EvenementEmploiCodePostalQueryGetter } from 'src/application/queries/query-getters/evenement-emploi-code-postal.query.getter'
+import { Evenement, EvenementService } from '../../domain/evenement'
+import { Authentification } from '../../domain/authentification'
 
 const NOMBRE_EVENEMENTS_MAX = 10
 const PAGE_PAR_DEFAUT = 1
@@ -65,7 +67,8 @@ export class GetEvenementsEmploiQueryHandler extends QueryHandler<
 > {
   constructor(
     private poleEmploiClient: PoleEmploiClient,
-    private codePostalQueryGetter: EvenementEmploiCodePostalQueryGetter
+    private codePostalQueryGetter: EvenementEmploiCodePostalQueryGetter,
+    private evenementService: EvenementService
   ) {
     super('GetEvenementsEmploiQueryHandler')
   }
@@ -114,7 +117,10 @@ export class GetEvenementsEmploiQueryHandler extends QueryHandler<
     return emptySuccess()
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creer(
+      Evenement.Code.EVENEMENT_EXTERNE_RECHERCHE,
+      utilisateur
+    )
   }
 }

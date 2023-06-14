@@ -7,21 +7,26 @@ import {
 } from 'src/application/queries/get-evenements-emploi.query.handler'
 import { success } from 'src/building-blocks/types/result'
 import { EvenementEmploiCodePostalQueryGetter } from 'src/application/queries/query-getters/evenement-emploi-code-postal.query.getter'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 
 describe('GetEvenementsEmploiQueryHandler', () => {
   let getEvenementsEmploiQueryHandler: GetEvenementsEmploiQueryHandler
   let sandbox: SinonSandbox
   let poleEmploiClient: StubbedClass<PoleEmploiClient>
+  let evenementService: StubbedClass<EvenementService>
   let codePostalQueryGetter: StubbedClass<EvenementEmploiCodePostalQueryGetter>
 
   before(() => {
     sandbox = createSandbox()
     poleEmploiClient = stubClass(PoleEmploiClient)
+    evenementService = stubClass(EvenementService)
     codePostalQueryGetter = stubClass(EvenementEmploiCodePostalQueryGetter)
 
     getEvenementsEmploiQueryHandler = new GetEvenementsEmploiQueryHandler(
       poleEmploiClient,
-      codePostalQueryGetter
+      codePostalQueryGetter,
+      evenementService
     )
   })
 
@@ -106,6 +111,18 @@ describe('GetEvenementsEmploiQueryHandler', () => {
           })
         )
       })
+    })
+  })
+  describe('monitor', () => {
+    it('crée un AE liste', async () => {
+      // When
+      await getEvenementsEmploiQueryHandler.monitor(unUtilisateurJeune())
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWith(
+        Evenement.Code.EVENEMENT_EXTERNE_RECHERCHE,
+        unUtilisateurJeune()
+      )
     })
   })
 })

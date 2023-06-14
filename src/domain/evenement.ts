@@ -42,6 +42,12 @@ export namespace Evenement {
     ANIMATION_COLLECTIVE_SUPPRIMEE = 'ANIMATION_COLLECTIVE_SUPPRIMEE',
     ANIMATION_COLLECTIVE_AFFICHEE = 'ANIMATION_COLLECTIVE_AFFICHEE',
     ANIMATION_COLLECTIVE_PARTAGEE = 'ANIMATION_COLLECTIVE_PARTAGEE',
+    EVENEMENT_EXTERNE_RECHERCHE = 'EVENEMENT_EXTERNE_RECHERCHE',
+    EVENEMENT_EXTERNE_DETAIL = 'EVENEMENT_EXTERNE_DETAIL',
+    EVENEMENT_EXTERNE_PARTAGE = 'EVENEMENT_EXTERNE_PARTAGE',
+    EVENEMENT_EXTERNE_PARTAGE_CONSEILLER = 'EVENEMENT_EXTERNE_PARTAGE_CONSEILLER',
+    EVENEMENT_EXTERNE_INSCRIPTION = 'EVENEMENT_EXTERNE_INSCRIPTION',
+    EVENEMENT_EXTERNE_MISE_EN_FAVORI = 'EVENEMENT_EXTERNE_MISE_EN_FAVORI',
     CV_PE_TELECHARGE = 'CV_PE_TELECHARGE',
     COMPTE_SUPPRIME = 'COMPTE_SUPPRIME',
     COMPTE_ARCHIVE = 'COMPTE_ARCHIVE',
@@ -204,6 +210,36 @@ const evenements: {
     categorie: 'Rendez-vous',
     action: 'Partage',
     nom: 'Animation collective'
+  },
+  [Evenement.Code.EVENEMENT_EXTERNE_RECHERCHE]: {
+    categorie: 'Evénement',
+    action: 'Recherche',
+    nom: 'Externe'
+  },
+  [Evenement.Code.EVENEMENT_EXTERNE_DETAIL]: {
+    categorie: 'Evénement',
+    action: 'Détail',
+    nom: 'Externe'
+  },
+  [Evenement.Code.EVENEMENT_EXTERNE_PARTAGE]: {
+    categorie: 'Evénement',
+    action: 'Partage',
+    nom: 'Externe'
+  },
+  [Evenement.Code.EVENEMENT_EXTERNE_PARTAGE_CONSEILLER]: {
+    categorie: 'Evénement',
+    action: 'Partage conseiller',
+    nom: 'Externe'
+  },
+  [Evenement.Code.EVENEMENT_EXTERNE_INSCRIPTION]: {
+    categorie: 'Evénement',
+    action: 'Inscription',
+    nom: 'Externe'
+  },
+  [Evenement.Code.EVENEMENT_EXTERNE_MISE_EN_FAVORI]: {
+    categorie: 'Evénement',
+    action: 'Favoris',
+    nom: 'Externe'
   },
   [Evenement.Code.COMPTE_SUPPRIME]: {
     categorie: 'Compte',

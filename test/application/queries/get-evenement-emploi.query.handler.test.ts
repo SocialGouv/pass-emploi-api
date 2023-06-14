@@ -6,18 +6,23 @@ import {
 import { PoleEmploiClient } from 'src/infrastructure/clients/pole-emploi-client'
 import { success } from '../../../src/building-blocks/types/result'
 import { StubbedClass, createSandbox, expect, stubClass } from '../../utils'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 
 describe('GetEvenementEmploiQueryHandler', () => {
   let getEvenementEmploiQueryHandler: GetEvenementEmploiQueryHandler
   let sandbox: SinonSandbox
   let poleEmploiClient: StubbedClass<PoleEmploiClient>
+  let evenementService: StubbedClass<EvenementService>
 
   before(() => {
     sandbox = createSandbox()
     poleEmploiClient = stubClass(PoleEmploiClient)
+    evenementService = stubClass(EvenementService)
 
     getEvenementEmploiQueryHandler = new GetEvenementEmploiQueryHandler(
-      poleEmploiClient
+      poleEmploiClient,
+      evenementService
     )
   })
 
@@ -85,6 +90,18 @@ describe('GetEvenementEmploiQueryHandler', () => {
           url: 'test',
           deroulement: undefined
         })
+      )
+    })
+  })
+  describe('monitor', () => {
+    it('crée un AE détail', async () => {
+      // When
+      await getEvenementEmploiQueryHandler.monitor(unUtilisateurJeune())
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWith(
+        Evenement.Code.EVENEMENT_EXTERNE_DETAIL,
+        unUtilisateurJeune()
       )
     })
   })
