@@ -28,9 +28,12 @@ import { GetFavorisAccueilQueryGetter } from '../../../../src/application/querie
 import { unJeune } from '../../../fixtures/jeune.fixture'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { GetCampagneQueryGetter } from 'src/application/queries/query-getters/get-campagne.query.getter'
+import { uneCampagneQueryModel } from 'test/fixtures/campagne.fixture'
 
 describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
   let handler: GetAccueilJeunePoleEmploiQueryHandler
+  let getCampagneQueryGetter: StubbedClass<GetCampagneQueryGetter>
   let getDemarchesQueryGetter: StubbedClass<GetDemarchesQueryGetter>
   let getRendezVousJeunePoleEmploiQueryGetter: StubbedClass<GetRendezVousJeunePoleEmploiQueryGetter>
   let getRecherchesSauvegardeesQueryGetter: StubbedClass<GetRecherchesSauvegardeesQueryGetter>
@@ -39,9 +42,10 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
   let keycloakClient: StubbedClass<KeycloakClient>
   let jeuneRepository: StubbedType<Jeune.Repository>
   const idpToken = 'id-token'
-  const jeune = unJeune()
+  const jeune = unJeune({ structure: Core.Structure.POLE_EMPLOI })
 
   beforeEach(() => {
+    getCampagneQueryGetter = stubClass(GetCampagneQueryGetter)
     getDemarchesQueryGetter = stubClass(GetDemarchesQueryGetter)
     getRecherchesSauvegardeesQueryGetter = stubClass(
       GetRecherchesSauvegardeesQueryGetter
@@ -64,7 +68,8 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
       getDemarchesQueryGetter,
       getRendezVousJeunePoleEmploiQueryGetter,
       getRecherchesSauvegardeesQueryGetter,
-      getFavorisQueryGetter
+      getFavorisQueryGetter,
+      getCampagneQueryGetter
     )
   })
 
@@ -124,6 +129,8 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
       etat: Recherche.Etat.SUCCES
     }
 
+    const campagneQueryModel = uneCampagneQueryModel()
+
     let result: Result<AccueilJeunePoleEmploiQueryModel>
 
     describe('quand les services externes répondent avec Succès', () => {
@@ -182,6 +189,12 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
             })
             .resolves([])
 
+          getCampagneQueryGetter.handle
+            .withArgs({
+              idJeune: query.idJeune
+            })
+            .resolves(campagneQueryModel)
+
           // When
           result = await handler.handle(query)
         })
@@ -219,6 +232,15 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
           expect(
             isSuccess(result) && getFavorisQueryGetter.handle
           ).to.have.been.calledOnceWithExactly({ idJeune: query.idJeune })
+        })
+        it('récupère la campagne rattachée', async () => {
+          // Then
+          expect(
+            isSuccess(result) && getCampagneQueryGetter.handle
+          ).to.have.been.calledOnceWithExactly({ idJeune: query.idJeune })
+          expect(isSuccess(result) && result.data.campagne).to.deep.equal(
+            campagneQueryModel
+          )
         })
       })
     })

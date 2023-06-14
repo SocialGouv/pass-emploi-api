@@ -10,7 +10,7 @@ import {
   success
 } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
-import { estPoleEmploiBRSA } from '../../../domain/core'
+import { estBRSA, estPoleEmploiBRSA } from '../../../domain/core'
 import { Demarche } from '../../../domain/demarche'
 import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
 import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client'
@@ -20,6 +20,7 @@ import { GetRecherchesSauvegardeesQueryGetter } from '../query-getters/accueil/g
 import { GetDemarchesQueryGetter } from '../query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { AccueilJeunePoleEmploiQueryModel } from '../query-models/jeunes.pole-emploi.query-model'
+import { GetCampagneQueryGetter } from '../query-getters/get-campagne.query.getter'
 
 export interface GetAccueilJeunePoleEmploiQuery extends Query {
   idJeune: string
@@ -40,7 +41,8 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
     private getDemarchesQueryGetter: GetDemarchesQueryGetter,
     private getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter,
     private getRecherchesSauvegardeesQueryGetter: GetRecherchesSauvegardeesQueryGetter,
-    private getFavorisQueryGetter: GetFavorisAccueilQueryGetter
+    private getFavorisQueryGetter: GetFavorisAccueilQueryGetter,
+    private getCampagneQueryGetter: GetCampagneQueryGetter
   ) {
     super('GetAccueilJeunePoleEmploiQueryHandler')
   }
@@ -69,7 +71,8 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
       resultDemarches,
       resultRendezVous,
       alertesQueryModels,
-      favorisQueryModels
+      favorisQueryModels,
+      campagneQueryModel
     ] = await Promise.all([
       this.getDemarchesQueryGetter.handle({
         ...query,
@@ -85,7 +88,10 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
       }),
       this.getFavorisQueryGetter.handle({
         idJeune: query.idJeune
-      })
+      }),
+      estBRSA(jeune.structure)
+        ? Promise.resolve(undefined)
+        : this.getCampagneQueryGetter.handle({ idJeune: query.idJeune })
     ])
 
     if (isFailure(resultDemarches)) {
@@ -137,7 +143,8 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
       },
       prochainRendezVous,
       mesAlertes: alertesQueryModels,
-      mesFavoris: favorisQueryModels
+      mesFavoris: favorisQueryModels,
+      campagne: campagneQueryModel
     }
     return success(data)
   }
