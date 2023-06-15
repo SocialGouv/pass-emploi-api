@@ -26,8 +26,12 @@ export class GetSuggestionsQueryHandler extends QueryHandler<
 
   async handle(query: GetSuggestionsQuery): Promise<SuggestionQueryModel[]> {
     const sources = query.avecDiagoriente
-      ? [Suggestion.Source.POLE_EMPLOI, Suggestion.Source.DIAGORIENTE]
-      : [Suggestion.Source.POLE_EMPLOI]
+      ? [
+          Suggestion.Source.POLE_EMPLOI,
+          Suggestion.Source.CONSEILLER,
+          Suggestion.Source.DIAGORIENTE
+        ]
+      : [Suggestion.Source.POLE_EMPLOI, Suggestion.Source.CONSEILLER]
 
     const suggestionsSql = await SuggestionSqlModel.findAll({
       where: {
