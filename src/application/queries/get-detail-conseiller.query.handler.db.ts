@@ -51,9 +51,7 @@ export class GetDetailConseillerQueryHandler extends QueryHandler<
     const conseillerSqlModel = await ConseillerSqlModel.findByPk(
       query.idConseiller,
       {
-        include: [
-          estMilo(query.structure) ? StructureMiloSqlModel : AgenceSqlModel
-        ]
+        include: [AgenceSqlModel, StructureMiloSqlModel]
       }
     )
 
