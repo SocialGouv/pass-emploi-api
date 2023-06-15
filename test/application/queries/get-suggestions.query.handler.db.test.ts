@@ -28,17 +28,20 @@ describe('GetSuggestionsQueryHandler', () => {
   })
 
   describe('handle', () => {
+    const suggestion = uneSuggestion()
+    const suggestionDiagoriente = uneSuggestion({
+      id: 'abc1ae20-8838-a9c7-aa2e-ab2243a8fb6a',
+      source: Suggestion.Source.DIAGORIENTE,
+      informations: {
+        titre: 'Petrisseur'
+      }
+    })
+    const suggestionConseiller = uneSuggestion({
+      id: '1231ae20-8738-a2c7-aa2e-ab3243a8cb6a',
+      source: Suggestion.Source.CONSEILLER
+    })
     it('retourne toutes les suggestions quand avecDiagoriente est true', async () => {
       // Given
-
-      const suggestion = uneSuggestion()
-      const suggestionDiagoriente = uneSuggestion({
-        id: 'abc1ae20-8838-a9c7-aa2e-ab2243a8fb6a',
-        source: Suggestion.Source.DIAGORIENTE,
-        informations: {
-          titre: 'Petrisseur'
-        }
-      })
 
       await SuggestionSqlModel.bulkCreate([
         {
@@ -67,6 +70,20 @@ describe('GetSuggestionsQueryHandler', () => {
           dateCreation: suggestionDiagoriente.dateCreation,
           dateRafraichissement: suggestionDiagoriente.dateRafraichissement,
           titre: suggestionDiagoriente.informations.titre
+        },
+        {
+          id: suggestionConseiller.id,
+          idJeune: suggestionConseiller.idJeune,
+          idFonctionnel: Buffer.from(
+            JSON.stringify(suggestionConseiller.idFonctionnel)
+          ).toString('base64'),
+          type: suggestionConseiller.type,
+          source: suggestionConseiller.source,
+          dateCreation: suggestionConseiller.dateCreation,
+          dateRafraichissement: suggestionConseiller.dateRafraichissement,
+          titre: suggestionConseiller.informations.titre,
+          metier: suggestionConseiller.informations.metier,
+          localisation: suggestionConseiller.informations.localisation
         }
       ])
 
@@ -96,11 +113,96 @@ describe('GetSuggestionsQueryHandler', () => {
           dateRafraichissement: uneDatetime().toISO(),
           metier: undefined,
           localisation: undefined
+        },
+        {
+          id: suggestionConseiller.id,
+          titre: 'Petrisseur',
+          type: Offre.Recherche.Type.OFFRES_EMPLOI,
+          source: suggestionConseiller.source,
+          dateCreation: uneDatetime().toISO(),
+          dateRafraichissement: uneDatetime().toISO(),
+          metier: 'Boulanger',
+          localisation: 'Lille'
         }
       ]
 
       // Then
 
+      expect(suggestions).to.deep.equal(queryModel)
+    })
+    it('retourne toutes les suggestions sauf celles provenant de Diagoriente', async () => {
+      await SuggestionSqlModel.bulkCreate([
+        {
+          id: suggestion.id,
+          idJeune: suggestion.idJeune,
+          idFonctionnel: Buffer.from(
+            JSON.stringify(suggestion.idFonctionnel)
+          ).toString('base64'),
+          type: suggestion.type,
+          source: suggestion.source,
+          dateCreation: suggestion.dateCreation,
+          dateRafraichissement: suggestion.dateRafraichissement,
+          criteres: suggestion.criteres,
+          titre: suggestion.informations.titre,
+          metier: suggestion.informations.metier,
+          localisation: suggestion.informations.localisation
+        },
+        {
+          id: suggestionDiagoriente.id,
+          idJeune: suggestionDiagoriente.idJeune,
+          idFonctionnel: Buffer.from(
+            JSON.stringify(suggestionDiagoriente.idFonctionnel)
+          ).toString('base64'),
+          type: suggestionDiagoriente.type,
+          source: suggestionDiagoriente.source,
+          dateCreation: suggestionDiagoriente.dateCreation,
+          dateRafraichissement: suggestionDiagoriente.dateRafraichissement,
+          titre: suggestionDiagoriente.informations.titre
+        },
+        {
+          id: suggestionConseiller.id,
+          idJeune: suggestionConseiller.idJeune,
+          idFonctionnel: Buffer.from(
+            JSON.stringify(suggestionConseiller.idFonctionnel)
+          ).toString('base64'),
+          type: suggestionConseiller.type,
+          source: suggestionConseiller.source,
+          dateCreation: suggestionConseiller.dateCreation,
+          dateRafraichissement: suggestionConseiller.dateRafraichissement,
+          titre: suggestionConseiller.informations.titre,
+          metier: suggestionConseiller.informations.metier,
+          localisation: suggestionConseiller.informations.localisation
+        }
+      ])
+
+      // When
+      const suggestions = await queryHandler.handle({
+        idJeune: suggestion.idJeune,
+        avecDiagoriente: false
+      })
+
+      const queryModel: SuggestionQueryModel[] = [
+        {
+          id: suggestion.id,
+          titre: 'Petrisseur',
+          type: Offre.Recherche.Type.OFFRES_EMPLOI,
+          source: suggestion.source,
+          metier: 'Boulanger',
+          localisation: 'Lille',
+          dateCreation: uneDatetime().toISO(),
+          dateRafraichissement: uneDatetime().toISO()
+        },
+        {
+          id: suggestionConseiller.id,
+          titre: 'Petrisseur',
+          type: Offre.Recherche.Type.OFFRES_EMPLOI,
+          source: suggestionConseiller.source,
+          dateCreation: uneDatetime().toISO(),
+          dateRafraichissement: uneDatetime().toISO(),
+          metier: 'Boulanger',
+          localisation: 'Lille'
+        }
+      ]
       expect(suggestions).to.deep.equal(queryModel)
     })
     it("retourne les suggestions non traitées d'un jeune", async () => {
