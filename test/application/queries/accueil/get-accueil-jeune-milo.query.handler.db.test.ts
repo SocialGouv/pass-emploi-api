@@ -32,21 +32,27 @@ import { uneAgenceMiloDto } from '../../../fixtures/sql-models/agence.sql-model'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
+import { uneCampagneQueryModel } from 'test/fixtures/campagne.fixture'
+import { GetCampagneQueryGetter } from 'src/application/queries/query-getters/get-campagne.query.getter'
 
 describe('GetAccueilJeuneMiloQueryHandler', () => {
   let handler: GetAccueilJeuneMiloQueryHandler
   let alertesQueryGetter: StubbedClass<GetRecherchesSauvegardeesQueryGetter>
   let favorisAccueilQueryGetter: StubbedClass<GetFavorisAccueilQueryGetter>
+  let getCampagneQueryGetter: StubbedClass<GetCampagneQueryGetter>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
 
   before(async () => {
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     alertesQueryGetter = stubClass(GetRecherchesSauvegardeesQueryGetter)
     favorisAccueilQueryGetter = stubClass(GetFavorisAccueilQueryGetter)
+    getCampagneQueryGetter = stubClass(GetCampagneQueryGetter)
+
     handler = new GetAccueilJeuneMiloQueryHandler(
       jeuneAuthorizer,
       alertesQueryGetter,
-      favorisAccueilQueryGetter
+      favorisAccueilQueryGetter,
+      getCampagneQueryGetter
     )
   })
 
@@ -56,6 +62,8 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
 
     const maintenantString = '2023-03-27T03:24:00'
     const maintenant = DateTime.fromISO(maintenantString)
+
+    const campagneQueryModel = uneCampagneQueryModel()
 
     before(async () => {
       query = {
@@ -191,7 +199,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       let evenementAVenirAutreAgence: AsSql<RendezVousDto>
       let evenementAVenir4HorsPage: AsSql<RendezVousDto>
 
-      before(async () => {
+      beforeEach(async () => {
         // Given
         evenementAVenir1 = unRendezVousDto({
           date: maintenant.plus({ day: 1 }).toJSDate(),
@@ -302,6 +310,27 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       expect(
         isSuccess(result) && favorisAccueilQueryGetter.handle
       ).to.have.been.calledWithExactly({ idJeune: query.idJeune })
+    })
+
+    it('retourne la campagne rattachée', async () => {
+      getCampagneQueryGetter.handle.resetHistory()
+      // Given
+      getCampagneQueryGetter.handle
+        .withArgs({
+          idJeune: query.idJeune
+        })
+        .resolves(campagneQueryModel)
+
+      // When
+      result = await handler.handle(query)
+
+      // Then
+      expect(
+        isSuccess(result) && getCampagneQueryGetter.handle
+      ).to.have.been.calledOnceWithExactly({ idJeune: query.idJeune })
+      expect(isSuccess(result) && result.data.campagne).to.deep.equal(
+        campagneQueryModel
+      )
     })
   })
 

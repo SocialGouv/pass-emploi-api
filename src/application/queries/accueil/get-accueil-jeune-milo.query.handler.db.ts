@@ -4,7 +4,7 @@ import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import { Result, failure, success } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
-import { estMiloPassEmploi } from '../../../domain/core'
+import { estBRSA, estMiloPassEmploi } from '../../../domain/core'
 import { ActionSqlModel } from '../../../infrastructure/sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
@@ -22,6 +22,7 @@ import { TYPES_ANIMATIONS_COLLECTIVES } from '../../../domain/rendez-vous/rendez
 import { ConseillerSqlModel } from '../../../infrastructure/sequelize/models/conseiller.sql-model'
 import { GetFavorisAccueilQueryGetter } from '../query-getters/accueil/get-favoris.query.getter.db'
 import { GetRecherchesSauvegardeesQueryGetter } from '../query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
+import { GetCampagneQueryGetter } from '../query-getters/get-campagne.query.getter'
 import { AccueilJeuneMiloQueryModel } from '../query-models/jeunes.milo.query-model'
 
 export interface GetAccueilJeuneMiloQuery extends Query {
@@ -37,7 +38,8 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
   constructor(
     private jeuneAuthorizer: JeuneAuthorizer,
     private getRecherchesSauvegardeesQueryGetter: GetRecherchesSauvegardeesQueryGetter,
-    private getFavorisAccueilQueryGetter: GetFavorisAccueilQueryGetter
+    private getFavorisAccueilQueryGetter: GetFavorisAccueilQueryGetter,
+    private getCampagneQueryGetter: GetCampagneQueryGetter
   ) {
     super('GetAccueilJeuneMiloQueryHandler')
   }
@@ -66,7 +68,8 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       actionSqlModelsEnRetard,
       evenementSqlModelAVenir,
       recherchesQueryModels,
-      favorisQueryModels
+      favorisQueryModels,
+      campagneQueryModel
     ] = await Promise.all([
       this.countRendezVousSemaine(maintenant, dateFinDeSemaine, idJeune),
       this.prochainRendezVous(maintenant, idJeune),
@@ -80,7 +83,10 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       this.getRecherchesSauvegardeesQueryGetter.handle({
         idJeune
       }),
-      this.getFavorisAccueilQueryGetter.handle({ idJeune })
+      this.getFavorisAccueilQueryGetter.handle({ idJeune }),
+      estBRSA(jeuneSqlModel.structure)
+        ? Promise.resolve(undefined)
+        : this.getCampagneQueryGetter.handle({ idJeune })
     ])
 
     return success({
@@ -104,7 +110,8 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
         )
       ),
       mesAlertes: recherchesQueryModels,
-      mesFavoris: favorisQueryModels
+      mesFavoris: favorisQueryModels,
+      campagne: campagneQueryModel
     })
   }
 
