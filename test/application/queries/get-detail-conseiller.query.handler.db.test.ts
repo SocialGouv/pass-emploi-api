@@ -165,11 +165,12 @@ describe('GetDetailConseillerQueryHandler', () => {
               firstName: 'toto',
               lastName: 'tata',
               email: 'nils.tavernier@passemploi.com',
-              agence: {
+              structureMilo: {
                 id: structureMiloSql.id,
                 nom: structureMiloSql.nomOfficiel
               },
-              notificationsSonores: false
+              notificationsSonores: false,
+              agence: undefined
             })
           )
         )

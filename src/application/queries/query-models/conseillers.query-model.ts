@@ -9,6 +9,14 @@ class AgenceDuConseillerQueryModel {
   nom: string
 }
 
+class StructureMiloDuConseillerQueryModel {
+  @ApiProperty({ required: false })
+  id?: string
+
+  @ApiProperty()
+  nom: string
+}
+
 export class DetailConseillerQueryModel {
   @ApiProperty()
   id: string
@@ -24,6 +32,9 @@ export class DetailConseillerQueryModel {
 
   @ApiProperty({ required: false })
   agence?: AgenceDuConseillerQueryModel
+
+  @ApiProperty({ required: false })
+  structureMilo?: StructureMiloDuConseillerQueryModel
 
   @ApiProperty()
   notificationsSonores: boolean
