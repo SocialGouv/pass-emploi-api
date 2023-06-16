@@ -1,4 +1,3 @@
-import { RafraichirSuggestionPoleEmploiCommandHandler } from '../../../src/application/commands/rafraichir-suggestion-pole-emploi.command.handler'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { Suggestion } from '../../../src/domain/offre/recherche/suggestion/suggestion'
@@ -13,15 +12,16 @@ import {
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { SuggestionPoleEmploiService } from '../../../src/domain/offre/recherche/suggestion/pole-emploi.service'
-import { Core, estPoleEmploiBRSA } from '../../../src/domain/core'
+import { Core } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { DiagorienteClient } from 'src/infrastructure/clients/diagoriente-client'
 import { Diagoriente } from 'src/domain/offre/recherche/suggestion/diagoriente'
 import { Recherche } from 'src/domain/offre/recherche/recherche'
+import { RafraichirSuggestionsCommandHandler } from 'src/application/commands/rafraichir-suggestions.command.handler'
 
 describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
-  let handler: RafraichirSuggestionPoleEmploiCommandHandler
+  let handler: RafraichirSuggestionsCommandHandler
   let jeuneRepository: StubbedType<Jeune.Repository>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let suggestionFactory: StubbedClass<Suggestion.Factory>
@@ -40,7 +40,7 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
     diagorienteClient = stubClass(DiagorienteClient)
     suggestionPoleEmploiRepository = stubInterface(sandbox)
     keycloakClient = stubClass(KeycloakClient)
-    handler = new RafraichirSuggestionPoleEmploiCommandHandler(
+    handler = new RafraichirSuggestionsCommandHandler(
       jeuneRepository,
       jeuneAuthorizer,
       suggestionFactory,
@@ -52,7 +52,7 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
   })
 
   describe('authorize', () => {
-    it('autorise un jeune PE', async () => {
+    it('autorise un jeune', async () => {
       // Given
       const utilisateur = unUtilisateurJeune()
 
@@ -70,11 +70,7 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
       // Then
       expect(
         jeuneAuthorizer.autoriserLeJeune
-      ).to.have.been.calledOnceWithExactly(
-        'idJeune',
-        utilisateur,
-        estPoleEmploiBRSA(utilisateur.structure)
-      )
+      ).to.have.been.calledOnceWithExactly('idJeune', utilisateur)
     })
   })
 
@@ -86,6 +82,69 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
         .resolves('idpToken')
     })
 
+    describe("quand l'utilisateur a une structure MILO", () => {
+      it('test', async () => {
+        const suggestionDiagoriente: Diagoriente = {
+          tag: {
+            code: 'B1301',
+            id: '1',
+            title: "Décoration d'espaces de vente et d'exposition"
+          },
+          id: '1',
+          favorited: true
+        }
+
+        const suggestionDiagorienteOffreEmploi: Suggestion = uneSuggestion({
+          source: Suggestion.Source.DIAGORIENTE,
+          type: Recherche.Type.OFFRES_EMPLOI,
+          informations: {
+            titre: suggestionDiagoriente.tag.title
+          }
+        })
+
+        const suggestionDiagorienteImmersion: Suggestion = uneSuggestion({
+          source: Suggestion.Source.DIAGORIENTE,
+          type: Recherche.Type.OFFRES_IMMERSION,
+          informations: {
+            titre: suggestionDiagoriente.tag.title
+          }
+        })
+
+        diagorienteClient.getMetiersFavoris.resolves(
+          success({
+            data: {
+              userByPartner: {
+                favorites: [suggestionDiagoriente]
+              }
+            }
+          })
+        )
+
+        suggestionFactory.buildListeSuggestionsOffresFromDiagoriente
+          .withArgs([suggestionDiagoriente], 'idJeune')
+          .returns([
+            suggestionDiagorienteOffreEmploi,
+            suggestionDiagorienteImmersion
+          ])
+
+        // When
+        await handler.handle({
+          idJeune: 'idJeune',
+          token: 'token',
+          structure: Core.Structure.MILO,
+          avecDiagoriente: true
+        })
+
+        // Then
+        expect(
+          suggestionPoleEmploiService.rafraichir
+        ).to.have.been.calledWithExactly(
+          [suggestionDiagorienteOffreEmploi, suggestionDiagorienteImmersion],
+          'idJeune'
+        )
+      })
+    })
+
     describe('quand Pole Emploi est up', () => {
       it('rafraichit les suggestions', async () => {
         // Given
@@ -94,14 +153,14 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
           .resolves(success([uneSuggestionPE()]))
 
         suggestionFactory.buildListeSuggestionsOffresFromPoleEmploi
-          .withArgs([uneSuggestionPE()], 'idJeune', Core.Structure.MILO)
+          .withArgs([uneSuggestionPE()], 'idJeune', Core.Structure.POLE_EMPLOI)
           .returns([uneSuggestion()])
 
         // When
         await handler.handle({
           idJeune: 'idJeune',
           token: 'token',
-          structure: Core.Structure.MILO,
+          structure: Core.Structure.POLE_EMPLOI,
           avecDiagoriente: false
         })
 
@@ -153,7 +212,7 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
         )
 
         suggestionFactory.buildListeSuggestionsOffresFromPoleEmploi
-          .withArgs([uneSuggestionPE()], 'idJeune', Core.Structure.MILO)
+          .withArgs([uneSuggestionPE()], 'idJeune', Core.Structure.POLE_EMPLOI)
           .returns([uneSuggestion()])
 
         suggestionFactory.buildListeSuggestionsOffresFromDiagoriente
@@ -167,7 +226,7 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
         await handler.handle({
           idJeune: 'idJeune',
           token: 'token',
-          structure: Core.Structure.MILO,
+          structure: Core.Structure.POLE_EMPLOI,
           avecDiagoriente: true
         })
 
@@ -196,7 +255,7 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
         const result = await handler.handle({
           idJeune: 'idJeune',
           token: 'token',
-          structure: Core.Structure.MILO,
+          structure: Core.Structure.POLE_EMPLOI,
           avecDiagoriente: false
         })
 

@@ -246,7 +246,7 @@ import { GetRendezVousJeunePoleEmploiQueryGetter } from './application/queries/q
 import { HandleJobMettreAJourCodesEvenementsCommandHandler } from './application/commands/jobs/handle-job-mettre-a-jour-codes-evenements.command'
 import { GetIndicateursPourConseillerQueryHandler } from './application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { HandleJobNettoyerLesDonneesCommandHandler } from './application/cron-jobs/handle-job-nettoyer-les-donnees.command.db'
-import { RafraichirSuggestionPoleEmploiCommandHandler } from './application/commands/rafraichir-suggestion-pole-emploi.command.handler'
+import { RafraichirSuggestionsCommandHandler } from './application/commands/rafraichir-suggestions.command.handler'
 import { SuggestionPeHttpRepository } from './infrastructure/repositories/offre/recherche/suggestion/suggestion-pe-http.repository.db'
 import {
   Suggestion,
@@ -689,7 +689,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetRecherchesSauvegardeesQueryGetter,
     GetRendezVousJeunePoleEmploiQueryGetter,
     GetIndicateursPourConseillerQueryHandler,
-    RafraichirSuggestionPoleEmploiCommandHandler,
+    RafraichirSuggestionsCommandHandler,
     GetSuggestionsQueryHandler,
     RefuserSuggestionCommandHandler,
     CreateRechercheFromSuggestionCommandHandler,

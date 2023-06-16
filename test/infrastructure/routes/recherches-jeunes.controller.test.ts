@@ -7,7 +7,6 @@ import {
   DeleteRechercheCommandHandler
 } from '../../../src/application/commands/delete-recherche.command.handler'
 import { RefuserSuggestionCommandHandler } from '../../../src/application/commands/refuser-suggestion.command.handler'
-import { RafraichirSuggestionPoleEmploiCommandHandler } from '../../../src/application/commands/rafraichir-suggestion-pole-emploi.command.handler'
 import { GetRecherchesQueryHandler } from '../../../src/application/queries/get-recherches.query.handler.db'
 import { GetSuggestionsQueryHandler } from '../../../src/application/queries/get-suggestions.query.handler.db'
 import { RechercheQueryModel } from '../../../src/application/queries/query-models/recherches.query-model'
@@ -43,12 +42,13 @@ import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 import Suggestion = Recherche.Suggestion
 import { Core } from '../../../src/domain/core'
+import { RafraichirSuggestionsCommandHandler } from 'src/application/commands/rafraichir-suggestions.command.handler'
 
 describe('RecherchesController', () => {
   let createRechercheCommandHandler: StubbedClass<CreateRechercheCommandHandler>
   let getRecherchesQueryHandler: StubbedClass<GetRecherchesQueryHandler>
   let deleteRechercheCommandHandler: StubbedClass<DeleteRechercheCommandHandler>
-  let rafraichirSuggestionPoleEmploiCommandHandler: StubbedClass<RafraichirSuggestionPoleEmploiCommandHandler>
+  let rafraichirSuggestionsCommandHandler: StubbedClass<RafraichirSuggestionsCommandHandler>
   let getSuggestionsQueryHandler: StubbedClass<GetSuggestionsQueryHandler>
   let createRechercheFromSuggestionCommandHandler: StubbedClass<CreateRechercheFromSuggestionCommandHandler>
   let refuserSuggestionCommandHandler: StubbedClass<RefuserSuggestionCommandHandler>
@@ -60,8 +60,8 @@ describe('RecherchesController', () => {
     createRechercheCommandHandler = app.get(CreateRechercheCommandHandler)
     getRecherchesQueryHandler = app.get(GetRecherchesQueryHandler)
     deleteRechercheCommandHandler = app.get(DeleteRechercheCommandHandler)
-    rafraichirSuggestionPoleEmploiCommandHandler = app.get(
-      RafraichirSuggestionPoleEmploiCommandHandler
+    rafraichirSuggestionsCommandHandler = app.get(
+      RafraichirSuggestionsCommandHandler
     )
     getSuggestionsQueryHandler = app.get(GetSuggestionsQueryHandler)
     createRechercheFromSuggestionCommandHandler = app.get(
@@ -350,11 +350,22 @@ describe('RecherchesController', () => {
   })
 
   describe('GET /recherches/suggestions', () => {
-    const queryModel: SuggestionQueryModel = {
+    const conseillerQueryModel: SuggestionQueryModel = {
       id: 'f781ae20-8838-49c7-aa2e-9b224318fb65',
       titre: 'Petrisseur',
       type: Offre.Recherche.Type.OFFRES_EMPLOI,
       source: Suggestion.Source.CONSEILLER,
+      metier: 'Boulanger',
+      localisation: 'Lille',
+      dateCreation: uneDatetime().toISO(),
+      dateRafraichissement: uneDatetime().toISO()
+    }
+
+    const diagorienteQueryModel: SuggestionQueryModel = {
+      id: 'a721ae30-8538-4bc7-ac6e-9a224328fb45',
+      titre: 'Petrisseur',
+      type: Offre.Recherche.Type.OFFRES_EMPLOI,
+      source: Suggestion.Source.DIAGORIENTE,
       metier: 'Boulanger',
       localisation: 'Lille',
       dateCreation: uneDatetime().toISO(),
@@ -368,15 +379,13 @@ describe('RecherchesController', () => {
       describe('quand tout va bien', () => {
         it('rafraichit les suggestions pole emploi et retourne les suggestions', async () => {
           // Given
-          rafraichirSuggestionPoleEmploiCommandHandler.execute.resolves(
-            emptySuccess()
-          )
+          rafraichirSuggestionsCommandHandler.execute.resolves(emptySuccess())
           getSuggestionsQueryHandler.execute
             .withArgs(
               { idJeune: '1', avecDiagoriente: false },
               unUtilisateurDecodePoleEmploi()
             )
-            .resolves([queryModel])
+            .resolves([conseillerQueryModel])
 
           // When
           await request(app.getHttpServer())
@@ -385,9 +394,9 @@ describe('RecherchesController', () => {
 
             // Then
             .expect(HttpStatus.OK)
-            .expect([queryModel])
+            .expect([conseillerQueryModel])
           expect(
-            rafraichirSuggestionPoleEmploiCommandHandler.execute
+            rafraichirSuggestionsCommandHandler.execute
           ).to.have.been.calledWithExactly(
             {
               idJeune: '1',
@@ -402,7 +411,7 @@ describe('RecherchesController', () => {
       describe('quand PE est down', () => {
         it('retourne une erreur', async () => {
           // Given
-          rafraichirSuggestionPoleEmploiCommandHandler.execute.resolves(
+          rafraichirSuggestionsCommandHandler.execute.resolves(
             failure(new ErreurHttp('Erreur', 500))
           )
           // When
@@ -419,36 +428,44 @@ describe('RecherchesController', () => {
       beforeEach(() => {
         jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
       })
-      describe('quand tout va bien', () => {
-        it('ne rafraichit pas les suggestions et renvoie les suggestions', async () => {
-          // Given
-          getSuggestionsQueryHandler.execute
-            .withArgs(
-              { idJeune: '1', avecDiagoriente: false },
-              unUtilisateurDecode()
-            )
-            .resolves([queryModel])
+      it('rafraichit les suggestions autres que PE et les retourne', async () => {
+        // Given
+        rafraichirSuggestionsCommandHandler.execute.resolves(emptySuccess())
+        getSuggestionsQueryHandler.execute
+          .withArgs(
+            { idJeune: '1', avecDiagoriente: true },
+            unUtilisateurDecode()
+          )
+          .resolves([diagorienteQueryModel])
 
-          // When
-          await request(app.getHttpServer())
-            .get('/jeunes/1/recherches/suggestions')
-            .set('authorization', unHeaderAuthorization())
+        // When
+        await request(app.getHttpServer())
+          .get('/jeunes/1/recherches/suggestions')
+          .query({ avecDiagoriente: true })
+          .set('authorization', unHeaderAuthorization())
 
-            // Then
-            .expect(HttpStatus.OK)
-            .expect([queryModel])
-          expect(
-            rafraichirSuggestionPoleEmploiCommandHandler.execute
-          ).not.to.have.been.called()
-        })
+          // Then
+          .expect(HttpStatus.OK)
+          .expect([diagorienteQueryModel])
+        expect(
+          rafraichirSuggestionsCommandHandler.execute
+        ).to.have.been.calledWithExactly(
+          {
+            idJeune: '1',
+            token: 'coucou',
+            structure: Core.Structure.MILO,
+            avecDiagoriente: true
+          },
+          unUtilisateurDecode()
+        )
       })
     })
-
-    ensureUserAuthenticationFailsIfInvalid(
-      'get',
-      '/jeunes/1/recherches/suggestions'
-    )
   })
+
+  ensureUserAuthenticationFailsIfInvalid(
+    'get',
+    '/jeunes/1/recherches/suggestions'
+  )
 
   describe('POST /recherches/suggestions/:idSuggestion/accepter', () => {
     describe('quand la suggestion existe', () => {
