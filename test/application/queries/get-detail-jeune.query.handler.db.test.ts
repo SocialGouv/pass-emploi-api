@@ -20,7 +20,7 @@ import {
   GetDetailJeuneQuery,
   GetDetailJeuneQueryHandler
 } from '../../../src/application/queries/get-detail-jeune.query.handler.db'
-import { JeuneMilo } from '../../../src/domain/jeune/jeune.milo'
+import { JeuneMilo } from '../../../src/domain/milo/jeune.milo'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune

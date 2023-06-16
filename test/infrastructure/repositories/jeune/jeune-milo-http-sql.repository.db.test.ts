@@ -17,11 +17,13 @@ import { testConfig } from '../../../utils/module-for-testing'
 import { unConseiller } from '../../../fixtures/conseiller.fixture'
 import { stubClass } from '../../../utils'
 import { FirebaseClient } from '../../../../src/infrastructure/clients/firebase-client'
-import { JeuneMilo } from '../../../../src/domain/jeune/jeune.milo'
+import { JeuneMilo } from '../../../../src/domain/milo/jeune.milo'
 import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
+import { StructureMiloSqlModel } from '../../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
+import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
 
 describe('MiloHttpRepository', () => {
   let databaseForTesting: DatabaseForTesting
@@ -85,7 +87,8 @@ describe('MiloHttpRepository', () => {
                 etat: 'EN_COURS',
                 dateFin: undefined
               }
-            ]
+            ],
+            nomStructure: '65-ML TARBES'
           })
         )
       })
@@ -243,6 +246,43 @@ describe('MiloHttpRepository', () => {
         expect(result[0].idJeune).to.equal(jeune.id)
         expect(result[0].situations).to.deep.equal(situationsMilo.situations)
       })
+    })
+  })
+
+  describe('saveStructureJeune', () => {
+    it('sauvegarde la structure du jeune quand trouvée', async () => {
+      // Given
+      const idStructureMilo = 1
+      const nomOfficiel = 'structure-du-jeune'
+      await StructureMiloSqlModel.create({
+        id: idStructureMilo,
+        nomOfficiel
+      })
+
+      // When
+      await miloHttpSqlRepository.saveStructureJeune(jeune.id, nomOfficiel)
+
+      // Then
+      const jeuneTrouve = await JeuneSqlModel.findByPk(jeune.id)
+
+      expect(jeuneTrouve?.idStructureMilo).to.equal(idStructureMilo.toString())
+    })
+    it('ne sauvegarde pas la structure du jeune quand non trouvée', async () => {
+      // Given
+      const idStructureMilo = 1
+      const nomOfficiel = 'structure-du-jeune'
+      await StructureMiloSqlModel.create({
+        id: idStructureMilo,
+        nomOfficiel: 'structure-pas-du-jeune'
+      })
+
+      // When
+      await miloHttpSqlRepository.saveStructureJeune(jeune.id, nomOfficiel)
+
+      // Then
+      const jeuneTrouve = await JeuneSqlModel.findByPk(jeune.id)
+
+      expect(jeuneTrouve?.idStructureMilo).to.be.null()
     })
   })
 

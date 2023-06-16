@@ -195,7 +195,7 @@ import { ModifierConseillerCommandHandler } from './application/commands/modifie
 import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './application/commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
 import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from './application/commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from './application/queries/get-favoris-service-civique-jeune.query.handler.db'
-import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from './application/commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
+import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from './application/jobs/handle-job-recuperer-situations-jeunes-milo.command'
 import { CampagnesController } from './infrastructure/routes/campagnes.controller'
 import { Campagne, CampagneRepositoryToken } from './domain/campagne'
 import { CampagneSqlRepository } from './infrastructure/repositories/campagne-sql.repository.db'
@@ -298,7 +298,7 @@ import {
   RendezVousMilo,
   MiloRendezVousRepositoryToken
 } from './domain/rendez-vous/rendez-vous.milo'
-import { MiloJeuneRepositoryToken } from './domain/jeune/jeune.milo'
+import { MiloJeuneRepositoryToken } from './domain/milo/jeune.milo'
 import { HandleJobFakeCommandHandler } from './application/commands/jobs/handle-job-fake.command'
 import { MettreAJourLesJeunesCejPeCommandHandler } from './application/commands/mettre-a-jour-les-jeunes-cej-pe.command.handler'
 import { UpdateAgenceConseillerCommandHandler } from './application/commands/support/update-agence-conseiller.command.handler'

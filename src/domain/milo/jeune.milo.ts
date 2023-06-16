@@ -24,6 +24,7 @@ export namespace JeuneMilo {
     codePostal: string
     situations: Situation[]
     dateFinCEJ?: DateTime
+    nomStructure: string
   }
 
   export enum EtatSituation {
@@ -45,6 +46,10 @@ export namespace JeuneMilo {
   export interface Repository {
     getDossier(id: string): Promise<Result<Dossier>>
     saveSituationsJeune(situations: Situations): Promise<void>
+    saveStructureJeune(
+      idJeune: string,
+      nomOfficielStructureMilo: string
+    ): Promise<void>
     getSituationsByJeune(idJeune: string): Promise<Situations | undefined>
     creerJeune(
       idDossier: string

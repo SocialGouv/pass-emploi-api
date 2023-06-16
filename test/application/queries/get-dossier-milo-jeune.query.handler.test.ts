@@ -6,7 +6,7 @@ import {
   GetDossierMiloJeuneQueryHandler
 } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
 import { estMilo } from '../../../src/domain/core'
-import { JeuneMilo } from '../../../src/domain/jeune/jeune.milo'
+import { JeuneMilo } from '../../../src/domain/milo/jeune.milo'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unDossierMilo } from '../../fixtures/milo.fixture'
 import { StubbedClass, createSandbox, expect, stubClass } from '../../utils'

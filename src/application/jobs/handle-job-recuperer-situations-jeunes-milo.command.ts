@@ -1,15 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Job } from '../../../building-blocks/types/job'
-import { JobHandler } from '../../../building-blocks/types/job-handler'
-import { isFailure } from '../../../building-blocks/types/result'
-import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
-import { Planificateur, ProcessJobType } from '../../../domain/planificateur'
-import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
-import { DateService } from '../../../utils/date-service'
+import { Job } from '../../building-blocks/types/job'
+import { JobHandler } from '../../building-blocks/types/job-handler'
+import { isFailure } from '../../building-blocks/types/result'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Planificateur, ProcessJobType } from '../../domain/planificateur'
+import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
+import { DateService } from '../../utils/date-service'
 import {
   JeuneMilo,
   MiloJeuneRepositoryToken
-} from '../../../domain/jeune/jeune.milo'
+} from '../../domain/milo/jeune.milo'
 
 const PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM = 100
 
@@ -70,6 +70,11 @@ export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends JobHan
           const dateFinCEJ = dossier.data.dateFinCEJ
           const jeuneAvecDateFinCEJ = Jeune.mettreAJour(jeune, { dateFinCEJ })
           await this.jeuneRepository.save(jeuneAvecDateFinCEJ)
+
+          await this.miloRepository.saveStructureJeune(
+            jeune.id,
+            dossier.data.nomStructure
+          )
 
           const situationsTriees = JeuneMilo.trierSituations(
             dossier.data.situations
