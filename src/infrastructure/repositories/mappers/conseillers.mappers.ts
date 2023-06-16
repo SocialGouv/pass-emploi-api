@@ -27,7 +27,7 @@ export function fromSqlToDetailConseillerQueryModel(
       nom: conseillerSqlModel.nomManuelAgence
     }
   } else if (conseillerSqlModel.structureMilo) {
-    conseiller.agence = {
+    conseiller.structureMilo = {
       id: conseillerSqlModel.structureMilo.id,
       nom: conseillerSqlModel.structureMilo.nomOfficiel
     }

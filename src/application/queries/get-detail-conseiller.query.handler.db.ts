@@ -14,6 +14,7 @@ import { StructureMiloSqlModel } from '../../infrastructure/sequelize/models/str
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { DetailConseillerQueryModel } from './query-models/conseillers.query-model'
 import { ConfigService } from '@nestjs/config'
+import { Includeable } from 'sequelize'
 
 export interface GetDetailConseillerQuery extends Query {
   idConseiller: string
@@ -41,17 +42,20 @@ export class GetDetailConseillerQueryHandler extends QueryHandler<
       'features.recupererStructureMilo'
     )
 
+    const include: Includeable[] = [AgenceSqlModel]
+
     if (estMilo(query.structure) && FT_RECUPERER_STRUCTURE_MILO) {
       await this.conseillerMiloService.recupererEtMettreAJourStructure(
         query.idConseiller,
         query.token
       )
+      include.push(StructureMiloSqlModel)
     }
 
     const conseillerSqlModel = await ConseillerSqlModel.findByPk(
       query.idConseiller,
       {
-        include: [AgenceSqlModel, StructureMiloSqlModel]
+        include
       }
     )
 
