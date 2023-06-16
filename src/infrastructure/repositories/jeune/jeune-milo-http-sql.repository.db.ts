@@ -5,11 +5,13 @@ import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.excepti
 import { firstValueFrom } from 'rxjs'
 import { ErreurHttp } from '../../../building-blocks/types/domain-error'
 import { Result, failure, success } from '../../../building-blocks/types/result'
+import { JeuneMilo } from '../../../domain/milo/jeune.milo'
 import { DateService } from '../../../utils/date-service'
 import { RateLimiterService } from '../../../utils/rate-limiter.service'
+import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
 import { SituationsMiloSqlModel } from '../../sequelize/models/situations-milo.sql-model'
+import { StructureMiloSqlModel } from '../../sequelize/models/structure-milo.sql-model'
 import { DossierMiloDto } from '../dto/milo.dto'
-import { JeuneMilo } from '../../../domain/jeune/jeune.milo'
 
 @Injectable()
 export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
@@ -57,7 +59,8 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
             categorie: situation.categorieSituation,
             dateFin: situation.dateFin ?? undefined
           }
-        })
+        }),
+        nomStructure: dossierDto.data.structureRattachement.nomOfficiel
       })
     } catch (e) {
       this.logger.error(e)
@@ -123,6 +126,26 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
       },
       { conflictFields: ['id_jeune'] }
     )
+  }
+
+  async saveStructureJeune(
+    idJeune: string,
+    nomOfficielStructureMilo: string
+  ): Promise<void> {
+    const structureSql = await StructureMiloSqlModel.findOne({
+      where: {
+        nomOfficiel: nomOfficielStructureMilo
+      }
+    })
+
+    if (structureSql) {
+      await JeuneSqlModel.update(
+        {
+          idStructureMilo: structureSql.id
+        },
+        { where: { id: idJeune } }
+      )
+    }
   }
 
   async getSituationsByJeune(

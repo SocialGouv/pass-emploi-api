@@ -1,4 +1,4 @@
-import { JeuneMilo } from '../../../domain/jeune/jeune.milo'
+import { JeuneMilo } from '../../../domain/milo/jeune.milo'
 
 export interface DossierMiloDto {
   idDossier: number

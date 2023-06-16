@@ -8,7 +8,7 @@ import {
   Table
 } from 'sequelize-typescript'
 import { JeuneSqlModel } from './jeune.sql-model'
-import { JeuneMilo } from '../../../domain/jeune/jeune.milo'
+import { JeuneMilo } from '../../../domain/milo/jeune.milo'
 
 export interface Situation {
   etat: JeuneMilo.EtatSituation

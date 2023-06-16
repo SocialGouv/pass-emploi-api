@@ -7,7 +7,7 @@ import { estMilo } from '../../domain/core'
 import {
   JeuneMilo,
   MiloJeuneRepositoryToken
-} from '../../domain/jeune/jeune.milo'
+} from '../../domain/milo/jeune.milo'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { DossierJeuneMiloQueryModel } from './query-models/milo.query-model'
 

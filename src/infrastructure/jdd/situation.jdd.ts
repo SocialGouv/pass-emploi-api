@@ -1,6 +1,6 @@
 import { SituationsMiloDto } from '../sequelize/models/situations-milo.sql-model'
 import { AsSql } from '../sequelize/types'
-import { JeuneMilo } from '../../domain/jeune/jeune.milo'
+import { JeuneMilo } from '../../domain/milo/jeune.milo'
 
 export const uneSituationsMiloJdd = (
   args: Partial<SituationsMiloDto> = {}

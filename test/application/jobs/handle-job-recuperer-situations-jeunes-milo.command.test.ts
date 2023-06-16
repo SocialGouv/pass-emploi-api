@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from 'src/application/commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
+import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from 'src/application/jobs/handle-job-recuperer-situations-jeunes-milo.command'
 import { ErreurHttp } from 'src/building-blocks/types/domain-error'
 import { failure, success } from 'src/building-blocks/types/result'
 import { Core } from 'src/domain/core'
@@ -9,9 +9,9 @@ import { SuiviJob } from 'src/domain/suivi-job'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import { unDossierMilo } from 'test/fixtures/milo.fixture'
-import { DateService } from '../../../../src/utils/date-service'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
-import { JeuneMilo } from '../../../../src/domain/jeune/jeune.milo'
+import { DateService } from '../../../src/utils/date-service'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { JeuneMilo } from '../../../src/domain/milo/jeune.milo'
 
 describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
   let handleJobRecupererSituationsJeunesMiloCommandHandler: HandleJobRecupererSituationsJeunesMiloCommandHandler
@@ -60,6 +60,7 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
         await handleJobRecupererSituationsJeunesMiloCommandHandler.handle()
 
       // Then
+      expect(miloRepository.saveStructureJeune).to.have.callCount(0)
       expect(miloRepository.saveSituationsJeune).to.have.callCount(0)
       expect(result.succes).to.equal(true)
       expect(result.resultat).to.deep.equal({
@@ -90,6 +91,9 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
         await handleJobRecupererSituationsJeunesMiloCommandHandler.handle()
 
       // Then
+      expect(
+        miloRepository.saveStructureJeune
+      ).to.have.been.calledOnceWithExactly(jeune1.id, 'ML')
       expect(miloRepository.saveSituationsJeune).to.have.callCount(1)
       expect(
         miloRepository.saveSituationsJeune

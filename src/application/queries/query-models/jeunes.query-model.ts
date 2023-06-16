@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { JeuneMilo } from '../../../domain/jeune/jeune.milo'
+import { JeuneMilo } from '../../../domain/milo/jeune.milo'
 import { Jeune } from '../../../domain/jeune/jeune'
 
 class SituationQueryModel {

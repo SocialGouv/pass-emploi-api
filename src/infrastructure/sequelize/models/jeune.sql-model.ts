@@ -18,6 +18,7 @@ import { RendezVousJeuneAssociationSqlModel } from './rendez-vous-jeune-associat
 import { RendezVousSqlModel } from './rendez-vous.sql-model'
 import { SituationsMiloSqlModel } from './situations-milo.sql-model'
 import { TransfertConseillerSqlModel } from './transfert-conseiller.sql-model'
+import { StructureMiloSqlModel } from './structure-milo.sql-model'
 
 export class JeuneDto extends Model {
   @PrimaryKey
@@ -141,6 +142,13 @@ export class JeuneDto extends Model {
     type: DataType.BOOLEAN
   })
   partageFavoris: boolean
+
+  @ForeignKey(() => StructureMiloSqlModel)
+  @Column({
+    field: 'id_structure_milo',
+    type: DataType.STRING
+  })
+  idStructureMilo?: string | null
 }
 
 @Table({
@@ -165,6 +173,9 @@ export class JeuneSqlModel extends JeuneDto {
 
   @HasOne(() => SituationsMiloSqlModel)
   situations?: SituationsMiloSqlModel
+
+  @BelongsTo(() => StructureMiloSqlModel)
+  structureMilo?: StructureMiloSqlModel
 
   static async creer(jeuneDto: AsSql<JeuneDto>): Promise<JeuneSqlModel> {
     return JeuneSqlModel.create(jeuneDto)

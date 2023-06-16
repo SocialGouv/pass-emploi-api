@@ -1,6 +1,6 @@
 import { SituationsMiloDto } from 'src/infrastructure/sequelize/models/situations-milo.sql-model'
 import { AsSql } from 'src/infrastructure/sequelize/types'
-import { JeuneMilo } from '../../src/domain/jeune/jeune.milo'
+import { JeuneMilo } from '../../src/domain/milo/jeune.milo'
 
 export const unDossierMilo = (
   args: Partial<JeuneMilo.Dossier> = {}
@@ -12,7 +12,8 @@ export const unDossierMilo = (
     dateDeNaissance: '1888-09-01',
     codePostal: '91580',
     email: 'jack.dawson@milo.com',
-    situations: []
+    situations: [],
+    nomStructure: 'ML'
   }
   return { ...defaults, ...args }
 }

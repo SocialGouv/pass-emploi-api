@@ -1,5 +1,5 @@
 import { expect } from '../../utils'
-import { JeuneMilo } from '../../../src/domain/jeune/jeune.milo'
+import { JeuneMilo } from '../../../src/domain/milo/jeune.milo'
 
 describe('Milo', () => {
   const situationsPrevuEmploi = {

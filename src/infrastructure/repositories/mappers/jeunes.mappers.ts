@@ -66,7 +66,8 @@ export function toSqlJeune(
     email: jeune.email ?? null,
     structure: jeune.structure,
     idPartenaire: jeune.idPartenaire ?? null,
-    partageFavoris: jeune.preferences.partageFavoris
+    partageFavoris: jeune.preferences.partageFavoris,
+    idStructureMilo: null
   }
 }
 

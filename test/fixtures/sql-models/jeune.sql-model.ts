@@ -26,7 +26,8 @@ export function unJeuneDto(
     installationId: '123456',
     instanceId: 'abcdef',
     partageFavoris: true,
-    timezone: 'Europe/Paris'
+    timezone: 'Europe/Paris',
+    idStructureMilo: null
   }
 
   return { ...defaults, ...args }

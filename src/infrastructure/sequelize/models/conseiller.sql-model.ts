@@ -105,10 +105,10 @@ export class ConseillerSqlModel extends ConseillerDto {
   @HasMany(() => JeuneSqlModel)
   jeunes!: JeuneSqlModel[]
 
-  @BelongsTo(() => AgenceSqlModel, 'id_agence')
+  @BelongsTo(() => AgenceSqlModel)
   agence?: AgenceSqlModel
 
-  @BelongsTo(() => StructureMiloSqlModel, 'id_structure_milo')
+  @BelongsTo(() => StructureMiloSqlModel)
   structureMilo?: StructureMiloSqlModel
 
   static async creer(conseillerDto: AsSql<ConseillerDto>): Promise<void> {

@@ -27,7 +27,7 @@ import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import {
   JeuneMilo,
   MiloJeuneRepositoryToken
-} from '../../domain/jeune/jeune.milo'
+} from '../../domain/milo/jeune.milo'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { IdentiteJeuneQueryModel } from '../queries/query-models/jeunes.query-model'
 
