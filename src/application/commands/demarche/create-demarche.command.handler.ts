@@ -45,7 +45,10 @@ export class CreateDemarcheCommandHandler extends CommandHandler<
     )
   }
 
-  async handle(command: CreateDemarcheCommand): Promise<Result<Demarche>> {
+  async handle(
+    command: CreateDemarcheCommand,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<Result<Demarche>> {
     const demarcheACreer: Demarche.ACreer = {
       dateFin: command.dateFin,
       description: command.description,
@@ -59,7 +62,11 @@ export class CreateDemarcheCommandHandler extends CommandHandler<
       return result
     }
 
-    return this.demarcheRepository.save(result.data, command.accessToken)
+    return this.demarcheRepository.save(
+      result.data,
+      command.accessToken,
+      utilisateur.structure
+    )
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
