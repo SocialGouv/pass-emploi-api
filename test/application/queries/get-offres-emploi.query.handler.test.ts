@@ -3,7 +3,6 @@ import { Evenement, EvenementService } from 'src/domain/evenement'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import {
-  FiltreOffres,
   GetOffresEmploiQuery,
   GetOffresEmploiQueryHandler
 } from '../../../src/application/queries/get-offres-emploi.query.handler'
@@ -42,7 +41,7 @@ describe('GetOffresEmploiQueryHandler', () => {
           limit: 52,
           q: 'boulanger',
           departement: '75',
-          filtreOffres: FiltreOffres.ALTERNANCE,
+          alternance: true,
           experience: [Offre.Emploi.Experience.entreUnEtTroisAns],
           debutantAccepte: false,
           contrat: [Offre.Emploi.Contrat.cdd],
@@ -68,7 +67,7 @@ describe('GetOffresEmploiQueryHandler', () => {
         const getOffresEmploiQuery: GetOffresEmploiQuery = {
           q: 'boulanger',
           departement: '75',
-          filtreOffres: FiltreOffres.ALTERNANCE,
+          alternance: true,
           experience: [Offre.Emploi.Experience.entreUnEtTroisAns],
           debutantAccepte: false,
           contrat: [Offre.Emploi.Contrat.cdd],
@@ -97,7 +96,7 @@ describe('GetOffresEmploiQueryHandler', () => {
         const getOffresEmploiQuery: GetOffresEmploiQuery = {
           q: 'boulanger',
           departement: '75',
-          filtreOffres: FiltreOffres.ALTERNANCE,
+          alternance: true,
           experience: [Offre.Emploi.Experience.entreUnEtTroisAns],
           contrat: [Offre.Emploi.Contrat.cdd],
           duree: [Offre.Emploi.Duree.tempsPlein]
@@ -122,7 +121,7 @@ describe('GetOffresEmploiQueryHandler', () => {
         const getOffresEmploiQuery: GetOffresEmploiQuery = {
           q: 'boulanger',
           departement: '75',
-          filtreOffres: undefined,
+          alternance: false,
           experience: [Offre.Emploi.Experience.entreUnEtTroisAns],
           contrat: [Offre.Emploi.Contrat.cdd],
           duree: [Offre.Emploi.Duree.tempsPlein]

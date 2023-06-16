@@ -12,10 +12,7 @@ import {
   toPoleEmploiContrat
 } from '../../../infrastructure/repositories/mappers/offres-emploi.mappers'
 import { DateService } from '../../../utils/date-service'
-import {
-  FiltreOffres,
-  GetOffresEmploiQuery
-} from '../get-offres-emploi.query.handler'
+import { GetOffresEmploiQuery } from '../get-offres-emploi.query.handler'
 import { OffresEmploiQueryModel } from '../query-models/offres-emploi.query-model'
 
 const DEFAULT_PAGE = 1
@@ -62,7 +59,7 @@ export class FindAllOffresEmploiQueryGetter {
     const {
       q,
       departement,
-      filtreOffres,
+      alternance,
       experience,
       debutantAccepte,
       duree,
@@ -81,11 +78,8 @@ export class FindAllOffresEmploiQueryGetter {
     if (departement) {
       params.append('departement', departement)
     }
-    if (filtreOffres === FiltreOffres.ALTERNANCE) {
+    if (alternance) {
       params.append('natureContrat', 'E2,FS')
-    }
-    if (filtreOffres === FiltreOffres.EMPLOI) {
-      params.append('natureContrat', 'CC,FT,EE,CU,CI,FU,ER,I1,FJ,PS,PR')
     }
     if (experience) {
       params.append('experience', buildQueryParamFromArray(experience))
