@@ -10,6 +10,7 @@ import {
   success
 } from '../../building-blocks/types/result'
 import {
+  SessionConseillerDetailDto,
   SessionConseillerMiloListeDto,
   StructureConseillerMiloDto
 } from './dto/milo.dto'
@@ -20,6 +21,7 @@ import { DateTime } from 'luxon'
 export class MiloClient {
   private readonly apiUrl: string
   private readonly apiKeySessionsListeConseiller: string
+  private readonly apiKeySessionDetailConseiller: string
   private readonly apiKeyUtilisateurs: string
   private logger: Logger
 
@@ -31,6 +33,8 @@ export class MiloClient {
     this.apiUrl = this.configService.get('milo').url
     this.apiKeySessionsListeConseiller =
       this.configService.get('milo').apiKeySessionsListeConseiller
+    this.apiKeySessionDetailConseiller =
+      this.configService.get('milo').apiKeySessionDetailConseiller
     this.apiKeyUtilisateurs = this.configService.get('milo').apiKeyUtilisateurs
   }
 
@@ -58,6 +62,17 @@ export class MiloClient {
       this.apiKeySessionsListeConseiller,
       idpToken,
       params
+    )
+  }
+
+  async getDetailSessionConseiller(
+    idpToken: string,
+    idSession: string
+  ): Promise<Result<SessionConseillerDetailDto>> {
+    return this.get<SessionConseillerDetailDto>(
+      `sessions/${idSession}`,
+      this.apiKeySessionDetailConseiller,
+      idpToken
     )
   }
 

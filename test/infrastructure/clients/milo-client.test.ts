@@ -4,6 +4,7 @@ import * as nock from 'nock'
 import { MiloClient } from '../../../src/infrastructure/clients/milo-client'
 import { testConfig } from '../../utils/module-for-testing'
 import {
+  unDetailSessionConseillerDto,
   uneListeDeStructuresConseillerMiloDto,
   uneSessionConseillerListeDto
 } from '../../fixtures/milo-dto.fixture'
@@ -42,6 +43,27 @@ describe('MiloClient', () => {
       )
       // Then
       expect(result).to.deep.equal(success(uneSessionConseillerListeDto))
+    })
+  })
+
+  describe('getDetailSessionConseiller', () => {
+    it('recupere le detail d’une sessions milo', async () => {
+      // Given
+      const idpToken = 'idpToken'
+      const idSession = '1'
+
+      nock(MILO_BASE_URL)
+        .get(`/operateurs/sessions/${idSession}`)
+        .reply(200, unDetailSessionConseillerDto)
+        .isDone()
+
+      // When
+      const result = await miloClient.getDetailSessionConseiller(
+        idpToken,
+        idSession
+      )
+      // Then
+      expect(result).to.deep.equal(success(unDetailSessionConseillerDto))
     })
   })
 
