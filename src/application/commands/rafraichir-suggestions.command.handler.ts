@@ -20,7 +20,7 @@ import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { DiagorienteClient } from 'src/infrastructure/clients/diagoriente-client'
 
-export interface RafraichirSuggestionPoleEmploiCommand extends Command {
+export interface RafraichirSuggestionsCommand extends Command {
   idJeune: string
   token: string
   structure: Core.Structure
@@ -28,8 +28,8 @@ export interface RafraichirSuggestionPoleEmploiCommand extends Command {
 }
 
 @Injectable()
-export class RafraichirSuggestionPoleEmploiCommandHandler extends CommandHandler<
-  RafraichirSuggestionPoleEmploiCommand,
+export class RafraichirSuggestionsCommandHandler extends CommandHandler<
+  RafraichirSuggestionsCommand,
   void
 > {
   constructor(
@@ -43,30 +43,41 @@ export class RafraichirSuggestionPoleEmploiCommandHandler extends CommandHandler
     private suggestionPoleEmploiRepository: Suggestion.PoleEmploi.Repository,
     private keycloakClient: KeycloakClient
   ) {
-    super('RafraichirSuggestionPoleEmploiCommandHandler')
+    super('RafraichirSuggestionsCommandHandler')
   }
 
-  async handle(
-    command: RafraichirSuggestionPoleEmploiCommand
-  ): Promise<Result> {
+  async handle(command: RafraichirSuggestionsCommand): Promise<Result> {
     const jeune = await this.jeuneRepository.get(command.idJeune)
-    let suggestionsDiagoriente: Suggestion[] = []
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', command.idJeune))
     }
-    const idpToken = await this.keycloakClient.exchangeTokenJeune(
-      command.token,
-      jeune.structure
-    )
 
-    const suggestionsPEResult =
-      await this.suggestionPoleEmploiRepository.findAll(idpToken)
+    let suggestionsPE: Suggestion[] = []
+    let suggestionsDiagoriente: Suggestion[] = []
+    const rafraichirSuggestionsPE = estPoleEmploiBRSA(command.structure)
+    const rafraichirSuggestionsDiagoriente = command.avecDiagoriente
 
-    if (isFailure(suggestionsPEResult)) {
-      return suggestionsPEResult
+    if (rafraichirSuggestionsPE) {
+      const idpToken = await this.keycloakClient.exchangeTokenJeune(
+        command.token,
+        jeune.structure
+      )
+      const suggestionsPEResult =
+        await this.suggestionPoleEmploiRepository.findAll(idpToken)
+
+      if (isFailure(suggestionsPEResult)) {
+        return suggestionsPEResult
+      }
+
+      suggestionsPE =
+        this.suggestionFactory.buildListeSuggestionsOffresFromPoleEmploi(
+          suggestionsPEResult.data,
+          command.idJeune,
+          command.structure
+        )
     }
 
-    if (command.avecDiagoriente) {
+    if (rafraichirSuggestionsDiagoriente) {
       const metiersFavorisDiagorienteResult =
         await this.diagorienteClient.getMetiersFavoris(jeune.id)
 
@@ -86,13 +97,6 @@ export class RafraichirSuggestionPoleEmploiCommandHandler extends CommandHandler
         )
     }
 
-    const suggestionsPE =
-      this.suggestionFactory.buildListeSuggestionsOffresFromPoleEmploi(
-        suggestionsPEResult.data,
-        command.idJeune,
-        command.structure
-      )
-
     await this.suggestionPoleEmploiService.rafraichir(
       [...suggestionsPE, ...suggestionsDiagoriente],
       command.idJeune
@@ -102,14 +106,10 @@ export class RafraichirSuggestionPoleEmploiCommandHandler extends CommandHandler
   }
 
   authorize(
-    command: RafraichirSuggestionPoleEmploiCommand,
+    command: RafraichirSuggestionsCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.autoriserLeJeune(
-      command.idJeune,
-      utilisateur,
-      estPoleEmploiBRSA(utilisateur.structure)
-    )
+    return this.jeuneAuthorizer.autoriserLeJeune(command.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

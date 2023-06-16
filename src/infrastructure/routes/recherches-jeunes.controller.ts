@@ -20,7 +20,6 @@ import {
   DeleteRechercheCommand,
   DeleteRechercheCommandHandler
 } from '../../application/commands/delete-recherche.command.handler'
-import { RafraichirSuggestionPoleEmploiCommandHandler } from '../../application/commands/rafraichir-suggestion-pole-emploi.command.handler'
 import { RefuserSuggestionCommandHandler } from '../../application/commands/refuser-suggestion.command.handler'
 import {
   GetRecherchesQuery,
@@ -32,7 +31,6 @@ import { RechercheQueryModel } from '../../application/queries/query-models/rech
 import { SuggestionQueryModel } from '../../application/queries/query-models/suggestion.query-model'
 import { isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { estPoleEmploiBRSA } from '../../domain/core'
 import { Recherche } from '../../domain/offre/recherche/recherche'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'
@@ -46,6 +44,7 @@ import {
   DiagorienteInformationsPayload,
   FindSuggestionsQueryParams
 } from './validation/suggestions-inputs'
+import { RafraichirSuggestionsCommandHandler } from 'src/application/commands/rafraichir-suggestions.command.handler'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
@@ -55,7 +54,7 @@ export class RecherchesJeunesController {
     private readonly createRechercheCommandHandler: CreateRechercheCommandHandler,
     private readonly getRecherchesQueryHandler: GetRecherchesQueryHandler,
     private readonly deleteRechercheCommandHandler: DeleteRechercheCommandHandler,
-    private readonly rafraichirSuggestionPoleEmploiCommandHandler: RafraichirSuggestionPoleEmploiCommandHandler,
+    private readonly rafraichirSuggestionsCommandHandler: RafraichirSuggestionsCommandHandler,
     private readonly getSuggestionsQueryHandler: GetSuggestionsQueryHandler,
     private readonly createRechercheFromSuggestionCommandHandler: CreateRechercheFromSuggestionCommandHandler,
     private readonly refuserSuggestionCommandHandler: RefuserSuggestionCommandHandler
@@ -165,21 +164,19 @@ export class RecherchesJeunesController {
     @Query() findSuggestionsQueryParams: FindSuggestionsQueryParams
   ): Promise<SuggestionQueryModel[]> {
     const avecDiagoriente = findSuggestionsQueryParams.avecDiagoriente ?? false
-    if (estPoleEmploiBRSA(utilisateur.structure)) {
-      const result =
-        await this.rafraichirSuggestionPoleEmploiCommandHandler.execute(
-          {
-            idJeune,
-            token: accessToken,
-            structure: utilisateur.structure,
-            avecDiagoriente
-          },
-          utilisateur
-        )
 
-      if (isFailure(result)) {
-        throw handleFailure(result)
-      }
+    const result = await this.rafraichirSuggestionsCommandHandler.execute(
+      {
+        idJeune,
+        token: accessToken,
+        structure: utilisateur.structure,
+        avecDiagoriente
+      },
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      throw handleFailure(result)
     }
 
     return this.getSuggestionsQueryHandler.execute(
