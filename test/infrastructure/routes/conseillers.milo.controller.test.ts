@@ -10,10 +10,15 @@ import {
 import { failure, success } from '../../../src/building-blocks/types/result'
 import * as request from 'supertest'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
-import { uneSessionConseillerMiloQueryModel } from '../../fixtures/sessions.fixture'
+import {
+  unDetailSessionConseillerMiloQueryModel,
+  uneSessionConseillerMiloQueryModel
+} from '../../fixtures/sessions.fixture'
+import { GetDetailSessionMiloQueryHandler } from '../../../src/application/queries/milo/get-detail-session.milo.query.handler'
 
 describe('ConseillersMiloController', () => {
   let getSessionsMiloQueryHandler: StubbedClass<GetSessionsMiloQueryHandler>
+  let getDetailSessionMiloQueryHandler: StubbedClass<GetDetailSessionMiloQueryHandler>
 
   let app: INestApplication
 
@@ -21,6 +26,7 @@ describe('ConseillersMiloController', () => {
     app = await getApplicationWithStubbedDependencies()
 
     getSessionsMiloQueryHandler = app.get(GetSessionsMiloQueryHandler)
+    getDetailSessionMiloQueryHandler = app.get(GetDetailSessionMiloQueryHandler)
   })
 
   describe('GET /conseillers/milo/:idConseiller/sessions', () => {
@@ -65,6 +71,39 @@ describe('ConseillersMiloController', () => {
           .expect(HttpStatus.NOT_FOUND)
       })
     })
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/conseillers/milo/1/sessions'
+    )
+  })
+
+  describe('GET /conseillers/milo/:idConseiller/sessions/:idSession', () => {
+    it('renvoie une 200 quand tout va bien', async () => {
+      // Given
+      const idSession = '123'
+      getDetailSessionMiloQueryHandler.execute.resolves(
+        success(unDetailSessionConseillerMiloQueryModel())
+      )
+
+      // When - Then
+      await request(app.getHttpServer())
+        .get(`/conseillers/milo/id-conseiller/sessions/${idSession}`)
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+        .expect(unDetailSessionConseillerMiloQueryModel())
+
+      expect(
+        getDetailSessionMiloQueryHandler.execute
+      ).to.have.been.calledOnceWithExactly(
+        {
+          idSession,
+          idConseiller: 'id-conseiller',
+          token: 'coucou'
+        },
+        unUtilisateurDecode()
+      )
+    })
+
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       '/conseillers/milo/1/sessions'
