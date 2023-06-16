@@ -329,6 +329,7 @@ import { ConseillerMiloSqlRepository } from './infrastructure/repositories/milo/
 import { ConseillersMiloController } from './infrastructure/routes/conseillers.milo.controller'
 import { EvenementEmploiCodePostalQueryGetter } from 'src/application/queries/query-getters/evenement-emploi-code-postal.query.getter'
 import { GetConseillersEtablissementQueryHandler } from 'src/application/queries/get-conseillers-etablissement.query.handler.db'
+import { GetDetailSessionMiloQueryHandler } from './application/queries/milo/get-detail-session.milo.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -726,6 +727,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetEvenementsEmploiQueryHandler,
     GetEvenementEmploiQueryHandler,
     GetSessionsMiloQueryHandler,
+    GetDetailSessionMiloQueryHandler,
     EvenementEmploiCodePostalQueryGetter
   ]
 }

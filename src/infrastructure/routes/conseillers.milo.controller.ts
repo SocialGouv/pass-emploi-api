@@ -7,14 +7,19 @@ import { handleFailure } from './failure.handler'
 import { Authentification } from '../../domain/authentification'
 import { GetSessionsQueryParams } from './validation/conseiller-milo.inputs'
 import { DateService } from '../../utils/date-service'
-import { SessionConseillerMiloQueryModel } from '../../application/queries/query-models/sessions.milo.query.model'
+import {
+  DetailSessionConseillerMiloQueryModel,
+  SessionConseillerMiloQueryModel
+} from '../../application/queries/query-models/sessions.milo.query.model'
+import { GetDetailSessionMiloQueryHandler } from '../../application/queries/milo/get-detail-session.milo.query.handler'
 
 @Controller('conseillers/milo')
 @ApiOAuth2([])
 @ApiTags('Conseillers Milo')
 export class ConseillersMiloController {
   constructor(
-    private readonly getSessionsMiloQueryHandler: GetSessionsMiloQueryHandler
+    private readonly getSessionsMiloQueryHandler: GetSessionsMiloQueryHandler,
+    private readonly getDetailSessionMiloQueryHandler: GetDetailSessionMiloQueryHandler
   ) {}
 
   @ApiOperation({
@@ -43,6 +48,32 @@ export class ConseillersMiloController {
           getSessionsQueryParams.dateFin
         )
       },
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
+  }
+
+  @ApiOperation({
+    summary:
+      'Récupère le détail d’une session de la structure MILO du conseiller',
+    description: 'Autorisé pour le conseiller Milo'
+  })
+  @Get('/:idConseiller/sessions/:idSession')
+  @ApiResponse({
+    type: DetailSessionConseillerMiloQueryModel
+  })
+  async getDetailSession(
+    @Param('idConseiller') idConseiller: string,
+    @Param('idSession') idSession: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string
+  ): Promise<DetailSessionConseillerMiloQueryModel> {
+    const result = await this.getDetailSessionMiloQueryHandler.execute(
+      { idSession, idConseiller, token: accessToken },
       utilisateur
     )
 
