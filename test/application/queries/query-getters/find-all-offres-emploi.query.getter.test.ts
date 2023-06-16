@@ -1,8 +1,5 @@
 import { DateTime } from 'luxon'
-import {
-  FiltreOffres,
-  GetOffresEmploiQuery
-} from '../../../../src/application/queries/get-offres-emploi.query.handler'
+import { GetOffresEmploiQuery } from '../../../../src/application/queries/get-offres-emploi.query.handler'
 import { FindAllOffresEmploiQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-emploi.query.getter'
 import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../../src/building-blocks/types/result'
@@ -31,7 +28,7 @@ describe('FindAllOffresEmploiQueryGetter', () => {
     const criteres: GetOffresEmploiQuery = {
       page: 1,
       limit: 50,
-      filtreOffres: FiltreOffres.ALTERNANCE,
+      alternance: true,
       duree: [Offre.Emploi.Duree.tempsPlein],
       contrat: [Offre.Emploi.Contrat.cdd, Offre.Emploi.Contrat.autre],
       commune: 'Paris',
@@ -81,7 +78,7 @@ describe('FindAllOffresEmploiQueryGetter', () => {
         const criteres: GetOffresEmploiQuery = {
           page: 1,
           limit: 50,
-          filtreOffres: undefined,
+          alternance: false,
           duree: [
             Offre.Emploi.Duree.tempsPlein,
             Offre.Emploi.Duree.tempsPartiel
@@ -114,7 +111,7 @@ describe('FindAllOffresEmploiQueryGetter', () => {
         const criteres: GetOffresEmploiQuery = {
           page: 1,
           limit: 50,
-          filtreOffres: undefined,
+          alternance: false,
           commune: '75118',
           minDateCreation: minDateDeCreation.toISO()
         }

@@ -2,12 +2,10 @@ import { HttpStatus, INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
 import {
   unHeaderAuthorization,
-  unJwtPayloadValide,
-  unJwtPayloadValideJeunePEBRSA
+  unJwtPayloadValide
 } from '../../fixtures/authentification.fixture'
 import { expect, StubbedClass } from '../../utils'
 import {
-  FiltreOffres,
   GetOffresEmploiQuery,
   GetOffresEmploiQueryHandler
 } from '../../../src/application/queries/get-offres-emploi.query.handler'
@@ -67,64 +65,7 @@ describe('OffresEmploiController', () => {
           limit: 50,
           q: 'informatique',
           departement: undefined,
-          filtreOffres: FiltreOffres.ALTERNANCE,
-          experience: [Offre.Emploi.Experience.moinsdUnAn],
-          debutantAccepte: true,
-          contrat: [Offre.Emploi.Contrat.cdi, Offre.Emploi.Contrat.cdd],
-          duree: [Offre.Emploi.Duree.tempsPartiel],
-          rayon: 10,
-          commune: '75118'
-        }
-
-        const offresEmploiQueryModel: OffresEmploiQueryModel = {
-          pagination: {
-            page: 1,
-            limit: 50,
-            total: 1
-          },
-          results: [uneOffreEmploiResumeQueryModel()]
-        }
-
-        getOffresEmploiQueryHandler.execute.resolves(
-          success(offresEmploiQueryModel)
-        )
-
-        // When
-        await request(app.getHttpServer())
-          .get('/offres-emploi')
-          .set('authorization', unHeaderAuthorization())
-          .query(findOffresEmploiQuery)
-          // Then
-          .expect(HttpStatus.OK)
-
-        expect(getOffresEmploiQueryHandler.execute).to.have.been.calledWith(
-          expectedQuery
-        )
-      })
-      it('force alternance à false pour les BRSA', async () => {
-        // Given
-        jwtService.verifyTokenAndGetJwt.resolves(
-          unJwtPayloadValideJeunePEBRSA()
-        )
-
-        const findOffresEmploiQuery = {
-          page: '1',
-          limit: '50',
-          q: 'informatique',
-          alternance: 'true',
-          experience: [Offre.Emploi.Experience.moinsdUnAn],
-          debutantAccepte: 'true',
-          contrat: [Offre.Emploi.Contrat.cdi, Offre.Emploi.Contrat.cdd],
-          duree: [Offre.Emploi.Duree.tempsPartiel],
-          rayon: '10',
-          commune: '75118'
-        }
-        const expectedQuery: GetOffresEmploiQuery = {
-          page: 1,
-          limit: 50,
-          q: 'informatique',
-          departement: undefined,
-          filtreOffres: FiltreOffres.EMPLOI,
+          alternance: true,
           experience: [Offre.Emploi.Experience.moinsdUnAn],
           debutantAccepte: true,
           contrat: [Offre.Emploi.Contrat.cdi, Offre.Emploi.Contrat.cdd],
