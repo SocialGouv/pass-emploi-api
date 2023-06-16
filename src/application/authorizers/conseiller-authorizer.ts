@@ -149,4 +149,23 @@ export class ConseillerAuthorizer {
 
     return failure(new DroitsInsuffisants())
   }
+
+  async autoriserConseillerSuperviseurDeLEtablissement(
+    utilisateur: Authentification.Utilisateur,
+    idAgence: string
+  ): Promise<Result> {
+    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+      const conseiller = await this.conseillerRepository.get(utilisateur.id)
+
+      if (
+        conseiller &&
+        Authentification.estSuperviseur(utilisateur) &&
+        conseiller.agence?.id === idAgence
+      ) {
+        return emptySuccess()
+      }
+    }
+
+    return failure(new DroitsInsuffisants())
+  }
 }

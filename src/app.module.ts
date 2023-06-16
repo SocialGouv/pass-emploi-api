@@ -328,6 +328,7 @@ import { ConseillerMiloRepositoryToken } from './domain/milo/conseiller.milo'
 import { ConseillerMiloSqlRepository } from './infrastructure/repositories/milo/conseiller.milo.repository.db'
 import { ConseillersMiloController } from './infrastructure/routes/conseillers.milo.controller'
 import { EvenementEmploiCodePostalQueryGetter } from 'src/application/queries/query-getters/evenement-emploi-code-postal.query.getter'
+import { GetConseillersEtablissementQueryHandler } from 'src/application/queries/get-conseillers-etablissement.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -591,6 +592,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     ListeDeDiffusionAuthorizer,
     GetDetailActionQueryHandler,
     GetDetailJeuneQueryHandler,
+    GetConseillersEtablissementQueryHandler,
     GetJeunesEtablissementV2QueryHandler,
     GetActionsJeuneQueryHandler,
     CreateActionCommandHandler,
