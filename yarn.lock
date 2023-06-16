@@ -5390,9 +5390,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"elastic-apm-node@npm:3.46.0":
-  version: 3.46.0
-  resolution: "elastic-apm-node@npm:3.46.0"
+"elastic-apm-node@npm:3.47.0":
+  version: 3.47.0
+  resolution: "elastic-apm-node@npm:3.47.0"
   dependencies:
     "@elastic/ecs-pino-format": ^1.2.0
     "@opentelemetry/api": ^1.4.1
@@ -5426,9 +5426,8 @@ __metadata:
     shallow-clone-shim: ^2.0.0
     source-map: ^0.8.0-beta.0
     sql-summary: ^1.0.1
-    traverse: ^0.6.6
     unicode-byte-truncate: ^1.0.0
-  checksum: 8442c79df38a687798d6f974dbc9474956226e8173e0fd260029f12b7d955f680cec175c25d1dfbeb517b8457c1826bcf9748bddab6ef8bd39af812fb1ee9752
+  checksum: 1fe255467edc0c1098d0d407caf6a616aedb68a7e1f593aee4d0c5d2e2e149c9d15f03eb3591c14a940fc9b7bdd0ee5c77dfaea62b965dbec13c00324e8d3560
   languageName: node
   linkType: hard
 
@@ -9298,7 +9297,7 @@ __metadata:
     dirty-chai: ^2.0.1
     dotenv-cli: ^7.2.1
     dotvault: ^0.0.9
-    elastic-apm-node: 3.46.0
+    elastic-apm-node: 3.47.0
     eslint: 8.42.0
     eslint-config-prettier: ^8.8.0
     eslint-plugin-chai-friendly: ^0.7.2
@@ -12322,13 +12321,6 @@ __metadata:
   version: 0.0.3
   resolution: "tr46@npm:0.0.3"
   checksum: 726321c5eaf41b5002e17ffbd1fb7245999a073e8979085dacd47c4b4e8068ff5777142fc6726d6ca1fd2ff16921b48788b87225cbc57c72636f6efa8efbffe3
-  languageName: node
-  linkType: hard
-
-"traverse@npm:^0.6.6":
-  version: 0.6.7
-  resolution: "traverse@npm:0.6.7"
-  checksum: 21018085ab72f717991597e12e2b52446962ed59df591502e4d7e1a709bc0a989f7c3d451aa7d882666ad0634f1546d696c5edecda1f2fc228777df7bb529a1e
   languageName: node
   linkType: hard
 
