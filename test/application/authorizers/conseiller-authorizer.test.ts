@@ -472,4 +472,56 @@ describe('ConseillerAuthorizer', () => {
       expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
     })
   })
+
+  describe('autoriserConseillerSuperviseurDeLEtablissement', () => {
+    it('autorise un conseiller superviseur de l’établissement', async () => {
+      // Given
+      const idAgence = 'toto'
+      const superviseur: Authentification.Utilisateur = unUtilisateurConseiller(
+        { roles: [Authentification.Role.SUPERVISEUR] }
+      )
+      conseillerRepository.get.withArgs(superviseur.id).resolves({
+        ...unConseiller,
+        agence: {
+          id: 'toto',
+          nom: 'tata'
+        }
+      })
+
+      // When
+      const result =
+        await conseillerAuthorizer.autoriserConseillerSuperviseurDeLEtablissement(
+          superviseur,
+          idAgence
+        )
+
+      // Then
+      expect(result).to.deep.equal(emptySuccess())
+    })
+
+    it('interdit un conseiller superviseur qui n’est pas du même établissement', async () => {
+      // Given
+      const idAgence = 'toto'
+      const idFakeAgence = 'idFakeAgence'
+
+      const conseiller: Authentification.Utilisateur = unUtilisateurConseiller()
+      conseillerRepository.get.withArgs(conseiller.id).resolves({
+        ...unConseiller,
+        agence: {
+          id: idFakeAgence,
+          nom: 'boarf'
+        }
+      })
+
+      // When
+      const result =
+        await conseillerAuthorizer.autoriserConseillerSuperviseurDeLEtablissement(
+          conseiller,
+          idAgence
+        )
+
+      // Then
+      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
+    })
+  })
 })
