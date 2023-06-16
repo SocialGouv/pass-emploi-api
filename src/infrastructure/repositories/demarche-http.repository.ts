@@ -21,11 +21,12 @@ export class DemarcheHttpRepository implements Demarche.Repository {
 
   async update(
     demarcheModifiee: Demarche.Modifiee,
-    accessToken: string
+    accessToken: string,
+    structure: Core.Structure
   ): Promise<Result<Demarche>> {
     const token = await this.keycloakClient.exchangeTokenJeune(
       accessToken,
-      Core.Structure.POLE_EMPLOI
+      structure
     )
     const result = await this.poleEmploiPartenaireClient.updateDemarche(
       demarcheModifiee,
@@ -41,11 +42,12 @@ export class DemarcheHttpRepository implements Demarche.Repository {
 
   async save(
     demarche: Demarche.Creee,
-    accessToken: string
+    accessToken: string,
+    structure: Core.Structure
   ): Promise<Result<Demarche>> {
     const token = await this.keycloakClient.exchangeTokenJeune(
       accessToken,
-      Core.Structure.POLE_EMPLOI
+      structure
     )
     const result = await this.poleEmploiPartenaireClient.createDemarche(
       demarche,

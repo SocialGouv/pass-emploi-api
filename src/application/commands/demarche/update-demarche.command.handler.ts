@@ -45,7 +45,8 @@ export class UpdateStatutDemarcheCommandHandler extends CommandHandler<
   }
 
   async handle(
-    command: UpdateStatutDemarcheCommand
+    command: UpdateStatutDemarcheCommand,
+    utilisateur: Authentification.Utilisateur
   ): Promise<Result<Demarche>> {
     const result = this.demarcheFactory.mettreAJourLeStatut(
       command.idDemarche,
@@ -58,7 +59,11 @@ export class UpdateStatutDemarcheCommandHandler extends CommandHandler<
       return result
     }
 
-    return this.demarcheRepository.update(result.data, command.accessToken)
+    return this.demarcheRepository.update(
+      result.data,
+      command.accessToken,
+      utilisateur.structure
+    )
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {

@@ -3,6 +3,7 @@ import { DateTime } from 'luxon'
 import { failure, Result, success } from '../building-blocks/types/result'
 import { DateService } from '../utils/date-service'
 import { MauvaiseCommandeError } from '../building-blocks/types/domain-error'
+import { Core } from './core'
 
 export const DemarcheRepositoryToken = 'DemarcheRepositoryToken'
 
@@ -82,12 +83,14 @@ export namespace Demarche {
   export interface Repository {
     update(
       demarcheModifiee: Demarche.Modifiee,
-      accessToken: string
+      accessToken: string,
+      structure: Core.Structure
     ): Promise<Result<Demarche>>
 
     save(
       demarche: Demarche.Creee,
-      accessToken: string
+      accessToken: string,
+      structure: Core.Structure
     ): Promise<Result<Demarche>>
   }
 

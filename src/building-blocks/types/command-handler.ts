@@ -40,7 +40,7 @@ export abstract class CommandHandler<C, T> {
         return authorizedResult
       }
 
-      const result = await this.handle(command)
+      const result = await this.handle(command, utilisateur)
 
       if (isSuccess(result)) {
         this.monitor(utilisateur, command).catch(error => {
@@ -57,7 +57,10 @@ export abstract class CommandHandler<C, T> {
     }
   }
 
-  abstract handle(command?: C): Promise<Result<T>>
+  abstract handle(
+    command?: C,
+    utilisateur?: Authentification.Utilisateur
+  ): Promise<Result<T>>
 
   abstract authorize(
     command?: C,

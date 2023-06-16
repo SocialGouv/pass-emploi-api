@@ -78,7 +78,10 @@ describe('CreateDemarcheCommandHandler', () => {
           .resolves(emptySuccess())
 
         // When
-        const result = await createDemarcheCommandHandler.handle(command)
+        const result = await createDemarcheCommandHandler.handle(
+          command,
+          utilisateur
+        )
 
         // Then
         expect(isSuccess(result)).to.be.true()
@@ -103,7 +106,10 @@ describe('CreateDemarcheCommandHandler', () => {
           .resolves(erreurHttp)
 
         // When
-        const result = await createDemarcheCommandHandler.handle(command)
+        const result = await createDemarcheCommandHandler.handle(
+          command,
+          utilisateur
+        )
 
         // Then
         expect(result).to.be.deep.equal(erreurHttp)
