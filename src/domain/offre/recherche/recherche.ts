@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { Offre } from '../offre'
 import * as _Suggestion from './suggestion/suggestion'
+import { MauvaiseCommandeError } from '../../../building-blocks/types/domain-error'
+import { Result, failure, success } from '../../../building-blocks/types/result'
 
 export const RecherchesRepositoryToken = 'RecherchesRepositoryToken'
 
@@ -11,7 +13,7 @@ export interface Recherche {
   titre: string
   metier?: string
   localisation?: string
-  criteres?: Recherche.Emploi | Recherche.ServiceCivique | Recherche.Immersion
+  criteres: Recherche.Emploi | Recherche.ServiceCivique | Recherche.Immersion
   idJeune: string
   dateCreation: DateTime
   dateDerniereRecherche: DateTime
@@ -103,8 +105,15 @@ export namespace Recherche {
 
   @Injectable()
   export class Factory {
-    buildRechercheFromSuggestion(suggestion: Suggestion.Acceptee): Recherche {
-      return {
+    buildRechercheFromSuggestion(
+      suggestion: Suggestion.Acceptee
+    ): Result<Recherche> {
+      if (!suggestion.criteres) {
+        return failure(
+          new MauvaiseCommandeError("La suggestion n'a pas de criteres")
+        )
+      }
+      return success({
         id: suggestion.idRecherche,
         type: suggestion.type,
         titre: suggestion.informations.titre,
@@ -115,7 +124,7 @@ export namespace Recherche {
         dateCreation: suggestion.dateCreationRecherche,
         dateDerniereRecherche: suggestion.dateCreationRecherche,
         etat: Recherche.Etat.SUCCES
-      }
+      })
     }
   }
 }

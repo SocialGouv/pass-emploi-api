@@ -24,7 +24,7 @@ export function fromSqlToRechercheQueryModel(
     type: rechercheSql.type,
     metier: rechercheSql.metier ?? undefined,
     localisation: rechercheSql.localisation ?? undefined,
-    criteres: rechercheSql.criteres ?? undefined,
+    criteres: rechercheSql.criteres,
     geometrie: rechercheSql.geometrie ?? undefined
   }
 }

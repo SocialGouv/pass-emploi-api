@@ -37,7 +37,6 @@ export class RechercheDto extends Model {
     | Offre.Recherche.Emploi
     | Offre.Recherche.Immersion
     | Offre.Recherche.ServiceCivique
-    | null
 
   @Column({ field: 'date_creation', type: DataType.DATE })
   dateCreation: Date

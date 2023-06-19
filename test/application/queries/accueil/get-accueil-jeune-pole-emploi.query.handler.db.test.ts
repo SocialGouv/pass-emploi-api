@@ -172,7 +172,7 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
               {
                 ...recherche,
                 geometrie: undefined,
-                criteres: undefined
+                criteres: {}
               }
             ])
 
