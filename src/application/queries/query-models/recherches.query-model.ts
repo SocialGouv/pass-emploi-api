@@ -14,7 +14,7 @@ export class RechercheQueryModel {
   @ApiProperty()
   localisation?: string
   @ApiProperty()
-  criteres?:
+  criteres:
     | Offre.Recherche.Emploi
     | Offre.Recherche.Immersion
     | Offre.Recherche.ServiceCivique

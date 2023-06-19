@@ -19,7 +19,7 @@ export interface CreateRechercheCommand extends Command {
   titre: string
   metier?: string
   localisation?: string
-  criteres?: Recherche.Immersion | Recherche.Emploi | Recherche.ServiceCivique
+  criteres: Recherche.Immersion | Recherche.Emploi | Recherche.ServiceCivique
 }
 
 @Injectable()

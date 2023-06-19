@@ -1,13 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { DiagorienteLocation } from 'src/domain/offre/recherche/suggestion/diagoriente'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
-import {
-  Result,
-  failure,
-  isFailure,
-  success
-} from '../../building-blocks/types/result'
+import { Result, failure, isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { EvenementService } from '../../domain/evenement'
 import {
@@ -19,7 +15,6 @@ import {
   SuggestionsRepositoryToken
 } from '../../domain/offre/recherche/suggestion/suggestion'
 import { SuggestionAuthorizer } from '../authorizers/suggestion-authorizer'
-import { DiagorienteLocation } from 'src/domain/offre/recherche/suggestion/diagoriente'
 
 export interface CreateRechercheFromSuggestionCommand extends Command {
   idJeune: string
@@ -75,14 +70,17 @@ export class CreateRechercheFromSuggestionCommandHandler extends CommandHandler<
       return suggestionAccepteeResult
     }
 
-    const recherche = this.rechercheFactory.buildRechercheFromSuggestion(
+    const rechercheResult = this.rechercheFactory.buildRechercheFromSuggestion(
       suggestionAccepteeResult.data
     )
+    if (isFailure(rechercheResult)) {
+      return rechercheResult
+    }
 
-    await this.rechercheRepository.save(recherche)
+    await this.rechercheRepository.save(rechercheResult.data)
     await this.suggestionRepository.save(suggestionAccepteeResult.data)
 
-    return success(recherche)
+    return rechercheResult
   }
 
   async monitor(

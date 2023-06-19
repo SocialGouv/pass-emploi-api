@@ -12,7 +12,7 @@ export function uneRechercheDto(
     titre: 'Boulanger en alternance',
     metier: 'Boucher',
     localisation: 'Paris',
-    criteres: null,
+    criteres: {},
     dateCreation: new Date('2023-03-03T10:00:00.000Z'),
     dateDerniereRecherche: new Date('2023-03-03T10:00:00.000Z'),
     etatDerniereRecherche: Recherche.Etat.SUCCES,

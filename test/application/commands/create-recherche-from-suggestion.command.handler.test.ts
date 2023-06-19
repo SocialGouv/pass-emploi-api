@@ -110,7 +110,9 @@ describe('CreateRechercheFromSuggestionCommandHandler', () => {
 
         suggestionRepository.get.resolves(suggestion)
         suggestionFactory.accepter.returns(success(suggestionAcceptee))
-        rechercheFactory.buildRechercheFromSuggestion.returns(recherche)
+        rechercheFactory.buildRechercheFromSuggestion.returns(
+          success(recherche)
+        )
 
         // When
         const result = await createRechercheFromSuggestionCommandHandler.handle(
@@ -172,7 +174,9 @@ describe('CreateRechercheFromSuggestionCommandHandler', () => {
 
         suggestionRepository.get.resolves(suggestion)
         suggestionFactory.accepter.returns(success(suggestionAcceptee))
-        rechercheFactory.buildRechercheFromSuggestion.returns(recherche)
+        rechercheFactory.buildRechercheFromSuggestion.returns(
+          success(recherche)
+        )
 
         // When
         const result = await createRechercheFromSuggestionCommandHandler.handle(
@@ -243,7 +247,9 @@ describe('CreateRechercheFromSuggestionCommandHandler', () => {
 
         suggestionRepository.get.resolves(suggestion)
         suggestionFactory.accepter.returns(success(suggestionAcceptee))
-        rechercheFactory.buildRechercheFromSuggestion.returns(recherche)
+        rechercheFactory.buildRechercheFromSuggestion.returns(
+          success(recherche)
+        )
 
         // When
         const result = await createRechercheFromSuggestionCommandHandler.handle(
