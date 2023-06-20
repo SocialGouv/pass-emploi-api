@@ -504,6 +504,7 @@ describe('RecherchesController', () => {
           .post(`/jeunes/1/recherches/suggestions/${idSuggestion}/accepter`)
           .send({
             location: {
+              libelle: 'Paris 12',
               code: '75012',
               type: Suggestion.TypeLocalisation.COMMUNE,
               latitude: 10.0,

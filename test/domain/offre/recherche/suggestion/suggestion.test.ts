@@ -398,6 +398,7 @@ describe('Suggestion', () => {
       })
       const locationDiagoriente = {
         location: {
+          libelle: 'Paris 12',
           type: Suggestion.TypeLocalisation.DEPARTEMENT,
           latitude: 10,
           longitude: 5,
@@ -422,6 +423,7 @@ describe('Suggestion', () => {
       })
       const locationDiagoriente = {
         location: {
+          libelle: 'Paris 12',
           type: Suggestion.TypeLocalisation.COMMUNE,
           latitude: 10,
           longitude: 5,
@@ -434,6 +436,7 @@ describe('Suggestion', () => {
         locationDiagoriente
       )
       expect(criteres).to.deep.equal({
+        q: suggestion.informations.titre,
         commune: '75012',
         rayon: 15,
         departement: undefined

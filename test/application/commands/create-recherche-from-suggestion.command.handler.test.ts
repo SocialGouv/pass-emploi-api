@@ -135,6 +135,7 @@ describe('CreateRechercheFromSuggestionCommandHandler', () => {
         // Given
         const payload = {
           location: {
+            libelle: 'Paris 12',
             type: Suggestion.TypeLocalisation.COMMUNE,
             latitude: 10,
             longitude: 5,
@@ -202,6 +203,7 @@ describe('CreateRechercheFromSuggestionCommandHandler', () => {
         // Given
         const payload = {
           location: {
+            libelle: 'Paris 12',
             type: Suggestion.TypeLocalisation.DEPARTEMENT,
             latitude: 10,
             longitude: 5,
