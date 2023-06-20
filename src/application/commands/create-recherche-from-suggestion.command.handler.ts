@@ -62,7 +62,15 @@ export class CreateRechercheFromSuggestionCommandHandler extends CommandHandler<
           suggestion,
           { location: command.location, rayon: command.rayon ?? undefined }
         )
-      suggestion = { ...suggestion, criteres: criteresDiagoriente }
+
+      suggestion = {
+        ...suggestion,
+        informations: {
+          ...suggestion.informations,
+          localisation: command.location.libelle
+        },
+        criteres: criteresDiagoriente
+      }
     }
 
     const suggestionAccepteeResult = this.suggestionFactory.accepter(suggestion)

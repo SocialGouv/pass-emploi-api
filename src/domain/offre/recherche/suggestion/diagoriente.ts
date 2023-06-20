@@ -13,6 +13,7 @@ interface Tag {
 }
 
 export interface DiagorienteLocation {
+  libelle: string
   type: Suggestion.TypeLocalisation
   code: string
   latitude?: number
