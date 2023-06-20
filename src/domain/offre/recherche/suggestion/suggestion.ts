@@ -350,6 +350,7 @@ export namespace Suggestion {
     ): Recherche.Emploi | Recherche.Immersion {
       if (suggestionDiagoriente.type === Recherche.Type.OFFRES_EMPLOI) {
         return {
+          q: suggestionDiagoriente.informations.titre,
           commune:
             locationDiagoriente.location.type === TypeLocalisation.COMMUNE
               ? locationDiagoriente.location.code

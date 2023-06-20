@@ -22,6 +22,11 @@ export class FindSuggestionsQueryParams {
 export class DiagorienteLocation {
   @ApiProperty()
   @IsNotEmpty()
+  @IsString()
+  libelle: string
+
+  @ApiProperty()
+  @IsNotEmpty()
   type: Suggestion.TypeLocalisation
 
   @ApiProperty()
