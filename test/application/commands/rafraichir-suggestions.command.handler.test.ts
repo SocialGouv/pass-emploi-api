@@ -98,6 +98,7 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
           source: Suggestion.Source.DIAGORIENTE,
           type: Recherche.Type.OFFRES_EMPLOI,
           informations: {
+            metier: suggestionDiagoriente.tag.title,
             titre: suggestionDiagoriente.tag.title
           }
         })
@@ -106,6 +107,7 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
           source: Suggestion.Source.DIAGORIENTE,
           type: Recherche.Type.OFFRES_IMMERSION,
           informations: {
+            metier: suggestionDiagoriente.tag.title,
             titre: suggestionDiagoriente.tag.title
           }
         })
