@@ -151,7 +151,8 @@ export namespace Suggestion {
         type: type,
         source: Suggestion.Source.DIAGORIENTE,
         informations: {
-          titre: suggestionDiagoriente.tag.title
+          titre: suggestionDiagoriente.tag.title,
+          metier: suggestionDiagoriente.tag.title
         },
         criteres: undefined
       }
