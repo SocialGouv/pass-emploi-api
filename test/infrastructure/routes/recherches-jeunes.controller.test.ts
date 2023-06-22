@@ -409,7 +409,7 @@ describe('RecherchesController', () => {
         })
       })
       describe('quand PE est down', () => {
-        it('retourne une erreur', async () => {
+        it("ne retourne pas d'erreur", async () => {
           // Given
           rafraichirSuggestionsCommandHandler.execute.resolves(
             failure(new ErreurHttp('Erreur', 500))
@@ -420,7 +420,7 @@ describe('RecherchesController', () => {
             .set('authorization', unHeaderAuthorization())
 
             // Then
-            .expect(HttpStatus.INTERNAL_SERVER_ERROR)
+            .expect(HttpStatus.OK)
         })
       })
     })
