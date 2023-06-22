@@ -19,6 +19,7 @@ import { Core, estPoleEmploiBRSA } from '../../domain/core'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { DiagorienteClient } from 'src/infrastructure/clients/diagoriente-client'
+import { buildError } from '../../utils/logger.module'
 
 export interface RafraichirSuggestionsCommand extends Command {
   idJeune: string
@@ -66,15 +67,20 @@ export class RafraichirSuggestionsCommandHandler extends CommandHandler<
         await this.suggestionPoleEmploiRepository.findAll(idpToken)
 
       if (isFailure(suggestionsPEResult)) {
-        return suggestionsPEResult
-      }
-
-      suggestionsPE =
-        this.suggestionFactory.buildListeSuggestionsOffresFromPoleEmploi(
-          suggestionsPEResult.data,
-          command.idJeune,
-          command.structure
+        this.logger.error(
+          buildError(
+            `Impossible de récupérer les suggestions depuis PE`,
+            Error(suggestionsPEResult.error.message)
+          )
         )
+      } else {
+        suggestionsPE =
+          this.suggestionFactory.buildListeSuggestionsOffresFromPoleEmploi(
+            suggestionsPEResult.data,
+            command.idJeune,
+            command.structure
+          )
+      }
     }
 
     if (rafraichirSuggestionsDiagoriente) {
@@ -82,25 +88,32 @@ export class RafraichirSuggestionsCommandHandler extends CommandHandler<
         await this.diagorienteClient.getMetiersFavoris(jeune.id)
 
       if (isFailure(metiersFavorisDiagorienteResult)) {
-        return metiersFavorisDiagorienteResult
+        this.logger.error(
+          buildError(
+            'Impossible de récupérer les métiers favoris depuis Diagoriente',
+            Error(metiersFavorisDiagorienteResult.error.message)
+          )
+        )
+      } else {
+        const metiersFavorisDiagoriente =
+          metiersFavorisDiagorienteResult.data.data.userByPartner.favorites.filter(
+            favori => favori.favorited
+          )
+        suggestionsDiagoriente =
+          this.suggestionFactory.buildListeSuggestionsOffresFromDiagoriente(
+            metiersFavorisDiagoriente,
+            command.idJeune
+          )
       }
-
-      const metiersFavorisDiagoriente =
-        metiersFavorisDiagorienteResult.data.data.userByPartner.favorites.filter(
-          favori => favori.favorited
-        )
-
-      suggestionsDiagoriente =
-        this.suggestionFactory.buildListeSuggestionsOffresFromDiagoriente(
-          metiersFavorisDiagoriente,
-          command.idJeune
-        )
     }
 
-    await this.suggestionPoleEmploiService.rafraichir(
-      [...suggestionsPE, ...suggestionsDiagoriente],
-      command.idJeune
-    )
+    const suggestionsARafraichir = [...suggestionsPE, ...suggestionsDiagoriente]
+    if (suggestionsARafraichir.length > 0) {
+      await this.suggestionPoleEmploiService.rafraichir(
+        suggestionsARafraichir,
+        command.idJeune
+      )
+    }
 
     return emptySuccess()
   }

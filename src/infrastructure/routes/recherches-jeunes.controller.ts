@@ -165,7 +165,7 @@ export class RecherchesJeunesController {
   ): Promise<SuggestionQueryModel[]> {
     const avecDiagoriente = findSuggestionsQueryParams.avecDiagoriente ?? false
 
-    const result = await this.rafraichirSuggestionsCommandHandler.execute(
+    await this.rafraichirSuggestionsCommandHandler.execute(
       {
         idJeune,
         token: accessToken,
@@ -174,10 +174,6 @@ export class RecherchesJeunesController {
       },
       utilisateur
     )
-
-    if (isFailure(result)) {
-      throw handleFailure(result)
-    }
 
     return this.getSuggestionsQueryHandler.execute(
       { idJeune, avecDiagoriente },

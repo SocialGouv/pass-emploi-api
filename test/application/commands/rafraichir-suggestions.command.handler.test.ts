@@ -9,7 +9,11 @@ import {
   uneSuggestion,
   uneSuggestionPE
 } from '../../fixtures/suggestion.fixture'
-import { failure, success } from '../../../src/building-blocks/types/result'
+import {
+  emptySuccess,
+  failure,
+  success
+} from '../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { SuggestionPoleEmploiService } from '../../../src/domain/offre/recherche/suggestion/pole-emploi.service'
 import { Core } from '../../../src/domain/core'
@@ -83,7 +87,7 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
     })
 
     describe("quand l'utilisateur a une structure MILO", () => {
-      it('test', async () => {
+      it('recupere suggestions PE et Diagoriente', async () => {
         const suggestionDiagoriente: Diagoriente = {
           tag: {
             code: 'B1301',
@@ -246,10 +250,13 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
       })
     })
 
-    describe('quand Pole Emploi est down', () => {
-      it("retourne l'erreur", async () => {
+    describe('quand Pole Emploi et Diago sont down', () => {
+      it("ne retourne pas l'erreur", async () => {
         // Given
         suggestionPoleEmploiRepository.findAll.resolves(
+          failure(new ErreurHttp('Service down', 500))
+        )
+        diagorienteClient.getMetiersFavoris.resolves(
           failure(new ErreurHttp('Service down', 500))
         )
 
@@ -258,13 +265,11 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
           idJeune: 'idJeune',
           token: 'token',
           structure: Core.Structure.POLE_EMPLOI,
-          avecDiagoriente: false
+          avecDiagoriente: true
         })
 
         // Then
-        expect(result).to.deep.equal(
-          failure(new ErreurHttp('Service down', 500))
-        )
+        expect(result).to.deep.equal(emptySuccess())
       })
     })
   })
