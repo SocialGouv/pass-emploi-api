@@ -1,7 +1,7 @@
 import {
   OffreTypeCode,
   SessionConseillerDetailDto
-} from '../../../infrastructure/clients/dto/milo.dto'
+} from 'src/infrastructure/clients/dto/milo.dto'
 import {
   DetailSessionConseillerMiloQueryModel,
   SessionConseillerMiloQueryModel,
@@ -22,12 +22,14 @@ function buildSessionTypeQueryModel(
 
 export function mapSessionDtoToQueryModel(
   sessionDto: SessionConseillerDetailDto,
+  estVisible: boolean,
   timezone: string
 ): SessionConseillerMiloQueryModel {
   return {
     id: sessionDto.session.id.toString(),
     nomSession: sessionDto.session.nom,
     nomOffre: sessionDto.offre.nom,
+    estVisible: estVisible,
     dateHeureDebut: DateTime.fromFormat(
       sessionDto.session.dateHeureDebut,
       'yyyy-MM-dd HH:mm:ss',
@@ -48,6 +50,7 @@ export function mapSessionDtoToQueryModel(
 
 export function mapDetailSessionDtoToQueryModel(
   sessionDto: SessionConseillerDetailDto,
+  estVisible: boolean,
   timezone: string
 ): DetailSessionConseillerMiloQueryModel {
   return {
@@ -71,6 +74,7 @@ export function mapDetailSessionDtoToQueryModel(
       dateMaxInscription: sessionDto.session.dateMaxInscription ?? undefined,
       animateur: sessionDto.session.animateur,
       lieu: sessionDto.session.lieu,
+      estVisible: estVisible,
       nbPlacesDisponibles: sessionDto.session.nbPlacesDisponibles ?? undefined,
       commentaire: sessionDto.session.commentaire ?? undefined
     },

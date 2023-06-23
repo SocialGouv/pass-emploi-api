@@ -2,13 +2,13 @@ import { HttpService } from '@nestjs/axios'
 import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
-import { ErreurHttp } from '../../building-blocks/types/domain-error'
+import { ErreurHttp } from 'src/building-blocks/types/domain-error'
 import {
   Result,
   failure,
   isFailure,
   success
-} from '../../building-blocks/types/result'
+} from 'src/building-blocks/types/result'
 import {
   SessionConseillerDetailDto,
   SessionConseillerMiloListeDto,

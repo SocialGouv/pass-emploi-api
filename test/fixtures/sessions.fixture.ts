@@ -1,8 +1,8 @@
 import {
   DetailSessionConseillerMiloQueryModel,
   SessionConseillerMiloQueryModel
-} from '../../src/application/queries/query-models/sessions.milo.query.model'
-import { OffreTypeCode } from '../../src/infrastructure/clients/dto/milo.dto'
+} from 'src/application/queries/query-models/sessions.milo.query.model'
+import { OffreTypeCode } from 'src/infrastructure/clients/dto/milo.dto'
 
 export const uneSessionConseillerMiloQueryModel =
   (): SessionConseillerMiloQueryModel => {
@@ -10,8 +10,9 @@ export const uneSessionConseillerMiloQueryModel =
       id: '1',
       nomSession: 'Une-session',
       nomOffre: 'Une-offre',
-      dateHeureDebut: '2020-04-06T10:20:00.000-03:00',
-      dateHeureFin: '2020-04-08T10:20:00.000-03:00',
+      estVisible: false,
+      dateHeureDebut: '2020-04-06T13:20:00.000Z',
+      dateHeureFin: '2020-04-08T13:20:00.000Z',
       type: {
         code: OffreTypeCode.WORKSHOP,
         label: 'Atelier i-milo'
@@ -30,6 +31,7 @@ export const unDetailSessionConseillerMiloQueryModel =
         dateMaxInscription: '2020-04-07T10:20:00.000Z',
         animateur: 'Un-animateur',
         lieu: 'Un-lieu',
+        estVisible: false,
         nbPlacesDisponibles: 10,
         commentaire: 'Un-commentaire'
       },

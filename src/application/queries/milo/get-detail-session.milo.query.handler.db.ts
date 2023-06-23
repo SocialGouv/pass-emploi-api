@@ -1,19 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Query } from '../../../building-blocks/types/query'
-import { QueryHandler } from '../../../building-blocks/types/query-handler'
-import {
-  isFailure,
-  Result,
-  success
-} from '../../../building-blocks/types/result'
-import { Authentification } from '../../../domain/authentification'
-import { Conseiller } from '../../../domain/conseiller/conseiller'
-import { estMilo } from '../../../domain/core'
-import { ConseillerMiloRepositoryToken } from '../../../domain/milo/conseiller.milo'
-import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client'
-import { MiloClient } from '../../../infrastructure/clients/milo-client'
+import { Query } from 'src/building-blocks/types/query'
+import { QueryHandler } from 'src/building-blocks/types/query-handler'
+import { isFailure, Result, success } from 'src/building-blocks/types/result'
+import { Authentification } from 'src/domain/authentification'
+import { Conseiller } from 'src/domain/conseiller/conseiller'
+import { estMilo } from 'src/domain/core'
+import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { mapDetailSessionDtoToQueryModel } from '../query-mappers/milo.mappers'
+import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { DetailSessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
 
 export interface GetDetailSessionMiloQuery extends Query {
@@ -60,8 +57,17 @@ export class GetDetailSessionMiloQueryHandler extends QueryHandler<
       return result
     }
 
+    const sessionSqlModel = await SessionMiloSqlModel.findByPk(
+      result.data.session.id.toString()
+    )
+    const estVisible = sessionSqlModel ? sessionSqlModel.estVisible : false
+
     return success(
-      mapDetailSessionDtoToQueryModel(result.data, timezoneStructure)
+      mapDetailSessionDtoToQueryModel(
+        result.data,
+        estVisible,
+        timezoneStructure
+      )
     )
   }
 

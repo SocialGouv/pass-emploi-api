@@ -1,17 +1,21 @@
-import { Controller, Get, Param, Query } from '@nestjs/common'
+import { Body, Controller, Get, Param, Put, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { GetDetailSessionMiloQueryHandler } from '../../application/queries/milo/get-detail-session.milo.query.handler.db'
-import { GetSessionsMiloQueryHandler } from '../../application/queries/milo/get-sessions.milo.query.handler.db'
+import { UpdateSessionMiloCommandHandler } from 'src/application/commands/milo/update-session-milo.command.handler'
+import { GetDetailSessionMiloQueryHandler } from 'src/application/queries/milo/get-detail-session.milo.query.handler.db'
+import { GetSessionsMiloQueryHandler } from 'src/application/queries/milo/get-sessions.milo.query.handler.db'
 import {
   DetailSessionConseillerMiloQueryModel,
   SessionConseillerMiloQueryModel
-} from '../../application/queries/query-models/sessions.milo.query.model'
-import { isSuccess } from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
-import { DateService } from '../../utils/date-service'
+} from 'src/application/queries/query-models/sessions.milo.query.model'
+import { isSuccess } from 'src/building-blocks/types/result'
+import { Authentification } from 'src/domain/authentification'
+import { DateService } from 'src/utils/date-service'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'
-import { GetSessionsQueryParams } from './validation/conseiller-milo.inputs'
+import {
+  GetSessionsQueryParams,
+  UpdateSessionMiloPayload
+} from './validation/conseiller-milo.inputs'
 
 @Controller('conseillers/milo')
 @ApiOAuth2([])
@@ -19,7 +23,8 @@ import { GetSessionsQueryParams } from './validation/conseiller-milo.inputs'
 export class ConseillersMiloController {
   constructor(
     private readonly getSessionsMiloQueryHandler: GetSessionsMiloQueryHandler,
-    private readonly getDetailSessionMiloQueryHandler: GetDetailSessionMiloQueryHandler
+    private readonly getDetailSessionMiloQueryHandler: GetDetailSessionMiloQueryHandler,
+    private readonly updateSessionMiloCommandHandler: UpdateSessionMiloCommandHandler
   ) {}
 
   @ApiOperation({
@@ -74,6 +79,35 @@ export class ConseillersMiloController {
   ): Promise<DetailSessionConseillerMiloQueryModel> {
     const result = await this.getDetailSessionMiloQueryHandler.execute(
       { idSession, idConseiller, token: accessToken },
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
+  }
+
+  @ApiOperation({
+    summary:
+      'Modifie la visibilité d’une session de la structure MILO du conseiller',
+    description: 'Autorisé pour le conseiller Milo'
+  })
+  @Put('/:idConseiller/sessions/:idSession')
+  async updateVisibiliteSession(
+    @Param('idConseiller') idConseiller: string,
+    @Param('idSession') idSession: string,
+    @Body() updateSessionMiloPayload: UpdateSessionMiloPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string
+  ): Promise<void> {
+    const result = await this.updateSessionMiloCommandHandler.execute(
+      {
+        idSession,
+        idConseiller,
+        token: accessToken,
+        estVisible: updateSessionMiloPayload.estVisible
+      },
       utilisateur
     )
 
