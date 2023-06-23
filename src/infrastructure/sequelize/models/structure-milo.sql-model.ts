@@ -25,6 +25,30 @@ export class StructureMiloDto extends Model {
     type: DataType.STRING
   })
   nomUsuel: string | null
+
+  @Column({
+    field: 'nom_region',
+    type: DataType.STRING
+  })
+  nomRegion?: string | null
+
+  @Column({
+    field: 'code_region',
+    type: DataType.STRING
+  })
+  codeRegion?: string | null
+
+  @Column({
+    field: 'nom_departement',
+    type: DataType.STRING
+  })
+  nomDepartement?: string | null
+
+  @Column({
+    field: 'code_departement',
+    type: DataType.STRING
+  })
+  codeDepartement?: string | null
 }
 
 @Table({

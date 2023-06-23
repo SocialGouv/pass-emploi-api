@@ -7,7 +7,11 @@ export function uneStructureMiloDto(
   const defaults: AsSql<StructureMiloDto> = {
     id: '1',
     nomOfficiel: '06-Nice',
-    nomUsuel: 'Nice'
+    nomUsuel: 'Nice',
+    nomDepartement: undefined,
+    codeDepartement: undefined,
+    nomRegion: undefined,
+    codeRegion: undefined
   }
 
   return { ...defaults, ...args }
