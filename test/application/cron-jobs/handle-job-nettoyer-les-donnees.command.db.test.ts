@@ -18,6 +18,8 @@ import {
 } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
+import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
+import Source = RendezVous.Source
 
 describe('HandleJobNettoyerLesDonneesCommandHandler', () => {
   let handleJobNettoyerLesDonneesCommandHandler: HandleJobNettoyerLesDonneesCommandHandler
@@ -25,6 +27,9 @@ describe('HandleJobNettoyerLesDonneesCommandHandler', () => {
   let suiviJobService: StubbedType<SuiviJob.Service>
   let rendezVousDto: AsSql<RendezVousDto>
   let rendezVousDtoSansDateSuppression: AsSql<RendezVousDto>
+  let rendezVousDtoMiloASupprimer: AsSql<RendezVousDto>
+  let rendezVousDtoAvecUneDateRecente: AsSql<RendezVousDto>
+  let rendezVousMiloAvantNettoyage: RendezVousSqlModel | null
   let rendezVousAvantNettoyage: RendezVousSqlModel | null
 
   before(async () => {
@@ -142,6 +147,20 @@ describe('HandleJobNettoyerLesDonneesCommandHandler', () => {
     rendezVousAvantNettoyage = await RendezVousSqlModel.findByPk(
       rendezVousDto.id
     )
+    // Given - Rendez-vous Milo
+    rendezVousDtoMiloASupprimer = unRendezVousDto({
+      date: uneDatetime().minus({ months: 7 }).toJSDate(),
+      source: Source.MILO
+    })
+    rendezVousDtoAvecUneDateRecente = unRendezVousDto({
+      date: uneDatetime().minus({ months: 1 }).toJSDate(),
+      source: Source.MILO
+    })
+    await RendezVousSqlModel.create(rendezVousDtoMiloASupprimer)
+    await RendezVousSqlModel.create(rendezVousDtoAvecUneDateRecente)
+    rendezVousMiloAvantNettoyage = await RendezVousSqlModel.findByPk(
+      rendezVousDtoMiloASupprimer.id
+    )
 
     // When
     await handleJobNettoyerLesDonneesCommandHandler.handle()
@@ -184,6 +203,18 @@ describe('HandleJobNettoyerLesDonneesCommandHandler', () => {
   })
 
   describe('rendez-vous supprimés', () => {
+    it('supprime les rendez-vous passés il y à plus de 3 mois et source = MILO', async () => {
+      // Then
+      const rendezVousApresNettoyage = await RendezVousSqlModel.findByPk(
+        rendezVousDtoMiloASupprimer.id
+      )
+      const rendezVousAvecDateRecenteApresNettoyage =
+        await RendezVousSqlModel.findByPk(rendezVousDtoAvecUneDateRecente.id)
+      expect(rendezVousMiloAvantNettoyage).not.to.be.null()
+      expect(rendezVousAvecDateRecenteApresNettoyage).not.to.be.null()
+      expect(rendezVousApresNettoyage).to.be.null()
+    })
+
     it('supprime les rendez-vous archivés de plus de six mois', async () => {
       // Then
       const rendezVousApresNettoyage = await RendezVousSqlModel.findByPk(
