@@ -11,6 +11,8 @@ import { LogApiPartenaireSqlModel } from '../../infrastructure/sequelize/models/
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { SuiviJobSqlModel } from '../../infrastructure/sequelize/models/suivi-job.sql-model'
 import { DateService } from '../../utils/date-service'
+import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
+import Source = RendezVous.Source
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.NETTOYER_LES_DONNEES)
@@ -31,6 +33,7 @@ export class HandleJobNettoyerLesDonneesCommandHandler extends JobHandler<Job> {
     let nombreEvenementsEngagementHebdoSupprimes = -1
     let nombreSuiviJobsSupprimes = -1
     let nombreRdvSupprimes = -1
+    let nombreRdvMiloSupprimes = -1
 
     try {
       nombreArchivesSupprimees = await ArchiveJeuneSqlModel.destroy({
@@ -66,6 +69,14 @@ export class HandleJobNettoyerLesDonneesCommandHandler extends JobHandler<Job> {
     }
 
     try {
+      nombreRdvMiloSupprimes = await RendezVousSqlModel.destroy({
+        where: dateSuperieureATroisMoisEtVenantDeMilo(maintenant)
+      })
+    } catch (_e) {
+      nbErreurs++
+    }
+
+    try {
       nombreRdvSupprimes = await RendezVousSqlModel.destroy({
         where: dateSuppressionSuperieureASixMois(maintenant)
       })
@@ -84,7 +95,8 @@ export class HandleJobNettoyerLesDonneesCommandHandler extends JobHandler<Job> {
         nombreLogsApiSupprimees: nombreLogsApiSupprimes,
         nombreEvenementsEngagementHebdoSupprimes,
         nombreSuiviJobsSupprimes,
-        nombreRdvSupprimes
+        nombreRdvSupprimes,
+        nombreRdvMiloSupprimes
       }
     }
   }
@@ -113,6 +125,15 @@ function dateEvenementSuperieureAUneSemaine(
 function dateExecutionSuperieureADeuxJours(maintenant: DateTime): WhereOptions {
   return {
     dateExecution: { [Op.lt]: maintenant.minus({ days: 2 }).toJSDate() }
+  }
+}
+
+function dateSuperieureATroisMoisEtVenantDeMilo(
+  maintenant: DateTime
+): WhereOptions {
+  return {
+    date: { [Op.lt]: maintenant.minus({ months: 3 }).toJSDate() },
+    source: Source.MILO
   }
 }
 
