@@ -7,6 +7,7 @@ import {
   SessionConseillerMiloQueryModel,
   SessionTypeQueryModel
 } from '../query-models/sessions.milo.query.model'
+import { DateTime } from 'luxon'
 
 function buildSessionTypeQueryModel(
   sessionDto: SessionConseillerDetailDto
@@ -26,8 +27,18 @@ export function mapSessionDtoToQueryModel(
     id: sessionDto.session.id.toString(),
     nomSession: sessionDto.session.nom,
     nomOffre: sessionDto.offre.nom,
-    dateHeureDebut: sessionDto.session.dateHeureDebut,
-    dateHeureFin: sessionDto.session.dateHeureFin,
+    dateHeureDebut: DateTime.fromFormat(
+      sessionDto.session.dateHeureDebut,
+      'yyyy-MM-dd HH:mm:ss'
+    )
+      .toISO()
+      .toString(),
+    dateHeureFin: DateTime.fromFormat(
+      sessionDto.session.dateHeureFin,
+      'yyyy-MM-dd HH:mm:ss'
+    )
+      .toISO()
+      .toString(),
     type: buildSessionTypeQueryModel(sessionDto)
   }
 }
@@ -39,8 +50,18 @@ export function mapDetailSessionDtoToQueryModel(
     session: {
       id: sessionDto.session.id.toString(),
       nom: sessionDto.session.nom,
-      dateHeureDebut: sessionDto.session.dateHeureDebut,
-      dateHeureFin: sessionDto.session.dateHeureFin,
+      dateHeureDebut: DateTime.fromFormat(
+        sessionDto.session.dateHeureDebut,
+        'yyyy-MM-dd HH:mm:ss'
+      )
+        .toISO()
+        .toString(),
+      dateHeureFin: DateTime.fromFormat(
+        sessionDto.session.dateHeureFin,
+        'yyyy-MM-dd HH:mm:ss'
+      )
+        .toISO()
+        .toString(),
       dateMaxInscription: sessionDto.session.dateMaxInscription ?? undefined,
       animateur: sessionDto.session.animateur,
       lieu: sessionDto.session.lieu,
