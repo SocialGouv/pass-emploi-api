@@ -140,7 +140,7 @@ export class DiagorienteClient {
 
 interface MetiersFavorisDiagorienteDto {
   data: {
-    userByPartner: {
+    userByPartner: null | {
       favorites: Array<{
         tag: {
           code: string

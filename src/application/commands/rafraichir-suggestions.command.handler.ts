@@ -96,9 +96,9 @@ export class RafraichirSuggestionsCommandHandler extends CommandHandler<
         )
       } else {
         const metiersFavorisDiagoriente =
-          metiersFavorisDiagorienteResult.data.data.userByPartner.favorites.filter(
+          metiersFavorisDiagorienteResult.data.data.userByPartner?.favorites.filter(
             favori => favori.favorited
-          )
+          ) ?? []
         suggestionsDiagoriente =
           this.suggestionFactory.buildListeSuggestionsOffresFromDiagoriente(
             metiersFavorisDiagoriente,
