@@ -79,9 +79,13 @@ export class GetDiagorienteMetiersFavorisQueryHandler extends QueryHandler<
       return result
     }
 
-    const metiersFavoris = result.data.data.userByPartner.favorites
-      .filter(favori => favori.favorited)
-      .map(favori => ({ code: favori.tag.code, libelle: favori.tag.title }))
+    const metiersFavoris =
+      result.data.data.userByPartner?.favorites
+        .filter(favori => favori.favorited)
+        .map(favori => ({
+          code: favori.tag.code,
+          libelle: favori.tag.title
+        })) ?? []
 
     return success({
       aDesMetiersFavoris: Boolean(metiersFavoris.length),
