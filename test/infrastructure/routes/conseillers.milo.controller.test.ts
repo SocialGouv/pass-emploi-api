@@ -1,7 +1,7 @@
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { HttpStatus, INestApplication } from '@nestjs/common'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
-import { GetSessionsMiloQueryHandler } from '../../../src/application/queries/milo/get-sessions.milo.query.handler'
+import { GetSessionsMiloQueryHandler } from '../../../src/application/queries/milo/get-sessions.milo.query.handler.db'
 import { StubbedClass, expect } from '../../utils'
 import {
   unHeaderAuthorization,
@@ -14,7 +14,7 @@ import {
   unDetailSessionConseillerMiloQueryModel,
   uneSessionConseillerMiloQueryModel
 } from '../../fixtures/sessions.fixture'
-import { GetDetailSessionMiloQueryHandler } from '../../../src/application/queries/milo/get-detail-session.milo.query.handler'
+import { GetDetailSessionMiloQueryHandler } from '../../../src/application/queries/milo/get-detail-session.milo.query.handler.db'
 
 describe('ConseillersMiloController', () => {
   let getSessionsMiloQueryHandler: StubbedClass<GetSessionsMiloQueryHandler>

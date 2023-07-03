@@ -322,14 +322,14 @@ import { GetCVPoleEmploiQueryHandler } from './application/queries/get-cv-pole-e
 import { EvenementsEmploiController } from './infrastructure/routes/evenements-emploi.controller'
 import { GetEvenementsEmploiQueryHandler } from './application/queries/get-evenements-emploi.query.handler'
 import { GetEvenementEmploiQueryHandler } from './application/queries/get-evenement-emploi.query.handler'
-import { GetSessionsMiloQueryHandler } from './application/queries/milo/get-sessions.milo.query.handler'
+import { GetSessionsMiloQueryHandler } from './application/queries/milo/get-sessions.milo.query.handler.db'
 import { MiloClient } from './infrastructure/clients/milo-client'
 import { ConseillerMiloRepositoryToken } from './domain/milo/conseiller.milo'
 import { ConseillerMiloSqlRepository } from './infrastructure/repositories/milo/conseiller.milo.repository.db'
 import { ConseillersMiloController } from './infrastructure/routes/conseillers.milo.controller'
 import { EvenementEmploiCodePostalQueryGetter } from 'src/application/queries/query-getters/evenement-emploi-code-postal.query.getter'
 import { GetConseillersEtablissementQueryHandler } from 'src/application/queries/get-conseillers-etablissement.query.handler.db'
-import { GetDetailSessionMiloQueryHandler } from './application/queries/milo/get-detail-session.milo.query.handler'
+import { GetDetailSessionMiloQueryHandler } from './application/queries/milo/get-detail-session.milo.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -399,7 +399,6 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     ObjectStorageClient,
     Action.Factory,
     Action.Commentaire.Factory,
-    Conseiller.Milo.Factory,
     Conseiller.Milo.Service,
     Mail.Factory,
     Authentification.Factory,

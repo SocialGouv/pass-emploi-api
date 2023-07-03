@@ -1,29 +1,39 @@
 import { Injectable } from '@nestjs/common'
-import { Conseiller } from '../../../domain/conseiller/conseiller'
-import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
-import { Result, failure, success } from '../../../building-blocks/types/result'
 import {
   ConseillerMiloSansStructure,
   NonTrouveError
 } from '../../../building-blocks/types/domain-error'
+import { Result, failure, success } from '../../../building-blocks/types/result'
+import { Conseiller } from '../../../domain/conseiller/conseiller'
+import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
+import { StructureMiloSqlModel } from '../../sequelize/models/structure-milo.sql-model'
 
 @Injectable()
 export class ConseillerMiloSqlRepository implements Conseiller.Milo.Repository {
   async get(id: string): Promise<Result<Conseiller.Milo>> {
-    const conseillerSqlModel = await ConseillerSqlModel.findByPk(id)
+    const conseillerSqlModel = await ConseillerSqlModel.findByPk(id, {
+      include: [{ model: StructureMiloSqlModel, required: false }]
+    })
     if (!conseillerSqlModel) {
       return failure(new NonTrouveError('Conseiller Milo', id))
     }
 
-    if (!conseillerSqlModel.idStructureMilo) {
+    if (
+      !conseillerSqlModel.idStructureMilo ||
+      !conseillerSqlModel.structureMilo
+    ) {
       return failure(new ConseillerMiloSansStructure(id))
     }
     return success({
       id,
-      idStructure: conseillerSqlModel.idStructureMilo
+      structure: {
+        id: conseillerSqlModel.structureMilo.id,
+        timezone: conseillerSqlModel.structureMilo.timezone
+      }
     })
   }
-  async update(conseiller: Conseiller.Milo): Promise<void> {
+
+  async save(conseiller: Conseiller.Milo.AvecStructure): Promise<void> {
     await ConseillerSqlModel.update(
       {
         idStructureMilo: conseiller.idStructure

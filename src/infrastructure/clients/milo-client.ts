@@ -41,20 +41,19 @@ export class MiloClient {
   async getSessionsConseiller(
     idpToken: string,
     idStructure: string,
+    timezone: string,
     dateDebut?: DateTime,
     dateFin?: DateTime
   ): Promise<Result<SessionConseillerMiloListeDto>> {
     const params = new URLSearchParams()
-    if (dateDebut)
-      params.append(
-        'dateDebutRecherche',
-        dateDebut.toFormat('yyyy-MM-dd').toString()
-      )
-    if (dateFin)
-      params.append(
-        'dateFinRecherche',
-        dateFin.toFormat('yyyy-MM-dd').toString()
-      )
+    if (dateDebut) {
+      const debutRecherche = dateDebut.setZone(timezone)
+      params.append('dateDebutRecherche', debutRecherche.toISODate())
+    }
+    if (dateFin) {
+      const finRecherche = dateFin.setZone(timezone)
+      params.append('dateFinRecherche', finRecherche.toISODate())
+    }
 
     // L'api ne renvoie que 50 sessions max par appel au delà, une pagination doit être mise en place. (voir doc 06/23)
     return this.get<SessionConseillerMiloListeDto>(

@@ -2,8 +2,8 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import {
-  Result,
   isFailure,
+  Result,
   success
 } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
@@ -13,21 +13,19 @@ import { ConseillerMiloRepositoryToken } from '../../../domain/milo/conseiller.m
 import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client'
 import { MiloClient } from '../../../infrastructure/clients/milo-client'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
-import { mapSessionDtoToQueryModel } from '../query-mappers/milo.mappers'
-import { DateTime } from 'luxon'
-import { SessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
+import { mapDetailSessionDtoToQueryModel } from '../query-mappers/milo.mappers'
+import { DetailSessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
 
-export interface GetSessionsMiloQuery extends Query {
+export interface GetDetailSessionMiloQuery extends Query {
+  idSession: string
   idConseiller: string
   token: string
-  dateDebut?: DateTime
-  dateFin?: DateTime
 }
 
 @Injectable()
-export class GetSessionsMiloQueryHandler extends QueryHandler<
-  GetSessionsMiloQuery,
-  Result<SessionConseillerMiloQueryModel[]>
+export class GetDetailSessionMiloQueryHandler extends QueryHandler<
+  GetDetailSessionMiloQuery,
+  Result<DetailSessionConseillerMiloQueryModel>
 > {
   constructor(
     private miloClient: MiloClient,
@@ -36,37 +34,39 @@ export class GetSessionsMiloQueryHandler extends QueryHandler<
     private conseillerAuthorizer: ConseillerAuthorizer,
     private keycloakClient: KeycloakClient
   ) {
-    super('GetSessionsMiloQueryHandler')
+    super('GetDetailSessionMiloQueryHandler')
   }
 
   async handle(
-    query: GetSessionsMiloQuery
-  ): Promise<Result<SessionConseillerMiloQueryModel[]>> {
+    query: GetDetailSessionMiloQuery
+  ): Promise<Result<DetailSessionConseillerMiloQueryModel>> {
     const resultConseiller = await this.conseillerRepository.get(
       query.idConseiller
     )
     if (isFailure(resultConseiller)) {
       return resultConseiller
     }
+    const { timezone: timezoneStructure } = resultConseiller.data.structure
 
     const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
       query.token
     )
 
-    const result = await this.miloClient.getSessionsConseiller(
+    const result = await this.miloClient.getDetailSessionConseiller(
       idpToken,
-      resultConseiller.data.idStructure,
-      query.dateDebut,
-      query.dateFin
+      query.idSession
     )
     if (isFailure(result)) {
       return result
     }
-    return success(result.data.sessions.map(mapSessionDtoToQueryModel))
+
+    return success(
+      mapDetailSessionDtoToQueryModel(result.data, timezoneStructure)
+    )
   }
 
   async authorize(
-    query: GetSessionsMiloQuery,
+    query: GetDetailSessionMiloQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     return this.conseillerAuthorizer.autoriserLeConseiller(

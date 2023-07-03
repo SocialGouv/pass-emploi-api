@@ -20,7 +20,7 @@ describe('ConseillerMiloSqlRepository', () => {
   })
 
   describe('get', () => {
-    it("retourne undefined quand le conseiller n'existe pas", async () => {
+    it("retourne une failure quand le conseiller n'existe pas", async () => {
       // When
       const conseiller = await conseillerMiloSqlRepository.get(idConseiller)
 
@@ -29,7 +29,7 @@ describe('ConseillerMiloSqlRepository', () => {
         failure(new NonTrouveError('Conseiller Milo', idConseiller))
       )
     })
-    it('retourne undefined quand le conseiller existe mais sans structure Milo', async () => {
+    it('retourne une failure quand le conseiller existe mais sans structure Milo', async () => {
       // Given
       await ConseillerSqlModel.create(unConseillerDto({ id: idConseiller }))
 
@@ -46,7 +46,8 @@ describe('ConseillerMiloSqlRepository', () => {
       const idStructureMilo = '1'
       await StructureMiloSqlModel.create({
         id: idStructureMilo,
-        nomOfficiel: 'Structure'
+        nomOfficiel: 'Structure',
+        timezone: 'Europe/Paris'
       })
       await ConseillerSqlModel.create(
         unConseillerDto({ id: idConseiller, idStructureMilo })
@@ -59,24 +60,25 @@ describe('ConseillerMiloSqlRepository', () => {
       expect(conseiller).to.deep.equal(
         success({
           id: idConseiller,
-          idStructure: idStructureMilo
+          structure: { id: idStructureMilo, timezone: 'Europe/Paris' }
         })
       )
     })
   })
 
-  describe('update', () => {
+  describe('save', () => {
     it('met à jour la structure Milo du conseiller', async () => {
       // Given
       const idStructureMilo = '1'
       await StructureMiloSqlModel.create({
         id: idStructureMilo,
-        nomOfficiel: 'Structure'
+        nomOfficiel: 'Structure',
+        timezone: 'Europe/Paris'
       })
       await ConseillerSqlModel.create(unConseillerDto({ id: idConseiller }))
 
       // When
-      await conseillerMiloSqlRepository.update({
+      await conseillerMiloSqlRepository.save({
         id: idConseiller,
         idStructure: idStructureMilo
       })

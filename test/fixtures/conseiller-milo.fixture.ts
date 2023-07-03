@@ -5,7 +5,7 @@ export const unConseillerMilo = (
 ): ConseillerMilo => {
   const defaults: ConseillerMilo = {
     id: 'test',
-    idStructure: '1'
+    structure: { id: '1', timezone: 'Europe/Paris' }
   }
   return { ...defaults, ...args }
 }

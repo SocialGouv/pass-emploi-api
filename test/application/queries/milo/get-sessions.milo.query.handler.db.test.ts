@@ -1,18 +1,24 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { DateTime } from 'luxon'
 import { describe } from 'mocha'
-import { SinonSandbox, createSandbox } from 'sinon'
+import { createSandbox, SinonSandbox } from 'sinon'
 import { ConseillerAuthorizer } from '../../../../src/application/authorizers/conseiller-authorizer'
-import { GetSessionsMiloQueryHandler } from '../../../../src/application/queries/milo/get-sessions.milo.query.handler'
+import {
+  GetSessionsMiloQuery,
+  GetSessionsMiloQueryHandler
+} from '../../../../src/application/queries/milo/get-sessions.milo.query.handler.db'
 import { ConseillerMiloSansStructure } from '../../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../../src/building-blocks/types/result'
 import { ConseillerMilo } from '../../../../src/domain/milo/conseiller.milo'
 import { KeycloakClient } from '../../../../src/infrastructure/clients/keycloak-client'
 import { MiloClient } from '../../../../src/infrastructure/clients/milo-client'
+import { StructureMiloSqlModel } from '../../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
 import { unConseillerMilo } from '../../../fixtures/conseiller-milo.fixture'
 import { uneSessionConseillerListeDto } from '../../../fixtures/milo-dto.fixture'
 import { uneSessionConseillerMiloQueryModel } from '../../../fixtures/sessions.fixture'
-import { StubbedClass, expect, stubClass } from '../../../utils'
+import { expect, StubbedClass, stubClass } from '../../../utils'
+import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('GetSessionsQueryHandler', () => {
   let getSessionsQueryHandler: GetSessionsMiloQueryHandler
@@ -27,6 +33,8 @@ describe('GetSessionsQueryHandler', () => {
   })
 
   beforeEach(async () => {
+    await getDatabase().cleanPG()
+
     miloClient = stubClass(MiloClient)
     keycloakClient = stubClass(KeycloakClient)
     conseillerRepository = stubInterface(sandbox)
@@ -86,14 +94,18 @@ describe('GetSessionsQueryHandler', () => {
         failure(new ConseillerMiloSansStructure(query.idConseiller))
       )
     })
-    it.skip('Récupère la liste des sessions de sa structure Milo quand le conseiller existe', async () => {
+
+    it('Récupère la liste des sessions de sa structure Milo quand le conseiller existe', async () => {
       // Given
-      const query = {
+      const query: GetSessionsMiloQuery = {
         idConseiller: 'idConseiller-1',
-        token: 'bearer un-token'
+        token: 'bearer un-token',
+        dateDebut: DateTime.fromISO('2023-04-12T00:00:00Z'),
+        dateFin: DateTime.fromISO('2023-04-13T00:00:00Z')
       }
       const idpToken = 'idpToken'
       const conseiller = unConseillerMilo()
+
       keycloakClient.exchangeTokenConseillerMilo
         .withArgs(query.token)
         .resolves(idpToken)
@@ -101,8 +113,19 @@ describe('GetSessionsQueryHandler', () => {
         .withArgs(query.idConseiller)
         .resolves(success(conseiller))
       miloClient.getSessionsConseiller
-        .withArgs(idpToken, conseiller.idStructure)
+        .withArgs(
+          idpToken,
+          conseiller.structure.id,
+          conseiller.structure.timezone,
+          query.dateDebut,
+          query.dateFin
+        )
         .resolves(success(uneSessionConseillerListeDto))
+      await StructureMiloSqlModel.create({
+        id: conseiller.structure.id,
+        nomOfficiel: 'Structure Milo',
+        timezone: 'America/Cayenne'
+      })
 
       // When
       const result = await getSessionsQueryHandler.handle(query)

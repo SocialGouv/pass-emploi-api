@@ -256,7 +256,8 @@ describe('MiloHttpRepository', () => {
       const nomOfficiel = 'structure-du-jeune'
       await StructureMiloSqlModel.create({
         id: idStructureMilo,
-        nomOfficiel
+        nomOfficiel,
+        timezone: 'Europe/Paris'
       })
 
       // When
@@ -273,7 +274,8 @@ describe('MiloHttpRepository', () => {
       const nomOfficiel = 'structure-du-jeune'
       await StructureMiloSqlModel.create({
         id: idStructureMilo,
-        nomOfficiel: 'structure-pas-du-jeune'
+        nomOfficiel: 'structure-pas-du-jeune',
+        timezone: 'Europe/Paris'
       })
 
       // When

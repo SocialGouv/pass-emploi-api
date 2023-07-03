@@ -1,17 +1,17 @@
 import { Controller, Get, Param, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { GetSessionsMiloQueryHandler } from '../../application/queries/milo/get-sessions.milo.query.handler'
-import { isSuccess } from '../../building-blocks/types/result'
-import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './failure.handler'
-import { Authentification } from '../../domain/authentification'
-import { GetSessionsQueryParams } from './validation/conseiller-milo.inputs'
-import { DateService } from '../../utils/date-service'
+import { GetDetailSessionMiloQueryHandler } from '../../application/queries/milo/get-detail-session.milo.query.handler.db'
+import { GetSessionsMiloQueryHandler } from '../../application/queries/milo/get-sessions.milo.query.handler.db'
 import {
   DetailSessionConseillerMiloQueryModel,
   SessionConseillerMiloQueryModel
 } from '../../application/queries/query-models/sessions.milo.query.model'
-import { GetDetailSessionMiloQueryHandler } from '../../application/queries/milo/get-detail-session.milo.query.handler'
+import { isSuccess } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { DateService } from '../../utils/date-service'
+import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
+import { handleFailure } from './failure.handler'
+import { GetSessionsQueryParams } from './validation/conseiller-milo.inputs'
 
 @Controller('conseillers/milo')
 @ApiOAuth2([])
@@ -41,10 +41,10 @@ export class ConseillersMiloController {
       {
         idConseiller,
         token: accessToken,
-        dateDebut: DateService.fromStringToLocaleDateTime(
+        dateDebut: DateService.fromStringToDateTime(
           getSessionsQueryParams.dateDebut
         ),
-        dateFin: DateService.fromStringToLocaleDateTime(
+        dateFin: DateService.fromStringToDateTime(
           getSessionsQueryParams.dateFin
         )
       },

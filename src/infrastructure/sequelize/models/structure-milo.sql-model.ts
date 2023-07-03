@@ -30,25 +30,31 @@ export class StructureMiloDto extends Model {
     field: 'nom_region',
     type: DataType.STRING
   })
-  nomRegion?: string | null
+  nomRegion: string | null
 
   @Column({
     field: 'code_region',
     type: DataType.STRING
   })
-  codeRegion?: string | null
+  codeRegion: string | null
 
   @Column({
     field: 'nom_departement',
     type: DataType.STRING
   })
-  nomDepartement?: string | null
+  nomDepartement: string | null
 
   @Column({
     field: 'code_departement',
     type: DataType.STRING
   })
-  codeDepartement?: string | null
+  codeDepartement: string | null
+
+  @Column({
+    field: 'timezone',
+    type: DataType.STRING
+  })
+  timezone: string
 }
 
 @Table({

@@ -21,7 +21,8 @@ function buildSessionTypeQueryModel(
 }
 
 export function mapSessionDtoToQueryModel(
-  sessionDto: SessionConseillerDetailDto
+  sessionDto: SessionConseillerDetailDto,
+  timezone: string
 ): SessionConseillerMiloQueryModel {
   return {
     id: sessionDto.session.id.toString(),
@@ -29,22 +30,25 @@ export function mapSessionDtoToQueryModel(
     nomOffre: sessionDto.offre.nom,
     dateHeureDebut: DateTime.fromFormat(
       sessionDto.session.dateHeureDebut,
-      'yyyy-MM-dd HH:mm:ss'
+      'yyyy-MM-dd HH:mm:ss',
+      { zone: timezone }
     )
-      .toISO()
-      .toString(),
+      .toUTC()
+      .toISO(),
     dateHeureFin: DateTime.fromFormat(
       sessionDto.session.dateHeureFin,
-      'yyyy-MM-dd HH:mm:ss'
+      'yyyy-MM-dd HH:mm:ss',
+      { zone: timezone }
     )
-      .toISO()
-      .toString(),
+      .toUTC()
+      .toISO(),
     type: buildSessionTypeQueryModel(sessionDto)
   }
 }
 
 export function mapDetailSessionDtoToQueryModel(
-  sessionDto: SessionConseillerDetailDto
+  sessionDto: SessionConseillerDetailDto,
+  timezone: string
 ): DetailSessionConseillerMiloQueryModel {
   return {
     session: {
@@ -52,16 +56,18 @@ export function mapDetailSessionDtoToQueryModel(
       nom: sessionDto.session.nom,
       dateHeureDebut: DateTime.fromFormat(
         sessionDto.session.dateHeureDebut,
-        'yyyy-MM-dd HH:mm:ss'
+        'yyyy-MM-dd HH:mm:ss',
+        { zone: timezone }
       )
-        .toISO()
-        .toString(),
+        .toUTC()
+        .toISO(),
       dateHeureFin: DateTime.fromFormat(
         sessionDto.session.dateHeureFin,
-        'yyyy-MM-dd HH:mm:ss'
+        'yyyy-MM-dd HH:mm:ss',
+        { zone: timezone }
       )
-        .toISO()
-        .toString(),
+        .toUTC()
+        .toISO(),
       dateMaxInscription: sessionDto.session.dateMaxInscription ?? undefined,
       animateur: sessionDto.session.animateur,
       lieu: sessionDto.session.lieu,

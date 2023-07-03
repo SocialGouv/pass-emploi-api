@@ -29,7 +29,7 @@ describe('MiloClient', () => {
 
       nock(MILO_BASE_URL)
         .get(
-          `/operateurs/structures/${idStructure}/sessions?dateDebutRecherche=2023-06-01&dateFinRecherche=2023-06-30`
+          `/operateurs/structures/${idStructure}/sessions?dateDebutRecherche=2023-05-31&dateFinRecherche=2023-06-29`
         )
         .reply(200, uneSessionConseillerListeDto)
         .isDone()
@@ -38,9 +38,11 @@ describe('MiloClient', () => {
       const result = await miloClient.getSessionsConseiller(
         idpToken,
         idStructure,
-        DateTime.fromISO('2023-06-01T14:00:00'),
-        DateTime.fromISO('2023-06-30T14:00:00')
+        'America/Cayenne',
+        DateTime.fromISO('2023-06-01T00:00:00'),
+        DateTime.fromISO('2023-06-30T00:00:00')
       )
+
       // Then
       expect(result).to.deep.equal(success(uneSessionConseillerListeDto))
     })
