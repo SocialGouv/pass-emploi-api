@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { GetDetailSessionMiloQueryHandler } from '../../application/queries/milo/get-detail-session.milo.query.handler'
+import { GetDetailSessionMiloQueryHandler } from '../../application/queries/milo/get-detail-session.milo.query.handler.db'
 import { GetSessionsMiloQueryHandler } from '../../application/queries/milo/get-sessions.milo.query.handler.db'
 import {
   DetailSessionConseillerMiloQueryModel,

@@ -14,7 +14,7 @@ import {
   unDetailSessionConseillerMiloQueryModel,
   uneSessionConseillerMiloQueryModel
 } from '../../fixtures/sessions.fixture'
-import { GetDetailSessionMiloQueryHandler } from '../../../src/application/queries/milo/get-detail-session.milo.query.handler'
+import { GetDetailSessionMiloQueryHandler } from '../../../src/application/queries/milo/get-detail-session.milo.query.handler.db'
 
 describe('ConseillersMiloController', () => {
   let getSessionsMiloQueryHandler: StubbedClass<GetSessionsMiloQueryHandler>

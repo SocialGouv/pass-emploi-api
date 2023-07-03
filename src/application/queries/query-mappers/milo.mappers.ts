@@ -43,7 +43,8 @@ export function mapSessionDtoToQueryModel(
 }
 
 export function mapDetailSessionDtoToQueryModel(
-  sessionDto: SessionConseillerDetailDto
+  sessionDto: SessionConseillerDetailDto,
+  timezone?: string
 ): DetailSessionConseillerMiloQueryModel {
   return {
     session: {
@@ -51,16 +52,14 @@ export function mapDetailSessionDtoToQueryModel(
       nom: sessionDto.session.nom,
       dateHeureDebut: DateTime.fromFormat(
         sessionDto.session.dateHeureDebut,
-        'yyyy-MM-dd HH:mm:ss'
-      )
-        .toISO()
-        .toString(),
+        'yyyy-MM-dd HH:mm:ss',
+        { zone: timezone }
+      ).toISO(),
       dateHeureFin: DateTime.fromFormat(
         sessionDto.session.dateHeureFin,
-        'yyyy-MM-dd HH:mm:ss'
-      )
-        .toISO()
-        .toString(),
+        'yyyy-MM-dd HH:mm:ss',
+        { zone: timezone }
+      ).toISO(),
       dateMaxInscription: sessionDto.session.dateMaxInscription ?? undefined,
       animateur: sessionDto.session.animateur,
       lieu: sessionDto.session.lieu,
