@@ -1,4 +1,10 @@
-import { IsDateString, IsNotEmpty, IsOptional } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger'
+import {
+  IsBoolean,
+  IsDateString,
+  IsNotEmpty,
+  IsOptional
+} from 'class-validator'
 
 export class GetSessionsQueryParams {
   @IsOptional()
@@ -10,4 +16,10 @@ export class GetSessionsQueryParams {
   @IsNotEmpty()
   @IsDateString()
   dateFin?: string
+}
+
+export class UpdateSessionMiloPayload {
+  @ApiProperty()
+  @IsBoolean()
+  estVisible: boolean
 }

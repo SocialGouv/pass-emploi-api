@@ -1,22 +1,25 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { describe } from 'mocha'
 import { SinonSandbox, createSandbox } from 'sinon'
-import { ConseillerAuthorizer } from '../../../../src/application/authorizers/conseiller-authorizer'
-import { ConseillerMiloSansStructure } from '../../../../src/building-blocks/types/domain-error'
-import { failure, success } from '../../../../src/building-blocks/types/result'
-import { ConseillerMilo } from '../../../../src/domain/milo/conseiller.milo'
-import { KeycloakClient } from '../../../../src/infrastructure/clients/keycloak-client'
-import { MiloClient } from '../../../../src/infrastructure/clients/milo-client'
-import { StructureMiloSqlModel } from '../../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
-import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
-import { unConseillerMilo } from '../../../fixtures/conseiller-milo.fixture'
-import { unDetailSessionConseillerDto } from '../../../fixtures/milo-dto.fixture'
-import { StubbedClass, expect, stubClass } from '../../../utils'
-import { GetDetailSessionMiloQueryHandler } from '../../../../src/application/queries/milo/get-detail-session.milo.query.handler.db'
-import { unDetailSessionConseillerMiloQueryModel } from '../../../fixtures/sessions.fixture'
-import { getDatabase } from '../../../utils/database-for-testing'
+import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
+import { ConseillerMiloSansStructure } from 'src/building-blocks/types/domain-error'
+import { failure, success } from 'src/building-blocks/types/result'
+import { ConseillerMilo } from 'src/domain/milo/conseiller.milo'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { MiloClient } from 'src/infrastructure/clients/milo-client'
+import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
+import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
+import { unDetailSessionConseillerDto } from 'test/fixtures/milo-dto.fixture'
+import { StubbedClass, expect, stubClass } from 'test/utils'
+import { GetDetailSessionMiloQueryHandler } from 'src/application/queries/milo/get-detail-session.milo.query.handler.db'
+import { unDetailSessionConseillerMiloQueryModel } from 'test/fixtures/sessions.fixture'
+import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
+import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
+import { DateTime } from 'luxon'
+import { getDatabase } from 'test/utils/database-for-testing'
 
 describe('GetDetailSessionMiloQueryHandler', () => {
+  const idStructureMilo = 'id-structure-1'
   let getDetailSessionMiloQueryHandler: GetDetailSessionMiloQueryHandler
   let miloClient: StubbedClass<MiloClient>
   let keycloakClient: StubbedClass<KeycloakClient>
@@ -91,10 +94,10 @@ describe('GetDetailSessionMiloQueryHandler', () => {
         failure(new ConseillerMiloSansStructure(query.idConseiller))
       )
     })
-    it("récupère le detail d'une session", async () => {
-      // Given
+
+    describe("récupère le detail d'une session", async () => {
       const query = {
-        idSession: 'idSession-1',
+        idSession: unDetailSessionConseillerDto.session.id.toString(),
         idConseiller: 'idConseiller-1',
         token: 'bearer un-token'
       }
@@ -115,13 +118,46 @@ describe('GetDetailSessionMiloQueryHandler', () => {
         timezone: 'America/Cayenne'
       })
 
-      // When
-      const result = await getDetailSessionMiloQueryHandler.handle(query)
+      it('quand elle n’existe pas en base, avec une visibilité à false', async () => {
+        // When
+        const result = await getDetailSessionMiloQueryHandler.handle(query)
 
-      // Then
-      expect(result).to.deep.equal(
-        success(unDetailSessionConseillerMiloQueryModel())
-      )
+        // Then
+        expect(result).to.deep.equal(
+          success(unDetailSessionConseillerMiloQueryModel())
+        )
+      })
+
+      describe('quand elle existe en base', () => {
+        beforeEach(async () => {
+          await SessionMiloSqlModel.create({
+            id: unDetailSessionConseillerDto.session.id.toString(),
+            estVisible: true,
+            idStructureMilo: idStructureMilo,
+            dateModification: DateTime.now().toJSDate()
+          })
+        })
+
+        afterEach(async () => {
+          await getDatabase().cleanPG()
+        })
+
+        it('avec la bonne visibilité', async () => {
+          // When
+          const result = await getDetailSessionMiloQueryHandler.handle(query)
+
+          // Then
+          expect(result).to.deep.equal(
+            success({
+              ...unDetailSessionConseillerMiloQueryModel(),
+              session: {
+                ...unDetailSessionConseillerMiloQueryModel().session,
+                estVisible: true
+              }
+            })
+          )
+        })
+      })
     })
   })
 })
