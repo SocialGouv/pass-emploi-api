@@ -329,7 +329,13 @@ import { ConseillerMiloSqlRepository } from './infrastructure/repositories/milo/
 import { ConseillersMiloController } from './infrastructure/routes/conseillers.milo.controller'
 import { EvenementEmploiCodePostalQueryGetter } from 'src/application/queries/query-getters/evenement-emploi-code-postal.query.getter'
 import { GetConseillersEtablissementQueryHandler } from 'src/application/queries/get-conseillers-etablissement.query.handler.db'
-import { GetDetailSessionMiloQueryHandler } from './application/queries/milo/get-detail-session.milo.query.handler.db'
+import { GetDetailSessionMiloQueryHandler } from 'src/application/queries/milo/get-detail-session.milo.query.handler.db'
+import { UpdateSessionMiloCommandHandler } from './application/commands/milo/update-session-milo.command.handler'
+import {
+  SessionMilo,
+  SessionMiloRepositoryToken
+} from './domain/milo/session.milo'
+import { SessionMiloSqlRepository } from './infrastructure/repositories/milo/session.milo.repository.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -422,6 +428,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Conseiller.ListeDeDiffusion.Factory,
     Conseiller.ListeDeDiffusion.Service,
     RendezVousMilo.Factory,
+    SessionMilo.Factory,
     BigqueryClient,
     DiagorienteClient,
     {
@@ -443,6 +450,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     {
       provide: ConseillerMiloRepositoryToken,
       useClass: ConseillerMiloSqlRepository
+    },
+    {
+      provide: SessionMiloRepositoryToken,
+      useClass: SessionMiloSqlRepository
     },
     {
       provide: OffresEmploiRepositoryToken,
@@ -727,6 +738,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetEvenementEmploiQueryHandler,
     GetSessionsMiloQueryHandler,
     GetDetailSessionMiloQueryHandler,
+    UpdateSessionMiloCommandHandler,
     EvenementEmploiCodePostalQueryGetter
   ]
 }
