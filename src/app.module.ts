@@ -322,7 +322,7 @@ import { GetCVPoleEmploiQueryHandler } from './application/queries/get-cv-pole-e
 import { EvenementsEmploiController } from './infrastructure/routes/evenements-emploi.controller'
 import { GetEvenementsEmploiQueryHandler } from './application/queries/get-evenements-emploi.query.handler'
 import { GetEvenementEmploiQueryHandler } from './application/queries/get-evenement-emploi.query.handler'
-import { GetSessionsMiloQueryHandler } from './application/queries/milo/get-sessions.milo.query.handler'
+import { GetSessionsMiloQueryHandler } from './application/queries/milo/get-sessions.milo.query.handler.db'
 import { MiloClient } from './infrastructure/clients/milo-client'
 import { ConseillerMiloRepositoryToken } from './domain/milo/conseiller.milo'
 import { ConseillerMiloSqlRepository } from './infrastructure/repositories/milo/conseiller.milo.repository.db'

@@ -8,6 +8,7 @@ export function uneStructureMiloDto(
     id: '1',
     nomOfficiel: '06-Nice',
     nomUsuel: 'Nice',
+    timezone: 'Europe/Paris',
     nomDepartement: undefined,
     codeDepartement: undefined,
     nomRegion: undefined,

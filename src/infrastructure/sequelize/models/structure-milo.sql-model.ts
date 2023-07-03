@@ -49,6 +49,12 @@ export class StructureMiloDto extends Model {
     type: DataType.STRING
   })
   codeDepartement?: string | null
+
+  @Column({
+    field: 'timezone',
+    type: DataType.STRING
+  })
+  timezone?: string | null
 }
 
 @Table({
