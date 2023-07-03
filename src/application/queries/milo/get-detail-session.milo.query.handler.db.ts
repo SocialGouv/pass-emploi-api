@@ -12,6 +12,7 @@ import { estMilo } from '../../../domain/core'
 import { ConseillerMiloRepositoryToken } from '../../../domain/milo/conseiller.milo'
 import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client'
 import { MiloClient } from '../../../infrastructure/clients/milo-client'
+import { StructureMiloSqlModel } from '../../../infrastructure/sequelize/models/structure-milo.sql-model'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { DetailSessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
 import { mapDetailSessionDtoToQueryModel } from '../query-mappers/milo.mappers'
@@ -46,6 +47,9 @@ export class GetDetailSessionMiloQueryHandler extends QueryHandler<
     if (isFailure(resultConseiller)) {
       return resultConseiller
     }
+    const idStructure = resultConseiller.data.idStructure
+    const structure = await StructureMiloSqlModel.findByPk(idStructure)
+    const timezoneStructure = structure!.timezone ?? undefined
 
     const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
       query.token
@@ -59,7 +63,9 @@ export class GetDetailSessionMiloQueryHandler extends QueryHandler<
       return result
     }
 
-    return success(mapDetailSessionDtoToQueryModel(result.data))
+    return success(
+      mapDetailSessionDtoToQueryModel(result.data, timezoneStructure)
+    )
   }
 
   async authorize(

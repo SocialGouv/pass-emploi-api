@@ -7,12 +7,14 @@ import { failure, success } from '../../../../src/building-blocks/types/result'
 import { ConseillerMilo } from '../../../../src/domain/milo/conseiller.milo'
 import { KeycloakClient } from '../../../../src/infrastructure/clients/keycloak-client'
 import { MiloClient } from '../../../../src/infrastructure/clients/milo-client'
+import { StructureMiloSqlModel } from '../../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
 import { unConseillerMilo } from '../../../fixtures/conseiller-milo.fixture'
 import { unDetailSessionConseillerDto } from '../../../fixtures/milo-dto.fixture'
 import { StubbedClass, expect, stubClass } from '../../../utils'
-import { GetDetailSessionMiloQueryHandler } from '../../../../src/application/queries/milo/get-detail-session.milo.query.handler'
+import { GetDetailSessionMiloQueryHandler } from '../../../../src/application/queries/milo/get-detail-session.milo.query.handler.db'
 import { unDetailSessionConseillerMiloQueryModel } from '../../../fixtures/sessions.fixture'
+import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('GetDetailSessionMiloQueryHandler', () => {
   let getDetailSessionMiloQueryHandler: GetDetailSessionMiloQueryHandler
@@ -27,6 +29,8 @@ describe('GetDetailSessionMiloQueryHandler', () => {
   })
 
   beforeEach(async () => {
+    await getDatabase().cleanPG()
+
     miloClient = stubClass(MiloClient)
     keycloakClient = stubClass(KeycloakClient)
     conseillerRepository = stubInterface(sandbox)
@@ -87,7 +91,7 @@ describe('GetDetailSessionMiloQueryHandler', () => {
         failure(new ConseillerMiloSansStructure(query.idConseiller))
       )
     })
-    it.skip("récupère le detail d'une session", async () => {
+    it("récupère le detail d'une session", async () => {
       // Given
       const query = {
         idSession: 'idSession-1',
@@ -105,6 +109,11 @@ describe('GetDetailSessionMiloQueryHandler', () => {
       miloClient.getDetailSessionConseiller
         .withArgs(idpToken, query.idSession)
         .resolves(success(unDetailSessionConseillerDto))
+      await StructureMiloSqlModel.create({
+        id: conseiller.idStructure,
+        nomOfficiel: 'Structure Milo',
+        timezone: 'America/Cayenne'
+      })
 
       // When
       const result = await getDetailSessionMiloQueryHandler.handle(query)
