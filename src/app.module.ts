@@ -182,6 +182,7 @@ import {
   PoleEmploiPartenaireInMemoryClient
 } from './infrastructure/clients/pole-emploi-partenaire-client'
 import { GetDemarchesQueryHandler } from './application/queries/get-demarches.query.handler'
+import { GetCatalogueQueryHandler } from './application/queries/get-catalogue.query.handler'
 import { GetJeuneMiloByDossierQueryHandler } from './application/queries/get-jeune-milo-by-dossier.query.handler.db'
 import { UpdateRendezVousCommandHandler } from './application/commands/update-rendez-vous.command.handler'
 import { InvitationIcsClient } from './infrastructure/clients/invitation-ics.client'
@@ -739,7 +740,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetSessionsMiloQueryHandler,
     GetDetailSessionMiloQueryHandler,
     UpdateSessionMiloCommandHandler,
-    EvenementEmploiCodePostalQueryGetter
+    EvenementEmploiCodePostalQueryGetter,
+    GetCatalogueQueryHandler
   ]
 }
 
