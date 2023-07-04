@@ -293,6 +293,7 @@ export class PoleEmploiClient {
       })
     )
   }
+
   private async post<T>(
     suffixUrl: string,
     body?: unknown,

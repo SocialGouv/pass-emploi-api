@@ -29,6 +29,7 @@ import {
   PrestationDto,
   RendezVousPoleEmploiDto,
   SuggestionDto,
+  ThematiqueDto,
   toEtat
 } from './dto/pole-emploi.dto'
 import { handleAxiosError } from './utils/axios-error-handler'
@@ -234,6 +235,22 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
       'peconnect-metiersrecherches/v1/metiersrecherches',
       token
     )
+  }
+
+  async getCatalogue(token: string): Promise<Result<ThematiqueDto[]>> {
+    try {
+      const response = await this.get<ThematiqueDto[]>(
+        `peconnect-demarches/v1/referentiel/demarches`,
+        token
+      )
+      return success(response.data)
+    } catch (e) {
+      return handleAxiosError(
+        e,
+        this.logger,
+        `La récupération du catalogue de démarche a échoué`
+      )
+    }
   }
 
   private async get<T>(

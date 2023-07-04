@@ -281,6 +281,43 @@ describe('PoleEmploiPartenaireClient', () => {
     })
   })
 
+  describe('getCatalogue', () => {
+    it('fait un appel http get avec les bons paramètres', async () => {
+      const catalogue = {
+        code: 'P02',
+        libelle: 'Ma formation professionnelle',
+        typesDemarcheRetourEmploi: [
+          {
+            type: 'TypeDemarcheRetourEmploiReferentielPartenaire',
+            code: 'Q06',
+            libelle:
+              "Information sur un projet de formation ou de Validation des acquis de l'expérience",
+            moyensRetourEmploi: [
+              {
+                type: 'MoyenRetourEmploiReferentielPartenaire',
+                code: 'C06.01',
+                libelle:
+                  "En participant à un atelier, une prestation, une réunion d'information",
+                droitCreation: false
+              }
+            ]
+          }
+        ]
+      }
+      // Given
+      nock(PARTENAIRE_BASE_URL)
+        .get('/peconnect-demarches/v1/referentiel/demarches')
+        .reply(200, [catalogue])
+        .isDone()
+
+      // When
+      const response = await poleEmploiPartenaireClient.getCatalogue(tokenJeune)
+
+      // Then
+      expect(response).to.deep.equal(success([catalogue]))
+    })
+  })
+
   describe('getDemarches', () => {
     describe('quand il y a des data', () => {
       it('renvoie les démarches', async () => {

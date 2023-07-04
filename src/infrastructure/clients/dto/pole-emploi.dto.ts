@@ -221,6 +221,25 @@ export interface TypeDemarcheDto {
   estUneAction: boolean
 }
 
+export interface ThematiqueDto {
+  code: string
+  libelle: string
+  typesDemarcheRetourEmploi: CatalogueDemarcheDto[]
+}
+
+interface CatalogueDemarcheDto {
+  code: string
+  libelle: string
+  moyensRetourEmploi: CommentDto[]
+}
+
+interface CommentDto {
+  type: string
+  code: string
+  libelle: string
+  droitCreation: boolean
+}
+
 export function toEtat(statut: Demarche.Statut): DemarcheDtoEtat {
   switch (statut) {
     case Demarche.Statut.ANNULEE:

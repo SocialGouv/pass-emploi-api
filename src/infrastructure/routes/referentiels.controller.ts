@@ -26,11 +26,13 @@ import { TypesDemarcheQueryModel } from '../../application/queries/query-models/
 import { RechercherTypesDemarcheQueryHandler } from '../../application/queries/rechercher-types-demarche.query.handler'
 import { isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Utilisateur } from '../decorators/authenticated.decorator'
+import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { Public } from '../decorators/public.decorator'
 import { handleFailure } from './failure.handler'
 import { GetAgencesQueryParams } from './validation/agences.inputs'
 import { TypesDemarchesQueryParams } from './validation/demarches.inputs'
+import { ThematiqueQueryModel } from 'src/application/queries/query-models/catalogue.query-model'
+import { GetCatalogueQueryHandler } from 'src/application/queries/get-catalogue.query.handler'
 
 @Controller('referentiels')
 @ApiTags('Referentiels')
@@ -40,6 +42,7 @@ export class ReferentielsController {
     private readonly getMetiersRomeQueryHandler: GetMetiersRomeQueryHandler,
     private readonly getTypesRendezvousQueryHandler: GetTypesRendezVousQueryHandler,
     private readonly rechercherTypesDemarcheQueryHandler: RechercherTypesDemarcheQueryHandler,
+    private readonly getCatalogueQueryHandler: GetCatalogueQueryHandler,
     private readonly getAgencesQueryHandler: GetAgencesQueryHandler,
     private readonly getMotifsSuppressionJeuneQueryHandler: GetMotifsSuppressionJeuneQueryHandler,
     private readonly getTypesQualificationsQueryHandler: GetTypesQualificationsQueryHandler,
@@ -92,6 +95,18 @@ export class ReferentielsController {
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<TypesDemarcheQueryModel[]> {
     return this.rechercherTypesDemarcheQueryHandler.execute(query, utilisateur)
+  }
+
+  @Get('pole-emploi/catalogue')
+  @ApiOAuth2([])
+  async getCatalogue(
+    @AccessToken() accessToken: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<ThematiqueQueryModel[]> {
+    return this.getCatalogueQueryHandler.execute(
+      { accessToken, structure: utilisateur.structure },
+      utilisateur
+    )
   }
 
   @Get('agences')
