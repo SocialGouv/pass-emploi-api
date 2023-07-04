@@ -15,18 +15,8 @@ module.exports = {
 
       await queryInterface.sequelize.query(
         `update structure_milo
-         set timezone = 'Europe/Paris'
-         where LENGTH(code_departement) = 2`,
-        {
-          type: Sequelize.QueryTypes.UPDATE,
-          transaction
-        }
-      )
-      await queryInterface.sequelize.query(
-        `update structure_milo
          set timezone = 'America/Guadeloupe'
-         where timezone IS NULL
-           and nom_departement LIKE '%Guadeloupe%'`,
+         where code_departement = '971'`,
         {
           type: Sequelize.QueryTypes.UPDATE,
           transaction
@@ -35,8 +25,7 @@ module.exports = {
       await queryInterface.sequelize.query(
         `update structure_milo
          set timezone = 'America/Martinique'
-         where timezone IS NULL
-           and nom_departement LIKE '%Martinique%'`,
+         where code_departement = '972'`,
         {
           type: Sequelize.QueryTypes.UPDATE,
           transaction
@@ -45,8 +34,7 @@ module.exports = {
       await queryInterface.sequelize.query(
         `update structure_milo
          set timezone = 'America/Cayenne'
-         where timezone IS NULL
-           and nom_departement LIKE '%Guyane%'`,
+         where code_departement = '973'`,
         {
           type: Sequelize.QueryTypes.UPDATE,
           transaction
@@ -55,8 +43,8 @@ module.exports = {
       await queryInterface.sequelize.query(
         `update structure_milo
          set timezone = 'Indian/Reunion'
-         where timezone IS NULL
-           and nom_departement LIKE '%Réunion%'`,
+         where code_departement = '974'
+            OR id = '23'`,
         {
           type: Sequelize.QueryTypes.UPDATE,
           transaction
@@ -65,8 +53,7 @@ module.exports = {
       await queryInterface.sequelize.query(
         `update structure_milo
          set timezone = 'Indian/Mayotte'
-         where timezone IS NULL
-           and nom_departement LIKE '%Mayotte%'`,
+         where code_departement = '976'`,
         {
           type: Sequelize.QueryTypes.UPDATE,
           transaction
@@ -75,12 +62,30 @@ module.exports = {
       await queryInterface.sequelize.query(
         `update structure_milo
          set timezone = 'America/Marigot'
-         where timezone IS NULL
-           and nom_departement LIKE '%Saint Martin%'`,
+         where code_departement = '978'`,
         {
           type: Sequelize.QueryTypes.UPDATE,
           transaction
         }
+      )
+      await queryInterface.sequelize.query(
+        `update structure_milo
+         set timezone = 'Europe/Paris'
+         where timezone IS NULL`,
+        {
+          type: Sequelize.QueryTypes.UPDATE,
+          transaction
+        }
+      )
+
+      await queryInterface.changeColumn(
+        'structure_milo',
+        'timezone',
+        {
+          type: Sequelize.STRING,
+          allowNull: false
+        },
+        { transaction }
       )
     })
   },

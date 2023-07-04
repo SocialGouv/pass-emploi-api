@@ -17,27 +17,15 @@ export const ConseillerMiloRepositoryToken = 'ConseillerMilo.Repository'
 
 export interface ConseillerMilo {
   id: string
-  idStructure: string
+  structure: { id: string; timezone: string }
 }
 
 export namespace ConseillerMilo {
   export interface Repository {
     get(idConseiller: string): Promise<Result<ConseillerMilo>>
-    update(conseiller: ConseillerMilo): Promise<void>
+    save(conseiller: { id: string; idStructure: string }): Promise<void>
   }
 
-  @Injectable()
-  export class Factory {
-    mettreAJourStructure(
-      idConseiller: string,
-      idStructure: string
-    ): Conseiller.Milo {
-      return {
-        id: idConseiller,
-        idStructure
-      }
-    }
-  }
   @Injectable()
   export class Service {
     private logger: Logger
@@ -46,7 +34,6 @@ export namespace ConseillerMilo {
     constructor(
       @Inject(ConseillerMiloRepositoryToken)
       private conseillerMiloRepository: Conseiller.Milo.Repository,
-      private conseillerMiloFactory: Factory,
       private miloClient: MiloClient,
       private keycloakClient: KeycloakClient
     ) {
@@ -83,24 +70,23 @@ export namespace ConseillerMilo {
         // Conseiller trouvé mais structure Milo non modifiée
         if (isSuccess(resultConseiller)) {
           const structureConseillerNonModifiee =
-            resultConseiller.data.idStructure === structure.data.id.toString()
+            resultConseiller.data.structure.id === structure.data.id.toString()
           if (structureConseillerNonModifiee) {
             return
           }
         }
 
-        const conseillerMiloAvecStructure =
-          this.conseillerMiloFactory.mettreAJourStructure(
-            idConseiller,
-            structure.data.id.toString()
-          )
+        const conseillerMiloAvecStructure = {
+          id: idConseiller,
+          idStructure: structure.data.id.toString()
+        }
 
         await StructureMiloSqlModel.upsert({
           id: structure.data.id,
           nomOfficiel: structure.data.nomOfficiel,
           nomUsuel: structure.data.nomUsuel
         })
-        await this.conseillerMiloRepository.update(conseillerMiloAvecStructure)
+        await this.conseillerMiloRepository.save(conseillerMiloAvecStructure)
       } catch (e) {
         this.logger.error(
           buildError(

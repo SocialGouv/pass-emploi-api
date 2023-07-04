@@ -38,9 +38,9 @@ describe('MiloClient', () => {
       const result = await miloClient.getSessionsConseiller(
         idpToken,
         idStructure,
+        'America/Cayenne',
         DateTime.fromISO('2023-06-01T00:00:00'),
-        DateTime.fromISO('2023-06-30T00:00:00'),
-        'America/Cayenne'
+        DateTime.fromISO('2023-06-30T00:00:00')
       )
 
       // Then

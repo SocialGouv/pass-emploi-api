@@ -76,7 +76,7 @@ describe('ConseillerMiloSqlRepository', () => {
       await ConseillerSqlModel.create(unConseillerDto({ id: idConseiller }))
 
       // When
-      await conseillerMiloSqlRepository.update({
+      await conseillerMiloSqlRepository.save({
         id: idConseiller,
         idStructure: idStructureMilo
       })

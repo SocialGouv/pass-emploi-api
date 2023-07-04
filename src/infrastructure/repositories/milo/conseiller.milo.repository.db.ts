@@ -6,11 +6,14 @@ import {
   ConseillerMiloSansStructure,
   NonTrouveError
 } from '../../../building-blocks/types/domain-error'
+import { StructureMiloSqlModel } from '../../sequelize/models/structure-milo.sql-model'
 
 @Injectable()
 export class ConseillerMiloSqlRepository implements Conseiller.Milo.Repository {
   async get(id: string): Promise<Result<Conseiller.Milo>> {
-    const conseillerSqlModel = await ConseillerSqlModel.findByPk(id)
+    const conseillerSqlModel = await ConseillerSqlModel.findByPk(id, {
+      include: [{ model: StructureMiloSqlModel, required: true }]
+    })
     if (!conseillerSqlModel) {
       return failure(new NonTrouveError('Conseiller Milo', id))
     }
@@ -20,10 +23,14 @@ export class ConseillerMiloSqlRepository implements Conseiller.Milo.Repository {
     }
     return success({
       id,
-      idStructure: conseillerSqlModel.idStructureMilo
+      structure: {
+        id: conseillerSqlModel.structureMilo!.id,
+        timezone: conseillerSqlModel.structureMilo!.timezone
+      }
     })
   }
-  async update(conseiller: Conseiller.Milo): Promise<void> {
+
+  async save(conseiller: { id: string; idStructure: string }): Promise<void> {
     await ConseillerSqlModel.update(
       {
         idStructureMilo: conseiller.idStructure

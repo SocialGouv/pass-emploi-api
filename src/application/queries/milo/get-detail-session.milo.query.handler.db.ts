@@ -2,8 +2,8 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import {
-  Result,
   isFailure,
+  Result,
   success
 } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
@@ -12,10 +12,9 @@ import { estMilo } from '../../../domain/core'
 import { ConseillerMiloRepositoryToken } from '../../../domain/milo/conseiller.milo'
 import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client'
 import { MiloClient } from '../../../infrastructure/clients/milo-client'
-import { StructureMiloSqlModel } from '../../../infrastructure/sequelize/models/structure-milo.sql-model'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
-import { DetailSessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
 import { mapDetailSessionDtoToQueryModel } from '../query-mappers/milo.mappers'
+import { DetailSessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
 
 export interface GetDetailSessionMiloQuery extends Query {
   idSession: string
@@ -47,9 +46,7 @@ export class GetDetailSessionMiloQueryHandler extends QueryHandler<
     if (isFailure(resultConseiller)) {
       return resultConseiller
     }
-    const idStructure = resultConseiller.data.idStructure
-    const structure = await StructureMiloSqlModel.findByPk(idStructure)
-    const timezoneStructure = structure!.timezone ?? undefined
+    const { timezone: timezoneStructure } = resultConseiller.data.structure
 
     const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
       query.token

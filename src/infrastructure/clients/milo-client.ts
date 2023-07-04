@@ -41,17 +41,17 @@ export class MiloClient {
   async getSessionsConseiller(
     idpToken: string,
     idStructure: string,
+    timezone: string,
     dateDebut?: DateTime,
-    dateFin?: DateTime,
-    timezone?: string
+    dateFin?: DateTime
   ): Promise<Result<SessionConseillerMiloListeDto>> {
     const params = new URLSearchParams()
     if (dateDebut) {
-      const debutRecherche = timezone ? dateDebut.setZone(timezone) : dateDebut
+      const debutRecherche = dateDebut.setZone(timezone)
       params.append('dateDebutRecherche', debutRecherche.toISODate())
     }
     if (dateFin) {
-      const finRecherche = timezone ? dateFin.setZone(timezone) : dateFin
+      const finRecherche = dateFin.setZone(timezone)
       params.append('dateFinRecherche', finRecherche.toISODate())
     }
 

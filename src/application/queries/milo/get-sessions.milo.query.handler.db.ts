@@ -13,7 +13,6 @@ import { estMilo } from '../../../domain/core'
 import { ConseillerMiloRepositoryToken } from '../../../domain/milo/conseiller.milo'
 import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client'
 import { MiloClient } from '../../../infrastructure/clients/milo-client'
-import { StructureMiloSqlModel } from '../../../infrastructure/sequelize/models/structure-milo.sql-model'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { mapSessionDtoToQueryModel } from '../query-mappers/milo.mappers'
 import { SessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
@@ -49,9 +48,8 @@ export class GetSessionsMiloQueryHandler extends QueryHandler<
     if (isFailure(resultConseiller)) {
       return resultConseiller
     }
-    const idStructure = resultConseiller.data.idStructure
-    const structure = await StructureMiloSqlModel.findByPk(idStructure)
-    const timezoneStructure = structure!.timezone ?? undefined
+    const { id: idStructure, timezone: timezoneStructure } =
+      resultConseiller.data.structure
 
     const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
       query.token
@@ -60,13 +58,14 @@ export class GetSessionsMiloQueryHandler extends QueryHandler<
     const result = await this.miloClient.getSessionsConseiller(
       idpToken,
       idStructure,
+      timezoneStructure,
       query.dateDebut,
-      query.dateFin,
-      timezoneStructure
+      query.dateFin
     )
     if (isFailure(result)) {
       return result
     }
+
     return success(
       result.data.sessions.map(session =>
         mapSessionDtoToQueryModel(session, timezoneStructure)
