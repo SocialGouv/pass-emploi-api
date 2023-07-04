@@ -59,51 +59,62 @@ export class RafraichirSuggestionsCommandHandler extends CommandHandler<
     const rafraichirSuggestionsDiagoriente = command.avecDiagoriente
 
     if (rafraichirSuggestionsPE) {
-      const idpToken = await this.keycloakClient.exchangeTokenJeune(
-        command.token,
-        jeune.structure
-      )
-      const suggestionsPEResult =
-        await this.suggestionPoleEmploiRepository.findAll(idpToken)
-
-      if (isFailure(suggestionsPEResult)) {
-        this.logger.error(
-          buildError(
-            `Impossible de récupérer les suggestions depuis PE`,
-            Error(suggestionsPEResult.error.message)
-          )
+      try {
+        const idpToken = await this.keycloakClient.exchangeTokenJeune(
+          command.token,
+          jeune.structure
         )
-      } else {
-        suggestionsPE =
-          this.suggestionFactory.buildListeSuggestionsOffresFromPoleEmploi(
-            suggestionsPEResult.data,
-            command.idJeune,
-            command.structure
+
+        const suggestionsPEResult =
+          await this.suggestionPoleEmploiRepository.findAll(idpToken)
+
+        if (isFailure(suggestionsPEResult)) {
+          this.logger.error(
+            buildError(
+              `Impossible de récupérer les suggestions depuis PE`,
+              Error(suggestionsPEResult.error.message)
+            )
           )
+        } else {
+          suggestionsPE =
+            this.suggestionFactory.buildListeSuggestionsOffresFromPoleEmploi(
+              suggestionsPEResult.data,
+              command.idJeune,
+              command.structure
+            )
+        }
+      } catch (e) {
+        this.logger.error(buildError(`Erreur récupération suggestions PE`, e))
       }
     }
 
     if (rafraichirSuggestionsDiagoriente) {
-      const metiersFavorisDiagorienteResult =
-        await this.diagorienteClient.getMetiersFavoris(jeune.id)
+      try {
+        const metiersFavorisDiagorienteResult =
+          await this.diagorienteClient.getMetiersFavoris(jeune.id)
 
-      if (isFailure(metiersFavorisDiagorienteResult)) {
+        if (isFailure(metiersFavorisDiagorienteResult)) {
+          this.logger.error(
+            buildError(
+              'Impossible de récupérer les métiers favoris depuis Diagoriente',
+              Error(metiersFavorisDiagorienteResult.error.message)
+            )
+          )
+        } else {
+          const metiersFavorisDiagoriente =
+            metiersFavorisDiagorienteResult.data.data.userByPartner?.favorites.filter(
+              favori => favori.favorited
+            ) ?? []
+          suggestionsDiagoriente =
+            this.suggestionFactory.buildListeSuggestionsOffresFromDiagoriente(
+              metiersFavorisDiagoriente,
+              command.idJeune
+            )
+        }
+      } catch (e) {
         this.logger.error(
-          buildError(
-            'Impossible de récupérer les métiers favoris depuis Diagoriente',
-            Error(metiersFavorisDiagorienteResult.error.message)
-          )
+          buildError(`Erreur récupération suggestions Diagoriente`, e)
         )
-      } else {
-        const metiersFavorisDiagoriente =
-          metiersFavorisDiagorienteResult.data.data.userByPartner?.favorites.filter(
-            favori => favori.favorited
-          ) ?? []
-        suggestionsDiagoriente =
-          this.suggestionFactory.buildListeSuggestionsOffresFromDiagoriente(
-            metiersFavorisDiagoriente,
-            command.idJeune
-          )
       }
     }
 
