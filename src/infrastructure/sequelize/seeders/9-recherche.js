@@ -8,7 +8,7 @@ module.exports = {
         type: 'OFFRES_EMPLOI',
         metier: 'Suivi des actions',
         localisation: 'Paris',
-        criteres: null,
+        criteres: {},
         date_creation: '2023-02-24Z10:00:00.000',
         date_derniere_recherche: '2023-02-24Z10:00:00.000',
         etat_derniere_recherche: 'SUCCES'
@@ -20,7 +20,7 @@ module.exports = {
         type: 'OFFRES_EMPLOI',
         metier: 'Suivi des actions',
         localisation: 'Paris',
-        criteres: null,
+        criteres: {},
         date_creation: '2023-03-24Z10:00:00.000',
         date_derniere_recherche: '2023-03-24Z10:00:00.000',
         etat_derniere_recherche: 'SUCCES'
@@ -32,7 +32,7 @@ module.exports = {
         type: 'OFFRES_IMMERSION',
         metier: 'Suivi des actions',
         localisation: 'Paris',
-        criteres: null,
+        criteres: {},
         date_creation: '2021-03-25Z10:00:00.000',
         date_derniere_recherche: '2021-03-25Z10:00:00.000',
         etat_derniere_recherche: 'SUCCES'
@@ -44,7 +44,7 @@ module.exports = {
         type: 'OFFRES_SERVICES_CIVIQUE',
         metier: 'Suivi des actions',
         localisation: 'Paris',
-        criteres: null,
+        criteres: {},
         date_creation: '2023-03-24Z10:00:00.000',
         date_derniere_recherche: '2023-03-24Z10:00:00.000',
         etat_derniere_recherche: 'ECHEC'

@@ -22,12 +22,8 @@ export interface ConseillerMilo {
 export namespace ConseillerMilo {
   export interface Repository {
     get(idConseiller: string): Promise<Result<ConseillerMilo>>
-    save(conseiller: AvecStructure): Promise<void>
-  }
-
-  export interface AvecStructure {
-    id: string
-    idStructure: string
+    save(conseiller: { id: string; idStructure: string | null }): Promise<void>
+    structureExiste(idStructure: string): Promise<boolean>
   }
 
   @Injectable()
@@ -80,11 +76,25 @@ export namespace ConseillerMilo {
           }
         }
 
-        const conseillerMiloAvecStructure = {
-          id: idConseiller,
-          idStructure: structure.data.id.toString()
+        const idStructure = structure.data.id.toString()
+        const structureExiste =
+          await this.conseillerMiloRepository.structureExiste(idStructure)
+
+        if (!structureExiste) {
+          this.logger.warn(
+            `La structure ${idStructure} du conseiller Milo ${idConseiller} n'est pas présente dans le référentiel`
+          )
+          await this.conseillerMiloRepository.save({
+            id: idConseiller,
+            idStructure: null
+          })
+          return
         }
-        await this.conseillerMiloRepository.save(conseillerMiloAvecStructure)
+
+        await this.conseillerMiloRepository.save({
+          id: idConseiller,
+          idStructure
+        })
       } catch (e) {
         this.logger.error(
           buildError(

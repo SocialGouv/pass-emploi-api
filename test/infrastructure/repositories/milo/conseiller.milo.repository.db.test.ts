@@ -87,5 +87,60 @@ describe('ConseillerMiloSqlRepository', () => {
       const conseillerTrouve = await ConseillerSqlModel.findByPk(idConseiller)
       expect(conseillerTrouve?.idStructureMilo).to.equal(idStructureMilo)
     })
+    it('met un idStructureMilo à null pour le conseiller', async () => {
+      // Given
+      const idStructureMilo = '1'
+      await StructureMiloSqlModel.create({
+        id: idStructureMilo,
+        nomOfficiel: 'Structure',
+        timezone: 'Europe/Paris'
+      })
+      await ConseillerSqlModel.create(
+        unConseillerDto({ id: idConseiller, idStructureMilo })
+      )
+
+      // When
+      await conseillerMiloSqlRepository.save({
+        id: idConseiller,
+        idStructure: null
+      })
+
+      // Then
+      const conseillerTrouve = await ConseillerSqlModel.findByPk(idConseiller)
+      expect(conseillerTrouve?.idStructureMilo).to.be.null()
+    })
+  })
+
+  describe('structureExiste', () => {
+    it('retourne true quand la structure Milo est présente dans le référentiel', async () => {
+      // Given
+      const idStructureMilo = '1'
+      await StructureMiloSqlModel.create({
+        id: idStructureMilo,
+        nomOfficiel: 'Structure',
+        timezone: 'Europe/Paris'
+      })
+
+      // When
+      const existe = await conseillerMiloSqlRepository.structureExiste(
+        idStructureMilo
+      )
+      const existePas = await conseillerMiloSqlRepository.structureExiste(
+        'idStructureMilo'
+      )
+
+      // Then
+      expect(existe).to.be.true()
+      expect(existePas).to.be.false()
+    })
+    it("retourne false quand la structure Milo n'est pas présente dans le référentiel", async () => {
+      // When
+      const existePas = await conseillerMiloSqlRepository.structureExiste(
+        'idStructureMilo'
+      )
+
+      // Then
+      expect(existePas).to.be.false()
+    })
   })
 })
