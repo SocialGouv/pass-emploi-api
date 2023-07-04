@@ -33,12 +33,20 @@ export class ConseillerMiloSqlRepository implements Conseiller.Milo.Repository {
     })
   }
 
-  async save(conseiller: Conseiller.Milo.AvecStructure): Promise<void> {
+  async save(conseiller: {
+    id: string
+    idStructure: string | null
+  }): Promise<void> {
     await ConseillerSqlModel.update(
       {
         idStructureMilo: conseiller.idStructure
       },
       { where: { id: conseiller.id } }
     )
+  }
+
+  async structureExiste(idStructure: string): Promise<boolean> {
+    const structureExistante = await StructureMiloSqlModel.findByPk(idStructure)
+    return Boolean(structureExistante)
   }
 }

@@ -107,7 +107,7 @@ describe('Conseiller.Milo', () => {
         // Then
         expect(conseillerMiloRepository.save).not.have.been.called()
       })
-      it('met à jour la structure Milo', async () => {
+      it('met à jour la structure Milo quand elle existe dans le referentiel', async () => {
         // Given
         const idConseiller = 'connu'
         const idStructure = '10'
@@ -133,10 +133,59 @@ describe('Conseiller.Milo', () => {
               uneStructureConseillerMiloDto({ id: Number(idNouvelleStructure) })
             )
           )
+        conseillerMiloRepository.structureExiste
+          .withArgs(idNouvelleStructure)
+          .resolves(true)
 
         const conseillerMiloAvecStructure = {
           id: idConseiller,
           idStructure: idNouvelleStructure
+        }
+
+        // When
+        await conseillerMiloService.recupererEtMettreAJourStructure(
+          idConseiller,
+          token
+        )
+
+        // Then
+        expect(
+          conseillerMiloRepository.save
+        ).to.have.been.calledOnceWithExactly(conseillerMiloAvecStructure)
+      })
+      it("met à null la structure Milo quand elle n'existe dans le referentiel", async () => {
+        // Given
+        const idConseiller = 'connu'
+        const idStructure = '10'
+        conseillerMiloRepository.get.withArgs(idConseiller).resolves(
+          success(
+            unConseillerMilo({
+              id: idConseiller,
+              structure: { id: idStructure, timezone: 'Europe/Paris' }
+            })
+          )
+        )
+        const token = 'tok'
+        const idpToken = 'idpTok'
+        keycloakClient.exchangeTokenConseillerMilo
+          .withArgs(token)
+          .resolves(idpToken)
+
+        const idNouvelleStructure = '11'
+        miloClient.getStructureConseiller
+          .withArgs(idpToken)
+          .resolves(
+            success(
+              uneStructureConseillerMiloDto({ id: Number(idNouvelleStructure) })
+            )
+          )
+        conseillerMiloRepository.structureExiste
+          .withArgs(idNouvelleStructure)
+          .resolves(false)
+
+        const conseillerMiloAvecStructure = {
+          id: idConseiller,
+          idStructure: null
         }
 
         // When

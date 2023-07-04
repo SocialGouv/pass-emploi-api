@@ -64,7 +64,7 @@ module.exports = {
         id: '5C02587A-D341-4E6D-B5A0-574733D0EBB9',
         prenom: 'Dupont',
         nom: 'Kenji',
-        id_conseiller: '972d013d-3781-418a-9b8d-1e288f346b45',
+        id_conseiller: 'a45665e1-df8a-4ad8-a34b-b972d3420669',
         date_creation: '2021-11-24T10:00:00.000Z',
         date_premiere_connexion: '2021-11-24T10:00:00.000Z',
         email: 'jeune.milo.passemploi@gmail.com',
@@ -75,7 +75,7 @@ module.exports = {
         id: 'e3f01482-8105-4306-ae93-527da1d72c90',
         prenom: 'Sylvain',
         nom: 'OLMETA',
-        id_conseiller: '972d013d-3781-418a-9b8d-1e288f346b45',
+        id_conseiller: 'a45665e1-df8a-4ad8-a34b-b972d3420669',
         date_creation: '2021-11-24T10:00:00.000Z',
         date_premiere_connexion: '2021-11-24T10:00:00.000Z',
         email: 'thomas.tourret@octo.com',
@@ -92,6 +92,16 @@ module.exports = {
         email: 'kevin.b.le@octo.com',
         structure: 'MILO',
         id_authentification: 'kele'
+      },
+      {
+        id: '98be24b6-8ae5-473a-a924-cdfc36416cf9',
+        prenom: 'MALEK',
+        nom: 'MALEK',
+        id_conseiller: '20097302-448d-4048-a0ae-306964aab60e',
+        date_creation: '2021-11-24T10:00:00.000Z',
+        date_premiere_connexion: '2021-11-24T10:00:00.000Z',
+        structure: 'MILO',
+        id_authentification: 'fc075265-0464-4530-a15c-f9483725bac7'
       }
     ])
   },

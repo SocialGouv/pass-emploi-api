@@ -36,14 +36,23 @@ module.exports = {
         notifications_sonores: false
       },
       {
-        id: '972d013d-3781-418a-9b8d-1e288f346b45',
+        id: 'a45665e1-df8a-4ad8-a34b-b972d3420669',
         prenom: 'Albert',
         nom: 'Durant',
         structure: 'MILO',
         email: 'conseiller.technique.milo.passemploi@gmail.com',
-        id_authentification: '41e460e8-3db3-41b4-af91-0fe02f131d99',
+        id_authentification: '8f4118cc-525a-404b-ac8b-c1f36974c7ec',
         notifications_sonores: false,
-        id_agence: '9999'
+        id_agence: '9999',
+        id_structure_milo: '12506'
+      },
+      {
+        id: '20097302-448d-4048-a0ae-306964aab60e',
+        prenom: 'Bruno',
+        nom: 'Dumont',
+        structure: 'MILO',
+        id_authentification: 'e6d4a5bf-0189-4581-8350-f772bca0d4a1',
+        notifications_sonores: false
       }
     ])
   },
