@@ -1,14 +1,15 @@
 import { HttpService } from '@nestjs/axios'
 import { expect } from 'chai'
 import * as nock from 'nock'
-import { MiloClient } from '../../../src/infrastructure/clients/milo-client'
-import { testConfig } from '../../utils/module-for-testing'
+import { MiloClient } from 'src/infrastructure/clients/milo-client'
+import { testConfig } from 'test/utils/module-for-testing'
 import {
   unDetailSessionConseillerDto,
   uneListeDeStructuresConseillerMiloDto,
-  uneSessionConseillerListeDto
-} from '../../fixtures/milo-dto.fixture'
-import { success } from '../../../src/building-blocks/types/result'
+  uneSessionConseillerListeDto,
+  uneSessionJeuneListeDto
+} from 'test/fixtures/milo-dto.fixture'
+import { success } from 'src/building-blocks/types/result'
 import { DateTime } from 'luxon'
 
 describe('MiloClient', () => {
@@ -45,6 +46,25 @@ describe('MiloClient', () => {
 
       // Then
       expect(result).to.deep.equal(success(uneSessionConseillerListeDto))
+    })
+  })
+
+  describe('getSessionsJeune', () => {
+    it('recupere la liste des sessions milo accessible au jeune', async () => {
+      // Given
+      const idpToken = 'idpToken'
+      const idDossier = 'idDossier'
+
+      nock(MILO_BASE_URL)
+        .get(`/operateurs/sessions?idDossier=${idDossier}`)
+        .reply(200, uneSessionJeuneListeDto)
+        .isDone()
+
+      // When
+      const result = await miloClient.getSessionsJeune(idpToken, idDossier)
+
+      // Then
+      expect(result).to.deep.equal(success(uneSessionJeuneListeDto))
     })
   })
 

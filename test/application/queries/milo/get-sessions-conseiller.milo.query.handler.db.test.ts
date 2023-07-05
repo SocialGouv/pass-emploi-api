@@ -1,8 +1,8 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { describe } from 'mocha'
-import { SinonSandbox, createSandbox } from 'sinon'
+import { createSandbox, SinonSandbox } from 'sinon'
 import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
-import { GetSessionsMiloQueryHandler } from 'src/application/queries/milo/get-sessions.milo.query.handler.db'
+import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-sessions-conseiller.milo.query.handler.db'
 import { ConseillerMiloSansStructure } from 'src/building-blocks/types/domain-error'
 import { failure, success } from 'src/building-blocks/types/result'
 import { ConseillerMilo } from 'src/domain/milo/conseiller.milo'
@@ -15,14 +15,14 @@ import {
   uneSessionConseillerListeDto
 } from 'test/fixtures/milo-dto.fixture'
 import { uneSessionConseillerMiloQueryModel } from 'test/fixtures/sessions.fixture'
-import { StubbedClass, expect, stubClass } from 'test/utils'
+import { expect, StubbedClass, stubClass } from 'test/utils'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { DateTime } from 'luxon'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { getDatabase } from 'test/utils/database-for-testing'
 
-describe('GetSessionsQueryHandler', () => {
-  let getSessionsQueryHandler: GetSessionsMiloQueryHandler
+describe('GetSessionsConseillerMiloQueryHandler', () => {
+  let getSessionsQueryHandler: GetSessionsConseillerMiloQueryHandler
   let miloClient: StubbedClass<MiloClient>
   let keycloakClient: StubbedClass<KeycloakClient>
   let conseillerRepository: StubbedType<ConseillerMilo.Repository>
@@ -38,7 +38,7 @@ describe('GetSessionsQueryHandler', () => {
     keycloakClient = stubClass(KeycloakClient)
     conseillerRepository = stubInterface(sandbox)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
-    getSessionsQueryHandler = new GetSessionsMiloQueryHandler(
+    getSessionsQueryHandler = new GetSessionsConseillerMiloQueryHandler(
       miloClient,
       conseillerRepository,
       conseillerAuthorizer,
@@ -151,9 +151,7 @@ describe('GetSessionsQueryHandler', () => {
 
         // Then
         expect(result).to.deep.equal(
-          success([
-            { ...uneSessionConseillerMiloQueryModel(), estVisible: true }
-          ])
+          success([{ ...uneSessionConseillerMiloQueryModel, estVisible: true }])
         )
       })
 
@@ -193,7 +191,7 @@ describe('GetSessionsQueryHandler', () => {
         expect(result).to.deep.equal(
           success([
             {
-              ...uneSessionConseillerMiloQueryModel(),
+              ...uneSessionConseillerMiloQueryModel,
               id: '2',
               estVisible: false
             }

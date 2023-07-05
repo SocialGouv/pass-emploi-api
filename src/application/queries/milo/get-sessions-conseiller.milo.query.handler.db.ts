@@ -1,24 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { Query } from '../../../building-blocks/types/query'
-import { QueryHandler } from '../../../building-blocks/types/query-handler'
-import {
-  Result,
-  isFailure,
-  success
-} from '../../../building-blocks/types/result'
-import { Authentification } from '../../../domain/authentification'
-import { Conseiller } from '../../../domain/conseiller/conseiller'
-import { estMilo } from '../../../domain/core'
-import { ConseillerMiloRepositoryToken } from '../../../domain/milo/conseiller.milo'
-import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client'
-import { MiloClient } from '../../../infrastructure/clients/milo-client'
+import { Query } from 'src/building-blocks/types/query'
+import { QueryHandler } from 'src/building-blocks/types/query-handler'
+import { isFailure, Result, success } from 'src/building-blocks/types/result'
+import { Authentification } from 'src/domain/authentification'
+import { Conseiller } from 'src/domain/conseiller/conseiller'
+import { estMilo } from 'src/domain/core'
+import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
-import { mapSessionDtoToQueryModel } from '../query-mappers/milo.mappers'
+import { mapSessionConseillerDtoToQueryModel } from '../query-mappers/milo.mappers'
 import { SessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 
-export interface GetSessionsMiloQuery extends Query {
+export interface GetSessionsConseillerMiloQuery extends Query {
   idConseiller: string
   token: string
   dateDebut?: DateTime
@@ -26,8 +22,8 @@ export interface GetSessionsMiloQuery extends Query {
 }
 
 @Injectable()
-export class GetSessionsMiloQueryHandler extends QueryHandler<
-  GetSessionsMiloQuery,
+export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
+  GetSessionsConseillerMiloQuery,
   Result<SessionConseillerMiloQueryModel[]>
 > {
   constructor(
@@ -37,11 +33,11 @@ export class GetSessionsMiloQueryHandler extends QueryHandler<
     private conseillerAuthorizer: ConseillerAuthorizer,
     private keycloakClient: KeycloakClient
   ) {
-    super('GetSessionsMiloQueryHandler')
+    super('GetSessionsConseillerMiloQueryHandler')
   }
 
   async handle(
-    query: GetSessionsMiloQuery
+    query: GetSessionsConseillerMiloQuery
   ): Promise<Result<SessionConseillerMiloQueryModel[]>> {
     const resultConseiller = await this.conseillerMiloRepository.get(
       query.idConseiller
@@ -75,7 +71,7 @@ export class GetSessionsMiloQueryHandler extends QueryHandler<
         const sessionSqlModel = sessionsSqlModels.find(
           ({ id }) => id === sessionMilo.session.id.toString()
         )
-        return mapSessionDtoToQueryModel(
+        return mapSessionConseillerDtoToQueryModel(
           sessionMilo,
           sessionSqlModel?.estVisible ?? false,
           timezoneStructure
@@ -86,7 +82,7 @@ export class GetSessionsMiloQueryHandler extends QueryHandler<
   }
 
   async authorize(
-    query: GetSessionsMiloQuery,
+    query: GetSessionsConseillerMiloQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     return this.conseillerAuthorizer.autoriserLeConseiller(
