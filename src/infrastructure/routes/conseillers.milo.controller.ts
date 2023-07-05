@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Put, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { UpdateSessionMiloCommandHandler } from 'src/application/commands/milo/update-session-milo.command.handler'
 import { GetDetailSessionMiloQueryHandler } from 'src/application/queries/milo/get-detail-session.milo.query.handler.db'
-import { GetSessionsMiloQueryHandler } from 'src/application/queries/milo/get-sessions.milo.query.handler.db'
+import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-sessions-conseiller.milo.query.handler.db'
 import {
   DetailSessionConseillerMiloQueryModel,
   SessionConseillerMiloQueryModel
@@ -22,7 +22,7 @@ import {
 @ApiTags('Conseillers Milo')
 export class ConseillersMiloController {
   constructor(
-    private readonly getSessionsMiloQueryHandler: GetSessionsMiloQueryHandler,
+    private readonly getSessionsMiloQueryHandler: GetSessionsConseillerMiloQueryHandler,
     private readonly getDetailSessionMiloQueryHandler: GetDetailSessionMiloQueryHandler,
     private readonly updateSessionMiloCommandHandler: UpdateSessionMiloCommandHandler
   ) {}

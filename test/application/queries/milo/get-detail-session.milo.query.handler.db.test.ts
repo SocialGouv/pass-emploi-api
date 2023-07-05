@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { describe } from 'mocha'
-import { SinonSandbox, createSandbox } from 'sinon'
+import { createSandbox, SinonSandbox } from 'sinon'
 import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
 import { ConseillerMiloSansStructure } from 'src/building-blocks/types/domain-error'
 import { failure, success } from 'src/building-blocks/types/result'
@@ -10,7 +10,7 @@ import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
 import { unDetailSessionConseillerDto } from 'test/fixtures/milo-dto.fixture'
-import { StubbedClass, expect, stubClass } from 'test/utils'
+import { expect, StubbedClass, stubClass } from 'test/utils'
 import { GetDetailSessionMiloQueryHandler } from 'src/application/queries/milo/get-detail-session.milo.query.handler.db'
 import { unDetailSessionConseillerMiloQueryModel } from 'test/fixtures/sessions.fixture'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
@@ -124,7 +124,7 @@ describe('GetDetailSessionMiloQueryHandler', () => {
 
         // Then
         expect(result).to.deep.equal(
-          success(unDetailSessionConseillerMiloQueryModel())
+          success(unDetailSessionConseillerMiloQueryModel)
         )
       })
 
@@ -149,9 +149,9 @@ describe('GetDetailSessionMiloQueryHandler', () => {
           // Then
           expect(result).to.deep.equal(
             success({
-              ...unDetailSessionConseillerMiloQueryModel(),
+              ...unDetailSessionConseillerMiloQueryModel,
               session: {
-                ...unDetailSessionConseillerMiloQueryModel().session,
+                ...unDetailSessionConseillerMiloQueryModel.session,
                 estVisible: true
               }
             })

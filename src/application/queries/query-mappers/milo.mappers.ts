@@ -1,26 +1,54 @@
 import {
   OffreTypeCode,
-  SessionConseillerDetailDto
+  SessionConseillerDetailDto,
+  SessionJeuneDetailDto
 } from 'src/infrastructure/clients/dto/milo.dto'
 import {
   DetailSessionConseillerMiloQueryModel,
   SessionConseillerMiloQueryModel,
+  SessionJeuneMiloQueryModel,
   SessionTypeQueryModel
 } from '../query-models/sessions.milo.query.model'
 import { DateTime } from 'luxon'
 
 function buildSessionTypeQueryModel(
-  sessionDto: SessionConseillerDetailDto
+  type: OffreTypeCode
 ): SessionTypeQueryModel {
-  switch (sessionDto.offre.type) {
+  switch (type) {
     case OffreTypeCode.WORKSHOP:
-      return { code: sessionDto.offre.type, label: 'Atelier i-milo' }
+      return { code: type, label: 'Atelier i-milo' }
     case OffreTypeCode.COLLECTIVE_INFORMATION:
-      return { code: sessionDto.offre.type, label: 'info coll i-milo' }
+      return { code: type, label: 'info coll i-milo' }
   }
 }
 
-export function mapSessionDtoToQueryModel(
+export function mapSessionJeuneDtoToQueryModel(
+  sessionDto: SessionJeuneDetailDto,
+  timezone: string
+): SessionJeuneMiloQueryModel {
+  return {
+    id: sessionDto.session.id.toString(),
+    nomSession: sessionDto.session.nom,
+    nomOffre: sessionDto.offre.nom,
+    dateHeureDebut: DateTime.fromFormat(
+      sessionDto.session.dateHeureDebut,
+      'yyyy-MM-dd HH:mm:ss',
+      { zone: timezone }
+    )
+      .toUTC()
+      .toISO(),
+    dateHeureFin: DateTime.fromFormat(
+      sessionDto.session.dateHeureFin,
+      'yyyy-MM-dd HH:mm:ss',
+      { zone: timezone }
+    )
+      .toUTC()
+      .toISO(),
+    type: buildSessionTypeQueryModel(sessionDto.offre.type)
+  }
+}
+
+export function mapSessionConseillerDtoToQueryModel(
   sessionDto: SessionConseillerDetailDto,
   estVisible: boolean,
   timezone: string
@@ -44,7 +72,7 @@ export function mapSessionDtoToQueryModel(
     )
       .toUTC()
       .toISO(),
-    type: buildSessionTypeQueryModel(sessionDto)
+    type: buildSessionTypeQueryModel(sessionDto.offre.type)
   }
 }
 
@@ -82,7 +110,7 @@ export function mapDetailSessionDtoToQueryModel(
       id: sessionDto.offre.id.toString(),
       nom: sessionDto.offre.nom,
       theme: sessionDto.offre.theme,
-      type: buildSessionTypeQueryModel(sessionDto),
+      type: buildSessionTypeQueryModel(sessionDto.offre.type),
       description: sessionDto.offre.description ?? undefined,
       nomPartenaire: sessionDto.offre.nomPartenaire ?? undefined
     }

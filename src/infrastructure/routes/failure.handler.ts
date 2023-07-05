@@ -18,6 +18,7 @@ import {
   DroitsInsuffisants,
   EmailExisteDejaError,
   ErreurHttp,
+  JeuneMiloSansIdDossier,
   JeuneNonLieALAgenceError,
   JeuneNonLieAuConseillerError,
   JeunePasInactifError,
@@ -47,6 +48,7 @@ export function handleFailure(result: Result): void {
       case JeuneNonLieALAgenceError.CODE:
       case ConseillerSansAgenceError.CODE:
       case ConseillerMiloSansStructure.CODE:
+      case JeuneMiloSansIdDossier.CODE:
         throw new BadRequestException(result.error, result.error.message)
       case RessourceIndisponibleError.CODE:
         throw new GoneException(result.error.message)

@@ -1,7 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger'
 
 export class SessionTypeQueryModel {
-  @ApiProperty()
+  @ApiProperty({
+    description: '2 valeurs possibles: WORKSHOP ou COLLECTIVE_INFORMATION'
+  })
   code: string
 
   @ApiProperty()
@@ -20,6 +22,26 @@ export class SessionConseillerMiloQueryModel {
 
   @ApiProperty()
   estVisible: boolean
+
+  @ApiProperty()
+  dateHeureDebut: string
+
+  @ApiProperty()
+  dateHeureFin: string
+
+  @ApiProperty()
+  type: SessionTypeQueryModel
+}
+
+export class SessionJeuneMiloQueryModel {
+  @ApiProperty()
+  id: string
+
+  @ApiProperty()
+  nomSession: string
+
+  @ApiProperty()
+  nomOffre: string
 
   @ApiProperty()
   dateHeureDebut: string

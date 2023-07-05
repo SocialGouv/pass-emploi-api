@@ -103,6 +103,16 @@ export class JeuneNonLieAuConseillerError implements DomainError {
   }
 }
 
+export class JeuneMiloSansIdDossier implements DomainError {
+  static CODE = 'JEUNE_MILO_SANS_ID_DOSSIER'
+  readonly code: string = JeuneMiloSansIdDossier.CODE
+  readonly message: string
+
+  constructor(idJeune: string) {
+    this.message = `Le jeune ${idJeune} n'a pas d'ID dossier`
+  }
+}
+
 export class CompteDiagorienteInvalideError implements DomainError {
   static CODE = 'COMPTE_DIAGORIENTE_INVALIDE'
   readonly code: string = CompteDiagorienteInvalideError.CODE

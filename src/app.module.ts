@@ -296,8 +296,8 @@ import { SuivreEvenementsMiloCronJobHandler } from './application/cron-jobs/suiv
 import { MiloRendezVousHttpRepository } from './infrastructure/repositories/rendez-vous/rendez-vous-milo-http.repository'
 import { TraiterEvenementMiloJobHandler } from './application/jobs/traiter-evenement-milo.handler'
 import {
-  RendezVousMilo,
-  MiloRendezVousRepositoryToken
+  MiloRendezVousRepositoryToken,
+  RendezVousMilo
 } from './domain/rendez-vous/rendez-vous.milo'
 import { MiloJeuneRepositoryToken } from './domain/milo/jeune.milo'
 import { HandleJobFakeCommandHandler } from './application/commands/jobs/handle-job-fake.command'
@@ -323,7 +323,7 @@ import { GetCVPoleEmploiQueryHandler } from './application/queries/get-cv-pole-e
 import { EvenementsEmploiController } from './infrastructure/routes/evenements-emploi.controller'
 import { GetEvenementsEmploiQueryHandler } from './application/queries/get-evenements-emploi.query.handler'
 import { GetEvenementEmploiQueryHandler } from './application/queries/get-evenement-emploi.query.handler'
-import { GetSessionsMiloQueryHandler } from './application/queries/milo/get-sessions.milo.query.handler.db'
+import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-sessions-conseiller.milo.query.handler.db'
 import { MiloClient } from './infrastructure/clients/milo-client'
 import { ConseillerMiloRepositoryToken } from './domain/milo/conseiller.milo'
 import { ConseillerMiloSqlRepository } from './infrastructure/repositories/milo/conseiller.milo.repository.db'
@@ -337,6 +337,7 @@ import {
   SessionMiloRepositoryToken
 } from './domain/milo/session.milo'
 import { SessionMiloSqlRepository } from './infrastructure/repositories/milo/session.milo.repository.db'
+import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -737,7 +738,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetCVPoleEmploiQueryHandler,
     GetEvenementsEmploiQueryHandler,
     GetEvenementEmploiQueryHandler,
-    GetSessionsMiloQueryHandler,
+    GetSessionsConseillerMiloQueryHandler,
+    GetSessionsJeuneMiloQueryHandler,
     GetDetailSessionMiloQueryHandler,
     UpdateSessionMiloCommandHandler,
     EvenementEmploiCodePostalQueryGetter,

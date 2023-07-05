@@ -1,8 +1,8 @@
 import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
 import { HttpStatus, INestApplication } from '@nestjs/common'
 import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
-import { GetSessionsMiloQueryHandler } from 'src/application/queries/milo/get-sessions.milo.query.handler.db'
-import { StubbedClass, expect } from 'test/utils'
+import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-sessions-conseiller.milo.query.handler.db'
+import { expect, StubbedClass } from 'test/utils'
 import {
   unHeaderAuthorization,
   unUtilisateurDecode
@@ -25,7 +25,7 @@ import {
 } from 'src/application/commands/milo/update-session-milo.command.handler'
 
 describe('ConseillersMiloController', () => {
-  let getSessionsMiloQueryHandler: StubbedClass<GetSessionsMiloQueryHandler>
+  let getSessionsMiloQueryHandler: StubbedClass<GetSessionsConseillerMiloQueryHandler>
   let getDetailSessionMiloQueryHandler: StubbedClass<GetDetailSessionMiloQueryHandler>
   let updateVisibiliteSessionCommandHandler: StubbedClass<UpdateSessionMiloCommandHandler>
 
@@ -34,7 +34,7 @@ describe('ConseillersMiloController', () => {
   before(async () => {
     app = await getApplicationWithStubbedDependencies()
 
-    getSessionsMiloQueryHandler = app.get(GetSessionsMiloQueryHandler)
+    getSessionsMiloQueryHandler = app.get(GetSessionsConseillerMiloQueryHandler)
     getDetailSessionMiloQueryHandler = app.get(GetDetailSessionMiloQueryHandler)
     updateVisibiliteSessionCommandHandler = app.get(
       UpdateSessionMiloCommandHandler
@@ -46,7 +46,7 @@ describe('ConseillersMiloController', () => {
       it('renvoie une 200', async () => {
         // Given
         getSessionsMiloQueryHandler.execute.resolves(
-          success([uneSessionConseillerMiloQueryModel()])
+          success([uneSessionConseillerMiloQueryModel])
         )
 
         // When - Then
@@ -54,7 +54,7 @@ describe('ConseillersMiloController', () => {
           .get('/conseillers/milo/id-conseiller/sessions')
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.OK)
-          .expect([uneSessionConseillerMiloQueryModel()])
+          .expect([uneSessionConseillerMiloQueryModel])
 
         expect(
           getSessionsMiloQueryHandler.execute
@@ -95,7 +95,7 @@ describe('ConseillersMiloController', () => {
       // Given
       const idSession = '123'
       getDetailSessionMiloQueryHandler.execute.resolves(
-        success(unDetailSessionConseillerMiloQueryModel())
+        success(unDetailSessionConseillerMiloQueryModel)
       )
 
       // When - Then
@@ -103,7 +103,7 @@ describe('ConseillersMiloController', () => {
         .get(`/conseillers/milo/id-conseiller/sessions/${idSession}`)
         .set('authorization', unHeaderAuthorization())
         .expect(HttpStatus.OK)
-        .expect(unDetailSessionConseillerMiloQueryModel())
+        .expect(unDetailSessionConseillerMiloQueryModel)
 
       expect(
         getDetailSessionMiloQueryHandler.execute

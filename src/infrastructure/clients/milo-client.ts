@@ -2,16 +2,17 @@ import { HttpService } from '@nestjs/axios'
 import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
-import { ErreurHttp } from '../../building-blocks/types/domain-error'
+import { ErreurHttp } from 'src/building-blocks/types/domain-error'
 import {
-  Result,
   failure,
   isFailure,
+  Result,
   success
-} from '../../building-blocks/types/result'
+} from 'src/building-blocks/types/result'
 import {
   SessionConseillerDetailDto,
   SessionConseillerMiloListeDto,
+  SessionJeuneMiloListeDto,
   StructureConseillerMiloDto
 } from './dto/milo.dto'
 import { handleAxiosError } from './utils/axios-error-handler'
@@ -21,6 +22,7 @@ import { DateTime } from 'luxon'
 export class MiloClient {
   private readonly apiUrl: string
   private readonly apiKeySessionsListeConseiller: string
+  private readonly apiKeySessionsListeJeune: string
   private readonly apiKeySessionDetailConseiller: string
   private readonly apiKeyUtilisateurs: string
   private logger: Logger
@@ -33,6 +35,8 @@ export class MiloClient {
     this.apiUrl = this.configService.get('milo').url
     this.apiKeySessionsListeConseiller =
       this.configService.get('milo').apiKeySessionsListeConseiller
+    this.apiKeySessionsListeJeune =
+      this.configService.get('milo').apiKeySessionsListeJeune
     this.apiKeySessionDetailConseiller =
       this.configService.get('milo').apiKeySessionDetailConseiller
     this.apiKeyUtilisateurs = this.configService.get('milo').apiKeyUtilisateurs
@@ -59,6 +63,22 @@ export class MiloClient {
     return this.get<SessionConseillerMiloListeDto>(
       `structures/${idStructure}/sessions`,
       this.apiKeySessionsListeConseiller,
+      idpToken,
+      params
+    )
+  }
+
+  async getSessionsJeune(
+    idpToken: string,
+    idDossier: string
+  ): Promise<Result<SessionJeuneMiloListeDto>> {
+    const params = new URLSearchParams()
+    params.append('idDossier', idDossier)
+
+    // L'api ne renvoie que 50 sessions max par appel au delà, une pagination doit être mise en place. (voir doc 06/23)
+    return this.get<SessionJeuneMiloListeDto>(
+      `sessions`,
+      this.apiKeySessionsListeJeune,
       idpToken,
       params
     )

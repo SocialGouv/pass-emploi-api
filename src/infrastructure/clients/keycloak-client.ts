@@ -4,8 +4,8 @@ import { ConfigService } from '@nestjs/config'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import { firstValueFrom } from 'rxjs'
-import { Core, estMilo, estPoleEmploiBRSA } from '../../domain/core'
-import { buildError } from '../../utils/logger.module'
+import { Core, estMilo, estPoleEmploiBRSA } from 'src/domain/core'
+import { buildError } from 'src/utils/logger.module'
 
 @Injectable()
 export class KeycloakClient {
@@ -39,6 +39,8 @@ export class KeycloakClient {
         return this.exchangeToken(bearer, 'pe-jeune', structure)
       case Core.Structure.POLE_EMPLOI_BRSA:
         return this.exchangeToken(bearer, 'pe-brsa-jeune', structure)
+      case Core.Structure.MILO:
+        return this.exchangeToken(bearer, 'similo-jeune', structure)
     }
     throw new UnauthorizedException({
       statusCode: 401,
