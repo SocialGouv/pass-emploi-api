@@ -5373,9 +5373,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"elastic-apm-http-client@npm:11.4.0":
-  version: 11.4.0
-  resolution: "elastic-apm-http-client@npm:11.4.0"
+"elastic-apm-http-client@npm:12.0.0":
+  version: 12.0.0
+  resolution: "elastic-apm-http-client@npm:12.0.0"
   dependencies:
     agentkeepalive: ^4.2.1
     breadth-filter: ^2.0.0
@@ -5386,13 +5386,13 @@ __metadata:
     readable-stream: ^3.4.0
     semver: ^6.3.0
     stream-chopper: ^3.0.1
-  checksum: 1b82e55395084c362907e8ed456b9bd51285eebd66d2579b4d88f2d023199a16a3fb8aecffe6e777da129981cb2d9b705f21dab5af92de359e979576ee19fd93
+  checksum: df927a78c5eeab8795cdc0429156982c68539531928e68ab84b7e24d02a8287da213668a2dc814c41282b231aa4dd30cdf4ae12a903bd1caaf22476844a458b1
   languageName: node
   linkType: hard
 
-"elastic-apm-node@npm:3.46.0":
-  version: 3.46.0
-  resolution: "elastic-apm-node@npm:3.46.0"
+"elastic-apm-node@npm:3.48.0":
+  version: 3.48.0
+  resolution: "elastic-apm-node@npm:3.48.0"
   dependencies:
     "@elastic/ecs-pino-format": ^1.2.0
     "@opentelemetry/api": ^1.4.1
@@ -5404,13 +5404,14 @@ __metadata:
     basic-auth: ^2.0.1
     cookie: ^0.5.0
     core-util-is: ^1.0.2
-    elastic-apm-http-client: 11.4.0
+    elastic-apm-http-client: 12.0.0
     end-of-stream: ^1.4.4
     error-callsites: ^2.0.4
     error-stack-parser: ^2.0.6
     escape-string-regexp: ^4.0.0
     fast-safe-stringify: ^2.0.7
     http-headers: ^3.0.2
+    import-in-the-middle: 1.3.5
     is-native: ^1.0.1
     lru-cache: ^6.0.0
     measured-reporting: ^1.51.1
@@ -5426,9 +5427,8 @@ __metadata:
     shallow-clone-shim: ^2.0.0
     source-map: ^0.8.0-beta.0
     sql-summary: ^1.0.1
-    traverse: ^0.6.6
     unicode-byte-truncate: ^1.0.0
-  checksum: 8442c79df38a687798d6f974dbc9474956226e8173e0fd260029f12b7d955f680cec175c25d1dfbeb517b8457c1826bcf9748bddab6ef8bd39af812fb1ee9752
+  checksum: 0eceaf4553873a369c91ccb159af017e30844daf9844edc586adaedd4260842b7f6273217fceee785fe595b159ffca5ec2f4af1bcec82bfa102fddf748b537de
   languageName: node
   linkType: hard
 
@@ -7290,6 +7290,15 @@ __metadata:
     parent-module: ^1.0.0
     resolve-from: ^4.0.0
   checksum: 2cacfad06e652b1edc50be650f7ec3be08c5e5a6f6d12d035c440a42a8cc028e60a5b99ca08a77ab4d6b1346da7d971915828f33cdab730d3d42f08242d09baa
+  languageName: node
+  linkType: hard
+
+"import-in-the-middle@npm:1.3.5":
+  version: 1.3.5
+  resolution: "import-in-the-middle@npm:1.3.5"
+  dependencies:
+    module-details-from-path: ^1.0.3
+  checksum: e8420c863cf0c7eb53647afea6b870357eeb2fa74624827452f94635fea43d022947cd49e3b9404c2cdcd1adf8bac5a61c3bae3321de1aa5d219a3a88297e7b6
   languageName: node
   linkType: hard
 
@@ -9298,7 +9307,7 @@ __metadata:
     dirty-chai: ^2.0.1
     dotenv-cli: ^7.2.1
     dotvault: ^0.0.9
-    elastic-apm-node: 3.46.0
+    elastic-apm-node: 3.48.0
     eslint: 8.42.0
     eslint-config-prettier: ^8.8.0
     eslint-plugin-chai-friendly: ^0.7.2
@@ -12322,13 +12331,6 @@ __metadata:
   version: 0.0.3
   resolution: "tr46@npm:0.0.3"
   checksum: 726321c5eaf41b5002e17ffbd1fb7245999a073e8979085dacd47c4b4e8068ff5777142fc6726d6ca1fd2ff16921b48788b87225cbc57c72636f6efa8efbffe3
-  languageName: node
-  linkType: hard
-
-"traverse@npm:^0.6.6":
-  version: 0.6.7
-  resolution: "traverse@npm:0.6.7"
-  checksum: 21018085ab72f717991597e12e2b52446962ed59df591502e4d7e1a709bc0a989f7c3d451aa7d882666ad0634f1546d696c5edecda1f2fc228777df7bb529a1e
   languageName: node
   linkType: hard
 
