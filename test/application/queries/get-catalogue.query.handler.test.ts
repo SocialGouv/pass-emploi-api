@@ -62,21 +62,7 @@ describe('GetCatalogueQueryHandler', () => {
             type: 'TypeDemarcheRetourEmploiReferentielPartenaire',
             code: 'Q12',
             libelle: "Recherche d'offres d'emploi ou d'entreprises",
-            moyensRetourEmploi: [
-              {
-                type: 'MoyenRetourEmploiReferentielPartenaire',
-                code: 'C12.05',
-                libelle:
-                  "En participant à un atelier, une prestation, une réunion d'information",
-                droitCreation: false
-              },
-              {
-                type: 'MoyenRetourEmploiReferentielPartenaire',
-                code: 'C12.01',
-                libelle: "Avec l'aide d'une personne ou d'une structure",
-                droitCreation: false
-              }
-            ]
+            moyensRetourEmploi: []
           }
         ]
       }
@@ -145,18 +131,8 @@ describe('GetCatalogueQueryHandler', () => {
             {
               codePourquoi: 'P03',
               codeQuoi: 'Q12',
-              comment: [
-                {
-                  code: 'C12.05',
-                  label:
-                    "En participant à un atelier, une prestation, une réunion d'information"
-                },
-                {
-                  code: 'C12.01',
-                  label: "Avec l'aide d'une personne ou d'une structure"
-                }
-              ],
-              commentObligatoire: true,
+              comment: [],
+              commentObligatoire: false,
               libellePourquoi: 'Mes candidatures',
               libelleQuoi: "Recherche d'offres d'emploi ou d'entreprises"
             }
