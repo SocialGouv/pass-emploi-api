@@ -62,7 +62,7 @@ export class GetCatalogueQueryHandler extends QueryHandler<
             libellePourquoi,
             codeQuoi: quoi.code,
             libelleQuoi: quoi.libelle,
-            commentObligatoire: true,
+            commentObligatoire: quoi.moyensRetourEmploi.length > 0,
             comment: quoi.moyensRetourEmploi.map(comment => {
               return {
                 code: comment.code,
