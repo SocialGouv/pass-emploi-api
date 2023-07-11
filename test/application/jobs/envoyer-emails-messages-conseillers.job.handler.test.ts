@@ -67,30 +67,6 @@ describe('EnvoyerEmailsMessagesConseillersJobHandler', () => {
       expect(result.succes).to.equal(true)
       expect(result.resultat).to.deep.equal({ succes: 2, mailsEnvoyes: 1 })
     })
-    it("envoie pas de mails aux conseillers qui n'ont pas d'email", async () => {
-      // Given
-      const conseillers = [unConseiller({ id: '1' }), unConseiller({ id: '2' })]
-      conseillers[0].email = undefined
-      conseillerRepository.findConseillersMessagesNonVerifies
-        .onFirstCall()
-        .resolves(conseillers)
-        .onSecondCall()
-        .resolves([])
-
-      chatRepository.getNombreDeConversationsNonLues
-        .withArgs(conseillers[0].id)
-        .resolves(1)
-        .withArgs(conseillers[1].id)
-        .resolves(0)
-
-      // When
-      const result = await envoyerEmailsMessagesConseillersJobHandler.handle()
-
-      // Then
-      expect(mailClient.envoyerMailConversationsNonLues).to.have.callCount(0)
-      expect(result.succes).to.equal(true)
-      expect(result.resultat).to.deep.equal({ succes: 2, mailsEnvoyes: 0 })
-    })
     it("envoie pas de mails aux conseillers si l'envoi de mail échoue", async () => {
       // Given
       const conseillers = [unConseiller({ id: '1' }), unConseiller({ id: '2' })]

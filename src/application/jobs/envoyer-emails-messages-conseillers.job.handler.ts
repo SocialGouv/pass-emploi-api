@@ -65,27 +65,22 @@ export class EnvoyerEmailsMessagesConseillersJobHandler extends JobHandler<Job> 
                 )
 
               if (nombreDeConversationsNonLues !== 0) {
-                if (!conseiller?.email) {
-                  this.logger.warn(
-                    `Impossible d'envoyer un mail au conseiller ${conseiller.id}, il n'existe pas`
+                try {
+                  await this.mailService.envoyerMailConversationsNonLues(
+                    conseiller,
+                    nombreDeConversationsNonLues
                   )
-                } else {
-                  try {
-                    await this.mailService.envoyerMailConversationsNonLues(
-                      conseiller,
-                      nombreDeConversationsNonLues
+                  stats.mailsEnvoyes++
+                } catch (e) {
+                  this.logger.error(
+                    buildError(
+                      "Erreur lors de l'envoi de l'email des conversations non lues",
+                      e
                     )
-                    stats.mailsEnvoyes++
-                  } catch (e) {
-                    this.logger.error(
-                      buildError(
-                        "Erreur lors de l'envoi de l'email des conversations non lues",
-                        e
-                      )
-                    )
-                  }
+                  )
                 }
               }
+
               await this.conseillerRepository.updateDateVerificationMessages(
                 conseiller.id,
                 maintenant.toJSDate()

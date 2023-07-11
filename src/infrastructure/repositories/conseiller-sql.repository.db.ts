@@ -43,6 +43,12 @@ export class ConseillerSqlRepository implements Conseiller.Repository {
       where: {
         dateVerificationMessages: {
           [Op.lt]: dateAMinuit
+        },
+        dateDerniereConnexion: {
+          [Op.gt]: dateVerification.minus({ months: 3 }).toJSDate()
+        },
+        email: {
+          [Op.ne]: null
         }
       },
       limit: nombreConseillers

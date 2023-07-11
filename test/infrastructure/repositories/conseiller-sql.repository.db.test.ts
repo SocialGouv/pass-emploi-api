@@ -1,12 +1,13 @@
 import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository.db'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 
-import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { expect } from '../../utils'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { Conseiller } from '../../../src/domain/conseiller/conseiller'
-import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { Core } from '../../../src/domain/core'
+import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
+import { unConseiller } from '../../fixtures/conseiller.fixture'
+import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
+import { expect } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
 
 describe('ConseillerSqlRepository', () => {
@@ -78,27 +79,40 @@ describe('ConseillerSqlRepository', () => {
     it("recupere les conseillers avec des messages non verifies aujourd'hui", async () => {
       // Given
       const dateMaintenant = uneDatetime()
-      const dateHier = uneDatetime().minus({ day: 1 })
-      const dateRechercheAujourdhui = uneDatetime().minus({ minute: 1 })
+      const dateHier = uneDatetime().minus({ day: 1 }).toJSDate()
+      const dateRechercheAujourdhui = uneDatetime()
+        .minus({ minute: 1 })
+        .toJSDate()
+      const ilYaUnMois = dateMaintenant.minus({ month: 1 }).toJSDate()
+      const ilYa4Mois = dateMaintenant.minus({ months: 4 }).toJSDate()
 
-      const conseillerAvecMessagesNonVerifies = unConseiller({
+      const conseillerAvecMessagesNonVerifies = unConseillerDto({
         id: '1',
-        dateVerificationMessages: dateHier
+        dateVerificationMessages: dateHier,
+        dateDerniereConnexion: ilYaUnMois
       })
-      const conseillerAvecMessagesVerifiesAujourdhui = unConseiller({
+      const conseillerAvecMessagesNonVerifiesMaisPasConnecte = unConseillerDto({
+        id: '11',
+        dateVerificationMessages: dateHier,
+        dateDerniereConnexion: ilYa4Mois
+      })
+      const conseillerAvecMessagesVerifiesAujourdhui = unConseillerDto({
         id: '2',
-        dateVerificationMessages: dateRechercheAujourdhui
+        dateVerificationMessages: dateRechercheAujourdhui,
+        dateDerniereConnexion: ilYaUnMois
       })
-      const conseillerAvecMessagesDejaVerifies = unConseiller({
+      const conseillerAvecMessagesDejaVerifies = unConseillerDto({
         id: '3',
-        dateVerificationMessages: dateMaintenant
+        dateVerificationMessages: dateMaintenant.toJSDate(),
+        dateDerniereConnexion: ilYaUnMois
       })
 
-      await conseillerSqlRepository.save(conseillerAvecMessagesNonVerifies)
-      await conseillerSqlRepository.save(
-        conseillerAvecMessagesVerifiesAujourdhui
-      )
-      await conseillerSqlRepository.save(conseillerAvecMessagesDejaVerifies)
+      await ConseillerSqlModel.bulkCreate([
+        conseillerAvecMessagesNonVerifies,
+        conseillerAvecMessagesNonVerifiesMaisPasConnecte,
+        conseillerAvecMessagesVerifiesAujourdhui,
+        conseillerAvecMessagesDejaVerifies
+      ])
 
       // When
       const conseillers =
@@ -114,6 +128,7 @@ describe('ConseillerSqlRepository', () => {
       )
     })
   })
+
   describe('updateDateVerificationMessages', () => {
     it('met a jour avec la date', async () => {
       // Given
