@@ -20,7 +20,7 @@ Les jobs ne tournaient plus sur les workers depuis le vendredi 20 mai suite à u
 - Lors du redémarrage des workers, tous les jobs en retard se sont lancés (envoi des notifications de rappel de rendez vous, mais en retard)
 
 ### Root Causes
-La commande ***HandleJobNotifierNouveauxServicesCiviqueCommandHandler*** contenait une condition de sortie d'une boucle while mal placée.
+La commande ***NotifierRecherchesServiceCiviqueJobHandler*** contenait une condition de sortie d'une boucle while mal placée.
 Lorsqu'une offre n'avait pas de localisation on restait en boucle dans ce while. Les 2 workers ont fini par être dans cette boucle infinie et ne pas pouvoir dépiler autre chose.
 
 ### Trigger
@@ -33,7 +33,7 @@ Afin de relancer les workers 2 actions ont été entreprises :
 
 ### Détection
 - Le dashboard des jobs et crons montrait que rien ne s'était passé depuis vendredi 20
-- Les logs des containers ne montraient qu'une seule opération concernant le ***HandleJobNotifierNouveauxServicesCiviqueCommandHandler***
+- Les logs des containers ne montraient qu'une seule opération concernant le ***NotifierRecherchesServiceCiviqueJobHandler***
 
 ### Actions
 | Action                                               | Type    | Owner           | Statut |

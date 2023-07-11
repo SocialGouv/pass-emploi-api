@@ -6,7 +6,6 @@ import {
 import { PlanificateurRedisRepository } from '../../src/infrastructure/repositories/planificateur-redis.repository.db'
 import { expect, stubClass } from '../utils'
 import { INestApplication } from '@nestjs/common'
-import { HandleJobFakeCommandHandler } from '../../src/application/commands/jobs/handle-job-fake.command'
 import { ConfigService } from '@nestjs/config'
 import {
   buildTestingModuleForEndToEndTesting,
@@ -15,6 +14,7 @@ import {
 import { FirebaseClient } from '../../src/infrastructure/clients/firebase-client'
 import { FakeFirebaseClient } from '../infrastructure/repositories/fakes/fake-firebase-client'
 import { DatabaseForTesting, getDatabase } from '../utils/database-for-testing'
+import { FakeJobHandler } from '../../src/application/jobs/fake.job.handler'
 
 describe('WorkerService', () => {
   let database: DatabaseForTesting
@@ -23,18 +23,18 @@ describe('WorkerService', () => {
     database = getDatabase()
   })
   let app: INestApplication
-  let handleJobFakeCommandHandler: HandleJobFakeCommandHandler
+  let fakeJobHandler: FakeJobHandler
   let planificateurRepository: PlanificateurRedisRepository
   let workerService: WorkerService
   beforeEach(async () => {
     await database.cleanRedis()
-    handleJobFakeCommandHandler = stubClass(HandleJobFakeCommandHandler)
+    fakeJobHandler = stubClass(FakeJobHandler)
 
     const testingModule = await buildTestingModuleForEndToEndTesting()
       .overrideProvider(ConfigService)
       .useValue(testConfig())
-      .overrideProvider(HandleJobFakeCommandHandler)
-      .useValue(handleJobFakeCommandHandler)
+      .overrideProvider(FakeJobHandler)
+      .useValue(fakeJobHandler)
       .overrideProvider(FirebaseClient)
       .useClass(FakeFirebaseClient)
       .compile()
@@ -68,7 +68,7 @@ describe('WorkerService', () => {
     it('exécute la commande idoine', done => {
       // Then
       setTimeout(() => {
-        expect(handleJobFakeCommandHandler.execute).to.have.been.calledWith()
+        expect(fakeJobHandler.execute).to.have.been.calledWith()
         done()
       }, 1500)
     })

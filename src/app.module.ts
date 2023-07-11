@@ -14,7 +14,7 @@ import { RechercheAuthorizer } from './application/authorizers/recherche-authori
 import { RendezVousAuthorizer } from './application/authorizers/rendezvous-authorizer'
 import { SupportAuthorizer } from './application/authorizers/support-authorizer'
 import { AddFavoriOffreEmploiCommandHandler } from './application/commands/add-favori-offre-emploi.command.handler'
-import { AddFavoriOffreServiceCiviqueCommandHandler } from './application/commands/add-favori-offre-service-civique-command-handler'
+import { AddFavoriOffreServiceCiviqueCommandHandler } from './application/commands/add-favori-offre-service-civique.command.handler'
 import { AddFavoriOffreImmersionCommandHandler } from './application/commands/add-favori-offre-immersion.command.handler'
 import { CreateActionCommandHandler } from './application/commands/action/create-action.command.handler'
 import { CreateEvenementCommandHandler } from './application/commands/create-evenement.command.handler'
@@ -33,10 +33,6 @@ import { DeleteRechercheCommandHandler } from './application/commands/delete-rec
 import { DeleteRendezVousCommandHandler } from './application/commands/delete-rendez-vous.command.handler'
 import { DeleteSuperviseursCommandHandler } from './application/commands/delete-superviseurs.command.handler'
 import { EnvoyerMessageGroupeCommandHandler } from './application/commands/envoyer-message-groupe.command.handler'
-import { HandleJobMailConseillerCommandHandler } from './application/commands/jobs/handle-job-mail-conseiller.command'
-import { HandleNettoyerLesJobsCommandHandler } from './application/cron-jobs/handle-job-nettoyer-les-jobs.command'
-import { HandleJobRappelRendezVousCommandHandler } from './application/commands/jobs/handle-job-rappel-rendez-vous.command'
-import { HandleJobUpdateMailingListConseillerCommandHandler } from './application/commands/jobs/handle-job-update-mailing-list-conseiller.command'
 import { NotifierNouvellesImmersionsCommandHandler } from './application/commands/notifier-nouvelles-immersions.command.handler'
 import { SendNotificationsNouveauxMessagesCommandHandler } from './application/commands/send-notifications-nouveaux-messages.command.handler'
 import { PlanifierExecutionCronCommandHandler } from './application/tasks/planifier-execution-cron.command.handler'
@@ -193,10 +189,8 @@ import { AgenceRepositoryToken } from './domain/agence'
 import { AgenceSqlRepository } from './infrastructure/repositories/agence-sql.repository.db'
 import { GetAgencesQueryHandler } from './application/queries/get-agences.query.handler.db'
 import { ModifierConseillerCommandHandler } from './application/commands/modifier-conseiller.command.handler'
-import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './application/commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
-import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from './application/commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from './application/queries/get-favoris-service-civique-jeune.query.handler.db'
-import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from './application/jobs/handle-job-recuperer-situations-jeunes-milo.command'
+import { RecupererSituationsJeunesMiloJobHandler } from './application/jobs/recuperer-situations-jeunes-milo.job.handler'
 import { CampagnesController } from './infrastructure/routes/campagnes.controller'
 import { Campagne, CampagneRepositoryToken } from './domain/campagne'
 import { CampagneSqlRepository } from './infrastructure/repositories/campagne-sql.repository.db'
@@ -218,7 +212,6 @@ import { FindAllOffresEmploiQueryGetter } from './application/queries/query-gett
 import { FindAllOffresImmersionQueryGetter } from './application/queries/query-getters/find-all-offres-immersion.query.getter'
 import { FindAllOffresServicesCiviqueQueryGetter } from './application/queries/query-getters/find-all-offres-services-civique.query.getter'
 import { RecupererJeunesDuConseillerCommandHandler } from './application/commands/recuperer-jeunes-du-conseiller.command.handler'
-import { HandleJobNettoyerPiecesJointesCommandHandler } from './application/commands/jobs/handle-job-nettoyer-pieces-jointes.command'
 import { ArchiverJeuneCommandHandler } from './application/commands/archiver-jeune.command.handler'
 import { ArchiveJeuneRepositoryToken } from './domain/archive-jeune'
 import { ArchiveJeuneSqlRepository } from './infrastructure/repositories/archive-jeune-sql.repository.db'
@@ -229,12 +222,10 @@ import { GetPreferencesJeuneQueryHandler } from './application/queries/get-prefe
 import { GetRendezVousConseillerPaginesQueryHandler } from './application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
 import { GetFavorisJeuneQueryHandler } from './application/queries/favoris/get-favoris-jeune.query.handler.db'
 import { GetMetadonneesFavorisJeuneQueryHandler } from './application/queries/favoris/get-metadonnees-favoris-jeune.query.handler.db'
-import { HandleJobRappelActionCommandHandler } from './application/commands/jobs/handle-job-rappel-action.command'
 import { AddCommentaireActionCommandHandler } from './application/commands/action/add-commentaire-action.command.handler'
 import { ModifierJeuneDuConseillerCommandHandler } from './application/commands/modifier-jeune-du-conseiller.command.handler'
 import { CommentaireActionSqlRepositoryDb } from './infrastructure/repositories/action/commentaire-action-sql.repository.db'
 import { GetCommentairesActionQueryHandler } from './application/queries/action/get-commentaires-action.query.handler.db'
-import { HandleJobNotifierRendezVousPECommandHandler } from './application/commands/jobs/handle-job-notifier-rendez-vous-pe.command'
 import { GetJeuneHomeAgendaQueryHandler } from './application/queries/get-jeune-home-agenda.query.db'
 import { JeunePoleEmploiSqlRepository } from './infrastructure/repositories/jeune/jeune-pole-emploi-sql.repository.db'
 import { GetTypesQualificationsQueryHandler } from './application/queries/action/get-types-qualifications.query.handler'
@@ -244,9 +235,8 @@ import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from './application/queries/
 import { GetDemarchesQueryGetter } from './application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRecherchesSauvegardeesQueryGetter } from './application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from './application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
-import { HandleJobMettreAJourCodesEvenementsCommandHandler } from './application/commands/jobs/handle-job-mettre-a-jour-codes-evenements.command'
 import { GetIndicateursPourConseillerQueryHandler } from './application/queries/get-indicateurs-pour-conseiller.query.handler.db'
-import { HandleJobNettoyerLesDonneesCommandHandler } from './application/cron-jobs/handle-job-nettoyer-les-donnees.command.db'
+import { NettoyerLesDonneesJobHandler } from './application/jobs/nettoyer-les-donnees.job.handler.db'
 import { RafraichirSuggestionsCommandHandler } from './application/commands/rafraichir-suggestions.command.handler'
 import { SuggestionPeHttpRepository } from './infrastructure/repositories/offre/recherche/suggestion/suggestion-pe-http.repository.db'
 import {
@@ -284,23 +274,18 @@ import { ListesDeDiffusionController } from './infrastructure/routes/listes-de-d
 import { ListeDeDiffusionAuthorizer } from './application/authorizers/liste-de-diffusion-authorizer'
 import { UpdateListeDeDiffusionCommandHandler } from './application/commands/update-liste-de-diffusion.command.handler'
 import { GetDetailListeDeDiffusionQueryHandler } from './application/queries/get-detail-liste-de-diffusion.query.handler.db'
-import { HandleJobAgenceAnimationCollectiveCommandHandler } from './application/commands/jobs/handle-job-agence-animation-collective.command.db'
-import { MonitorJobsCommandHandler } from './application/cron-jobs/monitor-jobs.command.db'
-import { HandleJobMettreAJourLesSegmentsCommandHandler } from './application/commands/jobs/handle-job-mettre-a-jour-les-segments.command.db'
+import { MajAgenceAnimationCollectiveJobHandler } from './application/jobs/maj-agence-animation-collective.job.handler.db'
 import { BigqueryClient } from './infrastructure/clients/bigquery.client'
 import { MessagesController } from './infrastructure/routes/messages.controller'
-import { HandleJobGenererJDDCommandHandler } from './application/commands/jobs/handle-job-generer-jdd.handler'
 import { SupportController } from './infrastructure/routes/support.controller'
 import { RefreshJddCommandHandler } from './application/commands/refresh-jdd.command.handler'
-import { SuivreEvenementsMiloCronJobHandler } from './application/cron-jobs/suivre-file-evenements-milo.handler'
 import { MiloRendezVousHttpRepository } from './infrastructure/repositories/rendez-vous/rendez-vous-milo-http.repository'
-import { TraiterEvenementMiloJobHandler } from './application/jobs/traiter-evenement-milo.handler'
+import { TraiterEvenementMiloJobHandler } from './application/jobs/traiter-evenement-milo.job.handler'
 import {
   MiloRendezVousRepositoryToken,
   RendezVousMilo
 } from './domain/rendez-vous/rendez-vous.milo'
 import { MiloJeuneRepositoryToken } from './domain/milo/jeune.milo'
-import { HandleJobFakeCommandHandler } from './application/commands/jobs/handle-job-fake.command'
 import { MettreAJourLesJeunesCejPeCommandHandler } from './application/commands/mettre-a-jour-les-jeunes-cej-pe.command.handler'
 import { UpdateAgenceConseillerCommandHandler } from './application/commands/support/update-agence-conseiller.command.handler'
 import { GetActionsConseillerV2QueryHandler } from './application/queries/action/get-actions-conseiller-v2.query.handler.db'
@@ -338,6 +323,21 @@ import {
 } from './domain/milo/session.milo'
 import { SessionMiloSqlRepository } from './infrastructure/repositories/milo/session.milo.repository.db'
 import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
+import { SuivreEvenementsMiloCronJobHandler } from './application/jobs/suivre-file-evenements-milo.job.handler'
+import { MonitorJobsJobHandler } from './application/jobs/monitor-jobs.job.handler.db'
+import { NettoyerPiecesJointesJobHandler } from './application/jobs/nettoyer-pieces-jointes.job.handler'
+import { NettoyerLesJobsJobHandler } from './application/jobs/nettoyer-les-jobs.job.handler'
+import { FakeJobHandler } from './application/jobs/fake.job.handler'
+import { NotifierRappelRendezVousJobHandler } from './application/jobs/notifier-rappel-rendez-vous.job.handler'
+import { NotifierRappelActionJobHandler } from './application/jobs/notifier-rappel-action.job.handler'
+import { EnvoyerEmailsMessagesConseillersJobHandler } from './application/jobs/envoyer-emails-messages-conseillers.job.handler'
+import { NotifierRecherchesOffreEmploiJobHandler } from './application/jobs/notifier-recherches-offre-emploi.job.handler'
+import { MajCodesEvenementsJobHandler } from './application/jobs/maj-codes-evenements.job.handler'
+import { NotifierRendezVousPEJobHandler } from './application/jobs/notifier-rendez-vous-pole-emploi.job.handler'
+import { MajMailingListConseillerJobHandler } from './application/jobs/maj-mailing-list-conseiller.job.handler'
+import { NotifierRecherchesServiceCiviqueJobHandler } from './application/jobs/notifier-recherches-service-civique.job.handler'
+import { HandleJobGenererJDDCommandHandler } from './application/jobs/generer-jdd.job.handler'
+import { MajSegmentsJobHandler } from './application/jobs/maj-segments.job.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -752,22 +752,22 @@ export function buildJobHandlerProviders(): Provider[] {
 }
 
 export const JobHandlerProviders = [
-  HandleNettoyerLesJobsCommandHandler,
-  HandleJobFakeCommandHandler,
-  HandleJobRappelRendezVousCommandHandler,
-  HandleJobRappelActionCommandHandler,
-  HandleJobMailConseillerCommandHandler,
-  HandleJobNotifierNouvellesOffresEmploiCommandHandler,
-  HandleJobRecupererSituationsJeunesMiloCommandHandler,
-  HandleJobAgenceAnimationCollectiveCommandHandler,
-  HandleJobMettreAJourCodesEvenementsCommandHandler,
-  HandleJobNotifierRendezVousPECommandHandler,
-  HandleJobNettoyerPiecesJointesCommandHandler,
-  HandleJobUpdateMailingListConseillerCommandHandler,
-  HandleJobNotifierNouveauxServicesCiviqueCommandHandler,
-  HandleJobNettoyerLesDonneesCommandHandler,
-  HandleJobMettreAJourLesSegmentsCommandHandler,
-  MonitorJobsCommandHandler,
+  NettoyerLesJobsJobHandler,
+  FakeJobHandler,
+  NotifierRappelRendezVousJobHandler,
+  NotifierRappelActionJobHandler,
+  EnvoyerEmailsMessagesConseillersJobHandler,
+  NotifierRecherchesOffreEmploiJobHandler,
+  RecupererSituationsJeunesMiloJobHandler,
+  MajAgenceAnimationCollectiveJobHandler,
+  MajCodesEvenementsJobHandler,
+  NotifierRendezVousPEJobHandler,
+  NettoyerPiecesJointesJobHandler,
+  MajMailingListConseillerJobHandler,
+  NotifierRecherchesServiceCiviqueJobHandler,
+  NettoyerLesDonneesJobHandler,
+  MajSegmentsJobHandler,
+  MonitorJobsJobHandler,
   HandleJobGenererJDDCommandHandler,
   SuivreEvenementsMiloCronJobHandler,
   TraiterEvenementMiloJobHandler,
