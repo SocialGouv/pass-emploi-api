@@ -14,25 +14,22 @@ import { JWTPayload } from 'jose'
 import {
   buildModuleMetadata,
   buildQueryCommandsProviders
-} from '../../src/app.module'
-import { Authentification } from '../../src/domain/authentification'
-import {
-  IJwtService,
-  JwtService
-} from '../../src/infrastructure/auth/jwt.service'
-import { OidcAuthGuard } from '../../src/infrastructure/auth/oidc.auth-guard'
+} from 'src/app.module'
+import { Authentification } from 'src/domain/authentification'
+import { IJwtService, JwtService } from 'src/infrastructure/auth/jwt.service'
+import { OidcAuthGuard } from 'src/infrastructure/auth/oidc.auth-guard'
 import {
   FirebaseClient,
   IFirebaseClient
-} from '../../src/infrastructure/clients/firebase-client'
-import { DateService } from '../../src/utils/date-service'
+} from 'src/infrastructure/clients/firebase-client'
+import { DateService } from 'src/utils/date-service'
 import { unJwtPayloadValide } from '../fixtures/authentification.fixture'
 import { FakeController } from '../infrastructure/auth/fake.controller'
 import { stubClass, stubClassSandbox } from './types'
-import TokenMessage = messaging.TokenMessage
 import { uneDatetime } from '../fixtures/date.fixture'
 import { createSandbox, SinonSandbox } from 'sinon'
 import { parse } from 'pg-connection-string'
+import TokenMessage = messaging.TokenMessage
 
 export function buildTestingModuleForHttpTesting(
   sandbox: SinonSandbox = createSandbox()
@@ -112,7 +109,7 @@ export const testConfig = (): ConfigService => {
       apiKeyInstanceSessionAnnulationJeune:
         'apiKeyInstanceSessionAnnulationJeune',
       apiKeySessionDetailConseiller: 'apiKeySessionDetailConseiller',
-      apiKeySessionsListeJeune: 'apiKeySessionsListeJeune',
+      apiKeySessionsDetailEtListeJeune: 'apiKeySessionsDetailEtListeJeune',
       apiKeySessionsListeConseiller: 'apiKeySessionsListeConseiller',
       apiKeyUtilisateurs: 'apiKeyUtilisateurs'
     },

@@ -19,11 +19,16 @@ import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-a
 import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/accueil/get-accueil-jeune-milo.query.handler.db'
 import { AccueilJeuneMiloQueryModel } from 'src/application/queries/query-models/jeunes.milo.query-model'
 import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
-import { uneSessionJeuneMiloQueryModel } from 'test/fixtures/sessions.fixture'
+import {
+  unDetailSessionJeuneMiloQueryModel,
+  uneSessionJeuneMiloQueryModel
+} from 'test/fixtures/sessions.fixture'
+import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
 
 describe('JeunesMiloController', () => {
-  let getAccueilJeuneMiloQueryHandler: StubbedClass<GetAccueilJeuneMiloQueryHandler>
-  let getSessionsJeuneMiloQueryHandler: StubbedClass<GetSessionsJeuneMiloQueryHandler>
+  let getAccueilQueryHandler: StubbedClass<GetAccueilJeuneMiloQueryHandler>
+  let getSessionsQueryHandler: StubbedClass<GetSessionsJeuneMiloQueryHandler>
+  let getDetailSessionQueryHandler: StubbedClass<GetDetailSessionJeuneMiloQueryHandler>
   let jwtService: StubbedClass<JwtService>
   let dateService: StubbedClass<DateService>
   let app: INestApplication
@@ -32,8 +37,11 @@ describe('JeunesMiloController', () => {
 
   before(async () => {
     app = await getApplicationWithStubbedDependencies()
-    getAccueilJeuneMiloQueryHandler = app.get(GetAccueilJeuneMiloQueryHandler)
-    getSessionsJeuneMiloQueryHandler = app.get(GetSessionsJeuneMiloQueryHandler)
+    getAccueilQueryHandler = app.get(GetAccueilJeuneMiloQueryHandler)
+    getSessionsQueryHandler = app.get(GetSessionsJeuneMiloQueryHandler)
+    getDetailSessionQueryHandler = app.get(
+      GetDetailSessionJeuneMiloQueryHandler
+    )
     jwtService = app.get(JwtService)
     dateService = app.get(DateService)
     dateService.now.returns(now)
@@ -59,7 +67,7 @@ describe('JeunesMiloController', () => {
     }
 
     it("renvoie l'accueil d'un jeune MILO sans personnalisation", async () => {
-      getAccueilJeuneMiloQueryHandler.execute
+      getAccueilQueryHandler.execute
         .withArgs(
           {
             idJeune,
@@ -81,7 +89,7 @@ describe('JeunesMiloController', () => {
     })
 
     it('renvoie une erreur quand le jeune est un jeune PE', async () => {
-      getAccueilJeuneMiloQueryHandler.execute
+      getAccueilQueryHandler.execute
         .withArgs(
           {
             idJeune,
@@ -103,7 +111,7 @@ describe('JeunesMiloController', () => {
     const token = 'token'
 
     it('renvoie la liste des sessions accessibles au jeune', async () => {
-      getSessionsJeuneMiloQueryHandler.execute
+      getSessionsQueryHandler.execute
         .withArgs({ idJeune, token }, unUtilisateurDecode())
         .resolves(success([uneSessionJeuneMiloQueryModel]))
 
@@ -115,7 +123,7 @@ describe('JeunesMiloController', () => {
     })
 
     it('renvoie une erreur quand le jeune est un jeune PE', async () => {
-      getSessionsJeuneMiloQueryHandler.execute
+      getSessionsQueryHandler.execute
         .withArgs({ idJeune, token }, unUtilisateurDecode())
         .resolves(failure(new DroitsInsuffisants()))
 
@@ -127,6 +135,39 @@ describe('JeunesMiloController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       `/jeunes/milo/${idJeune}/sessions`
+    )
+  })
+
+  describe('GET /jeunes/milo/:idJeune/sessions/:idSession', () => {
+    const idJeune = '1'
+    const idSession = 'A'
+    const token = 'token'
+
+    it('renvoie le détail de la session', async () => {
+      getDetailSessionQueryHandler.execute
+        .withArgs({ idSession, idJeune, token }, unUtilisateurDecode())
+        .resolves(success(unDetailSessionJeuneMiloQueryModel))
+
+      await request(app.getHttpServer())
+        .get(`/jeunes/milo/${idJeune}/sessions/${idSession}`)
+        .set('authorization', `bearer ${token}`)
+        .expect(HttpStatus.OK)
+        .expect(unDetailSessionJeuneMiloQueryModel)
+    })
+
+    it('renvoie une erreur quand le jeune est un jeune PE', async () => {
+      getDetailSessionQueryHandler.execute
+        .withArgs({ idSession, idJeune, token }, unUtilisateurDecode())
+        .resolves(failure(new DroitsInsuffisants()))
+
+      await request(app.getHttpServer())
+        .get(`/jeunes/milo/${idJeune}/sessions/${idSession}`)
+        .set('authorization', `bearer ${token}`)
+        .expect(HttpStatus.FORBIDDEN)
+    })
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      `/jeunes/milo/${idJeune}/sessions/${idSession}`
     )
   })
 })

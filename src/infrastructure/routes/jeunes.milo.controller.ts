@@ -9,16 +9,21 @@ import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'
 
 import { MaintenantQueryParams } from './validation/jeunes.inputs'
-import { SessionJeuneMiloQueryModel } from 'src/application/queries/query-models/sessions.milo.query.model'
+import {
+  DetailSessionJeuneMiloQueryModel,
+  SessionJeuneMiloQueryModel
+} from 'src/application/queries/query-models/sessions.milo.query.model'
 import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
+import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
 
 @Controller('jeunes')
 @ApiOAuth2([])
 @ApiTags('Jeunes')
 export class JeunesMiloController {
   constructor(
-    private readonly getAccueilJeuneMiloQueryHandler: GetAccueilJeuneMiloQueryHandler,
-    private readonly getSessionsJeuneMiloQueryHandler: GetSessionsJeuneMiloQueryHandler
+    private readonly getAccueilQueryHandler: GetAccueilJeuneMiloQueryHandler,
+    private readonly getSessionsQueryHandler: GetSessionsJeuneMiloQueryHandler,
+    private readonly getDetailSessionQueryHandler: GetDetailSessionJeuneMiloQueryHandler
   ) {}
 
   @Get(':idJeune/milo/accueil')
@@ -34,7 +39,7 @@ export class JeunesMiloController {
     @Query() queryParams: MaintenantQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<AccueilJeuneMiloQueryModel> {
-    const result = await this.getAccueilJeuneMiloQueryHandler.execute(
+    const result = await this.getAccueilQueryHandler.execute(
       { idJeune, maintenant: queryParams.maintenant },
       utilisateur
     )
@@ -60,8 +65,33 @@ export class JeunesMiloController {
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @AccessToken() accessToken: string
   ): Promise<SessionJeuneMiloQueryModel[]> {
-    const result = await this.getSessionsJeuneMiloQueryHandler.execute(
+    const result = await this.getSessionsQueryHandler.execute(
       { idJeune, token: accessToken },
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
+  }
+
+  @ApiOperation({
+    summary: 'Récupère le détail d’une session',
+    description: 'Autorisé pour le jeune Milo'
+  })
+  @Get('/milo/:idJeune/sessions/:idSession')
+  @ApiResponse({
+    type: DetailSessionJeuneMiloQueryModel
+  })
+  async getDetailSession(
+    @Param('idJeune') idJeune: string,
+    @Param('idSession') idSession: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string
+  ): Promise<DetailSessionJeuneMiloQueryModel> {
+    const result = await this.getDetailSessionQueryHandler.execute(
+      { idSession, idJeune, token: accessToken },
       utilisateur
     )
 

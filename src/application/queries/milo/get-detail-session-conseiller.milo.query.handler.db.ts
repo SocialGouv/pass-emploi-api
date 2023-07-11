@@ -9,19 +9,19 @@ import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
-import { mapDetailSessionDtoToQueryModel } from '../query-mappers/milo.mappers'
+import { mapDetailSessionConseillerDtoToQueryModel } from '../query-mappers/milo.mappers'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { DetailSessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
 
-export interface GetDetailSessionMiloQuery extends Query {
+export interface GetDetailSessionConseillerMiloQuery extends Query {
   idSession: string
   idConseiller: string
   token: string
 }
 
 @Injectable()
-export class GetDetailSessionMiloQueryHandler extends QueryHandler<
-  GetDetailSessionMiloQuery,
+export class GetDetailSessionConseillerMiloQueryHandler extends QueryHandler<
+  GetDetailSessionConseillerMiloQuery,
   Result<DetailSessionConseillerMiloQueryModel>
 > {
   constructor(
@@ -35,7 +35,7 @@ export class GetDetailSessionMiloQueryHandler extends QueryHandler<
   }
 
   async handle(
-    query: GetDetailSessionMiloQuery
+    query: GetDetailSessionConseillerMiloQuery
   ): Promise<Result<DetailSessionConseillerMiloQueryModel>> {
     const resultConseiller = await this.conseillerRepository.get(
       query.idConseiller
@@ -63,7 +63,7 @@ export class GetDetailSessionMiloQueryHandler extends QueryHandler<
     const estVisible = sessionSqlModel?.estVisible ?? false
 
     return success(
-      mapDetailSessionDtoToQueryModel(
+      mapDetailSessionConseillerDtoToQueryModel(
         result.data,
         estVisible,
         timezoneStructure
@@ -72,7 +72,7 @@ export class GetDetailSessionMiloQueryHandler extends QueryHandler<
   }
 
   async authorize(
-    query: GetDetailSessionMiloQuery,
+    query: GetDetailSessionConseillerMiloQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     return this.conseillerAuthorizer.autoriserLeConseiller(

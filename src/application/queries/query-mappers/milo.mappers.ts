@@ -5,6 +5,7 @@ import {
 } from 'src/infrastructure/clients/dto/milo.dto'
 import {
   DetailSessionConseillerMiloQueryModel,
+  DetailSessionJeuneMiloQueryModel,
   SessionConseillerMiloQueryModel,
   SessionJeuneMiloQueryModel,
   SessionTypeQueryModel
@@ -76,7 +77,7 @@ export function mapSessionConseillerDtoToQueryModel(
   }
 }
 
-export function mapDetailSessionDtoToQueryModel(
+export function mapDetailSessionConseillerDtoToQueryModel(
   sessionDto: SessionConseillerDetailDto,
   estVisible: boolean,
   timezone: string
@@ -114,5 +115,39 @@ export function mapDetailSessionDtoToQueryModel(
       description: sessionDto.offre.description ?? undefined,
       nomPartenaire: sessionDto.offre.nomPartenaire ?? undefined
     }
+  }
+}
+
+export function mapDetailSessionJeuneDtoToQueryModel(
+  sessionDto: SessionJeuneDetailDto,
+  timezone: string
+): DetailSessionJeuneMiloQueryModel {
+  return {
+    id: sessionDto.session.id.toString(),
+    nomSession: sessionDto.session.nom,
+    nomOffre: sessionDto.offre.nom,
+    theme: sessionDto.offre.theme,
+    type: buildSessionTypeQueryModel(sessionDto.offre.type),
+    dateHeureDebut: DateTime.fromFormat(
+      sessionDto.session.dateHeureDebut,
+      'yyyy-MM-dd HH:mm:ss',
+      { zone: timezone }
+    )
+      .toUTC()
+      .toISO(),
+    dateHeureFin: DateTime.fromFormat(
+      sessionDto.session.dateHeureFin,
+      'yyyy-MM-dd HH:mm:ss',
+      { zone: timezone }
+    )
+      .toUTC()
+      .toISO(),
+    lieu: sessionDto.session.lieu,
+    animateur: sessionDto.session.animateur,
+    nomPartenaire: sessionDto.offre.nomPartenaire ?? undefined,
+    description: sessionDto.offre.description ?? undefined,
+    commentaire: sessionDto.session.commentaire ?? undefined,
+    dateMaxInscription: sessionDto.session.dateMaxInscription ?? undefined,
+    nbPlacesDisponibles: sessionDto.session.nbPlacesDisponibles ?? undefined
   }
 }
