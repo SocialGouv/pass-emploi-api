@@ -53,7 +53,8 @@ export const unDetailSessionConseillerMiloQueryModel: DetailSessionConseillerMil
       type: { code: OffreTypeCode.WORKSHOP, label: 'Atelier i-milo' },
       description: 'Une-Desc',
       nomPartenaire: 'Un-partenaire'
-    }
+    },
+    inscriptions: []
   }
 
 export const unDetailSessionJeuneMiloQueryModel: DetailSessionJeuneMiloQueryModel =

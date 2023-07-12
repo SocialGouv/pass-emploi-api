@@ -9,17 +9,27 @@ import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
-import { unDetailSessionConseillerDto } from 'test/fixtures/milo-dto.fixture'
+import {
+  unDetailSessionConseillerDto,
+  uneInscriptionSessionMiloDto
+} from 'test/fixtures/milo-dto.fixture'
 import { expect, StubbedClass, stubClass } from 'test/utils'
-import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-conseiller.milo.query.handler.db'
+import {
+  GetDetailSessionConseillerMiloQuery,
+  GetDetailSessionConseillerMiloQueryHandler
+} from 'src/application/queries/milo/get-detail-session-conseiller.milo.query.handler.db'
 import { unDetailSessionConseillerMiloQueryModel } from 'test/fixtures/sessions.fixture'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { DateTime } from 'luxon'
 import { getDatabase } from 'test/utils/database-for-testing'
+import { SessionMilo } from '../../../../src/domain/milo/session.milo'
+import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 
 describe('GetDetailSessionConseillerMiloQueryHandler', () => {
-  const idStructureMilo = 'id-structure-1'
   let getDetailSessionMiloQueryHandler: GetDetailSessionConseillerMiloQueryHandler
   let miloClient: StubbedClass<MiloClient>
   let keycloakClient: StubbedClass<KeycloakClient>
@@ -97,26 +107,52 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
     })
 
     describe("récupère le detail d'une session", async () => {
-      const query = {
-        idSession: unDetailSessionConseillerDto.session.id.toString(),
-        idConseiller: 'idConseiller-1',
-        token: 'bearer un-token'
-      }
-      const idpToken = 'idpToken'
-      const conseiller = unConseillerMilo()
-      keycloakClient.exchangeTokenConseillerMilo
-        .withArgs(query.token)
-        .resolves(idpToken)
-      conseillerRepository.get
-        .withArgs(query.idConseiller)
-        .resolves(success(conseiller))
-      miloClient.getDetailSessionConseiller
-        .withArgs(idpToken, query.idSession)
-        .resolves(success(unDetailSessionConseillerDto))
-      await StructureMiloSqlModel.create({
-        id: conseiller.structure.id,
-        nomOfficiel: 'Structure Milo',
-        timezone: 'America/Cayenne'
+      let conseiller: ConseillerMilo
+      let query: GetDetailSessionConseillerMiloQuery
+      beforeEach(async () => {
+        query = {
+          idSession: unDetailSessionConseillerDto.session.id.toString(),
+          idConseiller: 'idConseiller-1',
+          token: 'bearer un-token'
+        }
+        const idpToken = 'idpToken'
+        conseiller = unConseillerMilo()
+        keycloakClient.exchangeTokenConseillerMilo
+          .withArgs(query.token)
+          .resolves(idpToken)
+        conseillerRepository.get
+          .withArgs(query.idConseiller)
+          .resolves(success(conseiller))
+        miloClient.getDetailSessionConseiller
+          .withArgs(idpToken, query.idSession)
+          .resolves(success(unDetailSessionConseillerDto))
+        miloClient.getListeInscritsSessionConseillers
+          .withArgs(idpToken, query.idSession)
+          .resolves(
+            success([
+              uneInscriptionSessionMiloDto({
+                idDossier: 12345,
+                statut: 'ONGOING'
+              }),
+              uneInscriptionSessionMiloDto({
+                idDossier: 12345,
+                statut: 'REFUSAL'
+              }),
+              uneInscriptionSessionMiloDto({
+                idDossier: 12345,
+                statut: 'REFUSAL_YOUNG'
+              }),
+              uneInscriptionSessionMiloDto({ idDossier: 67890 })
+            ])
+          )
+        await StructureMiloSqlModel.create({
+          ...conseiller.structure,
+          nomOfficiel: 'Structure Milo'
+        })
+        await ConseillerSqlModel.create(unConseillerDto())
+        await JeuneSqlModel.create(
+          unJeuneDto({ id: 'id-jeune', idPartenaire: '12345' })
+        )
       })
 
       it('quand elle n’existe pas en base, avec une visibilité à false', async () => {
@@ -125,7 +161,29 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
 
         // Then
         expect(result).to.deep.equal(
-          success(unDetailSessionConseillerMiloQueryModel)
+          success({
+            ...unDetailSessionConseillerMiloQueryModel,
+            inscriptions: [
+              {
+                idJeune: 'id-jeune',
+                nom: 'Granger',
+                prenom: 'Hermione',
+                statut: SessionMilo.Inscription.Statut.INSCRIT
+              },
+              {
+                idJeune: 'id-jeune',
+                nom: 'Granger',
+                prenom: 'Hermione',
+                statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+              },
+              {
+                idJeune: 'id-jeune',
+                nom: 'Granger',
+                prenom: 'Hermione',
+                statut: SessionMilo.Inscription.Statut.REFUS_JEUNE
+              }
+            ]
+          })
         )
       })
 
@@ -134,7 +192,7 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
           await SessionMiloSqlModel.create({
             id: unDetailSessionConseillerDto.session.id.toString(),
             estVisible: true,
-            idStructureMilo: idStructureMilo,
+            idStructureMilo: conseiller.structure.id,
             dateModification: DateTime.now().toJSDate()
           })
         })
@@ -154,7 +212,27 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
               session: {
                 ...unDetailSessionConseillerMiloQueryModel.session,
                 estVisible: true
-              }
+              },
+              inscriptions: [
+                {
+                  idJeune: 'id-jeune',
+                  nom: 'Granger',
+                  prenom: 'Hermione',
+                  statut: SessionMilo.Inscription.Statut.INSCRIT
+                },
+                {
+                  idJeune: 'id-jeune',
+                  nom: 'Granger',
+                  prenom: 'Hermione',
+                  statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+                },
+                {
+                  idJeune: 'id-jeune',
+                  nom: 'Granger',
+                  prenom: 'Hermione',
+                  statut: SessionMilo.Inscription.Statut.REFUS_JEUNE
+                }
+              ]
             })
           )
         })

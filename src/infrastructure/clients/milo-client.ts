@@ -114,7 +114,7 @@ export class MiloClient {
   ): Promise<Result<InscritSessionMiloDto[]>> {
     return this.get<InscritSessionMiloDto[]>(
       `sessions/${idSession}/inscrits`,
-      this.apiKeySessionDetailConseiller, // todo voir si on doit renommer la variable / meme que pour getDetailSession
+      this.apiKeySessionDetailConseiller,
       idpToken
     )
   }
