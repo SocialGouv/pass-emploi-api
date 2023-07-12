@@ -105,12 +105,29 @@ class OffreSessionQueryModel {
   nomPartenaire?: string
 }
 
+export class InscritSessionMiloQueryModel {
+  @ApiProperty()
+  idJeune: string
+
+  @ApiProperty()
+  nom: string
+
+  @ApiProperty()
+  prenom: string
+
+  @ApiProperty()
+  statut: string
+}
+
 export class DetailSessionConseillerMiloQueryModel {
   @ApiProperty()
   session: DetailSessionConseillerQueryModel
 
   @ApiProperty()
   offre: OffreSessionQueryModel
+
+  @ApiProperty()
+  inscriptions: InscritSessionMiloQueryModel[]
 }
 
 export class DetailSessionJeuneMiloQueryModel {

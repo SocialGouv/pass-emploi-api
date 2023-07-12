@@ -10,6 +10,7 @@ import {
   success
 } from 'src/building-blocks/types/result'
 import {
+  InscritSessionMiloDto,
   SessionConseillerDetailDto,
   SessionConseillerMiloListeDto,
   SessionJeuneDetailDto,
@@ -103,6 +104,17 @@ export class MiloClient {
     return this.get<SessionJeuneDetailDto>(
       `sessions/${idSession}`,
       this.apiKeySessionsDetailEtListeJeune,
+      idpToken
+    )
+  }
+
+  async getListeInscritsSessionConseillers(
+    idpToken: string,
+    idSession: string
+  ): Promise<Result<InscritSessionMiloDto[]>> {
+    return this.get<InscritSessionMiloDto[]>(
+      `sessions/${idSession}/inscrits`,
+      this.apiKeySessionDetailConseiller, // todo voir si on doit renommer la variable / meme que pour getDetailSession
       idpToken
     )
   }

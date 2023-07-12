@@ -12,6 +12,8 @@ import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { mapDetailSessionConseillerDtoToQueryModel } from '../query-mappers/milo.mappers'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { DetailSessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
+import { JeuneMilo } from '../../../domain/milo/jeune.milo'
+import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 
 export interface GetDetailSessionConseillerMiloQuery extends Query {
   idSession: string
@@ -57,6 +59,29 @@ export class GetDetailSessionConseillerMiloQueryHandler extends QueryHandler<
       return result
     }
 
+    const listeInscrits =
+      await this.miloClient.getListeInscritsSessionConseillers(
+        idpToken,
+        query.idSession
+      )
+    if (isFailure(listeInscrits)) {
+      return listeInscrits
+    }
+
+    console.log('------------------------------------------------')
+    console.log(listeInscrits)
+
+    const jeunes = await JeuneSqlModel.findAll({
+      where: {
+        idPartenaire: listeInscrits.data.map(unInscrit =>
+          unInscrit.idDossier.toString()
+        )
+      },
+      attributes: ['id', 'idPartenaire']
+    })
+
+    console.log(jeunes)
+
     const sessionSqlModel = await SessionMiloSqlModel.findByPk(
       result.data.session.id.toString()
     )
@@ -65,6 +90,8 @@ export class GetDetailSessionConseillerMiloQueryHandler extends QueryHandler<
     return success(
       mapDetailSessionConseillerDtoToQueryModel(
         result.data,
+        listeInscrits.data,
+        jeunes,
         estVisible,
         timezoneStructure
       )
