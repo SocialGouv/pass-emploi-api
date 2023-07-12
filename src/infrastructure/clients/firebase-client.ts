@@ -23,6 +23,7 @@ import {
 } from './dto/firebase.dto'
 import Timestamp = firestore.Timestamp
 import UpdateData = firestore.UpdateData
+import { DateTime } from 'luxon'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Utf8 = require('crypto-js/enc-utf8')
@@ -237,7 +238,21 @@ export class FirebaseClient implements IFirebaseClient {
       .where('seenByConseiller', '==', false)
       .get()
 
-    return chat.size
+    let actifDansLes48h = false
+    const ilYa48h = this.dateService.now().minus({ days: 2 })
+
+    for (const message of chat.docs) {
+      const derniereLectureConseiller = message.data().lastConseillerReading
+      if (
+        derniereLectureConseiller &&
+        DateTime.fromJSDate(derniereLectureConseiller.toDate()) > ilYa48h
+      ) {
+        actifDansLes48h = true
+        break
+      }
+    }
+
+    return actifDansLes48h ? 0 : chat.size
   }
 
   async getToken(utilisateur: Authentification.Utilisateur): Promise<string> {

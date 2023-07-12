@@ -94,7 +94,7 @@ export class EnvoyerEmailsMessagesConseillersJobHandler extends JobHandler<Job> 
             }
           })
         )
-      } while (conseillers.length)
+      } while (conseillers.length && nbErreurs < 500)
       succes = true
     } catch (e) {
       this.logger.error("Le job des mails des messages non lus s'est arrêté")
