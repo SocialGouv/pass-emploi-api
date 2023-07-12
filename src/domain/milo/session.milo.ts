@@ -33,4 +33,12 @@ export namespace SessionMilo {
       }
     }
   }
+
+  export namespace Inscription {
+    export enum Statut {
+      INSCRIT = 'INSCRIT',
+      REFUS_JEUNE = 'REFUS_JEUNE',
+      REFUS_TIERS = 'REFUS_TIERS'
+    }
+  }
 }

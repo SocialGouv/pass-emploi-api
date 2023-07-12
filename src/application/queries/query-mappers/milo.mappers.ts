@@ -1,9 +1,13 @@
+import { Logger } from '@nestjs/common'
+import { DateTime } from 'luxon'
+import { SessionMilo } from 'src/domain/milo/session.milo'
 import {
   InscritSessionMiloDto,
   OffreTypeCode,
   SessionConseillerDetailDto,
   SessionJeuneDetailDto
 } from 'src/infrastructure/clients/dto/milo.dto'
+import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import {
   DetailSessionConseillerMiloQueryModel,
   DetailSessionJeuneMiloQueryModel,
@@ -12,8 +16,6 @@ import {
   SessionJeuneMiloQueryModel,
   SessionTypeQueryModel
 } from '../query-models/sessions.milo.query.model'
-import { DateTime } from 'luxon'
-import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 
 function buildSessionTypeQueryModel(
   type: OffreTypeCode
@@ -88,7 +90,7 @@ export function mapInscritSessionMiloDtoToQueryModel(
     idJeune: idJeune,
     nom: inscritSessionMilo.nom,
     prenom: inscritSessionMilo.prenom,
-    statut: inscritSessionMilo.statut // todo map le statut pour le front
+    statut: mapStatutInscriptionDtoToQueryModel(inscritSessionMilo)
   }
 }
 
@@ -143,7 +145,7 @@ export function mapDetailSessionConseillerDtoToQueryModel(
     inscriptions: listeInscrits
       .filter(uneInscription =>
         mapIdPartenaireToIdJeune.has(uneInscription.idDossier.toString())
-      ) // todo voir ce qu'on fait des jeune qu'on a pas chez nous ( coté cej)
+      )
       .map(uneInscription =>
         mapInscritSessionMiloDtoToQueryModel(
           uneInscription,
@@ -184,5 +186,26 @@ export function mapDetailSessionJeuneDtoToQueryModel(
     commentaire: sessionDto.session.commentaire ?? undefined,
     dateMaxInscription: sessionDto.session.dateMaxInscription ?? undefined,
     nbPlacesDisponibles: sessionDto.session.nbPlacesDisponibles ?? undefined
+  }
+}
+
+function mapStatutInscriptionDtoToQueryModel(
+  inscription: InscritSessionMiloDto
+): SessionMilo.Inscription.Statut {
+  switch (inscription.statut) {
+    case 'ONGOING':
+      return SessionMilo.Inscription.Statut.INSCRIT
+    case 'REFUSAL':
+      return SessionMilo.Inscription.Statut.REFUS_TIERS
+    case 'REFUSAL_YOUNG':
+      return SessionMilo.Inscription.Statut.REFUS_JEUNE
+    default:
+      const logger = new Logger(
+        'SessionMiloMappers.mapStatutInscriptionDtoToQueryModel'
+      )
+      logger.error(
+        `Une inscription a un statut inconnu : session ${inscription.idInstanceSession}, dossier ${inscription.idDossier}`
+      )
+      return SessionMilo.Inscription.Statut.INSCRIT
   }
 }
