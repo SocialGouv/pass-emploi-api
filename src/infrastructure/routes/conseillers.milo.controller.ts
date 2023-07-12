@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Put, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { UpdateSessionMiloCommandHandler } from 'src/application/commands/milo/update-session-milo.command.handler'
-import { GetDetailSessionMiloQueryHandler } from 'src/application/queries/milo/get-detail-session.milo.query.handler.db'
+import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-conseiller.milo.query.handler.db'
 import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-sessions-conseiller.milo.query.handler.db'
 import {
   DetailSessionConseillerMiloQueryModel,
@@ -22,9 +22,9 @@ import {
 @ApiTags('Conseillers Milo')
 export class ConseillersMiloController {
   constructor(
-    private readonly getSessionsMiloQueryHandler: GetSessionsConseillerMiloQueryHandler,
-    private readonly getDetailSessionMiloQueryHandler: GetDetailSessionMiloQueryHandler,
-    private readonly updateSessionMiloCommandHandler: UpdateSessionMiloCommandHandler
+    private readonly getSessionsQueryHandler: GetSessionsConseillerMiloQueryHandler,
+    private readonly getDetailSessionQueryHandler: GetDetailSessionConseillerMiloQueryHandler,
+    private readonly updateSessionCommandHandler: UpdateSessionMiloCommandHandler
   ) {}
 
   @ApiOperation({
@@ -42,7 +42,7 @@ export class ConseillersMiloController {
     @AccessToken() accessToken: string,
     @Query() getSessionsQueryParams: GetSessionsQueryParams
   ): Promise<SessionConseillerMiloQueryModel[]> {
-    const result = await this.getSessionsMiloQueryHandler.execute(
+    const result = await this.getSessionsQueryHandler.execute(
       {
         idConseiller,
         token: accessToken,
@@ -77,7 +77,7 @@ export class ConseillersMiloController {
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @AccessToken() accessToken: string
   ): Promise<DetailSessionConseillerMiloQueryModel> {
-    const result = await this.getDetailSessionMiloQueryHandler.execute(
+    const result = await this.getDetailSessionQueryHandler.execute(
       { idSession, idConseiller, token: accessToken },
       utilisateur
     )
@@ -101,7 +101,7 @@ export class ConseillersMiloController {
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @AccessToken() accessToken: string
   ): Promise<void> {
-    const result = await this.updateSessionMiloCommandHandler.execute(
+    const result = await this.updateSessionCommandHandler.execute(
       {
         idSession,
         idConseiller,

@@ -53,7 +53,7 @@ export class SessionJeuneMiloQueryModel {
   type: SessionTypeQueryModel
 }
 
-class DetailSessionQueryModel {
+class DetailSessionConseillerQueryModel {
   @ApiProperty()
   id: string
 
@@ -107,8 +107,52 @@ class OffreSessionQueryModel {
 
 export class DetailSessionConseillerMiloQueryModel {
   @ApiProperty()
-  session: DetailSessionQueryModel
+  session: DetailSessionConseillerQueryModel
 
   @ApiProperty()
   offre: OffreSessionQueryModel
+}
+
+export class DetailSessionJeuneMiloQueryModel {
+  @ApiProperty()
+  id: string
+
+  @ApiProperty()
+  nomSession: string
+
+  @ApiProperty()
+  nomOffre: string
+
+  @ApiProperty()
+  theme: string
+
+  @ApiProperty()
+  type: SessionTypeQueryModel
+
+  @ApiProperty()
+  dateHeureDebut: string
+
+  @ApiProperty()
+  dateHeureFin: string
+
+  @ApiProperty()
+  lieu: string
+
+  @ApiProperty()
+  animateur: string
+
+  @ApiProperty({ required: false })
+  nomPartenaire?: string
+
+  @ApiProperty({ required: false })
+  description?: string
+
+  @ApiProperty({ required: false })
+  commentaire?: string
+
+  @ApiProperty({ required: false })
+  dateMaxInscription?: string
+
+  @ApiProperty({ required: false })
+  nbPlacesDisponibles?: number
 }

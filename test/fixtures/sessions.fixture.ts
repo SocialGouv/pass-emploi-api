@@ -1,5 +1,6 @@
 import {
   DetailSessionConseillerMiloQueryModel,
+  DetailSessionJeuneMiloQueryModel,
   SessionConseillerMiloQueryModel,
   SessionJeuneMiloQueryModel
 } from 'src/application/queries/query-models/sessions.milo.query.model'
@@ -53,4 +54,22 @@ export const unDetailSessionConseillerMiloQueryModel: DetailSessionConseillerMil
       description: 'Une-Desc',
       nomPartenaire: 'Un-partenaire'
     }
+  }
+
+export const unDetailSessionJeuneMiloQueryModel: DetailSessionJeuneMiloQueryModel =
+  {
+    id: '1',
+    nomSession: 'Une-session',
+    nomOffre: 'Une-offre',
+    theme: 'Un-theme',
+    type: { code: OffreTypeCode.WORKSHOP, label: 'Atelier i-milo' },
+    dateHeureDebut: '2020-04-06T13:20:00.000Z',
+    dateHeureFin: '2020-04-08T13:20:00.000Z',
+    lieu: 'Un-lieu',
+    animateur: 'Un-animateur',
+    nomPartenaire: 'Un-partenaire',
+    description: 'Une-Desc',
+    commentaire: 'Un-commentaire',
+    dateMaxInscription: '2020-04-07T10:20:00.000Z',
+    nbPlacesDisponibles: 10
   }

@@ -89,6 +89,7 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
     return
   }
 }
+
 async function recupererTimezoneSessionsVisibles(
   sessionsMilo: SessionJeuneDetailDto[]
 ): Promise<SessionJeuneMiloQueryModel[]> {

@@ -12,6 +12,7 @@ import {
 import {
   SessionConseillerDetailDto,
   SessionConseillerMiloListeDto,
+  SessionJeuneDetailDto,
   SessionJeuneMiloListeDto,
   StructureConseillerMiloDto
 } from './dto/milo.dto'
@@ -22,7 +23,7 @@ import { DateTime } from 'luxon'
 export class MiloClient {
   private readonly apiUrl: string
   private readonly apiKeySessionsListeConseiller: string
-  private readonly apiKeySessionsListeJeune: string
+  private readonly apiKeySessionsDetailEtListeJeune: string
   private readonly apiKeySessionDetailConseiller: string
   private readonly apiKeyUtilisateurs: string
   private logger: Logger
@@ -35,8 +36,8 @@ export class MiloClient {
     this.apiUrl = this.configService.get('milo').url
     this.apiKeySessionsListeConseiller =
       this.configService.get('milo').apiKeySessionsListeConseiller
-    this.apiKeySessionsListeJeune =
-      this.configService.get('milo').apiKeySessionsListeJeune
+    this.apiKeySessionsDetailEtListeJeune =
+      this.configService.get('milo').apiKeySessionsDetailEtListeJeune
     this.apiKeySessionDetailConseiller =
       this.configService.get('milo').apiKeySessionDetailConseiller
     this.apiKeyUtilisateurs = this.configService.get('milo').apiKeyUtilisateurs
@@ -78,7 +79,7 @@ export class MiloClient {
     // L'api ne renvoie que 50 sessions max par appel au delà, une pagination doit être mise en place. (voir doc 06/23)
     return this.get<SessionJeuneMiloListeDto>(
       `sessions`,
-      this.apiKeySessionsListeJeune,
+      this.apiKeySessionsDetailEtListeJeune,
       idpToken,
       params
     )
@@ -91,6 +92,17 @@ export class MiloClient {
     return this.get<SessionConseillerDetailDto>(
       `sessions/${idSession}`,
       this.apiKeySessionDetailConseiller,
+      idpToken
+    )
+  }
+
+  async getDetailSessionJeune(
+    idpToken: string,
+    idSession: string
+  ): Promise<Result<SessionJeuneDetailDto>> {
+    return this.get<SessionJeuneDetailDto>(
+      `sessions/${idSession}`,
+      this.apiKeySessionsDetailEtListeJeune,
       idpToken
     )
   }

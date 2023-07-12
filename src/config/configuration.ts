@@ -1,7 +1,7 @@
 /* eslint-disable */
-import { parse } from 'pg-connection-string'
+import {parse} from 'pg-connection-string'
 import * as Joi from 'joi'
-import { configurationSchema } from './configuration.schema'
+import {configurationSchema} from './configuration.schema'
 
 export default () => {
   const scalingoApp = process.env.APP
@@ -60,7 +60,7 @@ export default () => {
       apiKeyInstanceSessionEcritureConseiller: process.env.MILO_INSTANCE_SESSION_ECRITURE_CONSEILLER_API_KEY,
       apiKeyInstanceSessionAnnulationJeune: process.env.MILO_INSTANCE_SESSION_ANNULATION_JEUNE_API_KEY,
       apiKeySessionDetailConseiller: process.env.MILO_SESSION_DETAIL_CONSEILLER_API_KEY,
-      apiKeySessionsListeJeune: process.env.MILO_SESSIONS_LISTE_JEUNE_API_KEY,
+      apiKeySessionsDetailEtListeJeune: process.env.MILO_SESSIONS_DETAIL_ET_LISTE_JEUNE_API_KEY,
       apiKeySessionsListeConseiller: process.env.MILO_SESSIONS_LISTE_CONSEILLER_API_KEY,
       apiKeyUtilisateurs: process.env.MILO_UTILISATEURS_API_KEY,
       urlWeb: process.env.MILO_WEB_URL

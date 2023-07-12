@@ -315,7 +315,7 @@ import { ConseillerMiloSqlRepository } from './infrastructure/repositories/milo/
 import { ConseillersMiloController } from './infrastructure/routes/conseillers.milo.controller'
 import { EvenementEmploiCodePostalQueryGetter } from 'src/application/queries/query-getters/evenement-emploi-code-postal.query.getter'
 import { GetConseillersEtablissementQueryHandler } from 'src/application/queries/get-conseillers-etablissement.query.handler.db'
-import { GetDetailSessionMiloQueryHandler } from 'src/application/queries/milo/get-detail-session.milo.query.handler.db'
+import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-conseiller.milo.query.handler.db'
 import { UpdateSessionMiloCommandHandler } from './application/commands/milo/update-session-milo.command.handler'
 import {
   SessionMilo,
@@ -338,6 +338,7 @@ import { MajMailingListConseillerJobHandler } from './application/jobs/maj-maili
 import { NotifierRecherchesServiceCiviqueJobHandler } from './application/jobs/notifier-recherches-service-civique.job.handler'
 import { HandleJobGenererJDDCommandHandler } from './application/jobs/generer-jdd.job.handler'
 import { MajSegmentsJobHandler } from './application/jobs/maj-segments.job.handler.db'
+import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -740,7 +741,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetEvenementEmploiQueryHandler,
     GetSessionsConseillerMiloQueryHandler,
     GetSessionsJeuneMiloQueryHandler,
-    GetDetailSessionMiloQueryHandler,
+    GetDetailSessionConseillerMiloQueryHandler,
+    GetDetailSessionJeuneMiloQueryHandler,
     UpdateSessionMiloCommandHandler,
     EvenementEmploiCodePostalQueryGetter,
     GetCatalogueQueryHandler

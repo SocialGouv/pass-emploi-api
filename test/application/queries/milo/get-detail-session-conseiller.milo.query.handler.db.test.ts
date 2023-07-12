@@ -11,16 +11,16 @@ import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
 import { unDetailSessionConseillerDto } from 'test/fixtures/milo-dto.fixture'
 import { expect, StubbedClass, stubClass } from 'test/utils'
-import { GetDetailSessionMiloQueryHandler } from 'src/application/queries/milo/get-detail-session.milo.query.handler.db'
+import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-conseiller.milo.query.handler.db'
 import { unDetailSessionConseillerMiloQueryModel } from 'test/fixtures/sessions.fixture'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { DateTime } from 'luxon'
 import { getDatabase } from 'test/utils/database-for-testing'
 
-describe('GetDetailSessionMiloQueryHandler', () => {
+describe('GetDetailSessionConseillerMiloQueryHandler', () => {
   const idStructureMilo = 'id-structure-1'
-  let getDetailSessionMiloQueryHandler: GetDetailSessionMiloQueryHandler
+  let getDetailSessionMiloQueryHandler: GetDetailSessionConseillerMiloQueryHandler
   let miloClient: StubbedClass<MiloClient>
   let keycloakClient: StubbedClass<KeycloakClient>
   let conseillerRepository: StubbedType<ConseillerMilo.Repository>
@@ -38,12 +38,13 @@ describe('GetDetailSessionMiloQueryHandler', () => {
     keycloakClient = stubClass(KeycloakClient)
     conseillerRepository = stubInterface(sandbox)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
-    getDetailSessionMiloQueryHandler = new GetDetailSessionMiloQueryHandler(
-      miloClient,
-      conseillerRepository,
-      conseillerAuthorizer,
-      keycloakClient
-    )
+    getDetailSessionMiloQueryHandler =
+      new GetDetailSessionConseillerMiloQueryHandler(
+        miloClient,
+        conseillerRepository,
+        conseillerAuthorizer,
+        keycloakClient
+      )
   })
 
   afterEach(() => {

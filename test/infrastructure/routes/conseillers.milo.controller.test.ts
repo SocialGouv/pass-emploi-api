@@ -18,15 +18,15 @@ import {
   unDetailSessionConseillerMiloQueryModel,
   uneSessionConseillerMiloQueryModel
 } from 'test/fixtures/sessions.fixture'
-import { GetDetailSessionMiloQueryHandler } from 'src/application/queries/milo/get-detail-session.milo.query.handler.db'
+import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-conseiller.milo.query.handler.db'
 import {
   UpdateSessionMiloCommand,
   UpdateSessionMiloCommandHandler
 } from 'src/application/commands/milo/update-session-milo.command.handler'
 
 describe('ConseillersMiloController', () => {
-  let getSessionsMiloQueryHandler: StubbedClass<GetSessionsConseillerMiloQueryHandler>
-  let getDetailSessionMiloQueryHandler: StubbedClass<GetDetailSessionMiloQueryHandler>
+  let getSessionsQueryHandler: StubbedClass<GetSessionsConseillerMiloQueryHandler>
+  let getDetailSessionQueryHandler: StubbedClass<GetDetailSessionConseillerMiloQueryHandler>
   let updateVisibiliteSessionCommandHandler: StubbedClass<UpdateSessionMiloCommandHandler>
 
   let app: INestApplication
@@ -34,8 +34,10 @@ describe('ConseillersMiloController', () => {
   before(async () => {
     app = await getApplicationWithStubbedDependencies()
 
-    getSessionsMiloQueryHandler = app.get(GetSessionsConseillerMiloQueryHandler)
-    getDetailSessionMiloQueryHandler = app.get(GetDetailSessionMiloQueryHandler)
+    getSessionsQueryHandler = app.get(GetSessionsConseillerMiloQueryHandler)
+    getDetailSessionQueryHandler = app.get(
+      GetDetailSessionConseillerMiloQueryHandler
+    )
     updateVisibiliteSessionCommandHandler = app.get(
       UpdateSessionMiloCommandHandler
     )
@@ -45,7 +47,7 @@ describe('ConseillersMiloController', () => {
     describe('quand le conseiller a une structure milo renseignée', () => {
       it('renvoie une 200', async () => {
         // Given
-        getSessionsMiloQueryHandler.execute.resolves(
+        getSessionsQueryHandler.execute.resolves(
           success([uneSessionConseillerMiloQueryModel])
         )
 
@@ -57,7 +59,7 @@ describe('ConseillersMiloController', () => {
           .expect([uneSessionConseillerMiloQueryModel])
 
         expect(
-          getSessionsMiloQueryHandler.execute
+          getSessionsQueryHandler.execute
         ).to.have.been.calledOnceWithExactly(
           {
             idConseiller: 'id-conseiller',
@@ -73,7 +75,7 @@ describe('ConseillersMiloController', () => {
     describe('quand le conseiller n’a pas de structure milo renseignée', () => {
       it('renvoie une 404', async () => {
         // Given
-        getSessionsMiloQueryHandler.execute.resolves(
+        getSessionsQueryHandler.execute.resolves(
           failure(new NonTrouveError('Conseiller Milo', 'id-conseiller'))
         )
 
@@ -94,7 +96,7 @@ describe('ConseillersMiloController', () => {
     it('renvoie une 200 quand tout va bien', async () => {
       // Given
       const idSession = '123'
-      getDetailSessionMiloQueryHandler.execute.resolves(
+      getDetailSessionQueryHandler.execute.resolves(
         success(unDetailSessionConseillerMiloQueryModel)
       )
 
@@ -106,7 +108,7 @@ describe('ConseillersMiloController', () => {
         .expect(unDetailSessionConseillerMiloQueryModel)
 
       expect(
-        getDetailSessionMiloQueryHandler.execute
+        getDetailSessionQueryHandler.execute
       ).to.have.been.calledOnceWithExactly(
         {
           idSession,
