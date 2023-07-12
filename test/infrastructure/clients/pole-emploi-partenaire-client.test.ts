@@ -281,6 +281,26 @@ describe('PoleEmploiPartenaireClient', () => {
     })
   })
 
+  describe('getRendezVousPasses', () => {
+    it('fait un appel http get avec les bons paramètres', async () => {
+      // Given
+      nock(PARTENAIRE_BASE_URL)
+        .get('/peconnect-rendezvousagenda/v2/listerendezvous')
+        .query({ dateDebut: uneDatetime().toISO() })
+        .reply(200, [])
+        .isDone()
+
+      // When
+      const response = await poleEmploiPartenaireClient.getRendezVousPasses(
+        tokenJeune,
+        uneDatetime()
+      )
+
+      // Then
+      expect(response).to.deep.equal(success([]))
+    })
+  })
+
   describe('getCatalogue', () => {
     it('fait un appel http get avec les bons paramètres', async () => {
       const catalogue = {

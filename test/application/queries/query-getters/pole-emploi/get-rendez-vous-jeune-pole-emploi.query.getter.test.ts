@@ -17,6 +17,7 @@ import {
 } from '../../../../../src/infrastructure/clients/dto/pole-emploi.dto'
 import {
   failure,
+  isSuccess,
   success
 } from '../../../../../src/building-blocks/types/result'
 import {
@@ -79,24 +80,121 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
       const maintenant = uneDatetime()
 
       describe('quand periode est PASSES', () => {
-        it('renvoie un tableau vide', async () => {
+        it('renvoie les rdv passes', async () => {
           // Given
           const queryPasses: GetRendezVousJeunePoleEmploiQuery = {
             idJeune: '1',
             accessToken: 'token',
             periode: RendezVous.Periode.PASSES
           }
+
+          const prestations: PrestationDto[] = [
+            {
+              annule: false,
+              datefin: '',
+              identifiantStable: undefined,
+              session: {
+                adresse: {
+                  adresseLigne1: '588 BOULEVARD ALBERT CAMUS',
+                  codeInsee: '69264',
+                  codePostal: '69665',
+                  identifiantAurore: '69065_00014597',
+                  typeLieu: 'INTERNE',
+                  ville: 'VILLEFRANCHE SUR SAONE',
+                  villePostale: 'VILLEFRANCHE SUR SAONE CEDEX'
+                },
+                dateDebut: datePrestation,
+                dateFinPrevue: '',
+                dateLimite: '',
+                duree: {
+                  unite: 'JOUR',
+                  valeur: 1.0
+                },
+                enAgence: true,
+                infoCollective: false,
+                realiteVirtuelle: false,
+                themeAtelier: {
+                  libelle: "Utiliser Internet dans sa recherche d'emploi"
+                },
+                typePrestation: {
+                  libelle: 'Atelier'
+                }
+              }
+            },
+            {
+              annule: false,
+              datefin: '',
+              identifiantStable: undefined,
+              session: {
+                adresse: {
+                  adresseLigne1: '588 BOULEVARD ALBERT CAMUS',
+                  codeInsee: '69264',
+                  codePostal: '69665',
+                  identifiantAurore: '69065_00014597',
+                  typeLieu: 'INTERNE',
+                  ville: 'VILLEFRANCHE SUR SAONE',
+                  villePostale: 'VILLEFRANCHE SUR SAONE CEDEX'
+                },
+                dateDebut: maintenant.plus({ days: 10 }).toString(),
+                dateFinPrevue: '',
+                dateLimite: '',
+                duree: {
+                  unite: 'JOUR',
+                  valeur: 1.0
+                },
+                enAgence: true,
+                infoCollective: false,
+                realiteVirtuelle: false,
+                themeAtelier: {
+                  libelle: "Utiliser Internet dans sa recherche d'emploi"
+                },
+                typePrestation: {
+                  libelle: 'Atelier'
+                }
+              }
+            }
+          ]
+          const rendezVous: RendezVousPoleEmploiDto[] = [
+            {
+              theme: 'theme',
+              date: dateRendezVous,
+              heure: heureRendezVous,
+              duree: 23,
+              modaliteContact: 'AGENCE',
+              agence: 'Agence',
+              adresse: {
+                bureauDistributeur: 'bureau',
+                ligne4: '12 rue Albert Camus',
+                ligne5: '75018',
+                ligne6: 'Paris'
+              },
+              commentaire: 'commentaire',
+              typeRDV: 'RDVL',
+              lienVisio: 'lien'
+            }
+          ]
+
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
+          dateService.now.returns(maintenant)
+
+          poleEmploiPartenaireClient.getPrestations
+            .withArgs(idpToken, maintenant)
+            .resolves(success(prestations))
+          poleEmploiPartenaireClient.getRendezVousPasses
+            .withArgs(idpToken, jeune.creationDate.toUTC())
+            .resolves(success(rendezVous))
+
           // When
           const result = await queryGetter.handle(queryPasses)
           // Then
-          expect(poleEmploiPartenaireClient.getPrestations).to.have.callCount(0)
-          expect(poleEmploiPartenaireClient.getRendezVous).to.have.callCount(0)
-          expect(result).to.deep.equal(
-            success({
-              queryModel: []
-            })
-          )
+
+          expect(poleEmploiPartenaireClient.getPrestations).to.have.callCount(1)
+          expect(
+            poleEmploiPartenaireClient.getRendezVousPasses
+          ).to.have.callCount(1)
+          expect(
+            isSuccess(result) && result.data.queryModel.length
+          ).to.be.equal(2)
         })
       })
       describe("quand le lien de la visio prestations n'est pas encore disponible", () => {
@@ -270,6 +368,7 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
           poleEmploiPartenaireClient.getPrestations
             .withArgs(idpToken, maintenant)
             .resolves(success(prestations))
+
           poleEmploiPartenaireClient.getLienVisio
             .withArgs(idpToken, idVisio)
             .resolves(success('lienvisio.com'))
@@ -445,12 +544,14 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
           // Given
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           dateService.now.returns(maintenant)
+
           poleEmploiPartenaireClient.getPrestations
             .withArgs(idpToken, maintenant)
             .resolves(failureApi(new ErreurHttp('Erreur', 500)))
 
           // When
           const result = await queryGetter.handle(query)
+
           // Then
           expect(result._isSuccess).to.equal(false)
           if (!result._isSuccess)

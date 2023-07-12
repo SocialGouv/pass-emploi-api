@@ -46,6 +46,11 @@ interface PoleEmploiPartenaireClientI {
     tokenDuJeune: string
   ): Promise<ResultApi<RendezVousPoleEmploiDto[]>>
 
+  getRendezVousPasses(
+    tokenDuJeune: string,
+    dateDebut: DateTime
+  ): Promise<ResultApi<RendezVousPoleEmploiDto[]>>
+
   getPrestations(
     tokenDuJeune: string,
     dateRechercheRendezVous: DateTime
@@ -109,6 +114,20 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     return this.getWithCache<RendezVousPoleEmploiDto[]>(
       'peconnect-rendezvousagenda/v1/listerendezvous',
       tokenDuJeune
+    )
+  }
+
+  async getRendezVousPasses(
+    tokenDuJeune: string,
+    dateDebut: DateTime
+  ): Promise<ResultApi<RendezVousPoleEmploiDto[]>> {
+    this.logger.log('recuperation des rendez-vous passés du jeune')
+    const params = new URLSearchParams()
+    params.append('dateDebut', dateDebut.toISO())
+    return this.getWithCache<RendezVousPoleEmploiDto[]>(
+      'peconnect-rendezvousagenda/v2/listerendezvous',
+      tokenDuJeune,
+      params
     )
   }
 
