@@ -16,10 +16,12 @@ export const ConseillerMiloRepositoryToken = 'ConseillerMilo.Repository'
 
 export interface ConseillerMilo {
   id: string
-  structure: { id: string; timezone: string }
+  structure: ConseillerMilo.Structure
 }
 
 export namespace ConseillerMilo {
+  export type Structure = { id: string; timezone: string }
+
   export interface Repository {
     get(idConseiller: string): Promise<Result<ConseillerMilo>>
     save(conseiller: { id: string; idStructure: string | null }): Promise<void>

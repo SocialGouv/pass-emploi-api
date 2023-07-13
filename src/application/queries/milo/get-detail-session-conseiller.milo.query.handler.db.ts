@@ -7,12 +7,13 @@ import { Conseiller } from 'src/domain/conseiller/conseiller'
 import { estMilo } from 'src/domain/core'
 import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
-import { MiloClient } from 'src/infrastructure/clients/milo-client'
+import {
+  SessionMilo,
+  SessionMiloRepositoryToken
+} from '../../../domain/milo/session.milo'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
-import { mapDetailSessionConseillerDtoToQueryModel } from '../query-mappers/milo.mappers'
-import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
+import { mapSessionToDetailSessionConseillerQueryModel } from '../query-mappers/milo.mappers'
 import { DetailSessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
-import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 
 export interface GetDetailSessionConseillerMiloQuery extends Query {
   idSession: string
@@ -26,9 +27,10 @@ export class GetDetailSessionConseillerMiloQueryHandler extends QueryHandler<
   Result<DetailSessionConseillerMiloQueryModel>
 > {
   constructor(
-    private miloClient: MiloClient,
     @Inject(ConseillerMiloRepositoryToken)
     private conseillerRepository: Conseiller.Milo.Repository,
+    @Inject(SessionMiloRepositoryToken)
+    private sessionRepository: SessionMilo.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer,
     private keycloakClient: KeycloakClient
   ) {
@@ -44,51 +46,20 @@ export class GetDetailSessionConseillerMiloQueryHandler extends QueryHandler<
     if (isFailure(resultConseiller)) {
       return resultConseiller
     }
-    const { timezone: timezoneStructure } = resultConseiller.data.structure
+    const { structure } = resultConseiller.data
 
     const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
       query.token
     )
 
-    const [resultSession, resultInscrits] = await Promise.all([
-      this.miloClient.getDetailSessionConseiller(idpToken, query.idSession),
-      this.miloClient.getListeInscritsSessionConseillers(
-        idpToken,
-        query.idSession
-      )
-    ])
-    if (isFailure(resultSession)) {
-      return resultSession
-    }
-    if (isFailure(resultInscrits)) {
-      return resultInscrits
-    }
-    const inscrits = resultInscrits.data
-    const session = resultSession.data
-
-    const [idsJeunes, sessionSqlModel] = await Promise.all([
-      JeuneSqlModel.findAll({
-        where: {
-          idPartenaire: inscrits.map(unInscrit =>
-            unInscrit.idDossier.toString()
-          )
-        },
-        attributes: ['id', 'idPartenaire']
-      }),
-      SessionMiloSqlModel.findByPk(session.session.id.toString())
-    ])
-
-    const estVisible = sessionSqlModel?.estVisible ?? false
-
-    return success(
-      mapDetailSessionConseillerDtoToQueryModel(
-        session,
-        inscrits,
-        idsJeunes,
-        estVisible,
-        timezoneStructure
-      )
+    const resultat = await this.sessionRepository.getForConseiller(
+      query.idSession,
+      structure,
+      idpToken
     )
+    if (isFailure(resultat)) return resultat
+
+    return success(mapSessionToDetailSessionConseillerQueryModel(resultat.data))
   }
 
   async authorize(

@@ -141,7 +141,7 @@ describe('MiloClient', () => {
         .isDone()
 
       // When
-      const result = await miloClient.getListeInscritsSessionConseillers(
+      const result = await miloClient.getListeInscritsSession(
         idpToken,
         idSession
       )

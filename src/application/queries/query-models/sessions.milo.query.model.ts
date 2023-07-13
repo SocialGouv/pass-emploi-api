@@ -54,7 +54,7 @@ export class SessionJeuneMiloQueryModel {
   type: SessionTypeQueryModel
 }
 
-class DetailSessionConseillerQueryModel {
+export class DetailSessionConseillerQueryModel {
   @ApiProperty()
   id: string
 

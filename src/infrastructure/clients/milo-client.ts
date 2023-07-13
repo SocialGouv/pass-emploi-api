@@ -108,7 +108,7 @@ export class MiloClient {
     )
   }
 
-  async getListeInscritsSessionConseillers(
+  async getListeInscritsSession(
     idpToken: string,
     idSession: string
   ): Promise<Result<InscritSessionMiloDto[]>> {

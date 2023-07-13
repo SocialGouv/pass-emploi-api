@@ -1,37 +1,57 @@
-import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { DateService } from '../../utils/date-service'
+import { Result } from '../../building-blocks/types/result'
+import { ConseillerMilo } from './conseiller.milo'
 
 export const SessionMiloRepositoryToken = 'SessionMilo.Repository'
 
 export interface SessionMilo {
   id: string
+  nom: string
+  debut: DateTime
+  fin: DateTime
+  animateur: string
+  lieu: string
   estVisible: boolean
   idStructureMilo: string
-  dateModification: DateTime
+  offre: SessionMilo.Offre
+  inscriptions: SessionMilo.Inscription[]
+  dateMaxInscription?: DateTime
+  nbPlacesDisponibles?: number
+  commentaire?: string
+  dateModification?: DateTime
 }
 
 export namespace SessionMilo {
   export interface Repository {
-    save(session: SessionMilo): Promise<void>
+    getForConseiller(
+      idSession: string,
+      structureConseiller: ConseillerMilo.Structure,
+      tokenMilo: string
+    ): Promise<Result<SessionMilo>>
+    save(
+      session: Required<
+        Pick<
+          SessionMilo,
+          'id' | 'estVisible' | 'idStructureMilo' | 'dateModification'
+        >
+      >
+    ): Promise<void>
   }
 
-  @Injectable()
-  export class Factory {
-    constructor(private dateService: DateService) {}
+  export type Offre = {
+    id: string
+    nom: string
+    theme: string
+    type: { code: string; label: string }
+    description?: string
+    nomPartenaire?: string
+  }
 
-    mettreAJour(
-      idSession: string,
-      estVisible: boolean,
-      idStructureMilo: string
-    ): SessionMilo {
-      return {
-        id: idSession,
-        estVisible,
-        idStructureMilo,
-        dateModification: this.dateService.now()
-      }
-    }
+  export type Inscription = {
+    idJeune: string
+    nom: string
+    prenom: string
+    statut: SessionMilo.Inscription.Statut
   }
 
   export namespace Inscription {

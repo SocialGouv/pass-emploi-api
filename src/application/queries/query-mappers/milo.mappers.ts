@@ -1,17 +1,14 @@
-import { Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { SessionMilo } from 'src/domain/milo/session.milo'
 import {
-  InscritSessionMiloDto,
   OffreTypeCode,
   SessionConseillerDetailDto,
   SessionJeuneDetailDto
 } from 'src/infrastructure/clients/dto/milo.dto'
-import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import {
   DetailSessionConseillerMiloQueryModel,
+  DetailSessionConseillerQueryModel,
   DetailSessionJeuneMiloQueryModel,
-  InscritSessionMiloQueryModel,
   SessionConseillerMiloQueryModel,
   SessionJeuneMiloQueryModel,
   SessionTypeQueryModel
@@ -82,79 +79,6 @@ export function mapSessionConseillerDtoToQueryModel(
   }
 }
 
-export function mapInscritSessionMiloDtoToQueryModel(
-  inscritSessionMilo: InscritSessionMiloDto,
-  idJeune: string
-): InscritSessionMiloQueryModel {
-  return {
-    idJeune: idJeune,
-    nom: inscritSessionMilo.nom,
-    prenom: inscritSessionMilo.prenom,
-    statut: mapStatutInscriptionDtoToQueryModel(inscritSessionMilo)
-  }
-}
-
-export function mapDetailSessionConseillerDtoToQueryModel(
-  sessionDto: SessionConseillerDetailDto,
-  listeInscrits: InscritSessionMiloDto[],
-  jeunes: Array<Pick<JeuneSqlModel, 'id' | 'idPartenaire'>>,
-  estVisible: boolean,
-  timezone: string
-): DetailSessionConseillerMiloQueryModel {
-  const mapIdPartenaireToIdJeune: Map<string, string> = jeunes.reduce(
-    (resultat, unJeune) => {
-      resultat.set(unJeune.idPartenaire!, unJeune.id)
-      return resultat
-    },
-    new Map<string, string>()
-  )
-
-  return {
-    session: {
-      id: sessionDto.session.id.toString(),
-      nom: sessionDto.session.nom,
-      dateHeureDebut: DateTime.fromFormat(
-        sessionDto.session.dateHeureDebut,
-        'yyyy-MM-dd HH:mm:ss',
-        { zone: timezone }
-      )
-        .toUTC()
-        .toISO(),
-      dateHeureFin: DateTime.fromFormat(
-        sessionDto.session.dateHeureFin,
-        'yyyy-MM-dd HH:mm:ss',
-        { zone: timezone }
-      )
-        .toUTC()
-        .toISO(),
-      dateMaxInscription: sessionDto.session.dateMaxInscription ?? undefined,
-      animateur: sessionDto.session.animateur,
-      lieu: sessionDto.session.lieu,
-      estVisible: estVisible,
-      nbPlacesDisponibles: sessionDto.session.nbPlacesDisponibles ?? undefined,
-      commentaire: sessionDto.session.commentaire ?? undefined
-    },
-    offre: {
-      id: sessionDto.offre.id.toString(),
-      nom: sessionDto.offre.nom,
-      theme: sessionDto.offre.theme,
-      type: buildSessionTypeQueryModel(sessionDto.offre.type),
-      description: sessionDto.offre.description ?? undefined,
-      nomPartenaire: sessionDto.offre.nomPartenaire ?? undefined
-    },
-    inscriptions: listeInscrits
-      .filter(uneInscription =>
-        mapIdPartenaireToIdJeune.has(uneInscription.idDossier.toString())
-      )
-      .map(uneInscription =>
-        mapInscritSessionMiloDtoToQueryModel(
-          uneInscription,
-          mapIdPartenaireToIdJeune.get(uneInscription.idDossier.toString())!
-        )
-      )
-  }
-}
-
 export function mapDetailSessionJeuneDtoToQueryModel(
   sessionDto: SessionJeuneDetailDto,
   timezone: string
@@ -189,23 +113,30 @@ export function mapDetailSessionJeuneDtoToQueryModel(
   }
 }
 
-function mapStatutInscriptionDtoToQueryModel(
-  inscription: InscritSessionMiloDto
-): SessionMilo.Inscription.Statut {
-  switch (inscription.statut) {
-    case 'ONGOING':
-      return SessionMilo.Inscription.Statut.INSCRIT
-    case 'REFUSAL':
-      return SessionMilo.Inscription.Statut.REFUS_TIERS
-    case 'REFUSAL_YOUNG':
-      return SessionMilo.Inscription.Statut.REFUS_JEUNE
-    default:
-      const logger = new Logger(
-        'SessionMiloMappers.mapStatutInscriptionDtoToQueryModel'
-      )
-      logger.error(
-        `Une inscription a un statut inconnu : session ${inscription.idInstanceSession}, dossier ${inscription.idDossier}`
-      )
-      return SessionMilo.Inscription.Statut.INSCRIT
+export function mapSessionToDetailSessionConseillerQueryModel(
+  session: SessionMilo
+): DetailSessionConseillerMiloQueryModel {
+  const sessionQueryModel: DetailSessionConseillerQueryModel = {
+    id: session.id,
+    nom: session.nom,
+    dateHeureDebut: session.debut.toUTC().toISO(),
+    dateHeureFin: session.fin.toUTC().toISO(),
+    animateur: session.animateur,
+    lieu: session.lieu,
+    estVisible: session.estVisible
+  }
+
+  if (session.dateMaxInscription)
+    sessionQueryModel.dateMaxInscription = session.dateMaxInscription
+      .toUTC()
+      .toISO()
+  if (session.nbPlacesDisponibles)
+    sessionQueryModel.nbPlacesDisponibles = session.nbPlacesDisponibles
+  if (session.commentaire) sessionQueryModel.commentaire = session.commentaire
+
+  return {
+    session: sessionQueryModel,
+    offre: session.offre,
+    inscriptions: session.inscriptions
   }
 }
