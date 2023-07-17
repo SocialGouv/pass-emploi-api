@@ -61,18 +61,31 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
         jeune.structure
       ))
 
-    if (query.periode === RendezVous.Periode.PASSES) {
-      return success({
-        queryModel: []
-      })
-    }
-
     const maintenant = this.dateService.now()
+    let responsePrestations
+    let responseRendezVous
 
-    const [responsePrestations, responseRendezVous] = await Promise.all([
-      this.poleEmploiPartenaireClient.getPrestations(idpToken, maintenant),
-      this.poleEmploiPartenaireClient.getRendezVous(idpToken)
-    ])
+    if (query.periode === RendezVous.Periode.PASSES) {
+      responsePrestations =
+        await this.poleEmploiPartenaireClient.getPrestations(
+          idpToken,
+          jeune.creationDate
+        )
+      responseRendezVous =
+        await this.poleEmploiPartenaireClient.getRendezVousPasses(
+          idpToken,
+          jeune.creationDate.toUTC()
+        )
+    } else {
+      responsePrestations =
+        await this.poleEmploiPartenaireClient.getPrestations(
+          idpToken,
+          maintenant
+        )
+      responseRendezVous = await this.poleEmploiPartenaireClient.getRendezVous(
+        idpToken
+      )
+    }
 
     if (isFailure(responsePrestations)) {
       return responsePrestations
@@ -82,7 +95,7 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
       return responseRendezVous
     }
 
-    const rendezVousPrestations = await Promise.all(
+    let rendezVousPrestations = await Promise.all(
       responsePrestations.data
         .filter(prestation => !prestation.annule)
         .map(async prestation => {
@@ -126,9 +139,19 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
           }
         })
     )
+
     const rendezVousPoleEmploi = responseRendezVous.data.map(rendezVous => {
       return fromRendezVousDtoToRendezVousQueryModel(rendezVous, this.idService)
     })
+
+    if (query.periode === RendezVous.Periode.PASSES) {
+      rendezVousPrestations = rendezVousPrestations.filter(prestations =>
+        DateService.isGreater(
+          maintenant,
+          DateService.fromJSDateToDateTime(prestations.date)!
+        )
+      )
+    }
 
     const rendezVousDuJeune = rendezVousPrestations
       .concat(rendezVousPoleEmploi)
