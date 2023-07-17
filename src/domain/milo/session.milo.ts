@@ -22,15 +22,51 @@ export interface SessionMilo {
 }
 
 export namespace SessionMilo {
+  export function modifier(
+    session: SessionMilo,
+    visibilite: boolean,
+    // FIXME problème typage inscription (nom/prenom)
+    inscriptions: Array<Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>>,
+    dateModification: DateTime
+  ): {
+    sessionModifiee: SessionMilo & {
+      dateModification: DateTime
+    }
+    nouvellesInscriptions: Array<
+      Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
+    >
+  } {
+    const nouvellesInscriptions = inscriptions
+      .filter(({ statut }) => statut === SessionMilo.Inscription.Statut.INSCRIT)
+      .filter(
+        inscriptionATraiter =>
+          !session.inscriptions.some(
+            inscriptionExistante =>
+              inscriptionExistante.idJeune === inscriptionATraiter.idJeune
+          )
+      )
+
+    const sessionModifiee = {
+      ...session,
+      estVisible: visibilite,
+      dateModification
+    }
+    return {
+      sessionModifiee,
+      nouvellesInscriptions
+    }
+  }
+
   export interface Repository {
     getForConseiller(
       idSession: string,
       structureConseiller: ConseillerMilo.Structure,
       tokenMilo: string
     ): Promise<Result<SessionMilo>>
+
     // TODO comment cacher tokenMilo ?
     save(
-      session: SessionMilo,
+      session: SessionMilo & { dateModification: DateTime },
       inscriptionsModifiees: Array<
         Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
       >,

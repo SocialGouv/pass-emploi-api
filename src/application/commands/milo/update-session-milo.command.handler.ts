@@ -20,10 +20,11 @@ import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 
 export interface UpdateSessionMiloCommand extends Command {
-  estVisible: boolean
   idSession: string
   idConseiller: string
   token: string
+  estVisible: boolean
+  inscriptions?: Array<Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>>
 }
 
 @Injectable()
@@ -48,30 +49,32 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
     const conseillerMiloResult = await this.conseillerMiloRepository.get(
       command.idConseiller
     )
-    if (isFailure(conseillerMiloResult)) {
-      return conseillerMiloResult
-    }
+    if (isFailure(conseillerMiloResult)) return conseillerMiloResult
+    const { structure: structureConseiller } = conseillerMiloResult.data
 
     const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
       command.token
     )
 
-    const sessionMiloResult = await this.miloClient.getDetailSessionConseiller(
-      idpToken,
-      command.idSession
+    const resultSession = await this.sessionMiloRepository.getForConseiller(
+      command.idSession,
+      structureConseiller,
+      idpToken
     )
-    if (isFailure(sessionMiloResult)) {
-      return sessionMiloResult
-    }
+    if (isFailure(resultSession)) return resultSession
+    const session = resultSession.data
 
-    // TODO Pour l'inscription -> Session.modifier() + gérer date modification
-    // @ts-ignore
-    await this.sessionMiloRepository.save({
-      id: sessionMiloResult.data.session.id.toString(),
-      estVisible: command.estVisible,
-      idStructureMilo: conseillerMiloResult.data.structure.id,
-      dateModification: this.dateService.now()
-    })
+    const { sessionModifiee, nouvellesInscriptions } = SessionMilo.modifier(
+      session,
+      command.estVisible,
+      command.inscriptions ?? [],
+      this.dateService.now()
+    )
+    await this.sessionMiloRepository.save(
+      sessionModifiee,
+      nouvellesInscriptions,
+      idpToken
+    )
 
     return emptySuccess()
   }

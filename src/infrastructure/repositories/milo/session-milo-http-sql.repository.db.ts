@@ -75,19 +75,13 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     >,
     tokenMilo: string
   ): Promise<void> {
-    const jeunesAInscrire = inscriptionsModifiees.filter(
-      ({ statut }) => statut === SessionMilo.Inscription.Statut.INSCRIT
+    const idsDossierNouveauxInscrits = await getIdsDossierNouveauxInscrits(
+      inscriptionsModifiees
     )
-    const inscrits = await JeuneSqlModel.findAll({
-      where: {
-        id: jeunesAInscrire.map(({ idJeune }) => idJeune)
-      },
-      attributes: ['idPartenaire']
-    })
     await this.miloClient.inscrireJeunesSession(
       tokenMilo,
       session.id,
-      inscrits.map(({ idPartenaire }) => idPartenaire!)
+      idsDossierNouveauxInscrits
     )
 
     const sessionMiloSqlModel: AsSql<SessionMiloDto> = {
@@ -227,4 +221,21 @@ function dtoToSessionMiloTypeOffre(offreDto: OffreDto): {
       )
       return { code: type, label: 'Atelier i-milo' }
   }
+}
+
+async function getIdsDossierNouveauxInscrits(
+  inscriptionsModifiees: Array<
+    Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
+  >
+): Promise<string[]> {
+  const jeunesAInscrire = inscriptionsModifiees.filter(
+    ({ statut }) => statut === SessionMilo.Inscription.Statut.INSCRIT
+  )
+  const inscrits = await JeuneSqlModel.findAll({
+    where: {
+      id: jeunesAInscrire.map(({ idJeune }) => idJeune)
+    },
+    attributes: ['idPartenaire']
+  })
+  return inscrits.map(({ idPartenaire }) => idPartenaire!)
 }
