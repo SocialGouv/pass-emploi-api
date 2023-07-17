@@ -64,7 +64,8 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
       return sessionMiloResult
     }
 
-    // TODO Pour l'inscription -> Session.modifier()
+    // TODO Pour l'inscription -> Session.modifier() + gérer date modification
+    // @ts-ignore
     await this.sessionMiloRepository.save({
       id: sessionMiloResult.data.session.id.toString(),
       estVisible: command.estVisible,

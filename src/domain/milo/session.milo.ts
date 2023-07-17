@@ -28,13 +28,13 @@ export namespace SessionMilo {
       structureConseiller: ConseillerMilo.Structure,
       tokenMilo: string
     ): Promise<Result<SessionMilo>>
+    // TODO comment cacher tokenMilo ?
     save(
-      session: Required<
-        Pick<
-          SessionMilo,
-          'id' | 'estVisible' | 'idStructureMilo' | 'dateModification'
-        >
-      >
+      session: SessionMilo,
+      inscriptionsModifiees: Array<
+        Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
+      >,
+      tokenMilo: string
     ): Promise<void>
   }
 

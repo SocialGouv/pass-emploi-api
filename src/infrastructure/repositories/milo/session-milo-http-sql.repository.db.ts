@@ -68,20 +68,34 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
   }
 
   async save(
-    session: Required<
-      Pick<
-        SessionMilo,
-        'id' | 'estVisible' | 'idStructureMilo' | 'dateModification'
-      >
-    >
+    session: SessionMilo & { dateModification: DateTime },
+    // FIXME nommage
+    inscriptionsModifiees: Array<
+      Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
+    >,
+    tokenMilo: string
   ): Promise<void> {
+    const jeunesAInscrire = inscriptionsModifiees.filter(
+      ({ statut }) => statut === SessionMilo.Inscription.Statut.INSCRIT
+    )
+    const inscrits = await JeuneSqlModel.findAll({
+      where: {
+        id: jeunesAInscrire.map(({ idJeune }) => idJeune)
+      },
+      attributes: ['idPartenaire']
+    })
+    await this.miloClient.inscrireJeunesSession(
+      tokenMilo,
+      session.id,
+      inscrits.map(({ idPartenaire }) => idPartenaire!)
+    )
+
     const sessionMiloSqlModel: AsSql<SessionMiloDto> = {
       id: session.id,
       estVisible: session.estVisible,
       idStructureMilo: session.idStructureMilo,
       dateModification: session.dateModification.toJSDate()
     }
-
     await SessionMiloSqlModel.upsert(sessionMiloSqlModel)
   }
 }

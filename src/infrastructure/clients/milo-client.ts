@@ -142,6 +142,15 @@ export class MiloClient {
     return success(structurePrincipale)
   }
 
+  async inscrireJeunesSession(
+    _idpToken: string,
+    _idSession: string,
+    _idsDossiers: string[]
+  ): Promise<Result> {
+    // TODO ne pas appeler Milo si pas besoin
+    throw new Error('Not implemented')
+  }
+
   private async get<T>(
     suffixUrl: string,
     apiKey: string,
