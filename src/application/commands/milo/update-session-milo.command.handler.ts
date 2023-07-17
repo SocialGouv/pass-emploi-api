@@ -8,6 +8,7 @@ import {
 } from 'src/building-blocks/types/result'
 import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo'
 import { Conseiller } from 'src/domain/conseiller/conseiller'
+import { DateService } from '../../../utils/date-service'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { Authentification } from 'src/domain/authentification'
 import { estMilo } from 'src/domain/core'
@@ -37,7 +38,7 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
     private sessionMiloRepository: SessionMilo.Repository,
     private miloClient: MiloClient,
     private keycloakClient: KeycloakClient,
-    private sessionMiloFactory: SessionMilo.Factory,
+    private dateService: DateService,
     private conseillerAuthorizer: ConseillerAuthorizer
   ) {
     super('UpdateSessionMiloCommandHandler')
@@ -63,13 +64,13 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
       return sessionMiloResult
     }
 
-    const session = this.sessionMiloFactory.mettreAJour(
-      sessionMiloResult.data.session.id.toString(),
-      command.estVisible,
-      conseillerMiloResult.data.structure.id
-    )
-
-    await this.sessionMiloRepository.save(session)
+    // TODO Pour l'inscription -> Session.modifier()
+    await this.sessionMiloRepository.save({
+      id: sessionMiloResult.data.session.id.toString(),
+      estVisible: command.estVisible,
+      idStructureMilo: conseillerMiloResult.data.structure.id,
+      dateModification: this.dateService.now()
+    })
 
     return emptySuccess()
   }

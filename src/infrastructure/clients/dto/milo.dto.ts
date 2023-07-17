@@ -52,3 +52,11 @@ export interface StructureConseillerMiloDto {
   nomUsuel: string
   principale: boolean
 }
+
+export interface InscritSessionMiloDto {
+  idDossier: number
+  idInstanceSession: number
+  nom: string
+  prenom: string
+  statut: string
+}

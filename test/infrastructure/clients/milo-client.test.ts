@@ -6,6 +6,7 @@ import { testConfig } from 'test/utils/module-for-testing'
 import {
   unDetailSessionConseillerDto,
   unDetailSessionJeuneDto,
+  uneInscriptionSessionMiloDto,
   uneListeDeStructuresConseillerMiloDto,
   uneSessionConseillerListeDto,
   uneSessionJeuneListeDto
@@ -125,6 +126,27 @@ describe('MiloClient', () => {
       expect(result).to.deep.equal(
         success(uneListeDeStructuresConseillerMiloDto[1])
       )
+    })
+  })
+
+  describe('getListeInscritsSessionConseillers', () => {
+    it('recupere les inscrits d’une sessions milo', async () => {
+      // Given
+      const idpToken = 'idpToken'
+      const idSession = '1'
+
+      nock(MILO_BASE_URL)
+        .get(`/operateurs/sessions/${idSession}/inscrits`)
+        .reply(200, [uneInscriptionSessionMiloDto()])
+        .isDone()
+
+      // When
+      const result = await miloClient.getListeInscritsSession(
+        idpToken,
+        idSession
+      )
+      // Then
+      expect(result).to.deep.equal(success([uneInscriptionSessionMiloDto()]))
     })
   })
 })

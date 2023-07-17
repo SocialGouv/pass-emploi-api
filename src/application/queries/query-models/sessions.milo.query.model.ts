@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { SessionMilo } from '../../../domain/milo/session.milo'
 
 export class SessionTypeQueryModel {
   @ApiProperty({
@@ -53,7 +54,7 @@ export class SessionJeuneMiloQueryModel {
   type: SessionTypeQueryModel
 }
 
-class DetailSessionConseillerQueryModel {
+export class DetailSessionConseillerQueryModel {
   @ApiProperty()
   id: string
 
@@ -105,12 +106,29 @@ class OffreSessionQueryModel {
   nomPartenaire?: string
 }
 
+export class InscritSessionMiloQueryModel {
+  @ApiProperty()
+  idJeune: string
+
+  @ApiProperty()
+  nom: string
+
+  @ApiProperty()
+  prenom: string
+
+  @ApiProperty({ enum: SessionMilo.Inscription.Statut })
+  statut: SessionMilo.Inscription.Statut
+}
+
 export class DetailSessionConseillerMiloQueryModel {
   @ApiProperty()
   session: DetailSessionConseillerQueryModel
 
   @ApiProperty()
   offre: OffreSessionQueryModel
+
+  @ApiProperty({ type: InscritSessionMiloQueryModel, isArray: true })
+  inscriptions: InscritSessionMiloQueryModel[]
 }
 
 export class DetailSessionJeuneMiloQueryModel {

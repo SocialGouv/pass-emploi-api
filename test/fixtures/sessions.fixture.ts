@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import {
   DetailSessionConseillerMiloQueryModel,
   DetailSessionJeuneMiloQueryModel,
@@ -5,6 +6,7 @@ import {
   SessionJeuneMiloQueryModel
 } from 'src/application/queries/query-models/sessions.milo.query.model'
 import { OffreTypeCode } from 'src/infrastructure/clients/dto/milo.dto'
+import { SessionMilo } from '../../src/domain/milo/session.milo'
 
 export const uneSessionConseillerMiloQueryModel: SessionConseillerMiloQueryModel =
   {
@@ -53,7 +55,8 @@ export const unDetailSessionConseillerMiloQueryModel: DetailSessionConseillerMil
       type: { code: OffreTypeCode.WORKSHOP, label: 'Atelier i-milo' },
       description: 'Une-Desc',
       nomPartenaire: 'Un-partenaire'
-    }
+    },
+    inscriptions: []
   }
 
 export const unDetailSessionJeuneMiloQueryModel: DetailSessionJeuneMiloQueryModel =
@@ -73,3 +76,52 @@ export const unDetailSessionJeuneMiloQueryModel: DetailSessionJeuneMiloQueryMode
     dateMaxInscription: '2020-04-07T10:20:00.000Z',
     nbPlacesDisponibles: 10
   }
+
+export const uneSessionMilo = (): SessionMilo => ({
+  animateur: 'Un-animateur',
+  commentaire: 'Un-commentaire',
+  estVisible: false,
+  dateMaxInscription: DateTime.fromISO('2020-04-07T10:20:00.000Z'),
+  debut: DateTime.fromISO('2020-04-06T13:20:00.000Z', {
+    zone: 'America/Cayenne'
+  }),
+  fin: DateTime.fromISO('2020-04-08T13:20:00.000Z', {
+    zone: 'America/Cayenne'
+  }),
+  id: '1',
+  idStructureMilo: 'structure-milo',
+  inscriptions: [
+    {
+      idJeune: 'id-jeune',
+      nom: 'Granger',
+      prenom: 'Hermione',
+      statut: SessionMilo.Inscription.Statut.INSCRIT
+    },
+    {
+      idJeune: 'id-jeune',
+      nom: 'Granger',
+      prenom: 'Hermione',
+      statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+    },
+    {
+      idJeune: 'id-jeune',
+      nom: 'Granger',
+      prenom: 'Hermione',
+      statut: SessionMilo.Inscription.Statut.REFUS_JEUNE
+    }
+  ],
+  lieu: 'Un-lieu',
+  nbPlacesDisponibles: 10,
+  nom: 'Une-session',
+  offre: {
+    description: 'Une-Desc',
+    id: '1',
+    nom: 'Une-offre',
+    nomPartenaire: 'Un-partenaire',
+    theme: 'Un-theme',
+    type: {
+      code: 'WORKSHOP',
+      label: 'Atelier i-milo'
+    }
+  }
+})

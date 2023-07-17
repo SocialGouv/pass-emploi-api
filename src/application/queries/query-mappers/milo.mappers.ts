@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon'
+import { SessionMilo } from 'src/domain/milo/session.milo'
 import {
   OffreTypeCode,
   SessionConseillerDetailDto,
@@ -5,12 +7,12 @@ import {
 } from 'src/infrastructure/clients/dto/milo.dto'
 import {
   DetailSessionConseillerMiloQueryModel,
+  DetailSessionConseillerQueryModel,
   DetailSessionJeuneMiloQueryModel,
   SessionConseillerMiloQueryModel,
   SessionJeuneMiloQueryModel,
   SessionTypeQueryModel
 } from '../query-models/sessions.milo.query.model'
-import { DateTime } from 'luxon'
 
 function buildSessionTypeQueryModel(
   type: OffreTypeCode
@@ -77,47 +79,6 @@ export function mapSessionConseillerDtoToQueryModel(
   }
 }
 
-export function mapDetailSessionConseillerDtoToQueryModel(
-  sessionDto: SessionConseillerDetailDto,
-  estVisible: boolean,
-  timezone: string
-): DetailSessionConseillerMiloQueryModel {
-  return {
-    session: {
-      id: sessionDto.session.id.toString(),
-      nom: sessionDto.session.nom,
-      dateHeureDebut: DateTime.fromFormat(
-        sessionDto.session.dateHeureDebut,
-        'yyyy-MM-dd HH:mm:ss',
-        { zone: timezone }
-      )
-        .toUTC()
-        .toISO(),
-      dateHeureFin: DateTime.fromFormat(
-        sessionDto.session.dateHeureFin,
-        'yyyy-MM-dd HH:mm:ss',
-        { zone: timezone }
-      )
-        .toUTC()
-        .toISO(),
-      dateMaxInscription: sessionDto.session.dateMaxInscription ?? undefined,
-      animateur: sessionDto.session.animateur,
-      lieu: sessionDto.session.lieu,
-      estVisible: estVisible,
-      nbPlacesDisponibles: sessionDto.session.nbPlacesDisponibles ?? undefined,
-      commentaire: sessionDto.session.commentaire ?? undefined
-    },
-    offre: {
-      id: sessionDto.offre.id.toString(),
-      nom: sessionDto.offre.nom,
-      theme: sessionDto.offre.theme,
-      type: buildSessionTypeQueryModel(sessionDto.offre.type),
-      description: sessionDto.offre.description ?? undefined,
-      nomPartenaire: sessionDto.offre.nomPartenaire ?? undefined
-    }
-  }
-}
-
 export function mapDetailSessionJeuneDtoToQueryModel(
   sessionDto: SessionJeuneDetailDto,
   timezone: string
@@ -149,5 +110,33 @@ export function mapDetailSessionJeuneDtoToQueryModel(
     commentaire: sessionDto.session.commentaire ?? undefined,
     dateMaxInscription: sessionDto.session.dateMaxInscription ?? undefined,
     nbPlacesDisponibles: sessionDto.session.nbPlacesDisponibles ?? undefined
+  }
+}
+
+export function mapSessionToDetailSessionConseillerQueryModel(
+  session: SessionMilo
+): DetailSessionConseillerMiloQueryModel {
+  const sessionQueryModel: DetailSessionConseillerQueryModel = {
+    id: session.id,
+    nom: session.nom,
+    dateHeureDebut: session.debut.toUTC().toISO(),
+    dateHeureFin: session.fin.toUTC().toISO(),
+    animateur: session.animateur,
+    lieu: session.lieu,
+    estVisible: session.estVisible
+  }
+
+  if (session.dateMaxInscription)
+    sessionQueryModel.dateMaxInscription = session.dateMaxInscription
+      .toUTC()
+      .toISO()
+  if (session.nbPlacesDisponibles)
+    sessionQueryModel.nbPlacesDisponibles = session.nbPlacesDisponibles
+  if (session.commentaire) sessionQueryModel.commentaire = session.commentaire
+
+  return {
+    session: sessionQueryModel,
+    offre: session.offre,
+    inscriptions: session.inscriptions
   }
 }

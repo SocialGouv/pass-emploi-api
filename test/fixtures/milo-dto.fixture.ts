@@ -1,4 +1,5 @@
 import {
+  InscritSessionMiloDto,
   OffreDto,
   OffreTypeCode,
   SessionConseillerDetailDto,
@@ -70,3 +71,17 @@ export const uneListeDeStructuresConseillerMiloDto: StructureConseillerMiloDto[]
     uneStructureConseillerMiloDto(),
     uneStructureConseillerMiloDto({ id: 2, principale: true })
   ]
+
+export const uneInscriptionSessionMiloDto = (
+  args: Partial<InscritSessionMiloDto> = {}
+): InscritSessionMiloDto => {
+  const defaults = {
+    idDossier: 123456,
+    idInstanceSession: 67890,
+    nom: 'Granger',
+    prenom: 'Hermione',
+    statut: 'ONGOING'
+  }
+
+  return { ...defaults, ...args }
+}

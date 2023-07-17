@@ -317,11 +317,8 @@ import { EvenementEmploiCodePostalQueryGetter } from 'src/application/queries/qu
 import { GetConseillersEtablissementQueryHandler } from 'src/application/queries/get-conseillers-etablissement.query.handler.db'
 import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-conseiller.milo.query.handler.db'
 import { UpdateSessionMiloCommandHandler } from './application/commands/milo/update-session-milo.command.handler'
-import {
-  SessionMilo,
-  SessionMiloRepositoryToken
-} from './domain/milo/session.milo'
-import { SessionMiloSqlRepository } from './infrastructure/repositories/milo/session.milo.repository.db'
+import { SessionMiloRepositoryToken } from './domain/milo/session.milo'
+import { SessionMiloHttpSqlRepository } from './infrastructure/repositories/milo/session-milo-http-sql.repository.db'
 import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
 import { SuivreEvenementsMiloCronJobHandler } from './application/jobs/suivre-file-evenements-milo.job.handler'
 import { MonitorJobsJobHandler } from './application/jobs/monitor-jobs.job.handler.db'
@@ -431,7 +428,6 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Conseiller.ListeDeDiffusion.Factory,
     Conseiller.ListeDeDiffusion.Service,
     RendezVousMilo.Factory,
-    SessionMilo.Factory,
     BigqueryClient,
     DiagorienteClient,
     {
@@ -456,7 +452,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     },
     {
       provide: SessionMiloRepositoryToken,
-      useClass: SessionMiloSqlRepository
+      useClass: SessionMiloHttpSqlRepository
     },
     {
       provide: OffresEmploiRepositoryToken,

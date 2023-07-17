@@ -25,6 +25,7 @@ import {
 import { unDetailSessionConseillerDto } from 'test/fixtures/milo-dto.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { KeycloakClient } from '../../../../src/infrastructure/clients/keycloak-client'
+import { DateService } from '../../../../src/utils/date-service'
 
 describe('UpdateSessionMiloCommandHandler', () => {
   let updateSessionMiloCommandHandler: UpdateSessionMiloCommandHandler
@@ -32,8 +33,8 @@ describe('UpdateSessionMiloCommandHandler', () => {
   let sessionMiloRepository: StubbedType<SessionMilo.Repository>
   let miloClient: StubbedClass<MiloClient>
   let keycloakClient: StubbedClass<KeycloakClient>
-  let sessionMiloFactory: StubbedClass<SessionMilo.Factory>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
+  let dateService: StubbedClass<DateService>
   const conseiller = unConseillerMilo()
 
   beforeEach(async () => {
@@ -42,14 +43,14 @@ describe('UpdateSessionMiloCommandHandler', () => {
     sessionMiloRepository = stubInterface(sandbox)
     miloClient = stubClass(MiloClient)
     keycloakClient = stubClass(KeycloakClient)
-    sessionMiloFactory = stubClass(SessionMilo.Factory)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
+    dateService = stubClass(DateService)
     updateSessionMiloCommandHandler = new UpdateSessionMiloCommandHandler(
       conseillerMiloRepository,
       sessionMiloRepository,
       miloClient,
       keycloakClient,
-      sessionMiloFactory,
+      dateService,
       conseillerAuthorizer
     )
   })
@@ -111,20 +112,14 @@ describe('UpdateSessionMiloCommandHandler', () => {
       miloClient.getDetailSessionConseiller
         .withArgs(idpToken, command.idSession)
         .resolves(success(unDetailSessionConseillerDto))
+      dateService.now.returns(uneDatetime())
 
-      const session: SessionMilo = {
-        id: 'id-session',
+      const session = {
+        id: '1',
         estVisible: true,
-        idStructureMilo: 'id-structure',
+        idStructureMilo: '1',
         dateModification: uneDatetime()
       }
-      sessionMiloFactory.mettreAJour
-        .withArgs(
-          unDetailSessionConseillerDto.session.id.toString(),
-          command.estVisible,
-          conseiller.structure.id
-        )
-        .returns(session)
 
       // When
       const result = await updateSessionMiloCommandHandler.handle(command)
