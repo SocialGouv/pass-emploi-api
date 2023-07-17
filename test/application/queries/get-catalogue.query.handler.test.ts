@@ -52,7 +52,7 @@ describe('GetCatalogueQueryHandler', () => {
               },
               {
                 type: 'MoyenRetourEmploiReferentielPartenaire',
-                code: 'C11.04',
+                code: 'C11.05',
                 libelle: "Avec l'aide d'une personne ou d'une structure",
                 droitCreation: false
               }
@@ -60,9 +60,16 @@ describe('GetCatalogueQueryHandler', () => {
           },
           {
             type: 'TypeDemarcheRetourEmploiReferentielPartenaire',
-            code: 'Q12',
+            code: 'Q36',
             libelle: "Recherche d'offres d'emploi ou d'entreprises",
-            moyensRetourEmploi: []
+            moyensRetourEmploi: [
+              {
+                type: 'MoyenRetourEmploiReferentielPartenaire',
+                code: 'C11.04',
+                libelle: "Avec l'aide d'une personne ou d'une structure",
+                droitCreation: false
+              }
+            ]
           }
         ]
       }
@@ -114,12 +121,7 @@ describe('GetCatalogueQueryHandler', () => {
               codeQuoi: 'Q11',
               comment: [
                 {
-                  code: 'C11.01',
-                  label:
-                    "En participant à un atelier, une prestation, une réunion d'information"
-                },
-                {
-                  code: 'C11.04',
+                  code: 'C11.05',
                   label: "Avec l'aide d'une personne ou d'une structure"
                 }
               ],
@@ -127,41 +129,13 @@ describe('GetCatalogueQueryHandler', () => {
               libellePourquoi: 'Mes candidatures',
               libelleQuoi:
                 'Préparation de ses candidatures (CV, lettre de motivation, book)'
-            },
-            {
-              codePourquoi: 'P03',
-              codeQuoi: 'Q12',
-              comment: [],
-              commentObligatoire: false,
-              libellePourquoi: 'Mes candidatures',
-              libelleQuoi: "Recherche d'offres d'emploi ou d'entreprises"
             }
           ]
         },
         {
           code: 'P02',
           libelle: 'Ma formation professionnelle',
-          demarches: [
-            {
-              codePourquoi: 'P02',
-              codeQuoi: 'Q06',
-              comment: [
-                {
-                  code: 'C06.01',
-                  label:
-                    "En participant à un atelier, une prestation, une réunion d'information"
-                },
-                {
-                  code: 'C06.02',
-                  label: "Avec l'aide d'une personne ou d'une structure"
-                }
-              ],
-              commentObligatoire: true,
-              libellePourquoi: 'Ma formation professionnelle',
-              libelleQuoi:
-                "Information sur un projet de formation ou de Validation des acquis de l'expérience"
-            }
-          ]
+          demarches: []
         }
       ])
     })

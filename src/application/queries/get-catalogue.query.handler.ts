@@ -13,6 +13,12 @@ import {
 } from 'src/infrastructure/clients/pole-emploi-partenaire-client'
 import { buildError } from 'src/utils/logger.module'
 
+import { TypesDemarcheQueryModel } from './query-models/types-demarche.query-model'
+import {
+  codeCommentDemarchesCachees,
+  codeQuoiDemarchesCachees
+} from 'src/infrastructure/clients/utils/demarche-liste-visible'
+
 export interface GetCatalogueQuery extends Query {
   accessToken: string
   structure: Core.Structure
@@ -50,27 +56,38 @@ export class GetCatalogueQueryHandler extends QueryHandler<
       )
       return []
     }
+
     return catalogueResult.data.map(pourquoi => {
       const codePourquoi = pourquoi.code
       const libellePourquoi = pourquoi.libelle
+      const listeDemarches: TypesDemarcheQueryModel[] = []
+      pourquoi.typesDemarcheRetourEmploi.forEach(quoi => {
+        if (!codeQuoiDemarchesCachees.has(quoi.code)) {
+          const listeDemarchesVisible = quoi.moyensRetourEmploi.filter(
+            comment => !codeCommentDemarchesCachees.has(comment.code)
+          )
+          if (listeDemarchesVisible.length > 0) {
+            listeDemarches.push({
+              codePourquoi,
+              libellePourquoi,
+              codeQuoi: quoi.code,
+              libelleQuoi: quoi.libelle,
+              commentObligatoire: quoi.moyensRetourEmploi.length > 0,
+              comment: listeDemarchesVisible.map(comment => {
+                return {
+                  code: comment.code,
+                  label: comment.libelle
+                }
+              })
+            })
+          }
+        }
+      })
+
       return {
         code: codePourquoi,
         libelle: libellePourquoi,
-        demarches: pourquoi.typesDemarcheRetourEmploi.map(quoi => {
-          return {
-            codePourquoi,
-            libellePourquoi,
-            codeQuoi: quoi.code,
-            libelleQuoi: quoi.libelle,
-            commentObligatoire: quoi.moyensRetourEmploi.length > 0,
-            comment: quoi.moyensRetourEmploi.map(comment => {
-              return {
-                code: comment.code,
-                label: comment.libelle
-              }
-            })
-          }
-        })
+        demarches: listeDemarches
       }
     })
   }
