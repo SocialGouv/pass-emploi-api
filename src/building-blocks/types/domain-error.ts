@@ -261,3 +261,14 @@ export class DateNonAutoriseeError implements DomainError {
     this.message = `La date renseignée n’est pas valide.`
   }
 }
+
+export class MaxInscritsDepasse implements DomainError {
+  static CODE = 'MAX_INSCRITS_DEPASSE'
+  readonly code: string = MaxInscritsDepasse.CODE
+  readonly message: string
+
+  constructor() {
+    this.message =
+      'Le nombre d’inscrits dépasse le nombre de participants maximum'
+  }
+}

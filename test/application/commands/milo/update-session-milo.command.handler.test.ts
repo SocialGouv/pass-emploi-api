@@ -20,7 +20,8 @@ import {
 } from 'src/building-blocks/types/result'
 import {
   ConseillerMiloSansStructure,
-  ErreurHttp
+  ErreurHttp,
+  MaxInscritsDepasse
 } from 'src/building-blocks/types/domain-error'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { KeycloakClient } from '../../../../src/infrastructure/clients/keycloak-client'
@@ -182,6 +183,22 @@ describe('UpdateSessionMiloCommandHandler', () => {
           idpToken
         )
         expect(result).to.deep.equal(emptySuccess())
+      })
+
+      it('empêche de dépasser le nombre maximum de participants', async () => {
+        // Given
+        const session = uneSessionMilo({
+          nbPlacesDisponibles: 2,
+          inscriptions: []
+        })
+        sessionMiloRepository.getForConseiller.resolves(success(session))
+
+        // When
+        const result = await updateSessionMiloCommandHandler.handle(command)
+
+        // Then
+        expect(sessionMiloRepository.save).not.to.have.been.called()
+        expect(result).to.deep.equal(failure(new MaxInscritsDepasse()))
       })
     })
   })

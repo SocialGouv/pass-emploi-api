@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
-import { Result } from '../../building-blocks/types/result'
+import { MaxInscritsDepasse } from '../../building-blocks/types/domain-error'
+import { failure, Result, success } from '../../building-blocks/types/result'
 import { ConseillerMilo } from './conseiller.milo'
 
 export const SessionMiloRepositoryToken = 'SessionMilo.Repository'
@@ -28,14 +29,21 @@ export namespace SessionMilo {
     // FIXME problème typage inscription (nom/prenom)
     inscriptions: Array<Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>>,
     dateModification: DateTime
-  ): {
+  ): Result<{
     sessionModifiee: SessionMilo & {
       dateModification: DateTime
     }
     nouvellesInscriptions: Array<
       Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
     >
-  } {
+  }> {
+    if (
+      session.nbPlacesDisponibles &&
+      inscriptions.length > session.nbPlacesDisponibles
+    ) {
+      return failure(new MaxInscritsDepasse())
+    }
+
     const nouvellesInscriptions = inscriptions
       .filter(({ statut }) => statut === SessionMilo.Inscription.Statut.INSCRIT)
       .filter(
@@ -51,10 +59,10 @@ export namespace SessionMilo {
       estVisible: visibilite,
       dateModification
     }
-    return {
+    return success({
       sessionModifiee,
       nouvellesInscriptions
-    }
+    })
   }
 
   export interface Repository {
