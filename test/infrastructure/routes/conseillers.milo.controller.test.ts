@@ -23,11 +23,12 @@ import {
   UpdateSessionMiloCommand,
   UpdateSessionMiloCommandHandler
 } from 'src/application/commands/milo/update-session-milo.command.handler'
+import { SessionMilo } from '../../../src/domain/milo/session.milo'
 
 describe('ConseillersMiloController', () => {
   let getSessionsQueryHandler: StubbedClass<GetSessionsConseillerMiloQueryHandler>
   let getDetailSessionQueryHandler: StubbedClass<GetDetailSessionConseillerMiloQueryHandler>
-  let updateVisibiliteSessionCommandHandler: StubbedClass<UpdateSessionMiloCommandHandler>
+  let updateSessionCommandHandler: StubbedClass<UpdateSessionMiloCommandHandler>
 
   let app: INestApplication
 
@@ -38,9 +39,7 @@ describe('ConseillersMiloController', () => {
     getDetailSessionQueryHandler = app.get(
       GetDetailSessionConseillerMiloQueryHandler
     )
-    updateVisibiliteSessionCommandHandler = app.get(
-      UpdateSessionMiloCommandHandler
-    )
+    updateSessionCommandHandler = app.get(UpdateSessionMiloCommandHandler)
   })
 
   describe('GET /conseillers/milo/:idConseiller/sessions', () => {
@@ -135,10 +134,11 @@ describe('ConseillersMiloController', () => {
         estVisible: true,
         idConseiller: idConseiller,
         idSession: idSession,
-        token: 'coucou'
+        token: 'coucou',
+        inscriptions: undefined
       }
 
-      updateVisibiliteSessionCommandHandler.execute
+      updateSessionCommandHandler.execute
         .withArgs(command, unUtilisateurDecode())
         .resolves(emptySuccess())
 
@@ -152,9 +152,53 @@ describe('ConseillersMiloController', () => {
         .expect(HttpStatus.OK)
 
       expect(
-        updateVisibiliteSessionCommandHandler.execute
+        updateSessionCommandHandler.execute
       ).to.have.been.calledOnceWithExactly(command, unUtilisateurDecode())
     })
+
+    it('inscrit des jeunes à une session milo', async () => {
+      // Given
+      const listeInscrits = [
+        { idJeune: 'jeune-1', statut: SessionMilo.Inscription.Statut.INSCRIT },
+        {
+          idJeune: 'jeune-2',
+          statut: SessionMilo.Inscription.Statut.REFUS_JEUNE
+        },
+        {
+          idJeune: 'jeune-3',
+          statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+        }
+      ]
+      const idSession = '123'
+      const idConseiller = 'id-conseiller'
+
+      const command: UpdateSessionMiloCommand = {
+        estVisible: true,
+        idConseiller: idConseiller,
+        idSession: idSession,
+        token: 'coucou',
+        inscriptions: listeInscrits
+      }
+
+      updateSessionCommandHandler.execute
+        .withArgs(command, unUtilisateurDecode())
+        .resolves(emptySuccess())
+
+      // When - Then
+      await request(app.getHttpServer())
+        .put(`/conseillers/milo/${idConseiller}/sessions/${idSession}`)
+        .send({
+          estVisible: true,
+          inscriptions: listeInscrits
+        })
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+
+      expect(
+        updateSessionCommandHandler.execute
+      ).to.have.been.calledOnceWithExactly(command, unUtilisateurDecode())
+    })
+
     ensureUserAuthenticationFailsIfInvalid(
       'put',
       '/conseillers/milo/1/sessions/id-session'

@@ -3,8 +3,14 @@ import {
   IsBoolean,
   IsDateString,
   IsNotEmpty,
-  IsOptional
+  IsOptional,
+  ValidateNested,
+  IsArray,
+  IsString,
+  IsEnum
 } from 'class-validator'
+import { Type } from 'class-transformer'
+import { SessionMilo } from '../../../domain/milo/session.milo'
 
 export class GetSessionsQueryParams {
   @IsOptional()
@@ -18,8 +24,26 @@ export class GetSessionsQueryParams {
   dateFin?: string
 }
 
+class InscriptionSessionMiloPayload {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  idJeune: string
+
+  @ApiProperty({ enum: SessionMilo.Inscription.Statut })
+  @IsEnum(SessionMilo.Inscription.Statut)
+  statut: SessionMilo.Inscription.Statut
+}
+
 export class UpdateSessionMiloPayload {
   @ApiProperty()
   @IsBoolean()
   estVisible: boolean
+
+  @ApiProperty()
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => InscriptionSessionMiloPayload)
+  inscriptions?: InscriptionSessionMiloPayload[]
 }

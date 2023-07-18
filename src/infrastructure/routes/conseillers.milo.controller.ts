@@ -1,6 +1,9 @@
 import { Body, Controller, Get, Param, Put, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { UpdateSessionMiloCommandHandler } from 'src/application/commands/milo/update-session-milo.command.handler'
+import {
+  UpdateSessionMiloCommand,
+  UpdateSessionMiloCommandHandler
+} from 'src/application/commands/milo/update-session-milo.command.handler'
 import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-conseiller.milo.query.handler.db'
 import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-sessions-conseiller.milo.query.handler.db'
 import {
@@ -90,8 +93,9 @@ export class ConseillersMiloController {
 
   @ApiOperation({
     summary:
-      'Modifie la visibilité d’une session de la structure MILO du conseiller',
-    description: 'Autorisé pour le conseiller Milo'
+      'Modifie les informations d’une session de la structure MILO du conseiller (visibilité, inscriptions)',
+    description:
+      'Autorisé pour le conseiller Milo (ne gere que les inscriptions)'
   })
   @Put('/:idConseiller/sessions/:idSession')
   async updateSession(
@@ -101,13 +105,16 @@ export class ConseillersMiloController {
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @AccessToken() accessToken: string
   ): Promise<void> {
+    const command: UpdateSessionMiloCommand = {
+      idSession,
+      idConseiller,
+      token: accessToken,
+      estVisible: updateSessionMiloPayload.estVisible,
+      inscriptions: updateSessionMiloPayload.inscriptions
+    }
+
     const result = await this.updateSessionCommandHandler.execute(
-      {
-        idSession,
-        idConseiller,
-        token: accessToken,
-        estVisible: updateSessionMiloPayload.estVisible
-      },
+      command,
       utilisateur
     )
 
