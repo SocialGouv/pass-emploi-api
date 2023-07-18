@@ -26,13 +26,15 @@ export namespace SessionMilo {
   export function modifier(
     session: SessionMilo,
     visibilite: boolean,
-    // FIXME problème typage inscription (nom/prenom)
     inscriptions: Array<Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>>,
     dateModification: DateTime
   ): Result<{
-    sessionModifiee: SessionMilo & {
-      dateModification: DateTime
-    }
+    sessionModifiee: Required<
+      Pick<
+        SessionMilo,
+        'id' | 'idStructureMilo' | 'estVisible' | 'dateModification'
+      >
+    >
     nouvellesInscriptions: Array<
       Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
     >
@@ -72,9 +74,13 @@ export namespace SessionMilo {
       tokenMilo: string
     ): Promise<Result<SessionMilo>>
 
-    // TODO comment cacher tokenMilo ?
     save(
-      session: SessionMilo & { dateModification: DateTime },
+      session: Required<
+        Pick<
+          SessionMilo,
+          'id' | 'idStructureMilo' | 'estVisible' | 'dateModification'
+        >
+      >,
       inscriptionsModifiees: Array<
         Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
       >,

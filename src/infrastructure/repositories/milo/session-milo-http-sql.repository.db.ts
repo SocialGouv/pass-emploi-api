@@ -41,8 +41,8 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     if (isFailure(resultInscrits)) {
       return resultInscrits
     }
-    const inscrits = resultInscrits.data
     const sessionDto = resultSession.data
+    const inscrits = resultInscrits.data
 
     const [idsJeunes, sessionSqlModel] = await Promise.all([
       JeuneSqlModel.findAll({
@@ -68,8 +68,12 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
   }
 
   async save(
-    session: SessionMilo & { dateModification: DateTime },
-    // FIXME nommage
+    session: Required<
+      Pick<
+        SessionMilo,
+        'id' | 'idStructureMilo' | 'estVisible' | 'dateModification'
+      >
+    >,
     inscriptionsModifiees: Array<
       Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
     >,
