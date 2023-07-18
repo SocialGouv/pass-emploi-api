@@ -156,9 +156,11 @@ export class MiloClient {
         `dossiers/${idDossier}/instances-session`,
         this.apiKeyInstanceSessionEcritureConseiller,
         idpToken,
-        { idSession }
+        idSession
       )
-      if (isFailure(result)) return result
+      if (isFailure(result)) {
+        return result
+      }
     }
 
     return emptySuccess()
@@ -194,7 +196,7 @@ export class MiloClient {
     suffixUrl: string,
     apiKey: string,
     idpToken: string,
-    payload: { [key: string]: string }
+    payload: { [key: string]: string } | string
   ): Promise<Result> {
     try {
       await firstValueFrom(
@@ -205,7 +207,8 @@ export class MiloClient {
             headers: {
               Authorization: `Bearer ${idpToken}`,
               'X-Gravitee-Api-Key': apiKey,
-              operateur: 'APPLICATION_CEJ'
+              operateur: 'APPLICATION_CEJ',
+              'Content-Type': 'application/json'
             }
           }
         )
