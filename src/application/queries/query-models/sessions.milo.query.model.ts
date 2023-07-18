@@ -134,6 +134,14 @@ export class DetailSessionConseillerMiloQueryModel {
   inscriptions: InscritSessionMiloQueryModel[]
 }
 
+export class DetailSessionJeuneMiloInscriptionQueryModel {
+  @ApiProperty()
+  id: string
+
+  @ApiProperty({ enum: SessionMilo.Inscription.Statut })
+  statut: SessionMilo.Inscription.Statut
+}
+
 export class DetailSessionJeuneMiloQueryModel {
   @ApiProperty()
   id: string
@@ -176,4 +184,7 @@ export class DetailSessionJeuneMiloQueryModel {
 
   @ApiProperty({ required: false })
   nbPlacesDisponibles?: number
+
+  @ApiProperty({ required: false })
+  inscription?: DetailSessionJeuneMiloInscriptionQueryModel
 }

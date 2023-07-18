@@ -69,7 +69,11 @@ export class GetDetailSessionJeuneMiloQueryHandler extends QueryHandler<
     }
 
     const resultDetailSessionMiloClient =
-      await this.miloClient.getDetailSessionJeune(idpToken, query.idSession)
+      await this.miloClient.getDetailSessionJeune(
+        idpToken,
+        query.idSession,
+        jeune.idPartenaire
+      )
 
     if (isFailure(resultDetailSessionMiloClient)) {
       return resultDetailSessionMiloClient
@@ -78,6 +82,7 @@ export class GetDetailSessionJeuneMiloQueryHandler extends QueryHandler<
     return success(
       mapDetailSessionJeuneDtoToQueryModel(
         resultDetailSessionMiloClient.data,
+        jeune.idPartenaire,
         sessionMiloDb.structure!.timezone
       )
     )

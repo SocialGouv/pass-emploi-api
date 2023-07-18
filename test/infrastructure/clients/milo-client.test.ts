@@ -96,17 +96,31 @@ describe('MiloClient', () => {
       // Given
       const idpToken = 'idpToken'
       const idSession = '1'
+      const idDossier = 'id-dossier-jeune'
 
       nock(MILO_BASE_URL)
         .get(`/operateurs/sessions/${idSession}`)
         .reply(200, unDetailSessionJeuneDto)
         .isDone()
+      nock(MILO_BASE_URL)
+        .get(`/operateurs/dossiers/${idDossier}/sessions/${idSession}`)
+        .reply(200, { id: 'id-inscription', statut: 'ONGOING' })
+        .isDone()
 
       // When
-      const result = await miloClient.getDetailSessionJeune(idpToken, idSession)
+      const result = await miloClient.getDetailSessionJeune(
+        idpToken,
+        idSession,
+        idDossier
+      )
 
       // Then
-      expect(result).to.deep.equal(success(unDetailSessionJeuneDto))
+      expect(result).to.deep.equal(
+        success({
+          ...unDetailSessionJeuneDto,
+          inscription: { id: 'id-inscription', statut: 'ONGOING' }
+        })
+      )
     })
   })
 

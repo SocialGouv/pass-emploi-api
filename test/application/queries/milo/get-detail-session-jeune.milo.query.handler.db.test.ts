@@ -20,6 +20,7 @@ import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/struc
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { DateTime } from 'luxon'
 import { unDetailSessionJeuneMiloQueryModel } from 'test/fixtures/sessions.fixture'
+import { SessionMilo } from '../../../../src/domain/milo/session.milo'
 
 describe('GetDetailSessionJeuneMiloQueryHandler', () => {
   const idSession = 1
@@ -165,7 +166,8 @@ describe('GetDetailSessionJeuneMiloQueryHandler', () => {
             .resolves(
               success({
                 session: { ...uneSessionDto, id: idSession },
-                offre: uneOffreDto
+                offre: uneOffreDto,
+                inscription: { id: 'id-inscription', statut: 'REFUSAL_YOUNG' }
               })
             )
 
@@ -176,7 +178,11 @@ describe('GetDetailSessionJeuneMiloQueryHandler', () => {
           expect(result).to.deep.equal(
             success({
               ...unDetailSessionJeuneMiloQueryModel,
-              id: query.idSession
+              id: query.idSession,
+              inscription: {
+                id: 'id-inscription',
+                statut: SessionMilo.Inscription.Statut.REFUS_JEUNE
+              }
             })
           )
         })
