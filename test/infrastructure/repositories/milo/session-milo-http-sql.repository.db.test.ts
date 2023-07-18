@@ -1,5 +1,9 @@
 import { DateTime } from 'luxon'
-import { Success, success } from '../../../../src/building-blocks/types/result'
+import {
+  emptySuccess,
+  Success,
+  success
+} from '../../../../src/building-blocks/types/result'
 import { SessionMilo } from '../../../../src/domain/milo/session.milo'
 import { MiloClient } from '../../../../src/infrastructure/clients/milo-client'
 import { SessionMiloHttpSqlRepository } from '../../../../src/infrastructure/repositories/milo/session-milo-http-sql.repository.db'
@@ -163,6 +167,7 @@ describe('SessionMiloHttpSqlRepository', () => {
     let session: SessionMilo & { dateModification: DateTime }
     beforeEach(async () => {
       // Given
+      miloClient.inscrireJeunesSession.resolves(emptySuccess())
       await StructureMiloSqlModel.create({
         id: idStructure,
         nomOfficiel: 'Structure',

@@ -3,6 +3,7 @@ import { DateTime } from 'luxon'
 import { SessionMilo } from 'src/domain/milo/session.milo'
 import { InscritSessionMiloQueryModel } from '../../../application/queries/query-models/sessions.milo.query.model'
 import {
+  emptySuccess,
   isFailure,
   Result,
   success
@@ -78,15 +79,16 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
       Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
     >,
     tokenMilo: string
-  ): Promise<void> {
+  ): Promise<Result> {
     const idsDossierNouveauxInscrits = await getIdsDossierNouveauxInscrits(
       inscriptionsModifiees
     )
-    await this.miloClient.inscrireJeunesSession(
+    const resultInscription = await this.miloClient.inscrireJeunesSession(
       tokenMilo,
       session.id,
       idsDossierNouveauxInscrits
     )
+    if (isFailure(resultInscription)) return resultInscription
 
     const sessionMiloSqlModel: AsSql<SessionMiloDto> = {
       id: session.id,
@@ -95,6 +97,8 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
       dateModification: session.dateModification.toJSDate()
     }
     await SessionMiloSqlModel.upsert(sessionMiloSqlModel)
+
+    return emptySuccess()
   }
 }
 

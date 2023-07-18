@@ -73,11 +73,12 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
     if (isFailure(resultModification)) return resultModification
     const { sessionModifiee, nouvellesInscriptions } = resultModification.data
 
-    await this.sessionMiloRepository.save(
+    const resultSave = await this.sessionMiloRepository.save(
       sessionModifiee,
       nouvellesInscriptions,
       idpToken
     )
+    if (isFailure(resultSave)) return resultSave
 
     return emptySuccess()
   }

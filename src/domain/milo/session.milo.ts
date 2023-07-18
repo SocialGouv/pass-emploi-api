@@ -85,7 +85,7 @@ export namespace SessionMilo {
         Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
       >,
       tokenMilo: string
-    ): Promise<void>
+    ): Promise<Result>
   }
 
   export type Offre = {

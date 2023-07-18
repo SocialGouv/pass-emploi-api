@@ -126,6 +126,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
           .withArgs(command.token)
           .resolves(idpToken)
         dateService.now.returns(uneDatetime())
+        sessionMiloRepository.save.resolves(emptySuccess())
       })
 
       it('met à jour une session si le conseiller y a accès', async () => {
