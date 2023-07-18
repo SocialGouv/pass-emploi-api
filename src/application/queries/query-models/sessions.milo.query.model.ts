@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { SessionMilo } from '../../../domain/milo/session.milo'
 
 export class SessionTypeQueryModel {
@@ -52,6 +52,9 @@ export class SessionJeuneMiloQueryModel {
 
   @ApiProperty()
   type: SessionTypeQueryModel
+
+  @ApiPropertyOptional({ enum: SessionMilo.Inscription.Statut })
+  inscription?: SessionMilo.Inscription.Statut
 }
 
 export class DetailSessionConseillerQueryModel {

@@ -1,9 +1,11 @@
+import { Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { SessionMilo } from 'src/domain/milo/session.milo'
 import {
   OffreTypeCode,
   SessionConseillerDetailDto,
-  SessionJeuneDetailDto
+  SessionJeuneDetailDto,
+  SessionJeuneListeDto
 } from 'src/infrastructure/clients/dto/milo.dto'
 import {
   DetailSessionConseillerMiloQueryModel,
@@ -26,10 +28,11 @@ function buildSessionTypeQueryModel(
 }
 
 export function mapSessionJeuneDtoToQueryModel(
-  sessionDto: SessionJeuneDetailDto,
+  sessionDto: SessionJeuneListeDto,
+  idDossier: string,
   timezone: string
 ): SessionJeuneMiloQueryModel {
-  return {
+  const queryModel: SessionJeuneMiloQueryModel = {
     id: sessionDto.session.id.toString(),
     nomSession: sessionDto.session.nom,
     nomOffre: sessionDto.offre.nom,
@@ -49,6 +52,15 @@ export function mapSessionJeuneDtoToQueryModel(
       .toISO(),
     type: buildSessionTypeQueryModel(sessionDto.offre.type)
   }
+  if (sessionDto.sessionInstance) {
+    queryModel.inscription = dtoToStatutInscription(
+      sessionDto.sessionInstance.statut,
+      sessionDto.session.id,
+      idDossier
+    )
+  }
+
+  return queryModel
 }
 
 export function mapSessionConseillerDtoToQueryModel(
@@ -143,5 +155,26 @@ export function mapSessionToDetailSessionConseillerQueryModel(
       prenom: inscription.prenom,
       statut: inscription.statut
     }))
+  }
+}
+
+function dtoToStatutInscription(
+  statut: string,
+  idSession: number,
+  idDossier: string
+): SessionMilo.Inscription.Statut {
+  switch (statut) {
+    case 'ONGOING':
+      return SessionMilo.Inscription.Statut.INSCRIT
+    case 'REFUSAL':
+      return SessionMilo.Inscription.Statut.REFUS_TIERS
+    case 'REFUSAL_YOUNG':
+      return SessionMilo.Inscription.Statut.REFUS_JEUNE
+    default:
+      const logger = new Logger('SessionMilo.dtoToStatutInscription')
+      logger.error(
+        `Une inscription a un statut inconnu : session ${idSession}, dossier ${idDossier}`
+      )
+      return SessionMilo.Inscription.Statut.INSCRIT
   }
 }

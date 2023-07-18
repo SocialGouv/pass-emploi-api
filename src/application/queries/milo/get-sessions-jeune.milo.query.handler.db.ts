@@ -21,7 +21,7 @@ import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { mapSessionJeuneDtoToQueryModel } from 'src/application/queries/query-mappers/milo.mappers'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
-import { SessionJeuneDetailDto } from 'src/infrastructure/clients/dto/milo.dto'
+import { SessionJeuneListeDto } from 'src/infrastructure/clients/dto/milo.dto'
 
 export interface GetSessionsJeuneMiloQuery extends Query {
   idJeune: string
@@ -69,7 +69,8 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
     }
 
     const sessionsVisiblesQueryModels = await recupererTimezoneSessionsVisibles(
-      resultSessionMiloClient.data.sessions
+      resultSessionMiloClient.data.sessions,
+      jeune.idPartenaire
     )
     return success(sessionsVisiblesQueryModels)
   }
@@ -91,7 +92,8 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
 }
 
 async function recupererTimezoneSessionsVisibles(
-  sessionsMilo: SessionJeuneDetailDto[]
+  sessionsMilo: SessionJeuneListeDto[],
+  idDossier: string
 ): Promise<SessionJeuneMiloQueryModel[]> {
   const mapSessionsVisiblesTimezone = await mapperSessionsVisiblesToTimezone(
     sessionsMilo
@@ -104,13 +106,14 @@ async function recupererTimezoneSessionsVisibles(
     .map(session =>
       mapSessionJeuneDtoToQueryModel(
         session,
+        idDossier,
         mapSessionsVisiblesTimezone.get(session.session.id.toString())!
       )
     )
 }
 
 async function mapperSessionsVisiblesToTimezone(
-  sessionsMiloClient: SessionJeuneDetailDto[]
+  sessionsMiloClient: SessionJeuneListeDto[]
 ): Promise<Map<string, string>> {
   const sessionsVisibles = await SessionMiloSqlModel.findAll({
     where: {

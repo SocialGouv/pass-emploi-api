@@ -20,6 +20,7 @@ import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/struc
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { DateTime } from 'luxon'
 import { getDatabase } from 'test/utils/database-for-testing'
+import { SessionMilo } from '../../../../src/domain/milo/session.milo'
 
 describe('GetSessionsJeuneMiloQueryHandler', () => {
   const query = { idJeune: 'idJeune', token: 'token' }
@@ -201,6 +202,59 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
                 id: idSession2.toString(),
                 dateHeureDebut: dateHeureDebutTimeZoneParis,
                 dateHeureFin: dateHeureFinTimeZoneParis
+              }
+            ])
+          )
+        })
+
+        it('avec l’inscription du jeune', async () => {
+          // Given
+          miloClient.getSessionsJeune
+            .withArgs(idpToken, jeune.idPartenaire)
+            .resolves(
+              success({
+                page: 1,
+                nbSessions: 1,
+                sessions: [
+                  {
+                    session: sessionVisibleACayenne,
+                    offre: uneOffreDto,
+                    sessionInstance: { statut: 'ONGOING' }
+                  },
+                  {
+                    session: sessionVisibleACayenne,
+                    offre: uneOffreDto,
+                    sessionInstance: { statut: 'REFUSAL_YOUNG' }
+                  },
+                  {
+                    session: sessionVisibleACayenne,
+                    offre: uneOffreDto,
+                    sessionInstance: { statut: 'REFUSAL' }
+                  }
+                ]
+              })
+            )
+
+          // When
+          const result = await getSessionsQueryHandler.handle(query)
+
+          // Then
+          expect(result).to.deep.equal(
+            success([
+              {
+                ...uneSessionJeuneMiloQueryModel,
+                id: idSession3.toString(),
+                inscription: SessionMilo.Inscription.Statut.INSCRIT
+              },
+              {
+                ...uneSessionJeuneMiloQueryModel,
+                id: idSession3.toString(),
+                inscription: SessionMilo.Inscription.Statut.REFUS_JEUNE
+              },
+              {
+                ...uneSessionJeuneMiloQueryModel,
+                id: idSession3.toString(),
+                inscription: SessionMilo.Inscription.Statut.REFUS_TIERS
               }
             ])
           )
