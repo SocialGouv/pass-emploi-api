@@ -1,8 +1,9 @@
 import { HttpService } from '@nestjs/axios'
 import { expect } from 'chai'
+import { DateTime } from 'luxon'
 import * as nock from 'nock'
+import { emptySuccess, success } from 'src/building-blocks/types/result'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
-import { testConfig } from 'test/utils/module-for-testing'
 import {
   unDetailSessionConseillerDto,
   unDetailSessionJeuneDto,
@@ -11,8 +12,7 @@ import {
   uneSessionConseillerListeDto,
   uneSessionJeuneListeDto
 } from 'test/fixtures/milo-dto.fixture'
-import { success } from 'src/building-blocks/types/result'
-import { DateTime } from 'luxon'
+import { testConfig } from 'test/utils/module-for-testing'
 
 describe('MiloClient', () => {
   const configService = testConfig()
@@ -147,6 +147,46 @@ describe('MiloClient', () => {
       )
       // Then
       expect(result).to.deep.equal(success([uneInscriptionSessionMiloDto()]))
+    })
+  })
+
+  describe('inscrireJeunesSession', () => {
+    it('inscrit chaque jeune à la session', async () => {
+      // Given
+      const idSession = 'id-session'
+      const idsDossier = ['id-dossier-1', 'id-dossier-2', 'id-dossier-3']
+
+      const scope1 = nock(MILO_BASE_URL)
+        .post(
+          `/operateurs/dossiers/${idsDossier[0]}/instances-session`,
+          JSON.stringify(idSession)
+        )
+        .reply(201)
+      const scope2 = nock(MILO_BASE_URL)
+        .post(
+          `/operateurs/dossiers/${idsDossier[1]}/instances-session`,
+          JSON.stringify(idSession)
+        )
+        .reply(201)
+      const scope3 = nock(MILO_BASE_URL)
+        .post(
+          `/operateurs/dossiers/${idsDossier[2]}/instances-session`,
+          JSON.stringify(idSession)
+        )
+        .reply(201)
+
+      // When
+      const result = await miloClient.inscrireJeunesSession(
+        'idpToken',
+        idSession,
+        idsDossier
+      )
+
+      // Then
+      expect(scope1.isDone()).to.equal(true)
+      expect(scope2.isDone()).to.equal(true)
+      expect(scope3.isDone()).to.equal(true)
+      expect(result).to.deep.equal(emptySuccess())
     })
   })
 })

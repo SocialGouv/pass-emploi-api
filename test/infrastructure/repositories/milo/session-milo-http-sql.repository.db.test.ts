@@ -1,5 +1,9 @@
 import { DateTime } from 'luxon'
-import { Success, success } from '../../../../src/building-blocks/types/result'
+import {
+  emptySuccess,
+  Success,
+  success
+} from '../../../../src/building-blocks/types/result'
 import { SessionMilo } from '../../../../src/domain/milo/session.milo'
 import { MiloClient } from '../../../../src/infrastructure/clients/milo-client'
 import { SessionMiloHttpSqlRepository } from '../../../../src/infrastructure/repositories/milo/session-milo-http-sql.repository.db'
@@ -18,15 +22,15 @@ import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import { getDatabase } from '../../../utils/database-for-testing'
 
-describe('SessionMiloSqlRepository', () => {
+describe('SessionMiloHttpSqlRepository', () => {
   let miloClient: StubbedClass<MiloClient>
-  let sessionMiloSqlRepository: SessionMiloHttpSqlRepository
+  let sessionMiloHttpSqlRepository: SessionMiloHttpSqlRepository
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
 
     miloClient = stubClass(MiloClient)
-    sessionMiloSqlRepository = new SessionMiloHttpSqlRepository(miloClient)
+    sessionMiloHttpSqlRepository = new SessionMiloHttpSqlRepository(miloClient)
   })
 
   describe('.getForConseiller', () => {
@@ -45,18 +49,24 @@ describe('SessionMiloSqlRepository', () => {
       miloClient.getListeInscritsSession.resolves(
         success([
           uneInscriptionSessionMiloDto({
-            idDossier: 12345,
+            idDossier: 1,
+            nom: 'Granger',
+            prenom: 'Hermione',
             statut: 'ONGOING'
           }),
           uneInscriptionSessionMiloDto({
-            idDossier: 12345,
+            idDossier: 2,
+            nom: 'Weasley',
+            prenom: 'Ronald',
             statut: 'REFUSAL'
           }),
           uneInscriptionSessionMiloDto({
-            idDossier: 12345,
+            idDossier: 3,
+            nom: 'Potter',
+            prenom: 'Harry',
             statut: 'REFUSAL_YOUNG'
           }),
-          uneInscriptionSessionMiloDto({ idDossier: 67890 })
+          uneInscriptionSessionMiloDto({ idDossier: 4 })
         ])
       )
 
@@ -65,14 +75,16 @@ describe('SessionMiloSqlRepository', () => {
         nomOfficiel: 'Structure Milo'
       })
       await ConseillerSqlModel.create(unConseillerDto())
-      await JeuneSqlModel.create(
-        unJeuneDto({ id: 'id-jeune', idPartenaire: '12345' })
-      )
+      await JeuneSqlModel.bulkCreate([
+        unJeuneDto({ id: 'id-hermione', idPartenaire: '1' }),
+        unJeuneDto({ id: 'id-ron', idPartenaire: '2' }),
+        unJeuneDto({ id: 'id-harry', idPartenaire: '3' })
+      ])
     })
 
     it('récupère les informations nécessaires', async () => {
       // When
-      await sessionMiloSqlRepository.getForConseiller(
+      await sessionMiloHttpSqlRepository.getForConseiller(
         idSession,
         structureConseiller,
         tokenMilo
@@ -89,14 +101,39 @@ describe('SessionMiloSqlRepository', () => {
 
     it('reconstruit la session avec les inscrits et les dates dans la timezone du conseiller', async () => {
       // When
-      const actual = await sessionMiloSqlRepository.getForConseiller(
+      const actual = await sessionMiloHttpSqlRepository.getForConseiller(
         idSession,
         structureConseiller,
         tokenMilo
       )
 
       // Then
-      expect(actual).to.deep.equal(success(uneSessionMilo()))
+      expect(actual).to.deep.equal(
+        success(
+          uneSessionMilo({
+            inscriptions: [
+              {
+                idJeune: 'id-hermione',
+                nom: 'Granger',
+                prenom: 'Hermione',
+                statut: SessionMilo.Inscription.Statut.INSCRIT
+              },
+              {
+                idJeune: 'id-ron',
+                nom: 'Weasley',
+                prenom: 'Ronald',
+                statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+              },
+              {
+                idJeune: 'id-harry',
+                nom: 'Potter',
+                prenom: 'Harry',
+                statut: SessionMilo.Inscription.Statut.REFUS_JEUNE
+              }
+            ]
+          })
+        )
+      )
     })
 
     it('récupère la visibilité si elle a été modifiée', async () => {
@@ -110,7 +147,7 @@ describe('SessionMiloSqlRepository', () => {
       })
 
       // When
-      const actual = await sessionMiloSqlRepository.getForConseiller(
+      const actual = await sessionMiloHttpSqlRepository.getForConseiller(
         idSession,
         structureConseiller,
         tokenMilo
@@ -124,27 +161,149 @@ describe('SessionMiloSqlRepository', () => {
   })
 
   describe('.save', () => {
-    it('met à jour la structure Milo du conseiller', async () => {
+    const idStructure = 'structure-1'
+    const idSession = 'session-1'
+    const tokenMilo = 'token-milo'
+    let session: SessionMilo & { dateModification: DateTime }
+    beforeEach(async () => {
       // Given
-      const idStructure = '1'
-      const idSession = '1'
+      miloClient.inscrireJeunesSession.resolves(emptySuccess())
       await StructureMiloSqlModel.create({
         id: idStructure,
         nomOfficiel: 'Structure',
         timezone: 'Europe/Paris'
       })
+      await ConseillerSqlModel.create(unConseillerDto())
+      await JeuneSqlModel.bulkCreate([
+        unJeuneDto({ id: 'id-hermione', idPartenaire: 'id-dossier-hermione' }),
+        unJeuneDto({ id: 'id-ron', idPartenaire: 'id-dossier-ron' }),
+        unJeuneDto({ id: 'id-harry', idPartenaire: 'id-dossier-harry' })
+      ])
+
+      session = {
+        ...uneSessionMilo({
+          id: idSession,
+          idStructureMilo: idStructure,
+          estVisible: true,
+          inscriptions: [
+            {
+              idJeune: 'id-hermione',
+              nom: 'Granger',
+              prenom: 'Hermione',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            },
+            {
+              idJeune: 'id-ron',
+              nom: 'Weasley',
+              prenom: 'Ronald',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            },
+            {
+              idJeune: 'id-harry',
+              nom: 'Potter',
+              prenom: 'Harry',
+              statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+            }
+          ]
+        }),
+        dateModification: uneDatetime().minus({ day: 1 })
+      }
 
       // When
-      await sessionMiloSqlRepository.save({
-        id: idSession,
-        idStructureMilo: idStructure,
-        estVisible: true,
+      await sessionMiloHttpSqlRepository.save(
+        session,
+        [
+          {
+            idJeune: 'id-hermione',
+            statut: SessionMilo.Inscription.Statut.INSCRIT
+          },
+          {
+            idJeune: 'id-ron',
+            statut: SessionMilo.Inscription.Statut.INSCRIT
+          },
+          {
+            idJeune: 'id-harry',
+            statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+          }
+        ],
+        tokenMilo
+      )
+    })
+
+    it('sauvegarde la session en base', async () => {
+      // Then
+      const sessionTrouve = await SessionMiloSqlModel.findByPk(idSession)
+      expect(sessionTrouve!.id).to.equal(idSession)
+      expect(sessionTrouve!.idStructureMilo).to.equal(idStructure)
+      expect(sessionTrouve!.estVisible).to.equal(true)
+      expect(sessionTrouve!.dateModification).to.deep.equal(
+        uneDatetime().minus({ day: 1 }).toJSDate()
+      )
+    })
+
+    it('modifie la session en base', async () => {
+      // When
+      const sessionModifiee = {
+        ...uneSessionMilo({
+          id: idSession,
+          idStructureMilo: idStructure,
+          estVisible: false
+        }),
         dateModification: uneDatetime()
-      })
+      }
+      await sessionMiloHttpSqlRepository.save(sessionModifiee, [], tokenMilo)
 
       // Then
       const sessionTrouve = await SessionMiloSqlModel.findByPk(idSession)
-      expect(sessionTrouve?.idStructureMilo).to.equal('1')
+      expect(sessionTrouve!.estVisible).to.equal(false)
+      expect(sessionTrouve!.dateModification).to.deep.equal(
+        uneDatetime().toJSDate()
+      )
+    })
+
+    it('inscrit les participants', async () => {
+      // Then
+      expect(
+        miloClient.inscrireJeunesSession
+      ).to.have.been.calledOnceWithExactly(tokenMilo, idSession, [
+        'id-dossier-hermione',
+        'id-dossier-ron'
+      ])
+    })
+
+    it('ne réinscrit pas les participants déjà inscrits', async () => {
+      // Given
+      const sessionModifiee = {
+        ...session,
+        inscriptions: [
+          ...session.inscriptions,
+          {
+            idJeune: 'id-harry',
+            nom: 'Potter',
+            prenom: 'Harry',
+            statut: SessionMilo.Inscription.Statut.INSCRIT
+          }
+        ]
+      }
+
+      // When
+      await sessionMiloHttpSqlRepository.save(
+        sessionModifiee,
+        [
+          {
+            idJeune: 'id-harry',
+            statut: SessionMilo.Inscription.Statut.INSCRIT
+          }
+        ],
+        tokenMilo
+      )
+
+      // Then
+      expect(miloClient.inscrireJeunesSession).to.have.been.calledWithExactly(
+        tokenMilo,
+        idSession,
+        ['id-dossier-harry']
+      )
     })
   })
 })

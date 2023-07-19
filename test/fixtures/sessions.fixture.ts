@@ -77,51 +77,57 @@ export const unDetailSessionJeuneMiloQueryModel: DetailSessionJeuneMiloQueryMode
     nbPlacesDisponibles: 10
   }
 
-export const uneSessionMilo = (): SessionMilo => ({
-  animateur: 'Un-animateur',
-  commentaire: 'Un-commentaire',
-  estVisible: false,
-  dateMaxInscription: DateTime.fromISO('2020-04-07T10:20:00.000Z'),
-  debut: DateTime.fromISO('2020-04-06T13:20:00.000Z', {
-    zone: 'America/Cayenne'
-  }),
-  fin: DateTime.fromISO('2020-04-08T13:20:00.000Z', {
-    zone: 'America/Cayenne'
-  }),
-  id: '1',
-  idStructureMilo: 'structure-milo',
-  inscriptions: [
-    {
-      idJeune: 'id-jeune',
-      nom: 'Granger',
-      prenom: 'Hermione',
-      statut: SessionMilo.Inscription.Statut.INSCRIT
-    },
-    {
-      idJeune: 'id-jeune',
-      nom: 'Granger',
-      prenom: 'Hermione',
-      statut: SessionMilo.Inscription.Statut.REFUS_TIERS
-    },
-    {
-      idJeune: 'id-jeune',
-      nom: 'Granger',
-      prenom: 'Hermione',
-      statut: SessionMilo.Inscription.Statut.REFUS_JEUNE
-    }
-  ],
-  lieu: 'Un-lieu',
-  nbPlacesDisponibles: 10,
-  nom: 'Une-session',
-  offre: {
-    description: 'Une-Desc',
+export const uneSessionMilo = (
+  args: Partial<SessionMilo> = {}
+): SessionMilo => {
+  const defaults: SessionMilo = {
     id: '1',
-    nom: 'Une-offre',
-    nomPartenaire: 'Un-partenaire',
-    theme: 'Un-theme',
-    type: {
-      code: 'WORKSHOP',
-      label: 'Atelier i-milo'
+    idStructureMilo: 'structure-milo',
+    animateur: 'Un-animateur',
+    commentaire: 'Un-commentaire',
+    estVisible: false,
+    dateMaxInscription: DateTime.fromISO('2020-04-07T10:20:00.000Z'),
+    debut: DateTime.fromISO('2020-04-06T13:20:00.000Z', {
+      zone: 'America/Cayenne'
+    }),
+    fin: DateTime.fromISO('2020-04-08T13:20:00.000Z', {
+      zone: 'America/Cayenne'
+    }),
+    inscriptions: [
+      {
+        idJeune: 'id-hermione',
+        nom: 'Granger',
+        prenom: 'Hermione',
+        statut: SessionMilo.Inscription.Statut.INSCRIT
+      },
+      {
+        idJeune: 'id-ron',
+        nom: 'Weasley',
+        prenom: 'Ronald',
+        statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+      },
+      {
+        idJeune: 'id-harry',
+        nom: 'Potter',
+        prenom: 'Harry',
+        statut: SessionMilo.Inscription.Statut.REFUS_JEUNE
+      }
+    ],
+    lieu: 'Un-lieu',
+    nbPlacesDisponibles: 10,
+    nom: 'Une-session',
+    offre: {
+      description: 'Une-Desc',
+      id: '1',
+      nom: 'Une-offre',
+      nomPartenaire: 'Un-partenaire',
+      theme: 'Un-theme',
+      type: {
+        code: 'WORKSHOP',
+        label: 'Atelier i-milo'
+      }
     }
   }
-})
+
+  return { ...defaults, ...args }
+}

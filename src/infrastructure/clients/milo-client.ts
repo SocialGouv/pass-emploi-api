@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
 import { ErreurHttp } from 'src/building-blocks/types/domain-error'
 import {
+  emptySuccess,
   failure,
   isFailure,
   Result,
@@ -26,6 +27,7 @@ export class MiloClient {
   private readonly apiKeySessionsListeConseiller: string
   private readonly apiKeySessionsDetailEtListeJeune: string
   private readonly apiKeySessionDetailConseiller: string
+  private readonly apiKeyInstanceSessionEcritureConseiller: string
   private readonly apiKeyUtilisateurs: string
   private logger: Logger
 
@@ -41,6 +43,8 @@ export class MiloClient {
       this.configService.get('milo').apiKeySessionsDetailEtListeJeune
     this.apiKeySessionDetailConseiller =
       this.configService.get('milo').apiKeySessionDetailConseiller
+    this.apiKeyInstanceSessionEcritureConseiller =
+      this.configService.get('milo').apiKeyInstanceSessionEcritureConseiller
     this.apiKeyUtilisateurs = this.configService.get('milo').apiKeyUtilisateurs
   }
 
@@ -142,6 +146,26 @@ export class MiloClient {
     return success(structurePrincipale)
   }
 
+  async inscrireJeunesSession(
+    idpToken: string,
+    idSession: string,
+    idsDossier: string[]
+  ): Promise<Result> {
+    for (const idDossier of idsDossier) {
+      const result = await this.post(
+        `dossiers/${idDossier}/instances-session`,
+        this.apiKeyInstanceSessionEcritureConseiller,
+        idpToken,
+        idSession
+      )
+      if (isFailure(result)) {
+        return result
+      }
+    }
+
+    return emptySuccess()
+  }
+
   private async get<T>(
     suffixUrl: string,
     apiKey: string,
@@ -165,6 +189,33 @@ export class MiloClient {
       return success(response.data)
     } catch (e) {
       return handleAxiosError(e, this.logger, 'Erreur GET Milo')
+    }
+  }
+
+  private async post(
+    suffixUrl: string,
+    apiKey: string,
+    idpToken: string,
+    payload: { [key: string]: string } | string
+  ): Promise<Result> {
+    try {
+      await firstValueFrom(
+        this.httpService.post(
+          `${this.apiUrl}/operateurs/${suffixUrl}`,
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${idpToken}`,
+              'X-Gravitee-Api-Key': apiKey,
+              operateur: 'APPLICATION_CEJ',
+              'Content-Type': 'application/json'
+            }
+          }
+        )
+      )
+      return emptySuccess()
+    } catch (e) {
+      return handleAxiosError(e, this.logger, 'Erreur POST Milo')
     }
   }
 }

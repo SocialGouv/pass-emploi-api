@@ -124,21 +124,21 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
           ...unDetailSessionConseillerMiloQueryModel,
           inscriptions: [
             {
-              idJeune: 'id-jeune',
+              idJeune: 'id-hermione',
               nom: 'Granger',
               prenom: 'Hermione',
               statut: SessionMilo.Inscription.Statut.INSCRIT
             },
             {
-              idJeune: 'id-jeune',
-              nom: 'Granger',
-              prenom: 'Hermione',
+              idJeune: 'id-ron',
+              nom: 'Weasley',
+              prenom: 'Ronald',
               statut: SessionMilo.Inscription.Statut.REFUS_TIERS
             },
             {
-              idJeune: 'id-jeune',
-              nom: 'Granger',
-              prenom: 'Hermione',
+              idJeune: 'id-harry',
+              nom: 'Potter',
+              prenom: 'Harry',
               statut: SessionMilo.Inscription.Statut.REFUS_JEUNE
             }
           ]

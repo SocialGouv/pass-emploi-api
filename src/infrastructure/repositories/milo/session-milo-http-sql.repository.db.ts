@@ -3,6 +3,7 @@ import { DateTime } from 'luxon'
 import { SessionMilo } from 'src/domain/milo/session.milo'
 import { InscritSessionMiloQueryModel } from '../../../application/queries/query-models/sessions.milo.query.model'
 import {
+  emptySuccess,
   isFailure,
   Result,
   success
@@ -41,8 +42,8 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     if (isFailure(resultInscrits)) {
       return resultInscrits
     }
-    const inscrits = resultInscrits.data
     const sessionDto = resultSession.data
+    const inscrits = resultInscrits.data
 
     const [idsJeunes, sessionSqlModel] = await Promise.all([
       JeuneSqlModel.findAll({
@@ -71,18 +72,33 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     session: Required<
       Pick<
         SessionMilo,
-        'id' | 'estVisible' | 'idStructureMilo' | 'dateModification'
+        'id' | 'idStructureMilo' | 'estVisible' | 'dateModification'
       >
-    >
-  ): Promise<void> {
+    >,
+    inscriptionsModifiees: Array<
+      Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
+    >,
+    tokenMilo: string
+  ): Promise<Result> {
+    const idsDossierNouveauxInscrits = await getIdsDossierNouveauxInscrits(
+      inscriptionsModifiees
+    )
+    const resultInscription = await this.miloClient.inscrireJeunesSession(
+      tokenMilo,
+      session.id,
+      idsDossierNouveauxInscrits
+    )
+    if (isFailure(resultInscription)) return resultInscription
+
     const sessionMiloSqlModel: AsSql<SessionMiloDto> = {
       id: session.id,
       estVisible: session.estVisible,
       idStructureMilo: session.idStructureMilo,
       dateModification: session.dateModification.toJSDate()
     }
-
     await SessionMiloSqlModel.upsert(sessionMiloSqlModel)
+
+    return emptySuccess()
   }
 }
 
@@ -213,4 +229,21 @@ function dtoToSessionMiloTypeOffre(offreDto: OffreDto): {
       )
       return { code: type, label: 'Atelier i-milo' }
   }
+}
+
+async function getIdsDossierNouveauxInscrits(
+  inscriptionsModifiees: Array<
+    Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
+  >
+): Promise<string[]> {
+  const jeunesAInscrire = inscriptionsModifiees.filter(
+    ({ statut }) => statut === SessionMilo.Inscription.Statut.INSCRIT
+  )
+  const inscrits = await JeuneSqlModel.findAll({
+    where: {
+      id: jeunesAInscrire.map(({ idJeune }) => idJeune)
+    },
+    attributes: ['idPartenaire']
+  })
+  return inscrits.map(({ idPartenaire }) => idPartenaire!)
 }

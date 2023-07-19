@@ -20,12 +20,13 @@ import {
 } from 'src/building-blocks/types/result'
 import {
   ConseillerMiloSansStructure,
-  ErreurHttp
+  ErreurHttp,
+  MaxInscritsDepasse
 } from 'src/building-blocks/types/domain-error'
-import { unDetailSessionConseillerDto } from 'test/fixtures/milo-dto.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { KeycloakClient } from '../../../../src/infrastructure/clients/keycloak-client'
 import { DateService } from '../../../../src/utils/date-service'
+import { uneSessionMilo } from '../../../fixtures/sessions.fixture'
 
 describe('UpdateSessionMiloCommandHandler', () => {
   let updateSessionMiloCommandHandler: UpdateSessionMiloCommandHandler
@@ -57,10 +58,24 @@ describe('UpdateSessionMiloCommandHandler', () => {
 
   describe('handle', () => {
     const command: UpdateSessionMiloCommand = {
-      estVisible: true,
       idSession: 'idSession',
       idConseiller: conseiller.id,
-      token: 'token'
+      token: 'token',
+      estVisible: true,
+      inscriptions: [
+        {
+          idJeune: 'id-hermione',
+          statut: SessionMilo.Inscription.Statut.INSCRIT
+        },
+        {
+          idJeune: 'id-ron',
+          statut: SessionMilo.Inscription.Statut.INSCRIT
+        },
+        {
+          idJeune: 'id-harry',
+          statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+        }
+      ]
     }
 
     it('n’autorise pas un conseiller sans structure', async () => {
@@ -89,8 +104,8 @@ describe('UpdateSessionMiloCommandHandler', () => {
       keycloakClient.exchangeTokenConseillerMilo
         .withArgs(command.token)
         .resolves(idpToken)
-      miloClient.getDetailSessionConseiller
-        .withArgs(idpToken, command.idSession)
+      sessionMiloRepository.getForConseiller
+        .withArgs(command.idSession, conseiller.structure, idpToken)
         .resolves(failure(erreurHttp))
 
       // When
@@ -100,33 +115,92 @@ describe('UpdateSessionMiloCommandHandler', () => {
       expect(result).to.deep.equal(failure(erreurHttp))
     })
 
-    it('met à jour une session si le conseiller y a accès', async () => {
+    describe('quand le conseiller a accès à la session', () => {
       const idpToken = 'idpToken'
-      // Given
-      conseillerMiloRepository.get
-        .withArgs(command.idConseiller)
-        .resolves(success(conseiller))
-      keycloakClient.exchangeTokenConseillerMilo
-        .withArgs(command.token)
-        .resolves(idpToken)
-      miloClient.getDetailSessionConseiller
-        .withArgs(idpToken, command.idSession)
-        .resolves(success(unDetailSessionConseillerDto))
-      dateService.now.returns(uneDatetime())
+      beforeEach(async () => {
+        // Given
+        conseillerMiloRepository.get
+          .withArgs(command.idConseiller)
+          .resolves(success(conseiller))
+        keycloakClient.exchangeTokenConseillerMilo
+          .withArgs(command.token)
+          .resolves(idpToken)
+        dateService.now.returns(uneDatetime())
+        sessionMiloRepository.save.resolves(emptySuccess())
+      })
 
-      const session = {
-        id: '1',
-        estVisible: true,
-        idStructureMilo: '1',
-        dateModification: uneDatetime()
-      }
+      it('met à jour une session si le conseiller y a accès', async () => {
+        // Given
+        const session = uneSessionMilo({ inscriptions: [] })
+        sessionMiloRepository.getForConseiller.resolves(success(session))
 
-      // When
-      const result = await updateSessionMiloCommandHandler.handle(command)
+        // When
+        const result = await updateSessionMiloCommandHandler.handle(command)
 
-      // Then
-      expect(sessionMiloRepository.save).to.have.been.calledWithExactly(session)
-      expect(result).to.deep.equal(emptySuccess())
+        // Then
+        expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
+          { ...session, estVisible: true, dateModification: uneDatetime() },
+          [
+            {
+              idJeune: 'id-hermione',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            },
+            {
+              idJeune: 'id-ron',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            }
+          ],
+          idpToken
+        )
+        expect(result).to.deep.equal(emptySuccess())
+      })
+
+      it('ne met à jour une session qu’avec les nouveaux inscrits', async () => {
+        // Given
+        const session = uneSessionMilo({
+          inscriptions: [
+            {
+              idJeune: 'id-hermione',
+              nom: 'Granger',
+              prenom: 'Hermione',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            }
+          ]
+        })
+        sessionMiloRepository.getForConseiller.resolves(success(session))
+
+        // When
+        const result = await updateSessionMiloCommandHandler.handle(command)
+
+        // Then
+        expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
+          { ...session, estVisible: true, dateModification: uneDatetime() },
+          [
+            {
+              idJeune: 'id-ron',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            }
+          ],
+          idpToken
+        )
+        expect(result).to.deep.equal(emptySuccess())
+      })
+
+      it('empêche de dépasser le nombre maximum de participants', async () => {
+        // Given
+        const session = uneSessionMilo({
+          nbPlacesDisponibles: 2,
+          inscriptions: []
+        })
+        sessionMiloRepository.getForConseiller.resolves(success(session))
+
+        // When
+        const result = await updateSessionMiloCommandHandler.handle(command)
+
+        // Then
+        expect(sessionMiloRepository.save).not.to.have.been.called()
+        expect(result).to.deep.equal(failure(new MaxInscritsDepasse()))
+      })
     })
   })
 

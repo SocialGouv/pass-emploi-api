@@ -23,6 +23,7 @@ import {
   JeuneNonLieAuConseillerError,
   JeunePasInactifError,
   MauvaiseCommandeError,
+  MaxInscritsDepasse,
   NonTrouveError,
   ReponsesCampagneInvalide,
   RessourceIndisponibleError
@@ -49,6 +50,7 @@ export function handleFailure(result: Result): void {
       case ConseillerSansAgenceError.CODE:
       case ConseillerMiloSansStructure.CODE:
       case JeuneMiloSansIdDossier.CODE:
+      case MaxInscritsDepasse.CODE:
         throw new BadRequestException(result.error, result.error.message)
       case RessourceIndisponibleError.CODE:
         throw new GoneException(result.error.message)

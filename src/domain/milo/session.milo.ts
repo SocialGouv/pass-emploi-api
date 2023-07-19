@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
-import { Result } from '../../building-blocks/types/result'
+import { MaxInscritsDepasse } from '../../building-blocks/types/domain-error'
+import { failure, Result, success } from '../../building-blocks/types/result'
 import { ConseillerMilo } from './conseiller.milo'
 
 export const SessionMiloRepositoryToken = 'SessionMilo.Repository'
@@ -22,20 +23,69 @@ export interface SessionMilo {
 }
 
 export namespace SessionMilo {
+  export function modifier(
+    session: SessionMilo,
+    visibilite: boolean,
+    inscriptions: Array<Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>>,
+    dateModification: DateTime
+  ): Result<{
+    sessionModifiee: Required<
+      Pick<
+        SessionMilo,
+        'id' | 'idStructureMilo' | 'estVisible' | 'dateModification'
+      >
+    >
+    nouvellesInscriptions: Array<
+      Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
+    >
+  }> {
+    if (
+      session.nbPlacesDisponibles &&
+      inscriptions.length > session.nbPlacesDisponibles
+    ) {
+      return failure(new MaxInscritsDepasse())
+    }
+
+    const nouvellesInscriptions = inscriptions
+      .filter(({ statut }) => statut === SessionMilo.Inscription.Statut.INSCRIT)
+      .filter(
+        inscriptionATraiter =>
+          !session.inscriptions.some(
+            inscriptionExistante =>
+              inscriptionExistante.idJeune === inscriptionATraiter.idJeune
+          )
+      )
+
+    const sessionModifiee = {
+      ...session,
+      estVisible: visibilite,
+      dateModification
+    }
+    return success({
+      sessionModifiee,
+      nouvellesInscriptions
+    })
+  }
+
   export interface Repository {
     getForConseiller(
       idSession: string,
       structureConseiller: ConseillerMilo.Structure,
       tokenMilo: string
     ): Promise<Result<SessionMilo>>
+
     save(
       session: Required<
         Pick<
           SessionMilo,
-          'id' | 'estVisible' | 'idStructureMilo' | 'dateModification'
+          'id' | 'idStructureMilo' | 'estVisible' | 'dateModification'
         >
-      >
-    ): Promise<void>
+      >,
+      inscriptionsModifiees: Array<
+        Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
+      >,
+      tokenMilo: string
+    ): Promise<Result>
   }
 
   export type Offre = {
