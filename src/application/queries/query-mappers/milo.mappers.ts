@@ -137,6 +137,11 @@ export function mapSessionToDetailSessionConseillerQueryModel(
   return {
     session: sessionQueryModel,
     offre: session.offre,
-    inscriptions: session.inscriptions
+    inscriptions: session.inscriptions.map(inscription => ({
+      idJeune: inscription.idJeune,
+      nom: inscription.nom,
+      prenom: inscription.prenom,
+      statut: inscription.statut
+    }))
   }
 }

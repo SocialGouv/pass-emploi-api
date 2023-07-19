@@ -230,7 +230,7 @@ describe('SessionMiloHttpSqlRepository', () => {
         session,
         {
           idsJeunesAInscrire: ['id-hermione', 'id-ron'],
-          desinscriptions: [
+          inscriptionsASupprimer: [
             { idJeune: 'id-harry', idInscription: 'id-inscription-harry' }
           ]
         },
@@ -261,7 +261,7 @@ describe('SessionMiloHttpSqlRepository', () => {
       }
       await sessionMiloHttpSqlRepository.save(
         sessionModifiee,
-        { idsJeunesAInscrire: [], desinscriptions: [] },
+        { idsJeunesAInscrire: [], inscriptionsASupprimer: [] },
         tokenMilo
       )
 

@@ -76,33 +76,27 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     >,
     inscriptionsATraiter: {
       idsJeunesAInscrire: string[]
-      desinscriptions: Array<{ idJeune: string; idInscription: string }>
+      inscriptionsASupprimer: Array<{ idJeune: string; idInscription: string }>
     },
     tokenMilo: string
   ): Promise<Result> {
     const idsJeunes = inscriptionsATraiter.idsJeunesAInscrire.concat(
-      inscriptionsATraiter.desinscriptions.map(({ idJeune }) => idJeune)
+      inscriptionsATraiter.inscriptionsASupprimer.map(({ idJeune }) => idJeune)
     )
-    const idsDossier = await mapperIdsDossier(idsJeunes)
+    const idsDossier = await recupererIdsDossier(idsJeunes)
 
-    const desinscriptions = inscriptionsATraiter.desinscriptions.map(
-      desinscription => ({
-        idDossier: idsDossier.get(desinscription.idJeune)!,
-        idInstanceSession: desinscription.idInscription
-      })
+    const resultDesinscriptions = await this.desinscrire(
+      inscriptionsATraiter.inscriptionsASupprimer,
+      idsDossier,
+      tokenMilo
     )
-    const resultDesinscriptions =
-      await this.miloClient.desinscrireJeunesSession(tokenMilo, desinscriptions)
     if (isFailure(resultDesinscriptions)) return resultDesinscriptions
 
-    const idsDossierNouveauxInscrits =
-      inscriptionsATraiter.idsJeunesAInscrire.map(
-        idJeune => idsDossier.get(idJeune)!
-      )
-    const resultInscriptions = await this.miloClient.inscrireJeunesSession(
-      tokenMilo,
+    const resultInscriptions = await this.inscrire(
       session.id,
-      idsDossierNouveauxInscrits
+      inscriptionsATraiter.idsJeunesAInscrire,
+      idsDossier,
+      tokenMilo
     )
     if (isFailure(resultInscriptions)) return resultInscriptions
 
@@ -115,6 +109,34 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     await SessionMiloSqlModel.upsert(sessionMiloSqlModel)
 
     return emptySuccess()
+  }
+
+  private async inscrire(
+    idSession: string,
+    idsJeunesAInscrire: string[],
+    idsDossier: Map<string, string>,
+    tokenMilo: string
+  ): Promise<Result> {
+    const idsDossierNouveauxInscrits = idsJeunesAInscrire.map(
+      idJeune => idsDossier.get(idJeune)!
+    )
+    return this.miloClient.inscrireJeunesSession(
+      tokenMilo,
+      idSession,
+      idsDossierNouveauxInscrits
+    )
+  }
+
+  private async desinscrire(
+    inscriptionsASupprimer: Array<{ idJeune: string; idInscription: string }>,
+    idsDossier: Map<string, string>,
+    tokenMilo: string
+  ): Promise<Result> {
+    const desinscriptions = inscriptionsASupprimer.map(desinscription => ({
+      idDossier: idsDossier.get(desinscription.idJeune)!,
+      idInstanceSession: desinscription.idInscription
+    }))
+    return this.miloClient.desinscrireJeunesSession(tokenMilo, desinscriptions)
   }
 }
 
@@ -248,7 +270,7 @@ function dtoToSessionMiloTypeOffre(offreDto: OffreDto): {
   }
 }
 
-async function mapperIdsDossier(
+async function recupererIdsDossier(
   idsJeunes: string[]
 ): Promise<Map<string, string>> {
   const jeunes = await JeuneSqlModel.findAll({

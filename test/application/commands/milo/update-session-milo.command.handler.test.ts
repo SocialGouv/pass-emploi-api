@@ -68,11 +68,19 @@ describe('UpdateSessionMiloCommandHandler', () => {
           statut: SessionMilo.Inscription.Statut.INSCRIT
         },
         {
-          idJeune: 'id-ron',
+          idJeune: 'id-harry',
           statut: SessionMilo.Inscription.Statut.INSCRIT
         },
         {
-          idJeune: 'id-harry',
+          idJeune: 'id-ron',
+          statut: SessionMilo.Inscription.Statut.DESINSCRIT
+        },
+        {
+          idJeune: 'id-hagrid',
+          statut: SessionMilo.Inscription.Statut.DESINSCRIT
+        },
+        {
+          idJeune: 'id-rogue',
           statut: SessionMilo.Inscription.Statut.REFUS_TIERS
         }
       ]
@@ -141,8 +149,8 @@ describe('UpdateSessionMiloCommandHandler', () => {
         expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
           { ...session, estVisible: true, dateModification: uneDatetime() },
           {
-            idsJeunesAInscrire: ['id-hermione', 'id-ron'],
-            desinscriptions: []
+            idsJeunesAInscrire: ['id-hermione', 'id-harry'],
+            inscriptionsASupprimer: []
           },
           idpToken
         )
@@ -170,37 +178,16 @@ describe('UpdateSessionMiloCommandHandler', () => {
           ]
         })
         sessionMiloRepository.getForConseiller.resolves(success(session))
-        const c = {
-          ...command,
-          inscriptions: [
-            {
-              idJeune: 'id-hermione',
-              statut: SessionMilo.Inscription.Statut.INSCRIT
-            },
-            {
-              idJeune: 'id-harry',
-              statut: SessionMilo.Inscription.Statut.INSCRIT
-            },
-            {
-              idJeune: 'id-ron',
-              statut: SessionMilo.Inscription.Statut.DESINSCRIT
-            },
-            {
-              idJeune: 'id-hagrid',
-              statut: SessionMilo.Inscription.Statut.DESINSCRIT
-            }
-          ]
-        }
 
         // When
-        const result = await updateSessionMiloCommandHandler.handle(c)
+        const result = await updateSessionMiloCommandHandler.handle(command)
 
         // Then
         expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
           { ...session, estVisible: true, dateModification: uneDatetime() },
           {
             idsJeunesAInscrire: ['id-harry'],
-            desinscriptions: [
+            inscriptionsASupprimer: [
               {
                 idJeune: 'id-ron',
                 idInscription: 'id-inscription-ron'
