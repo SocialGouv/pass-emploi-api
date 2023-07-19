@@ -1,32 +1,32 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { Conseiller } from 'src/domain/conseiller/conseiller'
-import { SessionMilo } from 'src/domain/milo/session.milo'
-import { MiloClient } from 'src/infrastructure/clients/milo-client'
-import { createSandbox, expect, StubbedClass, stubClass } from 'test/utils'
+import { SinonSandbox } from 'sinon'
 import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
-import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
 import {
   UpdateSessionMiloCommand,
   UpdateSessionMiloCommandHandler
 } from 'src/application/commands/milo/update-session-milo.command.handler'
-import { Authentification } from 'src/domain/authentification'
-import Utilisateur = Authentification.Utilisateur
-import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
-import { SinonSandbox } from 'sinon'
-import {
-  emptySuccess,
-  failure,
-  success
-} from 'src/building-blocks/types/result'
 import {
   ConseillerMiloSansStructure,
   ErreurHttp,
   MaxInscritsDepasse
 } from 'src/building-blocks/types/domain-error'
+import {
+  emptySuccess,
+  failure,
+  success
+} from 'src/building-blocks/types/result'
+import { Authentification } from 'src/domain/authentification'
+import { Conseiller } from 'src/domain/conseiller/conseiller'
+import { SessionMilo } from 'src/domain/milo/session.milo'
+import { MiloClient } from 'src/infrastructure/clients/milo-client'
+import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
+import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
+import { createSandbox, expect, StubbedClass, stubClass } from 'test/utils'
 import { KeycloakClient } from '../../../../src/infrastructure/clients/keycloak-client'
 import { DateService } from '../../../../src/utils/date-service'
 import { uneSessionMilo } from '../../../fixtures/sessions.fixture'
+import Utilisateur = Authentification.Utilisateur
 
 describe('UpdateSessionMiloCommandHandler', () => {
   let updateSessionMiloCommandHandler: UpdateSessionMiloCommandHandler
@@ -140,47 +140,73 @@ describe('UpdateSessionMiloCommandHandler', () => {
         // Then
         expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
           { ...session, estVisible: true, dateModification: uneDatetime() },
-          [
-            {
-              idJeune: 'id-hermione',
-              statut: SessionMilo.Inscription.Statut.INSCRIT
-            },
-            {
-              idJeune: 'id-ron',
-              statut: SessionMilo.Inscription.Statut.INSCRIT
-            }
-          ],
+          {
+            idsJeunesAInscrire: ['id-hermione', 'id-ron'],
+            desinscriptions: []
+          },
           idpToken
         )
         expect(result).to.deep.equal(emptySuccess())
       })
 
-      it('ne met à jour une session qu’avec les nouveaux inscrits', async () => {
+      it('permet de modifier les inscriptions', async () => {
         // Given
         const session = uneSessionMilo({
           inscriptions: [
             {
               idJeune: 'id-hermione',
+              idInscription: 'id-inscription-hermione',
               nom: 'Granger',
               prenom: 'Hermione',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            },
+            {
+              idJeune: 'id-ron',
+              idInscription: 'id-inscription-ron',
+              nom: 'Weasley',
+              prenom: 'Ronald',
               statut: SessionMilo.Inscription.Statut.INSCRIT
             }
           ]
         })
         sessionMiloRepository.getForConseiller.resolves(success(session))
+        const c = {
+          ...command,
+          inscriptions: [
+            {
+              idJeune: 'id-hermione',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            },
+            {
+              idJeune: 'id-harry',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            },
+            {
+              idJeune: 'id-ron',
+              statut: SessionMilo.Inscription.Statut.DESINSCRIT
+            },
+            {
+              idJeune: 'id-hagrid',
+              statut: SessionMilo.Inscription.Statut.DESINSCRIT
+            }
+          ]
+        }
 
         // When
-        const result = await updateSessionMiloCommandHandler.handle(command)
+        const result = await updateSessionMiloCommandHandler.handle(c)
 
         // Then
         expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
           { ...session, estVisible: true, dateModification: uneDatetime() },
-          [
-            {
-              idJeune: 'id-ron',
-              statut: SessionMilo.Inscription.Statut.INSCRIT
-            }
-          ],
+          {
+            idsJeunesAInscrire: ['id-harry'],
+            desinscriptions: [
+              {
+                idJeune: 'id-ron',
+                idInscription: 'id-inscription-ron'
+              }
+            ]
+          },
           idpToken
         )
         expect(result).to.deep.equal(emptySuccess())

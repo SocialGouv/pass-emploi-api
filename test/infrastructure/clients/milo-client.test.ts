@@ -189,4 +189,43 @@ describe('MiloClient', () => {
       expect(result).to.deep.equal(emptySuccess())
     })
   })
+
+  describe('desinscrireJeunesSession', () => {
+    it('désinscrit chaque jeune de la session', async () => {
+      // Given
+      const aDesinscrire = [
+        { idDossier: 'id-dossier-1', idInstanceSession: 'id-inscription-1' },
+        { idDossier: 'id-dossier-2', idInstanceSession: 'id-inscription-2' },
+        { idDossier: 'id-dossier-3', idInstanceSession: 'id-inscription-3' }
+      ]
+
+      const scope1 = nock(MILO_BASE_URL)
+        .delete(
+          `/operateurs/dossiers/${aDesinscrire[0].idDossier}/instances-session/${aDesinscrire[0].idInstanceSession}`
+        )
+        .reply(201)
+      const scope2 = nock(MILO_BASE_URL)
+        .delete(
+          `/operateurs/dossiers/${aDesinscrire[1].idDossier}/instances-session/${aDesinscrire[1].idInstanceSession}`
+        )
+        .reply(201)
+      const scope3 = nock(MILO_BASE_URL)
+        .delete(
+          `/operateurs/dossiers/${aDesinscrire[2].idDossier}/instances-session/${aDesinscrire[2].idInstanceSession}`
+        )
+        .reply(201)
+
+      // When
+      const result = await miloClient.desinscrireJeunesSession(
+        'idpToken',
+        aDesinscrire
+      )
+
+      // Then
+      expect(scope1.isDone()).to.equal(true)
+      expect(scope2.isDone()).to.equal(true)
+      expect(scope3.isDone()).to.equal(true)
+      expect(result).to.deep.equal(emptySuccess())
+    })
+  })
 })

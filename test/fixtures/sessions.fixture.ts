@@ -96,18 +96,21 @@ export const uneSessionMilo = (
     inscriptions: [
       {
         idJeune: 'id-hermione',
+        idInscription: 'id-inscription-hermione',
         nom: 'Granger',
         prenom: 'Hermione',
         statut: SessionMilo.Inscription.Statut.INSCRIT
       },
       {
         idJeune: 'id-ron',
+        idInscription: 'id-inscription-ron',
         nom: 'Weasley',
         prenom: 'Ronald',
         statut: SessionMilo.Inscription.Statut.REFUS_TIERS
       },
       {
         idJeune: 'id-harry',
+        idInscription: 'id-inscription-harry',
         nom: 'Potter',
         prenom: 'Harry',
         statut: SessionMilo.Inscription.Statut.REFUS_JEUNE

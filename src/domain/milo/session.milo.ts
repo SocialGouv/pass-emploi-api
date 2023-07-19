@@ -26,7 +26,9 @@ export namespace SessionMilo {
   export function modifier(
     session: SessionMilo,
     visibilite: boolean,
-    inscriptions: Array<Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>>,
+    trucsQuiViennentDeLaCommand: Array<
+      Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
+    >,
     dateModification: DateTime
   ): Result<{
     sessionModifiee: Required<
@@ -35,18 +37,19 @@ export namespace SessionMilo {
         'id' | 'idStructureMilo' | 'estVisible' | 'dateModification'
       >
     >
-    nouvellesInscriptions: Array<
-      Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
-    >
+    inscriptionsATraiter: {
+      idsJeunesAInscrire: string[]
+      desinscriptions: Array<{ idJeune: string; idInscription: string }>
+    }
   }> {
     if (
       session.nbPlacesDisponibles &&
-      inscriptions.length > session.nbPlacesDisponibles
+      trucsQuiViennentDeLaCommand.length > session.nbPlacesDisponibles
     ) {
       return failure(new MaxInscritsDepasse())
     }
 
-    const nouvellesInscriptions = inscriptions
+    const nouvellesInscriptions = trucsQuiViennentDeLaCommand
       .filter(({ statut }) => statut === SessionMilo.Inscription.Statut.INSCRIT)
       .filter(
         inscriptionATraiter =>
@@ -55,6 +58,30 @@ export namespace SessionMilo {
               inscriptionExistante.idJeune === inscriptionATraiter.idJeune
           )
       )
+      .map(({ idJeune }) => idJeune)
+
+    const desinscriptions = trucsQuiViennentDeLaCommand
+      .filter(
+        ({ statut }) => statut === SessionMilo.Inscription.Statut.DESINSCRIT
+      )
+      .filter(inscriptionATraiter =>
+        session.inscriptions.some(
+          inscriptionExistante =>
+            inscriptionExistante.idJeune === inscriptionATraiter.idJeune
+        )
+      )
+      .map(inscriptionATraiter => ({
+        idJeune: inscriptionATraiter.idJeune,
+        idInscription: session.inscriptions.find(
+          inscriptionExistante =>
+            inscriptionExistante.idJeune === inscriptionATraiter.idJeune
+        )!.idInscription
+      }))
+
+    const inscriptionsATraiter = {
+      idsJeunesAInscrire: nouvellesInscriptions,
+      desinscriptions
+    }
 
     const sessionModifiee = {
       ...session,
@@ -63,7 +90,7 @@ export namespace SessionMilo {
     }
     return success({
       sessionModifiee,
-      nouvellesInscriptions
+      inscriptionsATraiter
     })
   }
 
@@ -81,9 +108,10 @@ export namespace SessionMilo {
           'id' | 'idStructureMilo' | 'estVisible' | 'dateModification'
         >
       >,
-      inscriptionsModifiees: Array<
-        Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
-      >,
+      inscriptionsATraiter: {
+        idsJeunesAInscrire: string[]
+        desinscriptions: Array<{ idJeune: string; idInscription: string }>
+      },
       tokenMilo: string
     ): Promise<Result>
   }
@@ -99,6 +127,7 @@ export namespace SessionMilo {
 
   export type Inscription = {
     idJeune: string
+    idInscription: string
     nom: string
     prenom: string
     statut: SessionMilo.Inscription.Statut
@@ -108,7 +137,8 @@ export namespace SessionMilo {
     export enum Statut {
       INSCRIT = 'INSCRIT',
       REFUS_JEUNE = 'REFUS_JEUNE',
-      REFUS_TIERS = 'REFUS_TIERS'
+      REFUS_TIERS = 'REFUS_TIERS',
+      DESINSCRIT = 'DESINSCRIT'
     }
   }
 }

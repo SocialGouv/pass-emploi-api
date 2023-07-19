@@ -1,23 +1,23 @@
-import { Command } from 'src/building-blocks/types/command'
 import { Inject, Injectable } from '@nestjs/common'
+import { Command } from 'src/building-blocks/types/command'
 import { CommandHandler } from 'src/building-blocks/types/command-handler'
 import {
   emptySuccess,
   isFailure,
   Result
 } from 'src/building-blocks/types/result'
-import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo'
-import { Conseiller } from 'src/domain/conseiller/conseiller'
-import { DateService } from '../../../utils/date-service'
-import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { Authentification } from 'src/domain/authentification'
+import { Conseiller } from 'src/domain/conseiller/conseiller'
 import { estMilo } from 'src/domain/core'
+import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo'
 import {
   SessionMilo,
   SessionMiloRepositoryToken
 } from 'src/domain/milo/session.milo'
-import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { MiloClient } from 'src/infrastructure/clients/milo-client'
+import { DateService } from '../../../utils/date-service'
+import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 
 export interface UpdateSessionMiloCommand extends Command {
   idSession: string
@@ -71,11 +71,11 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
       this.dateService.now()
     )
     if (isFailure(resultModification)) return resultModification
-    const { sessionModifiee, nouvellesInscriptions } = resultModification.data
+    const { sessionModifiee, inscriptionsATraiter } = resultModification.data
 
     const resultSave = await this.sessionMiloRepository.save(
       sessionModifiee,
-      nouvellesInscriptions,
+      inscriptionsATraiter,
       idpToken
     )
     if (isFailure(resultSave)) return resultSave
