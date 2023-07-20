@@ -24,7 +24,9 @@ export interface UpdateSessionMiloCommand extends Command {
   idConseiller: string
   token: string
   estVisible: boolean
-  inscriptions?: Array<Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>>
+  inscriptions?: Array<
+    Pick<SessionMilo.Inscription, 'idJeune' | 'statut' | 'commentaire'>
+  >
 }
 
 @Injectable()

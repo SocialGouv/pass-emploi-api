@@ -45,10 +45,19 @@ export namespace SessionMilo {
     inscriptions: Array<Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>>
   ): Result<{
     idsJeunesAInscrire: string[]
-    inscriptionsASupprimer: Array<{ idJeune: string; idInscription: string }>
+    inscriptionsASupprimer: Array<
+      Pick<SessionMilo.Inscription, 'idJeune' | 'idInscription'>
+    >
+    inscriptionsAModifier: Array<
+      Omit<SessionMilo.Inscription, 'nom' | 'prenom'>
+    >
   }> {
     const idsJeunesAInscrire = extraireIdsJeunesAInscrire(session, inscriptions)
     const inscriptionsASupprimer = extraireInscriptionsASupprimer(
+      session,
+      inscriptions
+    )
+    const inscriptionsAModifier = extraireInscriptionsAModifier(
       session,
       inscriptions
     )
@@ -69,7 +78,8 @@ export namespace SessionMilo {
 
     return success({
       idsJeunesAInscrire,
-      inscriptionsASupprimer
+      inscriptionsASupprimer,
+      inscriptionsAModifier
     })
   }
 
@@ -113,6 +123,7 @@ export namespace SessionMilo {
     nom: string
     prenom: string
     statut: SessionMilo.Inscription.Statut
+    commentaire?: string
   }
 
   export namespace Inscription {
@@ -144,10 +155,7 @@ function extraireIdsJeunesAInscrire(
 function extraireInscriptionsASupprimer(
   session: SessionMilo,
   inscriptions: Array<Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>>
-): Array<{
-  idInscription: string
-  idJeune: string
-}> {
+): Array<Pick<SessionMilo.Inscription, 'idJeune' | 'idInscription'>> {
   const inscriptionsASupprimer = []
 
   for (const inscription of inscriptions) {
@@ -164,6 +172,36 @@ function extraireInscriptionsASupprimer(
   }
 
   return inscriptionsASupprimer
+}
+
+function extraireInscriptionsAModifier(
+  session: SessionMilo,
+  inscriptions: Array<
+    Pick<SessionMilo.Inscription, 'idJeune' | 'statut' | 'commentaire'>
+  >
+): Array<Omit<SessionMilo.Inscription, 'nom' | 'prenom'>> {
+  const inscriptionsAModifier = []
+
+  for (const inscription of inscriptions) {
+    if (inscription.statut === SessionMilo.Inscription.Statut.DESINSCRIT)
+      continue
+
+    const jeuneDejaInscrit = findJeuneDejaInscrit(session, inscription.idJeune)
+    if (!jeuneDejaInscrit) continue
+
+    if (
+      inscription.statut === SessionMilo.Inscription.Statut.INSCRIT &&
+      jeuneDejaInscrit.statut === SessionMilo.Inscription.Statut.INSCRIT
+    )
+      continue
+
+    inscriptionsAModifier.push({
+      ...inscription,
+      idInscription: jeuneDejaInscrit.idInscription
+    })
+  }
+
+  return inscriptionsAModifier
 }
 
 function findJeuneDejaInscrit(

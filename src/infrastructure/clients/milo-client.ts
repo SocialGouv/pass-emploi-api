@@ -185,6 +185,7 @@ export class MiloClient {
 
   async modifierInscriptionJeunesSession(
     idpToken: string,
+    // FIXME use Pick<SessionMilo.Inscription>
     modifications: Array<{
       idDossier: string
       idInstanceSession: string
