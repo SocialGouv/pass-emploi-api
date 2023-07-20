@@ -10,6 +10,7 @@ import {
   Result,
   success
 } from 'src/building-blocks/types/result'
+import { SessionMilo } from '../../domain/milo/session.milo'
 import {
   InscritSessionMiloDto,
   SessionConseillerDetailDto,
@@ -154,9 +155,9 @@ export class MiloClient {
     for (const idDossier of idsDossier) {
       const result = await this.post(
         `dossiers/${idDossier}/instances-session`,
+        idSession,
         this.apiKeyInstanceSessionEcritureConseiller,
-        idpToken,
-        idSession
+        idpToken
       )
       if (isFailure(result)) {
         return result
@@ -173,6 +174,29 @@ export class MiloClient {
     for (const desinscription of desinscriptions) {
       const result = await this.delete(
         `dossiers/${desinscription.idDossier}/instances-session/${desinscription.idInstanceSession}`,
+        this.apiKeyInstanceSessionEcritureConseiller,
+        idpToken
+      )
+      if (isFailure(result)) return result
+    }
+
+    return emptySuccess()
+  }
+
+  async modifierInscriptionJeunesSession(
+    idpToken: string,
+    modifications: Array<{
+      idDossier: string
+      idInstanceSession: string
+      inscription: Pick<SessionMilo.Inscription, 'statut'> & {
+        commentaire?: string
+      }
+    }>
+  ): Promise<Result> {
+    for (const modification of modifications) {
+      const result = await this.put(
+        `dossiers/${modification.idDossier}/instances-session/${modification.idInstanceSession}`,
+        inscriptionToDto(modification.inscription),
         this.apiKeyInstanceSessionEcritureConseiller,
         idpToken
       )
@@ -208,11 +232,38 @@ export class MiloClient {
     }
   }
 
+  private async put(
+    suffixUrl: string,
+    payload: { [p: string]: string } | string,
+    apiKey: string,
+    idpToken: string
+  ): Promise<Result> {
+    try {
+      await firstValueFrom(
+        this.httpService.put(
+          `${this.apiUrl}/operateurs/${suffixUrl}`,
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${idpToken}`,
+              'X-Gravitee-Api-Key': apiKey,
+              operateur: 'APPLICATION_CEJ',
+              'Content-Type': 'application/json'
+            }
+          }
+        )
+      )
+      return emptySuccess()
+    } catch (e) {
+      return handleAxiosError(e, this.logger, 'Erreur POST Milo')
+    }
+  }
+
   private async post(
     suffixUrl: string,
+    payload: { [p: string]: string } | string,
     apiKey: string,
-    idpToken: string,
-    payload: { [key: string]: string } | string
+    idpToken: string
   ): Promise<Result> {
     try {
       await firstValueFrom(
@@ -256,3 +307,24 @@ export class MiloClient {
     }
   }
 }
+
+function inscriptionToDto(
+  inscription: Pick<SessionMilo.Inscription, 'statut'> & {
+    commentaire?: string
+  }
+): { statut: string; commentaire?: string } {
+  switch (inscription.statut) {
+    case SessionMilo.Inscription.Statut.INSCRIT:
+      return { statut: MILO_INSCRIT }
+    case SessionMilo.Inscription.Statut.REFUS_TIERS:
+      return { statut: MILO_REFUS_TIERS }
+    case SessionMilo.Inscription.Statut.REFUS_JEUNE:
+      return { statut: MILO_REFUS_JEUNE, commentaire: inscription.commentaire }
+    default:
+      throw new Error('Ça devrait pas arriver')
+  }
+}
+
+export const MILO_INSCRIT = 'ONGOING'
+export const MILO_REFUS_TIERS = 'REFUSAL'
+export const MILO_REFUS_JEUNE = 'REFUSAL_YOUNG'

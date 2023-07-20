@@ -14,7 +14,12 @@ import {
   OffreTypeCode,
   SessionConseillerDetailDto
 } from '../../clients/dto/milo.dto'
-import { MiloClient } from '../../clients/milo-client'
+import {
+  MILO_INSCRIT,
+  MILO_REFUS_JEUNE,
+  MILO_REFUS_TIERS,
+  MiloClient
+} from '../../clients/milo-client'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
 import {
   SessionMiloDto,
@@ -236,11 +241,11 @@ function dtoToStatutInscription(
   inscription: InscritSessionMiloDto
 ): SessionMilo.Inscription.Statut {
   switch (inscription.statut) {
-    case 'ONGOING':
+    case MILO_INSCRIT:
       return SessionMilo.Inscription.Statut.INSCRIT
-    case 'REFUSAL':
+    case MILO_REFUS_TIERS:
       return SessionMilo.Inscription.Statut.REFUS_TIERS
-    case 'REFUSAL_YOUNG':
+    case MILO_REFUS_JEUNE:
       return SessionMilo.Inscription.Statut.REFUS_JEUNE
     default:
       const logger = new Logger('SessionMilo.dtoToStatutInscription')
