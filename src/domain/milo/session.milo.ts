@@ -129,16 +129,16 @@ function extraireIdsJeunesAInscrire(
   session: SessionMilo,
   inscriptions: Array<Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>>
 ): string[] {
-  return inscriptions
-    .filter(({ statut }) => statut === SessionMilo.Inscription.Statut.INSCRIT)
-    .filter(
-      inscriptionATraiter =>
-        !session.inscriptions.some(
-          inscriptionExistante =>
-            inscriptionExistante.idJeune === inscriptionATraiter.idJeune
-        )
-    )
-    .map(({ idJeune }) => idJeune)
+  const idsJeunesAInscrire = []
+
+  for (const inscription of inscriptions) {
+    if (inscription.statut !== SessionMilo.Inscription.Statut.INSCRIT) continue
+    if (findJeuneDejaInscrit(session, inscription.idJeune)) continue
+
+    idsJeunesAInscrire.push(inscription.idJeune)
+  }
+
+  return idsJeunesAInscrire
 }
 
 function extraireInscriptionsASupprimer(
@@ -148,21 +148,29 @@ function extraireInscriptionsASupprimer(
   idInscription: string
   idJeune: string
 }> {
-  return inscriptions
-    .filter(
-      ({ statut }) => statut === SessionMilo.Inscription.Statut.DESINSCRIT
-    )
-    .filter(desinscriptionATraiter =>
-      session.inscriptions.some(
-        inscriptionExistante =>
-          inscriptionExistante.idJeune === desinscriptionATraiter.idJeune
-      )
-    )
-    .map(desinscriptionATraiter => ({
-      idJeune: desinscriptionATraiter.idJeune,
-      idInscription: session.inscriptions.find(
-        inscriptionExistante =>
-          inscriptionExistante.idJeune === desinscriptionATraiter.idJeune
-      )!.idInscription
-    }))
+  const inscriptionsASupprimer = []
+
+  for (const inscription of inscriptions) {
+    if (inscription.statut !== SessionMilo.Inscription.Statut.DESINSCRIT)
+      continue
+
+    const jeuneDejaInscrit = findJeuneDejaInscrit(session, inscription.idJeune)
+    if (!jeuneDejaInscrit) continue
+
+    inscriptionsASupprimer.push({
+      idJeune: inscription.idJeune,
+      idInscription: jeuneDejaInscrit.idInscription
+    })
+  }
+
+  return inscriptionsASupprimer
+}
+
+function findJeuneDejaInscrit(
+  session: SessionMilo,
+  idJeune: string
+): SessionMilo.Inscription | undefined {
+  return session.inscriptions.find(
+    inscriptionExistante => inscriptionExistante.idJeune === idJeune
+  )
 }
