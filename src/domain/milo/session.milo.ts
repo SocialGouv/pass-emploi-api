@@ -47,18 +47,25 @@ export namespace SessionMilo {
     idsJeunesAInscrire: string[]
     inscriptionsASupprimer: Array<{ idJeune: string; idInscription: string }>
   }> {
-    if (
-      session.nbPlacesDisponibles &&
-      inscriptions.length > session.nbPlacesDisponibles
-    ) {
-      return failure(new MaxInscritsDepasse())
-    }
-
     const idsJeunesAInscrire = extraireIdsJeunesAInscrire(session, inscriptions)
     const inscriptionsASupprimer = extraireInscriptionsASupprimer(
       session,
       inscriptions
     )
+
+    if (session.nbPlacesDisponibles) {
+      const inscrits = session.inscriptions.filter(
+        ({ statut }) => statut === SessionMilo.Inscription.Statut.INSCRIT
+      )
+      if (
+        session.nbPlacesDisponibles <
+        inscrits.length +
+          idsJeunesAInscrire.length -
+          inscriptionsASupprimer.length
+      ) {
+        return failure(new MaxInscritsDepasse())
+      }
+    }
 
     return success({
       idsJeunesAInscrire,

@@ -139,7 +139,10 @@ describe('UpdateSessionMiloCommandHandler', () => {
 
       it('met à jour une session si le conseiller y a accès', async () => {
         // Given
-        const session = uneSessionMilo({ inscriptions: [] })
+        const session = uneSessionMilo({
+          inscriptions: [],
+          nbPlacesDisponibles: 2
+        })
         sessionMiloRepository.getForConseiller.resolves(success(session))
 
         // When
@@ -202,7 +205,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
       it('empêche de dépasser le nombre maximum de participants', async () => {
         // Given
         const session = uneSessionMilo({
-          nbPlacesDisponibles: 2,
+          nbPlacesDisponibles: 1,
           inscriptions: []
         })
         sessionMiloRepository.getForConseiller.resolves(success(session))
