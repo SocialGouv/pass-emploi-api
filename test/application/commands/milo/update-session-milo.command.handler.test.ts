@@ -261,7 +261,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
         )
       })
 
-      // TODO vérifier
+      // TODO traiter
       it('empêche de dépasser le nombre maximum de participants', async () => {
         // Given
         const session = uneSessionMilo({
