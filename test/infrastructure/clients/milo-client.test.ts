@@ -58,12 +58,18 @@ describe('MiloClient', () => {
       const idDossier = 'idDossier'
 
       nock(MILO_BASE_URL)
-        .get(`/operateurs/sessions?idDossier=${idDossier}`)
+        .get(
+          `/operateurs/sessions?idDossier=${idDossier}&dateDebutRecherche=2023-07-21`
+        )
         .reply(200, uneListeSessionsJeuneDto)
         .isDone()
 
       // When
-      const result = await miloClient.getSessionsJeune(idpToken, idDossier)
+      const result = await miloClient.getSessionsJeune(
+        idpToken,
+        idDossier,
+        DateTime.fromISO('2023-07-21T17:53:42')
+      )
 
       // Then
       expect(result).to.deep.equal(success(uneListeSessionsJeuneDto))

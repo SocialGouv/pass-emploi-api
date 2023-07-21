@@ -16,6 +16,8 @@ import {
   SessionTypeQueryModel
 } from '../query-models/sessions.milo.query.model'
 
+export const MILO_DATE_FORMAT = 'yyyy-MM-dd HH:mm:ss'
+
 function buildSessionTypeQueryModel(
   type: OffreTypeCode
 ): SessionTypeQueryModel {
@@ -38,14 +40,14 @@ export function mapSessionJeuneDtoToQueryModel(
     nomOffre: sessionDto.offre.nom,
     dateHeureDebut: DateTime.fromFormat(
       sessionDto.session.dateHeureDebut,
-      'yyyy-MM-dd HH:mm:ss',
+      MILO_DATE_FORMAT,
       { zone: timezone }
     )
       .toUTC()
       .toISO(),
     dateHeureFin: DateTime.fromFormat(
       sessionDto.session.dateHeureFin,
-      'yyyy-MM-dd HH:mm:ss',
+      MILO_DATE_FORMAT,
       { zone: timezone }
     )
       .toUTC()
@@ -75,14 +77,14 @@ export function mapSessionConseillerDtoToQueryModel(
     estVisible: estVisible,
     dateHeureDebut: DateTime.fromFormat(
       sessionDto.session.dateHeureDebut,
-      'yyyy-MM-dd HH:mm:ss',
+      MILO_DATE_FORMAT,
       { zone: timezone }
     )
       .toUTC()
       .toISO(),
     dateHeureFin: DateTime.fromFormat(
       sessionDto.session.dateHeureFin,
-      'yyyy-MM-dd HH:mm:ss',
+      MILO_DATE_FORMAT,
       { zone: timezone }
     )
       .toUTC()
@@ -105,14 +107,14 @@ export function mapDetailSessionJeuneDtoToQueryModel(
     type: buildSessionTypeQueryModel(sessionDto.offre.type),
     dateHeureDebut: DateTime.fromFormat(
       sessionDto.session.dateHeureDebut,
-      'yyyy-MM-dd HH:mm:ss',
+      MILO_DATE_FORMAT,
       { zone: timezone }
     )
       .toUTC()
       .toISO(),
     dateHeureFin: DateTime.fromFormat(
       sessionDto.session.dateHeureFin,
-      'yyyy-MM-dd HH:mm:ss',
+      MILO_DATE_FORMAT,
       { zone: timezone }
     )
       .toUTC()
