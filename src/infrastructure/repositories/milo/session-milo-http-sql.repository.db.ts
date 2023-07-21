@@ -93,8 +93,11 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     )
     if (isFailure(resultDesinscriptions)) return resultDesinscriptions
 
+    const modificationsTriees = [...inscriptionsAModifier].sort(
+      trierReinscriptionsEnDernier
+    )
     const resultModifications = await this.modifier(
-      inscriptionsAModifier,
+      modificationsTriees,
       idsDossier,
       tokenMilo
     )
@@ -328,4 +331,12 @@ function inscriptionToStatutWithCommentaireDto(
     default:
       throw new Error('Ça devrait pas arriver')
   }
+}
+
+function trierReinscriptionsEnDernier({
+  statut
+}: {
+  statut: SessionMilo.Inscription.Statut
+}): number {
+  return statut === SessionMilo.Inscription.Statut.INSCRIT ? 1 : -1
 }

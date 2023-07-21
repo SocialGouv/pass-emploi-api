@@ -19,7 +19,7 @@ import {
 import { uneSessionMilo } from '../../../fixtures/sessions.fixture'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
-import { expect, StubbedClass, stubClass } from '../../../utils'
+import { expect, sinon, StubbedClass, stubClass } from '../../../utils'
 import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('SessionMiloHttpSqlRepository', () => {
@@ -301,12 +301,12 @@ describe('SessionMiloHttpSqlRepository', () => {
 
     it('soumet les modifications d’inscriptions à Milo', async () => {
       // Then
-      expect(
+      sinon.assert.callOrder(
+        miloClient.desinscrireJeunesSession,
+        miloClient.modifierInscriptionJeunesSession,
         miloClient.inscrireJeunesSession
-      ).to.have.been.calledOnceWithExactly(tokenMilo, idSession, [
-        'id-dossier-hermione',
-        'id-dossier-ron'
-      ])
+      )
+
       expect(
         miloClient.desinscrireJeunesSession
       ).to.have.been.calledOnceWithExactly(tokenMilo, [
@@ -319,9 +319,9 @@ describe('SessionMiloHttpSqlRepository', () => {
         miloClient.modifierInscriptionJeunesSession
       ).to.have.been.calledOnceWithExactly(tokenMilo, [
         {
-          idDossier: 'id-dossier-ginny',
-          idInstanceSession: 'id-inscription-ginny',
-          statut: 'ONGOING'
+          idDossier: 'id-dossier-fred',
+          idInstanceSession: 'id-inscription-fred',
+          statut: 'REFUSAL'
         },
         {
           idDossier: 'id-dossier-luna',
@@ -330,10 +330,16 @@ describe('SessionMiloHttpSqlRepository', () => {
           commentaire: 'J’ai pas envie'
         },
         {
-          idDossier: 'id-dossier-fred',
-          idInstanceSession: 'id-inscription-fred',
-          statut: 'REFUSAL'
+          idDossier: 'id-dossier-ginny',
+          idInstanceSession: 'id-inscription-ginny',
+          statut: 'ONGOING'
         }
+      ])
+      expect(
+        miloClient.inscrireJeunesSession
+      ).to.have.been.calledOnceWithExactly(tokenMilo, idSession, [
+        'id-dossier-hermione',
+        'id-dossier-ron'
       ])
     })
   })
