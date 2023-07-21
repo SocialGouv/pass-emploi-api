@@ -1,0 +1,27 @@
+export const codeCommentDemarchesCachees = new Set([
+  'C01.01',
+  'C01.02',
+  'C02.01',
+  'C02.02',
+  'C03.02',
+  'C06.01',
+  'C06.02',
+  'C37.01',
+  'C37.02',
+  'C40.01',
+  'C11.01',
+  'C11.04',
+  'C12.01',
+  'C12.05',
+  'C17.01',
+  'C17.02',
+  'C18.05',
+  'C19.02',
+  'C22.01',
+  'C22.02',
+  'C35.04',
+  'C39.01',
+  'C39.02',
+  'C39.03'
+])
+export const codeQuoiDemarchesCachees = new Set(['Q36', 'Q41'])

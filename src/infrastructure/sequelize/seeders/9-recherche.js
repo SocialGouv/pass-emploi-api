@@ -8,7 +8,17 @@ module.exports = {
         type: 'OFFRES_EMPLOI',
         metier: 'Suivi des actions',
         localisation: 'Paris',
-        criteres: {},
+        criteres: JSON.stringify({
+          q: 'Devops',
+          duree: [],
+          rayon: null,
+          commune: null,
+          contrat: [],
+          alternance: false,
+          experience: [],
+          departement: '75',
+          debutantAccepte: null
+        }),
         date_creation: '2023-02-24Z10:00:00.000',
         date_derniere_recherche: '2023-02-24Z10:00:00.000',
         etat_derniere_recherche: 'SUCCES'
@@ -20,7 +30,16 @@ module.exports = {
         type: 'OFFRES_EMPLOI',
         metier: 'Suivi des actions',
         localisation: 'Paris',
-        criteres: {},
+        criteres: JSON.stringify({
+          duree: [],
+          rayon: null,
+          commune: null,
+          contrat: [],
+          alternance: false,
+          experience: [],
+          departement: null,
+          debutantAccepte: null
+        }),
         date_creation: '2023-03-24Z10:00:00.000',
         date_derniere_recherche: '2023-03-24Z10:00:00.000',
         etat_derniere_recherche: 'SUCCES'
@@ -32,7 +51,12 @@ module.exports = {
         type: 'OFFRES_IMMERSION',
         metier: 'Suivi des actions',
         localisation: 'Paris',
-        criteres: {},
+        criteres: JSON.stringify({
+          lat: 48.830108,
+          lon: 2.323026,
+          rome: 'D1102',
+          distance: null
+        }),
         date_creation: '2021-03-25Z10:00:00.000',
         date_derniere_recherche: '2021-03-25Z10:00:00.000',
         etat_derniere_recherche: 'SUCCES'
@@ -44,7 +68,13 @@ module.exports = {
         type: 'OFFRES_SERVICES_CIVIQUE',
         metier: 'Suivi des actions',
         localisation: 'Paris',
-        criteres: {},
+        criteres: JSON.stringify({
+          lat: 47.779684,
+          lon: 0.775825,
+          domaine: null,
+          distance: null,
+          dateDeDebutMinimum: null
+        }),
         date_creation: '2023-03-24Z10:00:00.000',
         date_derniere_recherche: '2023-03-24Z10:00:00.000',
         etat_derniere_recherche: 'ECHEC'

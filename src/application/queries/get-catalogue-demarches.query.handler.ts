@@ -13,14 +13,20 @@ import {
 } from 'src/infrastructure/clients/pole-emploi-partenaire-client'
 import { buildError } from 'src/utils/logger.module'
 
-export interface GetCatalogueQuery extends Query {
+import { TypesDemarcheQueryModel } from './query-models/types-demarche.query-model'
+import {
+  codeCommentDemarchesCachees,
+  codeQuoiDemarchesCachees
+} from 'src/infrastructure/clients/utils/demarche-liste-visible'
+
+export interface GetCatalogueDemarchesQuery extends Query {
   accessToken: string
   structure: Core.Structure
 }
 
 @Injectable()
-export class GetCatalogueQueryHandler extends QueryHandler<
-  GetCatalogueQuery,
+export class GetCatalogueDemarchesQueryHandler extends QueryHandler<
+  GetCatalogueDemarchesQuery,
   ThematiqueQueryModel[]
 > {
   constructor(
@@ -32,7 +38,9 @@ export class GetCatalogueQueryHandler extends QueryHandler<
     super('GetCatalogueQueryHandler')
   }
 
-  async handle(query: GetCatalogueQuery): Promise<ThematiqueQueryModel[]> {
+  async handle(
+    query: GetCatalogueDemarchesQuery
+  ): Promise<ThematiqueQueryModel[]> {
     const idpToken = await this.keycloakClient.exchangeTokenJeune(
       query.accessToken,
       query.structure
@@ -50,33 +58,44 @@ export class GetCatalogueQueryHandler extends QueryHandler<
       )
       return []
     }
+
     return catalogueResult.data.map(pourquoi => {
       const codePourquoi = pourquoi.code
       const libellePourquoi = pourquoi.libelle
+      const listeDemarches: TypesDemarcheQueryModel[] = []
+      pourquoi.typesDemarcheRetourEmploi.forEach(quoi => {
+        if (!codeQuoiDemarchesCachees.has(quoi.code)) {
+          const listeDemarchesVisible = quoi.moyensRetourEmploi.filter(
+            comment => !codeCommentDemarchesCachees.has(comment.code)
+          )
+          if (listeDemarchesVisible.length > 0) {
+            listeDemarches.push({
+              codePourquoi,
+              libellePourquoi,
+              codeQuoi: quoi.code,
+              libelleQuoi: quoi.libelle,
+              commentObligatoire: quoi.moyensRetourEmploi.length > 0,
+              comment: listeDemarchesVisible.map(comment => {
+                return {
+                  code: comment.code,
+                  label: comment.libelle
+                }
+              })
+            })
+          }
+        }
+      })
+
       return {
         code: codePourquoi,
         libelle: libellePourquoi,
-        demarches: pourquoi.typesDemarcheRetourEmploi.map(quoi => {
-          return {
-            codePourquoi,
-            libellePourquoi,
-            codeQuoi: quoi.code,
-            libelleQuoi: quoi.libelle,
-            commentObligatoire: quoi.moyensRetourEmploi.length > 0,
-            comment: quoi.moyensRetourEmploi.map(comment => {
-              return {
-                code: comment.code,
-                label: comment.libelle
-              }
-            })
-          }
-        })
+        demarches: listeDemarches
       }
     })
   }
 
   async authorize(
-    _query: GetCatalogueQuery,
+    _query: GetCatalogueDemarchesQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     return this.jeuneAuthorizer.autoriserLeJeune(

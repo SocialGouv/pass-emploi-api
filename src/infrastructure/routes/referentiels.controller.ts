@@ -32,7 +32,7 @@ import { handleFailure } from './failure.handler'
 import { GetAgencesQueryParams } from './validation/agences.inputs'
 import { TypesDemarchesQueryParams } from './validation/demarches.inputs'
 import { ThematiqueQueryModel } from 'src/application/queries/query-models/catalogue.query-model'
-import { GetCatalogueQueryHandler } from 'src/application/queries/get-catalogue.query.handler'
+import { GetCatalogueDemarchesQueryHandler } from 'src/application/queries/get-catalogue-demarches.query.handler'
 
 @Controller('referentiels')
 @ApiTags('Referentiels')
@@ -42,7 +42,7 @@ export class ReferentielsController {
     private readonly getMetiersRomeQueryHandler: GetMetiersRomeQueryHandler,
     private readonly getTypesRendezvousQueryHandler: GetTypesRendezVousQueryHandler,
     private readonly rechercherTypesDemarcheQueryHandler: RechercherTypesDemarcheQueryHandler,
-    private readonly getCatalogueQueryHandler: GetCatalogueQueryHandler,
+    private readonly getCatalogueDemarchesQueryHandler: GetCatalogueDemarchesQueryHandler,
     private readonly getAgencesQueryHandler: GetAgencesQueryHandler,
     private readonly getMotifsSuppressionJeuneQueryHandler: GetMotifsSuppressionJeuneQueryHandler,
     private readonly getTypesQualificationsQueryHandler: GetTypesQualificationsQueryHandler,
@@ -97,13 +97,13 @@ export class ReferentielsController {
     return this.rechercherTypesDemarcheQueryHandler.execute(query, utilisateur)
   }
 
-  @Get('pole-emploi/catalogue')
+  @Get('pole-emploi/catalogue-demarches')
   @ApiOAuth2([])
-  async getCatalogue(
+  async getCatalogueDemarches(
     @AccessToken() accessToken: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<ThematiqueQueryModel[]> {
-    return this.getCatalogueQueryHandler.execute(
+    return this.getCatalogueDemarchesQueryHandler.execute(
       { accessToken, structure: utilisateur.structure },
       utilisateur
     )

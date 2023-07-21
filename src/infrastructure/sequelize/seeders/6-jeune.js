@@ -102,6 +102,16 @@ module.exports = {
         date_premiere_connexion: '2021-11-24T10:00:00.000Z',
         structure: 'MILO',
         id_authentification: 'fc075265-0464-4530-a15c-f9483725bac7'
+      },
+      {
+        id: '20a2133e-94b7-4ef0-a530-9e11d0a7d093',
+        prenom: 'FABRICE',
+        nom: 'TRAITCHEVITCH',
+        id_conseiller: 'e04bb080-5805-402e-a527-0f9d2ee0840f',
+        date_creation: '2021-11-24T10:00:00.000Z',
+        date_premiere_connexion: '2021-11-24T10:00:00.000Z',
+        structure: 'POLE_EMPLOI',
+        id_authentification: 'ebd96d6f-195e-470d-9ec3-95feeb9b4d4e'
       }
     ])
   },
