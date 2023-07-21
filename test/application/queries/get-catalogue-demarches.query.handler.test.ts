@@ -4,7 +4,7 @@ import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-auth
 import { Core, estPoleEmploiBRSA } from '../../../src/domain/core'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { StubbedClass, expect, stubClass } from '../../utils'
-import { GetCatalogueQueryHandler } from 'src/application/queries/get-catalogue.query.handler'
+import { GetCatalogueDemarchesQueryHandler } from 'src/application/queries/get-catalogue-demarches.query.handler'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import { success } from 'src/building-blocks/types/result'
 
@@ -12,13 +12,13 @@ describe('GetCatalogueQueryHandler', () => {
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let keycloakClient: StubbedClass<KeycloakClient>
-  let handler: GetCatalogueQueryHandler
+  let handler: GetCatalogueDemarchesQueryHandler
 
   beforeEach(() => {
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     keycloakClient = stubClass(KeycloakClient)
-    handler = new GetCatalogueQueryHandler(
+    handler = new GetCatalogueDemarchesQueryHandler(
       poleEmploiPartenaireClient,
       jeuneAuthorizer,
       keycloakClient

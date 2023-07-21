@@ -19,14 +19,14 @@ import {
   codeQuoiDemarchesCachees
 } from 'src/infrastructure/clients/utils/demarche-liste-visible'
 
-export interface GetCatalogueQuery extends Query {
+export interface GetCatalogueDemarchesQuery extends Query {
   accessToken: string
   structure: Core.Structure
 }
 
 @Injectable()
-export class GetCatalogueQueryHandler extends QueryHandler<
-  GetCatalogueQuery,
+export class GetCatalogueDemarchesQueryHandler extends QueryHandler<
+  GetCatalogueDemarchesQuery,
   ThematiqueQueryModel[]
 > {
   constructor(
@@ -38,7 +38,9 @@ export class GetCatalogueQueryHandler extends QueryHandler<
     super('GetCatalogueQueryHandler')
   }
 
-  async handle(query: GetCatalogueQuery): Promise<ThematiqueQueryModel[]> {
+  async handle(
+    query: GetCatalogueDemarchesQuery
+  ): Promise<ThematiqueQueryModel[]> {
     const idpToken = await this.keycloakClient.exchangeTokenJeune(
       query.accessToken,
       query.structure
@@ -93,7 +95,7 @@ export class GetCatalogueQueryHandler extends QueryHandler<
   }
 
   async authorize(
-    _query: GetCatalogueQuery,
+    _query: GetCatalogueDemarchesQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     return this.jeuneAuthorizer.autoriserLeJeune(

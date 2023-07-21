@@ -24,6 +24,7 @@ import { StubbedClass, stubClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 import Structure = Core.Structure
+import { GetCatalogueDemarchesQueryHandler } from '../../../src/application/queries/get-catalogue-demarches.query.handler'
 
 let getCommunesEtDepartementsQueryHandler: StubbedClass<GetCommunesEtDepartementsQueryHandler>
 let getAgencesQueryHandler: StubbedClass<GetAgencesQueryHandler>
@@ -32,6 +33,7 @@ let getMotifsSuppressionQueryHandler: StubbedClass<GetMotifsSuppressionJeuneQuer
 let getTypesQualificationsQueryHandler: StubbedClass<GetTypesQualificationsQueryHandler>
 let getActionsPredefiniesQueryHandler: StubbedClass<GetActionsPredefiniesQueryHandler>
 let getMetiersRomeQueryHandler: StubbedClass<GetMetiersRomeQueryHandler>
+let getCatalogueDemarchesQueryHandler: StubbedClass<GetCatalogueDemarchesQueryHandler>
 
 describe('ReferentielsController', () => {
   getCommunesEtDepartementsQueryHandler = stubClass(
@@ -50,6 +52,9 @@ describe('ReferentielsController', () => {
   getMetiersRomeQueryHandler = stubClass(GetMetiersRomeQueryHandler)
   getActionsPredefiniesQueryHandler = stubClass(
     GetActionsPredefiniesQueryHandler
+  )
+  getCatalogueDemarchesQueryHandler = stubClass(
+    GetCatalogueDemarchesQueryHandler
   )
 
   let app: INestApplication
@@ -72,6 +77,9 @@ describe('ReferentielsController', () => {
     getMetiersRomeQueryHandler = app.get(GetMetiersRomeQueryHandler)
     getActionsPredefiniesQueryHandler = app.get(
       GetActionsPredefiniesQueryHandler
+    )
+    getCatalogueDemarchesQueryHandler = app.get(
+      GetCatalogueDemarchesQueryHandler
     )
   })
 
@@ -280,7 +288,7 @@ describe('ReferentielsController', () => {
     })
   })
 
-  describe('GET /referentiels/types-demarche', () => {
+  describe('GET /referentiels/types-demarches', () => {
     describe('sans query param', () => {
       it('rejette', () => {
         // When - Then
@@ -326,6 +334,26 @@ describe('ReferentielsController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       '/referentiels/pole-emploi/types-demarches'
+    )
+  })
+
+  describe('GET /referentiels/catalogue-demarches', () => {
+    describe('quand PE est UP', () => {
+      it('renvoie le catalogue de démarches', () => {
+        // Given
+        getCatalogueDemarchesQueryHandler.execute.resolves([])
+
+        // When - Then
+        return request(app.getHttpServer())
+          .get('/referentiels/pole-emploi/types-demarches?recherche=salon')
+          .set('Authorization', 'Bearer ceci-est-un-jwt')
+          .expect(HttpStatus.OK)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/referentiels/pole-emploi/catalogue-demarches'
     )
   })
 
