@@ -139,7 +139,12 @@ describe('UpdateSessionMiloCommandHandler', () => {
         // Then
         expect(result).to.deep.equal(emptySuccess())
         expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
-          { ...session, estVisible: true, dateModification: uneDatetime() },
+          {
+            id: session.id,
+            idStructureMilo: session.idStructureMilo,
+            estVisible: true,
+            dateModification: uneDatetime()
+          },
           {
             idsJeunesAInscrire: [],
             inscriptionsASupprimer: [],
@@ -183,7 +188,12 @@ describe('UpdateSessionMiloCommandHandler', () => {
         // Then
         expect(result).to.deep.equal(emptySuccess())
         expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
-          { ...session, estVisible: true, dateModification: uneDatetime() },
+          {
+            id: session.id,
+            idStructureMilo: session.idStructureMilo,
+            estVisible: true,
+            dateModification: uneDatetime()
+          },
           {
             idsJeunesAInscrire: ['id-harry'],
             inscriptionsASupprimer: [],
@@ -227,7 +237,12 @@ describe('UpdateSessionMiloCommandHandler', () => {
         // Then
         expect(result).to.deep.equal(emptySuccess())
         expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
-          { ...session, estVisible: true, dateModification: uneDatetime() },
+          {
+            id: session.id,
+            idStructureMilo: session.idStructureMilo,
+            estVisible: true,
+            dateModification: uneDatetime()
+          },
           {
             idsJeunesAInscrire: [],
             inscriptionsASupprimer: [
@@ -310,7 +325,12 @@ describe('UpdateSessionMiloCommandHandler', () => {
         // Then
         expect(result).to.deep.equal(emptySuccess())
         expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
-          { ...session, estVisible: true, dateModification: uneDatetime() },
+          {
+            id: session.id,
+            idStructureMilo: session.idStructureMilo,
+            estVisible: true,
+            dateModification: uneDatetime()
+          },
           {
             idsJeunesAInscrire: [],
             inscriptionsASupprimer: [],
@@ -405,7 +425,12 @@ describe('UpdateSessionMiloCommandHandler', () => {
         // Then
         expect(result).to.deep.equal(emptySuccess())
         expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
-          { ...session, estVisible: true, dateModification: uneDatetime() },
+          {
+            id: session.id,
+            idStructureMilo: session.idStructureMilo,
+            estVisible: true,
+            dateModification: uneDatetime()
+          },
           {
             idsJeunesAInscrire: ['id-luna'],
             inscriptionsASupprimer: [
