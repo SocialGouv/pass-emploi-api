@@ -11,6 +11,7 @@ import { Conseiller } from 'src/domain/conseiller/conseiller'
 import { estMilo } from 'src/domain/core'
 import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo'
 import {
+  ModificationInscription,
   SessionMilo,
   SessionMiloRepositoryToken
 } from 'src/domain/milo/session.milo'
@@ -24,9 +25,7 @@ export interface UpdateSessionMiloCommand extends Command {
   idConseiller: string
   token: string
   estVisible: boolean
-  inscriptions?: Array<
-    Pick<SessionMilo.Inscription, 'idJeune' | 'statut' | 'commentaire'>
-  >
+  inscriptions?: ModificationInscription[]
 }
 
 @Injectable()

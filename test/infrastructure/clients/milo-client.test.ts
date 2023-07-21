@@ -13,7 +13,6 @@ import {
   uneSessionJeuneListeDto
 } from 'test/fixtures/milo-dto.fixture'
 import { testConfig } from 'test/utils/module-for-testing'
-import { SessionMilo } from '../../../src/domain/milo/session.milo'
 
 describe('MiloClient', () => {
   const configService = testConfig()
@@ -237,20 +236,18 @@ describe('MiloClient', () => {
         {
           idDossier: 'id-dossier-1',
           idInstanceSession: 'id-inscription-1',
-          inscription: { statut: SessionMilo.Inscription.Statut.INSCRIT }
+          statut: 'ONGOING'
         },
         {
           idDossier: 'id-dossier-2',
           idInstanceSession: 'id-inscription-2',
-          inscription: { statut: SessionMilo.Inscription.Statut.REFUS_TIERS }
+          statut: 'REFUSAL'
         },
         {
           idDossier: 'id-dossier-3',
           idInstanceSession: 'id-inscription-3',
-          inscription: {
-            statut: SessionMilo.Inscription.Statut.REFUS_JEUNE,
-            commentaire: 'J’ai pas envie'
-          }
+          statut: 'REFUSAL_YOUNG',
+          commentaire: 'J’ai pas envie'
         }
       ]
 

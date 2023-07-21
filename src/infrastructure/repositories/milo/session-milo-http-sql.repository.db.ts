@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { SessionMilo } from 'src/domain/milo/session.milo'
+import { InscriptionsATraiter, SessionMilo } from 'src/domain/milo/session.milo'
 import {
   emptySuccess,
   isFailure,
@@ -14,12 +14,7 @@ import {
   OffreTypeCode,
   SessionConseillerDetailDto
 } from '../../clients/dto/milo.dto'
-import {
-  MILO_INSCRIT,
-  MILO_REFUS_JEUNE,
-  MILO_REFUS_TIERS,
-  MiloClient
-} from '../../clients/milo-client'
+import { MiloClient } from '../../clients/milo-client'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
 import {
   SessionMiloDto,
@@ -79,27 +74,35 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
         'id' | 'idStructureMilo' | 'estVisible' | 'dateModification'
       >
     >,
-    inscriptionsATraiter: {
-      idsJeunesAInscrire: string[]
-      inscriptionsASupprimer: Array<{ idJeune: string; idInscription: string }>
-    },
+    {
+      inscriptionsAModifier,
+      inscriptionsASupprimer,
+      idsJeunesAInscrire
+    }: InscriptionsATraiter,
     tokenMilo: string
   ): Promise<Result> {
-    const idsJeunes = inscriptionsATraiter.idsJeunesAInscrire.concat(
-      inscriptionsATraiter.inscriptionsASupprimer.map(({ idJeune }) => idJeune)
-    )
+    const idsJeunes = idsJeunesAInscrire
+      .concat(inscriptionsASupprimer.map(({ idJeune }) => idJeune))
+      .concat(inscriptionsAModifier.map(({ idJeune }) => idJeune))
     const idsDossier = await recupererIdsDossier(idsJeunes)
 
     const resultDesinscriptions = await this.desinscrire(
-      inscriptionsATraiter.inscriptionsASupprimer,
+      inscriptionsASupprimer,
       idsDossier,
       tokenMilo
     )
     if (isFailure(resultDesinscriptions)) return resultDesinscriptions
 
+    const resultModifications = await this.modifier(
+      inscriptionsAModifier,
+      idsDossier,
+      tokenMilo
+    )
+    if (isFailure(resultModifications)) return resultModifications
+
     const resultInscriptions = await this.inscrire(
       session.id,
-      inscriptionsATraiter.idsJeunesAInscrire,
+      idsJeunesAInscrire,
       idsDossier,
       tokenMilo
     )
@@ -132,6 +135,24 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     )
   }
 
+  private async modifier(
+    inscriptionsAModifier: Array<
+      Omit<SessionMilo.Inscription, 'nom' | 'prenom'>
+    >,
+    idsDossier: Map<string, string>,
+    tokenMilo: string
+  ): Promise<Result> {
+    const modifications = inscriptionsAModifier.map(modification => ({
+      idDossier: idsDossier.get(modification.idJeune)!,
+      idInstanceSession: modification.idInscription,
+      ...inscriptionToStatutWithCommentaireDto(modification)
+    }))
+    return this.miloClient.modifierInscriptionJeunesSession(
+      tokenMilo,
+      modifications
+    )
+  }
+
   private async desinscrire(
     inscriptionsASupprimer: Array<{ idJeune: string; idInscription: string }>,
     idsDossier: Map<string, string>,
@@ -144,6 +165,10 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     return this.miloClient.desinscrireJeunesSession(tokenMilo, desinscriptions)
   }
 }
+
+const MILO_INSCRIT = 'ONGOING'
+const MILO_REFUS_TIERS = 'REFUSAL'
+const MILO_REFUS_JEUNE = 'REFUSAL_YOUNG'
 
 function dtoToSessionMilo(
   { session: sessionDto, offre: offreDto }: SessionConseillerDetailDto,
@@ -288,4 +313,19 @@ async function recupererIdsDossier(
     map.set(jeuneSql.id, jeuneSql.idPartenaire!)
     return map
   }, new Map<string, string>())
+}
+
+function inscriptionToStatutWithCommentaireDto(
+  inscription: Pick<SessionMilo.Inscription, 'statut' | 'commentaire'>
+): { statut: string; commentaire?: string } {
+  switch (inscription.statut) {
+    case SessionMilo.Inscription.Statut.INSCRIT:
+      return { statut: MILO_INSCRIT }
+    case SessionMilo.Inscription.Statut.REFUS_TIERS:
+      return { statut: MILO_REFUS_TIERS }
+    case SessionMilo.Inscription.Statut.REFUS_JEUNE:
+      return { statut: MILO_REFUS_JEUNE, commentaire: inscription.commentaire }
+    default:
+      throw new Error('Ça devrait pas arriver')
+  }
 }

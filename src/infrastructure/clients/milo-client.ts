@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios'
 import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { DateTime } from 'luxon'
 import { firstValueFrom } from 'rxjs'
 import { ErreurHttp } from 'src/building-blocks/types/domain-error'
 import {
@@ -10,7 +11,6 @@ import {
   Result,
   success
 } from 'src/building-blocks/types/result'
-import { SessionMilo } from '../../domain/milo/session.milo'
 import {
   InscritSessionMiloDto,
   SessionConseillerDetailDto,
@@ -20,7 +20,6 @@ import {
   StructureConseillerMiloDto
 } from './dto/milo.dto'
 import { handleAxiosError } from './utils/axios-error-handler'
-import { DateTime } from 'luxon'
 
 @Injectable()
 export class MiloClient {
@@ -185,19 +184,17 @@ export class MiloClient {
 
   async modifierInscriptionJeunesSession(
     idpToken: string,
-    // FIXME use Pick<SessionMilo.Inscription>
     modifications: Array<{
       idDossier: string
       idInstanceSession: string
-      inscription: Pick<SessionMilo.Inscription, 'statut'> & {
-        commentaire?: string
-      }
+      statut: string
+      commentaire?: string
     }>
   ): Promise<Result> {
     for (const modification of modifications) {
       const result = await this.put(
         `dossiers/${modification.idDossier}/instances-session/${modification.idInstanceSession}`,
-        inscriptionToDto(modification.inscription),
+        { statut: modification.statut, commentaire: modification.commentaire },
         this.apiKeyInstanceSessionEcritureConseiller,
         idpToken
       )
@@ -235,7 +232,7 @@ export class MiloClient {
 
   private async put(
     suffixUrl: string,
-    payload: { [p: string]: string } | string,
+    payload: { [p: string]: string | undefined } | string,
     apiKey: string,
     idpToken: string
   ): Promise<Result> {
@@ -308,24 +305,3 @@ export class MiloClient {
     }
   }
 }
-
-function inscriptionToDto(
-  inscription: Pick<SessionMilo.Inscription, 'statut'> & {
-    commentaire?: string
-  }
-): { statut: string; commentaire?: string } {
-  switch (inscription.statut) {
-    case SessionMilo.Inscription.Statut.INSCRIT:
-      return { statut: MILO_INSCRIT }
-    case SessionMilo.Inscription.Statut.REFUS_TIERS:
-      return { statut: MILO_REFUS_TIERS }
-    case SessionMilo.Inscription.Statut.REFUS_JEUNE:
-      return { statut: MILO_REFUS_JEUNE, commentaire: inscription.commentaire }
-    default:
-      throw new Error('Ça devrait pas arriver')
-  }
-}
-
-export const MILO_INSCRIT = 'ONGOING'
-export const MILO_REFUS_TIERS = 'REFUSAL'
-export const MILO_REFUS_JEUNE = 'REFUSAL_YOUNG'

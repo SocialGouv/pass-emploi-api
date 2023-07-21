@@ -28,6 +28,11 @@ export interface SessionMilo {
   dateModification?: DateTime
 }
 
+export type ModificationInscription = Pick<
+  SessionMilo.Inscription,
+  'idJeune' | 'statut' | 'commentaire'
+>
+
 export type InscriptionsATraiter = {
   idsJeunesAInscrire: string[]
   inscriptionsASupprimer: Array<
@@ -48,7 +53,8 @@ export namespace SessionMilo {
     >
   > {
     return {
-      ...session,
+      id: session.id,
+      idStructureMilo: session.idStructureMilo,
       estVisible: visibilite,
       dateModification
     }
@@ -56,17 +62,13 @@ export namespace SessionMilo {
 
   export function extraireInscriptionsATraiter(
     session: SessionMilo,
-    inscriptions: Array<
-      Pick<SessionMilo.Inscription, 'idJeune' | 'statut' | 'commentaire'>
-    >
+    inscriptions: ModificationInscription[]
   ): Result<InscriptionsATraiter> {
     const inscriptionsATraiter = trierInscriptionsATraiter(
       session,
       inscriptions
     )
 
-    // todo ne pas oublier de remettre la logique relatif au nbMaxParticipants
-    // todo penser aux inscription  en statut inscrit qui libere des place
     const resultNbPlaces = verifierNombrePlaces(session, inscriptionsATraiter)
     if (isFailure(resultNbPlaces)) return resultNbPlaces
 
@@ -87,13 +89,7 @@ export namespace SessionMilo {
           'id' | 'idStructureMilo' | 'estVisible' | 'dateModification'
         >
       >,
-      inscriptionsATraiter: {
-        idsJeunesAInscrire: string[]
-        inscriptionsASupprimer: Array<{
-          idJeune: string
-          idInscription: string
-        }>
-      },
+      inscriptionsATraiter: InscriptionsATraiter,
       tokenMilo: string
     ): Promise<Result>
   }
@@ -128,9 +124,7 @@ export namespace SessionMilo {
 
 function trierInscriptionsATraiter(
   session: SessionMilo,
-  inscriptions: Array<
-    Pick<SessionMilo.Inscription, 'idJeune' | 'statut' | 'commentaire'>
-  >
+  inscriptions: ModificationInscription[]
 ): InscriptionsATraiter {
   const inscriptionsExistantes = getInscriptionsExistantes(session)
 
