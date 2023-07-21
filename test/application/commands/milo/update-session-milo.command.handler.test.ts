@@ -261,21 +261,75 @@ describe('UpdateSessionMiloCommandHandler', () => {
         )
       })
 
-      // TODO traiter
       it('empêche de dépasser le nombre maximum de participants', async () => {
         // Given
-        const session = uneSessionMilo({
-          nbPlacesDisponibles: 1,
-          inscriptions: []
+        const inscriptionsExistantes: SessionMilo.Inscription[] = [
+          {
+            idJeune: 'id-hermione',
+            idInscription: 'id-inscription-hermione',
+            nom: 'Granger',
+            prenom: 'Hermione',
+            statut: SessionMilo.Inscription.Statut.INSCRIT
+          },
+          {
+            idJeune: 'id-ron',
+            idInscription: 'id-inscription-ron',
+            nom: 'Weasley',
+            prenom: 'Ronald',
+            statut: SessionMilo.Inscription.Statut.INSCRIT
+          },
+          {
+            idJeune: 'id-ginny',
+            idInscription: 'id-inscription-ginny',
+            nom: 'Weasley',
+            prenom: 'Ginny',
+            statut: SessionMilo.Inscription.Statut.INSCRIT
+          },
+          {
+            idJeune: 'id-luna',
+            idInscription: 'id-inscription-luna',
+            nom: 'Lovegood',
+            prenom: 'Luna',
+            statut: SessionMilo.Inscription.Statut.INSCRIT
+          },
+          {
+            idJeune: 'id-fred',
+            idInscription: 'id-inscription-fred',
+            nom: 'Weasley',
+            prenom: 'Fred',
+            statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+          }
+        ]
+
+        // Given 3 places
+        const session2Places = uneSessionMilo({
+          nbPlacesDisponibles: 2,
+          inscriptions: inscriptionsExistantes
         })
-        sessionMiloRepository.getForConseiller.resolves(success(session))
+        sessionMiloRepository.getForConseiller.resolves(success(session2Places))
 
         // When
-        const result = await updateSessionMiloCommandHandler.handle(command)
+        const result2Places = await updateSessionMiloCommandHandler.handle(
+          command
+        )
 
         // Then
-        expect(result).to.deep.equal(failure(new MaxInscritsDepasse()))
+        expect(result2Places).to.deep.equal(failure(new MaxInscritsDepasse()))
         expect(sessionMiloRepository.save).not.to.have.been.called()
+
+        // Given 4 places
+        const session3Places = uneSessionMilo({
+          nbPlacesDisponibles: 3,
+          inscriptions: inscriptionsExistantes
+        })
+        sessionMiloRepository.getForConseiller.resolves(success(session3Places))
+
+        // When
+        const result3Places = await updateSessionMiloCommandHandler.handle(
+          command
+        )
+        // Then
+        expect(result3Places).to.deep.equal(emptySuccess())
       })
     })
   })

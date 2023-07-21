@@ -204,20 +204,25 @@ function verifierNombrePlaces(
 ): Result {
   if (!session.nbPlacesDisponibles) return emptySuccess()
 
-  const inscrits = session.inscriptions.filter(
+  const inscritsExistants = session.inscriptions.filter(
     ({ statut }) => statut === SessionMilo.Inscription.Statut.INSCRIT
   )
-  if (
-    session.nbPlacesDisponibles <
-    inscrits.length +
-      idsJeunesAInscrire.length +
-      inscriptionsAModifier.filter(
-        uneInscritionAModifier =>
-          uneInscritionAModifier.statut ===
-          SessionMilo.Inscription.Statut.INSCRIT
-      ).length -
-      inscriptionsASupprimer.length
-  ) {
+  const aReinscrire = inscriptionsAModifier.filter(
+    aModifier => aModifier.statut === SessionMilo.Inscription.Statut.INSCRIT
+  )
+
+  const aDesinscrire = inscritsExistants.filter(inscrit =>
+    inscriptionsASupprimer.some(({ idJeune }) => idJeune === inscrit.idJeune)
+  )
+  const aRefuser = inscritsExistants.filter(inscrit =>
+    inscriptionsAModifier.some(({ idJeune }) => idJeune === inscrit.idJeune)
+  )
+
+  const nbPlacesPrises =
+    inscritsExistants.length + idsJeunesAInscrire.length + aReinscrire.length
+  const nbPlacesLiberees = aDesinscrire.length + aRefuser.length
+
+  if (session.nbPlacesDisponibles < nbPlacesPrises - nbPlacesLiberees) {
     return failure(new MaxInscritsDepasse())
   }
   return emptySuccess()
