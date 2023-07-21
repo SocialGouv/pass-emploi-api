@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Put, Query } from '@nestjs/common'
+import { Body, Controller, Get, Param, Patch, Put, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   UpdateSessionMiloCommand,
@@ -95,15 +95,55 @@ export class ConseillersMiloController {
     summary:
       'Modifie les informations d’une session de la structure MILO du conseiller (visibilité, inscriptions)',
     description:
-      'Autorisé pour le conseiller Milo (ne gere que les inscriptions)'
+      'Autorisé pour le conseiller Milo\nPermet pour l’instant d’inscrire et de désinscrire'
   })
-  @Put('/:idConseiller/sessions/:idSession')
+  @Patch('/:idConseiller/sessions/:idSession')
   async updateSession(
     @Param('idConseiller') idConseiller: string,
     @Param('idSession') idSession: string,
     @Body() updateSessionMiloPayload: UpdateSessionMiloPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @AccessToken() accessToken: string
+  ): Promise<void> {
+    return this._updateSession(
+      idSession,
+      idConseiller,
+      accessToken,
+      updateSessionMiloPayload,
+      utilisateur
+    )
+  }
+
+  @ApiOperation({
+    summary:
+      'Modifie les informations d’une session de la structure MILO du conseiller (visibilité, inscriptions)',
+    description:
+      'Autorisé pour le conseiller Milo\nPermet pour l’instant d’inscrire et de désinscrire',
+    deprecated: true
+  })
+  @Put('/:idConseiller/sessions/:idSession')
+  async deprecatedUpdateSession(
+    @Param('idConseiller') idConseiller: string,
+    @Param('idSession') idSession: string,
+    @Body() updateSessionMiloPayload: UpdateSessionMiloPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string
+  ): Promise<void> {
+    return this._updateSession(
+      idSession,
+      idConseiller,
+      accessToken,
+      updateSessionMiloPayload,
+      utilisateur
+    )
+  }
+
+  private async _updateSession(
+    idSession: string,
+    idConseiller: string,
+    accessToken: string,
+    updateSessionMiloPayload: UpdateSessionMiloPayload,
+    utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     const command: UpdateSessionMiloCommand = {
       idSession,

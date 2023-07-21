@@ -166,6 +166,22 @@ export class MiloClient {
     return emptySuccess()
   }
 
+  async desinscrireJeunesSession(
+    idpToken: string,
+    desinscriptions: Array<{ idDossier: string; idInstanceSession: string }>
+  ): Promise<Result> {
+    for (const desinscription of desinscriptions) {
+      const result = await this.delete(
+        `dossiers/${desinscription.idDossier}/instances-session/${desinscription.idInstanceSession}`,
+        this.apiKeyInstanceSessionEcritureConseiller,
+        idpToken
+      )
+      if (isFailure(result)) return result
+    }
+
+    return emptySuccess()
+  }
+
   private async get<T>(
     suffixUrl: string,
     apiKey: string,
@@ -216,6 +232,27 @@ export class MiloClient {
       return emptySuccess()
     } catch (e) {
       return handleAxiosError(e, this.logger, 'Erreur POST Milo')
+    }
+  }
+
+  private async delete(
+    suffixUrl: string,
+    apiKey: string,
+    idpToken: string
+  ): Promise<Result> {
+    try {
+      await firstValueFrom(
+        this.httpService.delete(`${this.apiUrl}/operateurs/${suffixUrl}`, {
+          headers: {
+            Authorization: `Bearer ${idpToken}`,
+            'X-Gravitee-Api-Key': apiKey,
+            operateur: 'APPLICATION_CEJ'
+          }
+        })
+      )
+      return emptySuccess()
+    } catch (e) {
+      return handleAxiosError(e, this.logger, 'Erreur DELETE Milo')
     }
   }
 }

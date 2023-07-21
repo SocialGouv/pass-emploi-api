@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { SessionMilo } from 'src/domain/milo/session.milo'
-import { InscritSessionMiloQueryModel } from '../../../application/queries/query-models/sessions.milo.query.model'
 import {
   emptySuccess,
   isFailure,
@@ -75,20 +74,31 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
         'id' | 'idStructureMilo' | 'estVisible' | 'dateModification'
       >
     >,
-    inscriptionsModifiees: Array<
-      Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
-    >,
+    inscriptionsATraiter: {
+      idsJeunesAInscrire: string[]
+      inscriptionsASupprimer: Array<{ idJeune: string; idInscription: string }>
+    },
     tokenMilo: string
   ): Promise<Result> {
-    const idsDossierNouveauxInscrits = await getIdsDossierNouveauxInscrits(
-      inscriptionsModifiees
+    const idsJeunes = inscriptionsATraiter.idsJeunesAInscrire.concat(
+      inscriptionsATraiter.inscriptionsASupprimer.map(({ idJeune }) => idJeune)
     )
-    const resultInscription = await this.miloClient.inscrireJeunesSession(
-      tokenMilo,
+    const idsDossier = await recupererIdsDossier(idsJeunes)
+
+    const resultDesinscriptions = await this.desinscrire(
+      inscriptionsATraiter.inscriptionsASupprimer,
+      idsDossier,
+      tokenMilo
+    )
+    if (isFailure(resultDesinscriptions)) return resultDesinscriptions
+
+    const resultInscriptions = await this.inscrire(
       session.id,
-      idsDossierNouveauxInscrits
+      inscriptionsATraiter.idsJeunesAInscrire,
+      idsDossier,
+      tokenMilo
     )
-    if (isFailure(resultInscription)) return resultInscription
+    if (isFailure(resultInscriptions)) return resultInscriptions
 
     const sessionMiloSqlModel: AsSql<SessionMiloDto> = {
       id: session.id,
@@ -99,6 +109,34 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     await SessionMiloSqlModel.upsert(sessionMiloSqlModel)
 
     return emptySuccess()
+  }
+
+  private async inscrire(
+    idSession: string,
+    idsJeunesAInscrire: string[],
+    idsDossier: Map<string, string>,
+    tokenMilo: string
+  ): Promise<Result> {
+    const idsDossierNouveauxInscrits = idsJeunesAInscrire.map(
+      idJeune => idsDossier.get(idJeune)!
+    )
+    return this.miloClient.inscrireJeunesSession(
+      tokenMilo,
+      idSession,
+      idsDossierNouveauxInscrits
+    )
+  }
+
+  private async desinscrire(
+    inscriptionsASupprimer: Array<{ idJeune: string; idInscription: string }>,
+    idsDossier: Map<string, string>,
+    tokenMilo: string
+  ): Promise<Result> {
+    const desinscriptions = inscriptionsASupprimer.map(desinscription => ({
+      idDossier: idsDossier.get(desinscription.idJeune)!,
+      idInstanceSession: desinscription.idInscription
+    }))
+    return this.miloClient.desinscrireJeunesSession(tokenMilo, desinscriptions)
   }
 }
 
@@ -184,9 +222,10 @@ function dtoToInscriptions(
 function dtoToInscription(
   inscritSessionMilo: InscritSessionMiloDto,
   idJeune: string
-): InscritSessionMiloQueryModel {
+): SessionMilo.Inscription {
   return {
     idJeune: idJeune,
+    idInscription: inscritSessionMilo.idInstanceSession.toString(),
     nom: inscritSessionMilo.nom,
     prenom: inscritSessionMilo.prenom,
     statut: dtoToStatutInscription(inscritSessionMilo)
@@ -231,19 +270,17 @@ function dtoToSessionMiloTypeOffre(offreDto: OffreDto): {
   }
 }
 
-async function getIdsDossierNouveauxInscrits(
-  inscriptionsModifiees: Array<
-    Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
-  >
-): Promise<string[]> {
-  const jeunesAInscrire = inscriptionsModifiees.filter(
-    ({ statut }) => statut === SessionMilo.Inscription.Statut.INSCRIT
-  )
-  const inscrits = await JeuneSqlModel.findAll({
+async function recupererIdsDossier(
+  idsJeunes: string[]
+): Promise<Map<string, string>> {
+  const jeunes = await JeuneSqlModel.findAll({
     where: {
-      id: jeunesAInscrire.map(({ idJeune }) => idJeune)
+      id: idsJeunes
     },
-    attributes: ['idPartenaire']
+    attributes: ['id', 'idPartenaire']
   })
-  return inscrits.map(({ idPartenaire }) => idPartenaire!)
+  return jeunes.reduce((map, jeuneSql) => {
+    map.set(jeuneSql.id, jeuneSql.idPartenaire!)
+    return map
+  }, new Map<string, string>())
 }

@@ -50,23 +50,32 @@ describe('SessionMiloHttpSqlRepository', () => {
         success([
           uneInscriptionSessionMiloDto({
             idDossier: 1,
+            idInstanceSession: 1,
             nom: 'Granger',
             prenom: 'Hermione',
             statut: 'ONGOING'
           }),
           uneInscriptionSessionMiloDto({
             idDossier: 2,
+            idInstanceSession: 2,
             nom: 'Weasley',
             prenom: 'Ronald',
             statut: 'REFUSAL'
           }),
           uneInscriptionSessionMiloDto({
             idDossier: 3,
+            idInstanceSession: 3,
             nom: 'Potter',
             prenom: 'Harry',
             statut: 'REFUSAL_YOUNG'
           }),
-          uneInscriptionSessionMiloDto({ idDossier: 4 })
+          uneInscriptionSessionMiloDto({
+            idDossier: 4,
+            idInstanceSession: 4,
+            nom: 'Hagrid',
+            prenom: 'Rubeus',
+            statut: 'REFUSAL_YOUNG'
+          })
         ])
       )
 
@@ -114,18 +123,21 @@ describe('SessionMiloHttpSqlRepository', () => {
             inscriptions: [
               {
                 idJeune: 'id-hermione',
+                idInscription: '1',
                 nom: 'Granger',
                 prenom: 'Hermione',
                 statut: SessionMilo.Inscription.Statut.INSCRIT
               },
               {
                 idJeune: 'id-ron',
+                idInscription: '2',
                 nom: 'Weasley',
                 prenom: 'Ronald',
                 statut: SessionMilo.Inscription.Statut.REFUS_TIERS
               },
               {
                 idJeune: 'id-harry',
+                idInscription: '3',
                 nom: 'Potter',
                 prenom: 'Harry',
                 statut: SessionMilo.Inscription.Statut.REFUS_JEUNE
@@ -168,6 +180,7 @@ describe('SessionMiloHttpSqlRepository', () => {
     beforeEach(async () => {
       // Given
       miloClient.inscrireJeunesSession.resolves(emptySuccess())
+      miloClient.desinscrireJeunesSession.resolves(emptySuccess())
       await StructureMiloSqlModel.create({
         id: idStructure,
         nomOfficiel: 'Structure',
@@ -188,18 +201,21 @@ describe('SessionMiloHttpSqlRepository', () => {
           inscriptions: [
             {
               idJeune: 'id-hermione',
+              idInscription: 'id-inscription-hermione',
               nom: 'Granger',
               prenom: 'Hermione',
               statut: SessionMilo.Inscription.Statut.INSCRIT
             },
             {
               idJeune: 'id-ron',
+              idInscription: 'id-inscription-ron',
               nom: 'Weasley',
               prenom: 'Ronald',
               statut: SessionMilo.Inscription.Statut.INSCRIT
             },
             {
               idJeune: 'id-harry',
+              idInscription: 'id-inscription-harry',
               nom: 'Potter',
               prenom: 'Harry',
               statut: SessionMilo.Inscription.Statut.REFUS_TIERS
@@ -212,20 +228,12 @@ describe('SessionMiloHttpSqlRepository', () => {
       // When
       await sessionMiloHttpSqlRepository.save(
         session,
-        [
-          {
-            idJeune: 'id-hermione',
-            statut: SessionMilo.Inscription.Statut.INSCRIT
-          },
-          {
-            idJeune: 'id-ron',
-            statut: SessionMilo.Inscription.Statut.INSCRIT
-          },
-          {
-            idJeune: 'id-harry',
-            statut: SessionMilo.Inscription.Statut.REFUS_TIERS
-          }
-        ],
+        {
+          idsJeunesAInscrire: ['id-hermione', 'id-ron'],
+          inscriptionsASupprimer: [
+            { idJeune: 'id-harry', idInscription: 'id-inscription-harry' }
+          ]
+        },
         tokenMilo
       )
     })
@@ -251,7 +259,11 @@ describe('SessionMiloHttpSqlRepository', () => {
         }),
         dateModification: uneDatetime()
       }
-      await sessionMiloHttpSqlRepository.save(sessionModifiee, [], tokenMilo)
+      await sessionMiloHttpSqlRepository.save(
+        sessionModifiee,
+        { idsJeunesAInscrire: [], inscriptionsASupprimer: [] },
+        tokenMilo
+      )
 
       // Then
       const sessionTrouve = await SessionMiloSqlModel.findByPk(idSession)
@@ -261,7 +273,7 @@ describe('SessionMiloHttpSqlRepository', () => {
       )
     })
 
-    it('inscrit les participants', async () => {
+    it('soumet les modifications d’inscriptions à Milo', async () => {
       // Then
       expect(
         miloClient.inscrireJeunesSession
@@ -269,41 +281,14 @@ describe('SessionMiloHttpSqlRepository', () => {
         'id-dossier-hermione',
         'id-dossier-ron'
       ])
-    })
-
-    it('ne réinscrit pas les participants déjà inscrits', async () => {
-      // Given
-      const sessionModifiee = {
-        ...session,
-        inscriptions: [
-          ...session.inscriptions,
-          {
-            idJeune: 'id-harry',
-            nom: 'Potter',
-            prenom: 'Harry',
-            statut: SessionMilo.Inscription.Statut.INSCRIT
-          }
-        ]
-      }
-
-      // When
-      await sessionMiloHttpSqlRepository.save(
-        sessionModifiee,
-        [
-          {
-            idJeune: 'id-harry',
-            statut: SessionMilo.Inscription.Statut.INSCRIT
-          }
-        ],
-        tokenMilo
-      )
-
-      // Then
-      expect(miloClient.inscrireJeunesSession).to.have.been.calledWithExactly(
-        tokenMilo,
-        idSession,
-        ['id-dossier-harry']
-      )
+      expect(
+        miloClient.desinscrireJeunesSession
+      ).to.have.been.calledOnceWithExactly(tokenMilo, [
+        {
+          idDossier: 'id-dossier-harry',
+          idInstanceSession: 'id-inscription-harry'
+        }
+      ])
     })
   })
 })
