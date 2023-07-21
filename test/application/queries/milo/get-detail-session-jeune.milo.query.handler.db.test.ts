@@ -170,7 +170,17 @@ describe('GetDetailSessionJeuneMiloQueryHandler', () => {
               })
             )
           miloClient.getSessionsJeune
-            .withArgs(idpToken, jeune.idPartenaire)
+            .withArgs(
+              idpToken,
+              jeune.idPartenaire,
+              DateTime.fromFormat(
+                '2020-04-06 10:20:00',
+                'yyyy-MM-dd HH:mm:ss',
+                {
+                  zone: 'America/Cayenne'
+                }
+              )
+            )
             .resolves(
               success({
                 page: 1,

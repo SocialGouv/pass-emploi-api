@@ -21,7 +21,11 @@ import {
 } from 'src/building-blocks/types/domain-error'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
-import { mapDetailSessionJeuneDtoToQueryModel } from 'src/application/queries/query-mappers/milo.mappers'
+import {
+  mapDetailSessionJeuneDtoToQueryModel,
+  MILO_DATE_FORMAT
+} from 'src/application/queries/query-mappers/milo.mappers'
+import { DateTime } from 'luxon'
 
 export interface GetDetailSessionJeuneMiloQuery extends Query {
   idSession: string
@@ -64,21 +68,27 @@ export class GetDetailSessionJeuneMiloQueryHandler extends QueryHandler<
       where: { id: query.idSession, estVisible: true },
       include: [{ model: StructureMiloSqlModel, as: 'structure' }]
     })
-
     if (!sessionMiloDb) {
       return failure(new NonTrouveError('Session', query.idSession))
     }
+    const timezone = sessionMiloDb.structure!.timezone
 
     const resultDetailSessionMiloClient =
       await this.miloClient.getDetailSessionJeune(idpToken, query.idSession)
-
     if (isFailure(resultDetailSessionMiloClient)) {
       return resultDetailSessionMiloClient
     }
+    const detailSession = resultDetailSessionMiloClient.data
 
+    const dateDebutRecherche = DateTime.fromFormat(
+      detailSession.session.dateHeureDebut,
+      MILO_DATE_FORMAT,
+      { zone: timezone }
+    )
     const resultListeSessions = await this.miloClient.getSessionsJeune(
       idpToken,
-      jeune.idPartenaire
+      jeune.idPartenaire,
+      dateDebutRecherche
     )
     const inscription = isSuccess(resultListeSessions)
       ? resultListeSessions.data.sessions.find(
@@ -88,9 +98,9 @@ export class GetDetailSessionJeuneMiloQueryHandler extends QueryHandler<
 
     return success(
       mapDetailSessionJeuneDtoToQueryModel(
-        resultDetailSessionMiloClient.data,
+        detailSession,
         jeune.idPartenaire,
-        sessionMiloDb.structure!.timezone,
+        timezone,
         inscription
       )
     )
