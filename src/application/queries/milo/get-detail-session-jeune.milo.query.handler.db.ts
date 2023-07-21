@@ -4,6 +4,7 @@ import { QueryHandler } from 'src/building-blocks/types/query-handler'
 import {
   failure,
   isFailure,
+  isSuccess,
   Result,
   success
 } from 'src/building-blocks/types/result'
@@ -69,21 +70,28 @@ export class GetDetailSessionJeuneMiloQueryHandler extends QueryHandler<
     }
 
     const resultDetailSessionMiloClient =
-      await this.miloClient.getDetailSessionJeune(
-        idpToken,
-        query.idSession,
-        jeune.idPartenaire
-      )
+      await this.miloClient.getDetailSessionJeune(idpToken, query.idSession)
 
     if (isFailure(resultDetailSessionMiloClient)) {
       return resultDetailSessionMiloClient
     }
 
+    const resultListeSessions = await this.miloClient.getSessionsJeune(
+      idpToken,
+      jeune.idPartenaire
+    )
+    const inscription = isSuccess(resultListeSessions)
+      ? resultListeSessions.data.sessions.find(
+          session => session.session.id.toString() === query.idSession
+        )!.sessionInstance
+      : undefined
+
     return success(
       mapDetailSessionJeuneDtoToQueryModel(
         resultDetailSessionMiloClient.data,
         jeune.idPartenaire,
-        sessionMiloDb.structure!.timezone
+        sessionMiloDb.structure!.timezone,
+        inscription
       )
     )
   }

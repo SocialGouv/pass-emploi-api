@@ -92,11 +92,10 @@ export function mapSessionConseillerDtoToQueryModel(
 }
 
 export function mapDetailSessionJeuneDtoToQueryModel(
-  sessionDto: SessionJeuneDetailDto & {
-    inscription?: { id: string; statut: string }
-  },
+  sessionDto: SessionJeuneDetailDto,
   idDossier: string,
-  timezone: string
+  timezone: string,
+  inscription?: { statut: string }
 ): DetailSessionJeuneMiloQueryModel {
   const queryModel: DetailSessionJeuneMiloQueryModel = {
     id: sessionDto.session.id.toString(),
@@ -126,11 +125,10 @@ export function mapDetailSessionJeuneDtoToQueryModel(
     dateMaxInscription: sessionDto.session.dateMaxInscription ?? undefined,
     nbPlacesDisponibles: sessionDto.session.nbPlacesDisponibles ?? undefined
   }
-  if (sessionDto.inscription)
+  if (inscription)
     queryModel.inscription = {
-      id: sessionDto.inscription.id,
       statut: dtoToStatutInscription(
-        sessionDto.inscription.statut,
+        inscription.statut,
         sessionDto.session.id,
         idDossier
       )

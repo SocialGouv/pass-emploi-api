@@ -12,7 +12,7 @@ import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
 import {
   unDetailSessionConseillerDto,
-  uneSessionConseillerListeDto
+  uneListeSessionsConseillerDto
 } from 'test/fixtures/milo-dto.fixture'
 import { uneSessionConseillerMiloQueryModel } from 'test/fixtures/sessions.fixture'
 import { expect, StubbedClass, stubClass } from 'test/utils'
@@ -144,7 +144,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
             query.dateDebut,
             query.dateFin
           )
-          .resolves(success(uneSessionConseillerListeDto))
+          .resolves(success(uneListeSessionsConseillerDto))
 
         // When
         const result = await getSessionsQueryHandler.handle(query)
