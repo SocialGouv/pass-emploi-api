@@ -40,13 +40,13 @@ export interface SessionJeuneDetailDto {
   offre: OffreDto
 }
 
-export interface SessionConseillerMiloListeDto {
+export interface ListeSessionsConseillerMiloDto {
   page: number
   nbSessions: number
   sessions: SessionConseillerDetailDto[]
 }
 
-export interface SessionJeuneMiloListeDto {
+export interface ListeSessionsJeuneMiloDto {
   page: number
   nbSessions: number
   sessions: SessionJeuneListeDto[]

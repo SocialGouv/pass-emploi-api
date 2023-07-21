@@ -135,9 +135,6 @@ export class DetailSessionConseillerMiloQueryModel {
 }
 
 export class DetailSessionJeuneMiloInscriptionQueryModel {
-  @ApiProperty()
-  id: string
-
   @ApiProperty({ enum: SessionMilo.Inscription.Statut })
   statut: SessionMilo.Inscription.Statut
 }

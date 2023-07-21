@@ -9,8 +9,8 @@ import {
   unDetailSessionJeuneDto,
   uneInscriptionSessionMiloDto,
   uneListeDeStructuresConseillerMiloDto,
-  uneSessionConseillerListeDto,
-  uneSessionJeuneListeDto
+  uneListeSessionsConseillerDto,
+  uneListeSessionsJeuneDto
 } from 'test/fixtures/milo-dto.fixture'
 import { testConfig } from 'test/utils/module-for-testing'
 
@@ -34,7 +34,7 @@ describe('MiloClient', () => {
         .get(
           `/operateurs/structures/${idStructure}/sessions?dateDebutRecherche=2023-05-31&dateFinRecherche=2023-06-29`
         )
-        .reply(200, uneSessionConseillerListeDto)
+        .reply(200, uneListeSessionsConseillerDto)
         .isDone()
 
       // When
@@ -47,7 +47,7 @@ describe('MiloClient', () => {
       )
 
       // Then
-      expect(result).to.deep.equal(success(uneSessionConseillerListeDto))
+      expect(result).to.deep.equal(success(uneListeSessionsConseillerDto))
     })
   })
 
@@ -59,14 +59,14 @@ describe('MiloClient', () => {
 
       nock(MILO_BASE_URL)
         .get(`/operateurs/sessions?idDossier=${idDossier}`)
-        .reply(200, uneSessionJeuneListeDto)
+        .reply(200, uneListeSessionsJeuneDto)
         .isDone()
 
       // When
       const result = await miloClient.getSessionsJeune(idpToken, idDossier)
 
       // Then
-      expect(result).to.deep.equal(success(uneSessionJeuneListeDto))
+      expect(result).to.deep.equal(success(uneListeSessionsJeuneDto))
     })
   })
 
@@ -96,31 +96,17 @@ describe('MiloClient', () => {
       // Given
       const idpToken = 'idpToken'
       const idSession = '1'
-      const idDossier = 'id-dossier-jeune'
 
       nock(MILO_BASE_URL)
         .get(`/operateurs/sessions/${idSession}`)
         .reply(200, unDetailSessionJeuneDto)
         .isDone()
-      nock(MILO_BASE_URL)
-        .get(`/operateurs/dossiers/${idDossier}/sessions/${idSession}`)
-        .reply(200, { id: 'id-inscription', statut: 'ONGOING' })
-        .isDone()
 
       // When
-      const result = await miloClient.getDetailSessionJeune(
-        idpToken,
-        idSession,
-        idDossier
-      )
+      const result = await miloClient.getDetailSessionJeune(idpToken, idSession)
 
       // Then
-      expect(result).to.deep.equal(
-        success({
-          ...unDetailSessionJeuneDto,
-          inscription: { id: 'id-inscription', statut: 'ONGOING' }
-        })
-      )
+      expect(result).to.deep.equal(success(unDetailSessionJeuneDto))
     })
   })
 

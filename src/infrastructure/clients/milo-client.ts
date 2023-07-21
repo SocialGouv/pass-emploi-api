@@ -14,9 +14,9 @@ import {
 import {
   InscritSessionMiloDto,
   SessionConseillerDetailDto,
-  SessionConseillerMiloListeDto,
+  ListeSessionsConseillerMiloDto,
   SessionJeuneDetailDto,
-  SessionJeuneMiloListeDto,
+  ListeSessionsJeuneMiloDto,
   StructureConseillerMiloDto
 } from './dto/milo.dto'
 import { handleAxiosError } from './utils/axios-error-handler'
@@ -57,7 +57,7 @@ export class MiloClient {
     timezone: string,
     dateDebut?: DateTime,
     dateFin?: DateTime
-  ): Promise<Result<SessionConseillerMiloListeDto>> {
+  ): Promise<Result<ListeSessionsConseillerMiloDto>> {
     const params = new URLSearchParams()
     if (dateDebut) {
       const debutRecherche = dateDebut.setZone(timezone)
@@ -69,7 +69,7 @@ export class MiloClient {
     }
 
     // L'api ne renvoie que 50 sessions max par appel au delà, une pagination doit être mise en place. (voir doc 06/23)
-    return this.get<SessionConseillerMiloListeDto>(
+    return this.get<ListeSessionsConseillerMiloDto>(
       `structures/${idStructure}/sessions`,
       {
         apiKey: this.apiKeySessionsListeConseiller,
@@ -82,12 +82,12 @@ export class MiloClient {
   async getSessionsJeune(
     idpToken: string,
     idDossier: string
-  ): Promise<Result<SessionJeuneMiloListeDto>> {
+  ): Promise<Result<ListeSessionsJeuneMiloDto>> {
     const params = new URLSearchParams()
     params.append('idDossier', idDossier)
 
     // L'api ne renvoie que 50 sessions max par appel au delà, une pagination doit être mise en place. (voir doc 06/23)
-    return this.get<SessionJeuneMiloListeDto>(
+    return this.get<ListeSessionsJeuneMiloDto>(
       `sessions`,
       {
         apiKey: this.apiKeySessionsDetailEtListeJeune,
@@ -109,31 +109,11 @@ export class MiloClient {
 
   async getDetailSessionJeune(
     idpToken: string,
-    idSession: string,
-    idDossier: string
-  ): Promise<
-    Result<
-      SessionJeuneDetailDto & { inscription?: { id: string; statut: string } }
-    >
-  > {
-    const resultSession = await this.get<SessionJeuneDetailDto>(
-      `sessions/${idSession}`,
-      {
-        apiKey: this.apiKeySessionsDetailEtListeJeune,
-        idpToken
-      }
-    )
-    if (isFailure(resultSession)) return resultSession
-
-    const resultInscription = await this.get<{ id: string; statut: string }>(
-      `dossiers/${idDossier}/sessions/${idSession}`,
-      { apiKey: this.apiKeyInstanceSessionLecture }
-    )
-    if (isFailure(resultInscription)) return resultSession
-
-    return success({
-      ...resultSession.data,
-      inscription: resultInscription.data
+    idSession: string
+  ): Promise<Result<SessionJeuneDetailDto>> {
+    return this.get<SessionJeuneDetailDto>(`sessions/${idSession}`, {
+      apiKey: this.apiKeySessionsDetailEtListeJeune,
+      idpToken
     })
   }
 
