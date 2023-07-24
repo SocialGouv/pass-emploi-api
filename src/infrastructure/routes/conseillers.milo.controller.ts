@@ -94,8 +94,7 @@ export class ConseillersMiloController {
   @ApiOperation({
     summary:
       'Modifie les informations d’une session de la structure MILO du conseiller (visibilité, inscriptions)',
-    description:
-      'Autorisé pour le conseiller Milo\nPermet pour l’instant d’inscrire et de désinscrire'
+    description: 'Autorisé pour le conseiller Milo'
   })
   @Patch('/:idConseiller/sessions/:idSession')
   async updateSession(
@@ -117,8 +116,7 @@ export class ConseillersMiloController {
   @ApiOperation({
     summary:
       'Modifie les informations d’une session de la structure MILO du conseiller (visibilité, inscriptions)',
-    description:
-      'Autorisé pour le conseiller Milo\nPermet pour l’instant d’inscrire et de désinscrire',
+    description: 'Autorisé pour le conseiller Milo',
     deprecated: true
   })
   @Put('/:idConseiller/sessions/:idSession')
