@@ -159,14 +159,17 @@ describe('ConseillersMiloController', () => {
     it('inscrit des jeunes à une session milo', async () => {
       // Given
       const listeInscrits = [
-        { idJeune: 'jeune-1', statut: SessionMilo.Inscription.Statut.INSCRIT },
+        {
+          idJeune: 'jeune-1',
+          statut: SessionMilo.Modification.StatutInscription.INSCRIT
+        },
         {
           idJeune: 'jeune-2',
-          statut: SessionMilo.Inscription.Statut.REFUS_JEUNE
+          statut: SessionMilo.Modification.StatutInscription.REFUS_JEUNE
         },
         {
           idJeune: 'jeune-3',
-          statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+          statut: SessionMilo.Modification.StatutInscription.REFUS_TIERS
         }
       ]
       const idSession = '123'
@@ -240,15 +243,18 @@ describe('ConseillersMiloController', () => {
     it('inscrit des jeunes à une session milo', async () => {
       // Given
       const listeInscrits = [
-        { idJeune: 'jeune-1', statut: SessionMilo.Inscription.Statut.INSCRIT },
+        {
+          idJeune: 'jeune-1',
+          statut: SessionMilo.Modification.StatutInscription.INSCRIT
+        },
         {
           idJeune: 'jeune-2',
-          statut: SessionMilo.Inscription.Statut.REFUS_JEUNE,
+          statut: SessionMilo.Modification.StatutInscription.REFUS_JEUNE,
           commentaire: 'J’ai pas envie'
         },
         {
           idJeune: 'jeune-3',
-          statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+          statut: SessionMilo.Modification.StatutInscription.REFUS_TIERS
         }
       ]
       const idSession = '123'

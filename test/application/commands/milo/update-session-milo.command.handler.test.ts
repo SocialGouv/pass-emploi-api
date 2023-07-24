@@ -173,11 +173,11 @@ describe('UpdateSessionMiloCommandHandler', () => {
           inscriptions: [
             {
               idJeune: 'id-hermione',
-              statut: SessionMilo.Inscription.Statut.INSCRIT
+              statut: SessionMilo.Modification.StatutInscription.INSCRIT
             },
             {
               idJeune: 'id-harry',
-              statut: SessionMilo.Inscription.Statut.INSCRIT
+              statut: SessionMilo.Modification.StatutInscription.INSCRIT
             }
           ]
         }
@@ -222,11 +222,11 @@ describe('UpdateSessionMiloCommandHandler', () => {
           inscriptions: [
             {
               idJeune: 'id-hermione',
-              statut: SessionMilo.Inscription.Statut.DESINSCRIT
+              statut: SessionMilo.Modification.StatutInscription.DESINSCRIT
             },
             {
               idJeune: 'id-harry',
-              statut: SessionMilo.Inscription.Statut.DESINSCRIT
+              statut: SessionMilo.Modification.StatutInscription.DESINSCRIT
             }
           ]
         }
@@ -297,24 +297,24 @@ describe('UpdateSessionMiloCommandHandler', () => {
           inscriptions: [
             {
               idJeune: 'id-hermione',
-              statut: SessionMilo.Inscription.Statut.REFUS_JEUNE,
+              statut: SessionMilo.Modification.StatutInscription.REFUS_JEUNE,
               commentaire: 'J’ai pas envie'
             },
             {
               idJeune: 'id-ron',
-              statut: SessionMilo.Inscription.Statut.INSCRIT
+              statut: SessionMilo.Modification.StatutInscription.INSCRIT
             },
             {
               idJeune: 'id-ginny',
-              statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+              statut: SessionMilo.Modification.StatutInscription.REFUS_TIERS
             },
             {
               idJeune: 'id-harry',
-              statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+              statut: SessionMilo.Modification.StatutInscription.REFUS_TIERS
             },
             {
               idJeune: 'id-luna',
-              statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+              statut: SessionMilo.Modification.StatutInscription.REFUS_TIERS
             }
           ]
         }
@@ -338,18 +338,18 @@ describe('UpdateSessionMiloCommandHandler', () => {
               {
                 idJeune: 'id-hermione',
                 idInscription: 'id-inscription-hermione',
-                statut: SessionMilo.Inscription.Statut.REFUS_JEUNE,
+                statut: SessionMilo.Modification.StatutInscription.REFUS_JEUNE,
                 commentaire: 'J’ai pas envie'
               },
               {
                 idJeune: 'id-ron',
                 idInscription: 'id-inscription-ron',
-                statut: SessionMilo.Inscription.Statut.INSCRIT
+                statut: SessionMilo.Modification.StatutInscription.INSCRIT
               },
               {
                 idJeune: 'id-ginny',
                 idInscription: 'id-inscription-ginny',
-                statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+                statut: SessionMilo.Modification.StatutInscription.REFUS_TIERS
               }
             ]
           },
@@ -397,24 +397,24 @@ describe('UpdateSessionMiloCommandHandler', () => {
           inscriptions: [
             {
               idJeune: 'id-hermione',
-              statut: SessionMilo.Inscription.Statut.REFUS_JEUNE,
+              statut: SessionMilo.Modification.StatutInscription.REFUS_JEUNE,
               commentaire: 'J’ai pas envie'
             },
             {
               idJeune: 'id-ron',
-              statut: SessionMilo.Inscription.Statut.INSCRIT
+              statut: SessionMilo.Modification.StatutInscription.INSCRIT
             },
             {
               idJeune: 'id-ginny',
-              statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+              statut: SessionMilo.Modification.StatutInscription.REFUS_TIERS
             },
             {
               idJeune: 'id-harry',
-              statut: SessionMilo.Inscription.Statut.DESINSCRIT
+              statut: SessionMilo.Modification.StatutInscription.DESINSCRIT
             },
             {
               idJeune: 'id-luna',
-              statut: SessionMilo.Inscription.Statut.INSCRIT
+              statut: SessionMilo.Modification.StatutInscription.INSCRIT
             }
           ]
         }
@@ -440,18 +440,18 @@ describe('UpdateSessionMiloCommandHandler', () => {
               {
                 idJeune: 'id-hermione',
                 idInscription: 'id-inscription-hermione',
-                statut: SessionMilo.Inscription.Statut.REFUS_JEUNE,
+                statut: SessionMilo.Modification.StatutInscription.REFUS_JEUNE,
                 commentaire: 'J’ai pas envie'
               },
               {
                 idJeune: 'id-ron',
                 idInscription: 'id-inscription-ron',
-                statut: SessionMilo.Inscription.Statut.INSCRIT
+                statut: SessionMilo.Modification.StatutInscription.INSCRIT
               },
               {
                 idJeune: 'id-ginny',
                 idInscription: 'id-inscription-ginny',
-                statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+                statut: SessionMilo.Modification.StatutInscription.REFUS_TIERS
               }
             ]
           },
@@ -502,23 +502,23 @@ describe('UpdateSessionMiloCommandHandler', () => {
           inscriptions: [
             {
               idJeune: 'id-ron',
-              statut: SessionMilo.Inscription.Statut.DESINSCRIT
+              statut: SessionMilo.Modification.StatutInscription.DESINSCRIT
             },
             {
               idJeune: 'id-ginny',
-              statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+              statut: SessionMilo.Modification.StatutInscription.REFUS_TIERS
             },
             {
               idJeune: 'id-luna',
-              statut: SessionMilo.Inscription.Statut.INSCRIT
+              statut: SessionMilo.Modification.StatutInscription.INSCRIT
             },
             {
               idJeune: 'id-harry',
-              statut: SessionMilo.Inscription.Statut.INSCRIT
+              statut: SessionMilo.Modification.StatutInscription.INSCRIT
             },
             {
               idJeune: 'id-hagrid',
-              statut: SessionMilo.Inscription.Statut.INSCRIT
+              statut: SessionMilo.Modification.StatutInscription.INSCRIT
             }
           ]
         }
