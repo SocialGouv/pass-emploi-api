@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios'
 import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { DateTime } from 'luxon'
 import { firstValueFrom } from 'rxjs'
 import { ErreurHttp } from 'src/building-blocks/types/domain-error'
 import {
@@ -19,7 +20,6 @@ import {
   StructureConseillerMiloDto
 } from './dto/milo.dto'
 import { handleAxiosError } from './utils/axios-error-handler'
-import { DateTime } from 'luxon'
 
 @Injectable()
 export class MiloClient {
@@ -154,9 +154,9 @@ export class MiloClient {
     for (const idDossier of idsDossier) {
       const result = await this.post(
         `dossiers/${idDossier}/instances-session`,
+        idSession,
         this.apiKeyInstanceSessionEcritureConseiller,
-        idpToken,
-        idSession
+        idpToken
       )
       if (isFailure(result)) {
         return result
@@ -173,6 +173,28 @@ export class MiloClient {
     for (const desinscription of desinscriptions) {
       const result = await this.delete(
         `dossiers/${desinscription.idDossier}/instances-session/${desinscription.idInstanceSession}`,
+        this.apiKeyInstanceSessionEcritureConseiller,
+        idpToken
+      )
+      if (isFailure(result)) return result
+    }
+
+    return emptySuccess()
+  }
+
+  async modifierInscriptionJeunesSession(
+    idpToken: string,
+    modifications: Array<{
+      idDossier: string
+      idInstanceSession: string
+      statut: string
+      commentaire?: string
+    }>
+  ): Promise<Result> {
+    for (const modification of modifications) {
+      const result = await this.put(
+        `dossiers/${modification.idDossier}/instances-session/${modification.idInstanceSession}`,
+        { statut: modification.statut, commentaire: modification.commentaire },
         this.apiKeyInstanceSessionEcritureConseiller,
         idpToken
       )
@@ -208,11 +230,38 @@ export class MiloClient {
     }
   }
 
+  private async put(
+    suffixUrl: string,
+    payload: { [p: string]: string | undefined } | string,
+    apiKey: string,
+    idpToken: string
+  ): Promise<Result> {
+    try {
+      await firstValueFrom(
+        this.httpService.put(
+          `${this.apiUrl}/operateurs/${suffixUrl}`,
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${idpToken}`,
+              'X-Gravitee-Api-Key': apiKey,
+              operateur: 'APPLICATION_CEJ',
+              'Content-Type': 'application/json'
+            }
+          }
+        )
+      )
+      return emptySuccess()
+    } catch (e) {
+      return handleAxiosError(e, this.logger, 'Erreur POST Milo')
+    }
+  }
+
   private async post(
     suffixUrl: string,
+    payload: { [p: string]: string } | string,
     apiKey: string,
-    idpToken: string,
-    payload: { [key: string]: string } | string
+    idpToken: string
   ): Promise<Result> {
     try {
       await firstValueFrom(

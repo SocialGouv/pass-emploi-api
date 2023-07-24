@@ -228,4 +228,59 @@ describe('MiloClient', () => {
       expect(result).to.deep.equal(emptySuccess())
     })
   })
+
+  describe('modifierInscriptionJeunesSession', () => {
+    it('refuses les inscriptions de chaque jeune à la session', async () => {
+      // Given
+      const aModifier = [
+        {
+          idDossier: 'id-dossier-1',
+          idInstanceSession: 'id-inscription-1',
+          statut: 'ONGOING'
+        },
+        {
+          idDossier: 'id-dossier-2',
+          idInstanceSession: 'id-inscription-2',
+          statut: 'REFUSAL'
+        },
+        {
+          idDossier: 'id-dossier-3',
+          idInstanceSession: 'id-inscription-3',
+          statut: 'REFUSAL_YOUNG',
+          commentaire: 'J’ai pas envie'
+        }
+      ]
+
+      const scope1 = nock(MILO_BASE_URL)
+        .put(
+          `/operateurs/dossiers/${aModifier[0].idDossier}/instances-session/${aModifier[0].idInstanceSession}`,
+          { statut: 'ONGOING' }
+        )
+        .reply(201)
+      const scope2 = nock(MILO_BASE_URL)
+        .put(
+          `/operateurs/dossiers/${aModifier[1].idDossier}/instances-session/${aModifier[1].idInstanceSession}`,
+          { statut: 'REFUSAL' }
+        )
+        .reply(201)
+      const scope3 = nock(MILO_BASE_URL)
+        .put(
+          `/operateurs/dossiers/${aModifier[2].idDossier}/instances-session/${aModifier[2].idInstanceSession}`,
+          { statut: 'REFUSAL_YOUNG', commentaire: 'J’ai pas envie' }
+        )
+        .reply(201)
+
+      // When
+      const result = await miloClient.modifierInscriptionJeunesSession(
+        'idpToken',
+        aModifier
+      )
+
+      // Then
+      expect(scope1.isDone()).to.equal(true)
+      expect(scope2.isDone()).to.equal(true)
+      expect(scope3.isDone()).to.equal(true)
+      expect(result).to.deep.equal(emptySuccess())
+    })
+  })
 })

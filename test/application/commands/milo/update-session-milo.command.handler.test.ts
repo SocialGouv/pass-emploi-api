@@ -57,46 +57,26 @@ describe('UpdateSessionMiloCommandHandler', () => {
   })
 
   describe('handle', () => {
-    const command: UpdateSessionMiloCommand = {
+    const commandSansInscriptions: UpdateSessionMiloCommand = {
       idSession: 'idSession',
       idConseiller: conseiller.id,
       token: 'token',
-      estVisible: true,
-      inscriptions: [
-        {
-          idJeune: 'id-hermione',
-          statut: SessionMilo.Inscription.Statut.INSCRIT
-        },
-        {
-          idJeune: 'id-harry',
-          statut: SessionMilo.Inscription.Statut.INSCRIT
-        },
-        {
-          idJeune: 'id-ron',
-          statut: SessionMilo.Inscription.Statut.DESINSCRIT
-        },
-        {
-          idJeune: 'id-hagrid',
-          statut: SessionMilo.Inscription.Statut.DESINSCRIT
-        },
-        {
-          idJeune: 'id-rogue',
-          statut: SessionMilo.Inscription.Statut.REFUS_TIERS
-        }
-      ]
+      estVisible: true
     }
 
     it('n’autorise pas un conseiller sans structure', async () => {
       // Given
       const conseillerMiloSansStructure = new ConseillerMiloSansStructure(
-        command.idConseiller
+        commandSansInscriptions.idConseiller
       )
       conseillerMiloRepository.get
-        .withArgs(command.idConseiller)
+        .withArgs(commandSansInscriptions.idConseiller)
         .resolves(failure(conseillerMiloSansStructure))
 
       // When
-      const result = await updateSessionMiloCommandHandler.handle(command)
+      const result = await updateSessionMiloCommandHandler.handle(
+        commandSansInscriptions
+      )
 
       // Then
       expect(result).to.deep.equal(failure(conseillerMiloSansStructure))
@@ -106,18 +86,24 @@ describe('UpdateSessionMiloCommandHandler', () => {
       // Given
       const idpToken = 'idpToken'
       conseillerMiloRepository.get
-        .withArgs(command.idConseiller)
+        .withArgs(commandSansInscriptions.idConseiller)
         .resolves(success(conseiller))
       const erreurHttp = new ErreurHttp('', 404)
       keycloakClient.exchangeTokenConseillerMilo
-        .withArgs(command.token)
+        .withArgs(commandSansInscriptions.token)
         .resolves(idpToken)
       sessionMiloRepository.getForConseiller
-        .withArgs(command.idSession, conseiller.structure, idpToken)
+        .withArgs(
+          commandSansInscriptions.idSession,
+          conseiller.structure,
+          idpToken
+        )
         .resolves(failure(erreurHttp))
 
       // When
-      const result = await updateSessionMiloCommandHandler.handle(command)
+      const result = await updateSessionMiloCommandHandler.handle(
+        commandSansInscriptions
+      )
 
       // Then
       expect(result).to.deep.equal(failure(erreurHttp))
@@ -128,39 +114,150 @@ describe('UpdateSessionMiloCommandHandler', () => {
       beforeEach(async () => {
         // Given
         conseillerMiloRepository.get
-          .withArgs(command.idConseiller)
+          .withArgs(commandSansInscriptions.idConseiller)
           .resolves(success(conseiller))
         keycloakClient.exchangeTokenConseillerMilo
-          .withArgs(command.token)
+          .withArgs(commandSansInscriptions.token)
           .resolves(idpToken)
         dateService.now.returns(uneDatetime())
         sessionMiloRepository.save.resolves(emptySuccess())
       })
 
-      it('met à jour une session si le conseiller y a accès', async () => {
+      it('la met à jour', async () => {
         // Given
         const session = uneSessionMilo({
           inscriptions: [],
-          nbPlacesDisponibles: 2
+          nbPlacesDisponibles: 3
         })
         sessionMiloRepository.getForConseiller.resolves(success(session))
+
+        // When
+        const result = await updateSessionMiloCommandHandler.handle(
+          commandSansInscriptions
+        )
+
+        // Then
+        expect(result).to.deep.equal(emptySuccess())
+        expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
+          {
+            id: session.id,
+            idStructureMilo: session.idStructureMilo,
+            estVisible: true,
+            dateModification: uneDatetime()
+          },
+          {
+            idsJeunesAInscrire: [],
+            inscriptionsASupprimer: [],
+            inscriptionsAModifier: []
+          },
+          idpToken
+        )
+      })
+
+      it('permet d’inscrire des jeunes à la session', async () => {
+        // Given
+        const session = uneSessionMilo({
+          inscriptions: [
+            {
+              idJeune: 'id-hermione',
+              idInscription: 'id-inscription-hermione',
+              nom: 'Granger',
+              prenom: 'Hermione',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            }
+          ]
+        })
+        sessionMiloRepository.getForConseiller.resolves(success(session))
+        const command = {
+          ...commandSansInscriptions,
+          inscriptions: [
+            {
+              idJeune: 'id-hermione',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            },
+            {
+              idJeune: 'id-harry',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            }
+          ]
+        }
 
         // When
         const result = await updateSessionMiloCommandHandler.handle(command)
 
         // Then
+        expect(result).to.deep.equal(emptySuccess())
         expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
-          { ...session, estVisible: true, dateModification: uneDatetime() },
           {
-            idsJeunesAInscrire: ['id-hermione', 'id-harry'],
-            inscriptionsASupprimer: []
+            id: session.id,
+            idStructureMilo: session.idStructureMilo,
+            estVisible: true,
+            dateModification: uneDatetime()
+          },
+          {
+            idsJeunesAInscrire: ['id-harry'],
+            inscriptionsASupprimer: [],
+            inscriptionsAModifier: []
           },
           idpToken
         )
-        expect(result).to.deep.equal(emptySuccess())
       })
 
-      it('permet de modifier les inscriptions', async () => {
+      it('permet de désinscrire des jeunes de la session', async () => {
+        // Given
+        const session = uneSessionMilo({
+          inscriptions: [
+            {
+              idJeune: 'id-hermione',
+              idInscription: 'id-inscription-hermione',
+              nom: 'Granger',
+              prenom: 'Hermione',
+              statut: SessionMilo.Inscription.Statut.REFUS_JEUNE
+            }
+          ]
+        })
+        sessionMiloRepository.getForConseiller.resolves(success(session))
+        const command = {
+          ...commandSansInscriptions,
+          inscriptions: [
+            {
+              idJeune: 'id-hermione',
+              statut: SessionMilo.Inscription.Statut.DESINSCRIT
+            },
+            {
+              idJeune: 'id-harry',
+              statut: SessionMilo.Inscription.Statut.DESINSCRIT
+            }
+          ]
+        }
+
+        // When
+        const result = await updateSessionMiloCommandHandler.handle(command)
+
+        // Then
+        expect(result).to.deep.equal(emptySuccess())
+        expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
+          {
+            id: session.id,
+            idStructureMilo: session.idStructureMilo,
+            estVisible: true,
+            dateModification: uneDatetime()
+          },
+          {
+            idsJeunesAInscrire: [],
+            inscriptionsASupprimer: [
+              {
+                idJeune: 'id-hermione',
+                idInscription: 'id-inscription-hermione'
+              }
+            ],
+            inscriptionsAModifier: []
+          },
+          idpToken
+        )
+      })
+
+      it('permet de modifier l’inscription des jeunes à la session', async () => {
         // Given
         const session = uneSessionMilo({
           inscriptions: [
@@ -176,46 +273,262 @@ describe('UpdateSessionMiloCommandHandler', () => {
               idInscription: 'id-inscription-ron',
               nom: 'Weasley',
               prenom: 'Ronald',
+              statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+            },
+            {
+              idJeune: 'id-ginny',
+              idInscription: 'id-inscription-ginny',
+              nom: 'Weasley',
+              prenom: 'Ginny',
+              statut: SessionMilo.Inscription.Statut.REFUS_JEUNE
+            },
+            {
+              idJeune: 'id-luna',
+              idInscription: 'id-inscription-luna',
+              nom: 'Lovegood',
+              prenom: 'Luna',
+              statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+            }
+          ]
+        })
+        sessionMiloRepository.getForConseiller.resolves(success(session))
+        const command = {
+          ...commandSansInscriptions,
+          inscriptions: [
+            {
+              idJeune: 'id-hermione',
+              statut: SessionMilo.Inscription.Statut.REFUS_JEUNE,
+              commentaire: 'J’ai pas envie'
+            },
+            {
+              idJeune: 'id-ron',
               statut: SessionMilo.Inscription.Statut.INSCRIT
+            },
+            {
+              idJeune: 'id-ginny',
+              statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+            },
+            {
+              idJeune: 'id-harry',
+              statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+            },
+            {
+              idJeune: 'id-luna',
+              statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+            }
+          ]
+        }
+
+        // When
+        const result = await updateSessionMiloCommandHandler.handle(command)
+
+        // Then
+        expect(result).to.deep.equal(emptySuccess())
+        expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
+          {
+            id: session.id,
+            idStructureMilo: session.idStructureMilo,
+            estVisible: true,
+            dateModification: uneDatetime()
+          },
+          {
+            idsJeunesAInscrire: [],
+            inscriptionsASupprimer: [],
+            inscriptionsAModifier: [
+              {
+                idJeune: 'id-hermione',
+                idInscription: 'id-inscription-hermione',
+                statut: SessionMilo.Inscription.Statut.REFUS_JEUNE,
+                commentaire: 'J’ai pas envie'
+              },
+              {
+                idJeune: 'id-ron',
+                idInscription: 'id-inscription-ron',
+                statut: SessionMilo.Inscription.Statut.INSCRIT
+              },
+              {
+                idJeune: 'id-ginny',
+                idInscription: 'id-inscription-ginny',
+                statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+              }
+            ]
+          },
+          idpToken
+        )
+      })
+
+      it('permet des modifications multiples', async () => {
+        // Given
+        const session = uneSessionMilo({
+          inscriptions: [
+            {
+              idJeune: 'id-hermione',
+              idInscription: 'id-inscription-hermione',
+              nom: 'Granger',
+              prenom: 'Hermione',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            },
+            {
+              idJeune: 'id-ron',
+              idInscription: 'id-inscription-ron',
+              nom: 'Weasley',
+              prenom: 'Ronald',
+              statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+            },
+            {
+              idJeune: 'id-ginny',
+              idInscription: 'id-inscription-ginny',
+              nom: 'Weasley',
+              prenom: 'Ginny',
+              statut: SessionMilo.Inscription.Statut.REFUS_JEUNE
+            },
+            {
+              idJeune: 'id-harry',
+              idInscription: 'id-inscription-harry',
+              nom: 'Lovegood',
+              prenom: 'Luna',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            }
+          ]
+        })
+        sessionMiloRepository.getForConseiller.resolves(success(session))
+        const command = {
+          ...commandSansInscriptions,
+          inscriptions: [
+            {
+              idJeune: 'id-hermione',
+              statut: SessionMilo.Inscription.Statut.REFUS_JEUNE,
+              commentaire: 'J’ai pas envie'
+            },
+            {
+              idJeune: 'id-ron',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            },
+            {
+              idJeune: 'id-ginny',
+              statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+            },
+            {
+              idJeune: 'id-harry',
+              statut: SessionMilo.Inscription.Statut.DESINSCRIT
+            },
+            {
+              idJeune: 'id-luna',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            }
+          ]
+        }
+
+        // When
+        const result = await updateSessionMiloCommandHandler.handle(command)
+
+        // Then
+        expect(result).to.deep.equal(emptySuccess())
+        expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
+          {
+            id: session.id,
+            idStructureMilo: session.idStructureMilo,
+            estVisible: true,
+            dateModification: uneDatetime()
+          },
+          {
+            idsJeunesAInscrire: ['id-luna'],
+            inscriptionsASupprimer: [
+              { idJeune: 'id-harry', idInscription: 'id-inscription-harry' }
+            ],
+            inscriptionsAModifier: [
+              {
+                idJeune: 'id-hermione',
+                idInscription: 'id-inscription-hermione',
+                statut: SessionMilo.Inscription.Statut.REFUS_JEUNE,
+                commentaire: 'J’ai pas envie'
+              },
+              {
+                idJeune: 'id-ron',
+                idInscription: 'id-inscription-ron',
+                statut: SessionMilo.Inscription.Statut.INSCRIT
+              },
+              {
+                idJeune: 'id-ginny',
+                idInscription: 'id-inscription-ginny',
+                statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+              }
+            ]
+          },
+          idpToken
+        )
+      })
+
+      it('empêche de dépasser le nombre maximum de participants', async () => {
+        // Given
+        const session = uneSessionMilo({
+          nbPlacesDisponibles: 3,
+          inscriptions: [
+            {
+              idJeune: 'id-hermione',
+              idInscription: 'id-inscription-hermione',
+              nom: 'Granger',
+              prenom: 'Hermione',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            },
+            {
+              idJeune: 'id-ron',
+              idInscription: 'id-inscription-ron',
+              nom: 'Weasley',
+              prenom: 'Ronald',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            },
+            {
+              idJeune: 'id-ginny',
+              idInscription: 'id-inscription-ginny',
+              nom: 'Weasley',
+              prenom: 'Ginny',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            },
+            {
+              idJeune: 'id-luna',
+              idInscription: 'id-inscription-luna',
+              nom: 'Lovegood',
+              prenom: 'Luna',
+              statut: SessionMilo.Inscription.Statut.REFUS_TIERS
             }
           ]
         })
         sessionMiloRepository.getForConseiller.resolves(success(session))
 
         // When
-        const result = await updateSessionMiloCommandHandler.handle(command)
-
-        // Then
-        expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
-          { ...session, estVisible: true, dateModification: uneDatetime() },
-          {
-            idsJeunesAInscrire: ['id-harry'],
-            inscriptionsASupprimer: [
-              {
-                idJeune: 'id-ron',
-                idInscription: 'id-inscription-ron'
-              }
-            ]
-          },
-          idpToken
+        const commandAvecTropDInscrits = {
+          ...commandSansInscriptions,
+          inscriptions: [
+            {
+              idJeune: 'id-ron',
+              statut: SessionMilo.Inscription.Statut.DESINSCRIT
+            },
+            {
+              idJeune: 'id-ginny',
+              statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+            },
+            {
+              idJeune: 'id-luna',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            },
+            {
+              idJeune: 'id-harry',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            },
+            {
+              idJeune: 'id-hagrid',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            }
+          ]
+        }
+        const result = await updateSessionMiloCommandHandler.handle(
+          commandAvecTropDInscrits
         )
-        expect(result).to.deep.equal(emptySuccess())
-      })
-
-      it('empêche de dépasser le nombre maximum de participants', async () => {
-        // Given
-        const session = uneSessionMilo({
-          nbPlacesDisponibles: 1,
-          inscriptions: []
-        })
-        sessionMiloRepository.getForConseiller.resolves(success(session))
-
-        // When
-        const result = await updateSessionMiloCommandHandler.handle(command)
 
         // Then
-        expect(sessionMiloRepository.save).not.to.have.been.called()
         expect(result).to.deep.equal(failure(new MaxInscritsDepasse()))
+        expect(sessionMiloRepository.save).not.to.have.been.called()
       })
     })
   })

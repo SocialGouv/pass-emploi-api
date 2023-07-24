@@ -243,7 +243,8 @@ describe('ConseillersMiloController', () => {
         { idJeune: 'jeune-1', statut: SessionMilo.Inscription.Statut.INSCRIT },
         {
           idJeune: 'jeune-2',
-          statut: SessionMilo.Inscription.Statut.REFUS_JEUNE
+          statut: SessionMilo.Inscription.Statut.REFUS_JEUNE,
+          commentaire: 'J’ai pas envie'
         },
         {
           idJeune: 'jeune-3',

@@ -1,6 +1,12 @@
 import { DateTime } from 'luxon'
 import { MaxInscritsDepasse } from '../../building-blocks/types/domain-error'
-import { failure, Result, success } from '../../building-blocks/types/result'
+import {
+  emptySuccess,
+  failure,
+  isFailure,
+  Result,
+  success
+} from '../../building-blocks/types/result'
 import { ConseillerMilo } from './conseiller.milo'
 
 export const SessionMiloRepositoryToken = 'SessionMilo.Repository'
@@ -22,6 +28,19 @@ export interface SessionMilo {
   dateModification?: DateTime
 }
 
+export type ModificationInscription = Pick<
+  SessionMilo.Inscription,
+  'idJeune' | 'statut' | 'commentaire'
+>
+
+export type InscriptionsATraiter = {
+  idsJeunesAInscrire: string[]
+  inscriptionsASupprimer: Array<
+    Pick<SessionMilo.Inscription, 'idJeune' | 'idInscription'>
+  >
+  inscriptionsAModifier: Array<Omit<SessionMilo.Inscription, 'nom' | 'prenom'>>
+}
+
 export namespace SessionMilo {
   export function modifier(
     session: SessionMilo,
@@ -34,7 +53,8 @@ export namespace SessionMilo {
     >
   > {
     return {
-      ...session,
+      id: session.id,
+      idStructureMilo: session.idStructureMilo,
       estVisible: visibilite,
       dateModification
     }
@@ -42,35 +62,17 @@ export namespace SessionMilo {
 
   export function extraireInscriptionsATraiter(
     session: SessionMilo,
-    inscriptions: Array<Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>>
-  ): Result<{
-    idsJeunesAInscrire: string[]
-    inscriptionsASupprimer: Array<{ idJeune: string; idInscription: string }>
-  }> {
-    const idsJeunesAInscrire = extraireIdsJeunesAInscrire(session, inscriptions)
-    const inscriptionsASupprimer = extraireInscriptionsASupprimer(
+    inscriptions: ModificationInscription[]
+  ): Result<InscriptionsATraiter> {
+    const inscriptionsATraiter = trierInscriptionsATraiter(
       session,
       inscriptions
     )
 
-    if (session.nbPlacesDisponibles) {
-      const inscrits = session.inscriptions.filter(
-        ({ statut }) => statut === SessionMilo.Inscription.Statut.INSCRIT
-      )
-      if (
-        session.nbPlacesDisponibles <
-        inscrits.length +
-          idsJeunesAInscrire.length -
-          inscriptionsASupprimer.length
-      ) {
-        return failure(new MaxInscritsDepasse())
-      }
-    }
+    const resultNbPlaces = verifierNombrePlaces(session, inscriptionsATraiter)
+    if (isFailure(resultNbPlaces)) return resultNbPlaces
 
-    return success({
-      idsJeunesAInscrire,
-      inscriptionsASupprimer
-    })
+    return success(inscriptionsATraiter)
   }
 
   export interface Repository {
@@ -87,13 +89,7 @@ export namespace SessionMilo {
           'id' | 'idStructureMilo' | 'estVisible' | 'dateModification'
         >
       >,
-      inscriptionsATraiter: {
-        idsJeunesAInscrire: string[]
-        inscriptionsASupprimer: Array<{
-          idJeune: string
-          idInscription: string
-        }>
-      },
+      inscriptionsATraiter: InscriptionsATraiter,
       tokenMilo: string
     ): Promise<Result>
   }
@@ -113,6 +109,7 @@ export namespace SessionMilo {
     nom: string
     prenom: string
     statut: SessionMilo.Inscription.Statut
+    commentaire?: string
   }
 
   export namespace Inscription {
@@ -125,52 +122,102 @@ export namespace SessionMilo {
   }
 }
 
-function extraireIdsJeunesAInscrire(
+function trierInscriptionsATraiter(
   session: SessionMilo,
-  inscriptions: Array<Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>>
-): string[] {
+  inscriptions: ModificationInscription[]
+): InscriptionsATraiter {
+  const inscriptionsExistantes = getInscriptionsExistantes(session)
+
   const idsJeunesAInscrire = []
-
-  for (const inscription of inscriptions) {
-    if (inscription.statut !== SessionMilo.Inscription.Statut.INSCRIT) continue
-    if (findJeuneDejaInscrit(session, inscription.idJeune)) continue
-
-    idsJeunesAInscrire.push(inscription.idJeune)
-  }
-
-  return idsJeunesAInscrire
-}
-
-function extraireInscriptionsASupprimer(
-  session: SessionMilo,
-  inscriptions: Array<Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>>
-): Array<{
-  idInscription: string
-  idJeune: string
-}> {
   const inscriptionsASupprimer = []
+  const inscriptionsAModifier = []
 
   for (const inscription of inscriptions) {
-    if (inscription.statut !== SessionMilo.Inscription.Statut.DESINSCRIT)
-      continue
+    switch (inscription.statut) {
+      case SessionMilo.Inscription.Statut.INSCRIT:
+        if (!inscriptionsExistantes.has(inscription.idJeune))
+          idsJeunesAInscrire.push(inscription.idJeune)
+        else {
+          const inscriptionExistante = inscriptionsExistantes.get(
+            inscription.idJeune
+          )
+          if (
+            inscriptionExistante!.statut !==
+            SessionMilo.Inscription.Statut.INSCRIT
+          )
+            inscriptionsAModifier.push({
+              ...inscription,
+              idInscription: inscriptionExistante!.idInscription
+            })
+        }
+        break
 
-    const jeuneDejaInscrit = findJeuneDejaInscrit(session, inscription.idJeune)
-    if (!jeuneDejaInscrit) continue
+      case SessionMilo.Inscription.Statut.DESINSCRIT:
+        if (inscriptionsExistantes.has(inscription.idJeune))
+          inscriptionsASupprimer.push({
+            idJeune: inscription.idJeune,
+            idInscription: inscriptionsExistantes.get(inscription.idJeune)!
+              .idInscription
+          })
+        break
 
-    inscriptionsASupprimer.push({
-      idJeune: inscription.idJeune,
-      idInscription: jeuneDejaInscrit.idInscription
-    })
+      case SessionMilo.Inscription.Statut.REFUS_JEUNE:
+      case SessionMilo.Inscription.Statut.REFUS_TIERS:
+        if (
+          inscriptionsExistantes.has(inscription.idJeune) &&
+          inscriptionsExistantes.get(inscription.idJeune)!.statut !==
+            inscription.statut
+        )
+          inscriptionsAModifier.push({
+            ...inscription,
+            idInscription: inscriptionsExistantes.get(inscription.idJeune)!
+              .idInscription
+          })
+        break
+    }
   }
-
-  return inscriptionsASupprimer
+  return { idsJeunesAInscrire, inscriptionsASupprimer, inscriptionsAModifier }
 }
 
-function findJeuneDejaInscrit(
+function getInscriptionsExistantes(
+  session: SessionMilo
+): Map<string, SessionMilo.Inscription> {
+  return session.inscriptions.reduce((map, inscriptionExistante) => {
+    map.set(inscriptionExistante.idJeune, inscriptionExistante)
+    return map
+  }, new Map<string, SessionMilo.Inscription>())
+}
+
+function verifierNombrePlaces(
   session: SessionMilo,
-  idJeune: string
-): SessionMilo.Inscription | undefined {
-  return session.inscriptions.find(
-    inscriptionExistante => inscriptionExistante.idJeune === idJeune
+  {
+    idsJeunesAInscrire,
+    inscriptionsAModifier,
+    inscriptionsASupprimer
+  }: InscriptionsATraiter
+): Result {
+  if (!session.nbPlacesDisponibles) return emptySuccess()
+
+  const inscritsExistants = session.inscriptions.filter(
+    ({ statut }) => statut === SessionMilo.Inscription.Statut.INSCRIT
   )
+  const aReinscrire = inscriptionsAModifier.filter(
+    aModifier => aModifier.statut === SessionMilo.Inscription.Statut.INSCRIT
+  )
+
+  const aDesinscrire = inscritsExistants.filter(inscrit =>
+    inscriptionsASupprimer.some(({ idJeune }) => idJeune === inscrit.idJeune)
+  )
+  const aRefuser = inscritsExistants.filter(inscrit =>
+    inscriptionsAModifier.some(({ idJeune }) => idJeune === inscrit.idJeune)
+  )
+
+  const nbPlacesPrises =
+    inscritsExistants.length + idsJeunesAInscrire.length + aReinscrire.length
+  const nbPlacesLiberees = aDesinscrire.length + aRefuser.length
+
+  if (session.nbPlacesDisponibles < nbPlacesPrises - nbPlacesLiberees) {
+    return failure(new MaxInscritsDepasse())
+  }
+  return emptySuccess()
 }

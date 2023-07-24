@@ -19,7 +19,7 @@ import {
 import { uneSessionMilo } from '../../../fixtures/sessions.fixture'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
-import { expect, StubbedClass, stubClass } from '../../../utils'
+import { expect, sinon, StubbedClass, stubClass } from '../../../utils'
 import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('SessionMiloHttpSqlRepository', () => {
@@ -181,6 +181,7 @@ describe('SessionMiloHttpSqlRepository', () => {
       // Given
       miloClient.inscrireJeunesSession.resolves(emptySuccess())
       miloClient.desinscrireJeunesSession.resolves(emptySuccess())
+      miloClient.modifierInscriptionJeunesSession.resolves(emptySuccess())
       await StructureMiloSqlModel.create({
         id: idStructure,
         nomOfficiel: 'Structure',
@@ -190,7 +191,10 @@ describe('SessionMiloHttpSqlRepository', () => {
       await JeuneSqlModel.bulkCreate([
         unJeuneDto({ id: 'id-hermione', idPartenaire: 'id-dossier-hermione' }),
         unJeuneDto({ id: 'id-ron', idPartenaire: 'id-dossier-ron' }),
-        unJeuneDto({ id: 'id-harry', idPartenaire: 'id-dossier-harry' })
+        unJeuneDto({ id: 'id-harry', idPartenaire: 'id-dossier-harry' }),
+        unJeuneDto({ id: 'id-ginny', idPartenaire: 'id-dossier-ginny' }),
+        unJeuneDto({ id: 'id-luna', idPartenaire: 'id-dossier-luna' }),
+        unJeuneDto({ id: 'id-fred', idPartenaire: 'id-dossier-fred' })
       ])
 
       session = {
@@ -232,6 +236,24 @@ describe('SessionMiloHttpSqlRepository', () => {
           idsJeunesAInscrire: ['id-hermione', 'id-ron'],
           inscriptionsASupprimer: [
             { idJeune: 'id-harry', idInscription: 'id-inscription-harry' }
+          ],
+          inscriptionsAModifier: [
+            {
+              idJeune: 'id-ginny',
+              idInscription: 'id-inscription-ginny',
+              statut: SessionMilo.Inscription.Statut.INSCRIT
+            },
+            {
+              idJeune: 'id-luna',
+              idInscription: 'id-inscription-luna',
+              statut: SessionMilo.Inscription.Statut.REFUS_JEUNE,
+              commentaire: 'J’ai pas envie'
+            },
+            {
+              idJeune: 'id-fred',
+              idInscription: 'id-inscription-fred',
+              statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+            }
           ]
         },
         tokenMilo
@@ -261,7 +283,11 @@ describe('SessionMiloHttpSqlRepository', () => {
       }
       await sessionMiloHttpSqlRepository.save(
         sessionModifiee,
-        { idsJeunesAInscrire: [], inscriptionsASupprimer: [] },
+        {
+          idsJeunesAInscrire: [],
+          inscriptionsASupprimer: [],
+          inscriptionsAModifier: []
+        },
         tokenMilo
       )
 
@@ -275,12 +301,12 @@ describe('SessionMiloHttpSqlRepository', () => {
 
     it('soumet les modifications d’inscriptions à Milo', async () => {
       // Then
-      expect(
+      sinon.assert.callOrder(
+        miloClient.desinscrireJeunesSession,
+        miloClient.modifierInscriptionJeunesSession,
         miloClient.inscrireJeunesSession
-      ).to.have.been.calledOnceWithExactly(tokenMilo, idSession, [
-        'id-dossier-hermione',
-        'id-dossier-ron'
-      ])
+      )
+
       expect(
         miloClient.desinscrireJeunesSession
       ).to.have.been.calledOnceWithExactly(tokenMilo, [
@@ -288,6 +314,32 @@ describe('SessionMiloHttpSqlRepository', () => {
           idDossier: 'id-dossier-harry',
           idInstanceSession: 'id-inscription-harry'
         }
+      ])
+      expect(
+        miloClient.modifierInscriptionJeunesSession
+      ).to.have.been.calledOnceWithExactly(tokenMilo, [
+        {
+          idDossier: 'id-dossier-fred',
+          idInstanceSession: 'id-inscription-fred',
+          statut: 'REFUSAL'
+        },
+        {
+          idDossier: 'id-dossier-luna',
+          idInstanceSession: 'id-inscription-luna',
+          statut: 'REFUSAL_YOUNG',
+          commentaire: 'J’ai pas envie'
+        },
+        {
+          idDossier: 'id-dossier-ginny',
+          idInstanceSession: 'id-inscription-ginny',
+          statut: 'ONGOING'
+        }
+      ])
+      expect(
+        miloClient.inscrireJeunesSession
+      ).to.have.been.calledOnceWithExactly(tokenMilo, idSession, [
+        'id-dossier-hermione',
+        'id-dossier-ron'
       ])
     })
   })

@@ -33,6 +33,12 @@ class InscriptionSessionMiloPayload {
   @ApiProperty({ enum: SessionMilo.Inscription.Statut })
   @IsEnum(SessionMilo.Inscription.Statut)
   statut: SessionMilo.Inscription.Statut
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  @IsNotEmpty()
+  commentaire?: string
 }
 
 export class UpdateSessionMiloPayload {
