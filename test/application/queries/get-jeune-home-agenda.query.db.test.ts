@@ -1,6 +1,6 @@
-import { DateTime } from 'luxon'
+import { DateTime, Interval } from 'luxon'
 import { GetJeuneHomeAgendaQueryHandler } from 'src/application/queries/get-jeune-home-agenda.query.db'
-import { JeuneHomeSuiviQueryModel } from 'src/application/queries/query-models/home-jeune-suivi.query-model'
+import { JeuneHomeAgendaQueryModel } from 'src/application/queries/query-models/home-jeune-suivi.query-model'
 import {
   emptySuccess,
   isSuccess,
@@ -18,28 +18,33 @@ import { uneActionQueryModelSansJeune } from 'test/fixtures/query-models/action.
 import { uneActionDto } from 'test/fixtures/sql-models/action.sql-model'
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
-import { ConseillerInterAgenceAuthorizer } from '../../../src/application/authorizers/conseiller-inter-agence-authorizer'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
-import { ActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
-import { RendezVousJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
-import { Core } from '../../../src/domain/core'
-import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
-import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { AsSql } from '../../../src/infrastructure/sequelize/types'
+import { ConseillerInterAgenceAuthorizer } from 'src/application/authorizers/conseiller-inter-agence-authorizer'
+import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
+import { ActionQueryModel } from 'src/application/queries/query-models/actions.query-model'
+import { RendezVousJeuneQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
+import { Core } from 'src/domain/core'
+import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
+import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { AsSql } from 'src/infrastructure/sequelize/types'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
-} from '../../fixtures/authentification.fixture'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { unRendezVousQueryModel } from '../../fixtures/query-models/rendez-vous.query-model.fixtures'
-import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { getDatabase } from '../../utils/database-for-testing'
-import { testConfig } from '../../utils/module-for-testing'
+} from 'test/fixtures/authentification.fixture'
+import { unJeune } from 'test/fixtures/jeune.fixture'
+import { unRendezVousQueryModel } from 'test/fixtures/query-models/rendez-vous.query-model.fixtures'
+import { unRendezVousDto } from 'test/fixtures/sql-models/rendez-vous.sql-model'
+import { expect, StubbedClass, stubClass } from 'test/utils'
+import { getDatabase } from 'test/utils/database-for-testing'
+import { testConfig } from 'test/utils/module-for-testing'
+import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
+import { uneSessionJeuneMiloQueryModel } from 'test/fixtures/sessions.fixture'
+import { SessionMilo } from 'src/domain/milo/session.milo'
 
 describe('GetJeuneHomeAgendaQueryHandler', () => {
   const utilisateurJeune = unUtilisateurJeune()
+  const idJeune = utilisateurJeune.id
   let handler: GetJeuneHomeAgendaQueryHandler
+  let sessionsQueryGetter: StubbedClass<GetSessionsJeuneMiloQueryGetter>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
   const aujourdhuiDimanche = '2022-08-14T12:00:00Z'
@@ -49,10 +54,12 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
+    sessionsQueryGetter = stubClass(GetSessionsJeuneMiloQueryGetter)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
     handler = new GetJeuneHomeAgendaQueryHandler(
       jeuneAuthorizer,
+      sessionsQueryGetter,
       conseillerAgenceAuthorizer,
       testConfig()
     )
@@ -61,8 +68,32 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
   })
 
   describe('handle', () => {
+    const token = 'token'
+    const homeQuery = {
+      idJeune,
+      maintenant: aujourdhuiDimanche,
+      token
+    }
+    const lundiDernierString = '2022-08-08T00:00:00Z'
+    const dimancheEnHuitString = '2022-08-22T00:00:00Z'
+    const sessionsQuery = {
+      idJeune,
+      token,
+      periode: Interval.fromDateTimes(
+        DateTime.fromISO(lundiDernierString, { setZone: true }),
+        DateTime.fromISO(dimancheEnHuitString, { setZone: true })
+      )
+    }
+
+    beforeEach(async () => {
+      sessionsQueryGetter.handle.withArgs(sessionsQuery).resolves(success([]))
+    })
+
     it("doit retourner les événements bornés entre lundi dernier minuit et lundi en huit minuit, d'après la locale utilisateur", async () => {
+      // Given
       const aujourdhuiMercredi = '2022-08-17T00:00:00-07:00'
+      const _lundiDernier = '2022-08-15T00:00:00-07:00'
+      const _dimancheEnHuit = '2022-08-29T00:00:00-07:00'
       const [_dimancheDernier, lundiDernier, dimancheEnHuit, _lundiEnHuit] =
         await createActions([
           '2022-08-14T23:59:00-07:00',
@@ -70,18 +101,26 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
           '2022-08-28T23:59:00-07:00',
           '2022-08-29T00:00:00-07:00'
         ])
+      const periode = Interval.fromDateTimes(
+        DateTime.fromISO(_lundiDernier, { setZone: true }),
+        DateTime.fromISO(_dimancheEnHuit, { setZone: true })
+      )
+      sessionsQueryGetter.handle
+        .withArgs({ ...sessionsQuery, periode: periode })
+        .resolves(success([]))
 
       // When
       const result = await handler.handle(
         {
-          idJeune: 'ABCDE',
-          maintenant: aujourdhuiMercredi
+          idJeune: idJeune,
+          maintenant: aujourdhuiMercredi,
+          token: token
         },
         utilisateurJeune
       )
 
       // Then
-      const expected: JeuneHomeSuiviQueryModel = {
+      const expected: JeuneHomeAgendaQueryModel = {
         actions: [
           uneActionQueryModelSansJeune({
             id: lundiDernier.id,
@@ -95,6 +134,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
           })
         ],
         rendezVous: [],
+        sessionsMilo: [],
         metadata: {
           actionsEnRetard: 2,
           dateDeDebut: lundiDernier.dateEcheance,
@@ -107,7 +147,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
     describe('actions', () => {
       let demain: AsSql<ActionDto>
       let apresDemain: AsSql<ActionDto>
-      let result: Result<JeuneHomeSuiviQueryModel>
+      let result: Result<JeuneHomeAgendaQueryModel>
 
       beforeEach(async () => {
         ;[demain, apresDemain] = await createActions([
@@ -116,15 +156,9 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         ])
 
         // When
-        result = await handler.handle(
-          {
-            idJeune: 'ABCDE',
-            maintenant: aujourdhuiDimanche
-          },
-          utilisateurJeune
-        )
+        result = await handler.handle(homeQuery, utilisateurJeune)
       })
-      it('doit retourner la liste des actions triées chronologiquement', async () => {
+      it('renvoie les actions triées par date', async () => {
         // Then
         const actionsQM: ActionQueryModel[] = [
           uneActionQueryModelSansJeune({
@@ -141,6 +175,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         )
       })
     })
+
     describe('rendez-vous', () => {
       it('renvoie les rendez-vous triés par date', async () => {
         // Given
@@ -164,13 +199,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         ])
 
         // When
-        const result = await handler.handle(
-          {
-            idJeune: 'ABCDE',
-            maintenant: aujourdhuiDimanche
-          },
-          utilisateurJeune
-        )
+        const result = await handler.handle(homeQuery, utilisateurJeune)
 
         // Then
         const expected: RendezVousJeuneQueryModel[] = [
@@ -188,8 +217,65 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         )
       })
     })
+
+    describe('sessionsMilo', () => {
+      it('renvoie un tableau vide si le jeune n’est inscrit à aucune session sur la période', async () => {
+        // Given
+        const sessionSansInscriptionCetteSemaine = {
+          ...uneSessionJeuneMiloQueryModel,
+          dateHeureDebut: DateTime.fromJSDate(demain)
+            .plus({ days: 1 })
+            .toISODate()
+        }
+        sessionsQueryGetter.handle
+          .withArgs(sessionsQuery)
+          .resolves(success([sessionSansInscriptionCetteSemaine]))
+
+        // When
+        const result = await handler.handle(homeQuery, utilisateurJeune)
+
+        // Then
+        expect(isSuccess(result) && result.data.sessionsMilo).to.be.empty()
+      })
+
+      it('renvoie les sessions Milo triées par date si le jeune est inscrit à des sessions sur la période', async () => {
+        // Given
+        const sessionAvecInscriptionAJPlus1 = {
+          ...uneSessionJeuneMiloQueryModel,
+          dateHeureDebut: DateTime.fromJSDate(demain)
+            .plus({ days: 1 })
+            .toISODate(),
+          inscription: SessionMilo.Inscription.Statut.INSCRIT
+        }
+        const sessionAvecInscriptionAJPlus2 = {
+          ...uneSessionJeuneMiloQueryModel,
+          dateHeureDebut: DateTime.fromJSDate(demain)
+            .plus({ days: 2 })
+            .toISODate(),
+          inscription: SessionMilo.Inscription.Statut.INSCRIT
+        }
+        sessionsQueryGetter.handle
+          .withArgs(sessionsQuery)
+          .resolves(
+            success([
+              sessionAvecInscriptionAJPlus2,
+              sessionAvecInscriptionAJPlus1
+            ])
+          )
+
+        // When
+        const result = await handler.handle(homeQuery, utilisateurJeune)
+
+        // Then
+        expect(isSuccess(result) && result.data.sessionsMilo).to.be.deep.equal([
+          sessionAvecInscriptionAJPlus1,
+          sessionAvecInscriptionAJPlus2
+        ])
+      })
+    })
+
     describe('metadata', () => {
-      let result: Result<JeuneHomeSuiviQueryModel>
+      let result: Result<JeuneHomeAgendaQueryModel>
 
       beforeEach(async () => {
         const hier = '2022-08-11T12:00:00Z'
@@ -199,13 +285,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         await createActions([hier, dansUneSemaine], Action.Statut.PAS_COMMENCEE)
 
         // When
-        result = await handler.handle(
-          {
-            idJeune: 'ABCDE',
-            maintenant: aujourdhuiDimanche
-          },
-          utilisateurJeune
-        )
+        result = await handler.handle(homeQuery, utilisateurJeune)
       })
       it("retourne le compte d'actions en retard et les dates", async () => {
         // Then
@@ -219,19 +299,22 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
   })
 
   describe('authorize', () => {
+    const jeune = unJeune()
+    const query = {
+      idJeune: jeune.id,
+      maintenant: aujourdhuiDimanche,
+      token: 'token'
+    }
+
     describe('quand c’est un jeune', () => {
       it('appelle l’authorizer idoine', async () => {
         // Given
-        const jeune = unJeune()
         jeuneAuthorizer.autoriserLeJeune
           .withArgs(jeune.id, unUtilisateurJeune({ id: jeune.id }))
           .resolves(emptySuccess())
 
         // When
-        const result = await handler.authorize(
-          { idJeune: jeune.id, maintenant: aujourdhuiDimanche },
-          unUtilisateurJeune()
-        )
+        const result = await handler.authorize(query, unUtilisateurJeune())
 
         // Then
         expect(result).to.deep.equal(emptySuccess())
@@ -244,8 +327,6 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         const utilisateur = unUtilisateurConseiller({
           structure: Core.Structure.MILO
         })
-
-        const query = { idJeune: jeune.id, maintenant: aujourdhuiDimanche }
 
         // When
         await handler.authorize(query, utilisateur)

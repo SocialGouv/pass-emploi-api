@@ -319,7 +319,7 @@ import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/quer
 import { UpdateSessionMiloCommandHandler } from './application/commands/milo/update-session-milo.command.handler'
 import { SessionMiloRepositoryToken } from './domain/milo/session.milo'
 import { SessionMiloHttpSqlRepository } from './infrastructure/repositories/milo/session-milo-http-sql.repository.db'
-import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
+import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler'
 import { SuivreEvenementsMiloCronJobHandler } from './application/jobs/suivre-file-evenements-milo.job.handler'
 import { MonitorJobsJobHandler } from './application/jobs/monitor-jobs.job.handler.db'
 import { NettoyerPiecesJointesJobHandler } from './application/jobs/nettoyer-pieces-jointes.job.handler'
@@ -336,6 +336,7 @@ import { NotifierRecherchesServiceCiviqueJobHandler } from './application/jobs/n
 import { HandleJobGenererJDDCommandHandler } from './application/jobs/generer-jdd.job.handler'
 import { MajSegmentsJobHandler } from './application/jobs/maj-segments.job.handler.db'
 import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
+import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -737,6 +738,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetEvenementEmploiQueryHandler,
     GetSessionsConseillerMiloQueryHandler,
     GetSessionsJeuneMiloQueryHandler,
+    GetSessionsJeuneMiloQueryGetter,
     GetDetailSessionConseillerMiloQueryHandler,
     GetDetailSessionJeuneMiloQueryHandler,
     UpdateSessionMiloCommandHandler,

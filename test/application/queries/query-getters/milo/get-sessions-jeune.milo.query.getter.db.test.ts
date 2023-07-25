@@ -1,9 +1,6 @@
 import { describe } from 'mocha'
 import { createSandbox, SinonSandbox } from 'sinon'
-import { unUtilisateurJeune } from 'test/fixtures/authentification.fixture'
 import { expect, StubbedClass, stubClass } from 'test/utils'
-import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
-import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
 import { Jeune } from 'src/domain/jeune/jeune'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { failure, success } from 'src/building-blocks/types/result'
@@ -18,20 +15,19 @@ import { uneSessionJeuneMiloQueryModel } from 'test/fixtures/sessions.fixture'
 import { uneOffreDto, uneSessionDto } from 'test/fixtures/milo-dto.fixture'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
-import { DateTime } from 'luxon'
+import { DateTime, Interval } from 'luxon'
 import { getDatabase } from 'test/utils/database-for-testing'
-import { SessionMilo } from '../../../../src/domain/milo/session.milo'
+import { SessionMilo } from 'src/domain/milo/session.milo'
+import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 
-describe('GetSessionsJeuneMiloQueryHandler', () => {
+describe('GetSessionsJeuneMiloQueryGetter', () => {
   const query = { idJeune: 'idJeune', token: 'token' }
   const jeune = unJeune()
-  const utilisateur = unUtilisateurJeune()
 
-  let getSessionsQueryHandler: GetSessionsJeuneMiloQueryHandler
+  let getSessionsQueryGetter: GetSessionsJeuneMiloQueryGetter
   let jeuneRepository: StubbedType<Jeune.Repository>
   let keycloakClient: StubbedClass<KeycloakClient>
   let miloClient: StubbedClass<MiloClient>
-  let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let sandbox: SinonSandbox
 
   before(async () => {
@@ -42,31 +38,15 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
     jeuneRepository = stubInterface(sandbox)
     keycloakClient = stubClass(KeycloakClient)
     miloClient = stubClass(MiloClient)
-    jeuneAuthorizer = stubClass(JeuneAuthorizer)
-    getSessionsQueryHandler = new GetSessionsJeuneMiloQueryHandler(
+    getSessionsQueryGetter = new GetSessionsJeuneMiloQueryGetter(
       jeuneRepository,
       keycloakClient,
-      miloClient,
-      jeuneAuthorizer
+      miloClient
     )
   })
 
   after(() => {
     sandbox.restore()
-  })
-
-  describe('authorize', () => {
-    it('autorise un jeune Milo', () => {
-      // When
-      getSessionsQueryHandler.authorize(query, utilisateur)
-
-      // Then
-      expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
-        'idJeune',
-        utilisateur,
-        true
-      )
-    })
   })
 
   describe('handle', () => {
@@ -76,7 +56,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
         jeuneRepository.get.withArgs(query.idJeune).resolves(undefined)
 
         // When
-        const result = await getSessionsQueryHandler.handle(query)
+        const result = await getSessionsQueryGetter.handle(query)
 
         // Then
         expect(result).to.deep.equal(
@@ -93,7 +73,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
           .resolves({ ...jeune, idPartenaire: undefined })
 
         // When
-        const result = await getSessionsQueryHandler.handle(query)
+        const result = await getSessionsQueryGetter.handle(query)
 
         // Then
         expect(result).to.deep.equal(
@@ -156,7 +136,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
             .resolves(
               success({
                 page: 1,
-                nbSessions: 1,
+                nbSessions: 2,
                 sessions: [
                   { session: sessionNonVisible, offre: uneOffreDto },
                   { session: sessionVisibleACayenne, offre: uneOffreDto }
@@ -165,7 +145,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
             )
 
           // When
-          const result = await getSessionsQueryHandler.handle(query)
+          const result = await getSessionsQueryGetter.handle(query)
 
           // Then
           expect(result).to.deep.equal(
@@ -190,7 +170,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
             )
 
           // When
-          const result = await getSessionsQueryHandler.handle(query)
+          const result = await getSessionsQueryGetter.handle(query)
 
           // Then
           const dateHeureDebutTimeZoneParis = '2020-04-06T08:20:00.000Z'
@@ -214,7 +194,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
             .resolves(
               success({
                 page: 1,
-                nbSessions: 1,
+                nbSessions: 3,
                 sessions: [
                   {
                     session: sessionVisibleACayenne,
@@ -236,7 +216,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
             )
 
           // When
-          const result = await getSessionsQueryHandler.handle(query)
+          const result = await getSessionsQueryGetter.handle(query)
 
           // Then
           expect(result).to.deep.equal(
@@ -256,6 +236,38 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
                 id: idSession3.toString(),
                 inscription: SessionMilo.Inscription.Statut.REFUS_TIERS
               }
+            ])
+          )
+        })
+
+        it('sur une période donnée si elle est renseignée', async () => {
+          // Given
+          const periode = Interval.fromDateTimes(
+            DateTime.local(2022),
+            DateTime.local(2023)
+          )
+          miloClient.getSessionsJeune
+            .withArgs(idpToken, jeune.idPartenaire, periode.start, periode.end)
+            .resolves(
+              success({
+                page: 1,
+                nbSessions: 1,
+                sessions: [
+                  { session: sessionVisibleACayenne, offre: uneOffreDto }
+                ]
+              })
+            )
+
+          // When
+          const result = await getSessionsQueryGetter.handle({
+            ...query,
+            periode
+          })
+
+          // Then
+          expect(result).to.deep.equal(
+            success([
+              { ...uneSessionJeuneMiloQueryModel, id: idSession3.toString() }
             ])
           )
         })

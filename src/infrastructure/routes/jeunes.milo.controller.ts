@@ -13,7 +13,7 @@ import {
   DetailSessionJeuneMiloQueryModel,
   SessionJeuneMiloQueryModel
 } from 'src/application/queries/query-models/sessions.milo.query.model'
-import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
+import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler'
 import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
 
 @Controller('jeunes')
@@ -37,10 +37,11 @@ export class JeunesMiloController {
   async getAccueilMilo(
     @Param('idJeune') idJeune: string,
     @Query() queryParams: MaintenantQueryParams,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string
   ): Promise<AccueilJeuneMiloQueryModel> {
     const result = await this.getAccueilQueryHandler.execute(
-      { idJeune, maintenant: queryParams.maintenant },
+      { idJeune, maintenant: queryParams.maintenant, token: accessToken },
       utilisateur
     )
 

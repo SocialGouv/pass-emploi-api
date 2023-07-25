@@ -6,7 +6,6 @@ import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
 import { failure, success } from 'src/building-blocks/types/result'
 import { JwtService } from 'src/infrastructure/auth/jwt.service'
 import {
-  unHeaderAuthorization,
   unJwtPayloadValide,
   unUtilisateurDecode
 } from 'test/fixtures/authentification.fixture'
@@ -18,7 +17,7 @@ import { DateService } from 'src/utils/date-service'
 import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
 import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/accueil/get-accueil-jeune-milo.query.handler.db'
 import { AccueilJeuneMiloQueryModel } from 'src/application/queries/query-models/jeunes.milo.query-model'
-import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
+import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler'
 import {
   unDetailSessionJeuneMiloQueryModel,
   uneSessionJeuneMiloQueryModel
@@ -54,6 +53,7 @@ describe('JeunesMiloController', () => {
   describe('GET /jeunes/:idJeune/milo/accueil', () => {
     const idJeune = '1'
     const maintenant = '2023-03-03'
+    const token = 'token'
     const accueilJeuneQueryModel: AccueilJeuneMiloQueryModel = {
       cetteSemaine: {
         nombreRendezVous: 1,
@@ -68,13 +68,7 @@ describe('JeunesMiloController', () => {
 
     it("renvoie l'accueil d'un jeune MILO sans personnalisation", async () => {
       getAccueilQueryHandler.execute
-        .withArgs(
-          {
-            idJeune,
-            maintenant
-          },
-          unUtilisateurDecode()
-        )
+        .withArgs({ idJeune, maintenant, token }, unUtilisateurDecode())
         .resolves(success(accueilJeuneQueryModel))
       const {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -83,24 +77,18 @@ describe('JeunesMiloController', () => {
       } = accueilJeuneQueryModel
       await request(app.getHttpServer())
         .get(`/jeunes/${idJeune}/milo/accueil?maintenant=2023-03-03`)
-        .set('authorization', unHeaderAuthorization())
+        .set('authorization', `bearer ${token}`)
         .expect(HttpStatus.OK)
         .expect({ ...accueilJeuneQueryModelResume })
     })
 
     it('renvoie une erreur quand le jeune est un jeune PE', async () => {
       getAccueilQueryHandler.execute
-        .withArgs(
-          {
-            idJeune,
-            maintenant
-          },
-          unUtilisateurDecode()
-        )
+        .withArgs({ idJeune, maintenant, token }, unUtilisateurDecode())
         .resolves(failure(new DroitsInsuffisants()))
       await request(app.getHttpServer())
         .get(`/jeunes/${idJeune}/milo/accueil?maintenant=2023-03-03`)
-        .set('authorization', unHeaderAuthorization())
+        .set('authorization', `bearer ${token}`)
         .expect(HttpStatus.FORBIDDEN)
     })
     ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1/milo/accueil')
