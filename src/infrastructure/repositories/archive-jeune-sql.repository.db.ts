@@ -37,12 +37,14 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
       return archiveResult
     }
 
-    await ArchiveJeuneSqlModel.create({
+    await ArchiveJeuneSqlModel.creer({
       idJeune: metadonnees.idJeune,
       email: metadonnees.email ?? null,
       prenom: metadonnees.prenomJeune,
       nom: metadonnees.nomJeune,
       structure: metadonnees.structure,
+      dateCreation: metadonnees.dateCreation,
+      datePremiereConnexion: metadonnees.datePremiereConnexion ?? null,
       motif: metadonnees.motif,
       commentaire: metadonnees.commentaire ?? null,
       dateArchivage: metadonnees.dateArchivage,

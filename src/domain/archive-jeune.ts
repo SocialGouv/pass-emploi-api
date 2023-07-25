@@ -166,6 +166,8 @@ export namespace ArchiveJeune {
     prenomJeune: string
     nomJeune: string
     structure: Core.Structure
+    dateCreation: Date
+    datePremiereConnexion?: Date
     motif: MotifSuppression | MotifSuppressionSupport
     commentaire?: string
     dateArchivage: Date
