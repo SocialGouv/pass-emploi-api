@@ -91,6 +91,8 @@ describe('ArchiverJeuneSupportCommandHandler', () => {
           prenomJeune: jeune.firstName,
           nomJeune: jeune.lastName,
           structure: Structure.MILO,
+          dateCreation: jeune.creationDate.toJSDate(),
+          datePremiereConnexion: jeune.creationDate.plus({ day: 1 }).toJSDate(),
           motif: 'Support',
           commentaire:
             "Pour des raisons techniques nous avons procédé à l'archivage de votre compte.",
