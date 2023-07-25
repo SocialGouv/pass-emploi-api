@@ -18,7 +18,7 @@ export const uneSessionConseillerMiloQueryModel: SessionConseillerMiloQueryModel
     dateHeureFin: '2020-04-08T13:20:00.000Z',
     type: {
       code: OffreTypeCode.WORKSHOP,
-      label: 'Atelier i-milo'
+      label: 'Atelier'
     }
   }
 
@@ -30,7 +30,7 @@ export const uneSessionJeuneMiloQueryModel: SessionJeuneMiloQueryModel = {
   dateHeureFin: '2020-04-08T13:20:00.000Z',
   type: {
     code: OffreTypeCode.WORKSHOP,
-    label: 'Atelier i-milo'
+    label: 'Atelier'
   }
 }
 
@@ -52,7 +52,7 @@ export const unDetailSessionConseillerMiloQueryModel: DetailSessionConseillerMil
       id: '1',
       nom: 'Une-offre',
       theme: 'Un-theme',
-      type: { code: OffreTypeCode.WORKSHOP, label: 'Atelier i-milo' },
+      type: { code: OffreTypeCode.WORKSHOP, label: 'Atelier' },
       description: 'Une-Desc',
       nomPartenaire: 'Un-partenaire'
     },
@@ -65,7 +65,7 @@ export const unDetailSessionJeuneMiloQueryModel: DetailSessionJeuneMiloQueryMode
     nomSession: 'Une-session',
     nomOffre: 'Une-offre',
     theme: 'Un-theme',
-    type: { code: OffreTypeCode.WORKSHOP, label: 'Atelier i-milo' },
+    type: { code: OffreTypeCode.WORKSHOP, label: 'Atelier' },
     dateHeureDebut: '2020-04-06T13:20:00.000Z',
     dateHeureFin: '2020-04-08T13:20:00.000Z',
     lieu: 'Un-lieu',
@@ -127,7 +127,7 @@ export const uneSessionMilo = (
       theme: 'Un-theme',
       type: {
         code: 'WORKSHOP',
-        label: 'Atelier i-milo'
+        label: 'Atelier'
       }
     }
   }

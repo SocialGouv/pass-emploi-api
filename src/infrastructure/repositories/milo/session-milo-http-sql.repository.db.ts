@@ -291,15 +291,15 @@ function dtoToSessionMiloTypeOffre(offreDto: OffreDto): {
   const type = offreDto.type
   switch (type) {
     case OffreTypeCode.WORKSHOP:
-      return { code: type, label: 'Atelier i-milo' }
+      return { code: type, label: 'Atelier' }
     case OffreTypeCode.COLLECTIVE_INFORMATION:
-      return { code: type, label: 'info coll i-milo' }
+      return { code: type, label: 'Information collective' }
     default:
       const logger = new Logger('SessionMilo.dtoToSessionMiloTypeOffre')
       logger.error(
         `Une session a un type d'offre inconnu : offre ${offreDto.id}, type ${type}`
       )
-      return { code: type, label: 'Atelier i-milo' }
+      return { code: type, label: 'Atelier' }
   }
 }
 

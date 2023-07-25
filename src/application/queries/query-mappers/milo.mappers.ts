@@ -19,9 +19,9 @@ function buildSessionTypeQueryModel(
 ): SessionTypeQueryModel {
   switch (type) {
     case OffreTypeCode.WORKSHOP:
-      return { code: type, label: 'Atelier i-milo' }
+      return { code: type, label: 'Atelier' }
     case OffreTypeCode.COLLECTIVE_INFORMATION:
-      return { code: type, label: 'info coll i-milo' }
+      return { code: type, label: 'Information collective' }
   }
 }
 
