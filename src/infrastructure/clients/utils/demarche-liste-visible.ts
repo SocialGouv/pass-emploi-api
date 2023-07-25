@@ -11,6 +11,7 @@ export const codeCommentDemarchesCachees = new Set([
   'C40.01',
   'C11.01',
   'C11.04',
+  'C11.07',
   'C12.01',
   'C12.05',
   'C17.01',

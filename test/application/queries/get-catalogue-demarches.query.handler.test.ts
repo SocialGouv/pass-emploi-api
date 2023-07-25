@@ -55,6 +55,12 @@ describe('GetCatalogueQueryHandler', () => {
                 code: 'C11.05',
                 libelle: "Avec l'aide d'une personne ou d'une structure",
                 droitCreation: false
+              },
+              {
+                type: 'MoyenRetourEmploiReferentielPartenaire',
+                code: 'C11.07',
+                libelle: 'Moyen à définir',
+                droitCreation: true
               }
             ]
           },
