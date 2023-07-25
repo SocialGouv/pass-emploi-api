@@ -172,6 +172,7 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
 const MILO_INSCRIT = 'ONGOING'
 const MILO_REFUS_TIERS = 'REFUSAL'
 const MILO_REFUS_JEUNE = 'REFUSAL_YOUNG'
+const MILO_PRESENT = 'ACHIEVED'
 
 function dtoToSessionMilo(
   { session: sessionDto, offre: offreDto }: SessionConseillerDetailDto,
@@ -275,6 +276,8 @@ function dtoToStatutInscription(
       return SessionMilo.Inscription.Statut.REFUS_TIERS
     case MILO_REFUS_JEUNE:
       return SessionMilo.Inscription.Statut.REFUS_JEUNE
+    case MILO_PRESENT:
+      return SessionMilo.Inscription.Statut.PRESENT
     default:
       const logger = new Logger('SessionMilo.dtoToStatutInscription')
       logger.error(
@@ -328,6 +331,8 @@ function inscriptionToStatutWithCommentaireDto(
       return { statut: MILO_REFUS_TIERS }
     case SessionMilo.Inscription.Statut.REFUS_JEUNE:
       return { statut: MILO_REFUS_JEUNE, commentaire: inscription.commentaire }
+    case SessionMilo.Inscription.Statut.PRESENT:
+      return { statut: MILO_PRESENT }
     default:
       throw new Error('Ça devrait pas arriver')
   }

@@ -28,11 +28,6 @@ export interface SessionMilo {
   dateModification?: DateTime
 }
 
-export type ModificationInscription = Pick<
-  SessionMilo.Inscription,
-  'idJeune' | 'statut' | 'commentaire'
->
-
 export type InscriptionsATraiter = {
   idsJeunesAInscrire: string[]
   inscriptionsASupprimer: Array<
@@ -62,7 +57,7 @@ export namespace SessionMilo {
 
   export function extraireInscriptionsATraiter(
     session: SessionMilo,
-    inscriptions: ModificationInscription[]
+    inscriptions: SessionMilo.Modification.Inscription[]
   ): Result<InscriptionsATraiter> {
     const inscriptionsATraiter = trierInscriptionsATraiter(
       session,
@@ -117,6 +112,20 @@ export namespace SessionMilo {
       INSCRIT = 'INSCRIT',
       REFUS_JEUNE = 'REFUS_JEUNE',
       REFUS_TIERS = 'REFUS_TIERS',
+      PRESENT = 'PRESENT'
+    }
+  }
+
+  export namespace Modification {
+    export type Inscription = Pick<
+      SessionMilo.Inscription,
+      'idJeune' | 'commentaire'
+    > & { statut: StatutInscription }
+
+    export enum StatutInscription {
+      INSCRIT = 'INSCRIT',
+      REFUS_JEUNE = 'REFUS_JEUNE',
+      REFUS_TIERS = 'REFUS_TIERS',
       DESINSCRIT = 'DESINSCRIT'
     }
   }
@@ -124,7 +133,7 @@ export namespace SessionMilo {
 
 function trierInscriptionsATraiter(
   session: SessionMilo,
-  inscriptions: ModificationInscription[]
+  inscriptions: SessionMilo.Modification.Inscription[]
 ): InscriptionsATraiter {
   const inscriptionsExistantes = getInscriptionsExistantes(session)
 
@@ -133,45 +142,52 @@ function trierInscriptionsATraiter(
   const inscriptionsAModifier = []
 
   for (const inscription of inscriptions) {
+    const inscriptionExistante = inscriptionsExistantes.get(inscription.idJeune)
+
     switch (inscription.statut) {
-      case SessionMilo.Inscription.Statut.INSCRIT:
-        if (!inscriptionsExistantes.has(inscription.idJeune))
-          idsJeunesAInscrire.push(inscription.idJeune)
-        else {
-          const inscriptionExistante = inscriptionsExistantes.get(
-            inscription.idJeune
-          )
-          if (
-            inscriptionExistante!.statut !==
-            SessionMilo.Inscription.Statut.INSCRIT
-          )
-            inscriptionsAModifier.push({
-              ...inscription,
-              idInscription: inscriptionExistante!.idInscription
-            })
-        }
-        break
-
-      case SessionMilo.Inscription.Statut.DESINSCRIT:
-        if (inscriptionsExistantes.has(inscription.idJeune))
-          inscriptionsASupprimer.push({
-            idJeune: inscription.idJeune,
-            idInscription: inscriptionsExistantes.get(inscription.idJeune)!
-              .idInscription
-          })
-        break
-
-      case SessionMilo.Inscription.Statut.REFUS_JEUNE:
-      case SessionMilo.Inscription.Statut.REFUS_TIERS:
-        if (
-          inscriptionsExistantes.has(inscription.idJeune) &&
-          inscriptionsExistantes.get(inscription.idJeune)!.statut !==
-            inscription.statut
+      case SessionMilo.Modification.StatutInscription.INSCRIT:
+        if (!inscriptionExistante) idsJeunesAInscrire.push(inscription.idJeune)
+        else if (
+          inscriptionExistante.statut !== SessionMilo.Inscription.Statut.INSCRIT
         )
           inscriptionsAModifier.push({
             ...inscription,
-            idInscription: inscriptionsExistantes.get(inscription.idJeune)!
-              .idInscription
+            statut: SessionMilo.Inscription.Statut.INSCRIT,
+            idInscription: inscriptionExistante.idInscription
+          })
+        break
+
+      case SessionMilo.Modification.StatutInscription.DESINSCRIT:
+        if (inscriptionExistante)
+          inscriptionsASupprimer.push({
+            idJeune: inscription.idJeune,
+            idInscription: inscriptionExistante.idInscription
+          })
+        break
+
+      case SessionMilo.Modification.StatutInscription.REFUS_JEUNE:
+        if (
+          inscriptionExistante &&
+          inscriptionExistante.statut !==
+            SessionMilo.Inscription.Statut.REFUS_JEUNE
+        )
+          inscriptionsAModifier.push({
+            ...inscription,
+            statut: SessionMilo.Inscription.Statut.REFUS_JEUNE,
+            idInscription: inscriptionExistante.idInscription
+          })
+        break
+
+      case SessionMilo.Modification.StatutInscription.REFUS_TIERS:
+        if (
+          inscriptionExistante &&
+          inscriptionExistante.statut !==
+            SessionMilo.Inscription.Statut.REFUS_TIERS
+        )
+          inscriptionsAModifier.push({
+            ...inscription,
+            statut: SessionMilo.Inscription.Statut.REFUS_TIERS,
+            idInscription: inscriptionExistante.idInscription
           })
         break
     }

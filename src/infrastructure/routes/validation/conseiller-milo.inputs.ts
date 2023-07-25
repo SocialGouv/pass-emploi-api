@@ -30,9 +30,9 @@ class InscriptionSessionMiloPayload {
   @IsNotEmpty()
   idJeune: string
 
-  @ApiProperty({ enum: SessionMilo.Inscription.Statut })
-  @IsEnum(SessionMilo.Inscription.Statut)
-  statut: SessionMilo.Inscription.Statut
+  @ApiProperty()
+  @IsEnum(SessionMilo.Modification.StatutInscription)
+  statut: SessionMilo.Modification.StatutInscription
 
   @ApiProperty()
   @IsString()
