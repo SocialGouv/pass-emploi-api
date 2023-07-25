@@ -1,25 +1,26 @@
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { DateTime } from 'luxon'
 import { describe } from 'mocha'
 import { createSandbox, SinonSandbox } from 'sinon'
-import { unUtilisateurJeune } from 'test/fixtures/authentification.fixture'
-import { expect, StubbedClass, stubClass } from 'test/utils'
 import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
-import { Jeune } from 'src/domain/jeune/jeune'
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { failure, success } from 'src/building-blocks/types/result'
+import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
 import {
   JeuneMiloSansIdDossier,
   NonTrouveError
 } from 'src/building-blocks/types/domain-error'
-import { unJeune } from 'test/fixtures/jeune.fixture'
+import { failure, success } from 'src/building-blocks/types/result'
+import { Jeune } from 'src/domain/jeune/jeune'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
-import { uneOffreDto, uneSessionDto } from 'test/fixtures/milo-dto.fixture'
-import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
-import { getDatabase } from 'test/utils/database-for-testing'
-import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
-import { DateTime } from 'luxon'
+import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
+import { unUtilisateurJeune } from 'test/fixtures/authentification.fixture'
+import { unJeune } from 'test/fixtures/jeune.fixture'
+import { uneOffreDto, uneSessionDto } from 'test/fixtures/milo-dto.fixture'
 import { unDetailSessionJeuneMiloQueryModel } from 'test/fixtures/sessions.fixture'
+import { expect, StubbedClass, stubClass } from 'test/utils'
+import { getDatabase } from 'test/utils/database-for-testing'
+import { SessionMilo } from '../../../../src/domain/milo/session.milo'
 
 describe('GetDetailSessionJeuneMiloQueryHandler', () => {
   const idSession = 1
@@ -168,6 +169,31 @@ describe('GetDetailSessionJeuneMiloQueryHandler', () => {
                 offre: uneOffreDto
               })
             )
+          miloClient.getSessionsJeune
+            .withArgs(
+              idpToken,
+              jeune.idPartenaire,
+              DateTime.fromFormat(
+                '2020-04-06 10:20:00',
+                'yyyy-MM-dd HH:mm:ss',
+                {
+                  zone: 'America/Cayenne'
+                }
+              )
+            )
+            .resolves(
+              success({
+                page: 1,
+                nbSessions: 1,
+                sessions: [
+                  {
+                    session: uneSessionDto,
+                    offre: uneOffreDto,
+                    sessionInstance: { statut: 'REFUSAL_YOUNG' }
+                  }
+                ]
+              })
+            )
 
           // When
           const result = await getDetailSessionQueryHandler.handle(query)
@@ -176,7 +202,10 @@ describe('GetDetailSessionJeuneMiloQueryHandler', () => {
           expect(result).to.deep.equal(
             success({
               ...unDetailSessionJeuneMiloQueryModel,
-              id: query.idSession
+              id: query.idSession,
+              inscription: {
+                statut: SessionMilo.Inscription.Statut.REFUS_JEUNE
+              }
             })
           )
         })

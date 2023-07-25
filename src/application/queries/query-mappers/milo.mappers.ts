@@ -1,9 +1,11 @@
+import { Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { SessionMilo } from 'src/domain/milo/session.milo'
 import {
   OffreTypeCode,
   SessionConseillerDetailDto,
-  SessionJeuneDetailDto
+  SessionJeuneDetailDto,
+  SessionJeuneListeDto
 } from 'src/infrastructure/clients/dto/milo.dto'
 import {
   DetailSessionConseillerMiloQueryModel,
@@ -13,6 +15,8 @@ import {
   SessionJeuneMiloQueryModel,
   SessionTypeQueryModel
 } from '../query-models/sessions.milo.query.model'
+
+export const MILO_DATE_FORMAT = 'yyyy-MM-dd HH:mm:ss'
 
 function buildSessionTypeQueryModel(
   type: OffreTypeCode
@@ -26,29 +30,39 @@ function buildSessionTypeQueryModel(
 }
 
 export function mapSessionJeuneDtoToQueryModel(
-  sessionDto: SessionJeuneDetailDto,
+  sessionDto: SessionJeuneListeDto,
+  idDossier: string,
   timezone: string
 ): SessionJeuneMiloQueryModel {
-  return {
+  const queryModel: SessionJeuneMiloQueryModel = {
     id: sessionDto.session.id.toString(),
     nomSession: sessionDto.session.nom,
     nomOffre: sessionDto.offre.nom,
     dateHeureDebut: DateTime.fromFormat(
       sessionDto.session.dateHeureDebut,
-      'yyyy-MM-dd HH:mm:ss',
+      MILO_DATE_FORMAT,
       { zone: timezone }
     )
       .toUTC()
       .toISO(),
     dateHeureFin: DateTime.fromFormat(
       sessionDto.session.dateHeureFin,
-      'yyyy-MM-dd HH:mm:ss',
+      MILO_DATE_FORMAT,
       { zone: timezone }
     )
       .toUTC()
       .toISO(),
     type: buildSessionTypeQueryModel(sessionDto.offre.type)
   }
+  if (sessionDto.sessionInstance) {
+    queryModel.inscription = dtoToStatutInscription(
+      sessionDto.sessionInstance.statut,
+      sessionDto.session.id,
+      idDossier
+    )
+  }
+
+  return queryModel
 }
 
 export function mapSessionConseillerDtoToQueryModel(
@@ -63,14 +77,14 @@ export function mapSessionConseillerDtoToQueryModel(
     estVisible: estVisible,
     dateHeureDebut: DateTime.fromFormat(
       sessionDto.session.dateHeureDebut,
-      'yyyy-MM-dd HH:mm:ss',
+      MILO_DATE_FORMAT,
       { zone: timezone }
     )
       .toUTC()
       .toISO(),
     dateHeureFin: DateTime.fromFormat(
       sessionDto.session.dateHeureFin,
-      'yyyy-MM-dd HH:mm:ss',
+      MILO_DATE_FORMAT,
       { zone: timezone }
     )
       .toUTC()
@@ -81,9 +95,11 @@ export function mapSessionConseillerDtoToQueryModel(
 
 export function mapDetailSessionJeuneDtoToQueryModel(
   sessionDto: SessionJeuneDetailDto,
-  timezone: string
+  idDossier: string,
+  timezone: string,
+  inscription?: { statut: string }
 ): DetailSessionJeuneMiloQueryModel {
-  return {
+  const queryModel: DetailSessionJeuneMiloQueryModel = {
     id: sessionDto.session.id.toString(),
     nomSession: sessionDto.session.nom,
     nomOffre: sessionDto.offre.nom,
@@ -91,14 +107,14 @@ export function mapDetailSessionJeuneDtoToQueryModel(
     type: buildSessionTypeQueryModel(sessionDto.offre.type),
     dateHeureDebut: DateTime.fromFormat(
       sessionDto.session.dateHeureDebut,
-      'yyyy-MM-dd HH:mm:ss',
+      MILO_DATE_FORMAT,
       { zone: timezone }
     )
       .toUTC()
       .toISO(),
     dateHeureFin: DateTime.fromFormat(
       sessionDto.session.dateHeureFin,
-      'yyyy-MM-dd HH:mm:ss',
+      MILO_DATE_FORMAT,
       { zone: timezone }
     )
       .toUTC()
@@ -111,6 +127,16 @@ export function mapDetailSessionJeuneDtoToQueryModel(
     dateMaxInscription: sessionDto.session.dateMaxInscription ?? undefined,
     nbPlacesDisponibles: sessionDto.session.nbPlacesDisponibles ?? undefined
   }
+  if (inscription)
+    queryModel.inscription = {
+      statut: dtoToStatutInscription(
+        inscription.statut,
+        sessionDto.session.id,
+        idDossier
+      )
+    }
+
+  return queryModel
 }
 
 export function mapSessionToDetailSessionConseillerQueryModel(
@@ -143,5 +169,26 @@ export function mapSessionToDetailSessionConseillerQueryModel(
       prenom: inscription.prenom,
       statut: inscription.statut
     }))
+  }
+}
+
+function dtoToStatutInscription(
+  statut: string,
+  idSession: number,
+  idDossier: string
+): SessionMilo.Inscription.Statut {
+  switch (statut) {
+    case 'ONGOING':
+      return SessionMilo.Inscription.Statut.INSCRIT
+    case 'REFUSAL':
+      return SessionMilo.Inscription.Statut.REFUS_TIERS
+    case 'REFUSAL_YOUNG':
+      return SessionMilo.Inscription.Statut.REFUS_JEUNE
+    default:
+      const logger = new Logger('SessionMilo.dtoToStatutInscription')
+      logger.error(
+        `Une inscription a un statut inconnu : session ${idSession}, dossier ${idDossier}`
+      )
+      return SessionMilo.Inscription.Statut.INSCRIT
   }
 }

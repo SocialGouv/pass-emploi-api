@@ -9,8 +9,8 @@ import {
   unDetailSessionJeuneDto,
   uneInscriptionSessionMiloDto,
   uneListeDeStructuresConseillerMiloDto,
-  uneSessionConseillerListeDto,
-  uneSessionJeuneListeDto
+  uneListeSessionsConseillerDto,
+  uneListeSessionsJeuneDto
 } from 'test/fixtures/milo-dto.fixture'
 import { testConfig } from 'test/utils/module-for-testing'
 
@@ -34,7 +34,7 @@ describe('MiloClient', () => {
         .get(
           `/operateurs/structures/${idStructure}/sessions?dateDebutRecherche=2023-05-31&dateFinRecherche=2023-06-29`
         )
-        .reply(200, uneSessionConseillerListeDto)
+        .reply(200, uneListeSessionsConseillerDto)
         .isDone()
 
       // When
@@ -47,7 +47,7 @@ describe('MiloClient', () => {
       )
 
       // Then
-      expect(result).to.deep.equal(success(uneSessionConseillerListeDto))
+      expect(result).to.deep.equal(success(uneListeSessionsConseillerDto))
     })
   })
 
@@ -58,15 +58,21 @@ describe('MiloClient', () => {
       const idDossier = 'idDossier'
 
       nock(MILO_BASE_URL)
-        .get(`/operateurs/sessions?idDossier=${idDossier}`)
-        .reply(200, uneSessionJeuneListeDto)
+        .get(
+          `/operateurs/sessions?idDossier=${idDossier}&dateDebutRecherche=2023-07-21`
+        )
+        .reply(200, uneListeSessionsJeuneDto)
         .isDone()
 
       // When
-      const result = await miloClient.getSessionsJeune(idpToken, idDossier)
+      const result = await miloClient.getSessionsJeune(
+        idpToken,
+        idDossier,
+        DateTime.fromISO('2023-07-21T17:53:42')
+      )
 
       // Then
-      expect(result).to.deep.equal(success(uneSessionJeuneListeDto))
+      expect(result).to.deep.equal(success(uneListeSessionsJeuneDto))
     })
   })
 

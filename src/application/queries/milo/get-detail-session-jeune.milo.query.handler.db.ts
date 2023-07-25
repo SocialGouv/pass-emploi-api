@@ -4,6 +4,7 @@ import { QueryHandler } from 'src/building-blocks/types/query-handler'
 import {
   failure,
   isFailure,
+  isSuccess,
   Result,
   success
 } from 'src/building-blocks/types/result'
@@ -20,7 +21,11 @@ import {
 } from 'src/building-blocks/types/domain-error'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
-import { mapDetailSessionJeuneDtoToQueryModel } from 'src/application/queries/query-mappers/milo.mappers'
+import {
+  mapDetailSessionJeuneDtoToQueryModel,
+  MILO_DATE_FORMAT
+} from 'src/application/queries/query-mappers/milo.mappers'
+import { DateTime } from 'luxon'
 
 export interface GetDetailSessionJeuneMiloQuery extends Query {
   idSession: string
@@ -63,22 +68,40 @@ export class GetDetailSessionJeuneMiloQueryHandler extends QueryHandler<
       where: { id: query.idSession, estVisible: true },
       include: [{ model: StructureMiloSqlModel, as: 'structure' }]
     })
-
     if (!sessionMiloDb) {
       return failure(new NonTrouveError('Session', query.idSession))
     }
+    const timezone = sessionMiloDb.structure!.timezone
 
     const resultDetailSessionMiloClient =
       await this.miloClient.getDetailSessionJeune(idpToken, query.idSession)
-
     if (isFailure(resultDetailSessionMiloClient)) {
       return resultDetailSessionMiloClient
     }
+    const detailSession = resultDetailSessionMiloClient.data
+
+    const dateDebutRecherche = DateTime.fromFormat(
+      detailSession.session.dateHeureDebut,
+      MILO_DATE_FORMAT,
+      { zone: timezone }
+    )
+    const resultListeSessions = await this.miloClient.getSessionsJeune(
+      idpToken,
+      jeune.idPartenaire,
+      dateDebutRecherche
+    )
+    const inscription = isSuccess(resultListeSessions)
+      ? resultListeSessions.data.sessions.find(
+          session => session.session.id.toString() === query.idSession
+        )!.sessionInstance
+      : undefined
 
     return success(
       mapDetailSessionJeuneDtoToQueryModel(
-        resultDetailSessionMiloClient.data,
-        sessionMiloDb.structure!.timezone
+        detailSession,
+        jeune.idPartenaire,
+        timezone,
+        inscription
       )
     )
   }

@@ -3,10 +3,11 @@ import {
   OffreDto,
   OffreTypeCode,
   SessionConseillerDetailDto,
-  SessionConseillerMiloListeDto,
+  ListeSessionsConseillerMiloDto,
   SessionDto,
   SessionJeuneDetailDto,
-  SessionJeuneMiloListeDto,
+  SessionJeuneListeDto,
+  ListeSessionsJeuneMiloDto,
   StructureConseillerMiloDto
 } from 'src/infrastructure/clients/dto/milo.dto'
 
@@ -36,21 +37,27 @@ export const unDetailSessionConseillerDto: SessionConseillerDetailDto = {
   offre: uneOffreDto
 }
 
+export const uneSessionListeJeuneDto: SessionJeuneListeDto = {
+  session: uneSessionDto,
+  offre: uneOffreDto,
+  sessionInstance: { statut: 'ONGOING' }
+}
+
 export const unDetailSessionJeuneDto: SessionJeuneDetailDto = {
   session: uneSessionDto,
   offre: uneOffreDto
 }
 
-export const uneSessionConseillerListeDto: SessionConseillerMiloListeDto = {
+export const uneListeSessionsConseillerDto: ListeSessionsConseillerMiloDto = {
   page: 1,
   nbSessions: 1,
   sessions: [unDetailSessionConseillerDto]
 }
 
-export const uneSessionJeuneListeDto: SessionJeuneMiloListeDto = {
+export const uneListeSessionsJeuneDto: ListeSessionsJeuneMiloDto = {
   page: 1,
   nbSessions: 1,
-  sessions: [unDetailSessionJeuneDto]
+  sessions: [uneSessionListeJeuneDto]
 }
 
 export const uneStructureConseillerMiloDto = (

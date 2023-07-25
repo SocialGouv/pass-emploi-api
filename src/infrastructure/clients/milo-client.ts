@@ -14,9 +14,9 @@ import {
 import {
   InscritSessionMiloDto,
   SessionConseillerDetailDto,
-  SessionConseillerMiloListeDto,
+  ListeSessionsConseillerMiloDto,
   SessionJeuneDetailDto,
-  SessionJeuneMiloListeDto,
+  ListeSessionsJeuneMiloDto,
   StructureConseillerMiloDto
 } from './dto/milo.dto'
 import { handleAxiosError } from './utils/axios-error-handler'
@@ -54,7 +54,7 @@ export class MiloClient {
     timezone: string,
     dateDebut?: DateTime,
     dateFin?: DateTime
-  ): Promise<Result<SessionConseillerMiloListeDto>> {
+  ): Promise<Result<ListeSessionsConseillerMiloDto>> {
     const params = new URLSearchParams()
     if (dateDebut) {
       const debutRecherche = dateDebut.setZone(timezone)
@@ -66,26 +66,36 @@ export class MiloClient {
     }
 
     // L'api ne renvoie que 50 sessions max par appel au delà, une pagination doit être mise en place. (voir doc 06/23)
-    return this.get<SessionConseillerMiloListeDto>(
+    return this.get<ListeSessionsConseillerMiloDto>(
       `structures/${idStructure}/sessions`,
-      this.apiKeySessionsListeConseiller,
-      idpToken,
+      {
+        apiKey: this.apiKeySessionsListeConseiller,
+        idpToken
+      },
       params
     )
   }
 
   async getSessionsJeune(
     idpToken: string,
-    idDossier: string
-  ): Promise<Result<SessionJeuneMiloListeDto>> {
+    idDossier: string,
+    dateDebutRecherche?: DateTime
+  ): Promise<Result<ListeSessionsJeuneMiloDto>> {
     const params = new URLSearchParams()
     params.append('idDossier', idDossier)
+    if (dateDebutRecherche)
+      params.append(
+        'dateDebutRecherche',
+        dateDebutRecherche.toFormat('yyyy-MM-dd')
+      )
 
     // L'api ne renvoie que 50 sessions max par appel au delà, une pagination doit être mise en place. (voir doc 06/23)
-    return this.get<SessionJeuneMiloListeDto>(
+    return this.get<ListeSessionsJeuneMiloDto>(
       `sessions`,
-      this.apiKeySessionsDetailEtListeJeune,
-      idpToken,
+      {
+        apiKey: this.apiKeySessionsDetailEtListeJeune,
+        idpToken
+      },
       params
     )
   }
@@ -94,33 +104,30 @@ export class MiloClient {
     idpToken: string,
     idSession: string
   ): Promise<Result<SessionConseillerDetailDto>> {
-    return this.get<SessionConseillerDetailDto>(
-      `sessions/${idSession}`,
-      this.apiKeySessionDetailConseiller,
+    return this.get<SessionConseillerDetailDto>(`sessions/${idSession}`, {
+      apiKey: this.apiKeySessionDetailConseiller,
       idpToken
-    )
+    })
   }
 
   async getDetailSessionJeune(
     idpToken: string,
     idSession: string
   ): Promise<Result<SessionJeuneDetailDto>> {
-    return this.get<SessionJeuneDetailDto>(
-      `sessions/${idSession}`,
-      this.apiKeySessionsDetailEtListeJeune,
+    return this.get<SessionJeuneDetailDto>(`sessions/${idSession}`, {
+      apiKey: this.apiKeySessionsDetailEtListeJeune,
       idpToken
-    )
+    })
   }
 
   async getListeInscritsSession(
     idpToken: string,
     idSession: string
   ): Promise<Result<InscritSessionMiloDto[]>> {
-    return this.get<InscritSessionMiloDto[]>(
-      `sessions/${idSession}/inscrits`,
-      this.apiKeySessionDetailConseiller,
+    return this.get<InscritSessionMiloDto[]>(`sessions/${idSession}/inscrits`, {
+      apiKey: this.apiKeySessionDetailConseiller,
       idpToken
-    )
+    })
   }
 
   async getStructureConseiller(
@@ -128,8 +135,10 @@ export class MiloClient {
   ): Promise<Result<StructureConseillerMiloDto>> {
     const resultStructures = await this.get<StructureConseillerMiloDto[]>(
       `utilisateurs/moi/structures`,
-      this.apiKeyUtilisateurs,
-      idpToken
+      {
+        apiKey: this.apiKeyUtilisateurs,
+        idpToken
+      }
     )
 
     if (isFailure(resultStructures)) {
@@ -206,19 +215,23 @@ export class MiloClient {
 
   private async get<T>(
     suffixUrl: string,
-    apiKey: string,
-    idpToken: string,
+    auth: {
+      apiKey: string
+      idpToken?: string
+    },
     params?: URLSearchParams
   ): Promise<Result<T>> {
     try {
+      const headers: Record<string, string> = {
+        'X-Gravitee-Api-Key': auth.apiKey,
+        operateur: 'APPLICATION_CEJ'
+      }
+      if (auth.idpToken) headers.Authorization = `Bearer ${auth.idpToken}`
+
       const response = await firstValueFrom(
         this.httpService.get<T>(`${this.apiUrl}/operateurs/${suffixUrl}`, {
           params,
-          headers: {
-            Authorization: `Bearer ${idpToken}`,
-            'X-Gravitee-Api-Key': apiKey,
-            operateur: 'APPLICATION_CEJ'
-          }
+          headers
         })
       )
       if (!response.data) {
