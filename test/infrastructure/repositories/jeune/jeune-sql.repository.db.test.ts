@@ -26,7 +26,10 @@ import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/mod
 import { FavoriOffreEmploiSqlModel } from '../../../../src/infrastructure/sequelize/models/favori-offre-emploi.sql-model'
 import { FavoriOffreEngagementSqlModel } from '../../../../src/infrastructure/sequelize/models/favori-offre-engagement.sql-model'
 import { FavoriOffreImmersionSqlModel } from '../../../../src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
-import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import {
+  JeuneDto,
+  JeuneSqlModel
+} from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { RechercheSqlModel } from '../../../../src/infrastructure/sequelize/models/recherche.sql-model'
 import { RendezVousSqlModel } from '../../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../../../src/infrastructure/sequelize/types'
@@ -48,6 +51,7 @@ import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
+import { DateTime } from 'luxon'
 
 describe('JeuneSqlRepository', () => {
   const uuid = '9e1a7d9f-4038-4631-9aa1-856ee90c7ff8'
@@ -96,7 +100,7 @@ describe('JeuneSqlRepository', () => {
         unJeuneDto({
           idConseiller: conseillerDto.id,
           dateCreation: jeune.creationDate.toJSDate(),
-          datePremiereConnexion: uneDatetime().toJSDate()
+          datePremiereConnexion: jeune.datePremiereConnexion!.toJSDate()
         })
       )
     })
@@ -137,7 +141,7 @@ describe('JeuneSqlRepository', () => {
         unJeuneDto({
           idConseiller: conseillerDto.id,
           dateCreation: jeune.creationDate.toJSDate(),
-          datePremiereConnexion: uneDatetime().toJSDate()
+          datePremiereConnexion: jeune.datePremiereConnexion!.toJSDate()
         })
       )
     })
@@ -372,7 +376,8 @@ describe('JeuneSqlRepository', () => {
       await JeuneSqlModel.creer(
         unJeuneDto({
           idConseiller: undefined,
-          dateCreation: jeune.creationDate.toJSDate()
+          dateCreation: jeune.creationDate.toJSDate(),
+          datePremiereConnexion: jeune.datePremiereConnexion!.toJSDate()
         })
       )
     })
@@ -417,7 +422,7 @@ describe('JeuneSqlRepository', () => {
           pushNotificationToken: 'token',
           dateDerniereActualisationToken: uneDatetime().toJSDate(),
           idPartenaire: 'test-id-dossier',
-          datePremiereConnexion: uneDatetime().toJSDate(),
+          datePremiereConnexion: uneDatetime().plus({ day: 1 }).toJSDate(),
           installationId: '123456',
           instanceId: 'abcdef',
           appVersion: '1.8.1',
@@ -632,6 +637,7 @@ describe('JeuneSqlRepository', () => {
   })
 
   describe('transferAndSaveAll', () => {
+    let jeuneATransfererDto: AsSql<JeuneDto>
     beforeEach(async () => {
       await ConseillerSqlModel.creer(
         unConseillerDto({ id: 'idConseillerCible' })
@@ -639,12 +645,11 @@ describe('JeuneSqlRepository', () => {
       await ConseillerSqlModel.creer(
         unConseillerDto({ id: 'idConseillerSource' })
       )
-      await JeuneSqlModel.creer(
-        unJeuneDto({
-          id: 'unJeuneATransferer',
-          idConseiller: 'idConseillerSource'
-        })
-      )
+      jeuneATransfererDto = unJeuneDto({
+        id: 'unJeuneATransferer',
+        idConseiller: 'idConseillerSource'
+      })
+      await JeuneSqlModel.creer(jeuneATransfererDto)
     })
 
     describe("quand le jeune n'était pas en transfert temporaire", () => {
@@ -653,6 +658,9 @@ describe('JeuneSqlRepository', () => {
           // Given
           const jeuneATransferer: Jeune = unJeune({
             id: 'unJeuneATransferer',
+            datePremiereConnexion: DateTime.fromJSDate(
+              jeuneATransfererDto.datePremiereConnexion!
+            ),
             conseiller: unConseillerDuJeune({
               id: 'idConseillerCible',
               idAgence: undefined
@@ -696,6 +704,9 @@ describe('JeuneSqlRepository', () => {
           // Given
           const jeuneATransferer: Jeune = unJeune({
             id: 'unJeuneATransferer',
+            datePremiereConnexion: DateTime.fromJSDate(
+              jeuneATransfererDto.datePremiereConnexion!
+            ),
             conseiller: unConseillerDuJeune({ id: 'idConseillerCible' }),
             conseillerInitial: {
               id: 'idConseillerSource'
@@ -722,15 +733,17 @@ describe('JeuneSqlRepository', () => {
       describe('quand le jeune est transféré de manière définitive', () => {
         it('met le conseiller initial à null', async () => {
           // Given
-          await JeuneSqlModel.creer(
-            unJeuneDto({
-              id: 'jeune-en-transfert',
-              idConseiller: 'idConseillerSource',
-              idConseillerInitial: 'idConseillerCible'
-            })
-          )
+          const jeuneEnTransfertDto = unJeuneDto({
+            id: 'jeune-en-transfert',
+            idConseiller: 'idConseillerSource',
+            idConseillerInitial: 'idConseillerCible'
+          })
+          await JeuneSqlModel.creer(jeuneEnTransfertDto)
           const jeuneATransferer: Jeune = unJeune({
             id: 'jeune-en-transfert',
+            datePremiereConnexion: DateTime.fromJSDate(
+              jeuneEnTransfertDto.datePremiereConnexion!
+            ),
             conseiller: unConseillerDuJeune({
               id: 'idConseillerCible',
               idAgence: undefined

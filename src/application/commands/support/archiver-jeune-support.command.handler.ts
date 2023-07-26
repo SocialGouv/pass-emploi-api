@@ -73,6 +73,8 @@ export class ArchiverJeuneSupportCommandHandler extends CommandHandler<
       prenomJeune: jeune.firstName,
       nomJeune: jeune.lastName,
       structure: jeune.structure,
+      dateCreation: jeune.creationDate.toJSDate(),
+      datePremiereConnexion: jeune.datePremiereConnexion?.toJSDate(),
       motif,
       commentaire: COMMENTAIRE_SUPPRESSION_SUPPORT,
       dateArchivage: this.dateService.nowJs()
