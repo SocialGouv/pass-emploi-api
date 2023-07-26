@@ -14,6 +14,7 @@ import {
   IsOptional,
   IsString,
   Length,
+  MinLength,
   ValidateNested
 } from 'class-validator'
 import { TriRendezVous } from '../../../application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
@@ -24,12 +25,12 @@ import {
   transformStringToBoolean
 } from './utils/transformers'
 
-export class GetConseillerQueryParams {
+export class GetConseillersQueryParams {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  @IsEmail()
-  email: string
+  @MinLength(2)
+  q: string
 }
 
 export class CreateJeunePoleEmploiPayload {

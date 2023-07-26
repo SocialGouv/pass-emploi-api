@@ -17,6 +17,20 @@ class StructureMiloDuConseillerQueryModel {
   nom: string
 }
 
+export class ConseillerSimpleQueryModel {
+  @ApiProperty()
+  id: string
+
+  @ApiProperty()
+  nom: string
+
+  @ApiProperty()
+  prenom: string
+
+  @ApiProperty({ required: false })
+  email?: string
+}
+
 export class DetailConseillerQueryModel {
   @ApiProperty()
   id: string
