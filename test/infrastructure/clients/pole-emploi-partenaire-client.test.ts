@@ -568,6 +568,47 @@ describe('PoleEmploiPartenaireClient', () => {
         expect(result).to.deep.equal(success([]))
       })
     })
+    describe('quand l’appel api PE retourne une 429', () => {
+      it('refait un essai et retourne les suggestions', async () => {
+        // Given
+        nock(PARTENAIRE_BASE_URL)
+          .defaultReplyHeaders({ 'retry-after': '1' })
+          .get('/peconnect-metiersrecherches/v1/metiersrecherches')
+          .reply(429)
+          .isDone()
+        nock(PARTENAIRE_BASE_URL)
+          .get('/peconnect-metiersrecherches/v1/metiersrecherches')
+          .reply(200, [])
+          .isDone()
+
+        // When
+        const result =
+          await poleEmploiPartenaireClient.getSuggestionsRecherches(tokenJeune)
+
+        // Then
+        expect(result).to.deep.equal(success([]))
+      })
+      it('refait un seul essai puis échoue', async () => {
+        // Given
+        nock(PARTENAIRE_BASE_URL)
+          .defaultReplyHeaders({ 'retry-after': '1' })
+          .get('/peconnect-metiersrecherches/v1/metiersrecherches')
+          .reply(429)
+          .isDone()
+        nock(PARTENAIRE_BASE_URL)
+          .defaultReplyHeaders({ 'retry-after': '1' })
+          .get('/peconnect-metiersrecherches/v1/metiersrecherches')
+          .reply(429)
+          .isDone()
+
+        // When
+        const result =
+          await poleEmploiPartenaireClient.getSuggestionsRecherches(tokenJeune)
+
+        // Then
+        expect(result).to.deep.equal(failure(new ErreurHttp('', 429)))
+      })
+    })
     describe('quand l’appel api PE échoue', () => {
       it('retourne une failure', async () => {
         // Given

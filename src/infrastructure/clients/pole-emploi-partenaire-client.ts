@@ -252,7 +252,9 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
   ): Promise<ResultApi<SuggestionDto[]>> {
     return this.getWithCache<SuggestionDto[]>(
       'peconnect-metiersrecherches/v1/metiersrecherches',
-      token
+      token,
+      undefined,
+      true
     )
   }
 
@@ -290,14 +292,56 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
       })
     )
   }
+  private async getWithRetry<T>(
+    suffixUrl: string,
+    tokenDuJeune: string,
+    params?: URLSearchParams,
+    secondesAAttendre?: number
+  ): Promise<AxiosResponse<T>> {
+    if (secondesAAttendre) {
+      await new Promise(resolve =>
+        setTimeout(resolve, secondesAAttendre * 1000)
+      )
+    }
+
+    return this.get<T>(suffixUrl, tokenDuJeune, params)
+      .then(res => res)
+      .catch(e => {
+        this.logger.error(e)
+
+        const estLePremierRetry = secondesAAttendre === undefined
+        if (
+          e.response?.status === 429 &&
+          estLePremierRetry &&
+          e.response?.headers &&
+          e.response?.headers['retry-after']
+        ) {
+          this.logger.log('Retry de la requête')
+          return this.getWithRetry<T>(
+            suffixUrl,
+            tokenDuJeune,
+            params,
+            parseInt(e.response?.headers['retry-after'])
+          )
+        }
+
+        throw e
+      })
+  }
 
   private async getWithCache<T>(
     suffixUrl: string,
     tokenDuJeune: string,
-    params?: URLSearchParams
+    params?: URLSearchParams,
+    retry?: boolean
   ): Promise<ResultApi<T>> {
     try {
-      const res = await this.get<T>(suffixUrl, tokenDuJeune, params)
+      let res
+      if (retry) {
+        res = await this.getWithRetry<T>(suffixUrl, tokenDuJeune, params)
+      } else {
+        res = await this.get<T>(suffixUrl, tokenDuJeune, params)
+      }
       this.ajouterLeRetourAuContexteNode(res)
       return success(res.data)
     } catch (e) {
