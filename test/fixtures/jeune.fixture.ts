@@ -6,13 +6,14 @@ import { uneDate, uneDatetime } from './date.fixture'
 export const unJeune = (
   args: Partial<Jeune> = {}
 ): Required<Omit<Jeune, 'conseillerInitial' | 'dateFinCEJ'>> => {
-  const defaults = {
+  const defaults: Required<Omit<Jeune, 'conseillerInitial' | 'dateFinCEJ'>> = {
     id: 'ABCDE',
     lastName: 'Doe',
     firstName: 'John',
     isActivated: true,
     conseiller: unConseillerDuJeune(),
     creationDate: uneDatetime(),
+    datePremiereConnexion: uneDatetime().plus({ day: 1 }),
     email: 'john.doe@plop.io',
     idPartenaire: '1234',
     structure: Core.Structure.MILO,
@@ -54,6 +55,7 @@ export const unJeuneSansConseiller = (
     firstName: 'John',
     isActivated: true,
     creationDate: uneDatetime(),
+    datePremiereConnexion: uneDatetime().plus({ day: 1 }),
     email: 'john.doe@plop.io',
     idPartenaire: '1234',
     structure: Core.Structure.MILO,

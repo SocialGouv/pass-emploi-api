@@ -2,6 +2,7 @@ import { ArchiveJeune } from '../../src/domain/archive-jeune'
 import { uneDate } from './date.fixture'
 import { Core } from '../../src/domain/core'
 import Structure = Core.Structure
+import { DateTime } from 'luxon'
 
 export const uneArchiveJeuneMetadonnees = (
   args: Partial<ArchiveJeune.Metadonnees> = {}
@@ -13,6 +14,7 @@ export const uneArchiveJeuneMetadonnees = (
     nomJeune: 'test',
     prenomJeune: 'test',
     structure: Structure.MILO,
+    dateCreation: DateTime.fromJSDate(uneDate()).minus({ month: 1 }).toJSDate(),
     dateArchivage: uneDate()
   }
 

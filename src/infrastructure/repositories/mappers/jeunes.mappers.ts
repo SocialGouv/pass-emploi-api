@@ -15,6 +15,9 @@ export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
     firstName: jeuneSqlModel.prenom,
     lastName: jeuneSqlModel.nom,
     creationDate: DateTime.fromJSDate(jeuneSqlModel.dateCreation),
+    datePremiereConnexion: jeuneSqlModel.datePremiereConnexion
+      ? DateTime.fromJSDate(jeuneSqlModel.datePremiereConnexion)
+      : undefined,
     isActivated: Boolean(jeuneSqlModel.datePremiereConnexion),
     structure: jeuneSqlModel.structure,
     email: jeuneSqlModel.email ?? undefined,

@@ -98,6 +98,8 @@ describe('ArchiverJeuneCommandHandler', () => {
           prenomJeune: jeune.firstName,
           nomJeune: jeune.lastName,
           structure: Structure.MILO,
+          dateCreation: jeune.creationDate.toJSDate(),
+          datePremiereConnexion: jeune.creationDate.plus({ day: 1 }).toJSDate(),
           motif: command.motif,
           commentaire: command.commentaire,
           dateArchivage: maintenant
