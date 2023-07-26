@@ -161,6 +161,8 @@ describe('ArchiveJeuneSqlRepository', () => {
         prenomJeune: jeuneDto.prenom,
         structure: jeuneDto.structure,
         email: jeuneDto.email!,
+        dateCreation: new Date('2022-01-05T09:23:00Z'),
+        datePremiereConnexion: new Date('2022-01-06T09:23:00Z'),
         dateArchivage: new Date('2022-07-05T09:23:00Z')
       }
       await archiveJeuneSqlRepository.archiver(metadonnees)
@@ -181,6 +183,8 @@ describe('ArchiveJeuneSqlRepository', () => {
         prenomJeune: jeuneDto.prenom,
         structure: jeuneDto.structure,
         email: jeuneDto.email!,
+        dateCreation: new Date('2022-01-05T09:23:00Z'),
+        datePremiereConnexion: new Date('2022-01-06T09:23:00Z'),
         dateArchivage: new Date('2022-07-05T09:23:00Z')
       }
 
@@ -201,6 +205,12 @@ describe('ArchiveJeuneSqlRepository', () => {
       expect(archiveJeuneSql!.email).to.equal(jeuneDto.email)
       expect(archiveJeuneSql!.dateArchivage).to.deep.equal(
         metadonnees.dateArchivage
+      )
+      expect(archiveJeuneSql!.dateCreation).to.deep.equal(
+        metadonnees.dateCreation
+      )
+      expect(archiveJeuneSql!.datePremiereConnexion).to.deep.equal(
+        metadonnees.datePremiereConnexion
       )
       expect(archiveJeuneSql!.motif).to.equal(metadonnees.motif)
       expect(archiveJeuneSql!.commentaire).to.equal(metadonnees.commentaire)

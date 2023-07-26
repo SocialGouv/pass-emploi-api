@@ -18,6 +18,7 @@ export interface Jeune {
   firstName: string
   lastName: string
   creationDate: DateTime
+  datePremiereConnexion?: DateTime
   dateFinCEJ?: DateTime
   structure: Core.Structure
   isActivated: boolean

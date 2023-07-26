@@ -7,6 +7,7 @@ import {
   Table
 } from 'sequelize-typescript'
 import { ArchiveJeune } from '../../../domain/archive-jeune'
+import { AsSql } from '../types'
 
 export class ArchiveJeuneDto extends Model {
   @PrimaryKey
@@ -51,6 +52,18 @@ export class ArchiveJeuneDto extends Model {
   structure: string | null
 
   @Column({
+    field: 'date_creation',
+    type: DataType.DATE
+  })
+  dateCreation: Date | null
+
+  @Column({
+    field: 'date_premiere_connexion',
+    type: DataType.DATE
+  })
+  datePremiereConnexion: Date | null
+
+  @Column({
     field: 'email',
     type: DataType.STRING
   })
@@ -70,4 +83,10 @@ export class ArchiveJeuneDto extends Model {
   timestamps: false,
   tableName: 'archive_jeune'
 })
-export class ArchiveJeuneSqlModel extends ArchiveJeuneDto {}
+export class ArchiveJeuneSqlModel extends ArchiveJeuneDto {
+  static async creer(
+    archiveDto: AsSql<Omit<ArchiveJeuneDto, 'id'>>
+  ): Promise<void> {
+    await ArchiveJeuneSqlModel.create(archiveDto)
+  }
+}
