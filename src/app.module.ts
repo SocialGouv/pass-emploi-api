@@ -50,7 +50,7 @@ import { Context } from './building-blocks/context'
 import { GetActionsJeuneQueryHandler } from './application/queries/action/get-actions-jeune.query.handler.db'
 import { GetChatSecretsQueryHandler } from './application/queries/get-chat-secrets.query.handler'
 import { GetCommunesEtDepartementsQueryHandler } from './application/queries/get-communes-et-departements.query.handler.db'
-import { GetConseillerByEmailQueryHandler } from './application/queries/get-conseiller-by-email.query.handler.db'
+import { GetConseillersQueryHandler } from './application/queries/get-conseillers.query.handler.db'
 import { GetConseillersJeuneQueryHandler } from './application/queries/get-conseillers-jeune.query.handler.db'
 import { GetDetailActionQueryHandler } from './application/queries/action/get-detail-action.query.handler.db'
 import { GetDetailConseillerQueryHandler } from './application/queries/get-detail-conseiller.query.handler.db'
@@ -314,7 +314,6 @@ import { ConseillerMiloRepositoryToken } from './domain/milo/conseiller.milo'
 import { ConseillerMiloSqlRepository } from './infrastructure/repositories/milo/conseiller.milo.repository.db'
 import { ConseillersMiloController } from './infrastructure/routes/conseillers.milo.controller'
 import { EvenementEmploiCodePostalQueryGetter } from 'src/application/queries/query-getters/evenement-emploi-code-postal.query.getter'
-import { GetConseillersEtablissementQueryHandler } from 'src/application/queries/get-conseillers-etablissement.query.handler.db'
 import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-conseiller.milo.query.handler.db'
 import { UpdateSessionMiloCommandHandler } from './application/commands/milo/update-session-milo.command.handler'
 import { SessionMiloRepositoryToken } from './domain/milo/session.milo'
@@ -602,7 +601,6 @@ export function buildQueryCommandsProviders(): Provider[] {
     ListeDeDiffusionAuthorizer,
     GetDetailActionQueryHandler,
     GetDetailJeuneQueryHandler,
-    GetConseillersEtablissementQueryHandler,
     GetJeunesEtablissementV2QueryHandler,
     GetActionsJeuneQueryHandler,
     CreateActionCommandHandler,
@@ -642,7 +640,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateEvenementCommandHandler,
     GetChatSecretsQueryHandler,
     SynchronizeJobsCommandHandler,
-    GetConseillerByEmailQueryHandler,
+    GetConseillersQueryHandler,
     TransfererJeunesConseillerCommandHandler,
     InitCronsCommandHandler,
     GetOffresServicesCiviqueQueryHandler,
