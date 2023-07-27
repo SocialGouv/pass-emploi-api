@@ -4,7 +4,7 @@ import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
 import { failure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { estBRSA, estMiloPassEmploi } from 'src/domain/core'
+import { estMiloPassEmploi } from 'src/domain/core'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
@@ -91,9 +91,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
         idJeune
       }),
       this.getFavorisAccueilQueryGetter.handle({ idJeune }),
-      estBRSA(jeuneSqlModel.structure)
-        ? Promise.resolve(undefined)
-        : this.getCampagneQueryGetter.handle({ idJeune }),
+      this.getCampagneQueryGetter.handle({ idJeune }),
       this.getSessionsQueryGetter.handle({
         idJeune,
         token: query.token,
@@ -116,7 +114,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
             idJeune
           )
         : undefined,
-      prochaineSessionMilo: sessions.length > 0 ? sessions[0] : undefined,
+      prochaineSessionMilo: sessions[0],
       evenementsAVenir: evenementSqlModelAVenir.map(acSql =>
         fromSqlToRendezVousDetailJeuneQueryModel(
           acSql,

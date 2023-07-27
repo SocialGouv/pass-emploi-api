@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { Query } from 'src/building-blocks/types/query'
 import {
   failure,
@@ -20,6 +20,7 @@ import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/struc
 import { SessionJeuneListeDto } from 'src/infrastructure/clients/dto/milo.dto'
 import { DateTime, Interval } from 'luxon'
 import { SessionMilo } from 'src/domain/milo/session.milo'
+import estInscrit = SessionMilo.Inscription.estInscrit
 
 export interface GetSessionsJeuneMiloQuery extends Query {
   idJeune: string
@@ -29,15 +30,12 @@ export interface GetSessionsJeuneMiloQuery extends Query {
 
 @Injectable()
 export class GetSessionsJeuneMiloQueryGetter {
-  private readonly logger: Logger
   constructor(
     @Inject(JeunesRepositoryToken)
     private readonly jeuneRepository: Jeune.Repository,
     private readonly keycloakClient: KeycloakClient,
     private readonly miloClient: MiloClient
-  ) {
-    this.logger = new Logger('GetSessionsJeuneMiloQueryGetter')
-  }
+  ) {}
 
   async handle(
     query: GetSessionsJeuneMiloQuery
@@ -117,18 +115,15 @@ export function sessionsAvecInscriptionTriees(
 ): SessionJeuneMiloQueryModel[] {
   if (isFailure(sessionsResult)) return []
   return sessionsResult.data
-    .filter(s => s.inscription == SessionMilo.Inscription.Statut.INSCRIT)
-    .sort(compareSessionsByDate)
+    .filter(({ inscription }) => estInscrit(inscription))
+    .sort(compareSessionsByDebut)
 }
 
-function compareSessionsByDate(
+function compareSessionsByDebut(
   session1: SessionJeuneMiloQueryModel,
   session2: SessionJeuneMiloQueryModel
 ): number {
   const date1 = DateTime.fromISO(session1.dateHeureDebut)
   const date2 = DateTime.fromISO(session2.dateHeureDebut)
-
-  if (date1 < date2) return -1
-  if (date1 > date2) return 1
-  return 0
+  return date1.toMillis() - date2.toMillis()
 }
