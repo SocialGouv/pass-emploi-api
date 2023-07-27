@@ -39,8 +39,8 @@ export type InscriptionsATraiter = {
 export namespace SessionMilo {
   export function modifier(
     session: SessionMilo,
-    visibilite: boolean,
-    dateModification: DateTime
+    dateModification: DateTime,
+    visibilite?: boolean
   ): Required<
     Pick<
       SessionMilo,
@@ -50,7 +50,7 @@ export namespace SessionMilo {
     return {
       id: session.id,
       idStructureMilo: session.idStructureMilo,
-      estVisible: visibilite,
+      estVisible: visibilite ?? session.estVisible,
       dateModification
     }
   }

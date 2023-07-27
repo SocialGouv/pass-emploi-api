@@ -15,7 +15,6 @@ import {
   SessionMiloRepositoryToken
 } from 'src/domain/milo/session.milo'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
-import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { DateService } from '../../../utils/date-service'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 
@@ -23,7 +22,7 @@ export interface UpdateSessionMiloCommand extends Command {
   idSession: string
   idConseiller: string
   token: string
-  estVisible: boolean
+  estVisible?: boolean
   inscriptions?: SessionMilo.Modification.Inscription[]
 }
 
@@ -37,7 +36,6 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
     private conseillerMiloRepository: Conseiller.Milo.Repository,
     @Inject(SessionMiloRepositoryToken)
     private sessionMiloRepository: SessionMilo.Repository,
-    private miloClient: MiloClient,
     private keycloakClient: KeycloakClient,
     private dateService: DateService,
     private conseillerAuthorizer: ConseillerAuthorizer
@@ -66,8 +64,8 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
 
     const sessionModifiee = SessionMilo.modifier(
       session,
-      command.estVisible,
-      this.dateService.now()
+      this.dateService.now(),
+      command.estVisible
     )
 
     const resultInscriptions = SessionMilo.extraireInscriptionsATraiter(
