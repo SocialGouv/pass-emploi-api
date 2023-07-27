@@ -1,28 +1,27 @@
-import { DateTime, Interval } from 'luxon'
+import { DateTime } from 'luxon'
+import { ConseillerInterAgenceAuthorizer } from 'src/application/authorizers/conseiller-inter-agence-authorizer'
+import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
 import { GetJeuneHomeAgendaQueryHandler } from 'src/application/queries/get-jeune-home-agenda.query.db'
+import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
+import { ActionQueryModel } from 'src/application/queries/query-models/actions.query-model'
 import { JeuneHomeAgendaQueryModel } from 'src/application/queries/query-models/home-jeune-suivi.query-model'
+import { RendezVousJeuneQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
 import {
   emptySuccess,
+  failure,
   isSuccess,
   Result,
   success
 } from 'src/building-blocks/types/result'
 import { Action } from 'src/domain/action/action'
+import { Core } from 'src/domain/core'
+import { SessionMilo } from 'src/domain/milo/session.milo'
 import {
   ActionDto,
   ActionSqlModel
 } from 'src/infrastructure/sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
-import { uneActionQueryModelSansJeune } from 'test/fixtures/query-models/action.query-model.fixtures'
-import { uneActionDto } from 'test/fixtures/sql-models/action.sql-model'
-import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
-import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
-import { ConseillerInterAgenceAuthorizer } from 'src/application/authorizers/conseiller-inter-agence-authorizer'
-import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
-import { ActionQueryModel } from 'src/application/queries/query-models/actions.query-model'
-import { RendezVousJeuneQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
-import { Core } from 'src/domain/core'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from 'src/infrastructure/sequelize/types'
@@ -31,14 +30,20 @@ import {
   unUtilisateurJeune
 } from 'test/fixtures/authentification.fixture'
 import { unJeune } from 'test/fixtures/jeune.fixture'
+import { uneActionQueryModelSansJeune } from 'test/fixtures/query-models/action.query-model.fixtures'
 import { unRendezVousQueryModel } from 'test/fixtures/query-models/rendez-vous.query-model.fixtures'
+import { uneSessionJeuneMiloQueryModel } from 'test/fixtures/sessions.fixture'
+import { uneActionDto } from 'test/fixtures/sql-models/action.sql-model'
+import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from 'test/fixtures/sql-models/rendez-vous.sql-model'
 import { expect, StubbedClass, stubClass } from 'test/utils'
 import { getDatabase } from 'test/utils/database-for-testing'
 import { testConfig } from 'test/utils/module-for-testing'
-import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
-import { uneSessionJeuneMiloQueryModel } from 'test/fixtures/sessions.fixture'
-import { SessionMilo } from 'src/domain/milo/session.milo'
+import {
+  JeuneMiloSansIdDossier,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
 
 describe('GetJeuneHomeAgendaQueryHandler', () => {
   const utilisateurJeune = unUtilisateurJeune()
@@ -50,7 +55,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
   const aujourdhuiDimanche = '2022-08-14T12:00:00Z'
   const demain = new Date('2022-08-15T12:00:00Z')
   const apresDemain = new Date('2022-08-16T12:00:00Z')
-  const jeuneDto = unJeuneDto()
+  const jeuneDto = unJeuneDto({ idPartenaire: 'idDossier' })
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
@@ -76,17 +81,48 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
     }
     const lundiDernierString = '2022-08-08T00:00:00Z'
     const dimancheEnHuitString = '2022-08-22T00:00:00Z'
-    const sessionsQuery = {
-      idJeune,
-      token,
-      periode: Interval.fromDateTimes(
-        DateTime.fromISO(lundiDernierString, { setZone: true }),
-        DateTime.fromISO(dimancheEnHuitString, { setZone: true })
-      )
-    }
-
     beforeEach(async () => {
-      sessionsQueryGetter.handle.withArgs(sessionsQuery).resolves(success([]))
+      sessionsQueryGetter.handle
+        .withArgs('idDossier', token, {
+          debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
+          fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
+        })
+        .resolves(success([]))
+    })
+
+    describe("quand le jeune n'existe pas", () => {
+      it('renvoie une failure ', async () => {
+        // Given
+        await JeuneSqlModel.destroy({ where: { id: jeuneDto.id } })
+
+        // When
+        const result = await handler.handle(homeQuery, utilisateurJeune)
+
+        // Then
+        expect(result).to.deep.equal(
+          failure(new NonTrouveError('Jeune', homeQuery.idJeune))
+        )
+      })
+    })
+
+    describe('quand le jeune existe sans ID partenaire', () => {
+      it('renvoie une failure ', async () => {
+        // Given
+        await JeuneSqlModel.update(
+          {
+            idPartenaire: null
+          },
+          { where: { id: jeuneDto.id } }
+        )
+
+        // When
+        const result = await handler.handle(homeQuery, utilisateurJeune)
+
+        // Then
+        expect(result).to.deep.equal(
+          failure(new JeuneMiloSansIdDossier(homeQuery.idJeune))
+        )
+      })
     })
 
     it("doit retourner les événements bornés entre lundi dernier minuit et lundi en huit minuit, d'après la locale utilisateur", async () => {
@@ -101,12 +137,11 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
           '2022-08-28T23:59:00-07:00',
           '2022-08-29T00:00:00-07:00'
         ])
-      const periode = Interval.fromDateTimes(
-        DateTime.fromISO(_lundiDernier, { setZone: true }),
-        DateTime.fromISO(_dimancheEnHuit, { setZone: true })
-      )
       sessionsQueryGetter.handle
-        .withArgs({ ...sessionsQuery, periode: periode })
+        .withArgs('idDossier', token, {
+          debut: DateTime.fromISO(_lundiDernier, { setZone: true }),
+          fin: DateTime.fromISO(_dimancheEnHuit, { setZone: true })
+        })
         .resolves(success([]))
 
       // When
@@ -228,7 +263,10 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
             .toISODate()
         }
         sessionsQueryGetter.handle
-          .withArgs(sessionsQuery)
+          .withArgs('idDossier', token, {
+            debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
+            fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
+          })
           .resolves(success([sessionSansInscriptionCetteSemaine]))
 
         // When
@@ -255,7 +293,10 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
           inscription: SessionMilo.Inscription.Statut.INSCRIT
         }
         sessionsQueryGetter.handle
-          .withArgs(sessionsQuery)
+          .withArgs('idDossier', token, {
+            debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
+            fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
+          })
           .resolves(
             success([
               sessionAvecInscriptionAJPlus2,

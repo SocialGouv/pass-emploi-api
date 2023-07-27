@@ -80,7 +80,7 @@ export class GetDetailSessionJeuneMiloQueryHandler extends QueryHandler<
     }
     const detailSession = resultDetailSessionMiloClient.data
 
-    const dateDebutRecherche = DateTime.fromFormat(
+    const dateSession = DateTime.fromFormat(
       detailSession.session.dateHeureDebut,
       MILO_DATE_FORMAT,
       { zone: timezone }
@@ -88,7 +88,7 @@ export class GetDetailSessionJeuneMiloQueryHandler extends QueryHandler<
     const resultListeSessions = await this.miloClient.getSessionsJeune(
       idpToken,
       jeune.idPartenaire,
-      dateDebutRecherche
+      { debut: dateSession, fin: dateSession }
     )
     const inscription = isSuccess(resultListeSessions)
       ? resultListeSessions.data.sessions.find(

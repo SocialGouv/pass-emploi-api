@@ -1,33 +1,36 @@
 import { Injectable } from '@nestjs/common'
-import { NonTrouveError } from 'src/building-blocks/types/domain-error'
-import { Query } from 'src/building-blocks/types/query'
-import { QueryHandler } from 'src/building-blocks/types/query-handler'
-import { failure, Result, success } from 'src/building-blocks/types/result'
-import { Authentification } from 'src/domain/authentification'
-import { estMiloPassEmploi } from 'src/domain/core'
-import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
-import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
-import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
 
-import { DateTime, Interval } from 'luxon'
+import { DateTime } from 'luxon'
 import { Op } from 'sequelize'
-import { Action } from 'src/domain/action/action'
-import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
-import {
-  fromSqlToRendezVousDetailJeuneQueryModel,
-  fromSqlToRendezVousJeuneQueryModel
-} from '../query-mappers/rendez-vous-milo.mappers'
-
-import { TYPES_ANIMATIONS_COLLECTIVES } from 'src/domain/rendez-vous/rendez-vous'
-import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
-import { GetFavorisAccueilQueryGetter } from '../query-getters/accueil/get-favoris.query.getter.db'
-import { GetRecherchesSauvegardeesQueryGetter } from '../query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
-import { GetCampagneQueryGetter } from '../query-getters/get-campagne.query.getter'
-import { AccueilJeuneMiloQueryModel } from '../query-models/jeunes.milo.query-model'
 import {
   GetSessionsJeuneMiloQueryGetter,
   sessionsAvecInscriptionTriees
 } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
+import {
+  JeuneMiloSansIdDossier,
+  NonTrouveError
+} from 'src/building-blocks/types/domain-error'
+import { Query } from 'src/building-blocks/types/query'
+import { QueryHandler } from 'src/building-blocks/types/query-handler'
+import { failure, Result, success } from 'src/building-blocks/types/result'
+import { Action } from 'src/domain/action/action'
+import { Authentification } from 'src/domain/authentification'
+import { estMiloPassEmploi } from 'src/domain/core'
+
+import { TYPES_ANIMATIONS_COLLECTIVES } from 'src/domain/rendez-vous/rendez-vous'
+import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
+import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
+import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { GetFavorisAccueilQueryGetter } from 'src/application/queries/query-getters/accueil/get-favoris.query.getter.db'
+import { GetRecherchesSauvegardeesQueryGetter } from 'src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
+import { GetCampagneQueryGetter } from 'src/application/queries/query-getters/get-campagne.query.getter'
+import {
+  fromSqlToRendezVousDetailJeuneQueryModel,
+  fromSqlToRendezVousJeuneQueryModel
+} from '../query-mappers/rendez-vous-milo.mappers'
+import { AccueilJeuneMiloQueryModel } from '../query-models/jeunes.milo.query-model'
+import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
 
 export interface GetAccueilJeuneMiloQuery extends Query {
   idJeune: string
@@ -62,9 +65,11 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     const jeuneSqlModel = await JeuneSqlModel.findByPk(query.idJeune, {
       include: [{ model: ConseillerSqlModel, required: true }]
     })
-
     if (!jeuneSqlModel) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
+    }
+    if (!jeuneSqlModel.idPartenaire) {
+      return failure(new JeuneMiloSansIdDossier(query.idJeune))
     }
 
     const [
@@ -92,11 +97,11 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       }),
       this.getFavorisAccueilQueryGetter.handle({ idJeune }),
       this.getCampagneQueryGetter.handle({ idJeune }),
-      this.getSessionsQueryGetter.handle({
-        idJeune,
-        token: query.token,
-        periode: Interval.fromDateTimes(maintenant, dateFinDeSemaine)
-      })
+      this.getSessionsQueryGetter.handle(
+        jeuneSqlModel.idPartenaire,
+        query.token,
+        { debut: maintenant, fin: dateFinDeSemaine }
+      )
     ])
 
     const sessions = sessionsAvecInscriptionTriees(sessionsQueryModels)

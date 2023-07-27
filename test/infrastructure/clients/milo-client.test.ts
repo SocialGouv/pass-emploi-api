@@ -82,12 +82,10 @@ describe('MiloClient', () => {
         .isDone()
 
       // When
-      const result = await miloClient.getSessionsJeune(
-        idpToken,
-        idDossier,
-        DateTime.fromISO('2023-07-21T17:53:42'),
-        DateTime.fromISO('2023-07-26T22:11:10')
-      )
+      const result = await miloClient.getSessionsJeune(idpToken, idDossier, {
+        debut: DateTime.fromISO('2023-07-21T17:53:42'),
+        fin: DateTime.fromISO('2023-07-26T22:11:10')
+      })
 
       // Then
       expect(result).to.deep.equal(success(uneListeSessionsJeuneDto))

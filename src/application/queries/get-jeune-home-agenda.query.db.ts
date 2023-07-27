@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { DateTime, Interval } from 'luxon'
+import { DateTime } from 'luxon'
 import { Op } from 'sequelize'
+import {
+  GetSessionsJeuneMiloQueryGetter,
+  sessionsAvecInscriptionTriees
+} from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
-import { Result, success } from 'src/building-blocks/types/result'
+import { failure, Result, success } from 'src/building-blocks/types/result'
 import { generateSourceRendezVousCondition } from 'src/config/feature-flipping'
 import { Action } from 'src/domain/action/action'
 import { Authentification } from 'src/domain/authentification'
@@ -13,16 +17,16 @@ import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-m
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import {
+  JeuneMiloSansIdDossier,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
 import { ConseillerInterAgenceAuthorizer } from '../authorizers/conseiller-inter-agence-authorizer'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { fromSqlToRendezVousJeuneQueryModel } from './query-mappers/rendez-vous-milo.mappers'
 import { ActionQueryModel } from './query-models/actions.query-model'
 import { JeuneHomeAgendaQueryModel } from './query-models/home-jeune-suivi.query-model'
 import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
-import {
-  GetSessionsJeuneMiloQueryGetter,
-  sessionsAvecInscriptionTriees
-} from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 
 export interface GetJeuneHomeAgendaQuery extends Query {
   idJeune: string
@@ -48,6 +52,16 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
     query: GetJeuneHomeAgendaQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result<JeuneHomeAgendaQueryModel>> {
+    const jeuneSqlModel = await JeuneSqlModel.findByPk(query.idJeune, {
+      include: [{ model: ConseillerSqlModel, required: true }]
+    })
+    if (!jeuneSqlModel) {
+      return failure(new NonTrouveError('Jeune', query.idJeune))
+    }
+    if (!jeuneSqlModel.idPartenaire) {
+      return failure(new JeuneMiloSansIdDossier(query.idJeune))
+    }
+
     const { lundiDernier, dimancheEnHuit } =
       this.recupererLesDatesEntreLundiDernierEtDeuxSemainesPlusTard(
         query.maintenant
@@ -62,11 +76,14 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
           utilisateur.type
         ),
         this.recupererLeNombreDactionsEnRetard(query),
-        this.getSessionsQueryGetter.handle({
-          idJeune: query.idJeune,
-          token: query.token,
-          periode: Interval.fromDateTimes(lundiDernier, dimancheEnHuit)
-        })
+        this.getSessionsQueryGetter.handle(
+          jeuneSqlModel.idPartenaire,
+          query.token,
+          {
+            debut: lundiDernier,
+            fin: dimancheEnHuit
+          }
+        )
       ])
 
     const sessionsMilo = sessionsAvecInscriptionTriees(sessionsQueryModels)

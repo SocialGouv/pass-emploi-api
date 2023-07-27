@@ -1,5 +1,16 @@
+import { DateTime } from 'luxon'
 import { describe } from 'mocha'
-import { expect, StubbedClass, stubClass } from 'test/utils'
+import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
+import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/accueil/get-accueil-jeune-milo.query.handler.db'
+import { GetFavorisAccueilQueryGetter } from 'src/application/queries/query-getters/accueil/get-favoris.query.getter.db'
+import { GetRecherchesSauvegardeesQueryGetter } from 'src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
+import { GetCampagneQueryGetter } from 'src/application/queries/query-getters/get-campagne.query.getter'
+import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
+import { AccueilJeuneMiloQueryModel } from 'src/application/queries/query-models/jeunes.milo.query-model'
+import {
+  JeuneMiloSansIdDossier,
+  NonTrouveError
+} from 'src/building-blocks/types/domain-error'
 
 import {
   failure,
@@ -7,15 +18,9 @@ import {
   Result,
   success
 } from 'src/building-blocks/types/result'
-
-import { DateTime, Interval } from 'luxon'
-import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
-import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/accueil/get-accueil-jeune-milo.query.handler.db'
-import { GetFavorisAccueilQueryGetter } from 'src/application/queries/query-getters/accueil/get-favoris.query.getter.db'
-import { GetRecherchesSauvegardeesQueryGetter } from 'src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
-import { AccueilJeuneMiloQueryModel } from 'src/application/queries/query-models/jeunes.milo.query-model'
 import { Action } from 'src/domain/action/action'
 import { estMiloPassEmploi } from 'src/domain/core'
+import { SessionMilo } from 'src/domain/milo/session.milo'
 import { CodeTypeRendezVous } from 'src/domain/rendez-vous/rendez-vous'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
 import { AgenceSqlModel } from 'src/infrastructure/sequelize/models/agence.sql-model'
@@ -28,21 +33,19 @@ import {
 } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from 'src/infrastructure/sequelize/types'
 import { unUtilisateurJeune } from 'test/fixtures/authentification.fixture'
+import { uneCampagneQueryModel } from 'test/fixtures/campagne.fixture'
 import {
   unRendezVousJeuneDetailQueryModel,
   unRendezVousQueryModel
 } from 'test/fixtures/query-models/rendez-vous.query-model.fixtures'
+import { uneSessionJeuneMiloQueryModel } from 'test/fixtures/sessions.fixture'
 import { uneActionDto } from 'test/fixtures/sql-models/action.sql-model'
 import { uneAgenceMiloDto } from 'test/fixtures/sql-models/agence.sql-model'
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from 'test/fixtures/sql-models/rendez-vous.sql-model'
-import { uneCampagneQueryModel } from 'test/fixtures/campagne.fixture'
-import { GetCampagneQueryGetter } from 'src/application/queries/query-getters/get-campagne.query.getter'
-import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
-import { NonTrouveError } from 'src/building-blocks/types/domain-error'
-import { uneSessionJeuneMiloQueryModel } from 'test/fixtures/sessions.fixture'
-import { SessionMilo } from 'src/domain/milo/session.milo'
+import { expect, StubbedClass, stubClass } from 'test/utils'
+import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('GetAccueilJeuneMiloQueryHandler', () => {
   let handler: GetAccueilJeuneMiloQueryHandler
@@ -76,18 +79,10 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
     const maintenantString = '2023-03-27T03:24:00'
     const dateFinDeSemaineString = '2023-04-02T23:59:59.999'
     const maintenant = DateTime.fromISO(maintenantString)
-    const sessionsQuery = {
-      idJeune: 'idJeune',
-      token,
-      periode: Interval.fromDateTimes(
-        maintenant,
-        DateTime.fromISO(dateFinDeSemaineString)
-      )
-    }
-
     const campagneQueryModel = uneCampagneQueryModel()
 
-    before(async () => {
+    beforeEach(async () => {
+      await getDatabase().cleanPG()
       accueilQuery = {
         idJeune: 'idJeune',
         maintenant: maintenantString,
@@ -105,22 +100,58 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       await JeuneSqlModel.creer(
         unJeuneDto({
           id: accueilQuery.idJeune,
-          idConseiller: conseiller.id
+          idConseiller: conseiller.id,
+          idPartenaire: 'idDossier'
         })
       )
-    })
-    after(async () => {
-      await AgenceSqlModel.destroy({ truncate: true, cascade: true })
+
+      sessionsQueryGetter.handle
+        .withArgs('idDossier', token, {
+          debut: maintenant,
+          fin: DateTime.fromISO(dateFinDeSemaineString)
+        })
+        .resolves(success([]))
     })
 
-    beforeEach(async () => {
-      sessionsQueryGetter.handle.withArgs(sessionsQuery).resolves(success([]))
+    describe("quand le jeune n'existe pas", () => {
+      it('renvoie une failure ', async () => {
+        // Given
+        await JeuneSqlModel.destroy({ where: { id: accueilQuery.idJeune } })
+
+        // When
+        result = await handler.handle(accueilQuery)
+
+        // Then
+        expect(result).to.deep.equal(
+          failure(new NonTrouveError('Jeune', accueilQuery.idJeune))
+        )
+      })
+    })
+
+    describe('quand le jeune existe sans ID partenaire', () => {
+      it('renvoie une failure ', async () => {
+        // Given
+        await JeuneSqlModel.update(
+          {
+            idPartenaire: null
+          },
+          { where: { id: accueilQuery.idJeune } }
+        )
+
+        // When
+        result = await handler.handle(accueilQuery)
+
+        // Then
+        expect(result).to.deep.equal(
+          failure(new JeuneMiloSansIdDossier(accueilQuery.idJeune))
+        )
+      })
     })
 
     describe('retourne les indicateurs du restant de la semaine', () => {
       let rendezVousCetteSemaine: RendezVousSqlModel
 
-      before(async () => {
+      beforeEach(async () => {
         // Given
         const actionARealiserDto = uneActionDto({
           idJeune: accueilQuery.idJeune,
@@ -145,16 +176,15 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
           idRendezVous: rendezVousCetteSemaine.id
         })
       })
-      after(async () => {
-        await ActionSqlModel.destroy({ truncate: true, cascade: true })
-        await RendezVousSqlModel.destroy({ truncate: true, cascade: true })
-      })
 
       describe('compte les rendez-vous', () => {
         it('sans les sessions si le GetSessionsJeuneMiloQueryGetter renvoie une failure', async () => {
           // Given
           sessionsQueryGetter.handle
-            .withArgs(sessionsQuery)
+            .withArgs('idDossier', token, {
+              debut: maintenant,
+              fin: DateTime.fromISO(dateFinDeSemaineString)
+            })
             .resolves(
               failure(new NonTrouveError('Jeune', accueilQuery.idJeune))
             )
@@ -175,7 +205,10 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
             dateHeureDebut: maintenant.plus({ days: 1 }).toISODate()
           }
           sessionsQueryGetter.handle
-            .withArgs(sessionsQuery)
+            .withArgs('idDossier', token, {
+              debut: maintenant,
+              fin: DateTime.fromISO(dateFinDeSemaineString)
+            })
             .resolves(success([sessionSansInscriptionCetteSemaine]))
 
           // When
@@ -194,7 +227,10 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
             inscription: SessionMilo.Inscription.Statut.INSCRIT
           }
           sessionsQueryGetter.handle
-            .withArgs(sessionsQuery)
+            .withArgs('idDossier', token, {
+              debut: maintenant,
+              fin: DateTime.fromISO(dateFinDeSemaineString)
+            })
             .resolves(success([sessionAvecInscriptionCetteSemaine]))
 
           // When
@@ -232,7 +268,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       const dansDeuxSemainesDateJS = maintenant.plus({ week: 2 }).toJSDate()
       let prochainRendezVousDans2Semaines: RendezVousSqlModel
 
-      before(async () => {
+      beforeEach(async () => {
         // Given
         prochainRendezVousDans2Semaines = await RendezVousSqlModel.create(
           unRendezVousDto({
@@ -244,9 +280,6 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
           idJeune: accueilQuery.idJeune,
           idRendezVous: prochainRendezVousDans2Semaines.id
         })
-      })
-      after(async () => {
-        await RendezVousSqlModel.destroy({ truncate: true, cascade: true })
       })
 
       it('retourne le prochain rendez-vous ', async () => {
@@ -282,7 +315,10 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
           inscription: SessionMilo.Inscription.Statut.INSCRIT
         }
         sessionsQueryGetter.handle
-          .withArgs(sessionsQuery)
+          .withArgs('idDossier', token, {
+            debut: maintenant,
+            fin: DateTime.fromISO(dateFinDeSemaineString)
+          })
           .resolves(
             success([
               sessionSansInscriptionAJPlus1,
@@ -302,7 +338,12 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
 
       it('à undefined s’il n’y en a pas', async () => {
         // Given
-        sessionsQueryGetter.handle.withArgs(sessionsQuery).resolves(success([]))
+        sessionsQueryGetter.handle
+          .withArgs('idDossier', token, {
+            debut: maintenant,
+            fin: DateTime.fromISO(dateFinDeSemaineString)
+          })
+          .resolves(success([]))
 
         // When
         result = await handler.handle(accueilQuery)

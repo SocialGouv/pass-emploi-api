@@ -1,63 +1,37 @@
-import { Inject, Injectable } from '@nestjs/common'
-import { Query } from 'src/building-blocks/types/query'
-import {
-  failure,
-  isFailure,
-  Result,
-  success
-} from 'src/building-blocks/types/result'
+import { Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
+import { mapSessionJeuneDtoToQueryModel } from 'src/application/queries/query-mappers/milo.mappers'
 import { SessionJeuneMiloQueryModel } from 'src/application/queries/query-models/sessions.milo.query.model'
-import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune/jeune'
-import {
-  JeuneMiloSansIdDossier,
-  NonTrouveError
-} from 'src/building-blocks/types/domain-error'
+import { isFailure, Result, success } from 'src/building-blocks/types/result'
+import { Core } from 'src/domain/core'
+import { SessionMilo } from 'src/domain/milo/session.milo'
+import { SessionJeuneListeDto } from 'src/infrastructure/clients/dto/milo.dto'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
-import { mapSessionJeuneDtoToQueryModel } from 'src/application/queries/query-mappers/milo.mappers'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
-import { SessionJeuneListeDto } from 'src/infrastructure/clients/dto/milo.dto'
-import { DateTime, Interval } from 'luxon'
-import { SessionMilo } from 'src/domain/milo/session.milo'
-import estInscrit = SessionMilo.Inscription.estInscrit
-
-export interface GetSessionsJeuneMiloQuery extends Query {
-  idJeune: string
-  token: string
-  periode?: Interval
-}
 
 @Injectable()
 export class GetSessionsJeuneMiloQueryGetter {
   constructor(
-    @Inject(JeunesRepositoryToken)
-    private readonly jeuneRepository: Jeune.Repository,
     private readonly keycloakClient: KeycloakClient,
     private readonly miloClient: MiloClient
   ) {}
 
   async handle(
-    query: GetSessionsJeuneMiloQuery
+    idPartenaire: string,
+    token: string,
+    periode?: { debut: DateTime; fin: DateTime }
   ): Promise<Result<SessionJeuneMiloQueryModel[]>> {
-    const jeune = await this.jeuneRepository.get(query.idJeune)
-    if (!jeune) {
-      return failure(new NonTrouveError('Jeune', query.idJeune))
-    }
-    if (!jeune.idPartenaire) {
-      return failure(new JeuneMiloSansIdDossier(query.idJeune))
-    }
-
     const idpToken = await this.keycloakClient.exchangeTokenJeune(
-      query.token,
-      jeune.structure
+      token,
+      Core.Structure.MILO
     )
 
     const resultSessionMiloClient = await this.miloClient.getSessionsJeune(
       idpToken,
-      jeune.idPartenaire,
-      query.periode?.start,
-      query.periode?.end
+      idPartenaire,
+      periode
     )
 
     if (isFailure(resultSessionMiloClient)) {
@@ -66,7 +40,7 @@ export class GetSessionsJeuneMiloQueryGetter {
 
     const sessionsVisiblesQueryModels = await recupererTimezoneSessionsVisibles(
       resultSessionMiloClient.data.sessions,
-      jeune.idPartenaire
+      idPartenaire
     )
     return success(sessionsVisiblesQueryModels)
   }
@@ -115,7 +89,9 @@ export function sessionsAvecInscriptionTriees(
 ): SessionJeuneMiloQueryModel[] {
   if (isFailure(sessionsResult)) return []
   return sessionsResult.data
-    .filter(({ inscription }) => estInscrit(inscription))
+    .filter(({ inscription }) =>
+      SessionMilo.Inscription.estInscrit(inscription)
+    )
     .sort(compareSessionsByDebut)
 }
 
