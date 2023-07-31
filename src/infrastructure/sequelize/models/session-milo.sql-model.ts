@@ -23,6 +23,12 @@ export class SessionMiloDto extends Model {
   })
   dateModification: Date
 
+  @Column({
+    field: 'date_cloture',
+    type: DataType.DATE
+  })
+  dateCloture: Date | null
+
   @ForeignKey(() => StructureMiloSqlModel)
   @Column({
     field: 'id_structure_milo',
