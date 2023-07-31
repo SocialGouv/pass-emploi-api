@@ -1,36 +1,29 @@
 import { describe } from 'mocha'
 import { createSandbox, SinonSandbox } from 'sinon'
-import { unUtilisateurJeune } from 'test/fixtures/authentification.fixture'
-import { expect, StubbedClass, stubClass } from 'test/utils'
-import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
 import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
-import { Jeune } from 'src/domain/jeune/jeune'
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { failure, success } from 'src/building-blocks/types/result'
+import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
+import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import {
   JeuneMiloSansIdDossier,
   NonTrouveError
 } from 'src/building-blocks/types/domain-error'
-import { unJeune } from 'test/fixtures/jeune.fixture'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
-import { MiloClient } from 'src/infrastructure/clients/milo-client'
+import { failure, success } from 'src/building-blocks/types/result'
+import { unUtilisateurJeune } from 'test/fixtures/authentification.fixture'
 import { uneSessionJeuneMiloQueryModel } from 'test/fixtures/sessions.fixture'
-import { uneOffreDto, uneSessionDto } from 'test/fixtures/milo-dto.fixture'
-import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
-import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
-import { DateTime } from 'luxon'
-import { getDatabase } from 'test/utils/database-for-testing'
-import { SessionMilo } from '../../../../src/domain/milo/session.milo'
+import { expect, StubbedClass, stubClass } from 'test/utils'
+import { Core } from '../../../../src/domain/core'
+import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
+import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('GetSessionsJeuneMiloQueryHandler', () => {
   const query = { idJeune: 'idJeune', token: 'token' }
-  const jeune = unJeune()
   const utilisateur = unUtilisateurJeune()
 
   let getSessionsQueryHandler: GetSessionsJeuneMiloQueryHandler
-  let jeuneRepository: StubbedType<Jeune.Repository>
-  let keycloakClient: StubbedClass<KeycloakClient>
-  let miloClient: StubbedClass<MiloClient>
+  let getSessionsQueryGetter: StubbedClass<GetSessionsJeuneMiloQueryGetter>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let sandbox: SinonSandbox
 
@@ -39,14 +32,13 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
   })
 
   beforeEach(async () => {
-    jeuneRepository = stubInterface(sandbox)
-    keycloakClient = stubClass(KeycloakClient)
-    miloClient = stubClass(MiloClient)
+    await getDatabase().cleanPG()
+    await ConseillerSqlModel.creer(unConseillerDto())
+
+    getSessionsQueryGetter = stubClass(GetSessionsJeuneMiloQueryGetter)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     getSessionsQueryHandler = new GetSessionsJeuneMiloQueryHandler(
-      jeuneRepository,
-      keycloakClient,
-      miloClient,
+      getSessionsQueryGetter,
       jeuneAuthorizer
     )
   })
@@ -72,9 +64,6 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
   describe('handle', () => {
     describe("quand le jeune n'existe pas", () => {
       it('renvoie une failure ', async () => {
-        // Given
-        jeuneRepository.get.withArgs(query.idJeune).resolves(undefined)
-
         // When
         const result = await getSessionsQueryHandler.handle(query)
 
@@ -88,9 +77,14 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
     describe('quand le jeune existe sans ID partenaire', () => {
       it('renvoie une failure ', async () => {
         // Given
-        jeuneRepository.get
-          .withArgs(query.idJeune)
-          .resolves({ ...jeune, idPartenaire: undefined })
+        await JeuneSqlModel.creer({
+          ...unJeuneDto({
+            id: 'idJeune',
+            structure: Core.Structure.MILO,
+            instanceId: 'instanceId'
+          }),
+          idPartenaire: null
+        })
 
         // When
         const result = await getSessionsQueryHandler.handle(query)
@@ -102,163 +96,53 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
       })
     })
 
-    describe('quand le jeune existe avec un ID partenaire', () => {
-      const idpToken = 'idpToken'
-      const idStructureParis = 'id-paris'
-      const idStructureCayenne = 'id-cayenne'
-      const idSession1 = 1
-      const idSession2 = 2
-      const idSession3 = 3
+    describe('quand le query getter renvoie une failure', () => {
+      it('renvoie la même failure ', async () => {
+        // Given
+        await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: 'idJeune',
+            idPartenaire: 'idDossier',
+            structure: Core.Structure.MILO,
+            instanceId: 'instanceId'
+          })
+        )
 
-      beforeEach(async () => {
-        jeuneRepository.get.withArgs(query.idJeune).resolves(jeune)
-        keycloakClient.exchangeTokenJeune
-          .withArgs(query.token, jeune.structure)
-          .resolves(idpToken)
+        const uneFailure = failure(new NonTrouveError('Jeune', query.idJeune))
+        getSessionsQueryGetter.handle
+          .withArgs('idDossier', 'token')
+          .resolves(uneFailure)
 
-        await StructureMiloSqlModel.create({
-          id: idStructureParis,
-          nomOfficiel: 'Paris',
-          timezone: 'Europe/Paris'
-        })
-        await StructureMiloSqlModel.create({
-          id: idStructureCayenne,
-          nomOfficiel: 'Cayenne',
-          timezone: 'America/Cayenne'
-        })
-        await SessionMiloSqlModel.create({
-          id: idSession2,
-          estVisible: true,
-          idStructureMilo: idStructureParis,
-          dateModification: DateTime.now().toJSDate()
-        })
-        await SessionMiloSqlModel.create({
-          id: idSession3,
-          estVisible: true,
-          idStructureMilo: idStructureCayenne,
-          dateModification: DateTime.now().toJSDate()
-        })
+        // When
+        const result = await getSessionsQueryHandler.handle(query)
+
+        // Then
+        expect(result).to.deep.equal(uneFailure)
       })
+    })
 
-      afterEach(async () => {
-        await getDatabase().cleanPG()
-      })
+    describe('quand le query getter renvoie un success', () => {
+      it('renvoie le même success', async () => {
+        // Given
+        await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: 'idJeune',
+            idPartenaire: 'idDossier',
+            structure: Core.Structure.MILO,
+            instanceId: 'instanceId'
+          })
+        )
 
-      describe('récupère la liste des sessions du jeune et les retourne', () => {
-        const sessionNonVisible = { ...uneSessionDto, id: idSession1 }
-        const sessionVisibleAParis = { ...uneSessionDto, id: idSession2 }
-        const sessionVisibleACayenne = { ...uneSessionDto, id: idSession3 }
+        const unSuccess = success([uneSessionJeuneMiloQueryModel])
+        getSessionsQueryGetter.handle
+          .withArgs('idDossier', 'token')
+          .resolves(unSuccess)
 
-        it('seulement si elles sont visibles', async () => {
-          // Given
-          miloClient.getSessionsJeune
-            .withArgs(idpToken, jeune.idPartenaire)
-            .resolves(
-              success({
-                page: 1,
-                nbSessions: 1,
-                sessions: [
-                  { session: sessionNonVisible, offre: uneOffreDto },
-                  { session: sessionVisibleACayenne, offre: uneOffreDto }
-                ]
-              })
-            )
+        // When
+        const result = await getSessionsQueryHandler.handle(query)
 
-          // When
-          const result = await getSessionsQueryHandler.handle(query)
-
-          // Then
-          expect(result).to.deep.equal(
-            success([
-              { ...uneSessionJeuneMiloQueryModel, id: idSession3.toString() }
-            ])
-          )
-        })
-
-        it('à la timezone de leur structure', async () => {
-          // Given
-          miloClient.getSessionsJeune
-            .withArgs(idpToken, jeune.idPartenaire)
-            .resolves(
-              success({
-                page: 1,
-                nbSessions: 1,
-                sessions: [
-                  { session: sessionVisibleAParis, offre: uneOffreDto }
-                ]
-              })
-            )
-
-          // When
-          const result = await getSessionsQueryHandler.handle(query)
-
-          // Then
-          const dateHeureDebutTimeZoneParis = '2020-04-06T08:20:00.000Z'
-          const dateHeureFinTimeZoneParis = '2020-04-08T08:20:00.000Z'
-          expect(result).to.deep.equal(
-            success([
-              {
-                ...uneSessionJeuneMiloQueryModel,
-                id: idSession2.toString(),
-                dateHeureDebut: dateHeureDebutTimeZoneParis,
-                dateHeureFin: dateHeureFinTimeZoneParis
-              }
-            ])
-          )
-        })
-
-        it('avec l’inscription du jeune', async () => {
-          // Given
-          miloClient.getSessionsJeune
-            .withArgs(idpToken, jeune.idPartenaire)
-            .resolves(
-              success({
-                page: 1,
-                nbSessions: 1,
-                sessions: [
-                  {
-                    session: sessionVisibleACayenne,
-                    offre: uneOffreDto,
-                    sessionInstance: { statut: 'ONGOING' }
-                  },
-                  {
-                    session: sessionVisibleACayenne,
-                    offre: uneOffreDto,
-                    sessionInstance: { statut: 'REFUSAL_YOUNG' }
-                  },
-                  {
-                    session: sessionVisibleACayenne,
-                    offre: uneOffreDto,
-                    sessionInstance: { statut: 'REFUSAL' }
-                  }
-                ]
-              })
-            )
-
-          // When
-          const result = await getSessionsQueryHandler.handle(query)
-
-          // Then
-          expect(result).to.deep.equal(
-            success([
-              {
-                ...uneSessionJeuneMiloQueryModel,
-                id: idSession3.toString(),
-                inscription: SessionMilo.Inscription.Statut.INSCRIT
-              },
-              {
-                ...uneSessionJeuneMiloQueryModel,
-                id: idSession3.toString(),
-                inscription: SessionMilo.Inscription.Statut.REFUS_JEUNE
-              },
-              {
-                ...uneSessionJeuneMiloQueryModel,
-                id: idSession3.toString(),
-                inscription: SessionMilo.Inscription.Statut.REFUS_TIERS
-              }
-            ])
-          )
-        })
+        // Then
+        expect(result).to.deep.equal(unSuccess)
       })
     })
   })

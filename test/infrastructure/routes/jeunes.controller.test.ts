@@ -22,21 +22,21 @@ import {
 import * as request from 'supertest'
 import { uneDatetime, uneDatetimeAvecOffset } from 'test/fixtures/date.fixture'
 import { uneDemarche } from 'test/fixtures/demarche.fixture'
-import { CreateActionCommandHandler } from '../../../src/application/commands/action/create-action.command.handler'
-import { DeleteJeuneInactifCommandHandler } from '../../../src/application/commands/delete-jeune-inactif.command.handler'
-import { UpdateJeunePreferencesCommandHandler } from '../../../src/application/commands/update-preferences-jeune.command.handler'
-import { GetConseillersJeuneQueryHandler } from '../../../src/application/queries/get-conseillers-jeune.query.handler.db'
-import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get-detail-jeune.query.handler.db'
-import { GetJeuneHomeActionsQueryHandler } from '../../../src/application/queries/get-jeune-home-actions.query.handler'
-import { GetJeuneHomeDemarchesQueryHandler } from '../../../src/application/queries/get-jeune-home-demarches.query.handler'
-import { GetPreferencesJeuneQueryHandler } from '../../../src/application/queries/get-preferences-jeune.handler.db'
-import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../src/application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
-import { GetRendezVousJeuneQueryHandler } from '../../../src/application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
+import { CreateActionCommandHandler } from 'src/application/commands/action/create-action.command.handler'
+import { DeleteJeuneInactifCommandHandler } from 'src/application/commands/delete-jeune-inactif.command.handler'
+import { UpdateJeunePreferencesCommandHandler } from 'src/application/commands/update-preferences-jeune.command.handler'
+import { GetConseillersJeuneQueryHandler } from 'src/application/queries/get-conseillers-jeune.query.handler.db'
+import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler.db'
+import { GetJeuneHomeActionsQueryHandler } from 'src/application/queries/get-jeune-home-actions.query.handler'
+import { GetJeuneHomeDemarchesQueryHandler } from 'src/application/queries/get-jeune-home-demarches.query.handler'
+import { GetPreferencesJeuneQueryHandler } from 'src/application/queries/get-preferences-jeune.handler.db'
+import { GetRendezVousJeunePoleEmploiQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
+import { GetRendezVousJeuneQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
 import {
   DetailJeuneQueryModel,
   PreferencesJeuneQueryModel
-} from '../../../src/application/queries/query-models/jeunes.query-model'
-import { RendezVousJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
+} from 'src/application/queries/query-models/jeunes.query-model'
+import { RendezVousJeuneQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
 import {
   DomainError,
   DroitsInsuffisants,
@@ -45,40 +45,40 @@ import {
   JeunePasInactifError,
   MauvaiseCommandeError,
   NonTrouveError
-} from '../../../src/building-blocks/types/domain-error'
+} from 'src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
   success
-} from '../../../src/building-blocks/types/result'
-import { Action } from '../../../src/domain/action/action'
-import { JwtService } from '../../../src/infrastructure/auth/jwt.service'
+} from 'src/building-blocks/types/result'
+import { Action } from 'src/domain/action/action'
+import { JwtService } from 'src/infrastructure/auth/jwt.service'
 import {
   unHeaderAuthorization,
   unJwtPayloadValide,
   unJwtPayloadValideJeunePE,
   unUtilisateurDecode
-} from '../../fixtures/authentification.fixture'
-import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
-import { enleverLesUndefined, expect, StubbedClass } from '../../utils'
-import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import { GetJeuneHomeAgendaQueryHandler } from '../../../src/application/queries/get-jeune-home-agenda.query.db'
+} from 'test/fixtures/authentification.fixture'
+import { unDetailJeuneQueryModel } from 'test/fixtures/query-models/jeunes.query-model.fixtures'
+import { enleverLesUndefined, expect, StubbedClass } from 'test/utils'
+import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
+import { GetJeuneHomeAgendaQueryHandler } from 'src/application/queries/get-jeune-home-agenda.query.db'
 import {
   JeuneHomeAgendaPoleEmploiQueryModel,
-  JeuneHomeSuiviQueryModel
-} from '../../../src/application/queries/query-models/home-jeune-suivi.query-model'
-import { uneActionQueryModelSansJeune } from '../../fixtures/query-models/action.query-model.fixtures'
-import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../../src/application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
-import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
+  JeuneHomeAgendaQueryModel
+} from 'src/application/queries/query-models/home-jeune-suivi.query-model'
+import { uneActionQueryModelSansJeune } from 'test/fixtures/query-models/action.query-model.fixtures'
+import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from 'src/application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
+import { uneDemarcheQueryModel } from 'test/fixtures/query-models/demarche.query-model.fixtures'
 import { DateTime } from 'luxon'
-import { GetAnimationsCollectivesJeuneQueryHandler } from '../../../src/application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
-import { GetUnRendezVousJeuneQueryHandler } from '../../../src/application/queries/rendez-vous/get-un-rendez-vous-jeune.query.handler.db'
-import { unRendezVousJeuneDetailQueryModel } from '../../fixtures/query-models/rendez-vous.query-model.fixtures'
-import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
-import { DateService } from '../../../src/utils/date-service'
-import { Cached } from '../../../src/building-blocks/types/query'
-import { JeuneHomeDemarcheQueryModel } from '../../../src/application/queries/query-models/home-jeune.query-model'
-import { Authentification } from '../../../src/domain/authentification'
+import { GetAnimationsCollectivesJeuneQueryHandler } from 'src/application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
+import { GetUnRendezVousJeuneQueryHandler } from 'src/application/queries/rendez-vous/get-un-rendez-vous-jeune.query.handler.db'
+import { unRendezVousJeuneDetailQueryModel } from 'test/fixtures/query-models/rendez-vous.query-model.fixtures'
+import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
+import { DateService } from 'src/utils/date-service'
+import { Cached } from 'src/building-blocks/types/query'
+import { JeuneHomeDemarcheQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
+import { Authentification } from 'src/domain/authentification'
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
@@ -918,12 +918,13 @@ describe('JeunesController', () => {
   describe('GET /jeunes/:idJeune/home/agenda', () => {
     const idJeune = '1'
     const maintenant = '2022-08-17T12:00:30+02:00'
-    const queryModel: JeuneHomeSuiviQueryModel = {
+    const queryModel: JeuneHomeAgendaQueryModel = {
       actions: [
         enleverLesUndefined(uneActionQueryModelSansJeune()),
         enleverLesUndefined(uneActionQueryModelSansJeune())
       ],
       rendezVous: [],
+      sessionsMilo: [],
       metadata: {
         actionsEnRetard: 2,
         dateDeFin: new Date(maintenant),
@@ -932,15 +933,10 @@ describe('JeunesController', () => {
     }
     it('retourne la home agenda du jeune quand tout se passe bien', async () => {
       // Given
+      const token = 'token'
       jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
       getJeuneHomeSuiviQueryHandler.execute
-        .withArgs(
-          {
-            idJeune,
-            maintenant
-          },
-          unUtilisateurDecode()
-        )
+        .withArgs({ idJeune, maintenant, token }, unUtilisateurDecode())
         .resolves(success(queryModel))
 
       // When
@@ -948,11 +944,12 @@ describe('JeunesController', () => {
         .get(
           `/jeunes/${idJeune}/home/agenda?maintenant=2022-08-17T12%3A00%3A30%2B02%3A00`
         )
-        .set('authorization', unHeaderAuthorization())
+        .set('authorization', `bearer ${token}`)
         // Then
         .expect({
           actions: queryModel.actions,
           rendezVous: queryModel.rendezVous,
+          sessionsMilo: queryModel.sessionsMilo,
           metadata: {
             actionsEnRetard: 2,
             dateDeFin: '2022-08-17T10:00:30.000Z',

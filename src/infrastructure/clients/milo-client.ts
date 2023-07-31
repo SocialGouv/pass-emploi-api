@@ -13,10 +13,10 @@ import {
 } from 'src/building-blocks/types/result'
 import {
   InscritSessionMiloDto,
-  SessionConseillerDetailDto,
   ListeSessionsConseillerMiloDto,
-  SessionJeuneDetailDto,
   ListeSessionsJeuneMiloDto,
+  SessionConseillerDetailDto,
+  SessionJeuneDetailDto,
   StructureConseillerMiloDto
 } from './dto/milo.dto'
 import { handleAxiosError } from './utils/axios-error-handler'
@@ -29,7 +29,7 @@ export class MiloClient {
   private readonly apiKeySessionDetailConseiller: string
   private readonly apiKeyInstanceSessionEcritureConseiller: string
   private readonly apiKeyUtilisateurs: string
-  private logger: Logger
+  private readonly logger: Logger
 
   constructor(
     private httpService: HttpService,
@@ -79,15 +79,17 @@ export class MiloClient {
   async getSessionsJeune(
     idpToken: string,
     idDossier: string,
-    dateDebutRecherche?: DateTime
+    recherche?: { debut: DateTime; fin: DateTime }
   ): Promise<Result<ListeSessionsJeuneMiloDto>> {
     const params = new URLSearchParams()
     params.append('idDossier', idDossier)
-    if (dateDebutRecherche)
+    if (recherche) {
       params.append(
         'dateDebutRecherche',
-        dateDebutRecherche.toFormat('yyyy-MM-dd')
+        recherche.debut.toFormat('yyyy-MM-dd')
       )
+      params.append('dateFinRecherche', recherche.fin.toFormat('yyyy-MM-dd'))
+    }
 
     // L'api ne renvoie que 50 sessions max par appel au delà, une pagination doit être mise en place. (voir doc 06/23)
     return this.get<ListeSessionsJeuneMiloDto>(

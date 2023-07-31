@@ -58,18 +58,34 @@ describe('MiloClient', () => {
       const idDossier = 'idDossier'
 
       nock(MILO_BASE_URL)
+        .get(`/operateurs/sessions?idDossier=${idDossier}`)
+        .reply(200, uneListeSessionsJeuneDto)
+        .isDone()
+
+      // When
+      const result = await miloClient.getSessionsJeune(idpToken, idDossier)
+
+      // Then
+      expect(result).to.deep.equal(success(uneListeSessionsJeuneDto))
+    })
+
+    it('permet de ne récuperer la liste des sessions que sur une période donnée', async () => {
+      // Given
+      const idpToken = 'idpToken'
+      const idDossier = 'idDossier'
+
+      nock(MILO_BASE_URL)
         .get(
-          `/operateurs/sessions?idDossier=${idDossier}&dateDebutRecherche=2023-07-21`
+          `/operateurs/sessions?idDossier=${idDossier}&dateDebutRecherche=2023-07-21&dateFinRecherche=2023-07-26`
         )
         .reply(200, uneListeSessionsJeuneDto)
         .isDone()
 
       // When
-      const result = await miloClient.getSessionsJeune(
-        idpToken,
-        idDossier,
-        DateTime.fromISO('2023-07-21T17:53:42')
-      )
+      const result = await miloClient.getSessionsJeune(idpToken, idDossier, {
+        debut: DateTime.fromISO('2023-07-21T17:53:42'),
+        fin: DateTime.fromISO('2023-07-26T22:11:10')
+      })
 
       // Then
       expect(result).to.deep.equal(success(uneListeSessionsJeuneDto))

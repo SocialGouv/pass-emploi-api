@@ -335,6 +335,7 @@ import { NotifierRecherchesServiceCiviqueJobHandler } from './application/jobs/n
 import { HandleJobGenererJDDCommandHandler } from './application/jobs/generer-jdd.job.handler'
 import { MajSegmentsJobHandler } from './application/jobs/maj-segments.job.handler.db'
 import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
+import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -735,6 +736,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetEvenementEmploiQueryHandler,
     GetSessionsConseillerMiloQueryHandler,
     GetSessionsJeuneMiloQueryHandler,
+    GetSessionsJeuneMiloQueryGetter,
     GetDetailSessionConseillerMiloQueryHandler,
     GetDetailSessionJeuneMiloQueryHandler,
     UpdateSessionMiloCommandHandler,

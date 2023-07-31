@@ -20,60 +20,56 @@ import {
   ApiResponse,
   ApiTags
 } from '@nestjs/swagger'
-import { ArchiverJeuneCommandHandler } from '../../application/commands/archiver-jeune.command.handler'
+import { ArchiverJeuneCommandHandler } from 'src/application/commands/archiver-jeune.command.handler'
 import {
   CreateDemarcheCommand,
   CreateDemarcheCommandHandler
-} from '../../application/commands/demarche/create-demarche.command.handler'
-import { DeleteJeuneCommandHandler } from '../../application/commands/delete-jeune.command.handler'
+} from 'src/application/commands/demarche/create-demarche.command.handler'
+import { DeleteJeuneCommandHandler } from 'src/application/commands/delete-jeune.command.handler'
 import {
   TransfererJeunesConseillerCommand,
   TransfererJeunesConseillerCommandHandler
-} from '../../application/commands/transferer-jeunes-conseiller.command.handler'
-import { GetDetailJeuneQueryHandler } from '../../application/queries/get-detail-jeune.query.handler.db'
-import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
+} from 'src/application/commands/transferer-jeunes-conseiller.command.handler'
+import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler.db'
+import { GetRendezVousJeunePoleEmploiQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
 import {
   JeuneHomeActionQueryModel,
   JeuneHomeDemarcheQueryModel
-} from '../../application/queries/query-models/home-jeune.query-model'
+} from 'src/application/queries/query-models/home-jeune.query-model'
 import {
   DetailJeuneQueryModel,
   HistoriqueConseillerJeuneQueryModel,
   PreferencesJeuneQueryModel
-} from '../../application/queries/query-models/jeunes.query-model'
+} from 'src/application/queries/query-models/jeunes.query-model'
 import {
   RendezVousJeuneDetailQueryModel,
   RendezVousJeuneQueryModel
-} from '../../application/queries/query-models/rendez-vous.query-model'
-import { Core, estPoleEmploiBRSA } from '../../domain/core'
-import { DateService } from '../../utils/date-service'
+} from 'src/application/queries/query-models/rendez-vous.query-model'
+import { Core, estPoleEmploiBRSA } from 'src/domain/core'
+import { DateService } from 'src/utils/date-service'
 import {
   CreateActionCommand,
   CreateActionCommandHandler
-} from '../../application/commands/action/create-action.command.handler'
-import { DeleteJeuneInactifCommandHandler } from '../../application/commands/delete-jeune-inactif.command.handler'
+} from 'src/application/commands/action/create-action.command.handler'
+import { DeleteJeuneInactifCommandHandler } from 'src/application/commands/delete-jeune-inactif.command.handler'
 import {
   UpdateStatutDemarcheCommand,
   UpdateStatutDemarcheCommandHandler
-} from '../../application/commands/demarche/update-demarche.command.handler'
-import { UpdateJeuneConfigurationApplicationCommandHandler } from '../../application/commands/update-jeune-configuration-application.command.handler'
-import { UpdateJeunePreferencesCommandHandler } from '../../application/commands/update-preferences-jeune.command.handler'
-import { GetConseillersJeuneQueryHandler } from '../../application/queries/get-conseillers-jeune.query.handler.db'
-import { GetJeuneHomeActionsQueryHandler } from '../../application/queries/get-jeune-home-actions.query.handler'
-import { GetJeuneHomeDemarchesQueryHandler } from '../../application/queries/get-jeune-home-demarches.query.handler'
+} from 'src/application/commands/demarche/update-demarche.command.handler'
+import { UpdateJeuneConfigurationApplicationCommandHandler } from 'src/application/commands/update-jeune-configuration-application.command.handler'
+import { UpdateJeunePreferencesCommandHandler } from 'src/application/commands/update-preferences-jeune.command.handler'
+import { GetConseillersJeuneQueryHandler } from 'src/application/queries/get-conseillers-jeune.query.handler.db'
+import { GetJeuneHomeActionsQueryHandler } from 'src/application/queries/get-jeune-home-actions.query.handler'
+import { GetJeuneHomeDemarchesQueryHandler } from 'src/application/queries/get-jeune-home-demarches.query.handler'
 import {
   GetPreferencesJeuneQuery,
   GetPreferencesJeuneQueryHandler
-} from '../../application/queries/get-preferences-jeune.handler.db'
-import { GetRendezVousJeuneQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
-import { DemarcheQueryModel } from '../../application/queries/query-models/actions.query-model'
-import {
-  isFailure,
-  isSuccess,
-  Result
-} from '../../building-blocks/types/result'
-import { Action } from '../../domain/action/action'
-import { Authentification } from '../../domain/authentification'
+} from 'src/application/queries/get-preferences-jeune.handler.db'
+import { GetRendezVousJeuneQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
+import { DemarcheQueryModel } from 'src/application/queries/query-models/actions.query-model'
+import { isFailure, isSuccess, Result } from 'src/building-blocks/types/result'
+import { Action } from 'src/domain/action/action'
+import { Authentification } from 'src/domain/authentification'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'
 import { CreateActionParLeJeunePayload } from './validation/actions.inputs'
@@ -91,18 +87,18 @@ import {
 } from './validation/jeunes.inputs'
 import {
   JeuneHomeAgendaPoleEmploiQueryModel,
-  JeuneHomeEvenementsQueryModel
-} from '../../application/queries/query-models/home-jeune-suivi.query-model'
-import { GetJeuneHomeAgendaQueryHandler } from '../../application/queries/get-jeune-home-agenda.query.db'
-import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
+  JeuneHomeAgendaQueryModel
+} from 'src/application/queries/query-models/home-jeune-suivi.query-model'
+import { GetJeuneHomeAgendaQueryHandler } from 'src/application/queries/get-jeune-home-agenda.query.db'
+import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from 'src/application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
 import { DateTime } from 'luxon'
-import { toDemarcheQueryModel } from '../../application/queries/query-mappers/demarche.mappers'
+import { toDemarcheQueryModel } from 'src/application/queries/query-mappers/demarche.mappers'
 import {
   GetAnimationsCollectivesJeuneQuery,
   GetAnimationsCollectivesJeuneQueryHandler
-} from '../../application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
-import { GetUnRendezVousJeuneQueryHandler } from '../../application/queries/rendez-vous/get-un-rendez-vous-jeune.query.handler.db'
-import { IdQueryModel } from '../../application/queries/query-models/common.query-models'
+} from 'src/application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
+import { GetUnRendezVousJeuneQueryHandler } from 'src/application/queries/rendez-vous/get-un-rendez-vous-jeune.query.handler.db'
+import { IdQueryModel } from 'src/application/queries/query-models/common.query-models'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -227,15 +223,16 @@ export class JeunesController {
 
   @Get(':idJeune/home/agenda')
   @ApiResponse({
-    type: JeuneHomeEvenementsQueryModel
+    type: JeuneHomeAgendaQueryModel
   })
   async getHomeAgenda(
     @Param('idJeune') idJeune: string,
     @Query() queryParams: MaintenantQueryParams,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<JeuneHomeEvenementsQueryModel> {
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string
+  ): Promise<JeuneHomeAgendaQueryModel> {
     const result = await this.getJeuneHomeSuiviQueryHandler.execute(
-      { idJeune, maintenant: queryParams.maintenant },
+      { idJeune, maintenant: queryParams.maintenant, token: accessToken },
       utilisateur
     )
 
