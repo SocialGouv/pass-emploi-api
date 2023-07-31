@@ -6,8 +6,8 @@ import {
   isFailure,
   Result,
   success
-} from '../../../building-blocks/types/result'
-import { ConseillerMilo } from '../../../domain/milo/conseiller.milo'
+} from 'src/building-blocks/types/result'
+import { ConseillerMilo } from 'src/domain/milo/conseiller.milo'
 import {
   InscritSessionMiloDto,
   OffreDto,
@@ -68,12 +68,11 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
   }
 
   async save(
-    session: Required<
-      Pick<
-        SessionMilo,
-        'id' | 'idStructureMilo' | 'estVisible' | 'dateModification'
-      >
-    >,
+    session: Pick<
+      SessionMilo,
+      'id' | 'idStructureMilo' | 'estVisible' | 'dateCloture'
+    > &
+      Required<Pick<SessionMilo, 'dateModification'>>,
     {
       inscriptionsAModifier,
       inscriptionsASupprimer,
@@ -115,7 +114,8 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
       id: session.id,
       estVisible: session.estVisible,
       idStructureMilo: session.idStructureMilo,
-      dateModification: session.dateModification.toJSDate()
+      dateModification: session.dateModification.toJSDate(),
+      dateCloture: session.dateCloture?.toJSDate() ?? null
     }
     await SessionMiloSqlModel.upsert(sessionMiloSqlModel)
 
