@@ -458,7 +458,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
       it('empêche de dépasser le nombre maximum de participants', async () => {
         // Given
         const session = uneSessionMilo({
-          nbPlacesDisponibles: 3,
+          nbPlacesDisponibles: 0,
           inscriptions: [
             {
               idJeune: 'id-hermione',
