@@ -3,24 +3,24 @@ import {
   emptySuccess,
   Success,
   success
-} from '../../../../src/building-blocks/types/result'
-import { SessionMilo } from '../../../../src/domain/milo/session.milo'
-import { MiloClient } from '../../../../src/infrastructure/clients/milo-client'
-import { SessionMiloHttpSqlRepository } from '../../../../src/infrastructure/repositories/milo/session-milo-http-sql.repository.db'
-import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { SessionMiloSqlModel } from '../../../../src/infrastructure/sequelize/models/session-milo.sql-model'
-import { StructureMiloSqlModel } from '../../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
-import { uneDatetime } from '../../../fixtures/date.fixture'
+} from 'src/building-blocks/types/result'
+import { SessionMilo } from 'src/domain/milo/session.milo'
+import { MiloClient } from 'src/infrastructure/clients/milo-client'
+import { SessionMiloHttpSqlRepository } from 'src/infrastructure/repositories/milo/session-milo-http-sql.repository.db'
+import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
+import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
+import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
+import { uneDatetime } from 'test/fixtures/date.fixture'
 import {
   unDetailSessionConseillerDto,
   uneInscriptionSessionMiloDto
-} from '../../../fixtures/milo-dto.fixture'
-import { uneSessionMilo } from '../../../fixtures/sessions.fixture'
-import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
-import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
+} from 'test/fixtures/milo-dto.fixture'
+import { uneSessionMilo } from 'test/fixtures/sessions.fixture'
+import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { expect, sinon, StubbedClass, stubClass } from '../../../utils'
-import { getDatabase } from '../../../utils/database-for-testing'
+import { getDatabase } from 'test/utils/database-for-testing'
 
 describe('SessionMiloHttpSqlRepository', () => {
   let miloClient: StubbedClass<MiloClient>
