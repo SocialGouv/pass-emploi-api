@@ -1,12 +1,12 @@
 import { DateTime } from 'luxon'
-import { MaxInscritsDepasse } from '../../building-blocks/types/domain-error'
+import { MaxInscritsDepasse } from 'src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
   isFailure,
   Result,
   success
-} from '../../building-blocks/types/result'
+} from 'src/building-blocks/types/result'
 import { ConseillerMilo } from './conseiller.milo'
 
 export const SessionMiloRepositoryToken = 'SessionMilo.Repository'
@@ -113,6 +113,15 @@ export namespace SessionMilo {
       REFUS_JEUNE = 'REFUS_JEUNE',
       REFUS_TIERS = 'REFUS_TIERS',
       PRESENT = 'PRESENT'
+    }
+
+    export function estInscrit(
+      statut?: SessionMilo.Inscription.Statut
+    ): boolean {
+      return (
+        statut === SessionMilo.Inscription.Statut.INSCRIT ||
+        statut === SessionMilo.Inscription.Statut.PRESENT
+      )
     }
   }
 
