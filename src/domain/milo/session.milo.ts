@@ -26,6 +26,7 @@ export interface SessionMilo {
   nbPlacesDisponibles?: number
   commentaire?: string
   dateModification?: DateTime
+  dateCloture?: DateTime
 }
 
 export type InscriptionsATraiter = {
