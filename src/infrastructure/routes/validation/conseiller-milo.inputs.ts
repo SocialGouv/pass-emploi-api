@@ -7,7 +7,9 @@ import {
   ValidateNested,
   IsArray,
   IsString,
-  IsEnum
+  IsEnum,
+  ValidateIf,
+  IsDefined
 } from 'class-validator'
 import { Type } from 'class-transformer'
 import { SessionMilo } from '../../../domain/milo/session.milo'
@@ -43,11 +45,19 @@ class InscriptionSessionMiloPayload {
 
 export class UpdateSessionMiloPayload {
   @ApiProperty()
+  @ValidateIf(
+    payload =>
+      payload.inscriptions === undefined || payload.estVisible !== undefined
+  )
+  @IsDefined({ message: 'Au moins un des champs doit être renseigné' })
   @IsBoolean()
-  estVisible: boolean
+  estVisible?: boolean
 
   @ApiProperty()
-  @IsOptional()
+  @ValidateIf(
+    payload =>
+      payload.estVisible === undefined || payload.inscriptions !== undefined
+  )
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => InscriptionSessionMiloPayload)

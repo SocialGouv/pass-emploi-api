@@ -18,7 +18,6 @@ import {
 import { Authentification } from 'src/domain/authentification'
 import { Conseiller } from 'src/domain/conseiller/conseiller'
 import { SessionMilo } from 'src/domain/milo/session.milo'
-import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
@@ -32,7 +31,6 @@ describe('UpdateSessionMiloCommandHandler', () => {
   let updateSessionMiloCommandHandler: UpdateSessionMiloCommandHandler
   let conseillerMiloRepository: StubbedType<Conseiller.Milo.Repository>
   let sessionMiloRepository: StubbedType<SessionMilo.Repository>
-  let miloClient: StubbedClass<MiloClient>
   let keycloakClient: StubbedClass<KeycloakClient>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let dateService: StubbedClass<DateService>
@@ -42,14 +40,12 @@ describe('UpdateSessionMiloCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     conseillerMiloRepository = stubInterface(sandbox)
     sessionMiloRepository = stubInterface(sandbox)
-    miloClient = stubClass(MiloClient)
     keycloakClient = stubClass(KeycloakClient)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     dateService = stubClass(DateService)
     updateSessionMiloCommandHandler = new UpdateSessionMiloCommandHandler(
       conseillerMiloRepository,
       sessionMiloRepository,
-      miloClient,
       keycloakClient,
       dateService,
       conseillerAuthorizer
