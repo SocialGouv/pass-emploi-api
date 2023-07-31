@@ -212,7 +212,7 @@ function verifierNombrePlaces(
     inscriptionsASupprimer
   }: InscriptionsATraiter
 ): Result {
-  if (!session.nbPlacesDisponibles) return emptySuccess()
+  if (session.nbPlacesDisponibles === undefined) return emptySuccess()
 
   const inscritsExistants = session.inscriptions.filter(
     ({ statut }) => statut === SessionMilo.Inscription.Statut.INSCRIT
@@ -228,8 +228,7 @@ function verifierNombrePlaces(
     inscriptionsAModifier.some(({ idJeune }) => idJeune === inscrit.idJeune)
   )
 
-  const nbPlacesPrises =
-    inscritsExistants.length + idsJeunesAInscrire.length + aReinscrire.length
+  const nbPlacesPrises = idsJeunesAInscrire.length + aReinscrire.length
   const nbPlacesLiberees = aDesinscrire.length + aRefuser.length
 
   if (session.nbPlacesDisponibles < nbPlacesPrises - nbPlacesLiberees) {
