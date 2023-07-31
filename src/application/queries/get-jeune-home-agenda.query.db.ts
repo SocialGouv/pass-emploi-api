@@ -2,36 +2,46 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { DateTime } from 'luxon'
 import { Op } from 'sequelize'
-import { Query } from '../../building-blocks/types/query'
-import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Result, success } from '../../building-blocks/types/result'
-import { generateSourceRendezVousCondition } from '../../config/feature-flipping'
-import { Action } from '../../domain/action/action'
-import { Authentification } from '../../domain/authentification'
-import { fromSqlToActionQueryModel } from '../../infrastructure/repositories/mappers/actions.mappers'
-import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
-import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
-import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
-import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
+import {
+  GetSessionsJeuneMiloQueryGetter,
+  sessionsAvecInscriptionTriees
+} from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
+import { Query } from 'src/building-blocks/types/query'
+import { QueryHandler } from 'src/building-blocks/types/query-handler'
+import { failure, Result, success } from 'src/building-blocks/types/result'
+import { generateSourceRendezVousCondition } from 'src/config/feature-flipping'
+import { Action } from 'src/domain/action/action'
+import { Authentification } from 'src/domain/authentification'
+import { fromSqlToActionQueryModel } from 'src/infrastructure/repositories/mappers/actions.mappers'
+import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
+import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
+import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import {
+  JeuneMiloSansIdDossier,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
 import { ConseillerInterAgenceAuthorizer } from '../authorizers/conseiller-inter-agence-authorizer'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { fromSqlToRendezVousJeuneQueryModel } from './query-mappers/rendez-vous-milo.mappers'
 import { ActionQueryModel } from './query-models/actions.query-model'
-import { JeuneHomeSuiviQueryModel } from './query-models/home-jeune-suivi.query-model'
+import { JeuneHomeAgendaQueryModel } from './query-models/home-jeune-suivi.query-model'
 import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
 
 export interface GetJeuneHomeAgendaQuery extends Query {
   idJeune: string
   maintenant: string
+  token: string
 }
 
 @Injectable()
 export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
   GetJeuneHomeAgendaQuery,
-  Result<JeuneHomeSuiviQueryModel>
+  Result<JeuneHomeAgendaQueryModel>
 > {
   constructor(
     private jeuneAuthorizer: JeuneAuthorizer,
+    private getSessionsQueryGetter: GetSessionsJeuneMiloQueryGetter,
     private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer,
     private configuration: ConfigService
   ) {
@@ -41,24 +51,47 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
   async handle(
     query: GetJeuneHomeAgendaQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<Result<JeuneHomeSuiviQueryModel>> {
+  ): Promise<Result<JeuneHomeAgendaQueryModel>> {
+    const jeuneSqlModel = await JeuneSqlModel.findByPk(query.idJeune, {
+      include: [{ model: ConseillerSqlModel, required: true }]
+    })
+    if (!jeuneSqlModel) {
+      return failure(new NonTrouveError('Jeune', query.idJeune))
+    }
+    if (!jeuneSqlModel.idPartenaire) {
+      return failure(new JeuneMiloSansIdDossier(query.idJeune))
+    }
+
     const { lundiDernier, dimancheEnHuit } =
       this.recupererLesDatesEntreLundiDernierEtDeuxSemainesPlusTard(
         query.maintenant
       )
-    const [actions, rendezVous, actionsEnRetard] = await Promise.all([
-      this.recupererLesActions(query, lundiDernier, dimancheEnHuit),
-      this.recupererLesRendezVous(
-        query,
-        lundiDernier,
-        dimancheEnHuit,
-        utilisateur.type
-      ),
-      this.recupererLeNombreDactionsEnRetard(query)
-    ])
+    const [actions, rendezVous, actionsEnRetard, sessionsQueryModels] =
+      await Promise.all([
+        this.recupererLesActions(query, lundiDernier, dimancheEnHuit),
+        this.recupererLesRendezVous(
+          query,
+          lundiDernier,
+          dimancheEnHuit,
+          utilisateur.type
+        ),
+        this.recupererLeNombreDactionsEnRetard(query),
+        this.getSessionsQueryGetter.handle(
+          jeuneSqlModel.idPartenaire,
+          query.token,
+          {
+            debut: lundiDernier,
+            fin: dimancheEnHuit
+          }
+        )
+      ])
+
+    const sessionsMilo = sessionsAvecInscriptionTriees(sessionsQueryModels)
+
     return success({
       actions,
       rendezVous,
+      sessionsMilo,
       metadata: {
         actionsEnRetard: actionsEnRetard,
         dateDeDebut: lundiDernier.toJSDate(),

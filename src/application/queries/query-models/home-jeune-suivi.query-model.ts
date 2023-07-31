@@ -1,20 +1,32 @@
 import { ActionQueryModel, DemarcheQueryModel } from './actions.query-model'
 import { RendezVousJeuneQueryModel } from './rendez-vous.query-model'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { SessionJeuneMiloQueryModel } from 'src/application/queries/query-models/sessions.milo.query.model'
 
-export class JeuneHomeSuiviQueryModel {
+export class JeuneHomeAgendaQueryModel {
+  @ApiProperty({
+    type: ActionQueryModel,
+    isArray: true
+  })
   actions: ActionQueryModel[]
+
+  @ApiProperty({
+    type: RendezVousJeuneQueryModel,
+    isArray: true
+  })
   rendezVous: RendezVousJeuneQueryModel[]
+
+  @ApiProperty({
+    type: SessionJeuneMiloQueryModel,
+    isArray: true
+  })
+  sessionsMilo: SessionJeuneMiloQueryModel[]
+
   metadata: {
     actionsEnRetard: number
     dateDeDebut: Date
     dateDeFin: Date
   }
-}
-
-export class JeuneHomeEvenementsQueryModel {
-  actions: ActionQueryModel[]
-  rendezVous: RendezVousJeuneQueryModel[]
 }
 
 export class JeuneHomeAgendaPoleEmploiQueryModel {
