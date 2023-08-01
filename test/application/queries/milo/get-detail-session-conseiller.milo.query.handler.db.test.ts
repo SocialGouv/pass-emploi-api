@@ -158,11 +158,37 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
       })
 
       describe('et lui affecte le statut ', () => {
-        it('A_VENIR si elle n’est pas encore passée', async () => {
+        it('CLOTUREE si elle a une de date de clôture', async () => {
           // Given
           const maintenant = DateTime.local(2023)
           sessionRepository.getForConseiller.resolves(
-            success({ ...uneSessionMilo(), fin: maintenant.plus({ days: 1 }) })
+            success({
+              ...uneSessionMilo(),
+              dateCloture: maintenant.minus({ hours: 1 })
+            })
+          )
+
+          // When
+          const result = await getDetailSessionMiloQueryHandler.handle(query)
+
+          // Then
+          expect(isSuccess(result)).to.be.true()
+          if (isSuccess(result)) {
+            expect(result.data.session.statut).to.deep.equal(
+              SessionMilo.Statut.CLOTUREE
+            )
+          }
+        })
+
+        it('A_VENIR si elle n’est pas encore passée et qu’elle n’a pas de date de clôture', async () => {
+          // Given
+          const maintenant = DateTime.local(2023)
+          sessionRepository.getForConseiller.resolves(
+            success({
+              ...uneSessionMilo(),
+              fin: maintenant.plus({ days: 1 }),
+              dateCloture: undefined
+            })
           )
 
           // When
@@ -177,7 +203,7 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
           }
         })
 
-        it('A_CLOTURER si elle est passée mais qu’elle n’a pas de date de clôture', async () => {
+        it('A_CLOTURER si elle est passée et qu’elle n’a pas de date de clôture', async () => {
           // Given
           const maintenant = DateTime.local(2023)
           sessionRepository.getForConseiller.resolves(
@@ -196,29 +222,6 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
           if (isSuccess(result)) {
             expect(result.data.session.statut).to.deep.equal(
               SessionMilo.Statut.A_CLOTURER
-            )
-          }
-        })
-
-        it('CLOTUREE si elle est passée et qu’elle a une de date de clôture', async () => {
-          // Given
-          const maintenant = DateTime.local(2023)
-          sessionRepository.getForConseiller.resolves(
-            success({
-              ...uneSessionMilo(),
-              fin: maintenant.minus({ days: 1 }),
-              dateCloture: maintenant.minus({ hours: 1 })
-            })
-          )
-
-          // When
-          const result = await getDetailSessionMiloQueryHandler.handle(query)
-
-          // Then
-          expect(isSuccess(result)).to.be.true()
-          if (isSuccess(result)) {
-            expect(result.data.session.statut).to.deep.equal(
-              SessionMilo.Statut.CLOTUREE
             )
           }
         })

@@ -76,9 +76,9 @@ export namespace SessionMilo {
     dateFin: DateTime,
     dateCloture?: DateTime
   ): SessionMilo.Statut {
-    if (dateFin > maintenant) return SessionMilo.Statut.A_VENIR
-    return dateCloture
-      ? SessionMilo.Statut.CLOTUREE
+    if (dateCloture) return SessionMilo.Statut.CLOTUREE
+    return maintenant < dateFin
+      ? SessionMilo.Statut.A_VENIR
       : SessionMilo.Statut.A_CLOTURER
   }
 
