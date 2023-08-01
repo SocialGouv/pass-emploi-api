@@ -14,6 +14,7 @@ import {
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { mapSessionToDetailSessionConseillerQueryModel } from '../query-mappers/milo.mappers'
 import { DetailSessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
+import { DateService } from 'src/utils/date-service'
 
 export interface GetDetailSessionConseillerMiloQuery extends Query {
   idSession: string
@@ -32,7 +33,8 @@ export class GetDetailSessionConseillerMiloQueryHandler extends QueryHandler<
     @Inject(SessionMiloRepositoryToken)
     private sessionRepository: SessionMilo.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer,
-    private keycloakClient: KeycloakClient
+    private keycloakClient: KeycloakClient,
+    private dateService: DateService
   ) {
     super('GetDetailSessionMiloQueryHandler')
   }
@@ -59,7 +61,12 @@ export class GetDetailSessionConseillerMiloQueryHandler extends QueryHandler<
     )
     if (isFailure(resultat)) return resultat
 
-    return success(mapSessionToDetailSessionConseillerQueryModel(resultat.data))
+    return success(
+      mapSessionToDetailSessionConseillerQueryModel(
+        resultat.data,
+        this.dateService.now()
+      )
+    )
   }
 
   async authorize(

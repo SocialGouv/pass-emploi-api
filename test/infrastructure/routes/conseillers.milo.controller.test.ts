@@ -23,7 +23,7 @@ import {
   UpdateSessionMiloCommand,
   UpdateSessionMiloCommandHandler
 } from 'src/application/commands/milo/update-session-milo.command.handler'
-import { SessionMilo } from '../../../src/domain/milo/session.milo'
+import { SessionMilo } from 'src/domain/milo/session.milo'
 
 describe('ConseillersMiloController', () => {
   let getSessionsQueryHandler: StubbedClass<GetSessionsConseillerMiloQueryHandler>

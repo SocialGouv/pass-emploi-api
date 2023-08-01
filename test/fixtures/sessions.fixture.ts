@@ -46,7 +46,8 @@ export const unDetailSessionConseillerMiloQueryModel: DetailSessionConseillerMil
       lieu: 'Un-lieu',
       estVisible: false,
       nbPlacesDisponibles: 10,
-      commentaire: 'Un-commentaire'
+      commentaire: 'Un-commentaire',
+      statut: SessionMilo.Statut.A_CLOTURER
     },
     offre: {
       id: '1',

@@ -87,6 +87,9 @@ export class DetailSessionConseillerQueryModel {
 
   @ApiProperty({ required: false })
   commentaire?: string
+
+  @ApiProperty({ enum: SessionMilo.Statut })
+  statut: SessionMilo.Statut
 }
 
 class OffreSessionQueryModel {

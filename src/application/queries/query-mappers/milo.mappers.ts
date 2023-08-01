@@ -140,7 +140,8 @@ export function mapDetailSessionJeuneDtoToQueryModel(
 }
 
 export function mapSessionToDetailSessionConseillerQueryModel(
-  session: SessionMilo
+  session: SessionMilo,
+  maintenant: DateTime
 ): DetailSessionConseillerMiloQueryModel {
   const sessionQueryModel: DetailSessionConseillerQueryModel = {
     id: session.id,
@@ -149,7 +150,12 @@ export function mapSessionToDetailSessionConseillerQueryModel(
     dateHeureFin: session.fin.toUTC().toISO(),
     animateur: session.animateur,
     lieu: session.lieu,
-    estVisible: session.estVisible
+    estVisible: session.estVisible,
+    statut: SessionMilo.calculerStatut(
+      maintenant,
+      session.fin,
+      session.dateCloture
+    )
   }
 
   if (session.dateMaxInscription)
