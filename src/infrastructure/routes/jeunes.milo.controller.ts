@@ -41,7 +41,11 @@ export class JeunesMiloController {
     @AccessToken() accessToken: string
   ): Promise<AccueilJeuneMiloQueryModel> {
     const result = await this.getAccueilQueryHandler.execute(
-      { idJeune, maintenant: queryParams.maintenant, token: accessToken },
+      {
+        idJeune,
+        maintenant: queryParams.maintenant,
+        token: accessToken
+      },
       utilisateur
     )
 
