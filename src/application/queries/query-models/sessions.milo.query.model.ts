@@ -32,6 +32,9 @@ export class SessionConseillerMiloQueryModel {
 
   @ApiProperty()
   type: SessionTypeQueryModel
+
+  @ApiProperty({ enum: SessionMilo.Statut })
+  statut: SessionMilo.Statut
 }
 
 export class SessionJeuneMiloQueryModel {

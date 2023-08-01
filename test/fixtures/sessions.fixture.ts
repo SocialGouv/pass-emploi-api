@@ -19,7 +19,8 @@ export const uneSessionConseillerMiloQueryModel: SessionConseillerMiloQueryModel
     type: {
       code: OffreTypeCode.WORKSHOP,
       label: 'Atelier'
-    }
+    },
+    statut: SessionMilo.Statut.A_CLOTURER
   }
 
 export const uneSessionJeuneMiloQueryModel: SessionJeuneMiloQueryModel = {

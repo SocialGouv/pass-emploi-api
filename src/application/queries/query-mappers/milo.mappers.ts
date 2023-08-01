@@ -68,8 +68,15 @@ export function mapSessionJeuneDtoToQueryModel(
 export function mapSessionConseillerDtoToQueryModel(
   sessionDto: SessionConseillerDetailDto,
   estVisible: boolean,
-  timezone: string
+  timezone: string,
+  maintenant: DateTime,
+  dateCloture?: DateTime
 ): SessionConseillerMiloQueryModel {
+  const dateHeureFin = DateTime.fromFormat(
+    sessionDto.session.dateHeureFin,
+    MILO_DATE_FORMAT,
+    { zone: timezone }
+  ).toUTC()
   return {
     id: sessionDto.session.id.toString(),
     nomSession: sessionDto.session.nom,
@@ -82,14 +89,9 @@ export function mapSessionConseillerDtoToQueryModel(
     )
       .toUTC()
       .toISO(),
-    dateHeureFin: DateTime.fromFormat(
-      sessionDto.session.dateHeureFin,
-      MILO_DATE_FORMAT,
-      { zone: timezone }
-    )
-      .toUTC()
-      .toISO(),
-    type: buildSessionTypeQueryModel(sessionDto.offre.type)
+    dateHeureFin: dateHeureFin.toISO(),
+    type: buildSessionTypeQueryModel(sessionDto.offre.type),
+    statut: SessionMilo.calculerStatut(maintenant, dateHeureFin, dateCloture)
   }
 }
 
