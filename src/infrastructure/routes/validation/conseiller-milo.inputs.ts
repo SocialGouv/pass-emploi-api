@@ -13,6 +13,7 @@ import {
 } from 'class-validator'
 import { Type } from 'class-transformer'
 import { SessionMilo } from '../../../domain/milo/session.milo'
+import Inscription = SessionMilo.Inscription
 
 export class GetSessionsQueryParams {
   @IsOptional()
@@ -62,4 +63,23 @@ export class UpdateSessionMiloPayload {
   @ValidateNested({ each: true })
   @Type(() => InscriptionSessionMiloPayload)
   inscriptions?: InscriptionSessionMiloPayload[]
+}
+
+export class EmargementJeuneSessionMiloPayload {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  idJeune: string
+
+  @ApiProperty()
+  @IsEnum(Inscription.Statut)
+  statut: Inscription.Statut
+}
+
+export class EmargementsSessionMiloPayload {
+  @ApiProperty()
+  @IsArray()
+  @IsNotEmpty()
+  @Type(() => EmargementJeuneSessionMiloPayload)
+  emargements: EmargementJeuneSessionMiloPayload[]
 }

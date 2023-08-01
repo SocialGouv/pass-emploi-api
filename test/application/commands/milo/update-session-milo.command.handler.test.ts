@@ -22,8 +22,8 @@ import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from 'test/utils'
-import { KeycloakClient } from '../../../../src/infrastructure/clients/keycloak-client'
-import { DateService } from '../../../../src/utils/date-service'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { DateService } from 'src/utils/date-service'
 import { uneSessionMilo } from '../../../fixtures/sessions.fixture'
 import Utilisateur = Authentification.Utilisateur
 
@@ -53,7 +53,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
   })
 
   describe('handle', () => {
-    const commandSansInscriptions: UpdateSessionMiloCommand = {
+    const commandSansInscription: UpdateSessionMiloCommand = {
       idSession: 'idSession',
       idConseiller: conseiller.id,
       token: 'token',
@@ -63,15 +63,15 @@ describe('UpdateSessionMiloCommandHandler', () => {
     it('n’autorise pas un conseiller sans structure', async () => {
       // Given
       const conseillerMiloSansStructure = new ConseillerMiloSansStructure(
-        commandSansInscriptions.idConseiller
+        commandSansInscription.idConseiller
       )
       conseillerMiloRepository.get
-        .withArgs(commandSansInscriptions.idConseiller)
+        .withArgs(commandSansInscription.idConseiller)
         .resolves(failure(conseillerMiloSansStructure))
 
       // When
       const result = await updateSessionMiloCommandHandler.handle(
-        commandSansInscriptions
+        commandSansInscription
       )
 
       // Then
@@ -82,15 +82,15 @@ describe('UpdateSessionMiloCommandHandler', () => {
       // Given
       const idpToken = 'idpToken'
       conseillerMiloRepository.get
-        .withArgs(commandSansInscriptions.idConseiller)
+        .withArgs(commandSansInscription.idConseiller)
         .resolves(success(conseiller))
       const erreurHttp = new ErreurHttp('', 404)
       keycloakClient.exchangeTokenConseillerMilo
-        .withArgs(commandSansInscriptions.token)
+        .withArgs(commandSansInscription.token)
         .resolves(idpToken)
       sessionMiloRepository.getForConseiller
         .withArgs(
-          commandSansInscriptions.idSession,
+          commandSansInscription.idSession,
           conseiller.structure,
           idpToken
         )
@@ -98,7 +98,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
 
       // When
       const result = await updateSessionMiloCommandHandler.handle(
-        commandSansInscriptions
+        commandSansInscription
       )
 
       // Then
@@ -110,10 +110,10 @@ describe('UpdateSessionMiloCommandHandler', () => {
       beforeEach(async () => {
         // Given
         conseillerMiloRepository.get
-          .withArgs(commandSansInscriptions.idConseiller)
+          .withArgs(commandSansInscription.idConseiller)
           .resolves(success(conseiller))
         keycloakClient.exchangeTokenConseillerMilo
-          .withArgs(commandSansInscriptions.token)
+          .withArgs(commandSansInscription.token)
           .resolves(idpToken)
         dateService.now.returns(uneDatetime())
         sessionMiloRepository.save.resolves(emptySuccess())
@@ -129,15 +129,14 @@ describe('UpdateSessionMiloCommandHandler', () => {
 
         // When
         const result = await updateSessionMiloCommandHandler.handle(
-          commandSansInscriptions
+          commandSansInscription
         )
 
         // Then
         expect(result).to.deep.equal(emptySuccess())
         expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
           {
-            id: session.id,
-            idStructureMilo: session.idStructureMilo,
+            ...supprimerInscriptions(session),
             estVisible: true,
             dateModification: uneDatetime()
           },
@@ -165,7 +164,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
         })
         sessionMiloRepository.getForConseiller.resolves(success(session))
         const command = {
-          ...commandSansInscriptions,
+          ...commandSansInscription,
           inscriptions: [
             {
               idJeune: 'id-hermione',
@@ -185,8 +184,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
         expect(result).to.deep.equal(emptySuccess())
         expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
           {
-            id: session.id,
-            idStructureMilo: session.idStructureMilo,
+            ...supprimerInscriptions(session),
             estVisible: true,
             dateModification: uneDatetime()
           },
@@ -214,7 +212,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
         })
         sessionMiloRepository.getForConseiller.resolves(success(session))
         const command = {
-          ...commandSansInscriptions,
+          ...commandSansInscription,
           inscriptions: [
             {
               idJeune: 'id-hermione',
@@ -234,8 +232,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
         expect(result).to.deep.equal(emptySuccess())
         expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
           {
-            id: session.id,
-            idStructureMilo: session.idStructureMilo,
+            ...supprimerInscriptions(session),
             estVisible: true,
             dateModification: uneDatetime()
           },
@@ -289,7 +286,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
         })
         sessionMiloRepository.getForConseiller.resolves(success(session))
         const command = {
-          ...commandSansInscriptions,
+          ...commandSansInscription,
           inscriptions: [
             {
               idJeune: 'id-hermione',
@@ -322,8 +319,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
         expect(result).to.deep.equal(emptySuccess())
         expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
           {
-            id: session.id,
-            idStructureMilo: session.idStructureMilo,
+            ...supprimerInscriptions(session),
             estVisible: true,
             dateModification: uneDatetime()
           },
@@ -389,7 +385,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
         })
         sessionMiloRepository.getForConseiller.resolves(success(session))
         const command = {
-          ...commandSansInscriptions,
+          ...commandSansInscription,
           inscriptions: [
             {
               idJeune: 'id-hermione',
@@ -422,8 +418,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
         expect(result).to.deep.equal(emptySuccess())
         expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
           {
-            id: session.id,
-            idStructureMilo: session.idStructureMilo,
+            ...supprimerInscriptions(session),
             estVisible: true,
             dateModification: uneDatetime()
           },
@@ -494,7 +489,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
 
         // When
         const commandAvecTropDInscrits = {
-          ...commandSansInscriptions,
+          ...commandSansInscription,
           inscriptions: [
             {
               idJeune: 'id-ron',
@@ -550,3 +545,10 @@ describe('UpdateSessionMiloCommandHandler', () => {
     })
   })
 })
+
+function supprimerInscriptions(
+  session: SessionMilo
+): Omit<SessionMilo, 'inscriptions'> {
+  const { inscriptions: _inscriptions, ...sessionSansInscriptions } = session
+  return sessionSansInscriptions
+}

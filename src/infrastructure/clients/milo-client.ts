@@ -200,12 +200,17 @@ export class MiloClient {
       idInstanceSession: string
       statut: string
       commentaire?: string
+      dateFinReelle?: string
     }>
   ): Promise<Result> {
     for (const modification of modifications) {
       const result = await this.put(
         `dossiers/${modification.idDossier}/instances-session/${modification.idInstanceSession}`,
-        { statut: modification.statut, commentaire: modification.commentaire },
+        {
+          statut: modification.statut,
+          commentaire: modification.commentaire,
+          dateFinReelle: modification.dateFinReelle
+        },
         this.apiKeyInstanceSessionEcritureConseiller,
         idpToken
       )
