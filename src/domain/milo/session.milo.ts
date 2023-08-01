@@ -71,6 +71,17 @@ export namespace SessionMilo {
     return success(inscriptionsATraiter)
   }
 
+  export function calculerStatut(
+    maintenant: DateTime,
+    dateFin: DateTime,
+    dateCloture?: DateTime
+  ): SessionMilo.Statut {
+    if (dateFin > maintenant) return SessionMilo.Statut.A_VENIR
+    return dateCloture
+      ? SessionMilo.Statut.CLOTUREE
+      : SessionMilo.Statut.A_CLOTURER
+  }
+
   export interface Repository {
     getForConseiller(
       idSession: string,
@@ -88,6 +99,12 @@ export namespace SessionMilo {
       inscriptionsATraiter: InscriptionsATraiter,
       tokenMilo: string
     ): Promise<Result>
+  }
+
+  export enum Statut {
+    A_VENIR = 'A_VENIR',
+    A_CLOTURER = 'A_CLOTURER',
+    CLOTUREE = 'CLOTUREE'
   }
 
   export type Offre = {
