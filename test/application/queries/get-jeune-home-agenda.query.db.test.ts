@@ -77,7 +77,8 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
     const homeQuery = {
       idJeune,
       maintenant: aujourdhuiDimanche,
-      token
+      token,
+      structure: Core.Structure.MILO
     }
     const lundiDernierString = '2022-08-08T00:00:00Z'
     const dimancheEnHuitString = '2022-08-22T00:00:00Z'
@@ -344,7 +345,8 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
     const query = {
       idJeune: jeune.id,
       maintenant: aujourdhuiDimanche,
-      token: 'token'
+      token: 'token',
+      structure: Core.Structure.MILO
     }
 
     describe('quand c’est un jeune', () => {

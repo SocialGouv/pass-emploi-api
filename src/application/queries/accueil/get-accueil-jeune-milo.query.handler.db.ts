@@ -15,7 +15,7 @@ import { QueryHandler } from 'src/building-blocks/types/query-handler'
 import { failure, Result, success } from 'src/building-blocks/types/result'
 import { Action } from 'src/domain/action/action'
 import { Authentification } from 'src/domain/authentification'
-import { estMiloPassEmploi } from 'src/domain/core'
+import { estMilo, estMiloPassEmploi } from 'src/domain/core'
 
 import { TYPES_ANIMATIONS_COLLECTIVES } from 'src/domain/rendez-vous/rendez-vous'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
@@ -53,7 +53,8 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     super('GetAccueilJeuneMiloQueryHandler')
   }
   async handle(
-    query: GetAccueilJeuneMiloQuery
+    query: GetAccueilJeuneMiloQuery,
+    utilisateur: Authentification.Utilisateur
   ): Promise<Result<AccueilJeuneMiloQueryModel>> {
     const maintenant = DateTime.fromISO(query.maintenant, {
       setZone: true
@@ -68,9 +69,6 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     if (!jeuneSqlModel) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
-    if (!jeuneSqlModel.idPartenaire) {
-      return failure(new JeuneMiloSansIdDossier(query.idJeune))
-    }
 
     const [
       rendezVousSqlModelsCount,
@@ -80,8 +78,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       evenementSqlModelAVenir,
       recherchesQueryModels,
       favorisQueryModels,
-      campagneQueryModel,
-      sessionsQueryModels
+      campagneQueryModel
     ] = await Promise.all([
       this.countRendezVousSemaine(maintenant, dateFinDeSemaine, idJeune),
       this.prochainRendezVous(maintenant, idJeune),
@@ -96,15 +93,24 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
         idJeune
       }),
       this.getFavorisAccueilQueryGetter.handle({ idJeune }),
-      this.getCampagneQueryGetter.handle({ idJeune }),
-      this.getSessionsQueryGetter.handle(
+      this.getCampagneQueryGetter.handle({ idJeune })
+    ])
+
+    let sessions
+    if (estMilo(utilisateur.structure)) {
+      if (!jeuneSqlModel.idPartenaire) {
+        return failure(new JeuneMiloSansIdDossier(query.idJeune))
+      }
+      const sessionsQueryModels = await this.getSessionsQueryGetter.handle(
         jeuneSqlModel.idPartenaire,
         query.token,
         { debut: maintenant, fin: dateFinDeSemaine }
       )
-    ])
 
-    const sessions = sessionsAvecInscriptionTriees(sessionsQueryModels)
+      sessions = sessionsAvecInscriptionTriees(sessionsQueryModels)
+    } else {
+      sessions = sessionsAvecInscriptionTriees(success([]))
+    }
 
     return success({
       cetteSemaine: {

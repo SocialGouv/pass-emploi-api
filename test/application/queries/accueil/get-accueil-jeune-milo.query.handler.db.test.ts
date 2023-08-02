@@ -1,7 +1,10 @@
 import { DateTime } from 'luxon'
 import { describe } from 'mocha'
 import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
-import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/accueil/get-accueil-jeune-milo.query.handler.db'
+import {
+  GetAccueilJeuneMiloQuery,
+  GetAccueilJeuneMiloQueryHandler
+} from 'src/application/queries/accueil/get-accueil-jeune-milo.query.handler.db'
 import { GetFavorisAccueilQueryGetter } from 'src/application/queries/query-getters/accueil/get-favoris.query.getter.db'
 import { GetRecherchesSauvegardeesQueryGetter } from 'src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
 import { GetCampagneQueryGetter } from 'src/application/queries/query-getters/get-campagne.query.getter'
@@ -19,7 +22,7 @@ import {
   success
 } from 'src/building-blocks/types/result'
 import { Action } from 'src/domain/action/action'
-import { estMiloPassEmploi } from 'src/domain/core'
+import { Core, estMiloPassEmploi } from 'src/domain/core'
 import { SessionMilo } from 'src/domain/milo/session.milo'
 import { CodeTypeRendezVous } from 'src/domain/rendez-vous/rendez-vous'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
@@ -73,13 +76,14 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
 
   describe('handle', () => {
     let result: Result<AccueilJeuneMiloQueryModel>
-    let accueilQuery: { idJeune: string; maintenant: string; token: string }
+    let accueilQuery: GetAccueilJeuneMiloQuery
 
     const token = 'token'
     const maintenantString = '2023-03-27T03:24:00'
     const dateFinDeSemaineString = '2023-04-02T23:59:59.999'
     const maintenant = DateTime.fromISO(maintenantString)
     const campagneQueryModel = uneCampagneQueryModel()
+    const utilisateurJeune = unUtilisateurJeune()
 
     beforeEach(async () => {
       await getDatabase().cleanPG()
@@ -119,7 +123,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
         await JeuneSqlModel.destroy({ where: { id: accueilQuery.idJeune } })
 
         // When
-        result = await handler.handle(accueilQuery)
+        result = await handler.handle(accueilQuery, utilisateurJeune)
 
         // Then
         expect(result).to.deep.equal(
@@ -139,7 +143,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
         )
 
         // When
-        result = await handler.handle(accueilQuery)
+        result = await handler.handle(accueilQuery, utilisateurJeune)
 
         // Then
         expect(result).to.deep.equal(
@@ -190,7 +194,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
             )
 
           // When
-          result = await handler.handle(accueilQuery)
+          result = await handler.handle(accueilQuery, utilisateurJeune)
 
           // Then
           expect(
@@ -212,7 +216,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
             .resolves(success([sessionSansInscriptionCetteSemaine]))
 
           // When
-          result = await handler.handle(accueilQuery)
+          result = await handler.handle(accueilQuery, utilisateurJeune)
 
           // Then
           expect(
@@ -234,7 +238,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
             .resolves(success([sessionAvecInscriptionCetteSemaine]))
 
           // When
-          result = await handler.handle(accueilQuery)
+          result = await handler.handle(accueilQuery, utilisateurJeune)
 
           // Then
           expect(
@@ -244,7 +248,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       })
       it('compte les actions en retard', async () => {
         // When
-        result = await handler.handle(accueilQuery)
+        result = await handler.handle(accueilQuery, utilisateurJeune)
 
         // Then
         expect(
@@ -254,7 +258,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       })
       it('compte les actions à réaliser', async () => {
         // When
-        result = await handler.handle(accueilQuery)
+        result = await handler.handle(accueilQuery, utilisateurJeune)
 
         // Then
         expect(
@@ -284,7 +288,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
 
       it('retourne le prochain rendez-vous ', async () => {
         // When
-        result = await handler.handle(accueilQuery)
+        result = await handler.handle(accueilQuery, utilisateurJeune)
 
         // Then
         expect(
@@ -328,7 +332,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
           )
 
         // When
-        result = await handler.handle(accueilQuery)
+        result = await handler.handle(accueilQuery, utilisateurJeune)
 
         // Then
         expect(
@@ -346,7 +350,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
           .resolves(success([]))
 
         // When
-        result = await handler.handle(accueilQuery)
+        result = await handler.handle(accueilQuery, utilisateurJeune)
 
         // Then
         expect(
@@ -410,7 +414,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
 
       it('retourne les 3 prochains événements à venir', async () => {
         // When
-        result = await handler.handle(accueilQuery)
+        result = await handler.handle(accueilQuery, utilisateurJeune)
 
         // Then
         expect(isSuccess(result) && result.data.evenementsAVenir).to.deep.equal(
@@ -455,7 +459,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       alertesQueryGetter.handle.resolves([])
 
       // When
-      result = await handler.handle(accueilQuery)
+      result = await handler.handle(accueilQuery, utilisateurJeune)
 
       // Then
       expect(
@@ -468,7 +472,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       favorisAccueilQueryGetter.handle.resolves([])
 
       // When
-      result = await handler.handle(accueilQuery)
+      result = await handler.handle(accueilQuery, utilisateurJeune)
 
       // Then
       expect(
@@ -486,7 +490,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
         .resolves(campagneQueryModel)
 
       // When
-      result = await handler.handle(accueilQuery)
+      result = await handler.handle(accueilQuery, utilisateurJeune)
 
       // Then
       expect(
@@ -505,7 +509,8 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       const query = {
         idJeune: 'idJeune',
         maintenant: '2023-12-12',
-        token: 'token'
+        token: 'token',
+        structure: Core.Structure.MILO
       }
 
       // When
