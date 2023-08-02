@@ -232,7 +232,11 @@ export class JeunesController {
     @AccessToken() accessToken: string
   ): Promise<JeuneHomeAgendaQueryModel> {
     const result = await this.getJeuneHomeSuiviQueryHandler.execute(
-      { idJeune, maintenant: queryParams.maintenant, token: accessToken },
+      {
+        idJeune,
+        maintenant: queryParams.maintenant,
+        token: accessToken
+      },
       utilisateur
     )
 

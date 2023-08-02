@@ -27,6 +27,7 @@ import { fromSqlToRendezVousJeuneQueryModel } from './query-mappers/rendez-vous-
 import { ActionQueryModel } from './query-models/actions.query-model'
 import { JeuneHomeAgendaQueryModel } from './query-models/home-jeune-suivi.query-model'
 import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
+import { estMilo } from '../../domain/core'
 
 export interface GetJeuneHomeAgendaQuery extends Query {
   idJeune: string
@@ -58,35 +59,40 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
     if (!jeuneSqlModel) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
-    if (!jeuneSqlModel.idPartenaire) {
-      return failure(new JeuneMiloSansIdDossier(query.idJeune))
-    }
 
     const { lundiDernier, dimancheEnHuit } =
       this.recupererLesDatesEntreLundiDernierEtDeuxSemainesPlusTard(
         query.maintenant
       )
-    const [actions, rendezVous, actionsEnRetard, sessionsQueryModels] =
-      await Promise.all([
-        this.recupererLesActions(query, lundiDernier, dimancheEnHuit),
-        this.recupererLesRendezVous(
-          query,
-          lundiDernier,
-          dimancheEnHuit,
-          utilisateur.type
-        ),
-        this.recupererLeNombreDactionsEnRetard(query),
-        this.getSessionsQueryGetter.handle(
-          jeuneSqlModel.idPartenaire,
-          query.token,
-          {
-            debut: lundiDernier,
-            fin: dimancheEnHuit
-          }
-        )
-      ])
+    const [actions, rendezVous, actionsEnRetard] = await Promise.all([
+      this.recupererLesActions(query, lundiDernier, dimancheEnHuit),
+      this.recupererLesRendezVous(
+        query,
+        lundiDernier,
+        dimancheEnHuit,
+        utilisateur.type
+      ),
+      this.recupererLeNombreDactionsEnRetard(query)
+    ])
 
-    const sessionsMilo = sessionsAvecInscriptionTriees(sessionsQueryModels)
+    let sessionsMilo
+    if (estMilo(utilisateur.structure)) {
+      if (!jeuneSqlModel.idPartenaire) {
+        return failure(new JeuneMiloSansIdDossier(query.idJeune))
+      }
+      const sessionsQueryModels = await this.getSessionsQueryGetter.handle(
+        jeuneSqlModel.idPartenaire,
+        query.token,
+        {
+          debut: lundiDernier,
+          fin: dimancheEnHuit
+        }
+      )
+
+      sessionsMilo = sessionsAvecInscriptionTriees(sessionsQueryModels)
+    } else {
+      sessionsMilo = sessionsAvecInscriptionTriees(success([]))
+    }
 
     return success({
       actions,
