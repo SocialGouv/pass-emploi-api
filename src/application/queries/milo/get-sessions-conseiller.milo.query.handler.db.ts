@@ -13,6 +13,7 @@ import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { mapSessionConseillerDtoToQueryModel } from '../query-mappers/milo.mappers'
 import { SessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
+import { DateService } from 'src/utils/date-service'
 
 export interface GetSessionsConseillerMiloQuery extends Query {
   idConseiller: string
@@ -31,7 +32,8 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
     @Inject(ConseillerMiloRepositoryToken)
     private conseillerMiloRepository: Conseiller.Milo.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer,
-    private keycloakClient: KeycloakClient
+    private keycloakClient: KeycloakClient,
+    private dateService: DateService
   ) {
     super('GetSessionsConseillerMiloQueryHandler')
   }
@@ -71,10 +73,13 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
         const sessionSqlModel = sessionsSqlModels.find(
           ({ id }) => id === sessionMilo.session.id.toString()
         )
+        const dateCloture = sessionSqlModel?.dateCloture
         return mapSessionConseillerDtoToQueryModel(
           sessionMilo,
           sessionSqlModel?.estVisible ?? false,
-          timezoneStructure
+          timezoneStructure,
+          this.dateService.now(),
+          dateCloture ? DateTime.fromJSDate(dateCloture) : undefined
         )
       }
     )

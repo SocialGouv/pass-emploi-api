@@ -8,9 +8,9 @@ import {
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
 import {
-  Result,
   failure,
   isFailure,
+  Result,
   success
 } from '../../building-blocks/types/result'
 import {
