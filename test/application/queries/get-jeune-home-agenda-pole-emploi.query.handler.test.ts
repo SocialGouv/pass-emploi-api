@@ -26,6 +26,7 @@ import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
 import { unRendezVousQueryModel } from '../../fixtures/query-models/rendez-vous.query-model.fixtures'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
 
 describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
   let handler: GetJeuneHomeAgendaPoleEmploiQueryHandler
@@ -74,16 +75,18 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
       dateFin: maintenant.plus({ weeks: 2, day: 1 }).toISO()
     })
 
-    const unRendezVousHier = unRendezVousQueryModel({
-      date: maintenant.minus({ day: 1 }).toJSDate()
+    const unRendezVousDeUnJourAvantLundiPasse = unRendezVousQueryModel({
+      date: maintenant.startOf('week').minus({ day: 1 }).toJSDate()
+    })
+    const unRendezVousDeLundiPasse = unRendezVousQueryModel({
+      date: maintenant.startOf('week').toJSDate()
     })
 
-    const unRendezVousAujourdhui = unRendezVousQueryModel({
-      date: maintenant.toJSDate()
+    const unRendezVousDeDimancheEnHuit = unRendezVousQueryModel({
+      date: maintenant.endOf('week').plus({ week: 1 }).toJSDate()
     })
-
-    const unRendezVousDansDeuxSemainesPlusUnJour = unRendezVousQueryModel({
-      date: maintenant.plus({ weeks: 2, day: 1 }).toJSDate()
+    const unRendezVousDeUnJourApresDimancheEnHuit = unRendezVousQueryModel({
+      date: maintenant.endOf('week').plus({ week: 1, day: 1 }).toJSDate()
     })
 
     let result: Result<Cached<JeuneHomeAgendaPoleEmploiQueryModel>>
@@ -118,14 +121,16 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
           getRendezVousJeunePoleEmploiQueryGetter.handle
             .withArgs({
               ...query,
-              idpToken
+              idpToken,
+              periode: RendezVous.Periode.PASSES
             })
             .resolves(
               success({
                 queryModel: [
-                  unRendezVousHier,
-                  unRendezVousAujourdhui,
-                  unRendezVousDansDeuxSemainesPlusUnJour
+                  unRendezVousDeUnJourAvantLundiPasse,
+                  unRendezVousDeLundiPasse,
+                  unRendezVousDeDimancheEnHuit,
+                  unRendezVousDeUnJourApresDimancheEnHuit
                 ]
               })
             )
@@ -143,11 +148,14 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
           ])
         })
 
-        it('retourne des rendez vous filtrées entre maintenant et dans deux semaines', () => {
+        it('retourne des rendez vous filtrées entre lundi et dimanche dans deux semaines', () => {
           // Then
           expect(
             isSuccess(result) && result.data.queryModel.rendezVous
-          ).to.deep.equal([unRendezVousAujourdhui])
+          ).to.deep.equal([
+            unRendezVousDeLundiPasse,
+            unRendezVousDeDimancheEnHuit
+          ])
         })
 
         it('retourne des metadata', () => {
@@ -155,8 +163,8 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
           expect(
             isSuccess(result) && result.data.queryModel.metadata
           ).to.deep.equal({
-            dateDeDebut: maintenant.toJSDate(),
-            dateDeFin: dansDeuxSemaines.toJSDate(),
+            dateDeDebut: maintenant.startOf('week').toJSDate(),
+            dateDeFin: maintenant.endOf('week').plus({ week: 1 }).toJSDate(),
             demarchesEnRetard: 0
           })
         })

@@ -18,6 +18,7 @@ import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from './query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { JeuneHomeAgendaPoleEmploiQueryModel } from './query-models/home-jeune-suivi.query-model'
+import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
 
 export interface GetJeuneHomeAgendaPoleEmploiQuery extends Query {
   idJeune: string
@@ -54,6 +55,7 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
     )
 
     const dansDeuxSemaines = query.maintenant.plus({ weeks: 2 })
+    const dimancheEnHuit = query.maintenant.endOf('week').plus({ week: 1 })
 
     const [resultDemarches, resultRendezVous] = await Promise.all([
       this.getDemarchesQueryGetter.handle({
@@ -63,7 +65,8 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
       }),
       this.getRendezVousJeunePoleEmploiQueryGetter.handle({
         ...query,
-        idpToken
+        idpToken,
+        periode: RendezVous.Periode.PASSES
       })
     ])
 
@@ -82,8 +85,8 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
     )
     const rendezVous = resultRendezVous.data.queryModel.filter(
       unRendezVous =>
-        unRendezVous.date >= query.maintenant.toJSDate() &&
-        unRendezVous.date <= dansDeuxSemaines.toJSDate()
+        unRendezVous.date >= query.maintenant.startOf('week').toJSDate() &&
+        unRendezVous.date <= dimancheEnHuit.toJSDate()
     )
     const nombreDeDemarchesEnRetard = resultDemarches.data.queryModel.filter(
       demarche =>
@@ -97,8 +100,8 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
         demarches,
         rendezVous,
         metadata: {
-          dateDeDebut: query.maintenant.toJSDate(),
-          dateDeFin: dansDeuxSemaines.toJSDate(),
+          dateDeDebut: query.maintenant.startOf('week').toJSDate(),
+          dateDeFin: dimancheEnHuit.toJSDate(),
           demarchesEnRetard: nombreDeDemarchesEnRetard
         }
       },
