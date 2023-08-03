@@ -17,12 +17,12 @@ import {
 } from '../../../fixtures/authentification.fixture'
 import { enleverLesUndefined, expect, StubbedClass } from '../../../utils'
 import { getApplicationWithStubbedDependencies } from '../../../utils/module-for-testing'
-import { JeuneHomeAgendaPoleEmploiQueryModel } from '../../../../src/application/queries/query-models/home-jeune-suivi.query-model'
+import { SuiviCetteSemainePoleEmploiQueryModel } from '../../../../src/application/queries/query-models/home-jeune-suivi.query-model'
 import { uneDemarcheQueryModel } from '../../../fixtures/query-models/demarche.query-model.fixtures'
 import { DateTime } from 'luxon'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../../utils/ensure-user-authentication-fails-if-invalid'
 import { JwtService } from '../../../../src/infrastructure/auth/jwt.service'
-import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../../../src/application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
+import { GetSuiviCetteSemainePoleEmploiQueryHandler } from '../../../../src/application/queries/get-suivi-cette-semaine-pole-emploi.query.handler'
 import { uneDatetime } from '../../../fixtures/date.fixture'
 import { GetJeuneHomeDemarchesQueryHandler } from '../../../../src/application/queries/get-jeune-home-demarches.query.handler'
 import { RendezVousJeuneQueryModel } from '../../../../src/application/queries/query-models/rendez-vous.query-model'
@@ -34,7 +34,7 @@ import { JeuneHomeDemarcheQueryModel } from '../../../../src/application/queries
 
 describe('JeunesController v2', () => {
   let getActionsByJeuneQueryHandler: StubbedClass<GetActionsJeuneQueryHandler>
-  let getJeuneHomeAgendaPoleEmploiQueryHandler: StubbedClass<GetJeuneHomeAgendaPoleEmploiQueryHandler>
+  let getJeuneHomeAgendaPoleEmploiQueryHandler: StubbedClass<GetSuiviCetteSemainePoleEmploiQueryHandler>
   let getJeuneHomeDemarchesQueryHandler: StubbedClass<GetJeuneHomeDemarchesQueryHandler>
   let getRendezVousJeunePoleEmploiQueryHandler: StubbedClass<GetRendezVousJeunePoleEmploiQueryHandler>
   let getRendezVousJeuneQueryHandler: StubbedClass<GetRendezVousJeuneQueryHandler>
@@ -45,7 +45,7 @@ describe('JeunesController v2', () => {
     app = await getApplicationWithStubbedDependencies()
     getActionsByJeuneQueryHandler = app.get(GetActionsJeuneQueryHandler)
     getJeuneHomeAgendaPoleEmploiQueryHandler = app.get(
-      GetJeuneHomeAgendaPoleEmploiQueryHandler
+      GetSuiviCetteSemainePoleEmploiQueryHandler
     )
     getJeuneHomeDemarchesQueryHandler = app.get(
       GetJeuneHomeDemarchesQueryHandler
@@ -188,7 +188,7 @@ describe('JeunesController v2', () => {
   describe('GET /v2/jeunes/:idJeune/home/agenda/pole-emploi', () => {
     const idJeune = '1'
     const maintenant = '2022-08-17T12:00:30+02:00'
-    const queryModel: JeuneHomeAgendaPoleEmploiQueryModel = {
+    const queryModel: SuiviCetteSemainePoleEmploiQueryModel = {
       demarches: [
         enleverLesUndefined(uneDemarcheQueryModel()),
         enleverLesUndefined(uneDemarcheQueryModel())
@@ -203,7 +203,7 @@ describe('JeunesController v2', () => {
     it('retourne la home agenda du jeune quand tout se passe bien', async () => {
       // Given
       jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
-      const data: Cached<JeuneHomeAgendaPoleEmploiQueryModel> = {
+      const data: Cached<SuiviCetteSemainePoleEmploiQueryModel> = {
         queryModel,
         dateDuCache: uneDatetime()
       }

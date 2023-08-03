@@ -10,16 +10,16 @@ import { IdService } from 'src/utils/id-service'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import {
-  GetJeuneHomeAgendaPoleEmploiQuery,
-  GetJeuneHomeAgendaPoleEmploiQueryHandler
-} from '../../../src/application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
+  GetSuiviCetteSemainePoleEmploiQuery,
+  GetSuiviCetteSemainePoleEmploiQueryHandler
+} from '../../../src/application/queries/get-suivi-cette-semaine-pole-emploi.query.handler'
 import { GetDemarchesQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { success } from '../../../src/building-blocks/types/result'
 
-describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
-  let handler: GetJeuneHomeAgendaPoleEmploiQueryHandler
+describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
+  let handler: GetSuiviCetteSemainePoleEmploiQueryHandler
 
   let sandbox: SinonSandbox
   let jeunesRepository: StubbedType<Jeune.Repository>
@@ -44,7 +44,7 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
     poleEmploiPartenaireClient.getDemarches.resolves(success([]))
 
     poleEmploiPartenaireClient.getPrestations.resolves(success([]))
-    poleEmploiPartenaireClient.getRendezVous.resolves(success([]))
+    poleEmploiPartenaireClient.getRendezVousPasses.resolves(success([]))
 
     dateService = stubClass(DateService)
     dateService.now.returns(maintenant)
@@ -71,7 +71,7 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
         keycloakClient
       )
 
-    handler = new GetJeuneHomeAgendaPoleEmploiQueryHandler(
+    handler = new GetSuiviCetteSemainePoleEmploiQueryHandler(
       jeunesRepository,
       getDemarchesQueryGetter,
       getRendezVousJeunePoleEmploiQueryGetter,
@@ -86,7 +86,7 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
     it('récupère le token uniquement 1 fois pour les 2 appels à pole-emploi', async () => {
       // Given
       const maintenant = DateTime.fromISO('2020-04-06T12:00:00.000Z')
-      const query: GetJeuneHomeAgendaPoleEmploiQuery = {
+      const query: GetSuiviCetteSemainePoleEmploiQuery = {
         idJeune: 'idJeune',
         maintenant: maintenant,
         accessToken: 'accessToken'

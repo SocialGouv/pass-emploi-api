@@ -231,7 +231,7 @@ import { JeunePoleEmploiSqlRepository } from './infrastructure/repositories/jeun
 import { GetTypesQualificationsQueryHandler } from './application/queries/action/get-types-qualifications.query.handler'
 import { ActionMiloHttpRepository } from './infrastructure/repositories/action/action-milo-http-sql.repository'
 import { QualifierActionCommandHandler } from './application/commands/action/qualifier-action.command.handler'
-import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from './application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
+import { GetSuiviCetteSemainePoleEmploiQueryHandler } from './application/queries/get-suivi-cette-semaine-pole-emploi.query.handler'
 import { GetDemarchesQueryGetter } from './application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRecherchesSauvegardeesQueryGetter } from './application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from './application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
@@ -694,7 +694,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetRendezVousConseillerPaginesQueryHandler,
     GetTypesQualificationsQueryHandler,
     QualifierActionCommandHandler,
-    GetJeuneHomeAgendaPoleEmploiQueryHandler,
+    GetSuiviCetteSemainePoleEmploiQueryHandler,
     GetDemarchesQueryGetter,
     GetRecherchesSauvegardeesQueryGetter,
     GetRendezVousJeunePoleEmploiQueryGetter,

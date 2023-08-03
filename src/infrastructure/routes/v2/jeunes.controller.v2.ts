@@ -12,7 +12,7 @@ import {
   GetActionsJeuneQuery,
   GetActionsJeuneQueryHandler
 } from '../../../application/queries/action/get-actions-jeune.query.handler.db'
-import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../../application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
+import { GetSuiviCetteSemainePoleEmploiQueryHandler } from '../../../application/queries/get-suivi-cette-semaine-pole-emploi.query.handler'
 import { GetJeuneHomeDemarchesQueryHandler } from '../../../application/queries/get-jeune-home-demarches.query.handler'
 import { ListeActionsV2QueryModel } from '../../../application/queries/query-models/actions.query-model'
 import { JeuneHomeAgendaPoleEmploiQueryModelV2 } from '../../../application/queries/query-models/home-jeune-suivi.query-model'
@@ -43,7 +43,7 @@ export class JeunesControllerV2 {
     private readonly getRendezVousJeuneQueryHandler: GetRendezVousJeuneQueryHandler,
     private readonly getJeuneHomeDemarchesQueryHandler: GetJeuneHomeDemarchesQueryHandler,
     private readonly getRendezVousJeunePoleEmploiQueryHandler: GetRendezVousJeunePoleEmploiQueryHandler,
-    private readonly getJeuneHomeAgendaPoleEmploiQueryHandler: GetJeuneHomeAgendaPoleEmploiQueryHandler
+    private readonly getJeuneHomeAgendaPoleEmploiQueryHandler: GetSuiviCetteSemainePoleEmploiQueryHandler
   ) {}
 
   @Get(':idJeune/actions')

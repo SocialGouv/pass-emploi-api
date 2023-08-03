@@ -86,11 +86,11 @@ import {
   UpdateJeunePreferencesPayload
 } from './validation/jeunes.inputs'
 import {
-  JeuneHomeAgendaPoleEmploiQueryModel,
+  SuiviCetteSemainePoleEmploiQueryModel,
   JeuneHomeAgendaQueryModel
 } from 'src/application/queries/query-models/home-jeune-suivi.query-model'
 import { GetJeuneHomeAgendaQueryHandler } from 'src/application/queries/get-jeune-home-agenda.query.db'
-import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from 'src/application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
+import { GetSuiviCetteSemainePoleEmploiQueryHandler } from 'src/application/queries/get-suivi-cette-semaine-pole-emploi.query.handler'
 import { DateTime } from 'luxon'
 import { toDemarcheQueryModel } from 'src/application/queries/query-mappers/demarche.mappers'
 import {
@@ -110,7 +110,7 @@ export class JeunesController {
     private readonly updateJeuneConfigurationApplicationCommandHandler: UpdateJeuneConfigurationApplicationCommandHandler,
     private readonly getJeuneHomeActionsQueryHandler: GetJeuneHomeActionsQueryHandler,
     private readonly getJeuneHomeSuiviQueryHandler: GetJeuneHomeAgendaQueryHandler,
-    private readonly getJeuneHomeAgendaPoleEmploiQueryHandler: GetJeuneHomeAgendaPoleEmploiQueryHandler,
+    private readonly getJeuneHomeAgendaPoleEmploiQueryHandler: GetSuiviCetteSemainePoleEmploiQueryHandler,
     private readonly getJeuneHomeDemarchesQueryHandler: GetJeuneHomeDemarchesQueryHandler,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly getRendezVousJeuneQueryHandler: GetRendezVousJeuneQueryHandler,
@@ -245,7 +245,7 @@ export class JeunesController {
 
   @Get(':idJeune/home/agenda/pole-emploi')
   @ApiResponse({
-    type: JeuneHomeAgendaPoleEmploiQueryModel
+    type: SuiviCetteSemainePoleEmploiQueryModel
   })
   @ApiOperation({
     deprecated: true,
@@ -256,7 +256,7 @@ export class JeunesController {
     @Query() queryParams: MaintenantQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @AccessToken() accessToken: string
-  ): Promise<JeuneHomeAgendaPoleEmploiQueryModel> {
+  ): Promise<SuiviCetteSemainePoleEmploiQueryModel> {
     const maintenant = DateTime.fromISO(queryParams.maintenant, {
       setZone: true
     })

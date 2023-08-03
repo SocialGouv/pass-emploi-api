@@ -8,7 +8,7 @@ import {
   StubbedClass,
   stubClass
 } from '../utils'
-import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../src/application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
+import { GetSuiviCetteSemainePoleEmploiQueryHandler } from '../../src/application/queries/get-suivi-cette-semaine-pole-emploi.query.handler'
 import {
   unHeaderAuthorization,
   unJwtPayloadValide
@@ -32,7 +32,7 @@ import {
 import { DateTime } from 'luxon'
 
 describe('JeunesControllerE2E', () => {
-  let getJeuneHomeAgendaPoleEmploiQueryHandler: GetJeuneHomeAgendaPoleEmploiQueryHandler
+  let getJeuneHomeAgendaPoleEmploiQueryHandler: GetSuiviCetteSemainePoleEmploiQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let keycloakClient: StubbedClass<KeycloakClient>
   let jeuneRepository: StubbedType<Jeune.Repository>
@@ -74,7 +74,7 @@ describe('JeunesControllerE2E', () => {
       )
 
     getJeuneHomeAgendaPoleEmploiQueryHandler =
-      new GetJeuneHomeAgendaPoleEmploiQueryHandler(
+      new GetSuiviCetteSemainePoleEmploiQueryHandler(
         jeuneRepository,
         getDemarchesQueryGetter,
         getRendezVousJeunePoleEmploiQueryGetter,
@@ -83,7 +83,7 @@ describe('JeunesControllerE2E', () => {
       )
 
     const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(GetJeuneHomeAgendaPoleEmploiQueryHandler)
+      .overrideProvider(GetSuiviCetteSemainePoleEmploiQueryHandler)
       .useValue(getJeuneHomeAgendaPoleEmploiQueryHandler)
       .overrideProvider(JwtService)
       .useValue(jwtService)
@@ -107,7 +107,7 @@ describe('JeunesControllerE2E', () => {
   describe('GET /jeunes/:idJeune/home/agenda/pole-emploi', () => {
     const jeune = unJeune()
 
-    it('retourne la home agenda du jeune', async () => {
+    it('retourne la page Mon suivi > Cette semaine du jeune', async () => {
       // Given
       jeuneAuthorizer.autoriserLeJeune.resolves(emptySuccess())
       keycloakClient.exchangeTokenJeune.resolves('idpToken')
@@ -116,7 +116,7 @@ describe('JeunesControllerE2E', () => {
       poleEmploiPartenaireClient.getDemarches.resolves(
         success(demarchesPoleEmploi)
       )
-      poleEmploiPartenaireClient.getRendezVous.resolves(
+      poleEmploiPartenaireClient.getRendezVousPasses.resolves(
         success(rendezVousPoleEmploi)
       )
       poleEmploiPartenaireClient.getPrestations.resolves(success([]))
