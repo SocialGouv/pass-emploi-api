@@ -5384,43 +5384,28 @@ __metadata:
   languageName: node
   linkType: hard
 
-"elastic-apm-http-client@npm:12.0.0":
-  version: 12.0.0
-  resolution: "elastic-apm-http-client@npm:12.0.0"
-  dependencies:
-    agentkeepalive: ^4.2.1
-    breadth-filter: ^2.0.0
-    end-of-stream: ^1.4.4
-    fast-safe-stringify: ^2.0.7
-    fast-stream-to-buffer: ^1.0.0
-    object-filter-sequence: ^1.0.0
-    readable-stream: ^3.4.0
-    semver: ^6.3.0
-    stream-chopper: ^3.0.1
-  checksum: df927a78c5eeab8795cdc0429156982c68539531928e68ab84b7e24d02a8287da213668a2dc814c41282b231aa4dd30cdf4ae12a903bd1caaf22476844a458b1
-  languageName: node
-  linkType: hard
-
-"elastic-apm-node@npm:3.48.0":
-  version: 3.48.0
-  resolution: "elastic-apm-node@npm:3.48.0"
+"elastic-apm-node@npm:3.49.0":
+  version: 3.49.0
+  resolution: "elastic-apm-node@npm:3.49.0"
   dependencies:
     "@elastic/ecs-pino-format": ^1.2.0
     "@opentelemetry/api": ^1.4.1
     "@opentelemetry/core": ^1.11.0
     "@opentelemetry/sdk-metrics": ^1.12.0
     after-all-results: ^2.0.0
+    agentkeepalive: ^4.2.1
     async-cache: ^1.1.0
     async-value-promise: ^1.1.1
     basic-auth: ^2.0.1
+    breadth-filter: ^2.0.0
     cookie: ^0.5.0
     core-util-is: ^1.0.2
-    elastic-apm-http-client: 12.0.0
     end-of-stream: ^1.4.4
     error-callsites: ^2.0.4
     error-stack-parser: ^2.0.6
     escape-string-regexp: ^4.0.0
     fast-safe-stringify: ^2.0.7
+    fast-stream-to-buffer: ^1.0.0
     http-headers: ^3.0.2
     import-in-the-middle: 1.3.5
     is-native: ^1.0.1
@@ -5432,14 +5417,16 @@ __metadata:
     object-identity-map: ^1.0.2
     original-url: ^1.2.3
     pino: ^6.11.2
+    readable-stream: ^3.4.0
     relative-microtime: ^2.0.0
-    require-in-the-middle: ^7.0.1
-    semver: ^6.3.0
+    require-in-the-middle: ^7.1.1
+    semver: ^6.3.1
     shallow-clone-shim: ^2.0.0
     source-map: ^0.8.0-beta.0
     sql-summary: ^1.0.1
+    stream-chopper: ^3.0.1
     unicode-byte-truncate: ^1.0.0
-  checksum: 0eceaf4553873a369c91ccb159af017e30844daf9844edc586adaedd4260842b7f6273217fceee785fe595b159ffca5ec2f4af1bcec82bfa102fddf748b537de
+  checksum: ced2f21abc4421110334e6c3d3df7a7a01f541b9acc5844a942e2acbb6fe88f05c8b610430c23c6c25ae0d4a2f69d02c70c755187f75b0d3f066a2c83556bff4
   languageName: node
   linkType: hard
 
@@ -9316,7 +9303,7 @@ __metadata:
     dirty-chai: ^2.0.1
     dotenv-cli: ^7.2.1
     dotvault: ^0.0.9
-    elastic-apm-node: 3.48.0
+    elastic-apm-node: 3.49.0
     eslint: 8.46.0
     eslint-config-prettier: ^8.8.0
     eslint-plugin-chai-friendly: ^0.7.2
@@ -10943,14 +10930,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"require-in-the-middle@npm:^7.0.1":
-  version: 7.1.1
-  resolution: "require-in-the-middle@npm:7.1.1"
+"require-in-the-middle@npm:^7.1.1":
+  version: 7.2.0
+  resolution: "require-in-the-middle@npm:7.2.0"
   dependencies:
     debug: ^4.1.1
     module-details-from-path: ^1.0.3
     resolve: ^1.22.1
-  checksum: 00c7e28c271cefc219962b18c1803f6124c761238c1edbf588c68a7143bfeb5779df455d2f0791c2c1f6e841580c50080d4435156e72841fa0bc50c3f383d032
+  checksum: 5ed219d12aec4d0f098029827f9e929d8e0ca4f2fe01f23a9b02169e57c5157cced9e7acaef6a871d3f56646f2cb807b08f2f23d66912ee53eca16cb88eff743
   languageName: node
   linkType: hard
 
@@ -11236,12 +11223,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^6.0.0, semver@npm:^6.3.0":
-  version: 6.3.0
-  resolution: "semver@npm:6.3.0"
+"semver@npm:^6.0.0, semver@npm:^6.3.0, semver@npm:^6.3.1":
+  version: 6.3.1
+  resolution: "semver@npm:6.3.1"
   bin:
-    semver: ./bin/semver.js
-  checksum: 1b26ecf6db9e8292dd90df4e781d91875c0dcc1b1909e70f5d12959a23c7eebb8f01ea581c00783bbee72ceeaad9505797c381756326073850dc36ed284b21b9
+    semver: bin/semver.js
+  checksum: ae47d06de28836adb9d3e25f22a92943477371292d9b665fb023fae278d345d508ca1958232af086d85e0155aee22e313e100971898bbb8d5d89b8b1d4054ca2
   languageName: node
   linkType: hard
 
