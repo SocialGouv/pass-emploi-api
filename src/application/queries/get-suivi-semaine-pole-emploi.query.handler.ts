@@ -17,18 +17,19 @@ import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from './query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
-import { JeuneHomeAgendaPoleEmploiQueryModel } from './query-models/home-jeune-suivi.query-model'
+import { SuiviSemainePoleEmploiQueryModel } from './query-models/home-jeune-suivi.query-model'
+import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
 
-export interface GetJeuneHomeAgendaPoleEmploiQuery extends Query {
+export interface GetSuiviSemainePoleEmploiQuery extends Query {
   idJeune: string
   accessToken: string
   maintenant: DateTime
 }
 
 @Injectable()
-export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
-  GetJeuneHomeAgendaPoleEmploiQuery,
-  Result<Cached<JeuneHomeAgendaPoleEmploiQueryModel>>
+export class GetSuiviSemainePoleEmploiQueryHandler extends QueryHandler<
+  GetSuiviSemainePoleEmploiQuery,
+  Result<Cached<SuiviSemainePoleEmploiQueryModel>>
 > {
   constructor(
     @Inject(JeunesRepositoryToken)
@@ -38,12 +39,12 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
     private jeuneAuthorizer: JeuneAuthorizer,
     private keycloakClient: KeycloakClient
   ) {
-    super('GetJeuneHomeAgendaPoleEmploiQueryHandler')
+    super('GetSuiviSemainePoleEmploiQueryHandler')
   }
 
   async handle(
-    query: GetJeuneHomeAgendaPoleEmploiQuery
-  ): Promise<Result<Cached<JeuneHomeAgendaPoleEmploiQueryModel>>> {
+    query: GetSuiviSemainePoleEmploiQuery
+  ): Promise<Result<Cached<SuiviSemainePoleEmploiQueryModel>>> {
     const jeune = await this.jeuneRepository.get(query.idJeune)
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
@@ -53,7 +54,8 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
       jeune.structure
     )
 
-    const dansDeuxSemaines = query.maintenant.plus({ weeks: 2 })
+    const lundiPasse = query.maintenant.startOf('week')
+    const dimancheEnHuit = query.maintenant.endOf('week').plus({ week: 1 })
 
     const [resultDemarches, resultRendezVous] = await Promise.all([
       this.getDemarchesQueryGetter.handle({
@@ -63,7 +65,8 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
       }),
       this.getRendezVousJeunePoleEmploiQueryGetter.handle({
         ...query,
-        idpToken
+        idpToken,
+        periode: RendezVous.Periode.PASSES
       })
     ])
 
@@ -77,13 +80,13 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
 
     const demarches = resultDemarches.data.queryModel.filter(
       demarche =>
-        DateTime.fromISO(demarche.dateFin) >= query.maintenant &&
-        DateTime.fromISO(demarche.dateFin) <= dansDeuxSemaines
+        DateTime.fromISO(demarche.dateFin) >= lundiPasse &&
+        DateTime.fromISO(demarche.dateFin) <= dimancheEnHuit
     )
     const rendezVous = resultRendezVous.data.queryModel.filter(
       unRendezVous =>
-        unRendezVous.date >= query.maintenant.toJSDate() &&
-        unRendezVous.date <= dansDeuxSemaines.toJSDate()
+        unRendezVous.date >= lundiPasse.toJSDate() &&
+        unRendezVous.date <= dimancheEnHuit.toJSDate()
     )
     const nombreDeDemarchesEnRetard = resultDemarches.data.queryModel.filter(
       demarche =>
@@ -92,13 +95,13 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
         demarche.statut !== Demarche.Statut.ANNULEE
     ).length
 
-    const data: Cached<JeuneHomeAgendaPoleEmploiQueryModel> = {
+    const data: Cached<SuiviSemainePoleEmploiQueryModel> = {
       queryModel: {
         demarches,
         rendezVous,
         metadata: {
-          dateDeDebut: query.maintenant.toJSDate(),
-          dateDeFin: dansDeuxSemaines.toJSDate(),
+          dateDeDebut: lundiPasse.toJSDate(),
+          dateDeFin: dimancheEnHuit.toJSDate(),
           demarchesEnRetard: nombreDeDemarchesEnRetard
         }
       },
@@ -111,7 +114,7 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
   }
 
   async authorize(
-    query: GetJeuneHomeAgendaPoleEmploiQuery,
+    query: GetSuiviSemainePoleEmploiQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     return this.jeuneAuthorizer.autoriserLeJeune(
