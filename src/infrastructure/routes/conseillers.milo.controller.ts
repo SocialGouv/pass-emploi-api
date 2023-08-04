@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Patch, Put, Query } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query
+} from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   UpdateSessionMiloCommand,
@@ -16,9 +25,14 @@ import { DateService } from 'src/utils/date-service'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'
 import {
+  EmargementsSessionMiloPayload,
   GetSessionsQueryParams,
   UpdateSessionMiloPayload
 } from './validation/conseiller-milo.inputs'
+import {
+  EmargementSessionMiloCommand,
+  EmargementSessionMiloCommandHandler
+} from '../../application/commands/milo/emargement-session-milo.command.handler'
 
 @Controller('conseillers/milo')
 @ApiOAuth2([])
@@ -27,7 +41,8 @@ export class ConseillersMiloController {
   constructor(
     private readonly getSessionsQueryHandler: GetSessionsConseillerMiloQueryHandler,
     private readonly getDetailSessionQueryHandler: GetDetailSessionConseillerMiloQueryHandler,
-    private readonly updateSessionCommandHandler: UpdateSessionMiloCommandHandler
+    private readonly updateSessionCommandHandler: UpdateSessionMiloCommandHandler,
+    private readonly emargementSessionCommandHandler: EmargementSessionMiloCommandHandler
   ) {}
 
   @ApiOperation({
@@ -82,6 +97,37 @@ export class ConseillersMiloController {
   ): Promise<DetailSessionConseillerMiloQueryModel> {
     const result = await this.getDetailSessionQueryHandler.execute(
       { idSession, idConseiller, token: accessToken },
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
+  }
+
+  @ApiOperation({
+    summary:
+      'Permet de clore une session de la structure MILO du conseiller et de faire son émargement.',
+    description: 'Autorisé pour le conseiller Milo'
+  })
+  @Post('/:idConseiller/sessions/:idSession/cloturer')
+  async emargerSession(
+    @Param('idConseiller') idConseiller: string,
+    @Param('idSession') idSession: string,
+    @Body() emargementSessionMiloPayload: EmargementsSessionMiloPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string
+  ): Promise<void> {
+    const command: EmargementSessionMiloCommand = {
+      idSession,
+      idConseiller,
+      token: accessToken,
+      emargements: emargementSessionMiloPayload.emargements
+    }
+
+    const result = await this.emargementSessionCommandHandler.execute(
+      command,
       utilisateur
     )
 
