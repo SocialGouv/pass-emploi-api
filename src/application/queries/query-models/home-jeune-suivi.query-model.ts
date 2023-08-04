@@ -29,7 +29,7 @@ export class JeuneHomeAgendaQueryModel {
   }
 }
 
-export class JeuneHomeAgendaPoleEmploiQueryModel {
+export class SuiviSemainePoleEmploiQueryModel {
   @ApiProperty({
     type: DemarcheQueryModel,
     isArray: true
@@ -51,9 +51,9 @@ export class JeuneHomeAgendaPoleEmploiQueryModel {
 
 export class JeuneHomeAgendaPoleEmploiQueryModelV2 {
   @ApiProperty({
-    type: JeuneHomeAgendaPoleEmploiQueryModel
+    type: SuiviSemainePoleEmploiQueryModel
   })
-  resultat: JeuneHomeAgendaPoleEmploiQueryModel
+  resultat: SuiviSemainePoleEmploiQueryModel
 
   @ApiPropertyOptional()
   dateDerniereMiseAJour?: Date
