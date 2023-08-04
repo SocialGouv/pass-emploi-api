@@ -1,6 +1,9 @@
 import { SessionMilo } from 'src/domain/milo/session.milo'
-import { expect } from 'chai'
 import { DateTime } from 'luxon'
+import { uneSessionMilo } from '../../fixtures/sessions.fixture'
+import { failure, isSuccess } from 'src/building-blocks/types/result'
+import { EmargementIncorrect } from 'src/building-blocks/types/domain-error'
+import { expect } from 'test/utils'
 
 describe('SessionMilo', () => {
   describe('calculerStatut', () => {
@@ -57,5 +60,107 @@ describe('SessionMilo', () => {
         expect(statut).to.equal(SessionMilo.Statut.A_CLOTURER)
       })
     })
+  })
+
+  describe('emarger', () => {
+    const uneDateDEmargement = DateTime.local(2023)
+    const uneSessionAvecUneInscription = {
+      ...uneSessionMilo(),
+      inscriptions: [
+        {
+          idJeune: 'id-hermione',
+          idInscription: 'id-inscription-hermione',
+          nom: 'Granger',
+          prenom: 'Hermione',
+          statut: SessionMilo.Inscription.Statut.INSCRIT
+        }
+      ]
+    }
+
+    it('renvoie une failure si tous les jeunes de la session ne sont pas emargés', () => {
+      // When
+      const result = SessionMilo.emarger(
+        uneSessionMilo(),
+        [
+          {
+            idJeune: 'id-hermione',
+            statut: SessionMilo.Inscription.Statut.INSCRIT
+          }
+        ],
+        uneDateDEmargement
+      )
+      // Then
+      expect(result).to.deep.equal(failure(new EmargementIncorrect()))
+    })
+
+    it('renvoie un statut REFUS_JEUNE pour les jeunes inscrits mais non présents', async () => {
+      assertInsriptionsAModifier(SessionMilo.Inscription.Statut.INSCRIT, [
+        {
+          idJeune: 'id-hermione',
+          idInscription: 'id-inscription-hermione',
+          statut: SessionMilo.Inscription.Statut.REFUS_JEUNE,
+          commentaire: 'Absent'
+        }
+      ])
+    })
+
+    it('renvoie un statut PRESENT pour les jeunes présents', async () => {
+      assertInsriptionsAModifier(SessionMilo.Inscription.Statut.PRESENT, [
+        {
+          idJeune: 'id-hermione',
+          idInscription: 'id-inscription-hermione',
+          statut: SessionMilo.Inscription.Statut.PRESENT,
+          commentaire: undefined
+        }
+      ])
+    })
+
+    it('ne renvoie pas les jeunes au statut REFUS_JEUNE', async () => {
+      assertInsriptionsAModifier(SessionMilo.Inscription.Statut.REFUS_JEUNE, [])
+    })
+
+    it('ne renvoie pas les jeunes au statut REFUS_TIERS', async () => {
+      assertInsriptionsAModifier(SessionMilo.Inscription.Statut.REFUS_TIERS, [])
+    })
+
+    it('renvoie la session avec une date de clôture et la date de modification mise à jour', async () => {
+      const result = await SessionMilo.emarger(
+        uneSessionAvecUneInscription,
+        [
+          {
+            idJeune: 'id-hermione',
+            statut: SessionMilo.Inscription.Statut.PRESENT
+          }
+        ],
+        uneDateDEmargement
+      )
+      // Then
+      expect(isSuccess(result)).to.be.true()
+      if (isSuccess(result)) {
+        expect(result.data.sessionEmargee).to.deep.equal({
+          ...uneSessionAvecUneInscription,
+          dateCloture: uneDateDEmargement,
+          dateModification: uneDateDEmargement
+        })
+      }
+    })
+
+    function assertInsriptionsAModifier(
+      givenStatut: SessionMilo.Inscription.Statut,
+      expected: Array<Omit<SessionMilo.Inscription, 'nom' | 'prenom'>>
+    ): void {
+      // When
+      const result = SessionMilo.emarger(
+        uneSessionAvecUneInscription,
+        [{ idJeune: 'id-hermione', statut: givenStatut }],
+        uneDateDEmargement
+      )
+
+      // Then
+      expect(isSuccess(result)).to.be.true()
+      if (isSuccess(result)) {
+        expect(result.data.inscriptionsAModifier).to.deep.equal(expected)
+      }
+    }
   })
 })

@@ -252,7 +252,7 @@ describe('MiloClient', () => {
   })
 
   describe('modifierInscriptionJeunesSession', () => {
-    it('refuses les inscriptions de chaque jeune à la session', async () => {
+    it('modifie les inscriptions de chaque jeune à la session', async () => {
       // Given
       const aModifier = [
         {
@@ -270,6 +270,12 @@ describe('MiloClient', () => {
           idInstanceSession: 'id-inscription-3',
           statut: 'REFUSAL_YOUNG',
           commentaire: 'J’ai pas envie'
+        },
+        {
+          idDossier: 'id-dossier-4',
+          idInstanceSession: 'id-inscription-4',
+          statut: 'ACHIEVED',
+          dateFinReelle: '2020-04-08'
         }
       ]
 
@@ -291,6 +297,12 @@ describe('MiloClient', () => {
           { statut: 'REFUSAL_YOUNG', commentaire: 'J’ai pas envie' }
         )
         .reply(201)
+      const scope4 = nock(MILO_BASE_URL)
+        .put(
+          `/operateurs/dossiers/${aModifier[3].idDossier}/instances-session/${aModifier[3].idInstanceSession}`,
+          { statut: 'ACHIEVED', dateFinReelle: '2020-04-08' }
+        )
+        .reply(201)
 
       // When
       const result = await miloClient.modifierInscriptionJeunesSession(
@@ -302,6 +314,7 @@ describe('MiloClient', () => {
       expect(scope1.isDone()).to.equal(true)
       expect(scope2.isDone()).to.equal(true)
       expect(scope3.isDone()).to.equal(true)
+      expect(scope4.isDone()).to.equal(true)
       expect(result).to.deep.equal(emptySuccess())
     })
   })

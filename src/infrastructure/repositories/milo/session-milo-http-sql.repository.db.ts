@@ -68,11 +68,7 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
   }
 
   async save(
-    session: Pick<
-      SessionMilo,
-      'id' | 'idStructureMilo' | 'estVisible' | 'dateCloture'
-    > &
-      Required<Pick<SessionMilo, 'dateModification'>>,
+    sessionSansInscription: Omit<SessionMilo, 'inscriptions'>,
     {
       inscriptionsAModifier,
       inscriptionsASupprimer,
@@ -95,15 +91,16 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     const modificationsTriees = [...inscriptionsAModifier].sort(
       trierReinscriptionsEnDernier
     )
-    const resultModifications = await this.modifier(
+    const resultModifications = await this.modifierInscriptions(
       modificationsTriees,
+      sessionSansInscription.fin,
       idsDossier,
       tokenMilo
     )
     if (isFailure(resultModifications)) return resultModifications
 
     const resultInscriptions = await this.inscrire(
-      session.id,
+      sessionSansInscription.id,
       idsJeunesAInscrire,
       idsDossier,
       tokenMilo
@@ -111,11 +108,12 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     if (isFailure(resultInscriptions)) return resultInscriptions
 
     const sessionMiloSqlModel: AsSql<SessionMiloDto> = {
-      id: session.id,
-      estVisible: session.estVisible,
-      idStructureMilo: session.idStructureMilo,
-      dateModification: session.dateModification.toJSDate(),
-      dateCloture: session.dateCloture?.toJSDate() ?? null
+      id: sessionSansInscription.id,
+      estVisible: sessionSansInscription.estVisible,
+      idStructureMilo: sessionSansInscription.idStructureMilo,
+      dateModification:
+        sessionSansInscription.dateModification?.toJSDate() ?? new Date(),
+      dateCloture: sessionSansInscription.dateCloture?.toJSDate() ?? null
     }
     await SessionMiloSqlModel.upsert(sessionMiloSqlModel)
 
@@ -138,17 +136,21 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     )
   }
 
-  private async modifier(
+  private async modifierInscriptions(
     inscriptionsAModifier: Array<
       Omit<SessionMilo.Inscription, 'nom' | 'prenom'>
     >,
+    dateFinSession: DateTime,
     idsDossier: Map<string, string>,
     tokenMilo: string
   ): Promise<Result> {
     const modifications = inscriptionsAModifier.map(modification => ({
       idDossier: idsDossier.get(modification.idJeune)!,
       idInstanceSession: modification.idInscription,
-      ...inscriptionToStatutWithCommentaireDto(modification)
+      ...inscriptionToStatutWithCommentaireAndDateDto(
+        modification,
+        dateFinSession
+      )
     }))
     return this.miloClient.modifierInscriptionJeunesSession(
       tokenMilo,
@@ -321,9 +323,10 @@ async function recupererIdsDossier(
   }, new Map<string, string>())
 }
 
-function inscriptionToStatutWithCommentaireDto(
-  inscription: Pick<SessionMilo.Inscription, 'statut' | 'commentaire'>
-): { statut: string; commentaire?: string } {
+function inscriptionToStatutWithCommentaireAndDateDto(
+  inscription: Pick<SessionMilo.Inscription, 'statut' | 'commentaire'>,
+  dateFinSession: DateTime
+): { statut: string; commentaire?: string; dateFinReelle?: string } {
   switch (inscription.statut) {
     case SessionMilo.Inscription.Statut.INSCRIT:
       return { statut: MILO_INSCRIT }
@@ -332,7 +335,7 @@ function inscriptionToStatutWithCommentaireDto(
     case SessionMilo.Inscription.Statut.REFUS_JEUNE:
       return { statut: MILO_REFUS_JEUNE, commentaire: inscription.commentaire }
     case SessionMilo.Inscription.Statut.PRESENT:
-      return { statut: MILO_PRESENT }
+      return { statut: MILO_PRESENT, dateFinReelle: dateFinSession.toISODate() }
     default:
       throw new Error('Ça devrait pas arriver')
   }
