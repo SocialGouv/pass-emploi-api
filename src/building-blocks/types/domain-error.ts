@@ -272,3 +272,14 @@ export class MaxInscritsDepasse implements DomainError {
       'Le nombre d’inscrits dépasse le nombre de participants maximum'
   }
 }
+
+export class EmargementIncorrect implements DomainError {
+  static CODE = 'EMARGEMENT_INCORRECT'
+  readonly code: string = EmargementIncorrect.CODE
+  readonly message: string
+
+  constructor() {
+    this.message =
+      'Tous les jeunes inscrits, et uniquement eux, doivent être émargés'
+  }
+}

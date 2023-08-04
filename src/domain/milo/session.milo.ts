@@ -1,5 +1,8 @@
 import { DateTime } from 'luxon'
-import { MaxInscritsDepasse } from 'src/building-blocks/types/domain-error'
+import {
+  EmargementIncorrect,
+  MaxInscritsDepasse
+} from 'src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
@@ -38,19 +41,20 @@ export type InscriptionsATraiter = {
 }
 
 export namespace SessionMilo {
+  function supprimerInscriptions(
+    session: SessionMilo
+  ): Omit<SessionMilo, 'inscriptions'> {
+    const { inscriptions: _inscriptions, ...sessionSansInscriptions } = session
+    return sessionSansInscriptions
+  }
+
   export function modifier(
     session: SessionMilo,
     dateModification: DateTime,
     visibilite?: boolean
-  ): Required<
-    Pick<
-      SessionMilo,
-      'id' | 'idStructureMilo' | 'estVisible' | 'dateModification'
-    >
-  > {
+  ): Omit<SessionMilo, 'inscriptions'> {
     return {
-      id: session.id,
-      idStructureMilo: session.idStructureMilo,
+      ...supprimerInscriptions(session),
       estVisible: visibilite ?? session.estVisible,
       dateModification
     }
@@ -69,6 +73,64 @@ export namespace SessionMilo {
     if (isFailure(resultNbPlaces)) return resultNbPlaces
 
     return success(inscriptionsATraiter)
+  }
+
+  export function emarger(
+    session: SessionMilo,
+    emargements: SessionMilo.Modification.Emargement[],
+    dateEmargement: DateTime
+  ): Result<{
+    sessionEmargee: Omit<SessionMilo, 'inscriptions'>
+    inscriptionsAModifier: Array<
+      Omit<SessionMilo.Inscription, 'nom' | 'prenom'>
+    >
+  }> {
+    const idsJeuneInscrit = session.inscriptions
+      .map(inscription => inscription.idJeune)
+      .sort()
+    const idsJeuneEmarge = emargements
+      .map(emargement => emargement.idJeune)
+      .sort()
+
+    if (JSON.stringify(idsJeuneInscrit) !== JSON.stringify(idsJeuneEmarge)) {
+      return failure(new EmargementIncorrect())
+    }
+
+    const sessionModifiee = {
+      ...session,
+      dateModification: dateEmargement,
+      dateCloture: dateEmargement
+    }
+
+    const inscriptionsAModifier = []
+    const inscriptionsExistantes = getInscriptionsExistantes(session)
+
+    for (const emargement of emargements) {
+      if (
+        emargement.statut !== Inscription.Statut.INSCRIT &&
+        emargement.statut !== Inscription.Statut.PRESENT
+      )
+        continue
+
+      const inscription = inscriptionsExistantes.get(emargement.idJeune)!
+
+      const statutInscription =
+        emargement.statut === Inscription.Statut.INSCRIT
+          ? SessionMilo.Inscription.Statut.REFUS_JEUNE
+          : SessionMilo.Inscription.Statut.PRESENT
+
+      inscriptionsAModifier.push({
+        idJeune: inscription.idJeune,
+        idInscription: inscription.idInscription,
+        statut: statutInscription,
+        commentaire:
+          statutInscription === SessionMilo.Inscription.Statut.REFUS_JEUNE
+            ? 'Absent'
+            : undefined
+      })
+    }
+
+    return success({ sessionEmargee: sessionModifiee, inscriptionsAModifier })
   }
 
   export function calculerStatut(
@@ -90,12 +152,7 @@ export namespace SessionMilo {
     ): Promise<Result<SessionMilo>>
 
     save(
-      session: Required<
-        Pick<
-          SessionMilo,
-          'id' | 'idStructureMilo' | 'estVisible' | 'dateModification'
-        >
-      >,
+      sessionSansInscriptions: Omit<SessionMilo, 'inscriptions'>,
       inscriptionsATraiter: InscriptionsATraiter,
       tokenMilo: string
     ): Promise<Result>
@@ -148,6 +205,8 @@ export namespace SessionMilo {
       SessionMilo.Inscription,
       'idJeune' | 'commentaire'
     > & { statut: StatutInscription }
+
+    export type Emargement = Pick<SessionMilo.Inscription, 'idJeune' | 'statut'>
 
     export enum StatutInscription {
       INSCRIT = 'INSCRIT',

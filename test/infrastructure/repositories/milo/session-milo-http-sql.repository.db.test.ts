@@ -194,7 +194,8 @@ describe('SessionMiloHttpSqlRepository', () => {
         unJeuneDto({ id: 'id-harry', idPartenaire: 'id-dossier-harry' }),
         unJeuneDto({ id: 'id-ginny', idPartenaire: 'id-dossier-ginny' }),
         unJeuneDto({ id: 'id-luna', idPartenaire: 'id-dossier-luna' }),
-        unJeuneDto({ id: 'id-fred', idPartenaire: 'id-dossier-fred' })
+        unJeuneDto({ id: 'id-fred', idPartenaire: 'id-dossier-fred' }),
+        unJeuneDto({ id: 'id-rogue', idPartenaire: 'id-dossier-rogue' })
       ])
 
       session = {
@@ -223,6 +224,13 @@ describe('SessionMiloHttpSqlRepository', () => {
               nom: 'Potter',
               prenom: 'Harry',
               statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+            },
+            {
+              idJeune: 'id-rogue',
+              idInscription: 'id-inscription-rogue',
+              nom: 'Rogue',
+              prenom: 'Severus',
+              statut: SessionMilo.Inscription.Statut.PRESENT
             }
           ]
         }),
@@ -253,6 +261,11 @@ describe('SessionMiloHttpSqlRepository', () => {
               idJeune: 'id-fred',
               idInscription: 'id-inscription-fred',
               statut: SessionMilo.Inscription.Statut.REFUS_TIERS
+            },
+            {
+              idJeune: 'id-rogue',
+              idInscription: 'id-inscription-rogue',
+              statut: SessionMilo.Inscription.Statut.PRESENT
             }
           ]
         },
@@ -318,6 +331,12 @@ describe('SessionMiloHttpSqlRepository', () => {
       expect(
         miloClient.modifierInscriptionJeunesSession
       ).to.have.been.calledOnceWithExactly(tokenMilo, [
+        {
+          idDossier: 'id-dossier-rogue',
+          idInstanceSession: 'id-inscription-rogue',
+          statut: 'ACHIEVED',
+          dateFinReelle: '2020-04-08'
+        },
         {
           idDossier: 'id-dossier-fred',
           idInstanceSession: 'id-inscription-fred',
