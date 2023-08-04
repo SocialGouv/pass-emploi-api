@@ -64,11 +64,11 @@ import { enleverLesUndefined, expect, StubbedClass } from 'test/utils'
 import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
 import { GetJeuneHomeAgendaQueryHandler } from 'src/application/queries/get-jeune-home-agenda.query.db'
 import {
-  SuiviCetteSemainePoleEmploiQueryModel,
+  SuiviSemainePoleEmploiQueryModel,
   JeuneHomeAgendaQueryModel
 } from 'src/application/queries/query-models/home-jeune-suivi.query-model'
 import { uneActionQueryModelSansJeune } from 'test/fixtures/query-models/action.query-model.fixtures'
-import { GetSuiviCetteSemainePoleEmploiQueryHandler } from 'src/application/queries/get-suivi-cette-semaine-pole-emploi.query.handler'
+import { GetSuiviSemainePoleEmploiQueryHandler } from 'src/application/queries/get-suivi-semaine-pole-emploi.query.handler'
 import { uneDemarcheQueryModel } from 'test/fixtures/query-models/demarche.query-model.fixtures'
 import { DateTime } from 'luxon'
 import { GetAnimationsCollectivesJeuneQueryHandler } from 'src/application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
@@ -91,7 +91,7 @@ describe('JeunesController', () => {
   let getRendezVousJeunePoleEmploiQueryHandler: StubbedClass<GetRendezVousJeunePoleEmploiQueryHandler>
   let getJeuneHomeDemarchesQueryHandler: StubbedClass<GetJeuneHomeDemarchesQueryHandler>
   let getJeuneHomeSuiviQueryHandler: StubbedClass<GetJeuneHomeAgendaQueryHandler>
-  let getJeuneHomeAgendaPoleEmploiQueryHandler: StubbedClass<GetSuiviCetteSemainePoleEmploiQueryHandler>
+  let getJeuneHomeAgendaPoleEmploiQueryHandler: StubbedClass<GetSuiviSemainePoleEmploiQueryHandler>
   let getJeuneHomeActionsQueryHandler: StubbedClass<GetJeuneHomeActionsQueryHandler>
   let updateStatutDemarcheCommandHandler: StubbedClass<UpdateStatutDemarcheCommandHandler>
   let createDemarcheCommandHandler: StubbedClass<CreateDemarcheCommandHandler>
@@ -126,7 +126,7 @@ describe('JeunesController', () => {
     )
     getJeuneHomeSuiviQueryHandler = app.get(GetJeuneHomeAgendaQueryHandler)
     getJeuneHomeAgendaPoleEmploiQueryHandler = app.get(
-      GetSuiviCetteSemainePoleEmploiQueryHandler
+      GetSuiviSemainePoleEmploiQueryHandler
     )
     getJeuneHomeActionsQueryHandler = app.get(GetJeuneHomeActionsQueryHandler)
     updateStatutDemarcheCommandHandler = app.get(
@@ -994,7 +994,7 @@ describe('JeunesController', () => {
   describe('GET /jeunes/:idJeune/home/agenda/pole-emploi', () => {
     const idJeune = '1'
     const maintenant = '2022-08-17T12:00:30+02:00'
-    const queryModel: SuiviCetteSemainePoleEmploiQueryModel = {
+    const queryModel: SuiviSemainePoleEmploiQueryModel = {
       demarches: [
         enleverLesUndefined(uneDemarcheQueryModel()),
         enleverLesUndefined(uneDemarcheQueryModel())
@@ -1068,7 +1068,7 @@ describe('JeunesController', () => {
     it('rejette quand la query est cachée', async () => {
       // Given
       jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
-      const data: Cached<SuiviCetteSemainePoleEmploiQueryModel> = {
+      const data: Cached<SuiviSemainePoleEmploiQueryModel> = {
         queryModel: queryModel,
         dateDuCache: uneDatetime()
       }

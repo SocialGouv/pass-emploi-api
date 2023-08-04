@@ -8,7 +8,7 @@ import {
   StubbedClass,
   stubClass
 } from '../utils'
-import { GetSuiviCetteSemainePoleEmploiQueryHandler } from '../../src/application/queries/get-suivi-cette-semaine-pole-emploi.query.handler'
+import { GetSuiviSemainePoleEmploiQueryHandler } from '../../src/application/queries/get-suivi-semaine-pole-emploi.query.handler'
 import {
   unHeaderAuthorization,
   unJwtPayloadValide
@@ -32,7 +32,7 @@ import {
 import { DateTime } from 'luxon'
 
 describe('JeunesControllerE2E', () => {
-  let getJeuneHomeAgendaPoleEmploiQueryHandler: GetSuiviCetteSemainePoleEmploiQueryHandler
+  let getJeuneHomeAgendaPoleEmploiQueryHandler: GetSuiviSemainePoleEmploiQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let keycloakClient: StubbedClass<KeycloakClient>
   let jeuneRepository: StubbedType<Jeune.Repository>
@@ -74,7 +74,7 @@ describe('JeunesControllerE2E', () => {
       )
 
     getJeuneHomeAgendaPoleEmploiQueryHandler =
-      new GetSuiviCetteSemainePoleEmploiQueryHandler(
+      new GetSuiviSemainePoleEmploiQueryHandler(
         jeuneRepository,
         getDemarchesQueryGetter,
         getRendezVousJeunePoleEmploiQueryGetter,
@@ -83,7 +83,7 @@ describe('JeunesControllerE2E', () => {
       )
 
     const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(GetSuiviCetteSemainePoleEmploiQueryHandler)
+      .overrideProvider(GetSuiviSemainePoleEmploiQueryHandler)
       .useValue(getJeuneHomeAgendaPoleEmploiQueryHandler)
       .overrideProvider(JwtService)
       .useValue(jwtService)

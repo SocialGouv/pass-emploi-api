@@ -17,19 +17,19 @@ import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from './query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
-import { SuiviCetteSemainePoleEmploiQueryModel } from './query-models/home-jeune-suivi.query-model'
+import { SuiviSemainePoleEmploiQueryModel } from './query-models/home-jeune-suivi.query-model'
 import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
 
-export interface GetSuiviCetteSemainePoleEmploiQuery extends Query {
+export interface GetSuiviSemainePoleEmploiQuery extends Query {
   idJeune: string
   accessToken: string
   maintenant: DateTime
 }
 
 @Injectable()
-export class GetSuiviCetteSemainePoleEmploiQueryHandler extends QueryHandler<
-  GetSuiviCetteSemainePoleEmploiQuery,
-  Result<Cached<SuiviCetteSemainePoleEmploiQueryModel>>
+export class GetSuiviSemainePoleEmploiQueryHandler extends QueryHandler<
+  GetSuiviSemainePoleEmploiQuery,
+  Result<Cached<SuiviSemainePoleEmploiQueryModel>>
 > {
   constructor(
     @Inject(JeunesRepositoryToken)
@@ -39,12 +39,12 @@ export class GetSuiviCetteSemainePoleEmploiQueryHandler extends QueryHandler<
     private jeuneAuthorizer: JeuneAuthorizer,
     private keycloakClient: KeycloakClient
   ) {
-    super('GetSuiviCetteSemainePoleEmploiQueryHandler')
+    super('GetSuiviSemainePoleEmploiQueryHandler')
   }
 
   async handle(
-    query: GetSuiviCetteSemainePoleEmploiQuery
-  ): Promise<Result<Cached<SuiviCetteSemainePoleEmploiQueryModel>>> {
+    query: GetSuiviSemainePoleEmploiQuery
+  ): Promise<Result<Cached<SuiviSemainePoleEmploiQueryModel>>> {
     const jeune = await this.jeuneRepository.get(query.idJeune)
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
@@ -95,7 +95,7 @@ export class GetSuiviCetteSemainePoleEmploiQueryHandler extends QueryHandler<
         demarche.statut !== Demarche.Statut.ANNULEE
     ).length
 
-    const data: Cached<SuiviCetteSemainePoleEmploiQueryModel> = {
+    const data: Cached<SuiviSemainePoleEmploiQueryModel> = {
       queryModel: {
         demarches,
         rendezVous,
@@ -114,7 +114,7 @@ export class GetSuiviCetteSemainePoleEmploiQueryHandler extends QueryHandler<
   }
 
   async authorize(
-    query: GetSuiviCetteSemainePoleEmploiQuery,
+    query: GetSuiviSemainePoleEmploiQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     return this.jeuneAuthorizer.autoriserLeJeune(

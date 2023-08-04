@@ -10,16 +10,16 @@ import { IdService } from 'src/utils/id-service'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import {
-  GetSuiviCetteSemainePoleEmploiQuery,
-  GetSuiviCetteSemainePoleEmploiQueryHandler
-} from '../../../src/application/queries/get-suivi-cette-semaine-pole-emploi.query.handler'
+  GetSuiviSemainePoleEmploiQuery,
+  GetSuiviSemainePoleEmploiQueryHandler
+} from '../../../src/application/queries/get-suivi-semaine-pole-emploi.query.handler'
 import { GetDemarchesQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { success } from '../../../src/building-blocks/types/result'
 
 describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
-  let handler: GetSuiviCetteSemainePoleEmploiQueryHandler
+  let handler: GetSuiviSemainePoleEmploiQueryHandler
 
   let sandbox: SinonSandbox
   let jeunesRepository: StubbedType<Jeune.Repository>
@@ -71,7 +71,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
         keycloakClient
       )
 
-    handler = new GetSuiviCetteSemainePoleEmploiQueryHandler(
+    handler = new GetSuiviSemainePoleEmploiQueryHandler(
       jeunesRepository,
       getDemarchesQueryGetter,
       getRendezVousJeunePoleEmploiQueryGetter,
@@ -86,7 +86,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
     it('récupère le token uniquement 1 fois pour les 2 appels à pole-emploi', async () => {
       // Given
       const maintenant = DateTime.fromISO('2020-04-06T12:00:00.000Z')
-      const query: GetSuiviCetteSemainePoleEmploiQuery = {
+      const query: GetSuiviSemainePoleEmploiQuery = {
         idJeune: 'idJeune',
         maintenant: maintenant,
         accessToken: 'accessToken'

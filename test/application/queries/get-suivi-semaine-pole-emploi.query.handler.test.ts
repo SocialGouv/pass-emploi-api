@@ -4,12 +4,12 @@ import { describe } from 'mocha'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import {
-  GetSuiviCetteSemainePoleEmploiQuery,
-  GetSuiviCetteSemainePoleEmploiQueryHandler
-} from '../../../src/application/queries/get-suivi-cette-semaine-pole-emploi.query.handler'
+  GetSuiviSemainePoleEmploiQuery,
+  GetSuiviSemainePoleEmploiQueryHandler
+} from '../../../src/application/queries/get-suivi-semaine-pole-emploi.query.handler'
 import { GetDemarchesQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
-import { SuiviCetteSemainePoleEmploiQueryModel } from '../../../src/application/queries/query-models/home-jeune-suivi.query-model'
+import { SuiviSemainePoleEmploiQueryModel } from '../../../src/application/queries/query-models/home-jeune-suivi.query-model'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { Cached } from '../../../src/building-blocks/types/query'
 import {
@@ -28,8 +28,8 @@ import { unRendezVousQueryModel } from '../../fixtures/query-models/rendez-vous.
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
 
-describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
-  let handler: GetSuiviCetteSemainePoleEmploiQueryHandler
+describe('GetSuiviSemainePoleEmploiQueryHandler', () => {
+  let handler: GetSuiviSemainePoleEmploiQueryHandler
   let getDemarchesQueryGetter: StubbedClass<GetDemarchesQueryGetter>
   let getRendezVousJeunePoleEmploiQueryGetter: StubbedClass<GetRendezVousJeunePoleEmploiQueryGetter>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
@@ -50,7 +50,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
     keycloakClient.exchangeTokenJeune.resolves(idpToken)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
 
-    handler = new GetSuiviCetteSemainePoleEmploiQueryHandler(
+    handler = new GetSuiviSemainePoleEmploiQueryHandler(
       jeuneRepository,
       getDemarchesQueryGetter,
       getRendezVousJeunePoleEmploiQueryGetter,
@@ -90,13 +90,13 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
       date: dimancheEnHuit.plus({ day: 1 }).toJSDate()
     })
 
-    let result: Result<Cached<SuiviCetteSemainePoleEmploiQueryModel>>
+    let result: Result<Cached<SuiviSemainePoleEmploiQueryModel>>
 
     describe('quand les services externes répondent avec Succès', () => {
       describe('mapping et filtres', () => {
         beforeEach(async () => {
           // Given
-          const query: GetSuiviCetteSemainePoleEmploiQuery = {
+          const query: GetSuiviSemainePoleEmploiQuery = {
             idJeune: 'idJeune',
             maintenant: maintenant,
             accessToken: 'accessToken'
@@ -173,7 +173,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
           describe('quand la date de fin de la démarche est passée', () => {
             it('compte une démarche en retard', async () => {
               // Given
-              const query: GetSuiviCetteSemainePoleEmploiQuery = {
+              const query: GetSuiviSemainePoleEmploiQuery = {
                 idJeune: 'idJeune',
                 maintenant: maintenant,
                 accessToken: 'accessToken'
@@ -205,7 +205,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
           describe('quand la date de fin de la démarche est future', () => {
             it('compte 0 démarche en retard', async () => {
               // Given
-              const query: GetSuiviCetteSemainePoleEmploiQuery = {
+              const query: GetSuiviSemainePoleEmploiQuery = {
                 idJeune: 'idJeune',
                 maintenant: maintenant,
                 accessToken: 'accessToken'
@@ -239,7 +239,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
           describe('quand la date de fin de la démarche est passée', () => {
             it('compte une démarche en retard', async () => {
               // Given
-              const query: GetSuiviCetteSemainePoleEmploiQuery = {
+              const query: GetSuiviSemainePoleEmploiQuery = {
                 idJeune: 'idJeune',
                 maintenant: maintenant,
                 accessToken: 'accessToken'
@@ -271,7 +271,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
           describe('quand la date de fin de la démarche est future', () => {
             it('compte 0 démarche en retard', async () => {
               // Given
-              const query: GetSuiviCetteSemainePoleEmploiQuery = {
+              const query: GetSuiviSemainePoleEmploiQuery = {
                 idJeune: 'idJeune',
                 maintenant: maintenant,
                 accessToken: 'accessToken'
@@ -305,7 +305,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
           describe('quand la date de fin de la démarche est passée', () => {
             it('compte 0 démarche en retard', async () => {
               // Given
-              const query: GetSuiviCetteSemainePoleEmploiQuery = {
+              const query: GetSuiviSemainePoleEmploiQuery = {
                 idJeune: 'idJeune',
                 maintenant: maintenant,
                 accessToken: 'accessToken'
@@ -337,7 +337,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
           describe('quand la date de fin de la démarche est future', () => {
             it('compte 0 démarche en retard', async () => {
               // Given
-              const query: GetSuiviCetteSemainePoleEmploiQuery = {
+              const query: GetSuiviSemainePoleEmploiQuery = {
                 idJeune: 'idJeune',
                 maintenant: maintenant,
                 accessToken: 'accessToken'
@@ -371,7 +371,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
           describe('quand la date de fin de la démarche est passée', () => {
             it('compte 0 démarche en retard', async () => {
               // Given
-              const query: GetSuiviCetteSemainePoleEmploiQuery = {
+              const query: GetSuiviSemainePoleEmploiQuery = {
                 idJeune: 'idJeune',
                 maintenant: maintenant,
                 accessToken: 'accessToken'
@@ -403,7 +403,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
           describe('quand la date de fin de la démarche est future', () => {
             it('compte 0 démarche en retard', async () => {
               // Given
-              const query: GetSuiviCetteSemainePoleEmploiQuery = {
+              const query: GetSuiviSemainePoleEmploiQuery = {
                 idJeune: 'idJeune',
                 maintenant: maintenant,
                 accessToken: 'accessToken'
@@ -439,7 +439,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
     describe('quand les démarches sont en échec', () => {
       it("retourne l'échec", async () => {
         // Given
-        const query: GetSuiviCetteSemainePoleEmploiQuery = {
+        const query: GetSuiviSemainePoleEmploiQuery = {
           idJeune: 'idJeune',
           maintenant: maintenant,
           accessToken: 'accessToken'
@@ -460,7 +460,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
     describe('quand les rendez vous sont en échec', () => {
       it("retourne l'échec", async () => {
         // Given
-        const query: GetSuiviCetteSemainePoleEmploiQuery = {
+        const query: GetSuiviSemainePoleEmploiQuery = {
           idJeune: 'idJeune',
           maintenant: maintenant,
           accessToken: 'accessToken'
@@ -484,7 +484,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
     it('autorise un jeune PE', () => {
       // Given
       const utilisateur = unUtilisateurJeune()
-      const query: GetSuiviCetteSemainePoleEmploiQuery = {
+      const query: GetSuiviSemainePoleEmploiQuery = {
         idJeune: 'idJeune',
         maintenant: DateTime.now(),
         accessToken: 'accessToken'
