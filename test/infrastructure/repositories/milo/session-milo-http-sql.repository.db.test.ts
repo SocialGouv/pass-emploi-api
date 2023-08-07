@@ -335,7 +335,7 @@ describe('SessionMiloHttpSqlRepository', () => {
           idDossier: 'id-dossier-rogue',
           idInstanceSession: 'id-inscription-rogue',
           statut: 'ACHIEVED',
-          dateFinReelle: '2020-04-08'
+          dateDebutReelle: '2020-04-06'
         },
         {
           idDossier: 'id-dossier-fred',
