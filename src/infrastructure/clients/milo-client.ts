@@ -200,7 +200,7 @@ export class MiloClient {
       idInstanceSession: string
       statut: string
       commentaire?: string
-      dateFinReelle?: string
+      dateDebutReelle?: string
     }>
   ): Promise<Result> {
     for (const modification of modifications) {
@@ -209,7 +209,7 @@ export class MiloClient {
         {
           statut: modification.statut,
           commentaire: modification.commentaire,
-          dateFinReelle: modification.dateFinReelle
+          dateDebutReelle: modification.dateDebutReelle
         },
         this.apiKeyInstanceSessionEcritureConseiller,
         idpToken

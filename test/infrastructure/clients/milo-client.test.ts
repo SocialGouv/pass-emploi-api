@@ -275,7 +275,7 @@ describe('MiloClient', () => {
           idDossier: 'id-dossier-4',
           idInstanceSession: 'id-inscription-4',
           statut: 'ACHIEVED',
-          dateFinReelle: '2020-04-08'
+          dateDebutReelle: '2020-04-08'
         }
       ]
 
@@ -300,7 +300,7 @@ describe('MiloClient', () => {
       const scope4 = nock(MILO_BASE_URL)
         .put(
           `/operateurs/dossiers/${aModifier[3].idDossier}/instances-session/${aModifier[3].idInstanceSession}`,
-          { statut: 'ACHIEVED', dateFinReelle: '2020-04-08' }
+          { statut: 'ACHIEVED', dateDebutReelle: '2020-04-08' }
         )
         .reply(201)
 

@@ -93,7 +93,7 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     )
     const resultModifications = await this.modifierInscriptions(
       modificationsTriees,
-      sessionSansInscription.fin,
+      sessionSansInscription.debut,
       idsDossier,
       tokenMilo
     )
@@ -140,7 +140,7 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     inscriptionsAModifier: Array<
       Omit<SessionMilo.Inscription, 'nom' | 'prenom'>
     >,
-    dateFinSession: DateTime,
+    dateDebutSession: DateTime,
     idsDossier: Map<string, string>,
     tokenMilo: string
   ): Promise<Result> {
@@ -149,7 +149,7 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
       idInstanceSession: modification.idInscription,
       ...inscriptionToStatutWithCommentaireAndDateDto(
         modification,
-        dateFinSession
+        dateDebutSession
       )
     }))
     return this.miloClient.modifierInscriptionJeunesSession(
@@ -325,8 +325,8 @@ async function recupererIdsDossier(
 
 function inscriptionToStatutWithCommentaireAndDateDto(
   inscription: Pick<SessionMilo.Inscription, 'statut' | 'commentaire'>,
-  dateFinSession: DateTime
-): { statut: string; commentaire?: string; dateFinReelle?: string } {
+  dateDebutSession: DateTime
+): { statut: string; commentaire?: string; dateDebutReelle?: string } {
   switch (inscription.statut) {
     case SessionMilo.Inscription.Statut.INSCRIT:
       return { statut: MILO_INSCRIT }
@@ -335,7 +335,10 @@ function inscriptionToStatutWithCommentaireAndDateDto(
     case SessionMilo.Inscription.Statut.REFUS_JEUNE:
       return { statut: MILO_REFUS_JEUNE, commentaire: inscription.commentaire }
     case SessionMilo.Inscription.Statut.PRESENT:
-      return { statut: MILO_PRESENT, dateFinReelle: dateFinSession.toISODate() }
+      return {
+        statut: MILO_PRESENT,
+        dateDebutReelle: dateDebutSession.toISODate()
+      }
     default:
       throw new Error('Ça devrait pas arriver')
   }
