@@ -172,7 +172,10 @@ export const testConfig = (): ConfigService => {
       notifierRendezVousMilo: true,
       recupererStructureMilo: true
     },
-    oidc: {}
+    oidc: {},
+    values: {
+      maxRechercheConseillers: '5'
+    }
   })
 }
 

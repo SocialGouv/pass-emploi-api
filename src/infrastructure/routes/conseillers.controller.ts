@@ -46,7 +46,7 @@ import {
   SendNotificationsNouveauxMessagesCommandHandler
 } from '../../application/commands/send-notifications-nouveaux-messages.command.handler'
 import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from '../../application/queries/action/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
-import { GetConseillerByEmailQueryHandler } from '../../application/queries/get-conseiller-by-email.query.handler.db'
+import { GetConseillersQueryHandler } from '../../application/queries/get-conseillers.query.handler.db'
 import { GetDetailConseillerQueryHandler } from '../../application/queries/get-detail-conseiller.query.handler.db'
 import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
 import {
@@ -56,7 +56,10 @@ import {
 import { GetJeuneMiloByDossierQueryHandler } from '../../application/queries/get-jeune-milo-by-dossier.query.handler.db'
 import { GetJeunesByConseillerQueryHandler } from '../../application/queries/get-jeunes-by-conseiller.query.handler.db'
 import { GetJeunesIdentitesQueryHandler } from '../../application/queries/get-jeunes-identites.query.handler.db'
-import { DetailConseillerQueryModel } from '../../application/queries/query-models/conseillers.query-model'
+import {
+  ConseillerSimpleQueryModel,
+  DetailConseillerQueryModel
+} from '../../application/queries/query-models/conseillers.query-model'
 import { IndicateursPourConseillerQueryModel } from '../../application/queries/query-models/indicateurs-pour-conseiller.query-model'
 import {
   DetailJeuneConseillerQueryModel,
@@ -87,7 +90,7 @@ import {
   CreerJeuneMiloPayload,
   DetailConseillerPayload,
   EnvoyerNotificationsPayload,
-  GetConseillerQueryParams,
+  GetConseillersQueryParams,
   GetIdentitesJeunesQueryParams,
   GetIndicateursPourConseillerQueryParams,
   GetRendezVousConseillerQueryParams,
@@ -102,7 +105,7 @@ export class ConseillersController {
   constructor(
     private readonly dateService: DateService,
     private readonly getDetailConseillerQueryHandler: GetDetailConseillerQueryHandler,
-    private readonly getConseillerByEmailQueryHandler: GetConseillerByEmailQueryHandler,
+    private readonly getConseillersQueryHandler: GetConseillersQueryHandler,
     private readonly getJeunesByConseillerQueryHandler: GetJeunesByConseillerQueryHandler,
     private readonly getResumeActionsDesJeunesDuConseillerQueryHandler: GetResumeActionsDesJeunesDuConseillerQueryHandlerDb,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
@@ -142,20 +145,22 @@ export class ConseillersController {
   }
 
   @ApiOperation({
-    summary: 'Récupère un conseiller par email',
-    description: 'Autorisé pour un conseiller'
+    summary:
+      'Recherche des conseillers par email ou par nom/prénom dans une même structure',
+    description: 'Autorisé pour un Conseiller Superviseur'
   })
   @Get()
   @ApiResponse({
-    type: DetailConseillerQueryModel
+    type: ConseillerSimpleQueryModel,
+    isArray: true
   })
-  async getDetailConseillerByEmail(
-    @Query() getConseillerQuery: GetConseillerQueryParams,
+  async getConseillers(
+    @Query() queryParams: GetConseillersQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<DetailConseillerQueryModel> {
-    const result = await this.getConseillerByEmailQueryHandler.execute(
+  ): Promise<ConseillerSimpleQueryModel[]> {
+    const result = await this.getConseillersQueryHandler.execute(
       {
-        emailConseiller: getConseillerQuery.email,
+        recherche: queryParams.q,
         structureUtilisateur: utilisateur.structure
       },
       utilisateur

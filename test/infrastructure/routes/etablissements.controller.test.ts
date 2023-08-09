@@ -2,9 +2,8 @@ import { HttpStatus, INestApplication } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import * as request from 'supertest'
 import { CloturerAnimationCollectiveCommandHandler } from '../../../src/application/commands/cloturer-animation-collective.command.handler'
-import { GetAnimationsCollectivesQueryHandler } from '../../../src/application/queries/rendez-vous/get-animations-collectives.query.handler.db'
-import { GetConseillersEtablissementQueryHandler } from 'src/application/queries/get-conseillers-etablissement.query.handler.db'
 import { GetJeunesByEtablissementQueryHandler } from '../../../src/application/queries/get-jeunes-by-etablissement.query.handler.db'
+import { GetAnimationsCollectivesQueryHandler } from '../../../src/application/queries/rendez-vous/get-animations-collectives.query.handler.db'
 import {
   emptySuccess,
   success
@@ -13,13 +12,12 @@ import {
   unHeaderAuthorization,
   unUtilisateurDecode
 } from '../../fixtures/authentification.fixture'
-import { expect, StubbedClass } from '../../utils'
+import { StubbedClass, expect } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
 describe('EtablissementsController', () => {
   let getAnimationsCollectivesQueryHandler: StubbedClass<GetAnimationsCollectivesQueryHandler>
-  let getConseillersEtablissementQueryHandler: StubbedClass<GetConseillersEtablissementQueryHandler>
   let getJeunesEtablissementQueryHandler: StubbedClass<GetJeunesByEtablissementQueryHandler>
   let cloturerAnimationCollectiveCommandHandler: StubbedClass<CloturerAnimationCollectiveCommandHandler>
   let app: INestApplication
@@ -28,9 +26,6 @@ describe('EtablissementsController', () => {
     app = await getApplicationWithStubbedDependencies()
     getAnimationsCollectivesQueryHandler = app.get(
       GetAnimationsCollectivesQueryHandler
-    )
-    getConseillersEtablissementQueryHandler = app.get(
-      GetConseillersEtablissementQueryHandler
     )
     getJeunesEtablissementQueryHandler = app.get(
       GetJeunesByEtablissementQueryHandler
@@ -101,34 +96,6 @@ describe('EtablissementsController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       '/etablissements/75114/jeunes'
-    )
-  })
-
-  describe('GET etablissements/:id/conseillers', () => {
-    it("renvoie les conseillers de l'établissement", async () => {
-      // Given
-      getConseillersEtablissementQueryHandler.execute
-        .withArgs(
-          {
-            idAgence: '75114'
-          },
-          unUtilisateurDecode()
-        )
-        .resolves(success([]))
-
-      // When
-      await request(app.getHttpServer())
-        .get('/etablissements/75114/conseillers')
-        .set('authorization', unHeaderAuthorization())
-
-        // Then
-        .expect(HttpStatus.OK)
-        .expect([])
-    })
-
-    ensureUserAuthenticationFailsIfInvalid(
-      'get',
-      '/etablissements/75114/conseillers'
     )
   })
 
