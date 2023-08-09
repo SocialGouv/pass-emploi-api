@@ -29,7 +29,7 @@ export class FavoriOffreServiceCiviqueAuthorizer {
     if (
       favori &&
       utilisateur &&
-      utilisateur.type === Authentification.Type.JEUNE &&
+      Authentification.estJeune(utilisateur.type) &&
       utilisateur.id === idJeune
     ) {
       return emptySuccess()

@@ -68,10 +68,9 @@ export function fromSqlToRendezVousDetailJeuneQueryModel(
     ),
     type: {
       code: rendezVousSql.type,
-      label:
-        type === Authentification.Type.JEUNE
-          ? mapCodeLabelTypeRendezVousJeune[rendezVousSql.type]
-          : mapCodeLabelTypeRendezVous[rendezVousSql.type]
+      label: Authentification.estJeune(type)
+        ? mapCodeLabelTypeRendezVousJeune[rendezVousSql.type]
+        : mapCodeLabelTypeRendezVous[rendezVousSql.type]
     },
     precision: rendezVousSql.precision ?? undefined,
     adresse: rendezVousSql.adresse ?? undefined,
@@ -173,7 +172,7 @@ function getLabelType(
   rendezVousSql: RendezVousSqlModel,
   typeUtilisateur: Authentification.Type
 ): string {
-  if (typeUtilisateur === Authentification.Type.JEUNE) {
+  if (Authentification.estJeune(typeUtilisateur)) {
     return mapCodeLabelTypeRendezVousJeune[rendezVousSql.type]
   } else {
     return mapCodeLabelTypeRendezVous[rendezVousSql.type]

@@ -257,10 +257,9 @@ export class FirebaseClient implements IFirebaseClient {
 
   async getToken(utilisateur: Authentification.Utilisateur): Promise<string> {
     const customClaims = {
-      jeuneId:
-        utilisateur.type === Authentification.Type.JEUNE
-          ? utilisateur.id
-          : null,
+      jeuneId: Authentification.estJeune(utilisateur.type)
+        ? utilisateur.id
+        : null,
       conseillerId:
         utilisateur.type === Authentification.Type.CONSEILLER
           ? utilisateur.id

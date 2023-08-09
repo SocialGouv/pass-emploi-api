@@ -44,6 +44,10 @@ export namespace Authentification {
     return utilisateur.roles.includes(Authentification.Role.SUPERVISEUR)
   }
 
+  export function estJeune(type: Authentification.Type): boolean {
+    return type === Authentification.Type.JEUNE
+  }
+
   export interface Repository {
     get(
       id: string,

@@ -20,10 +20,7 @@ export class JeuneAuthorizer {
     utilisateur: Authentification.Utilisateur,
     structureAutorisee = true
   ): Promise<Result> {
-    if (
-      utilisateur.type === Authentification.Type.JEUNE &&
-      structureAutorisee
-    ) {
+    if (Authentification.estJeune(utilisateur.type) && structureAutorisee) {
       const jeune = await this.jeuneRepository.existe(idJeune)
 
       if (jeune && utilisateur.id === idJeune) {

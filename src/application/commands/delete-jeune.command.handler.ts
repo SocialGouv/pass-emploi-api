@@ -57,7 +57,7 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
     command: DeleteJeuneCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.JEUNE) {
+    if (Authentification.estJeune(utilisateur.type)) {
       return this.jeuneAuthorizer.autoriserLeJeune(command.idJeune, utilisateur)
     }
     return this.supportAuthorizer.autoriserSupport(utilisateur)
