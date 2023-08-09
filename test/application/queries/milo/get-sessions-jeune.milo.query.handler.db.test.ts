@@ -17,6 +17,7 @@ import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/j
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { getDatabase } from '../../../utils/database-for-testing'
+import { SessionMilo } from '../../../../src/domain/milo/session.milo'
 
 describe('GetSessionsJeuneMiloQueryHandler', () => {
   const query = { idJeune: 'idJeune', token: 'token' }
@@ -122,27 +123,64 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
     })
 
     describe('quand le query getter renvoie un success', () => {
-      it('renvoie le même success', async () => {
-        // Given
-        await JeuneSqlModel.creer(
-          unJeuneDto({
-            id: 'idJeune',
-            idPartenaire: 'idDossier',
-            structure: Core.Structure.MILO,
-            instanceId: 'instanceId'
-          })
-        )
+      describe('quand on ne passe pas de filtre en query param', () => {
+        it('renvoie le même success', async () => {
+          // Given
+          await JeuneSqlModel.creer(
+            unJeuneDto({
+              id: 'idJeune',
+              idPartenaire: 'idDossier',
+              structure: Core.Structure.MILO,
+              instanceId: 'instanceId'
+            })
+          )
 
-        const unSuccess = success([uneSessionJeuneMiloQueryModel])
-        getSessionsQueryGetter.handle
-          .withArgs('idDossier', 'token')
-          .resolves(unSuccess)
+          const unSuccess = success([uneSessionJeuneMiloQueryModel])
+          getSessionsQueryGetter.handle
+            .withArgs('idDossier', 'token')
+            .resolves(unSuccess)
 
-        // When
-        const result = await getSessionsQueryHandler.handle(query)
+          // When
+          const result = await getSessionsQueryHandler.handle(query)
 
-        // Then
-        expect(result).to.deep.equal(unSuccess)
+          // Then
+          expect(result).to.deep.equal(unSuccess)
+        })
+      })
+      describe('quand on passe un filtre pour ne récupérer que les sessions ou le jeune est inscrit', () => {
+        it('renvoie le même success', async () => {
+          const queryAvecFiltre = {
+            idJeune: 'idJeune',
+            token: 'token',
+            filtrerEstInscrit: true
+          }
+
+          // Given
+          await JeuneSqlModel.creer(
+            unJeuneDto({
+              id: 'idJeune',
+              idPartenaire: 'idDossier',
+              structure: Core.Structure.MILO,
+              instanceId: 'instanceId'
+            })
+          )
+
+          const unSuccess = success([
+            {
+              ...uneSessionJeuneMiloQueryModel,
+              inscription: SessionMilo.Inscription.Statut.INSCRIT
+            }
+          ])
+          getSessionsQueryGetter.handle
+            .withArgs('idDossier', 'token')
+            .resolves(unSuccess)
+
+          // When
+          const result = await getSessionsQueryHandler.handle(queryAvecFiltre)
+
+          // Then
+          expect(result).to.deep.equal(unSuccess)
+        })
       })
     })
   })

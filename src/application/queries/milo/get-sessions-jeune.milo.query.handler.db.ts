@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
-import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
+import {
+  GetSessionsJeuneMiloQueryGetter,
+  sessionsAvecInscriptionTriees
+} from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { SessionJeuneMiloQueryModel } from 'src/application/queries/query-models/sessions.milo.query.model'
 import {
   JeuneMiloSansIdDossier,
@@ -8,7 +11,12 @@ import {
 } from 'src/building-blocks/types/domain-error'
 import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
-import { failure, Result } from 'src/building-blocks/types/result'
+import {
+  failure,
+  isSuccess,
+  Result,
+  success
+} from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { estMilo } from 'src/domain/core'
 import { ConseillerSqlModel } from '../../../infrastructure/sequelize/models/conseiller.sql-model'
@@ -17,6 +25,7 @@ import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sq
 export interface GetSessionsJeuneMiloQuery extends Query {
   idJeune: string
   token: string
+  filtrerEstInscrit?: boolean
 }
 
 @Injectable()
@@ -44,10 +53,16 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
       return failure(new JeuneMiloSansIdDossier(query.idJeune))
     }
 
-    return this.getSessionsQueryGetter.handle(
+    const resultSessions = await this.getSessionsQueryGetter.handle(
       jeuneSqlModel.idPartenaire,
       query.token
     )
+
+    if (query.filtrerEstInscrit && isSuccess(resultSessions)) {
+      return success(sessionsAvecInscriptionTriees(resultSessions))
+    }
+
+    return resultSessions
   }
 
   async authorize(
