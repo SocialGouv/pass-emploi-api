@@ -401,7 +401,7 @@ const evenements: {
   },
   [Evenement.Code.MESSAGE_OFFRE_PARTAGEE]: {
     categorie: 'Message',
-    action: 'Partager',
+    action: 'Partage',
     nom: 'Offre'
   },
   [Evenement.Code.RDV_CREE]: { categorie: 'Rendez-vous', action: 'Création' },
