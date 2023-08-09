@@ -49,7 +49,7 @@ export class AuthentificationSqlRepository
           return fromConseillerSqlToUtilisateur(conseillerSqlModel)
         }
       }
-    } else if (type === Authentification.Type.JEUNE) {
+    } else if (Authentification.estJeune(type)) {
       const jeuneSqlModel = await JeuneSqlModel.findOne({
         where: {
           idAuthentification: idUtilisateurAuth,

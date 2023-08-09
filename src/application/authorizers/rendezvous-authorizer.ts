@@ -34,7 +34,7 @@ export class RendezVousAuthorizer {
     idRendezVous: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.JEUNE) {
+    if (Authentification.estJeune(utilisateur.type)) {
       const rendezVous = await this.rendezVousRepository.get(idRendezVous)
       if (!rendezVous) {
         return failure(new NonTrouveError('RendezVous', idRendezVous))

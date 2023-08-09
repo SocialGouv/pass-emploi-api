@@ -23,7 +23,7 @@ export class RechercheAuthorizer {
     idRecherche: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.JEUNE) {
+    if (Authentification.estJeune(utilisateur.type)) {
       const rechercheExiste = await this.rechercheRepository.existe(
         idRecherche,
         idJeune

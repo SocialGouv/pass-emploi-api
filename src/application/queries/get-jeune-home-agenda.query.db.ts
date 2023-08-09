@@ -42,7 +42,7 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
 > {
   constructor(
     private jeuneAuthorizer: JeuneAuthorizer,
-    private getSessionsQueryGetter: GetSessionsJeuneMiloQueryGetter,
+    private getSessionsJeuneQueryGetter: GetSessionsJeuneMiloQueryGetter,
     private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer,
     private configuration: ConfigService
   ) {
@@ -80,14 +80,20 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
       if (!jeuneSqlModel.idPartenaire) {
         return failure(new JeuneMiloSansIdDossier(query.idJeune))
       }
-      const sessionsQueryModels = await this.getSessionsQueryGetter.handle(
-        jeuneSqlModel.idPartenaire,
-        query.token,
-        {
-          debut: lundiDernier,
-          fin: dimancheEnHuit
-        }
-      )
+      let sessionsQueryModels
+      if (Authentification.estJeune(utilisateur.type)) {
+        sessionsQueryModels = await this.getSessionsJeuneQueryGetter.handle(
+          jeuneSqlModel.idPartenaire,
+          query.token,
+          {
+            debut: lundiDernier,
+            fin: dimancheEnHuit
+          }
+        )
+      } else {
+        // FIXME     soucis d'appel de la route getSessionsJeune : le endpoint n'est pas atteignable avec un JWT conseiller
+        sessionsQueryModels = success([])
+      }
 
       sessionsMilo = sessionsAvecInscriptionTriees(sessionsQueryModels)
     } else {

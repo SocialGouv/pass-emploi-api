@@ -25,7 +25,7 @@ export class ActionAuthorizer {
 
     if (utilisateur && conseillerEtJeune) {
       if (
-        utilisateur.type === Authentification.Type.JEUNE &&
+        Authentification.estJeune(utilisateur.type) &&
         utilisateur.id === conseillerEtJeune.idJeune
       ) {
         return emptySuccess()

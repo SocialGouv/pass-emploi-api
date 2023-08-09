@@ -24,7 +24,7 @@ export class SuggestionAuthorizer {
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (
-      utilisateur.type === Authentification.Type.JEUNE &&
+      Authentification.estJeune(utilisateur.type) &&
       utilisateur.id === idJeune
     ) {
       const suggestion = await this.suggestionRepository.get(idSuggestion)
