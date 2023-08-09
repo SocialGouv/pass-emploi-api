@@ -25,7 +25,8 @@ import {
   ModifierJeuneDuConseillerCommandHandler
 } from '../../../src/application/commands/modifier-jeune-du-conseiller.command.handler'
 import { SendNotificationsNouveauxMessagesCommandHandler } from '../../../src/application/commands/send-notifications-nouveaux-messages.command.handler'
-import { GetConseillerByEmailQueryHandler } from '../../../src/application/queries/get-conseiller-by-email.query.handler.db'
+import { GetConseillersQueryHandler } from '../../../src/application/queries/get-conseillers.query.handler.db'
+import { GetDetailConseillerQueryHandler } from '../../../src/application/queries/get-detail-conseiller.query.handler.db'
 import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
 import { GetIndicateursPourConseillerQueryHandler } from '../../../src/application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { GetJeunesByConseillerQueryHandler } from '../../../src/application/queries/get-jeunes-by-conseiller.query.handler.db'
@@ -61,11 +62,10 @@ import { unJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-mode
 import { StubbedClass, expect } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
-import { GetDetailConseillerQueryHandler } from '../../../src/application/queries/get-detail-conseiller.query.handler.db'
 
 describe('ConseillersController', () => {
   let getDetailConseillerQueryHandler: StubbedClass<GetDetailConseillerQueryHandler>
-  let getConseillerByEmailQueryHandler: StubbedClass<GetConseillerByEmailQueryHandler>
+  let getConseillersQueryHandler: StubbedClass<GetConseillersQueryHandler>
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
   let getJeunesByConseillerQueryHandler: StubbedClass<GetJeunesByConseillerQueryHandler>
   let sendNotificationsNouveauxMessages: StubbedClass<SendNotificationsNouveauxMessagesCommandHandler>
@@ -88,7 +88,7 @@ describe('ConseillersController', () => {
   before(async () => {
     app = await getApplicationWithStubbedDependencies()
     getDetailConseillerQueryHandler = app.get(GetDetailConseillerQueryHandler)
-    getConseillerByEmailQueryHandler = app.get(GetConseillerByEmailQueryHandler)
+    getConseillersQueryHandler = app.get(GetConseillersQueryHandler)
     createActionCommandHandler = app.get(CreateActionCommandHandler)
     getJeunesByConseillerQueryHandler = app.get(
       GetJeunesByConseillerQueryHandler
@@ -137,39 +137,57 @@ describe('ConseillersController', () => {
     ensureUserAuthenticationFailsIfInvalid('delete', '/conseillers/whatever')
   })
 
-  describe('GET /conseillers?email', () => {
-    it("renvoie les infos du conseiller s'il existe ", async () => {
+  describe('GET /conseillers', () => {
+    const queryModel = [{ id: 'a', nom: 'b', prenom: 'c', email: 'd' }]
+    it('recherche des conseillers', async () => {
       // Given
-      const queryModel = detailConseillerQueryModel()
-      getConseillerByEmailQueryHandler.execute.resolves(success(queryModel))
+      getConseillersQueryHandler.execute.resolves(success(queryModel))
 
       // When - Then
       await request(app.getHttpServer())
-        .get('/conseillers?email=conseiller@email.fr')
+        .get('/conseillers?q=jean')
         .set('authorization', unHeaderAuthorization())
         .expect(HttpStatus.OK)
         .expect(queryModel)
 
-      expect(
-        getConseillerByEmailQueryHandler.execute
-      ).to.have.been.calledWithExactly(
+      expect(getConseillersQueryHandler.execute).to.have.been.calledWithExactly(
         {
-          emailConseiller: 'conseiller@email.fr',
-          structureUtilisateur: Core.Structure.MILO
+          structureUtilisateur: Core.Structure.MILO,
+          recherche: 'jean'
         },
         unUtilisateurDecode()
       )
     })
+    it('renvoie bad request si les criteres de recherche sont inferieurs à 2 caractères', async () => {
+      // Given
+      getConseillersQueryHandler.execute.resolves(success(queryModel))
+
+      // When - Then
+      await request(app.getHttpServer())
+        .get('/conseillers?q=j')
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+    it("renvoie bad request si aucun critere n'est renseigné", async () => {
+      // Given
+      getConseillersQueryHandler.execute.resolves(success(queryModel))
+
+      // When - Then
+      await request(app.getHttpServer())
+        .get('/conseillers')
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.BAD_REQUEST)
+    })
 
     it("renvoie un code 403 si l'utilisateur n'est pas superviseur ", async () => {
       // Given
-      getConseillerByEmailQueryHandler.execute.resolves(
+      getConseillersQueryHandler.execute.resolves(
         failure(new DroitsInsuffisants())
       )
 
       // When - Then
       await request(app.getHttpServer())
-        .get('/conseillers?email=conseiller@email.fr&structure=POLE_EMPLOI')
+        .get('/conseillers?q=conseiller@email.fr&structure=POLE_EMPLOI')
         .set('authorization', unHeaderAuthorization())
         .expect(HttpStatus.FORBIDDEN)
     })
