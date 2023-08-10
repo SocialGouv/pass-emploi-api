@@ -1617,9 +1617,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@google-cloud/bigquery@npm:^6.2.0":
-  version: 6.2.0
-  resolution: "@google-cloud/bigquery@npm:6.2.0"
+"@google-cloud/bigquery@npm:^7.0.0":
+  version: 7.1.1
+  resolution: "@google-cloud/bigquery@npm:7.1.1"
   dependencies:
     "@google-cloud/common": ^4.0.0
     "@google-cloud/paginator": ^4.0.0
@@ -1630,11 +1630,9 @@ __metadata:
     duplexify: ^4.0.0
     extend: ^3.0.2
     is: ^3.3.0
-    p-event: ^4.1.0
-    readable-stream: ^4.0.0
     stream-events: ^1.0.5
     uuid: ^9.0.0
-  checksum: c298b7fadd3de82ef8895c4830d7f54a5830f9b45a2cd9ee3891d17cf893f95113f8865ff2df10c87c0c79769f18278045fdb3c2f4f38aa43e7169dae069d191
+  checksum: c97bb85c6bb05a2d0567a59cb7e036a7e115cf95b53d4900e6ab58474acdc68dd6796e8ae3e042dc69bb0c051bba5a781bb2c23422840a20f083009d612993c2
   languageName: node
   linkType: hard
 
@@ -9266,7 +9264,7 @@ __metadata:
   dependencies:
     "@aws-sdk/client-s3": ^3.352.0
     "@aws-sdk/s3-request-presigner": ^3.352.0
-    "@google-cloud/bigquery": ^6.2.0
+    "@google-cloud/bigquery": ^7.0.0
     "@nestjs/axios": 1.0.1
     "@nestjs/cli": ^9.5.0
     "@nestjs/common": 9.4.3
@@ -9907,15 +9905,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"p-event@npm:^4.1.0":
-  version: 4.2.0
-  resolution: "p-event@npm:4.2.0"
-  dependencies:
-    p-timeout: ^3.1.0
-  checksum: 8a3588f7a816a20726a3262dfeee70a631e3997e4773d23219176333eda55cce9a76219e3d2b441b331eb746e14fdb381eb2694ab9ff2fcf87c846462696fe89
-  languageName: node
-  linkType: hard
-
 "p-finally@npm:^1.0.0":
   version: 1.0.0
   resolution: "p-finally@npm:1.0.0"
@@ -9999,15 +9988,6 @@ __metadata:
   dependencies:
     p-finally: ^1.0.0
   checksum: 65a456f49cca1328774a6bfba61aac98d854b36df9153c2887f82f078d4399e9a30463be8a479871c22ed350a23b34a66ff303ca652b9d81ed4ff5260ac660d2
-  languageName: node
-  linkType: hard
-
-"p-timeout@npm:^3.1.0":
-  version: 3.2.0
-  resolution: "p-timeout@npm:3.2.0"
-  dependencies:
-    p-finally: ^1.0.0
-  checksum: 3dd0eaa048780a6f23e5855df3dd45c7beacff1f820476c1d0d1bcd6648e3298752ba2c877aa1c92f6453c7dd23faaf13d9f5149fc14c0598a142e2c5e8d649c
   languageName: node
   linkType: hard
 
