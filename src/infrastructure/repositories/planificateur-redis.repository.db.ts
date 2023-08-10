@@ -98,7 +98,8 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
       repeat: {
         cron: cron.expression,
         tz: CRON_TIMEZONE,
-        startDate: cron.dateDebutExecution
+        startDate: cron.dateDebutExecution,
+        key: cron.type
       }
     })
   }
