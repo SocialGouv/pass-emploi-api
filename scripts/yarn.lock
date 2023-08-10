@@ -936,10 +936,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"remove-accents@npm:^0.4.2":
-  version: 0.4.4
-  resolution: "remove-accents@npm:0.4.4"
-  checksum: 0219a20550f8e6d7ebb47993fc08633c9c10b171d573467671641178de7a00b47ffcdbbf3be323a22c45de8903ac869cc4707dfc5aa5f25b7711e0c9b4daf4f4
+"remove-accents@npm:^0.5.0":
+  version: 0.5.0
+  resolution: "remove-accents@npm:0.5.0"
+  checksum: 7045b37015acb03df406d21f9cbe93c3fcf2034189f5d2e33b1dace9c7d6bdcd839929905ced21a5d76c58553557e1a42651930728702312a5774179d5b9147b
   languageName: node
   linkType: hard
 
@@ -1164,7 +1164,7 @@ __metadata:
     node-fetch: ^3.1.0
     pg: ^8.7.1
     pg-connection-string: ^2.5.0
-    remove-accents: ^0.4.2
+    remove-accents: ^0.5.0
     typescript: ^4.8.3
   languageName: unknown
   linkType: soft
