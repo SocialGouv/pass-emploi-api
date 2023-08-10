@@ -94,8 +94,16 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
               page: 1,
               nbSessions: 2,
               sessions: [
-                { session: sessionNonVisible, offre: uneOffreDto },
-                { session: sessionVisibleACayenne, offre: uneOffreDto }
+                {
+                  session: sessionNonVisible,
+                  offre: uneOffreDto,
+                  sessionInstance: { statut: 'ONGOING' }
+                },
+                {
+                  session: sessionVisibleACayenne,
+                  offre: uneOffreDto,
+                  sessionInstance: { statut: 'ONGOING' }
+                }
               ]
             })
           )
@@ -109,7 +117,11 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
         // Then
         expect(result).to.deep.equal(
           success([
-            { ...uneSessionJeuneMiloQueryModel, id: idSession3.toString() }
+            {
+              ...uneSessionJeuneMiloQueryModel,
+              id: idSession3.toString(),
+              inscription: 'INSCRIT'
+            }
           ])
         )
       })
@@ -122,7 +134,13 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
             success({
               page: 1,
               nbSessions: 1,
-              sessions: [{ session: sessionVisibleAParis, offre: uneOffreDto }]
+              sessions: [
+                {
+                  session: sessionVisibleAParis,
+                  offre: uneOffreDto,
+                  sessionInstance: { statut: 'ONGOING' }
+                }
+              ]
             })
           )
 
@@ -141,13 +159,55 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
               ...uneSessionJeuneMiloQueryModel,
               id: idSession2.toString(),
               dateHeureDebut: dateHeureDebutTimeZoneParis,
-              dateHeureFin: dateHeureFinTimeZoneParis
+              dateHeureFin: dateHeureFinTimeZoneParis,
+              inscription: 'INSCRIT'
             }
           ])
         )
       })
 
-      it('avec l’inscription du jeune', async () => {
+      it('sur une période donnée si elle est renseignée', async () => {
+        // Given
+        const periode = {
+          debut: DateTime.local(2022),
+          fin: DateTime.local(2023)
+        }
+        miloClient.getSessionsJeune
+          .withArgs(idpToken, jeune.idPartenaire, periode)
+          .resolves(
+            success({
+              page: 1,
+              nbSessions: 1,
+              sessions: [
+                {
+                  session: sessionVisibleACayenne,
+                  offre: uneOffreDto,
+                  sessionInstance: { statut: 'ONGOING' }
+                }
+              ]
+            })
+          )
+
+        // When
+        const result = await getSessionsQueryGetter.handle(
+          jeune.idPartenaire,
+          'token',
+          { periode }
+        )
+
+        // Then
+        expect(result).to.deep.equal(
+          success([
+            {
+              ...uneSessionJeuneMiloQueryModel,
+              id: idSession3.toString(),
+              inscription: 'INSCRIT'
+            }
+          ])
+        )
+      })
+
+      it('permet de garder celles auxquelles le jeune n’est pas inscrit', async () => {
         // Given
         miloClient.getSessionsJeune
           .withArgs(idpToken, jeune.idPartenaire)
@@ -170,6 +230,10 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
                   session: sessionVisibleACayenne,
                   offre: uneOffreDto,
                   sessionInstance: { statut: 'REFUSAL' }
+                },
+                {
+                  session: sessionVisibleACayenne,
+                  offre: uneOffreDto
                 }
               ]
             })
@@ -178,7 +242,8 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
         // When
         const result = await getSessionsQueryGetter.handle(
           jeune.idPartenaire,
-          'token'
+          'token',
+          { keepAllSessionsFromStructure: true }
         )
 
         // Then
@@ -198,40 +263,11 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
               ...uneSessionJeuneMiloQueryModel,
               id: idSession3.toString(),
               inscription: SessionMilo.Inscription.Statut.REFUS_TIERS
+            },
+            {
+              ...uneSessionJeuneMiloQueryModel,
+              id: idSession3.toString()
             }
-          ])
-        )
-      })
-
-      it('sur une période donnée si elle est renseignée', async () => {
-        // Given
-        const periode = {
-          debut: DateTime.local(2022),
-          fin: DateTime.local(2023)
-        }
-        miloClient.getSessionsJeune
-          .withArgs(idpToken, jeune.idPartenaire, periode)
-          .resolves(
-            success({
-              page: 1,
-              nbSessions: 1,
-              sessions: [
-                { session: sessionVisibleACayenne, offre: uneOffreDto }
-              ]
-            })
-          )
-
-        // When
-        const result = await getSessionsQueryGetter.handle(
-          jeune.idPartenaire,
-          'token',
-          periode
-        )
-
-        // Then
-        expect(result).to.deep.equal(
-          success([
-            { ...uneSessionJeuneMiloQueryModel, id: idSession3.toString() }
           ])
         )
       })

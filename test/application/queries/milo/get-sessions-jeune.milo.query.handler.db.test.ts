@@ -137,7 +137,9 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
 
           const unSuccess = success([uneSessionJeuneMiloQueryModel])
           getSessionsQueryGetter.handle
-            .withArgs('idDossier', 'token')
+            .withArgs('idDossier', 'token', {
+              keepAllSessionsFromStructure: true
+            })
             .resolves(unSuccess)
 
           // When
@@ -172,7 +174,9 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
             }
           ])
           getSessionsQueryGetter.handle
-            .withArgs('idDossier', 'token')
+            .withArgs('idDossier', 'token', {
+              keepAllSessionsFromStructure: false
+            })
             .resolves(unSuccess)
 
           // When

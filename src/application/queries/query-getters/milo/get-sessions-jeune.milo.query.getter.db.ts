@@ -21,7 +21,10 @@ export class GetSessionsJeuneMiloQueryGetter {
   async handle(
     idPartenaire: string,
     token: string,
-    periode?: { debut: DateTime; fin: DateTime }
+    options?: {
+      periode?: { debut: DateTime; fin: DateTime }
+      keepAllSessionsFromStructure?: boolean
+    }
   ): Promise<Result<SessionJeuneMiloQueryModel[]>> {
     const idpToken = await this.keycloakClient.exchangeTokenJeune(
       token,
@@ -31,7 +34,7 @@ export class GetSessionsJeuneMiloQueryGetter {
     const resultSessionMiloClient = await this.miloClient.getSessionsJeune(
       idpToken,
       idPartenaire,
-      periode
+      options?.periode
     )
 
     if (isFailure(resultSessionMiloClient)) {
@@ -42,7 +45,10 @@ export class GetSessionsJeuneMiloQueryGetter {
       resultSessionMiloClient.data.sessions,
       idPartenaire
     )
-    return success(sessionsVisiblesQueryModels)
+
+    if (options?.keepAllSessionsFromStructure)
+      return success(sessionsVisiblesQueryModels)
+    return success(trierSessionsAvecInscriptions(sessionsVisiblesQueryModels))
   }
 }
 
@@ -84,11 +90,10 @@ async function mapperSessionsVisiblesToTimezone(
   }, new Map<string, string>())
 }
 
-export function sessionsAvecInscriptionTriees(
-  sessionsResult: Result<SessionJeuneMiloQueryModel[]>
+function trierSessionsAvecInscriptions(
+  sessions: SessionJeuneMiloQueryModel[]
 ): SessionJeuneMiloQueryModel[] {
-  if (isFailure(sessionsResult)) return []
-  return sessionsResult.data
+  return sessions
     .filter(({ inscription }) =>
       SessionMilo.Inscription.estInscrit(inscription)
     )

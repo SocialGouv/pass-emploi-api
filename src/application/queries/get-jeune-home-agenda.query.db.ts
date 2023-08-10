@@ -2,13 +2,15 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { DateTime } from 'luxon'
 import { Op } from 'sequelize'
-import {
-  GetSessionsJeuneMiloQueryGetter,
-  sessionsAvecInscriptionTriees
-} from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
+import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
-import { failure, Result, success } from 'src/building-blocks/types/result'
+import {
+  failure,
+  isFailure,
+  Result,
+  success
+} from 'src/building-blocks/types/result'
 import { generateSourceRendezVousCondition } from 'src/config/feature-flipping'
 import { Action } from 'src/domain/action/action'
 import { Authentification } from 'src/domain/authentification'
@@ -28,6 +30,7 @@ import { ActionQueryModel } from './query-models/actions.query-model'
 import { JeuneHomeAgendaQueryModel } from './query-models/home-jeune-suivi.query-model'
 import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
 import { estMilo } from '../../domain/core'
+import { SessionJeuneMiloQueryModel } from './query-models/sessions.milo.query.model'
 
 export interface GetJeuneHomeAgendaQuery extends Query {
   idJeune: string
@@ -75,29 +78,28 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
       this.recupererLeNombreDactionsEnRetard(query)
     ])
 
-    let sessionsMilo
-    if (estMilo(utilisateur.structure)) {
+    let sessionsMilo: SessionJeuneMiloQueryModel[]
+    if (
+      estMilo(utilisateur.structure) &&
+      Authentification.estJeune(utilisateur.type)
+    ) {
       if (!jeuneSqlModel.idPartenaire) {
         return failure(new JeuneMiloSansIdDossier(query.idJeune))
       }
-      let sessionsQueryModels
-      if (Authentification.estJeune(utilisateur.type)) {
-        sessionsQueryModels = await this.getSessionsJeuneQueryGetter.handle(
-          jeuneSqlModel.idPartenaire,
-          query.token,
-          {
+      const sessionsQueryModels = await this.getSessionsJeuneQueryGetter.handle(
+        jeuneSqlModel.idPartenaire,
+        query.token,
+        {
+          periode: {
             debut: lundiDernier,
             fin: dimancheEnHuit
           }
-        )
-      } else {
-        // FIXME     soucis d'appel de la route getSessionsJeune : le endpoint n'est pas atteignable avec un JWT conseiller
-        sessionsQueryModels = success([])
-      }
-
-      sessionsMilo = sessionsAvecInscriptionTriees(sessionsQueryModels)
+        }
+      )
+      if (isFailure(sessionsQueryModels)) return sessionsQueryModels
+      sessionsMilo = sessionsQueryModels.data
     } else {
-      sessionsMilo = sessionsAvecInscriptionTriees(success([]))
+      sessionsMilo = []
     }
 
     return success({
