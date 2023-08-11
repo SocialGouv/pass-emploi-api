@@ -48,7 +48,7 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
     return this.getSessionsQueryGetter.handle(
       jeuneSqlModel.idPartenaire,
       query.token,
-      { keepAllSessionsFromStructure: !query.filtrerEstInscrit }
+      { filtrerEstInscrit: query.filtrerEstInscrit }
     )
   }
 

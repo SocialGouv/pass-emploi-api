@@ -243,7 +243,7 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
         const result = await getSessionsQueryGetter.handle(
           jeune.idPartenaire,
           'token',
-          { keepAllSessionsFromStructure: true }
+          { filtrerEstInscrit: false }
         )
 
         // Then

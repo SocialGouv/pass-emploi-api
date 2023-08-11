@@ -23,7 +23,7 @@ export class GetSessionsJeuneMiloQueryGetter {
     token: string,
     options?: {
       periode?: { debut: DateTime; fin: DateTime }
-      keepAllSessionsFromStructure?: boolean
+      filtrerEstInscrit?: boolean
     }
   ): Promise<Result<SessionJeuneMiloQueryModel[]>> {
     const idpToken = await this.keycloakClient.exchangeTokenJeune(
@@ -46,9 +46,9 @@ export class GetSessionsJeuneMiloQueryGetter {
       idPartenaire
     )
 
-    if (options?.keepAllSessionsFromStructure)
-      return success(sessionsVisiblesQueryModels)
-    return success(trierSessionsAvecInscriptions(sessionsVisiblesQueryModels))
+    if (options?.filtrerEstInscrit)
+      return success(trierSessionsAvecInscriptions(sessionsVisiblesQueryModels))
+    return success(sessionsVisiblesQueryModels)
   }
 }
 
