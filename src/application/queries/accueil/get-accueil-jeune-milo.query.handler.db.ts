@@ -2,17 +2,19 @@ import { Injectable } from '@nestjs/common'
 
 import { DateTime } from 'luxon'
 import { Op } from 'sequelize'
-import {
-  GetSessionsJeuneMiloQueryGetter,
-  sessionsAvecInscriptionTriees
-} from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
+import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import {
   JeuneMiloSansIdDossier,
   NonTrouveError
 } from 'src/building-blocks/types/domain-error'
 import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
-import { failure, Result, success } from 'src/building-blocks/types/result'
+import {
+  failure,
+  isSuccess,
+  Result,
+  success
+} from 'src/building-blocks/types/result'
 import { Action } from 'src/domain/action/action'
 import { Authentification } from 'src/domain/authentification'
 import { estMilo, estMiloPassEmploi } from 'src/domain/core'
@@ -31,6 +33,7 @@ import {
 } from '../query-mappers/rendez-vous-milo.mappers'
 import { AccueilJeuneMiloQueryModel } from '../query-models/jeunes.milo.query-model'
 import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
+import { SessionJeuneMiloQueryModel } from '../query-models/sessions.milo.query.model'
 
 export interface GetAccueilJeuneMiloQuery extends Query {
   idJeune: string
@@ -96,7 +99,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       this.getCampagneQueryGetter.handle({ idJeune })
     ])
 
-    let sessions
+    let sessions: SessionJeuneMiloQueryModel[] = []
     if (estMilo(utilisateur.structure)) {
       if (!jeuneSqlModel.idPartenaire) {
         return failure(new JeuneMiloSansIdDossier(query.idJeune))
@@ -104,12 +107,11 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       const sessionsQueryModels = await this.getSessionsQueryGetter.handle(
         jeuneSqlModel.idPartenaire,
         query.token,
-        { debut: maintenant, fin: dateFinDeSemaine }
+        { periode: { debut: maintenant, fin: dateFinDeSemaine } }
       )
-
-      sessions = sessionsAvecInscriptionTriees(sessionsQueryModels)
-    } else {
-      sessions = sessionsAvecInscriptionTriees(success([]))
+      if (isSuccess(sessionsQueryModels)) {
+        sessions = sessionsQueryModels.data
+      }
     }
 
     return success({

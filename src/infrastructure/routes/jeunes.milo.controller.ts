@@ -15,6 +15,7 @@ import {
 } from 'src/application/queries/query-models/sessions.milo.query.model'
 import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
 import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
+import { GetSessionsJeunesQueryParams } from './validation/jeunes-milo.inputs'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -68,10 +69,15 @@ export class JeunesMiloController {
   async getSessions(
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
-    @AccessToken() accessToken: string
+    @AccessToken() accessToken: string,
+    @Query() getSessionsJeunesQueryParams: GetSessionsJeunesQueryParams
   ): Promise<SessionJeuneMiloQueryModel[]> {
     const result = await this.getSessionsQueryHandler.execute(
-      { idJeune, token: accessToken },
+      {
+        idJeune,
+        token: accessToken,
+        filtrerEstInscrit: getSessionsJeunesQueryParams.filtrerEstInscrit
+      },
       utilisateur
     )
 

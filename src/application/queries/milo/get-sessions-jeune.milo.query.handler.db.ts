@@ -17,6 +17,7 @@ import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sq
 export interface GetSessionsJeuneMiloQuery extends Query {
   idJeune: string
   token: string
+  filtrerEstInscrit?: boolean
 }
 
 @Injectable()
@@ -46,7 +47,8 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
 
     return this.getSessionsQueryGetter.handle(
       jeuneSqlModel.idPartenaire,
-      query.token
+      query.token,
+      { filtrerEstInscrit: query.filtrerEstInscrit }
     )
   }
 

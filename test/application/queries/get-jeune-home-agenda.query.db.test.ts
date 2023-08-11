@@ -85,8 +85,10 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
     beforeEach(async () => {
       sessionsQueryGetter.handle
         .withArgs('idDossier', token, {
-          debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
-          fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
+          periode: {
+            debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
+            fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
+          }
         })
         .resolves(success([]))
     })
@@ -140,8 +142,10 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         ])
       sessionsQueryGetter.handle
         .withArgs('idDossier', token, {
-          debut: DateTime.fromISO(_lundiDernier, { setZone: true }),
-          fin: DateTime.fromISO(_dimancheEnHuit, { setZone: true })
+          periode: {
+            debut: DateTime.fromISO(_lundiDernier, { setZone: true }),
+            fin: DateTime.fromISO(_dimancheEnHuit, { setZone: true })
+          }
         })
         .resolves(success([]))
 
@@ -257,18 +261,14 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
     describe('sessionsMilo', () => {
       it('renvoie un tableau vide si le jeune n’est inscrit à aucune session sur la période', async () => {
         // Given
-        const sessionSansInscriptionCetteSemaine = {
-          ...uneSessionJeuneMiloQueryModel,
-          dateHeureDebut: DateTime.fromJSDate(demain)
-            .plus({ days: 1 })
-            .toISODate()
-        }
         sessionsQueryGetter.handle
           .withArgs('idDossier', token, {
-            debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
-            fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
+            periode: {
+              debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
+              fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
+            }
           })
-          .resolves(success([sessionSansInscriptionCetteSemaine]))
+          .resolves(success([]))
 
         // When
         const result = await handler.handle(homeQuery, utilisateurJeune)
@@ -295,13 +295,15 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         }
         sessionsQueryGetter.handle
           .withArgs('idDossier', token, {
-            debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
-            fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
+            periode: {
+              debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
+              fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
+            }
           })
           .resolves(
             success([
-              sessionAvecInscriptionAJPlus2,
-              sessionAvecInscriptionAJPlus1
+              sessionAvecInscriptionAJPlus1,
+              sessionAvecInscriptionAJPlus2
             ])
           )
 

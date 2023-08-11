@@ -111,8 +111,10 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
 
       sessionsQueryGetter.handle
         .withArgs('idDossier', token, {
-          debut: maintenant,
-          fin: DateTime.fromISO(dateFinDeSemaineString)
+          periode: {
+            debut: maintenant,
+            fin: DateTime.fromISO(dateFinDeSemaineString)
+          }
         })
         .resolves(success([]))
     })
@@ -186,8 +188,10 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
           // Given
           sessionsQueryGetter.handle
             .withArgs('idDossier', token, {
-              debut: maintenant,
-              fin: DateTime.fromISO(dateFinDeSemaineString)
+              periode: {
+                debut: maintenant,
+                fin: DateTime.fromISO(dateFinDeSemaineString)
+              }
             })
             .resolves(
               failure(new NonTrouveError('Jeune', accueilQuery.idJeune))
@@ -204,16 +208,14 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
 
         it('sans les sessions si le jeune n’en a pas où il est inscrit dans la semaine', async () => {
           // Given
-          const sessionSansInscriptionCetteSemaine = {
-            ...uneSessionJeuneMiloQueryModel,
-            dateHeureDebut: maintenant.plus({ days: 1 }).toISODate()
-          }
           sessionsQueryGetter.handle
             .withArgs('idDossier', token, {
-              debut: maintenant,
-              fin: DateTime.fromISO(dateFinDeSemaineString)
+              periode: {
+                debut: maintenant,
+                fin: DateTime.fromISO(dateFinDeSemaineString)
+              }
             })
-            .resolves(success([sessionSansInscriptionCetteSemaine]))
+            .resolves(success([]))
 
           // When
           result = await handler.handle(accueilQuery, utilisateurJeune)
@@ -232,8 +234,10 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
           }
           sessionsQueryGetter.handle
             .withArgs('idDossier', token, {
-              debut: maintenant,
-              fin: DateTime.fromISO(dateFinDeSemaineString)
+              periode: {
+                debut: maintenant,
+                fin: DateTime.fromISO(dateFinDeSemaineString)
+              }
             })
             .resolves(success([sessionAvecInscriptionCetteSemaine]))
 
@@ -304,10 +308,6 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
 
     describe('retourne une prochaine session Milo', () => {
       it('renseignée s’il y en a une', async () => {
-        const sessionSansInscriptionAJPlus1 = {
-          ...uneSessionJeuneMiloQueryModel,
-          dateHeureDebut: maintenant.plus({ days: 1 }).toISODate()
-        }
         const sessionAvecInscriptionAJPlus2 = {
           ...uneSessionJeuneMiloQueryModel,
           dateHeureDebut: maintenant.plus({ days: 2 }).toISODate(),
@@ -320,12 +320,13 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
         }
         sessionsQueryGetter.handle
           .withArgs('idDossier', token, {
-            debut: maintenant,
-            fin: DateTime.fromISO(dateFinDeSemaineString)
+            periode: {
+              debut: maintenant,
+              fin: DateTime.fromISO(dateFinDeSemaineString)
+            }
           })
           .resolves(
             success([
-              sessionSansInscriptionAJPlus1,
               sessionAvecInscriptionAJPlus2,
               sessionAvecInscriptionAJPlus3
             ])
@@ -344,8 +345,10 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
         // Given
         sessionsQueryGetter.handle
           .withArgs('idDossier', token, {
-            debut: maintenant,
-            fin: DateTime.fromISO(dateFinDeSemaineString)
+            periode: {
+              debut: maintenant,
+              fin: DateTime.fromISO(dateFinDeSemaineString)
+            }
           })
           .resolves(success([]))
 
