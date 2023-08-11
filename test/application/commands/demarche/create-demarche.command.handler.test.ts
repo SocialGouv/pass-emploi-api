@@ -132,13 +132,45 @@ describe('CreateDemarcheCommandHandler', () => {
   })
 
   describe('monitor', () => {
-    it('monitore la creation de la démarche', async () => {
+    it('crée un événement d’engagement pour une démarche personnalisée (hors référentiel)', async () => {
+      // Given
+      const commandPourDemarchePersonnalisee: CreateDemarcheCommand = {
+        idJeune: 'idJeune',
+        accessToken: 'accessToken',
+        description: 'demarche personalisée',
+        dateFin: uneDatetime()
+      }
+
       // When
-      await createDemarcheCommandHandler.monitor(utilisateur)
+      await createDemarcheCommandHandler.monitor(
+        utilisateur,
+        commandPourDemarchePersonnalisee
+      )
 
       // Then
       expect(evenementService.creer).to.have.been.calledWithExactly(
         Evenement.Code.ACTION_CREEE_HORS_REFERENTIEL,
+        utilisateur
+      )
+    })
+    it('crée un événement d’engagement pour une démarche du référentiel pôle emploi', async () => {
+      // Given
+      const commandPourDemarcheDuReferentiel: CreateDemarcheCommand = {
+        idJeune: 'idJeune',
+        accessToken: 'accessToken',
+        codeQuoi: 'codeQuoi',
+        codePourquoi: 'codePourquoi',
+        codeComment: 'codeComment',
+        dateFin: uneDatetime()
+      }
+      // When
+      await createDemarcheCommandHandler.monitor(
+        utilisateur,
+        commandPourDemarcheDuReferentiel
+      )
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.ACTION_CREEE_REFERENTIEL,
         utilisateur
       )
     })
