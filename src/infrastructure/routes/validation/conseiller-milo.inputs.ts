@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
   IsBoolean,
   IsDateString,
@@ -11,9 +11,10 @@ import {
   ValidateIf,
   IsDefined
 } from 'class-validator'
-import { Type } from 'class-transformer'
+import { Transform, Type } from 'class-transformer'
 import { SessionMilo } from '../../../domain/milo/session.milo'
 import Inscription = SessionMilo.Inscription
+import { transformStringToBoolean } from './utils/transformers'
 
 export class GetSessionsQueryParams {
   @IsOptional()
@@ -25,6 +26,12 @@ export class GetSessionsQueryParams {
   @IsNotEmpty()
   @IsDateString()
   dateFin?: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  @Transform(params => transformStringToBoolean(params, 'filtrerAClore'))
+  filtrerAClore?: boolean
 }
 
 class InscriptionSessionMiloPayload {

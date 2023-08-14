@@ -15,12 +15,14 @@ import { SessionConseillerMiloQueryModel } from '../query-models/sessions.milo.q
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { DateService } from 'src/utils/date-service'
 import { ConfigService } from '@nestjs/config'
+import { GetSessionsConseillerMiloQueryGetter } from '../query-getters/milo/get-sessions-conseiller.milo.getter.db'
 
 export interface GetSessionsConseillerMiloQuery extends Query {
   idConseiller: string
   token: string
   dateDebut?: DateTime
   dateFin?: DateTime
+  filtrerAClore?: boolean
 }
 
 @Injectable()
@@ -34,6 +36,7 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
     private conseillerMiloRepository: Conseiller.Milo.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer,
     private keycloakClient: KeycloakClient,
+    private readonly getSessionsQueryGetter: GetSessionsConseillerMiloQueryGetter,
     private dateService: DateService,
     private configService: ConfigService
   ) {
@@ -57,11 +60,21 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
     const { id: idStructureMilo, timezone: timezoneStructure } =
       resultConseiller.data.structure
 
+    // todo     retirer le token exchange ici comme on le fait dans le querry getter
     const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
       query.token
     )
 
-    const [resultSessionMilo, sessionsSqlModels] = await Promise.all([
+    const [
+      resultSessionsMiloFromQueryGetter,
+      resultSessionMiloFromClient,
+      sessionsSqlModels
+    ] = await Promise.all([
+      this.getSessionsQueryGetter.handle(
+        query.token,
+        idStructureMilo,
+        timezoneStructure
+      ),
       this.miloClient.getSessionsConseiller(
         idpToken,
         idStructureMilo,
@@ -71,11 +84,11 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
       ),
       SessionMiloSqlModel.findAll({ where: { idStructureMilo } })
     ])
-    if (isFailure(resultSessionMilo)) {
-      return resultSessionMilo
+    if (isFailure(resultSessionMiloFromClient)) {
+      return resultSessionMiloFromClient
     }
 
-    const sessionsQueryModels = resultSessionMilo.data.sessions.map(
+    const sessionsQueryModels = resultSessionMiloFromClient.data.sessions.map(
       sessionMilo => {
         const sessionSqlModel = sessionsSqlModels.find(
           ({ id }) => id === sessionMilo.session.id.toString()
