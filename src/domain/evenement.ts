@@ -401,7 +401,7 @@ const evenements: {
   },
   [Evenement.Code.MESSAGE_OFFRE_PARTAGEE]: {
     categorie: 'Message',
-    action: 'Partager',
+    action: 'Partage',
     nom: 'Offre'
   },
   [Evenement.Code.RDV_CREE]: { categorie: 'Rendez-vous', action: 'Création' },
@@ -480,7 +480,7 @@ const evenements: {
   },
   [Evenement.Code.PIECE_JOINTE_TELECHARGEE]: {
     categorie: 'Message',
-    action: 'Téléchargement PJ'
+    action: 'Ouverture PJ'
   },
   [Evenement.Code.PREFERENCES_MISES_A_JOUR]: {
     categorie: 'Préférences',

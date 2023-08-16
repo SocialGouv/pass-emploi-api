@@ -69,10 +69,26 @@ export class CreateDemarcheCommandHandler extends CommandHandler<
     )
   }
 
-  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creer(
-      Evenement.Code.ACTION_CREEE_HORS_REFERENTIEL,
-      utilisateur
-    )
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    command: CreateDemarcheCommand
+  ): Promise<void> {
+    if (command.description) {
+      await this.evenementService.creer(
+        Evenement.Code.ACTION_CREEE_HORS_REFERENTIEL,
+        utilisateur
+      )
+    }
+    if (command.codeQuoi && command.codePourquoi) {
+      await this.evenementService.creer(
+        Evenement.Code.ACTION_CREEE_REFERENTIEL,
+        utilisateur
+      )
+    }
   }
 }
+
+/*
+ -utiliser le parametre command
+ - Action crée reférentiel
+* */
