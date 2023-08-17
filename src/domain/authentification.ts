@@ -14,7 +14,8 @@ export namespace Authentification {
   }
 
   export enum Role {
-    SUPERVISEUR = 'SUPERVISEUR'
+    SUPERVISEUR = 'SUPERVISEUR',
+    SUPERVISEUR_PE_BRSA = 'SUPERVISEUR_PE_BRSA'
   }
 
   export const METADATA_IDENTIFIER_API_KEY_PARTENAIRE = 'partenaire'

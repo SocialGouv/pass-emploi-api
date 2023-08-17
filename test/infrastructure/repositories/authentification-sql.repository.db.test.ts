@@ -45,7 +45,7 @@ describe('AuthentificationSqlRepository', () => {
       )
     })
     describe("quand c'est un conseiller", () => {
-      it("retourne l'utilisateur quand il existe", async () => {
+      it("retourne l'utilisateur quand il existe sans roles", async () => {
         // When
         const utilisateur = await authentificationSqlRepository.get(
           'id-authentification-conseiller',
@@ -70,7 +70,7 @@ describe('AuthentificationSqlRepository', () => {
       })
     })
     describe("quand c'est un conseiller superviseur", () => {
-      it("retourne l'utilisateur avec le bon role", async () => {
+      it("retourne l'utilisateur avec le role SUPERVISEUR uniquement", async () => {
         // Given
         await SuperviseurSqlModel.create({
           email: conseillerDto.email,
@@ -88,6 +88,44 @@ describe('AuthentificationSqlRepository', () => {
         expect(utilisateur).to.deep.equal(
           unUtilisateurConseiller({
             roles: [Authentification.Role.SUPERVISEUR]
+          })
+        )
+      })
+      it("retourne l'utilisateur avec le role SUPERVISEUR et SUPERVISEUR_PE_BRSA", async () => {
+        // Given
+        const structure = Core.Structure.POLE_EMPLOI
+        await ConseillerSqlModel.creer(
+          unConseillerDto({
+            id: 'pe',
+            idAuthentification: 'id-authentification-conseiller',
+            structure
+          })
+        )
+        await SuperviseurSqlModel.create({
+          email: conseillerDto.email,
+          structure
+        })
+        await SuperviseurSqlModel.create({
+          email: conseillerDto.email,
+          structure: Core.Structure.POLE_EMPLOI_BRSA
+        })
+
+        // When
+        const utilisateur = await authentificationSqlRepository.get(
+          conseillerDto.idAuthentification,
+          structure,
+          Authentification.Type.CONSEILLER
+        )
+
+        // Then
+        expect(utilisateur).to.deep.equal(
+          unUtilisateurConseiller({
+            id: 'pe',
+            structure,
+            roles: [
+              Authentification.Role.SUPERVISEUR,
+              Authentification.Role.SUPERVISEUR_PE_BRSA
+            ]
           })
         )
       })

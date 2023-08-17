@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { Authentification } from '../../domain/authentification'
-import { Core } from '../../domain/core'
+import { Core, estPoleEmploiBRSA } from '../../domain/core'
 import { KeycloakClient } from '../clients/keycloak-client'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
@@ -34,20 +34,30 @@ export class AuthentificationSqlRepository
       })
 
       if (conseillerSqlModel) {
-        const estSuperviseur = await SuperviseurSqlModel.findOne({
+        const superviseursParEmail = await SuperviseurSqlModel.findAll({
           where: {
-            email: conseillerSqlModel.email,
-            structure: conseillerSqlModel.structure
+            email: conseillerSqlModel.email
           }
         })
 
+        const estSuperviseur = estConseillerSuperviseur(
+          superviseursParEmail,
+          structure
+        )
+        const estSuperviseurPEBRSA = estConseillerSuperviseurPEBRSA(
+          superviseursParEmail,
+          structure,
+          estSuperviseur
+        )
+        const roles = []
+
         if (estSuperviseur) {
-          return fromConseillerSqlToUtilisateur(conseillerSqlModel, [
-            Authentification.Role.SUPERVISEUR
-          ])
-        } else {
-          return fromConseillerSqlToUtilisateur(conseillerSqlModel)
+          roles.push(Authentification.Role.SUPERVISEUR)
         }
+        if (estSuperviseurPEBRSA) {
+          roles.push(Authentification.Role.SUPERVISEUR_PE_BRSA)
+        }
+        return fromConseillerSqlToUtilisateur(conseillerSqlModel, roles)
       }
     } else if (Authentification.estJeune(type)) {
       const jeuneSqlModel = await JeuneSqlModel.findOne({
@@ -144,4 +154,39 @@ export class AuthentificationSqlRepository
     await this.keycloakClient.deleteUserByIdUser(idUtilisateur)
     this.logger.log(`Utilisateur ${idUtilisateur} supprimé de keycloak`)
   }
+}
+
+function estConseillerSuperviseur(
+  superviseursParEmail: SuperviseurSqlModel[],
+  structureDuConseiller: Core.Structure
+): boolean {
+  return Boolean(
+    superviseursParEmail.find(
+      superviseurParEmail =>
+        superviseurParEmail.structure === structureDuConseiller
+    )
+  )
+}
+
+function estConseillerSuperviseurPEBRSA(
+  superviseursParEmail: SuperviseurSqlModel[],
+  structureDuConseiller: Core.Structure,
+  estSuperviseur: boolean
+): boolean {
+  return (
+    estPoleEmploiBRSA(structureDuConseiller) &&
+    estSuperviseur &&
+    Boolean(
+      superviseursParEmail.find(
+        superviseurParEmail =>
+          superviseurParEmail.structure === Core.Structure.POLE_EMPLOI
+      )
+    ) &&
+    Boolean(
+      superviseursParEmail.find(
+        superviseurParEmail =>
+          superviseurParEmail.structure === Core.Structure.POLE_EMPLOI_BRSA
+      )
+    )
+  )
 }
