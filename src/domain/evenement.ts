@@ -124,6 +124,14 @@ export namespace Evenement {
     SUGGESTION_ALTERNANCE_PROFIL_PE_REFUSEE = 'SUGGESTION_ALTERNANCE_PROFIL_PE_REFUSEE',
     SUGGESTION_IMMERSION_PROFIL_PE_REFUSEE = 'SUGGESTION_IMMERSION_PROFIL_PE_REFUSEE',
     SUGGESTION_SERVICE_CIVIQUE_PROFIL_PE_REFUSEE = 'SUGGESTION_SERVICE_CIVIQUE_PROFIL_PE_REFUSEE',
+    SUGGESTION_EMPLOI_DIAGORIENTE_ACCEPTEE = 'SUGGESTION_EMPLOI_DIAGORIENTE_ACCEPTEE',
+    SUGGESTION_ALTERNANCE_DIAGORIENTE_ACCEPTEE = 'SUGGESTION_ALTERNANCE_DIAGORIENTE_ACCEPTEE',
+    SUGGESTION_IMMERSION_DIAGORIENTE_ACCEPTEE = 'SUGGESTION_IMMERSION_DIAGORIENTE_ACCEPTEE',
+    SUGGESTION_SERVICE_CIVIQUE_DIAGORIENTE_ACCEPTEE = 'SUGGESTION_SERVICE_CIVIQUE_DIAGORIENTE_ACCEPTEE',
+    SUGGESTION_EMPLOI_DIAGORIENTE_REFUSEE = 'SUGGESTION_EMPLOI_DIAGORIENTE_REFUSEE',
+    SUGGESTION_ALTERNANCE_DIAGORIENTE_REFUSEE = 'SUGGESTION_ALTERNANCE_DIAGORIENTE_REFUSEE',
+    SUGGESTION_IMMERSION_DIAGORIENTE_REFUSEE = 'SUGGESTION_IMMERSION_DIAGORIENTE_REFUSEE',
+    SUGGESTION_SERVICE_CIVIQUE_DIAGORIENTE_REFUSEE = 'SUGGESTION_SERVICE_CIVIQUE_DIAGORIENTE_REFUSEE',
     RECHERCHE_EMPLOI_SUGGEREE = 'RECHERCHE_EMPLOI_SUGGEREE',
     RECHERCHE_ALTERNANCE_SUGGEREE = 'RECHERCHE_ALTERNANCE_SUGGEREE',
     RECHERCHE_IMMERSION_SUGGEREE = 'RECHERCHE_IMMERSION_SUGGEREE',
@@ -562,7 +570,7 @@ const evenements: {
     nom: 'Immersion'
   },
   [Evenement.Code.SUGGESTION_SERVICE_CIVIQUE_CONSEILLER_REFUSEE]: {
-    categorie: 'Recherche',
+    categorie: 'Suggestion',
     action: 'Refuser - Conseiller',
     nom: 'Service Civique'
   },
@@ -604,6 +612,46 @@ const evenements: {
   [Evenement.Code.SUGGESTION_SERVICE_CIVIQUE_PROFIL_PE_REFUSEE]: {
     categorie: 'Suggestion',
     action: 'Refuser - Profil PE',
+    nom: 'Service Civique'
+  },
+  [Evenement.Code.SUGGESTION_EMPLOI_DIAGORIENTE_ACCEPTEE]: {
+    categorie: 'Suggestion',
+    action: 'Accepter - Diagoriente',
+    nom: 'Emploi'
+  },
+  [Evenement.Code.SUGGESTION_ALTERNANCE_DIAGORIENTE_ACCEPTEE]: {
+    categorie: 'Suggestion',
+    action: 'Accepter - Diagoriente',
+    nom: 'Alternance'
+  },
+  [Evenement.Code.SUGGESTION_IMMERSION_DIAGORIENTE_ACCEPTEE]: {
+    categorie: 'Suggestion',
+    action: 'Accepter - Diagoriente',
+    nom: 'Immersion'
+  },
+  [Evenement.Code.SUGGESTION_SERVICE_CIVIQUE_DIAGORIENTE_ACCEPTEE]: {
+    categorie: 'Suggestion',
+    action: 'Accepter - Diagoriente',
+    nom: 'Service Civique'
+  },
+  [Evenement.Code.SUGGESTION_EMPLOI_DIAGORIENTE_REFUSEE]: {
+    categorie: 'Suggestion',
+    action: 'Refuser - Diagoriente',
+    nom: 'Emploi'
+  },
+  [Evenement.Code.SUGGESTION_ALTERNANCE_DIAGORIENTE_REFUSEE]: {
+    categorie: 'Suggestion',
+    action: 'Refuser - Diagoriente',
+    nom: 'Alternance'
+  },
+  [Evenement.Code.SUGGESTION_IMMERSION_DIAGORIENTE_REFUSEE]: {
+    categorie: 'Suggestion',
+    action: 'Refuser - Diagoriente',
+    nom: 'Immersion'
+  },
+  [Evenement.Code.SUGGESTION_SERVICE_CIVIQUE_DIAGORIENTE_REFUSEE]: {
+    categorie: 'Suggestion',
+    action: 'Refuser - Diagoriente',
     nom: 'Service Civique'
   },
   [Evenement.Code.RECHERCHE_EMPLOI_SUGGEREE]: {
@@ -699,6 +747,8 @@ function fromSuggestionToCodeEvenement(suggestion: Suggestion): Evenement.Code {
               return Evenement.Code.SUGGESTION_EMPLOI_PROFIL_PE_ACCEPTEE
             case Suggestion.Source.CONSEILLER:
               return Evenement.Code.SUGGESTION_EMPLOI_CONSEILLER_ACCEPTEE
+            case Suggestion.Source.DIAGORIENTE:
+              return Evenement.Code.SUGGESTION_EMPLOI_DIAGORIENTE_ACCEPTEE
           }
         }
         break
@@ -709,6 +759,8 @@ function fromSuggestionToCodeEvenement(suggestion: Suggestion): Evenement.Code {
               return Evenement.Code.SUGGESTION_IMMERSION_PROFIL_PE_ACCEPTEE
             case Suggestion.Source.CONSEILLER:
               return Evenement.Code.SUGGESTION_IMMERSION_CONSEILLER_ACCEPTEE
+            case Suggestion.Source.DIAGORIENTE:
+              return Evenement.Code.SUGGESTION_IMMERSION_DIAGORIENTE_ACCEPTEE
           }
         }
         break
@@ -719,6 +771,8 @@ function fromSuggestionToCodeEvenement(suggestion: Suggestion): Evenement.Code {
               return Evenement.Code.SUGGESTION_ALTERNANCE_PROFIL_PE_ACCEPTEE
             case Suggestion.Source.CONSEILLER:
               return Evenement.Code.SUGGESTION_ALTERNANCE_CONSEILLER_ACCEPTEE
+            case Suggestion.Source.DIAGORIENTE:
+              return Evenement.Code.SUGGESTION_ALTERNANCE_DIAGORIENTE_ACCEPTEE
           }
         }
         break
@@ -731,6 +785,9 @@ function fromSuggestionToCodeEvenement(suggestion: Suggestion): Evenement.Code {
             case Suggestion.Source.CONSEILLER:
               return Evenement.Code
                 .SUGGESTION_SERVICE_CIVIQUE_CONSEILLER_ACCEPTEE
+            case Suggestion.Source.DIAGORIENTE:
+              return Evenement.Code
+                .SUGGESTION_SERVICE_CIVIQUE_DIAGORIENTE_ACCEPTEE
           }
         }
         break
@@ -745,6 +802,8 @@ function fromSuggestionToCodeEvenement(suggestion: Suggestion): Evenement.Code {
               return Evenement.Code.SUGGESTION_EMPLOI_PROFIL_PE_REFUSEE
             case Suggestion.Source.CONSEILLER:
               return Evenement.Code.SUGGESTION_EMPLOI_CONSEILLER_REFUSEE
+            case Suggestion.Source.DIAGORIENTE:
+              return Evenement.Code.SUGGESTION_EMPLOI_DIAGORIENTE_REFUSEE
           }
         }
         break
@@ -755,6 +814,8 @@ function fromSuggestionToCodeEvenement(suggestion: Suggestion): Evenement.Code {
               return Evenement.Code.SUGGESTION_IMMERSION_PROFIL_PE_REFUSEE
             case Suggestion.Source.CONSEILLER:
               return Evenement.Code.SUGGESTION_IMMERSION_CONSEILLER_REFUSEE
+            case Suggestion.Source.DIAGORIENTE:
+              return Evenement.Code.SUGGESTION_IMMERSION_DIAGORIENTE_REFUSEE
           }
         }
         break
@@ -765,6 +826,8 @@ function fromSuggestionToCodeEvenement(suggestion: Suggestion): Evenement.Code {
               return Evenement.Code.SUGGESTION_ALTERNANCE_PROFIL_PE_REFUSEE
             case Suggestion.Source.CONSEILLER:
               return Evenement.Code.SUGGESTION_ALTERNANCE_CONSEILLER_REFUSEE
+            case Suggestion.Source.DIAGORIENTE:
+              return Evenement.Code.SUGGESTION_ALTERNANCE_DIAGORIENTE_REFUSEE
           }
         }
         break
@@ -776,6 +839,9 @@ function fromSuggestionToCodeEvenement(suggestion: Suggestion): Evenement.Code {
             case Suggestion.Source.CONSEILLER:
               return Evenement.Code
                 .SUGGESTION_SERVICE_CIVIQUE_CONSEILLER_REFUSEE
+            case Suggestion.Source.DIAGORIENTE:
+              return Evenement.Code
+                .SUGGESTION_SERVICE_CIVIQUE_DIAGORIENTE_REFUSEE
           }
         }
         break
