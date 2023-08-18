@@ -3,16 +3,17 @@ import { ConfigService } from '@nestjs/config'
 import { QueryTypes, Sequelize } from 'sequelize'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Result, success } from '../../building-blocks/types/result'
+import { Result, failure, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { ConseillerSimpleQueryModel } from './query-models/conseillers.query-model'
+import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
 
 export interface GetConseillersQuery extends Query {
   recherche: string
-  structureUtilisateur: Core.Structure
+  structureDifferenteRecherchee?: Core.StructuresPoleEmploiBRSA
 }
 
 @Injectable()
@@ -28,10 +29,19 @@ export class GetConseillersQueryHandler extends QueryHandler<
     super('GetConseillersQueryHandler')
   }
 
-  async handle({
-    recherche,
-    structureUtilisateur
-  }: GetConseillersQuery): Promise<Result<ConseillerSimpleQueryModel[]>> {
+  async handle(
+    { recherche, structureDifferenteRecherchee }: GetConseillersQuery,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<Result<ConseillerSimpleQueryModel[]>> {
+    if (
+      structureDifferenteRecherchee &&
+      !Authentification.estSuperviseurPEBRSA(utilisateur)
+    ) {
+      return failure(new DroitsInsuffisants())
+    }
+
+    const structure = structureDifferenteRecherchee ?? utilisateur.structure
+
     const conseillersRawSql = await this.sequelize.query<{
       id: string
       nom: string
@@ -53,7 +63,7 @@ export class GetConseillersQueryHandler extends QueryHandler<
       {
         replacements: {
           query: recherche,
-          structure: structureUtilisateur,
+          structure,
           limit: this.confiService.get('values.maxRechercheConseillers')
         },
         type: QueryTypes.SELECT

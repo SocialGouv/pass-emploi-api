@@ -10,6 +10,9 @@ export namespace Core {
     Core.Structure.POLE_EMPLOI,
     Core.Structure.POLE_EMPLOI_BRSA
   ]
+  export type StructuresPoleEmploiBRSA =
+    | Core.Structure.POLE_EMPLOI
+    | Core.Structure.POLE_EMPLOI_BRSA
 
   export interface Id {
     id: string

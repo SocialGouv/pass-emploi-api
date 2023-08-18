@@ -31,6 +31,11 @@ export class GetConseillersQueryParams {
   @IsNotEmpty()
   @MinLength(2)
   q: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsIn(Core.structuresPoleEmploiBRSA)
+  structure?: string
 }
 
 export class CreateJeunePoleEmploiPayload {

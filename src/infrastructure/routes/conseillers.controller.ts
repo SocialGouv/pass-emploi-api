@@ -161,7 +161,8 @@ export class ConseillersController {
     const result = await this.getConseillersQueryHandler.execute(
       {
         recherche: queryParams.q,
-        structureUtilisateur: utilisateur.structure
+        structureDifferenteRecherchee:
+          queryParams.structure as Core.StructuresPoleEmploiBRSA
       },
       utilisateur
     )

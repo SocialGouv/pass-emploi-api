@@ -45,6 +45,10 @@ export namespace Authentification {
     return utilisateur.roles.includes(Authentification.Role.SUPERVISEUR)
   }
 
+  export function estSuperviseurPEBRSA(utilisateur: Utilisateur): boolean {
+    return utilisateur.roles.includes(Authentification.Role.SUPERVISEUR_PE_BRSA)
+  }
+
   export function estJeune(type: Authentification.Type): boolean {
     return type === Authentification.Type.JEUNE
   }
