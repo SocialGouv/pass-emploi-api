@@ -95,6 +95,7 @@ export const uneSessionMilo = (
     fin: DateTime.fromISO('2020-04-08T13:20:00.000Z', {
       zone: 'America/Cayenne'
     }),
+    dateCloture: undefined,
     inscriptions: [
       {
         idJeune: 'id-hermione',
