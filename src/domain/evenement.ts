@@ -47,7 +47,6 @@ export namespace Evenement {
     EVENEMENT_EXTERNE_PARTAGE = 'EVENEMENT_EXTERNE_PARTAGE',
     EVENEMENT_EXTERNE_PARTAGE_CONSEILLER = 'EVENEMENT_EXTERNE_PARTAGE_CONSEILLER',
     EVENEMENT_EXTERNE_INSCRIPTION = 'EVENEMENT_EXTERNE_INSCRIPTION',
-    EVENEMENT_EXTERNE_MISE_EN_FAVORI = 'EVENEMENT_EXTERNE_MISE_EN_FAVORI',
     CV_PE_TELECHARGE = 'CV_PE_TELECHARGE',
     COMPTE_SUPPRIME = 'COMPTE_SUPPRIME',
     COMPTE_ARCHIVE = 'COMPTE_ARCHIVE',
@@ -202,13 +201,13 @@ const evenements: {
     nom: 'Animation collective'
   },
   [Evenement.Code.ANIMATION_COLLECTIVE_AFFICHEE]: {
-    categorie: 'Rendez-vous',
-    action: 'Consultation',
+    categorie: 'Evénement',
+    action: 'Détail',
     nom: 'Animation collective'
   },
   [Evenement.Code.ANIMATION_COLLECTIVE_PARTAGEE]: {
-    categorie: 'Rendez-vous',
-    action: 'Partage',
+    categorie: 'Evénement',
+    action: 'Partage conseiller',
     nom: 'Animation collective'
   },
   [Evenement.Code.EVENEMENT_EXTERNE_RECHERCHE]: {
@@ -234,11 +233,6 @@ const evenements: {
   [Evenement.Code.EVENEMENT_EXTERNE_INSCRIPTION]: {
     categorie: 'Evénement',
     action: 'Inscription',
-    nom: 'Externe'
-  },
-  [Evenement.Code.EVENEMENT_EXTERNE_MISE_EN_FAVORI]: {
-    categorie: 'Evénement',
-    action: 'Favoris',
     nom: 'Externe'
   },
   [Evenement.Code.COMPTE_SUPPRIME]: {
