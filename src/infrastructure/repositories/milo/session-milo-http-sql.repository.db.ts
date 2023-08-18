@@ -201,7 +201,10 @@ function dtoToSessionMilo(
     estVisible: false,
     idStructureMilo: structureMilo.id,
     offre: dtoToOffre(offreDto),
-    inscriptions: dtoToInscriptions(listeInscrits, jeunes)
+    inscriptions: dtoToInscriptions(listeInscrits, jeunes),
+    dateCloture: sessionSql?.dateCloture
+      ? DateTime.fromJSDate(sessionSql?.dateCloture)
+      : undefined
   }
 
   if (sessionDto.dateMaxInscription)
