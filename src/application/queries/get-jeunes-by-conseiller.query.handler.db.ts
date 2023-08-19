@@ -17,6 +17,7 @@ import {
 } from '../../domain/conseiller/conseiller'
 import { toDetailJeuneConseillerQueryModel } from './query-mappers/jeune.mappers'
 import { DetailJeuneConseillerQueryModel } from './query-models/jeunes.query-model'
+import { estPoleEmploiBRSA } from '../../domain/core'
 
 export interface GetJeunesByConseillerQuery extends Query {
   idConseiller: string
@@ -51,6 +52,7 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
       return failure(new DroitsInsuffisants())
     }
     if (
+      !utilisateurEstSuperviseurPEBRSA(utilisateur, conseiller) &&
       !utilisateurEstSuperviseurDuConseiller(utilisateur, conseiller) &&
       !utilisateurEstConseiller(utilisateur, conseiller)
     ) {
@@ -96,6 +98,16 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
 
     return sqlJeunes.map(toDetailJeuneConseillerQueryModel)
   }
+}
+
+function utilisateurEstSuperviseurPEBRSA(
+  utilisateur: Authentification.Utilisateur,
+  conseiller: Conseiller
+): boolean {
+  return (
+    Authentification.estSuperviseurPEBRSA(utilisateur) &&
+    estPoleEmploiBRSA(conseiller.structure)
+  )
 }
 
 function utilisateurEstSuperviseurDuConseiller(

@@ -167,7 +167,6 @@ describe('SupportController', () => {
         const command: TransfererJeunesConseillerCommand = {
           ...payload,
           estTemporaire: false,
-          structure: undefined,
           provenanceUtilisateur: Authentification.Type.SUPPORT
         }
         transfererJeunesConseillerCommandHandler.execute

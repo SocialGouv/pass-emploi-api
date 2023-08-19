@@ -1,25 +1,25 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { Command } from '../../building-blocks/types/command'
+import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
   MauvaiseCommandeError,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
-import { Core } from '../../domain/core'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
-import { Command } from '../../building-blocks/types/command'
-import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
+  Result,
   emptySuccess,
-  failure,
-  Result
+  failure
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
+import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import {
   Conseiller,
   ConseillersRepositoryToken
 } from '../../domain/conseiller/conseiller'
-import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
-import { Chat, ChatRepositoryToken } from '../../domain/chat'
+import { estPoleEmploiBRSA } from '../../domain/core'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
+import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { SupportAuthorizer } from '../authorizers/support-authorizer'
 
 export interface TransfererJeunesConseillerCommand extends Command {
@@ -27,7 +27,6 @@ export interface TransfererJeunesConseillerCommand extends Command {
   idConseillerCible: string
   idsJeunes: string[]
   estTemporaire: boolean
-  structure?: Core.Structure
   provenanceUtilisateur: Extract<
     Authentification.Type,
     Authentification.Type.SUPPORT | Authentification.Type.CONSEILLER
@@ -54,7 +53,10 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
     super('TransfererJeunesConseillerCommandHandler')
   }
 
-  async handle(command: TransfererJeunesConseillerCommand): Promise<Result> {
+  async handle(
+    command: TransfererJeunesConseillerCommand,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<Result> {
     const [conseillerSource, conseillerCible, jeunes] = await Promise.all([
       this.conseillerRepository.get(command.idConseillerSource),
       this.conseillerRepository.get(command.idConseillerCible),
@@ -81,15 +83,30 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
     }
 
     if (command.provenanceUtilisateur === Authentification.Type.CONSEILLER) {
-      if (
-        command.structure !== conseillerSource.structure ||
-        command.structure !== conseillerCible.structure
-      ) {
-        return failure(
-          new MauvaiseCommandeError(
-            'Les informations de structure ne correspondent pas'
+      const superviseurDansLaMemeStructureQueConseillerSourceEtCible =
+        utilisateur.structure === conseillerSource.structure &&
+        utilisateur.structure === conseillerCible.structure
+
+      const conseillerSourceEtCibleDansLaMemeStructure =
+        estPoleEmploiBRSA(conseillerSource.structure) &&
+        estPoleEmploiBRSA(conseillerCible.structure) &&
+        conseillerSource.structure === conseillerCible.structure
+
+      if (Authentification.estSuperviseurPEBRSA(utilisateur)) {
+        if (!conseillerSourceEtCibleDansLaMemeStructure)
+          return failure(
+            new MauvaiseCommandeError(
+              'Les informations de structure des conseillers source et cible ne correspondent pas'
+            )
           )
-        )
+      } else {
+        if (!superviseurDansLaMemeStructureQueConseillerSourceEtCible) {
+          return failure(
+            new MauvaiseCommandeError(
+              'Les informations de structure ne correspondent pas'
+            )
+          )
+        }
       }
     } else if (
       command.provenanceUtilisateur === Authentification.Type.SUPPORT

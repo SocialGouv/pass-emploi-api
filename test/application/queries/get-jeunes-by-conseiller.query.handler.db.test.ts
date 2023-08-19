@@ -355,5 +355,69 @@ describe('GetJeunesByConseillerQueryHandler', () => {
         expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
+
+    describe("quand l'utilisateur est un superviseur PE BRSA", () => {
+      it('retourne les jeunes du conseiller', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          id: 'un-autre-id',
+          structure: Core.Structure.POLE_EMPLOI,
+          roles: [Authentification.Role.SUPERVISEUR_PE_BRSA]
+        })
+        conseillersRepository.get.withArgs(utilisateur.id).resolves(
+          unConseiller({
+            id: utilisateur.id,
+            structure: Core.Structure.POLE_EMPLOI_BRSA
+          })
+        )
+        conseillersRepository.get.withArgs(query.idConseiller).resolves(
+          unConseiller({
+            id: query.idConseiller,
+            structure: Core.Structure.POLE_EMPLOI_BRSA
+          })
+        )
+
+        // When
+        const result = await getJeunesByConseillerQueryHandler.authorize(
+          query,
+          utilisateur
+        )
+
+        // Then
+        expect(result).to.deep.equal(emptySuccess())
+      })
+    })
+
+    describe("quand l'utilisateur est un superviseur PE BRSA qui veut récupérer des jeunes d'un conseiller non PE BRSA", () => {
+      it('renvoie un échec DroitsInsuffisants', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          id: 'un-autre-id',
+          structure: Core.Structure.MILO,
+          roles: [Authentification.Role.SUPERVISEUR_PE_BRSA]
+        })
+        conseillersRepository.get.withArgs(utilisateur.id).resolves(
+          unConseiller({
+            id: utilisateur.id,
+            structure: Core.Structure.MILO
+          })
+        )
+        conseillersRepository.get.withArgs(query.idConseiller).resolves(
+          unConseiller({
+            id: query.idConseiller,
+            structure: Core.Structure.MILO
+          })
+        )
+
+        // When
+        const result = await getJeunesByConseillerQueryHandler.authorize(
+          query,
+          utilisateur
+        )
+
+        // Then
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
+      })
+    })
   })
 })

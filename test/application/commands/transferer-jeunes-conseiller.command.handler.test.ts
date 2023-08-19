@@ -25,6 +25,7 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { SupportAuthorizer } from '../../../src/application/authorizers/support-authorizer'
 import { Authentification } from '../../../src/domain/authentification'
 import Structure = Core.Structure
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 
 describe('TransfererJeunesConseillerCommandHandler', () => {
   let transfererJeunesConseillerCommandHandler: TransfererJeunesConseillerCommandHandler
@@ -107,9 +108,15 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
       idConseillerCible: conseillerCible.id,
       estTemporaire: false,
       idsJeunes: ['1', '2'],
-      structure: Core.Structure.POLE_EMPLOI,
       provenanceUtilisateur: Authentification.Type.CONSEILLER
     }
+    const utilisateur = unUtilisateurConseiller({
+      structure: Core.Structure.POLE_EMPLOI
+    })
+    const utilisateurSuperviseurPEBRSA = unUtilisateurConseiller({
+      structure: Core.Structure.POLE_EMPLOI,
+      roles: [Authentification.Role.SUPERVISEUR_PE_BRSA]
+    })
 
     describe('succès', () => {
       describe('quand le transfert est permanent', () => {
@@ -139,7 +146,8 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
 
           // When
           result = await transfererJeunesConseillerCommandHandler.handle(
-            command
+            command,
+            utilisateur
           )
 
           // Then
@@ -191,7 +199,6 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
           idConseillerCible: conseillerCible.id,
           estTemporaire: true,
           idsJeunes: ['1'],
-          structure: Core.Structure.POLE_EMPLOI,
           provenanceUtilisateur: Authentification.Type.CONSEILLER
         }
 
@@ -221,7 +228,10 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
 
             // When
             const result =
-              await transfererJeunesConseillerCommandHandler.handle(command)
+              await transfererJeunesConseillerCommandHandler.handle(
+                command,
+                utilisateur
+              )
 
             // Then
             const jeuneApresTransfert: Jeune = {
@@ -261,7 +271,10 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
 
             // When
             const result =
-              await transfererJeunesConseillerCommandHandler.handle(command)
+              await transfererJeunesConseillerCommandHandler.handle(
+                command,
+                utilisateur
+              )
 
             // Then
             const jeuneApresTransfert: Jeune = {
@@ -300,7 +313,10 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
 
             // When
             const result =
-              await transfererJeunesConseillerCommandHandler.handle(command)
+              await transfererJeunesConseillerCommandHandler.handle(
+                command,
+                utilisateur
+              )
 
             // Then
             const jeuneApresTransfert: Jeune = {
@@ -343,7 +359,6 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             idConseillerCible: conseillerCibleDeNantes.id,
             estTemporaire: false,
             idsJeunes: ['1'],
-            structure: Core.Structure.POLE_EMPLOI,
             provenanceUtilisateur: Authentification.Type.CONSEILLER
           }
 
@@ -357,7 +372,10 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             .resolves([jeuneQuiVientANantes])
 
           // When
-          await transfererJeunesConseillerCommandHandler.handle(command)
+          await transfererJeunesConseillerCommandHandler.handle(
+            command,
+            utilisateur
+          )
 
           // Then
           expect(
@@ -367,6 +385,58 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             conseillerSource.agence?.id
           )
         })
+      })
+    })
+    describe('succès superviseurPEBRSA', () => {
+      it('effectue un transfert pour des conseillers de structure différente de celle du supérviseur', async () => {
+        // Given
+        const conseillerSourceBRSA = unConseiller({
+          id: 'idConseillerSourceBRSA',
+          agence: {
+            id: '1',
+            nom: 'Pôle emploi PARIS'
+          },
+          structure: Core.Structure.POLE_EMPLOI_BRSA
+        })
+
+        const conseillerCibleBRSA = unConseiller({
+          id: 'idConseillerCibleBRSA',
+          agence: {
+            id: '1',
+            nom: 'Pôle emploi PARIS'
+          },
+          structure: Core.Structure.POLE_EMPLOI_BRSA
+        })
+        const command: TransfererJeunesConseillerCommand = {
+          idConseillerSource: conseillerSourceBRSA.id,
+          idConseillerCible: conseillerCibleBRSA.id,
+          estTemporaire: false,
+          idsJeunes: ['1'],
+          provenanceUtilisateur: Authentification.Type.CONSEILLER
+        }
+
+        conseillerRepository.get
+          .onFirstCall()
+          .resolves(conseillerSourceBRSA)
+          .onSecondCall()
+          .resolves(conseillerCibleBRSA)
+        const jeune1 = unJeune({
+          id: command.idsJeunes[0],
+          conseiller: conseillerSourceDuJeune,
+          conseillerInitial: undefined
+        })
+        jeuneRepository.findAllJeunesByIdsAndConseiller
+          .withArgs(command.idsJeunes, command.idConseillerSource)
+          .resolves([jeune1])
+
+        // When
+        const result = await transfererJeunesConseillerCommandHandler.handle(
+          command,
+          utilisateurSuperviseurPEBRSA
+        )
+
+        // Then
+        expect(result).to.deep.equal(emptySuccess())
       })
     })
     describe('échecs', () => {
@@ -384,7 +454,6 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
               idConseillerCible: conseillerCible.id,
               estTemporaire: false,
               idsJeunes: ['1', '2'],
-              structure: Core.Structure.POLE_EMPLOI,
               provenanceUtilisateur: Authentification.Type.CONSEILLER
             }
 
@@ -401,12 +470,105 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
 
             // When
             const result =
-              await transfererJeunesConseillerCommandHandler.handle(command)
+              await transfererJeunesConseillerCommandHandler.handle(
+                command,
+                utilisateur
+              )
 
             // Then
             expect(!result._isSuccess && result.error).to.deep.equal(
               new MauvaiseCommandeError(
                 'Les informations de structure ne correspondent pas'
+              )
+            )
+          })
+        })
+      })
+      describe('en tant que superviseur PE BRSA', () => {
+        describe("quand la structure du conseiller source ou cible n'est pas PE BSRA", () => {
+          it('retourne une MauvaiseCommandeError', async () => {
+            // Given
+            const conseillerSource = unConseiller({
+              structure: Structure.MILO
+            })
+            const conseillerCible = unConseiller({
+              structure: Structure.MILO
+            })
+
+            const command: TransfererJeunesConseillerCommand = {
+              idConseillerSource: conseillerSource.id,
+              idConseillerCible: conseillerCible.id,
+              estTemporaire: false,
+              idsJeunes: ['1', '2'],
+              provenanceUtilisateur: Authentification.Type.CONSEILLER
+            }
+
+            conseillerRepository.get
+              .onFirstCall()
+              .resolves(conseillerSource)
+              .onSecondCall()
+              .resolves(conseillerCible)
+
+            jeuneRepository.findAllJeunesByIdsAndConseiller.resolves([
+              unJeune(),
+              unJeune()
+            ])
+
+            // When
+            const result =
+              await transfererJeunesConseillerCommandHandler.handle(
+                command,
+                utilisateurSuperviseurPEBRSA
+              )
+
+            // Then
+            expect(!result._isSuccess && result.error).to.deep.equal(
+              new MauvaiseCommandeError(
+                'Les informations de structure des conseillers source et cible ne correspondent pas'
+              )
+            )
+          })
+        })
+        describe('quand la structure du conseiller source ou cible est différente', () => {
+          it('retourne une MauvaiseCommandeError', async () => {
+            // Given
+            const conseillerSource = unConseiller({
+              structure: Structure.POLE_EMPLOI_BRSA
+            })
+            const conseillerCible = unConseiller({
+              structure: Structure.POLE_EMPLOI
+            })
+
+            const command: TransfererJeunesConseillerCommand = {
+              idConseillerSource: conseillerSource.id,
+              idConseillerCible: conseillerCible.id,
+              estTemporaire: false,
+              idsJeunes: ['1', '2'],
+              provenanceUtilisateur: Authentification.Type.CONSEILLER
+            }
+
+            conseillerRepository.get
+              .onFirstCall()
+              .resolves(conseillerSource)
+              .onSecondCall()
+              .resolves(conseillerCible)
+
+            jeuneRepository.findAllJeunesByIdsAndConseiller.resolves([
+              unJeune(),
+              unJeune()
+            ])
+
+            // When
+            const result =
+              await transfererJeunesConseillerCommandHandler.handle(
+                command,
+                utilisateurSuperviseurPEBRSA
+              )
+
+            // Then
+            expect(!result._isSuccess && result.error).to.deep.equal(
+              new MauvaiseCommandeError(
+                'Les informations de structure des conseillers source et cible ne correspondent pas'
               )
             )
           })
@@ -430,9 +592,11 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
               idConseillerCible: conseillerCible.id,
               estTemporaire: false,
               idsJeunes: ['1', '2'],
-              structure: Core.Structure.PASS_EMPLOI,
               provenanceUtilisateur: Authentification.Type.SUPPORT
             }
+            const utilisateurPassEmploi = unUtilisateurConseiller({
+              structure: Core.Structure.PASS_EMPLOI
+            })
 
             conseillerRepository.get
               .onFirstCall()
@@ -447,7 +611,10 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
 
             // When
             const result =
-              await transfererJeunesConseillerCommandHandler.handle(command)
+              await transfererJeunesConseillerCommandHandler.handle(
+                command,
+                utilisateurPassEmploi
+              )
 
             // Then
             expect(!result._isSuccess && result.error).to.deep.equal(
@@ -468,7 +635,10 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
 
             // When
             const result =
-              await transfererJeunesConseillerCommandHandler.handle(command)
+              await transfererJeunesConseillerCommandHandler.handle(
+                command,
+                utilisateur
+              )
 
             // Then
             expect(result).to.deep.equal(
@@ -487,7 +657,10 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
 
             // When
             const result =
-              await transfererJeunesConseillerCommandHandler.handle(command)
+              await transfererJeunesConseillerCommandHandler.handle(
+                command,
+                utilisateur
+              )
 
             // Then
             expect(result).to.deep.equal(
@@ -506,7 +679,10 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
 
             // When
             const result =
-              await transfererJeunesConseillerCommandHandler.handle(command)
+              await transfererJeunesConseillerCommandHandler.handle(
+                command,
+                utilisateur
+              )
 
             // Then
             expect(result).to.deep.equal(

@@ -1,14 +1,56 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
+import { DateTime } from 'luxon'
+import { CreateActionCommandHandler } from 'src/application/commands/action/create-action.command.handler'
 import { ArchiverJeuneCommandHandler } from 'src/application/commands/archiver-jeune.command.handler'
-import { CreateDemarcheCommandHandler } from 'src/application/commands/demarche/create-demarche.command.handler'
+import { DeleteJeuneInactifCommandHandler } from 'src/application/commands/delete-jeune-inactif.command.handler'
 import { DeleteJeuneCommandHandler } from 'src/application/commands/delete-jeune.command.handler'
-import { TransfererJeunesConseillerCommandHandler } from 'src/application/commands/transferer-jeunes-conseiller.command.handler'
+import { CreateDemarcheCommandHandler } from 'src/application/commands/demarche/create-demarche.command.handler'
 import { UpdateStatutDemarcheCommandHandler } from 'src/application/commands/demarche/update-demarche.command.handler'
+import { TransfererJeunesConseillerCommandHandler } from 'src/application/commands/transferer-jeunes-conseiller.command.handler'
 import { UpdateJeuneConfigurationApplicationCommandHandler } from 'src/application/commands/update-jeune-configuration-application.command.handler'
+import { UpdateJeunePreferencesCommandHandler } from 'src/application/commands/update-preferences-jeune.command.handler'
+import { GetConseillersJeuneQueryHandler } from 'src/application/queries/get-conseillers-jeune.query.handler.db'
+import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler.db'
+import { GetJeuneHomeActionsQueryHandler } from 'src/application/queries/get-jeune-home-actions.query.handler'
+import { GetJeuneHomeAgendaQueryHandler } from 'src/application/queries/get-jeune-home-agenda.query.db'
+import { GetJeuneHomeDemarchesQueryHandler } from 'src/application/queries/get-jeune-home-demarches.query.handler'
+import { GetPreferencesJeuneQueryHandler } from 'src/application/queries/get-preferences-jeune.handler.db'
+import { GetSuiviSemainePoleEmploiQueryHandler } from 'src/application/queries/get-suivi-semaine-pole-emploi.query.handler'
+import {
+  JeuneHomeAgendaQueryModel,
+  SuiviSemainePoleEmploiQueryModel
+} from 'src/application/queries/query-models/home-jeune-suivi.query-model'
+import { JeuneHomeDemarcheQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
+import {
+  DetailJeuneQueryModel,
+  PreferencesJeuneQueryModel
+} from 'src/application/queries/query-models/jeunes.query-model'
+import { RendezVousJeuneQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
+import { GetAnimationsCollectivesJeuneQueryHandler } from 'src/application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
+import { GetRendezVousJeunePoleEmploiQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
+import { GetRendezVousJeuneQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
+import { GetUnRendezVousJeuneQueryHandler } from 'src/application/queries/rendez-vous/get-un-rendez-vous-jeune.query.handler.db'
+import {
+  DomainError,
+  DroitsInsuffisants,
+  ErreurHttp,
+  JeuneNonLieAuConseillerError,
+  JeunePasInactifError,
+  MauvaiseCommandeError,
+  NonTrouveError
+} from 'src/building-blocks/types/domain-error'
+import { Cached } from 'src/building-blocks/types/query'
+import {
+  emptySuccess,
+  failure,
+  success
+} from 'src/building-blocks/types/result'
+import { Action } from 'src/domain/action/action'
 import { ArchiveJeune } from 'src/domain/archive-jeune'
-import { Core } from 'src/domain/core'
+import { Authentification } from 'src/domain/authentification'
 import { Demarche } from 'src/domain/demarche'
 import { RendezVous } from 'src/domain/rendez-vous/rendez-vous'
+import { JwtService } from 'src/infrastructure/auth/jwt.service'
 import { CreateActionParLeJeunePayload } from 'src/infrastructure/routes/validation/actions.inputs'
 import {
   CreateDemarchePayload,
@@ -19,66 +61,23 @@ import {
   UpdateConfigurationInput,
   UpdateJeunePreferencesPayload
 } from 'src/infrastructure/routes/validation/jeunes.inputs'
+import { DateService } from 'src/utils/date-service'
 import * as request from 'supertest'
-import { uneDatetime, uneDatetimeAvecOffset } from 'test/fixtures/date.fixture'
-import { uneDemarche } from 'test/fixtures/demarche.fixture'
-import { CreateActionCommandHandler } from 'src/application/commands/action/create-action.command.handler'
-import { DeleteJeuneInactifCommandHandler } from 'src/application/commands/delete-jeune-inactif.command.handler'
-import { UpdateJeunePreferencesCommandHandler } from 'src/application/commands/update-preferences-jeune.command.handler'
-import { GetConseillersJeuneQueryHandler } from 'src/application/queries/get-conseillers-jeune.query.handler.db'
-import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler.db'
-import { GetJeuneHomeActionsQueryHandler } from 'src/application/queries/get-jeune-home-actions.query.handler'
-import { GetJeuneHomeDemarchesQueryHandler } from 'src/application/queries/get-jeune-home-demarches.query.handler'
-import { GetPreferencesJeuneQueryHandler } from 'src/application/queries/get-preferences-jeune.handler.db'
-import { GetRendezVousJeunePoleEmploiQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
-import { GetRendezVousJeuneQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
-import {
-  DetailJeuneQueryModel,
-  PreferencesJeuneQueryModel
-} from 'src/application/queries/query-models/jeunes.query-model'
-import { RendezVousJeuneQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
-import {
-  DomainError,
-  DroitsInsuffisants,
-  ErreurHttp,
-  JeuneNonLieAuConseillerError,
-  JeunePasInactifError,
-  MauvaiseCommandeError,
-  NonTrouveError
-} from 'src/building-blocks/types/domain-error'
-import {
-  emptySuccess,
-  failure,
-  success
-} from 'src/building-blocks/types/result'
-import { Action } from 'src/domain/action/action'
-import { JwtService } from 'src/infrastructure/auth/jwt.service'
 import {
   unHeaderAuthorization,
   unJwtPayloadValide,
   unJwtPayloadValideJeunePE,
   unUtilisateurDecode
 } from 'test/fixtures/authentification.fixture'
-import { unDetailJeuneQueryModel } from 'test/fixtures/query-models/jeunes.query-model.fixtures'
-import { enleverLesUndefined, expect, StubbedClass } from 'test/utils'
-import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
-import { GetJeuneHomeAgendaQueryHandler } from 'src/application/queries/get-jeune-home-agenda.query.db'
-import {
-  SuiviSemainePoleEmploiQueryModel,
-  JeuneHomeAgendaQueryModel
-} from 'src/application/queries/query-models/home-jeune-suivi.query-model'
+import { uneDatetime, uneDatetimeAvecOffset } from 'test/fixtures/date.fixture'
+import { uneDemarche } from 'test/fixtures/demarche.fixture'
 import { uneActionQueryModelSansJeune } from 'test/fixtures/query-models/action.query-model.fixtures'
-import { GetSuiviSemainePoleEmploiQueryHandler } from 'src/application/queries/get-suivi-semaine-pole-emploi.query.handler'
 import { uneDemarcheQueryModel } from 'test/fixtures/query-models/demarche.query-model.fixtures'
-import { DateTime } from 'luxon'
-import { GetAnimationsCollectivesJeuneQueryHandler } from 'src/application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
-import { GetUnRendezVousJeuneQueryHandler } from 'src/application/queries/rendez-vous/get-un-rendez-vous-jeune.query.handler.db'
+import { unDetailJeuneQueryModel } from 'test/fixtures/query-models/jeunes.query-model.fixtures'
 import { unRendezVousJeuneDetailQueryModel } from 'test/fixtures/query-models/rendez-vous.query-model.fixtures'
+import { StubbedClass, enleverLesUndefined, expect } from 'test/utils'
+import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
-import { DateService } from 'src/utils/date-service'
-import { Cached } from 'src/building-blocks/types/query'
-import { JeuneHomeDemarcheQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
-import { Authentification } from 'src/domain/authentification'
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
@@ -180,7 +179,6 @@ describe('JeunesController', () => {
           idConseillerCible: '2',
           idsJeunes: ['1'],
           estTemporaire: false,
-          structure: Core.Structure.MILO,
           provenanceUtilisateur: Authentification.Type.CONSEILLER
         },
         unUtilisateurDecode()
@@ -206,7 +204,6 @@ describe('JeunesController', () => {
           idConseillerCible: '2',
           idsJeunes: ['1'],
           estTemporaire: true,
-          structure: Core.Structure.MILO,
           provenanceUtilisateur: Authentification.Type.CONSEILLER
         },
         unUtilisateurDecode()

@@ -151,7 +151,6 @@ export class SupportController {
         idConseillerCible: payload.idConseillerCible,
         idsJeunes: payload.idsJeunes,
         estTemporaire: false,
-        structure: undefined,
         provenanceUtilisateur: Authentification.Type.SUPPORT
       },
       utilisateur
