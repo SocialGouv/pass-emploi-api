@@ -18,6 +18,7 @@ import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-mod
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { getDatabase } from '../../../utils/database-for-testing'
 import { SessionMilo } from '../../../../src/domain/milo/session.milo'
+import { testConfig } from 'test/utils/module-for-testing'
 
 describe('GetSessionsJeuneMiloQueryHandler', () => {
   const query = { idJeune: 'idJeune', token: 'token' }
@@ -40,7 +41,8 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     getSessionsQueryHandler = new GetSessionsJeuneMiloQueryHandler(
       getSessionsQueryGetter,
-      jeuneAuthorizer
+      jeuneAuthorizer,
+      testConfig()
     )
   })
 

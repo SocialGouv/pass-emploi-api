@@ -8,11 +8,12 @@ import {
 } from 'src/building-blocks/types/domain-error'
 import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
-import { failure, Result } from 'src/building-blocks/types/result'
+import { failure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { estMilo } from 'src/domain/core'
 import { ConseillerSqlModel } from '../../../infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
+import { ConfigService } from '@nestjs/config'
 
 export interface GetSessionsJeuneMiloQuery extends Query {
   idJeune: string
@@ -27,7 +28,8 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
 > {
   constructor(
     private readonly getSessionsQueryGetter: GetSessionsJeuneMiloQueryGetter,
-    private readonly jeuneAuthorizer: JeuneAuthorizer
+    private readonly jeuneAuthorizer: JeuneAuthorizer,
+    private readonly configService: ConfigService
   ) {
     super('GetSessionsJeuneMiloQueryHandler')
   }
@@ -35,6 +37,11 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
   async handle(
     query: GetSessionsJeuneMiloQuery
   ): Promise<Result<SessionJeuneMiloQueryModel[]>> {
+    const FT_RECUPERER_STRUCTURE_MILO = this.configService.get(
+      'features.recupererStructureMilo'
+    )
+    if (!FT_RECUPERER_STRUCTURE_MILO) return success([])
+
     const jeuneSqlModel = await JeuneSqlModel.findByPk(query.idJeune, {
       include: [{ model: ConseillerSqlModel, required: true }]
     })

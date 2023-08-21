@@ -49,6 +49,7 @@ import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from 'test/fixtures/sql-models/rendez-vous.sql-model'
 import { expect, StubbedClass, stubClass } from 'test/utils'
 import { getDatabase } from '../../../utils/database-for-testing'
+import { testConfig } from 'test/utils/module-for-testing'
 
 describe('GetAccueilJeuneMiloQueryHandler', () => {
   let handler: GetAccueilJeuneMiloQueryHandler
@@ -70,7 +71,8 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       sessionsQueryGetter,
       alertesQueryGetter,
       favorisAccueilQueryGetter,
-      getCampagneQueryGetter
+      getCampagneQueryGetter,
+      testConfig()
     )
   })
 
@@ -83,7 +85,6 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
     const dateFinDeSemaineString = '2023-04-02T23:59:59.999'
     const maintenant = DateTime.fromISO(maintenantString)
     const campagneQueryModel = uneCampagneQueryModel()
-    const utilisateurJeune = unUtilisateurJeune()
 
     beforeEach(async () => {
       await getDatabase().cleanPG()
@@ -125,7 +126,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
         await JeuneSqlModel.destroy({ where: { id: accueilQuery.idJeune } })
 
         // When
-        result = await handler.handle(accueilQuery, utilisateurJeune)
+        result = await handler.handle(accueilQuery)
 
         // Then
         expect(result).to.deep.equal(
@@ -145,7 +146,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
         )
 
         // When
-        result = await handler.handle(accueilQuery, utilisateurJeune)
+        result = await handler.handle(accueilQuery)
 
         // Then
         expect(result).to.deep.equal(
@@ -198,7 +199,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
             )
 
           // When
-          result = await handler.handle(accueilQuery, utilisateurJeune)
+          result = await handler.handle(accueilQuery)
 
           // Then
           expect(
@@ -218,7 +219,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
             .resolves(success([]))
 
           // When
-          result = await handler.handle(accueilQuery, utilisateurJeune)
+          result = await handler.handle(accueilQuery)
 
           // Then
           expect(
@@ -242,7 +243,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
             .resolves(success([sessionAvecInscriptionCetteSemaine]))
 
           // When
-          result = await handler.handle(accueilQuery, utilisateurJeune)
+          result = await handler.handle(accueilQuery)
 
           // Then
           expect(
@@ -252,7 +253,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       })
       it('compte les actions en retard', async () => {
         // When
-        result = await handler.handle(accueilQuery, utilisateurJeune)
+        result = await handler.handle(accueilQuery)
 
         // Then
         expect(
@@ -262,7 +263,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       })
       it('compte les actions à réaliser', async () => {
         // When
-        result = await handler.handle(accueilQuery, utilisateurJeune)
+        result = await handler.handle(accueilQuery)
 
         // Then
         expect(
@@ -292,7 +293,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
 
       it('retourne le prochain rendez-vous ', async () => {
         // When
-        result = await handler.handle(accueilQuery, utilisateurJeune)
+        result = await handler.handle(accueilQuery)
 
         // Then
         expect(
@@ -333,7 +334,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
           )
 
         // When
-        result = await handler.handle(accueilQuery, utilisateurJeune)
+        result = await handler.handle(accueilQuery)
 
         // Then
         expect(
@@ -353,7 +354,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
           .resolves(success([]))
 
         // When
-        result = await handler.handle(accueilQuery, utilisateurJeune)
+        result = await handler.handle(accueilQuery)
 
         // Then
         expect(
@@ -417,7 +418,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
 
       it('retourne les 3 prochains événements à venir', async () => {
         // When
-        result = await handler.handle(accueilQuery, utilisateurJeune)
+        result = await handler.handle(accueilQuery)
 
         // Then
         expect(isSuccess(result) && result.data.evenementsAVenir).to.deep.equal(
@@ -462,7 +463,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       alertesQueryGetter.handle.resolves([])
 
       // When
-      result = await handler.handle(accueilQuery, utilisateurJeune)
+      result = await handler.handle(accueilQuery)
 
       // Then
       expect(
@@ -475,7 +476,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       favorisAccueilQueryGetter.handle.resolves([])
 
       // When
-      result = await handler.handle(accueilQuery, utilisateurJeune)
+      result = await handler.handle(accueilQuery)
 
       // Then
       expect(
@@ -493,7 +494,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
         .resolves(campagneQueryModel)
 
       // When
-      result = await handler.handle(accueilQuery, utilisateurJeune)
+      result = await handler.handle(accueilQuery)
 
       // Then
       expect(

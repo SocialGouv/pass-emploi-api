@@ -17,7 +17,7 @@ import {
 } from 'src/building-blocks/types/result'
 import { Action } from 'src/domain/action/action'
 import { Authentification } from 'src/domain/authentification'
-import { estMilo, estMiloPassEmploi } from 'src/domain/core'
+import { estMiloPassEmploi } from 'src/domain/core'
 
 import { TYPES_ANIMATIONS_COLLECTIVES } from 'src/domain/rendez-vous/rendez-vous'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
@@ -34,6 +34,7 @@ import {
 import { AccueilJeuneMiloQueryModel } from '../query-models/jeunes.milo.query-model'
 import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
 import { SessionJeuneMiloQueryModel } from '../query-models/sessions.milo.query.model'
+import { ConfigService } from '@nestjs/config'
 
 export interface GetAccueilJeuneMiloQuery extends Query {
   idJeune: string
@@ -51,13 +52,13 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     private getSessionsQueryGetter: GetSessionsJeuneMiloQueryGetter,
     private getRecherchesSauvegardeesQueryGetter: GetRecherchesSauvegardeesQueryGetter,
     private getFavorisAccueilQueryGetter: GetFavorisAccueilQueryGetter,
-    private getCampagneQueryGetter: GetCampagneQueryGetter
+    private getCampagneQueryGetter: GetCampagneQueryGetter,
+    private configService: ConfigService
   ) {
     super('GetAccueilJeuneMiloQueryHandler')
   }
   async handle(
-    query: GetAccueilJeuneMiloQuery,
-    utilisateur: Authentification.Utilisateur
+    query: GetAccueilJeuneMiloQuery
   ): Promise<Result<AccueilJeuneMiloQueryModel>> {
     const maintenant = DateTime.fromISO(query.maintenant, {
       setZone: true
@@ -100,7 +101,12 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     ])
 
     let sessions: SessionJeuneMiloQueryModel[] = []
-    if (estMilo(utilisateur.structure)) {
+
+    const FT_RECUPERER_STRUCTURE_MILO = this.configService.get(
+      'features.recupererStructureMilo'
+    )
+
+    if (FT_RECUPERER_STRUCTURE_MILO) {
       if (!jeuneSqlModel.idPartenaire) {
         return failure(new JeuneMiloSansIdDossier(query.idJeune))
       }
