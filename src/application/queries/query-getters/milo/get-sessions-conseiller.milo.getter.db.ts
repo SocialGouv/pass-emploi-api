@@ -8,52 +8,92 @@ import {
   success
 } from '../../../../building-blocks/types/result'
 import { ListeSessionsConseillerMiloDto } from '../../../../infrastructure/clients/dto/milo.dto'
+import { SessionMiloSqlModel } from '../../../../infrastructure/sequelize/models/session-milo.sql-model'
+import { mapSessionConseillerDtoToQueryModel } from '../../query-mappers/milo.mappers'
+import { DateService } from '../../../../utils/date-service'
+import { SessionConseillerMiloQueryModel } from '../../query-models/sessions.milo.query.model'
+import { SessionMilo } from '../../../../domain/milo/session.milo'
 
 @Injectable()
 export class GetSessionsConseillerMiloQueryGetter {
   constructor(
     private readonly keycloakClient: KeycloakClient,
-    private readonly miloClient: MiloClient
+    private readonly miloClient: MiloClient,
+    private readonly dateService: DateService
   ) {}
 
   async handle(
     token: string,
-    idStructure: string,
+    idStructureMilo: string,
     timezoneStructure: string,
     options?: {
-      periode?: { debut: DateTime; fin: DateTime }
+      periode?: { debut?: DateTime; fin?: DateTime }
       filtrerAClore?: boolean
     }
-  ): Promise<Result<ListeSessionsConseillerMiloDto>> {
-    // TODO changer le typage  du handle pour renvoyer un query model et pas un DTO
+  ): Promise<Result<SessionConseillerMiloQueryModel[]>> {
     const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
       token
     )
 
-    // todo gerer les params + pagination
+    // todo voir avec le FRED quand est ce quon set la date de debut pour recuperer les offres a clore ( 1, 2 , 6 mois ... ? )
+    //
+    // todo gerer la  pagination
+    let periode
+    if (
+      options &&
+      options.periode &&
+      (options.periode.debut || options.periode.fin)
+    )
+      periode = {
+        dateDebut: options.periode.debut,
+        dateFin: options.periode.fin
+      }
     const resultSessionMiloClient: Result<ListeSessionsConseillerMiloDto> =
       await this.miloClient.getSessionsConseiller(
         idpToken,
-        idStructure,
-        timezoneStructure
+        idStructureMilo,
+        timezoneStructure,
+        periode
       )
+
+    const sessionsSqlModels = await SessionMiloSqlModel.findAll({
+      where: { idStructureMilo }
+    })
 
     if (isFailure(resultSessionMiloClient)) {
       return resultSessionMiloClient
     }
 
+    const sessionsQueryModels = resultSessionMiloClient.data.sessions.map(
+      sessionMilo => {
+        const sessionSqlModel = sessionsSqlModels.find(
+          ({ id }) => id === sessionMilo.session.id.toString()
+        )
+        const dateCloture = sessionSqlModel?.dateCloture
+        return mapSessionConseillerDtoToQueryModel(
+          sessionMilo,
+          sessionSqlModel?.estVisible ?? false,
+          timezoneStructure,
+          this.dateService.now(),
+          dateCloture ? DateTime.fromJSDate(dateCloture) : undefined
+        )
+      }
+    )
+
+    console.log('test option')
+    console.log(options)
     if (options?.filtrerAClore)
-      return success(trierSessionsAClore(resultSessionMiloClient.data))
-    return success(resultSessionMiloClient.data)
+      return success(sessionsQueryModels.filter(trierSessionAClore))
+    return success(sessionsQueryModels)
   }
 }
 
-function trierSessionsAClore(
-  listeSessionsConseillerMiloDto: ListeSessionsConseillerMiloDto
-): ListeSessionsConseillerMiloDto {
-  // todo filtrer si date de debut passée
-  return {
-    ...listeSessionsConseillerMiloDto,
-    sessions: listeSessionsConseillerMiloDto.sessions
-  }
+function trierSessionAClore(
+  sessionQueryModels: SessionConseillerMiloQueryModel
+): boolean {
+  console.log(
+    '------------',
+    sessionQueryModels.id + ' = ' + sessionQueryModels.statut
+  )
+  return sessionQueryModels.statut === SessionMilo.Statut.A_CLOTURER
 }

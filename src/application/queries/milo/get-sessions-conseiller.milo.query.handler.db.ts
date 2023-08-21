@@ -7,13 +7,8 @@ import { Authentification } from 'src/domain/authentification'
 import { Conseiller } from 'src/domain/conseiller/conseiller'
 import { estMilo } from 'src/domain/core'
 import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
-import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
-import { mapSessionConseillerDtoToQueryModel } from '../query-mappers/milo.mappers'
 import { SessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
-import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
-import { DateService } from 'src/utils/date-service'
 import { ConfigService } from '@nestjs/config'
 import { GetSessionsConseillerMiloQueryGetter } from '../query-getters/milo/get-sessions-conseiller.milo.getter.db'
 
@@ -31,14 +26,11 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
   Result<SessionConseillerMiloQueryModel[]>
 > {
   constructor(
-    private miloClient: MiloClient,
+    private getSessionsConsseillerMiloQueryGetter: GetSessionsConseillerMiloQueryGetter,
     @Inject(ConseillerMiloRepositoryToken)
     private conseillerMiloRepository: Conseiller.Milo.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer,
-    private keycloakClient: KeycloakClient,
-    private readonly getSessionsQueryGetter: GetSessionsConseillerMiloQueryGetter,
-    private dateService: DateService,
-    private configService: ConfigService
+  private configService: ConfigService
   ) {
     super('GetSessionsConseillerMiloQueryHandler')
   }
@@ -60,50 +52,22 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
     const { id: idStructureMilo, timezone: timezoneStructure } =
       resultConseiller.data.structure
 
-    // todo     retirer le token exchange ici comme on le fait dans le querry getter
-    const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
-      query.token
-    )
-
-    const [
-      resultSessionsMiloFromQueryGetter,
-      resultSessionMiloFromClient,
-      sessionsSqlModels
-    ] = await Promise.all([
-      this.getSessionsQueryGetter.handle(
+    let periode
+    if (query.dateDebut || query.dateFin)
+      periode = { debut: query.dateDebut, fin: query.dateFin }
+    const resultSessionsMiloFromQueryGetter =
+      await this.getSessionsConsseillerMiloQueryGetter.handle(
         query.token,
         idStructureMilo,
-        timezoneStructure
-      ),
-      this.miloClient.getSessionsConseiller(
-        idpToken,
-        idStructureMilo,
         timezoneStructure,
-        query.dateDebut,
-        query.dateFin
-      ),
-      SessionMiloSqlModel.findAll({ where: { idStructureMilo } })
-    ])
-    if (isFailure(resultSessionMiloFromClient)) {
-      return resultSessionMiloFromClient
+        { filtrerAClore: query.filtrerAClore, periode }
+      )
+
+    if (isFailure(resultSessionsMiloFromQueryGetter)) {
+      return resultSessionsMiloFromQueryGetter
     }
 
-    const sessionsQueryModels = resultSessionMiloFromClient.data.sessions.map(
-      sessionMilo => {
-        const sessionSqlModel = sessionsSqlModels.find(
-          ({ id }) => id === sessionMilo.session.id.toString()
-        )
-        const dateCloture = sessionSqlModel?.dateCloture
-        return mapSessionConseillerDtoToQueryModel(
-          sessionMilo,
-          sessionSqlModel?.estVisible ?? false,
-          timezoneStructure,
-          this.dateService.now(),
-          dateCloture ? DateTime.fromJSDate(dateCloture) : undefined
-        )
-      }
-    )
-    return success(sessionsQueryModels)
+    return resultSessionsMiloFromQueryGetter
   }
 
   async authorize(

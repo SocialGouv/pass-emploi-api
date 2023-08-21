@@ -52,16 +52,15 @@ export class MiloClient {
     idpToken: string,
     idStructure: string,
     timezone: string,
-    dateDebut?: DateTime,
-    dateFin?: DateTime
+    periode?: { dateDebut?: DateTime; dateFin?: DateTime }
   ): Promise<Result<ListeSessionsConseillerMiloDto>> {
     const params = new URLSearchParams()
-    if (dateDebut) {
-      const debutRecherche = dateDebut.setZone(timezone)
+    if (periode && periode.dateDebut) {
+      const debutRecherche = periode.dateDebut.setZone(timezone)
       params.append('dateDebutRecherche', debutRecherche.toISODate())
     }
-    if (dateFin) {
-      const finRecherche = dateFin.setZone(timezone)
+    if (periode && periode.dateFin) {
+      const finRecherche = periode.dateFin.setZone(timezone)
       params.append('dateFinRecherche', finRecherche.toISODate())
     }
 
