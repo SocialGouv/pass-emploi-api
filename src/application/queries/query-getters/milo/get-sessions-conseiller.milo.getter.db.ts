@@ -35,10 +35,13 @@ export class GetSessionsConseillerMiloQueryGetter {
       token
     )
 
-    // todo voir avec le FRED quand est ce quon set la date de debut pour recuperer les offres a clore ( 1, 2 , 6 mois ... ? )
-    //
     // todo gerer la  pagination
     let periode
+    if (options && options.filtrerAClore) {
+      periode = {
+        dateDebut: DateTime.fromISO('2023-08-01')
+      }
+    }
     if (
       options &&
       options.periode &&
@@ -48,6 +51,7 @@ export class GetSessionsConseillerMiloQueryGetter {
         dateDebut: options.periode.debut,
         dateFin: options.periode.fin
       }
+
     const resultSessionMiloClient: Result<ListeSessionsConseillerMiloDto> =
       await this.miloClient.getSessionsConseiller(
         idpToken,
