@@ -14,6 +14,7 @@ import { mapSessionConseillerDtoToQueryModel } from '../query-mappers/milo.mappe
 import { SessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { DateService } from 'src/utils/date-service'
+import { ConfigService } from '@nestjs/config'
 
 export interface GetSessionsConseillerMiloQuery extends Query {
   idConseiller: string
@@ -33,7 +34,8 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
     private conseillerMiloRepository: Conseiller.Milo.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer,
     private keycloakClient: KeycloakClient,
-    private dateService: DateService
+    private dateService: DateService,
+    private configService: ConfigService
   ) {
     super('GetSessionsConseillerMiloQueryHandler')
   }
@@ -41,6 +43,11 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
   async handle(
     query: GetSessionsConseillerMiloQuery
   ): Promise<Result<SessionConseillerMiloQueryModel[]>> {
+    const FT_RECUPERER_STRUCTURE_MILO = this.configService.get(
+      'features.recupererStructureMilo'
+    )
+    if (!FT_RECUPERER_STRUCTURE_MILO) return success([])
+
     const resultConseiller = await this.conseillerMiloRepository.get(
       query.idConseiller
     )

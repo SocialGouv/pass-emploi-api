@@ -25,6 +25,7 @@ import { getDatabase } from 'test/utils/database-for-testing'
 import { DateService } from 'src/utils/date-service'
 import { SessionMilo } from 'src/domain/milo/session.milo'
 import { SessionConseillerDetailDto } from 'src/infrastructure/clients/dto/milo.dto'
+import { testConfig } from 'test/utils/module-for-testing'
 
 describe('GetSessionsConseillerMiloQueryHandler', () => {
   const maintenantEn2023 = DateTime.local(2023)
@@ -55,7 +56,8 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
       conseillerRepository,
       conseillerAuthorizer,
       keycloakClient,
-      dateService
+      dateService,
+      testConfig()
     )
   })
 
