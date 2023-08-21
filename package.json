@@ -101,7 +101,7 @@
     "jose": "^4.14.4",
     "lodash.isequal": "^4.5.0",
     "luxon": "3.4.0",
-    "nestjs-pino": "3.2.0",
+    "nestjs-pino": "3.4.0",
     "openid-client": "5.4.3",
     "pg": "8.11.2",
     "pg-connection-string": "2.6.2",
