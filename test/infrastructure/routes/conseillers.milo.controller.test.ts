@@ -64,7 +64,8 @@ describe('ConseillersMiloController', () => {
             idConseiller: 'id-conseiller',
             token: 'coucou',
             dateDebut: undefined,
-            dateFin: undefined
+            dateFin: undefined,
+            filtrerAClore: undefined
           },
           unUtilisateurDecode()
         )
