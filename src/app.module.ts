@@ -337,7 +337,7 @@ import { MajSegmentsJobHandler } from './application/jobs/maj-segments.job.handl
 import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
 import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { EmargementSessionMiloCommandHandler } from 'src/application/commands/milo/emargement-session-milo.command.handler'
-import { GetSessionsConseillerMiloQueryGetter } from './application/queries/query-getters/milo/get-sessions-conseiller.milo.getter.db'
+import { GetSessionsConseillerMiloQueryGetter } from './application/queries/query-getters/milo/get-sessions-conseiller.milo.query.getter.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [

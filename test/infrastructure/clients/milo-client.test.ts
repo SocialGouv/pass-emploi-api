@@ -42,8 +42,10 @@ describe('MiloClient', () => {
         idpToken,
         idStructure,
         'America/Cayenne',
-        DateTime.fromISO('2023-06-01T00:00:00'),
-        DateTime.fromISO('2023-06-30T00:00:00')
+        {
+          dateDebut: DateTime.fromISO('2023-06-01T00:00:00'),
+          dateFin: DateTime.fromISO('2023-06-30T00:00:00')
+        }
       )
 
       // Then

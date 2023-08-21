@@ -1,14 +1,8 @@
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { describe } from 'mocha'
 import { createSandbox, SinonSandbox } from 'sinon'
-import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
-import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-sessions-conseiller.milo.query.handler.db'
-import { ConseillerMiloSansStructure } from 'src/building-blocks/types/domain-error'
-import { failure, isSuccess, success } from 'src/building-blocks/types/result'
-import { ConseillerMilo } from 'src/domain/milo/conseiller.milo'
+import { isSuccess, success } from 'src/building-blocks/types/result'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
-import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
 import {
   unDetailSessionConseillerDto,
@@ -25,19 +19,16 @@ import { getDatabase } from 'test/utils/database-for-testing'
 import { DateService } from 'src/utils/date-service'
 import { SessionMilo } from 'src/domain/milo/session.milo'
 import { SessionConseillerDetailDto } from 'src/infrastructure/clients/dto/milo.dto'
-import { GetSessionsConseillerMiloQueryGetter } from '../../../../../src/application/queries/query-getters/milo/get-sessions-conseiller.milo.getter.db'
+import { GetSessionsConseillerMiloQueryGetter } from '../../../../../src/application/queries/query-getters/milo/get-sessions-conseiller.milo.query.getter.db'
 
 describe('GetSessionsConseillerMiloQueryHandler', () => {
   const maintenantEn2023 = DateTime.local(2023)
   const uneDateStrEn2022 = '2022-01-01 10:20:00'
   const uneDateStrEn2024 = '2024-01-01 10:20:00'
 
-  let getSessionsQueryHandler: GetSessionsConseillerMiloQueryHandler
+  let getSessionsQueryGetter: GetSessionsConseillerMiloQueryGetter
   let miloClient: StubbedClass<MiloClient>
   let keycloakClient: StubbedClass<KeycloakClient>
-  let getSessionsQueryGetter: StubbedClass<GetSessionsConseillerMiloQueryGetter>
-  let conseillerRepository: StubbedType<ConseillerMilo.Repository>
-  let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let dateService: StubbedClass<DateService>
   let sandbox: SinonSandbox
 
@@ -48,15 +39,12 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
   beforeEach(async () => {
     miloClient = stubClass(MiloClient)
     keycloakClient = stubClass(KeycloakClient)
-    conseillerRepository = stubInterface(sandbox)
-    conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     dateService = stubClass(DateService)
     dateService.now.returns(maintenantEn2023)
-    getSessionsQueryGetter = stubClass(GetSessionsConseillerMiloQueryGetter)
-    getSessionsQueryHandler = new GetSessionsConseillerMiloQueryHandler(
-      getSessionsQueryGetter,
-      conseillerRepository,
-      conseillerAuthorizer
+    getSessionsQueryGetter = new GetSessionsConseillerMiloQueryGetter(
+      keycloakClient,
+      miloClient,
+      dateService
     )
   })
 
@@ -68,64 +56,26 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
     sandbox.restore()
   })
 
-  describe('authorize', () => {
-    it('autorise un conseiller Milo', () => {
-      // When
-      const query = {
-        idConseiller: 'idConseiller',
-        token: 'bearer un-token'
-      }
-      getSessionsQueryHandler.authorize(query, unUtilisateurConseiller())
-
-      // Then
-      expect(
-        conseillerAuthorizer.autoriserLeConseiller
-      ).to.have.been.calledWithExactly(
-        'idConseiller',
-        unUtilisateurConseiller(),
-        true
-      )
-    })
-  })
-
   describe('handle', () => {
-    describe("quand le conseiller n'existe pas", () => {
-      it('renvoie une failure ', async () => {
-        // Given
-        const query = {
-          idConseiller: 'idConseiller-1',
-          token: 'bearer un-token'
-        }
-        const idpToken = 'idpToken'
-        keycloakClient.exchangeTokenConseillerMilo
-          .withArgs(query.token)
-          .resolves(idpToken)
-        conseillerRepository.get
-          .withArgs(query.idConseiller)
-          .resolves(
-            failure(new ConseillerMiloSansStructure(query.idConseiller))
-          )
-
-        // When
-        const result = await getSessionsQueryHandler.handle(query)
-
-        // Then
-        expect(result).to.deep.equal(
-          failure(new ConseillerMiloSansStructure(query.idConseiller))
-        )
-      })
-    })
-
-    describe('quand le conseiller existe', () => {
+    describe('récupère la liste des session de la structure du conseiller MILO', () => {
       const query = {
-        idConseiller: 'idConseiller-1',
         token: 'bearer un-token',
-        dateDebut: DateTime.fromISO('2023-04-12T00:00:00Z'),
-        dateFin: DateTime.fromISO('2023-04-13T00:00:00Z')
+        idStructureMilo: 'idStructure-1',
+        timezoneStructure: 'America/Cayenne',
+        options: {
+          periode: {
+            debut: DateTime.fromISO('2023-04-12T00:00:00Z'),
+            fin: DateTime.fromISO('2023-04-13T00:00:00Z')
+          },
+          filtreAClore: true
+        }
       }
       const idpToken = 'idpToken'
       const conseiller = unConseillerMilo({
-        structure: { id: '1', timezone: 'America/Cayenne' }
+        structure: {
+          id: query.idStructureMilo,
+          timezone: query.timezoneStructure
+        }
       })
 
       beforeEach(async () => {
@@ -143,9 +93,6 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
         keycloakClient.exchangeTokenConseillerMilo
           .withArgs(query.token)
           .resolves(idpToken)
-        conseillerRepository.get
-          .withArgs(query.idConseiller)
-          .resolves(success(conseiller))
       })
 
       it('récupère la liste des sessions de sa structure Milo avec une visibilité', async () => {
@@ -156,14 +103,24 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
             conseiller.structure.id,
             conseiller.structure.timezone,
             {
-              dateDebut: query.dateDebut,
-              dateFin: query.dateFin
+              dateDebut: query.options.periode.debut,
+              dateFin: query.options.periode.fin
             }
           )
           .resolves(success(uneListeSessionsConseillerDto))
 
         // When
-        const result = await getSessionsQueryHandler.handle(query)
+        const result = await getSessionsQueryGetter.handle(
+          query.token,
+          query.idStructureMilo,
+          query.timezoneStructure,
+          {
+            periode: {
+              debut: query.options.periode.debut,
+              fin: query.options.periode.fin
+            }
+          }
+        )
 
         // Then
         expect(result).to.deep.equal(
@@ -179,7 +136,17 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
         })
 
         // When
-        const result = await getSessionsQueryHandler.handle(query)
+        const result = await getSessionsQueryGetter.handle(
+          query.token,
+          query.idStructureMilo,
+          query.timezoneStructure,
+          {
+            periode: {
+              debut: query.options.periode.debut,
+              fin: query.options.periode.fin
+            }
+          }
+        )
 
         // Then
         expect(result).to.deep.equal(
@@ -190,6 +157,40 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
               estVisible: false
             }
           ])
+        )
+      })
+
+      it('retourne uniquement la liste des sessions a clore lorsque le query param est a TRUE', async () => {
+        // Given
+        miloClient.getSessionsConseiller
+          .withArgs(
+            idpToken,
+            conseiller.structure.id,
+            conseiller.structure.timezone,
+            {
+              dateDebut: query.options.periode.debut,
+              dateFin: query.options.periode.fin
+            }
+          )
+          .resolves(success(uneListeSessionsConseillerDto))
+
+        // When
+        const result = await getSessionsQueryGetter.handle(
+          query.token,
+          query.idStructureMilo,
+          query.timezoneStructure,
+          {
+            periode: {
+              debut: query.options.periode.debut,
+              fin: query.options.periode.fin
+            },
+            filtrerAClore: query.options.filtreAClore
+          }
+        )
+
+        // Then
+        expect(result).to.deep.equal(
+          success([{ ...uneSessionConseillerMiloQueryModel, estVisible: true }])
         )
       })
 
@@ -204,7 +205,17 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
           )
 
           // When
-          const result = await getSessionsQueryHandler.handle(query)
+          const result = await getSessionsQueryGetter.handle(
+            query.token,
+            query.idStructureMilo,
+            query.timezoneStructure,
+            {
+              periode: {
+                debut: query.options.periode.debut,
+                fin: query.options.periode.fin
+              }
+            }
+          )
 
           // Then
           expect(isSuccess(result)).to.be.true()
@@ -223,7 +234,17 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
           })
 
           // When
-          const result = await getSessionsQueryHandler.handle(query)
+          const result = await getSessionsQueryGetter.handle(
+            query.token,
+            query.idStructureMilo,
+            query.timezoneStructure,
+            {
+              periode: {
+                debut: query.options.periode.debut,
+                fin: query.options.periode.fin
+              }
+            }
+          )
 
           // Then
           expect(isSuccess(result)).to.be.true()
@@ -242,7 +263,17 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
           })
 
           // When
-          const result = await getSessionsQueryHandler.handle(query)
+          const result = await getSessionsQueryGetter.handle(
+            query.token,
+            query.idStructureMilo,
+            query.timezoneStructure,
+            {
+              periode: {
+                debut: query.options.periode.debut,
+                fin: query.options.periode.fin
+              }
+            }
+          )
 
           // Then
           expect(isSuccess(result)).to.be.true()
@@ -263,8 +294,8 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
             conseiller.structure.id,
             conseiller.structure.timezone,
             {
-              dateDebut: query.dateDebut,
-              dateFin: query.dateFin
+              dateDebut: query.options.periode.debut,
+              dateFin: query.options.periode.fin
             }
           )
           .resolves(

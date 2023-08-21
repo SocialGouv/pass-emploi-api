@@ -35,7 +35,6 @@ export class GetSessionsConseillerMiloQueryGetter {
       token
     )
 
-    // todo gerer la  pagination
     let periode
     if (options && options.filtrerAClore) {
       periode = {
@@ -60,13 +59,13 @@ export class GetSessionsConseillerMiloQueryGetter {
         periode
       )
 
-    const sessionsSqlModels = await SessionMiloSqlModel.findAll({
-      where: { idStructureMilo }
-    })
-
     if (isFailure(resultSessionMiloClient)) {
       return resultSessionMiloClient
     }
+
+    const sessionsSqlModels = await SessionMiloSqlModel.findAll({
+      where: { idStructureMilo }
+    })
 
     const sessionsQueryModels = resultSessionMiloClient.data.sessions.map(
       sessionMilo => {
@@ -84,20 +83,14 @@ export class GetSessionsConseillerMiloQueryGetter {
       }
     )
 
-    console.log('test option')
-    console.log(options)
     if (options?.filtrerAClore)
-      return success(sessionsQueryModels.filter(trierSessionAClore))
+      return success(sessionsQueryModels.filter(filtrerSessionAClore))
     return success(sessionsQueryModels)
   }
 }
 
-function trierSessionAClore(
+function filtrerSessionAClore(
   sessionQueryModels: SessionConseillerMiloQueryModel
 ): boolean {
-  console.log(
-    '------------',
-    sessionQueryModels.id + ' = ' + sessionQueryModels.statut
-  )
   return sessionQueryModels.statut === SessionMilo.Statut.A_CLOTURER
 }

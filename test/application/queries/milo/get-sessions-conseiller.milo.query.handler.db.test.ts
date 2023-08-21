@@ -15,8 +15,7 @@ import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session
 import { DateTime } from 'luxon'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { getDatabase } from 'test/utils/database-for-testing'
-import { GetSessionsConseillerMiloQueryGetter } from '../../../../src/application/queries/query-getters/milo/get-sessions-conseiller.milo.getter.db'
-import { testConfig } from 'test/utils/module-for-testing'
+import { GetSessionsConseillerMiloQueryGetter } from '../../../../src/application/queries/query-getters/milo/get-sessions-conseiller.milo.query.getter.db'
 import { testConfig } from '../../../utils/module-for-testing'
 
 describe('GetSessionsConseillerMiloQueryHandler', () => {

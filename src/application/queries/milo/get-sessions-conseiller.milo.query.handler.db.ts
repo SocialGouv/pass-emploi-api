@@ -10,7 +10,7 @@ import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { SessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
 import { ConfigService } from '@nestjs/config'
-import { GetSessionsConseillerMiloQueryGetter } from '../query-getters/milo/get-sessions-conseiller.milo.getter.db'
+import { GetSessionsConseillerMiloQueryGetter } from '../query-getters/milo/get-sessions-conseiller.milo.query.getter.db'
 
 export interface GetSessionsConseillerMiloQuery extends Query {
   idConseiller: string
@@ -30,7 +30,7 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
     @Inject(ConseillerMiloRepositoryToken)
     private conseillerMiloRepository: Conseiller.Milo.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer,
-  private configService: ConfigService
+    private configService: ConfigService
   ) {
     super('GetSessionsConseillerMiloQueryHandler')
   }

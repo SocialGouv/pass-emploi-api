@@ -45,7 +45,6 @@ export class ConseillersMiloController {
     private readonly emargementSessionCommandHandler: EmargementSessionMiloCommandHandler
   ) {}
 
-  // todo rester sur ce end point et le faire évoluer / ou en créer d'un autre avec une gestion de pagination
   @ApiOperation({
     summary: 'Récupère la liste des sessions de sa structure MILO',
     description: 'Autorisé pour le conseiller Milo'
