@@ -78,8 +78,13 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
       this.recupererLeNombreDactionsEnRetard(query)
     ])
 
+    const FT_RECUPERER_STRUCTURE_MILO = this.configuration.get(
+      'features.recupererStructureMilo'
+    )
+
     let sessionsMilo: SessionJeuneMiloQueryModel[]
     if (
+      FT_RECUPERER_STRUCTURE_MILO &&
       estMilo(utilisateur.structure) &&
       Authentification.estJeune(utilisateur.type)
     ) {
