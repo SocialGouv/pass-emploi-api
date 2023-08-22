@@ -69,7 +69,8 @@ export class ConseillersMiloController {
         ),
         dateFin: DateService.fromStringToDateTime(
           getSessionsQueryParams.dateFin
-        )
+        ),
+        filtrerAClore: getSessionsQueryParams.filtrerAClore
       },
       utilisateur
     )
