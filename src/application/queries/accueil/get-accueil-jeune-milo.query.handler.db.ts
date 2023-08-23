@@ -17,7 +17,7 @@ import {
 } from 'src/building-blocks/types/result'
 import { Action } from 'src/domain/action/action'
 import { Authentification } from 'src/domain/authentification'
-import { estMiloPassEmploi } from 'src/domain/core'
+import { estMilo, estMiloPassEmploi } from 'src/domain/core'
 
 import { TYPES_ANIMATIONS_COLLECTIVES } from 'src/domain/rendez-vous/rendez-vous'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
@@ -106,7 +106,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       'features.recupererStructureMilo'
     )
 
-    if (FT_RECUPERER_STRUCTURE_MILO) {
+    if (FT_RECUPERER_STRUCTURE_MILO && estMilo(jeuneSqlModel.structure)) {
       if (!jeuneSqlModel.idPartenaire) {
         return failure(new JeuneMiloSansIdDossier(query.idJeune))
       }
