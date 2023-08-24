@@ -26,29 +26,41 @@ import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import { DateService } from 'src/utils/date-service'
 import { uneSessionMilo } from '../../../fixtures/sessions.fixture'
 import Utilisateur = Authentification.Utilisateur
+import { Notification } from '../../../../src/domain/notification/notification'
+import { stubClassSandbox } from '../../../utils/types'
+import { Jeune } from '../../../../src/domain/jeune/jeune'
+import { uneConfiguration, unJeune } from '../../../fixtures/jeune.fixture'
 
 describe('UpdateSessionMiloCommandHandler', () => {
   let updateSessionMiloCommandHandler: UpdateSessionMiloCommandHandler
   let conseillerMiloRepository: StubbedType<Conseiller.Milo.Repository>
+  let jeuneRepository: StubbedType<Jeune.Repository>
   let sessionMiloRepository: StubbedType<SessionMilo.Repository>
   let keycloakClient: StubbedClass<KeycloakClient>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let dateService: StubbedClass<DateService>
+  let notificationService: StubbedClass<Notification.Service>
+
   const conseiller = unConseillerMilo()
 
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()
     conseillerMiloRepository = stubInterface(sandbox)
+    jeuneRepository = stubInterface(sandbox)
     sessionMiloRepository = stubInterface(sandbox)
     keycloakClient = stubClass(KeycloakClient)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     dateService = stubClass(DateService)
+    notificationService = stubClassSandbox(Notification.Service, sandbox)
+    notificationService.notifierInscriptionSession.resolves()
     updateSessionMiloCommandHandler = new UpdateSessionMiloCommandHandler(
       conseillerMiloRepository,
       sessionMiloRepository,
+      jeuneRepository,
       keycloakClient,
       dateService,
-      conseillerAuthorizer
+      conseillerAuthorizer,
+      notificationService
     )
   })
 
@@ -176,6 +188,14 @@ describe('UpdateSessionMiloCommandHandler', () => {
             }
           ]
         }
+        const unJeuneANotifier = unJeune({
+          id: 'jeune-1',
+          configuration: uneConfiguration({ idJeune: 'id-harry' })
+        })
+
+        jeuneRepository.findAll
+          .withArgs(['id-harry'])
+          .resolves([unJeuneANotifier])
 
         // When
         const result = await updateSessionMiloCommandHandler.handle(command)
@@ -195,6 +215,9 @@ describe('UpdateSessionMiloCommandHandler', () => {
           },
           idpToken
         )
+        expect(
+          notificationService.notifierInscriptionSession
+        ).to.have.been.calledOnceWithExactly(session.id, [unJeuneANotifier])
       })
 
       it('permet de désinscrire des jeunes de la session', async () => {

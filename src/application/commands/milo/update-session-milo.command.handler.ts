@@ -17,6 +17,8 @@ import {
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import { DateService } from '../../../utils/date-service'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
+import { Notification } from '../../../domain/notification/notification'
+import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
 
 export interface UpdateSessionMiloCommand extends Command {
   idSession: string
@@ -36,9 +38,12 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
     private conseillerMiloRepository: Conseiller.Milo.Repository,
     @Inject(SessionMiloRepositoryToken)
     private sessionMiloRepository: SessionMilo.Repository,
+    @Inject(JeunesRepositoryToken)
+    private jeuneRepository: Jeune.Repository,
     private keycloakClient: KeycloakClient,
     private dateService: DateService,
-    private conseillerAuthorizer: ConseillerAuthorizer
+    private conseillerAuthorizer: ConseillerAuthorizer,
+    private notificationService: Notification.Service
   ) {
     super('UpdateSessionMiloCommandHandler')
   }
@@ -81,6 +86,15 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
       idpToken
     )
     if (isFailure(resultSave)) return resultSave
+
+    const jeunesANotifiers = await this.jeuneRepository.findAll(
+      inscriptionsATraiter.idsJeunesAInscrire
+    )
+
+    this.notificationService.notifierInscriptionSession(
+      session.id,
+      jeunesANotifiers
+    )
 
     return emptySuccess()
   }
