@@ -87,8 +87,3 @@ export class CreateDemarcheCommandHandler extends CommandHandler<
     }
   }
 }
-
-/*
- -utiliser le parametre command
- - Action crée reférentiel
-* */
