@@ -53,6 +53,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
     dateService = stubClass(DateService)
     notificationService = stubClassSandbox(Notification.Service, sandbox)
     notificationService.notifierInscriptionSession.resolves()
+    notificationService.notifierDesinscriptionSession.resolves()
     updateSessionMiloCommandHandler = new UpdateSessionMiloCommandHandler(
       conseillerMiloRepository,
       sessionMiloRepository,
@@ -189,7 +190,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
           ]
         }
         const unJeuneANotifier = unJeune({
-          id: 'jeune-1',
+          id: 'id-harry',
           configuration: uneConfiguration({ idJeune: 'id-harry' })
         })
 
@@ -222,10 +223,14 @@ describe('UpdateSessionMiloCommandHandler', () => {
 
       it('permet de désinscrire des jeunes de la session', async () => {
         // Given
+        const unJeuneHermione = unJeune({
+          id: 'id-hermione',
+          configuration: uneConfiguration({ idJeune: 'id-hermione' })
+        })
         const session = uneSessionMilo({
           inscriptions: [
             {
-              idJeune: 'id-hermione',
+              idJeune: unJeuneHermione.id,
               idInscription: 'id-inscription-hermione',
               nom: 'Granger',
               prenom: 'Hermione',
@@ -238,7 +243,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
           ...commandSansInscription,
           inscriptions: [
             {
-              idJeune: 'id-hermione',
+              idJeune: unJeuneHermione.id,
               statut: SessionMilo.Modification.StatutInscription.DESINSCRIT
             },
             {
@@ -247,6 +252,10 @@ describe('UpdateSessionMiloCommandHandler', () => {
             }
           ]
         }
+
+        jeuneRepository.findAll
+          .withArgs([unJeuneHermione.id])
+          .resolves([unJeuneHermione])
 
         // When
         const result = await updateSessionMiloCommandHandler.handle(command)
@@ -263,7 +272,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
             idsJeunesAInscrire: [],
             inscriptionsASupprimer: [
               {
-                idJeune: 'id-hermione',
+                idJeune: unJeuneHermione.id,
                 idInscription: 'id-inscription-hermione'
               }
             ],
@@ -271,14 +280,27 @@ describe('UpdateSessionMiloCommandHandler', () => {
           },
           idpToken
         )
+        expect(
+          notificationService.notifierDesinscriptionSession
+        ).to.have.been.calledOnceWithExactly(session.id, session.debut, [
+          unJeuneHermione
+        ])
       })
 
       it('permet de modifier l’inscription des jeunes à la session', async () => {
         // Given
+        const unJeuneHermione = unJeune({
+          id: 'id-hermione',
+          configuration: uneConfiguration({ idJeune: 'id-hermione' })
+        })
+        const unJeuneGinny = unJeune({
+          id: 'id-ginny',
+          configuration: uneConfiguration({ idJeune: 'id-ginny' })
+        })
         const session = uneSessionMilo({
           inscriptions: [
             {
-              idJeune: 'id-hermione',
+              idJeune: unJeuneHermione.id,
               idInscription: 'id-inscription-hermione',
               nom: 'Granger',
               prenom: 'Hermione',
@@ -292,7 +314,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
               statut: SessionMilo.Inscription.Statut.REFUS_TIERS
             },
             {
-              idJeune: 'id-ginny',
+              idJeune: unJeuneGinny.id,
               idInscription: 'id-inscription-ginny',
               nom: 'Weasley',
               prenom: 'Ginny',
@@ -312,7 +334,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
           ...commandSansInscription,
           inscriptions: [
             {
-              idJeune: 'id-hermione',
+              idJeune: unJeuneHermione.id,
               statut: SessionMilo.Modification.StatutInscription.REFUS_JEUNE,
               commentaire: 'J’ai pas envie'
             },
@@ -321,19 +343,23 @@ describe('UpdateSessionMiloCommandHandler', () => {
               statut: SessionMilo.Modification.StatutInscription.INSCRIT
             },
             {
-              idJeune: 'id-ginny',
-              statut: SessionMilo.Modification.StatutInscription.REFUS_TIERS
-            },
-            {
-              idJeune: 'id-harry',
+              idJeune: unJeuneGinny.id,
               statut: SessionMilo.Modification.StatutInscription.REFUS_TIERS
             },
             {
               idJeune: 'id-luna',
               statut: SessionMilo.Modification.StatutInscription.REFUS_TIERS
+            },
+            {
+              idJeune: 'id-harry',
+              statut: SessionMilo.Modification.StatutInscription.REFUS_TIERS
             }
           ]
         }
+
+        jeuneRepository.findAll
+          .withArgs([unJeuneHermione.id, unJeuneGinny.id])
+          .resolves([unJeuneHermione, unJeuneGinny])
 
         // When
         const result = await updateSessionMiloCommandHandler.handle(command)
@@ -351,7 +377,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
             inscriptionsASupprimer: [],
             inscriptionsAModifier: [
               {
-                idJeune: 'id-hermione',
+                idJeune: unJeuneHermione.id,
                 idInscription: 'id-inscription-hermione',
                 statut: SessionMilo.Modification.StatutInscription.REFUS_JEUNE,
                 commentaire: 'J’ai pas envie'
@@ -362,7 +388,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
                 statut: SessionMilo.Modification.StatutInscription.INSCRIT
               },
               {
-                idJeune: 'id-ginny',
+                idJeune: unJeuneGinny.id,
                 idInscription: 'id-inscription-ginny',
                 statut: SessionMilo.Modification.StatutInscription.REFUS_TIERS
               }
@@ -370,6 +396,12 @@ describe('UpdateSessionMiloCommandHandler', () => {
           },
           idpToken
         )
+        expect(
+          notificationService.notifierDesinscriptionSession
+        ).to.have.been.calledOnceWithExactly(session.id, session.debut, [
+          unJeuneHermione,
+          unJeuneGinny
+        ])
       })
 
       it('permet des modifications multiples', async () => {

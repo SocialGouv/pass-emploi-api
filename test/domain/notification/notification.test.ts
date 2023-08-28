@@ -11,6 +11,7 @@ import { unRendezVous } from 'test/fixtures/rendez-vous.fixture'
 import { Notification } from '../../../src/domain/notification/notification'
 import { createSandbox, expect } from '../../utils'
 import { Jeune } from '../../../src/domain/jeune/jeune'
+import { DateTime } from 'luxon'
 
 describe('Notification', () => {
   describe('Service', () => {
@@ -276,6 +277,39 @@ describe('Notification', () => {
 
         // When
         await notificationService.notifierInscriptionSession(idSession, [jeune])
+
+        // Then
+        expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
+          expectedNotification
+        )
+      })
+    })
+    describe('notifierDesinscriptionSession', () => {
+      it('notifie les jeunes avec pushNotificationToken', async () => {
+        // Given
+        const jeune: Jeune = unJeune()
+        const idSession = 'session-id'
+        const dateSession = DateTime.fromISO('2020-04-06T13:20:00.000Z', {
+          zone: 'America/Cayenne'
+        })
+        const expectedNotification = uneNotification({
+          token: jeune.configuration?.pushNotificationToken,
+          notification: {
+            title: 'Rendez-vous supprimé',
+            body: 'Votre rendez-vous du 06/04 est supprimé'
+          },
+          data: {
+            type: Notification.Type.DELETED_SESSION_MILO,
+            id: idSession
+          }
+        })
+
+        // When
+        await notificationService.notifierDesinscriptionSession(
+          idSession,
+          dateSession,
+          [jeune]
+        )
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(

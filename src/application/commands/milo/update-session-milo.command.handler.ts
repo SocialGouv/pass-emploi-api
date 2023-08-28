@@ -19,6 +19,7 @@ import { DateService } from '../../../utils/date-service'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { Notification } from '../../../domain/notification/notification'
 import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
+import Inscription = SessionMilo.Inscription
 
 export interface UpdateSessionMiloCommand extends Command {
   idSession: string
@@ -87,14 +88,44 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
     )
     if (isFailure(resultSave)) return resultSave
 
-    const jeunesANotifiers = await this.jeuneRepository.findAll(
-      inscriptionsATraiter.idsJeunesAInscrire
-    )
+    const [
+      jeunesANotifiersInscription = [],
+      jeunesANotifiersModification = [],
+      jeunesANotifiersSuppression = []
+    ] = await Promise.all([
+      this.jeuneRepository.findAll(inscriptionsATraiter.idsJeunesAInscrire),
+      this.jeuneRepository.findAll(
+        inscriptionsATraiter.inscriptionsAModifier
+          .filter(
+            inscription => inscription.statut !== Inscription.Statut.INSCRIT
+          )
+          .map(inscription => inscription.idJeune)
+      ),
+      this.jeuneRepository.findAll(
+        inscriptionsATraiter.inscriptionsASupprimer.map(
+          inscription => inscription.idJeune
+        )
+      )
+    ])
 
-    this.notificationService.notifierInscriptionSession(
-      session.id,
-      jeunesANotifiers
-    )
+    // todo concat avec les jeunes qui ont été modifier en inscription
+    if (jeunesANotifiersInscription.length) {
+      this.notificationService.notifierInscriptionSession(
+        session.id,
+        jeunesANotifiersInscription
+      )
+    }
+
+    if (
+      jeunesANotifiersModification.length ||
+      jeunesANotifiersSuppression.length
+    ) {
+      this.notificationService.notifierDesinscriptionSession(
+        session.id,
+        session.debut,
+        jeunesANotifiersModification.concat(jeunesANotifiersSuppression)
+      )
+    }
 
     return emptySuccess()
   }
