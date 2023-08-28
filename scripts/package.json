@@ -16,7 +16,7 @@
     "@google-cloud/bigquery": "^7.0.0",
     "dotenv": "^16.0.2",
     "json2csv": "^5.0.7",
-    "mongodb": "^5.0.0",
+    "mongodb": "^6.0.0",
     "node-fetch": "^3.1.0",
     "pg": "^8.7.1",
     "pg-connection-string": "^2.5.0",
