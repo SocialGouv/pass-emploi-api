@@ -25,7 +25,8 @@ export namespace Notification {
     UPDATED_RENDEZVOUS = 'UPDATED_RENDEZVOUS',
     NEW_MESSAGE = 'NEW_MESSAGE',
     NOUVELLE_OFFRE = 'NOUVELLE_OFFRE',
-    DETAIL_ACTION = 'DETAIL_ACTION'
+    DETAIL_ACTION = 'DETAIL_ACTION',
+    DETAIL_SESSION_MILO = 'DETAIL_SESSION_MILO'
   }
 
   export type TypeRdv =
@@ -278,6 +279,27 @@ export namespace Notification {
       }
     }
 
+    async notifierInscriptionSession(
+      idSsession: string,
+      jeunes: Jeune[]
+    ): Promise<void[]> {
+      return Promise.all(
+        jeunes.map(async jeune => {
+          if (jeune.configuration?.pushNotificationToken) {
+            const notification = this.creerNotificationInscriptionSession(
+              jeune.configuration?.pushNotificationToken,
+              idSsession
+            )
+            if (notification) {
+              return this.notificationRepository.send(notification)
+            }
+          } else {
+            this.logMessageEchec(jeune.id)
+          }
+        })
+      )
+    }
+
     private creerNotificationNouvelleAction(
       token: string,
       idAction: string
@@ -411,6 +433,23 @@ export namespace Notification {
         data: {
           type: Type.DETAIL_ACTION,
           id: idAction
+        }
+      }
+    }
+
+    private creerNotificationInscriptionSession(
+      token: string,
+      idSession: string
+    ): Notification.Message {
+      return {
+        token,
+        notification: {
+          title: 'Nouveau rendez-vous',
+          body: 'Votre conseiller a programmé un nouveau rendez-vous'
+        },
+        data: {
+          type: Type.DETAIL_SESSION_MILO,
+          id: idSession
         }
       }
     }

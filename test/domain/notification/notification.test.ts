@@ -257,5 +257,31 @@ describe('Notification', () => {
         )
       })
     })
+    describe('notifierInscriptionSession', () => {
+      it('notifie les jeunes avec pushNotificationToken', async () => {
+        // Given
+        const jeune: Jeune = unJeune()
+        const idSession = 'session-id'
+        const expectedNotification = uneNotification({
+          token: jeune.configuration?.pushNotificationToken,
+          notification: {
+            title: 'Nouveau rendez-vous',
+            body: 'Votre conseiller a programmé un nouveau rendez-vous'
+          },
+          data: {
+            type: Notification.Type.DETAIL_SESSION_MILO,
+            id: idSession
+          }
+        })
+
+        // When
+        await notificationService.notifierInscriptionSession(idSession, [jeune])
+
+        // Then
+        expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
+          expectedNotification
+        )
+      })
+    })
   })
 })
