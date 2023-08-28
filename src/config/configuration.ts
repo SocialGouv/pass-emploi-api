@@ -1,7 +1,7 @@
 /* eslint-disable */
-import {parse} from 'pg-connection-string'
+import { parse } from 'pg-connection-string'
 import * as Joi from 'joi'
-import {configurationSchema} from './configuration.schema'
+import { configurationSchema } from './configuration.schema'
 
 export default () => {
   const scalingoApp = process.env.APP
@@ -56,12 +56,18 @@ export default () => {
       apiKeyCreerJeune: process.env.MILO_JEUNE_API_KEY,
       apiKeyEvents: process.env.MILO_EVENTS_API_KEY,
       apiKeyDetailRendezVous: process.env.MILO_RENDEZ_VOUS_API_KEY,
-      apiKeyInstanceSessionLecture: process.env.MILO_INSTANCE_SESSION_LECTURE_API_KEY,
-      apiKeyInstanceSessionEcritureConseiller: process.env.MILO_INSTANCE_SESSION_ECRITURE_CONSEILLER_API_KEY,
-      apiKeyInstanceSessionAnnulationJeune: process.env.MILO_INSTANCE_SESSION_ANNULATION_JEUNE_API_KEY,
-      apiKeySessionDetailConseiller: process.env.MILO_SESSION_DETAIL_CONSEILLER_API_KEY,
-      apiKeySessionsDetailEtListeJeune: process.env.MILO_SESSIONS_DETAIL_ET_LISTE_JEUNE_API_KEY,
-      apiKeySessionsListeConseiller: process.env.MILO_SESSIONS_LISTE_CONSEILLER_API_KEY,
+      apiKeyInstanceSessionLecture:
+        process.env.MILO_INSTANCE_SESSION_LECTURE_API_KEY,
+      apiKeyInstanceSessionEcritureConseiller:
+        process.env.MILO_INSTANCE_SESSION_ECRITURE_CONSEILLER_API_KEY,
+      apiKeyInstanceSessionAnnulationJeune:
+        process.env.MILO_INSTANCE_SESSION_ANNULATION_JEUNE_API_KEY,
+      apiKeySessionDetailConseiller:
+        process.env.MILO_SESSION_DETAIL_CONSEILLER_API_KEY,
+      apiKeySessionsDetailEtListeJeune:
+        process.env.MILO_SESSIONS_DETAIL_ET_LISTE_JEUNE_API_KEY,
+      apiKeySessionsListeConseiller:
+        process.env.MILO_SESSIONS_LISTE_CONSEILLER_API_KEY,
       apiKeyUtilisateurs: process.env.MILO_UTILISATEURS_API_KEY,
       urlWeb: process.env.MILO_WEB_URL
     },
@@ -140,11 +146,13 @@ export default () => {
       },
       getAckEvenementMilo: {
         limit: process.env.RATE_LIMITER_GET_ACK_EVENEMENT_MILO_LIMIT ?? '10',
-        interval: process.env.RATE_LIMITER_GET_ACK_EVENEMENT_MILO_INTERVAL ?? '1200'
+        interval:
+          process.env.RATE_LIMITER_GET_ACK_EVENEMENT_MILO_INTERVAL ?? '1200'
       },
       getRendezVousMilo: {
         limit: process.env.RATE_LIMITER_GET_RENDEZ_VOUS_MILO_LIMIT ?? '3',
-        interval: process.env.RATE_LIMITER_GET_RENDEZ_VOUS_MILO_INTERVAL ?? '1000'
+        interval:
+          process.env.RATE_LIMITER_GET_RENDEZ_VOUS_MILO_INTERVAL ?? '1000'
       },
       getSessionMilo: {
         limit: process.env.RATE_LIMITER_GET_SESSION_MILO_LIMIT ?? '3',
@@ -180,7 +188,10 @@ export default () => {
     features: {
       rendezVousMilo: process.env.FEATURE_RDV_MILO === 'true',
       notifierRendezVousMilo: process.env.FEATURE_NOTIFIER_RDV_MILO === 'true',
-      recupererStructureMilo: process.env.FEATURE_RECUPERER_STRUCTURE_MILO === 'true',
+      recupererStructureMilo:
+        process.env.FEATURE_RECUPERER_STRUCTURE_MILO === 'true',
+      recupererSessionsMilo:
+        process.env.FEATURE_RECUPERER_SESSIONS_MILO === 'true'
     },
     values: {
       maxRechercheConseillers: process.env.MAX_RECHERCHE_CONSEILLERS ?? '10'

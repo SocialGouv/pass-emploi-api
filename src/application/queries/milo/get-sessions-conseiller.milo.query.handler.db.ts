@@ -38,10 +38,12 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
   async handle(
     query: GetSessionsConseillerMiloQuery
   ): Promise<Result<SessionConseillerMiloQueryModel[]>> {
-    const FT_RECUPERER_STRUCTURE_MILO = this.configService.get(
-      'features.recupererStructureMilo'
+    const FT_RECUPERER_SESSIONS_MILO = this.configService.get(
+      'features.recupererSessionsMilo'
     )
-    if (!FT_RECUPERER_STRUCTURE_MILO) return success([])
+    if (!FT_RECUPERER_SESSIONS_MILO) {
+      return success([])
+    }
 
     const resultConseiller = await this.conseillerMiloRepository.get(
       query.idConseiller

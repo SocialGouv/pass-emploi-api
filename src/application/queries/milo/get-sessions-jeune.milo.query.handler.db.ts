@@ -37,10 +37,10 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
   async handle(
     query: GetSessionsJeuneMiloQuery
   ): Promise<Result<SessionJeuneMiloQueryModel[]>> {
-    const FT_RECUPERER_STRUCTURE_MILO = this.configService.get(
-      'features.recupererStructureMilo'
+    const FT_RECUPERER_SESSIONS_MILO = this.configService.get(
+      'features.recupererSessionsMilo'
     )
-    if (!FT_RECUPERER_STRUCTURE_MILO) return success([])
+    if (!FT_RECUPERER_SESSIONS_MILO) return success([])
 
     const jeuneSqlModel = await JeuneSqlModel.findByPk(query.idJeune, {
       include: [{ model: ConseillerSqlModel, required: true }]

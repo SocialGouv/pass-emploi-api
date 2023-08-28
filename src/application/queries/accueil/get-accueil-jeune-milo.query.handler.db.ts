@@ -102,11 +102,11 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
 
     let sessions: SessionJeuneMiloQueryModel[] = []
 
-    const FT_RECUPERER_STRUCTURE_MILO = this.configService.get(
-      'features.recupererStructureMilo'
+    const FT_RECUPERER_SESSIONS_MILO = this.configService.get(
+      'features.recupererSessionsMilo'
     )
 
-    if (FT_RECUPERER_STRUCTURE_MILO && estMilo(jeuneSqlModel.structure)) {
+    if (FT_RECUPERER_SESSIONS_MILO && estMilo(jeuneSqlModel.structure)) {
       if (!jeuneSqlModel.idPartenaire) {
         return failure(new JeuneMiloSansIdDossier(query.idJeune))
       }
