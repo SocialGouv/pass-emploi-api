@@ -48,6 +48,7 @@ export function unDetailJeuneQueryModel(
     conseiller: unConseillerJeuneQueryModel(),
     urlDossier: undefined,
     idPartenaire: '1234',
+    structureMilo: undefined,
     dateFinCEJ: undefined
   }
 

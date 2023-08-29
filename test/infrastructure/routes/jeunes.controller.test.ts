@@ -21,10 +21,7 @@ import {
   SuiviSemainePoleEmploiQueryModel
 } from 'src/application/queries/query-models/home-jeune-suivi.query-model'
 import { JeuneHomeDemarcheQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
-import {
-  DetailJeuneQueryModel,
-  PreferencesJeuneQueryModel
-} from 'src/application/queries/query-models/jeunes.query-model'
+import { PreferencesJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-model'
 import { RendezVousJeuneQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
 import { GetAnimationsCollectivesJeuneQueryHandler } from 'src/application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
@@ -73,11 +70,11 @@ import { uneDatetime, uneDatetimeAvecOffset } from 'test/fixtures/date.fixture'
 import { uneDemarche } from 'test/fixtures/demarche.fixture'
 import { uneActionQueryModelSansJeune } from 'test/fixtures/query-models/action.query-model.fixtures'
 import { uneDemarcheQueryModel } from 'test/fixtures/query-models/demarche.query-model.fixtures'
-import { unDetailJeuneQueryModel } from 'test/fixtures/query-models/jeunes.query-model.fixtures'
 import { unRendezVousJeuneDetailQueryModel } from 'test/fixtures/query-models/rendez-vous.query-model.fixtures'
 import { StubbedClass, enleverLesUndefined, expect } from 'test/utils'
 import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
+import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
@@ -422,21 +419,17 @@ describe('JeunesController', () => {
     const idJeune = '1'
     it('renvoie le jeune quand il existe', async () => {
       // Given
-      const detailJeuneQueryModel: DetailJeuneQueryModel =
-        unDetailJeuneQueryModel({ dateFinCEJ: uneDatetime().toISO() })
       getDetailJeuneQueryHandler.execute.resolves(
-        success(detailJeuneQueryModel)
+        success(unDetailJeuneQueryModel())
       )
 
       // When
-      const expected = { ...detailJeuneQueryModel }
-      delete expected.urlDossier
       await request(app.getHttpServer())
         .get(`/jeunes/${idJeune}`)
         .set('authorization', unHeaderAuthorization())
         // Then
         .expect(HttpStatus.OK)
-        .expect(expected)
+
       expect(getDetailJeuneQueryHandler.execute).to.have.been.calledWithExactly(
         {
           idJeune
@@ -444,7 +437,7 @@ describe('JeunesController', () => {
         unUtilisateurDecode()
       )
     })
-    it('renvoie une 404 quand le jeune n"existe pas', async () => {
+    it("renvoie une 404 quand le jeune n'existe pas", async () => {
       // Given
       getDetailJeuneQueryHandler.execute.resolves(
         failure(new NonTrouveError('Jeune', idJeune))

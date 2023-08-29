@@ -78,16 +78,15 @@ export class MiloClient {
   async getSessionsJeune(
     idpToken: string,
     idDossier: string,
-    recherche?: { debut: DateTime; fin: DateTime }
+    periode?: { debut?: DateTime; fin?: DateTime }
   ): Promise<Result<ListeSessionsJeuneMiloDto>> {
     const params = new URLSearchParams()
     params.append('idDossier', idDossier)
-    if (recherche) {
-      params.append(
-        'dateDebutRecherche',
-        recherche.debut.toFormat('yyyy-MM-dd')
-      )
-      params.append('dateFinRecherche', recherche.fin.toFormat('yyyy-MM-dd'))
+    if (periode?.debut) {
+      params.append('dateDebutRecherche', periode.debut.toFormat('yyyy-MM-dd'))
+    }
+    if (periode?.fin) {
+      params.append('dateFinRecherche', periode.fin.toFormat('yyyy-MM-dd'))
     }
 
     // L'api ne renvoie que 50 sessions max par appel au delà, une pagination doit être mise en place. (voir doc 06/23)

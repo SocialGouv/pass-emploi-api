@@ -10,8 +10,8 @@ class AgenceDuConseillerQueryModel {
 }
 
 class StructureMiloDuConseillerQueryModel {
-  @ApiProperty({ required: false })
-  id?: string
+  @ApiProperty()
+  id: string
 
   @ApiProperty()
   nom: string

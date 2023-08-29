@@ -14,10 +14,13 @@ import { estMilo } from 'src/domain/core'
 import { ConseillerSqlModel } from '../../../infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { ConfigService } from '@nestjs/config'
+import { DateTime } from 'luxon'
 
 export interface GetSessionsJeuneMiloQuery extends Query {
   idJeune: string
   accessToken: string
+  dateDebut?: DateTime
+  dateFin?: DateTime
   filtrerEstInscrit?: boolean
 }
 
@@ -40,7 +43,9 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
     const FT_RECUPERER_SESSIONS_MILO = this.configService.get(
       'features.recupererSessionsMilo'
     )
-    if (!FT_RECUPERER_SESSIONS_MILO) return success([])
+    if (!FT_RECUPERER_SESSIONS_MILO) {
+      return success([])
+    }
 
     const jeuneSqlModel = await JeuneSqlModel.findByPk(query.idJeune, {
       include: [{ model: ConseillerSqlModel, required: true }]
@@ -55,7 +60,10 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
     return this.getSessionsQueryGetter.handle(
       jeuneSqlModel.idPartenaire,
       query.accessToken,
-      { filtrerEstInscrit: query.filtrerEstInscrit }
+      {
+        periode: { debut: query.dateDebut, fin: query.dateFin },
+        filtrerEstInscrit: query.filtrerEstInscrit
+      }
     )
   }
 
