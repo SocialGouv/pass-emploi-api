@@ -26,7 +26,8 @@ export namespace Notification {
     NEW_MESSAGE = 'NEW_MESSAGE',
     NOUVELLE_OFFRE = 'NOUVELLE_OFFRE',
     DETAIL_ACTION = 'DETAIL_ACTION',
-    DETAIL_SESSION_MILO = 'DETAIL_SESSION_MILO'
+    DETAIL_SESSION_MILO = 'DETAIL_SESSION_MILO',
+    DELETED_SESSION_MILO = 'DELETED_SESSION_MILO'
   }
 
   export type TypeRdv =
@@ -300,6 +301,29 @@ export namespace Notification {
       )
     }
 
+    async notifierDesinscriptionSession(
+      idSsession: string,
+      dateSession: DateTime,
+      jeunes: Jeune[]
+    ): Promise<void[]> {
+      return Promise.all(
+        jeunes.map(async jeune => {
+          if (jeune.configuration?.pushNotificationToken) {
+            const notification = this.creerNotificationDesinscriptionSession(
+              jeune.configuration?.pushNotificationToken,
+              idSsession,
+              dateSession
+            )
+            if (notification) {
+              return this.notificationRepository.send(notification)
+            }
+          } else {
+            this.logMessageEchec(jeune.id)
+          }
+        })
+      )
+    }
+
     private creerNotificationNouvelleAction(
       token: string,
       idAction: string
@@ -449,6 +473,25 @@ export namespace Notification {
         },
         data: {
           type: Type.DETAIL_SESSION_MILO,
+          id: idSession
+        }
+      }
+    }
+
+    private creerNotificationDesinscriptionSession(
+      token: string,
+      idSession: string,
+      date: DateTime
+    ): Notification.Message {
+      const formattedDate = date.toFormat('dd/MM')
+      return {
+        token,
+        notification: {
+          title: 'Rendez-vous supprimé',
+          body: `Votre rendez-vous du ${formattedDate} est supprimé`
+        },
+        data: {
+          type: Type.DELETED_SESSION_MILO,
           id: idSession
         }
       }

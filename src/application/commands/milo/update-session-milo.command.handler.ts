@@ -19,6 +19,7 @@ import { DateService } from '../../../utils/date-service'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { Notification } from '../../../domain/notification/notification'
 import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
+import Inscription = SessionMilo.Inscription
 
 export interface UpdateSessionMiloCommand extends Command {
   idSession: string
@@ -87,14 +88,42 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
     )
     if (isFailure(resultSave)) return resultSave
 
-    const jeunesANotifiers = await this.jeuneRepository.findAll(
-      inscriptionsATraiter.idsJeunesAInscrire
-    )
+    const [
+      jeunesANotifierInscription = [],
+      jeunesModifiesANotifierDesinscription = [],
+      jeunesSupprimesANotifierDesinscription = []
+    ] = await Promise.all([
+      this.jeuneRepository.findAll(inscriptionsATraiter.idsJeunesAInscrire),
+      this.jeuneRepository.findAll(
+        trouverListesJeunesModifiesPourDesinscription(
+          inscriptionsATraiter.inscriptionsAModifier
+        )
+      ),
+      this.jeuneRepository.findAll(
+        inscriptionsATraiter.inscriptionsASupprimer.map(
+          inscription => inscription.idJeune
+        )
+      )
+    ])
 
-    this.notificationService.notifierInscriptionSession(
-      session.id,
-      jeunesANotifiers
-    )
+    if (jeunesANotifierInscription.length) {
+      this.notificationService.notifierInscriptionSession(
+        session.id,
+        jeunesANotifierInscription
+      )
+    }
+
+    const jeunesANotifierDesinscription =
+      jeunesModifiesANotifierDesinscription.concat(
+        jeunesSupprimesANotifierDesinscription
+      )
+    if (jeunesANotifierDesinscription.length) {
+      this.notificationService.notifierDesinscriptionSession(
+        session.id,
+        session.debut,
+        jeunesANotifierDesinscription
+      )
+    }
 
     return emptySuccess()
   }
@@ -113,4 +142,12 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
   async monitor(): Promise<void> {
     return
   }
+}
+
+function trouverListesJeunesModifiesPourDesinscription(
+  toto: Array<Omit<Inscription, 'nom' | 'prenom'>>
+): string[] {
+  return toto
+    .filter(inscription => inscription.statut !== Inscription.Statut.INSCRIT)
+    .map(inscription => inscription.idJeune)
 }
