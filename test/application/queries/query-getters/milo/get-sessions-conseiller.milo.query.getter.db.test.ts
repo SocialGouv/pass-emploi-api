@@ -59,7 +59,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
   describe('handle', () => {
     describe('récupère la liste des session de la structure du conseiller MILO', () => {
       const query = {
-        token: 'bearer un-token',
+        accessToken: 'bearer un-token',
         idStructureMilo: 'idStructure-1',
         timezoneStructure: 'America/Cayenne',
         options: {
@@ -91,7 +91,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
           dateModification: DateTime.now().toJSDate()
         })
         keycloakClient.exchangeTokenConseillerMilo
-          .withArgs(query.token)
+          .withArgs(query.accessToken)
           .resolves(idpToken)
       })
 
@@ -111,7 +111,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
 
         // When
         const result = await getSessionsQueryGetter.handle(
-          query.token,
+          query.accessToken,
           query.idStructureMilo,
           query.timezoneStructure,
           {
@@ -137,7 +137,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
 
         // When
         const result = await getSessionsQueryGetter.handle(
-          query.token,
+          query.accessToken,
           query.idStructureMilo,
           query.timezoneStructure,
           {
@@ -176,7 +176,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
 
         // When
         const result = await getSessionsQueryGetter.handle(
-          query.token,
+          query.accessToken,
           query.idStructureMilo,
           query.timezoneStructure,
           {
@@ -206,7 +206,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
 
           // When
           const result = await getSessionsQueryGetter.handle(
-            query.token,
+            query.accessToken,
             query.idStructureMilo,
             query.timezoneStructure,
             {
@@ -235,7 +235,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
 
           // When
           const result = await getSessionsQueryGetter.handle(
-            query.token,
+            query.accessToken,
             query.idStructureMilo,
             query.timezoneStructure,
             {
@@ -264,7 +264,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
 
           // When
           const result = await getSessionsQueryGetter.handle(
-            query.token,
+            query.accessToken,
             query.idStructureMilo,
             query.timezoneStructure,
             {

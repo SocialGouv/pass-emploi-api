@@ -19,7 +19,7 @@ import { Includeable } from 'sequelize'
 export interface GetDetailConseillerQuery extends Query {
   idConseiller: string
   structure: Core.Structure
-  token: string
+  accessToken: string
 }
 
 @Injectable()
@@ -47,7 +47,7 @@ export class GetDetailConseillerQueryHandler extends QueryHandler<
     if (estMilo(query.structure) && FT_RECUPERER_STRUCTURE_MILO) {
       await this.conseillerMiloService.recupererEtMettreAJourStructure(
         query.idConseiller,
-        query.token
+        query.accessToken
       )
       include.push(StructureMiloSqlModel)
     }

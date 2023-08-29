@@ -23,7 +23,7 @@ export class GetSessionsConseillerMiloQueryGetter {
   ) {}
 
   async handle(
-    token: string,
+    accessToken: string,
     idStructureMilo: string,
     timezoneStructure: string,
     options?: {
@@ -32,7 +32,7 @@ export class GetSessionsConseillerMiloQueryGetter {
     }
   ): Promise<Result<SessionConseillerMiloQueryModel[]>> {
     const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
-      token
+      accessToken
     )
 
     let periode

@@ -27,7 +27,7 @@ describe('GetDetailSessionJeuneMiloQueryHandler', () => {
   const query = {
     idSession: idSession.toString(),
     idJeune: 'idJeune',
-    token: 'token'
+    accessToken: 'token'
   }
   const jeune = unJeune()
   const utilisateur = unUtilisateurJeune()
@@ -113,7 +113,7 @@ describe('GetDetailSessionJeuneMiloQueryHandler', () => {
       beforeEach(async () => {
         jeuneRepository.get.withArgs(query.idJeune).resolves(jeune)
         keycloakClient.exchangeTokenJeune
-          .withArgs(query.token, jeune.structure)
+          .withArgs(query.accessToken, jeune.structure)
           .resolves(idpToken)
       })
 

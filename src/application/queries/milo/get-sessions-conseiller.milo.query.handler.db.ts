@@ -14,7 +14,7 @@ import { GetSessionsConseillerMiloQueryGetter } from '../query-getters/milo/get-
 
 export interface GetSessionsConseillerMiloQuery extends Query {
   idConseiller: string
-  token: string
+  accessToken: string
   dateDebut?: DateTime
   dateFin?: DateTime
   filtrerAClore?: boolean
@@ -59,7 +59,7 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
       periode = { debut: query.dateDebut, fin: query.dateFin }
     const resultSessionsMiloFromQueryGetter =
       await this.getSessionsConsseillerMiloQueryGetter.handle(
-        query.token,
+        query.accessToken,
         idStructureMilo,
         timezoneStructure,
         { filtrerAClore: query.filtrerAClore, periode }

@@ -61,7 +61,7 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
       const query = {
         idSession: 'idSession',
         idConseiller: 'idConseiller',
-        token: 'bearer un-token'
+        accessToken: 'bearer un-token'
       }
       getDetailSessionMiloQueryHandler.authorize(
         query,
@@ -83,7 +83,7 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
     const query = {
       idSession: 'idSession-1',
       idConseiller: 'idConseiller-1',
-      token: 'bearer un-token'
+      accessToken: 'bearer un-token'
     }
     it("renvoie une failure quand le conseiller Milo n'existe pas", async () => {
       // Given
@@ -108,7 +108,7 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
           .withArgs(query.idConseiller)
           .resolves(success(unConseillerMilo()))
         keycloakClient.exchangeTokenConseillerMilo
-          .withArgs(query.token)
+          .withArgs(query.accessToken)
           .resolves(tokenMilo)
       })
 

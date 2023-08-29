@@ -68,7 +68,10 @@ describe('JeunesMiloController', () => {
 
     it("renvoie l'accueil d'un jeune MILO sans personnalisation", async () => {
       getAccueilQueryHandler.execute
-        .withArgs({ idJeune, maintenant, token }, unUtilisateurDecode())
+        .withArgs(
+          { idJeune, maintenant, accessToken: token },
+          unUtilisateurDecode()
+        )
         .resolves(success(accueilJeuneQueryModel))
       const {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -84,7 +87,10 @@ describe('JeunesMiloController', () => {
 
     it('renvoie une erreur quand le jeune est un jeune PE', async () => {
       getAccueilQueryHandler.execute
-        .withArgs({ idJeune, maintenant, token }, unUtilisateurDecode())
+        .withArgs(
+          { idJeune, maintenant, accessToken: token },
+          unUtilisateurDecode()
+        )
         .resolves(failure(new DroitsInsuffisants()))
       await request(app.getHttpServer())
         .get(`/jeunes/${idJeune}/milo/accueil?maintenant=2023-03-03`)
@@ -101,7 +107,7 @@ describe('JeunesMiloController', () => {
     it('renvoie la liste des sessions accessibles au jeune', async () => {
       getSessionsQueryHandler.execute
         .withArgs(
-          { idJeune, token, filtrerEstInscrit: undefined },
+          { idJeune, accessToken: token, filtrerEstInscrit: undefined },
           unUtilisateurDecode()
         )
         .resolves(success([uneSessionJeuneMiloQueryModel]))
@@ -116,7 +122,7 @@ describe('JeunesMiloController', () => {
     it('renvoie une erreur quand le jeune est un jeune PE', async () => {
       getSessionsQueryHandler.execute
         .withArgs(
-          { idJeune, token, filtrerEstInscrit: undefined },
+          { idJeune, accessToken: token, filtrerEstInscrit: undefined },
           unUtilisateurDecode()
         )
         .resolves(failure(new DroitsInsuffisants()))
@@ -139,7 +145,10 @@ describe('JeunesMiloController', () => {
 
     it('renvoie le détail de la session', async () => {
       getDetailSessionQueryHandler.execute
-        .withArgs({ idSession, idJeune, token }, unUtilisateurDecode())
+        .withArgs(
+          { idSession, idJeune, accessToken: token },
+          unUtilisateurDecode()
+        )
         .resolves(success(unDetailSessionJeuneMiloQueryModel))
 
       await request(app.getHttpServer())
@@ -151,7 +160,10 @@ describe('JeunesMiloController', () => {
 
     it('renvoie une erreur quand le jeune est un jeune PE', async () => {
       getDetailSessionQueryHandler.execute
-        .withArgs({ idSession, idJeune, token }, unUtilisateurDecode())
+        .withArgs(
+          { idSession, idJeune, accessToken: token },
+          unUtilisateurDecode()
+        )
         .resolves(failure(new DroitsInsuffisants()))
 
       await request(app.getHttpServer())

@@ -400,7 +400,7 @@ describe('RecherchesController', () => {
           ).to.have.been.calledWithExactly(
             {
               idJeune: '1',
-              token: 'coucou',
+              accessToken: 'coucou',
               structure: Core.Structure.POLE_EMPLOI,
               avecDiagoriente: false
             },
@@ -452,7 +452,7 @@ describe('RecherchesController', () => {
         ).to.have.been.calledWithExactly(
           {
             idJeune: '1',
-            token: 'coucou',
+            accessToken: 'coucou',
             structure: Core.Structure.MILO,
             avecDiagoriente: true
           },

@@ -39,7 +39,7 @@ import { ConfigService } from '@nestjs/config'
 export interface GetAccueilJeuneMiloQuery extends Query {
   idJeune: string
   maintenant: string
-  token: string
+  accessToken: string
 }
 
 @Injectable()
@@ -112,7 +112,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       }
       const sessionsQueryModels = await this.getSessionsQueryGetter.handle(
         jeuneSqlModel.idPartenaire,
-        query.token,
+        query.accessToken,
         { periode: { debut: maintenant, fin: dateFinDeSemaine } }
       )
       if (isSuccess(sessionsQueryModels)) {

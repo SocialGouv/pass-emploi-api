@@ -64,7 +64,7 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
       await handler.authorize(
         {
           idJeune: 'idJeune',
-          token: 'token',
+          accessToken: 'token',
           structure: Core.Structure.POLE_EMPLOI,
           avecDiagoriente: false
         },
@@ -136,7 +136,7 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
         // When
         await handler.handle({
           idJeune: 'idJeune',
-          token: 'token',
+          accessToken: 'token',
           structure: Core.Structure.MILO,
           avecDiagoriente: true
         })
@@ -165,7 +165,7 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
         // When
         await handler.handle({
           idJeune: 'idJeune',
-          token: 'token',
+          accessToken: 'token',
           structure: Core.Structure.POLE_EMPLOI,
           avecDiagoriente: false
         })
@@ -231,7 +231,7 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
         // When
         await handler.handle({
           idJeune: 'idJeune',
-          token: 'token',
+          accessToken: 'token',
           structure: Core.Structure.POLE_EMPLOI,
           avecDiagoriente: true
         })
@@ -263,7 +263,7 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
         // When
         const result = await handler.handle({
           idJeune: 'idJeune',
-          token: 'token',
+          accessToken: 'token',
           structure: Core.Structure.POLE_EMPLOI,
           avecDiagoriente: true
         })

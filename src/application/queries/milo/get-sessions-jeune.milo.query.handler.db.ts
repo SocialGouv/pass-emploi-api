@@ -17,7 +17,7 @@ import { ConfigService } from '@nestjs/config'
 
 export interface GetSessionsJeuneMiloQuery extends Query {
   idJeune: string
-  token: string
+  accessToken: string
   filtrerEstInscrit?: boolean
 }
 
@@ -54,7 +54,7 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
 
     return this.getSessionsQueryGetter.handle(
       jeuneSqlModel.idPartenaire,
-      query.token,
+      query.accessToken,
       { filtrerEstInscrit: query.filtrerEstInscrit }
     )
   }

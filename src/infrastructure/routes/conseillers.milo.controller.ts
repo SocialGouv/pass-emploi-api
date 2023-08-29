@@ -62,7 +62,7 @@ export class ConseillersMiloController {
     const result = await this.getSessionsQueryHandler.execute(
       {
         idConseiller,
-        token: accessToken,
+        accessToken: accessToken,
         dateDebut: DateService.fromStringToDateTime(
           getSessionsQueryParams.dateDebut
         ),
@@ -96,7 +96,7 @@ export class ConseillersMiloController {
     @AccessToken() accessToken: string
   ): Promise<DetailSessionConseillerMiloQueryModel> {
     const result = await this.getDetailSessionQueryHandler.execute(
-      { idSession, idConseiller, token: accessToken },
+      { idSession, idConseiller, accessToken: accessToken },
       utilisateur
     )
 
@@ -122,7 +122,7 @@ export class ConseillersMiloController {
     const command: EmargementSessionMiloCommand = {
       idSession,
       idConseiller,
-      token: accessToken,
+      accessToken: accessToken,
       emargements: emargementSessionMiloPayload.emargements
     }
 
@@ -153,7 +153,7 @@ export class ConseillersMiloController {
     const command: UpdateSessionMiloCommand = {
       idSession,
       idConseiller,
-      token: accessToken,
+      accessToken: accessToken,
       estVisible: updateSessionMiloPayload.estVisible,
       inscriptions: updateSessionMiloPayload.inscriptions
     }

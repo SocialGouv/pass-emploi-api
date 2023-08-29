@@ -45,7 +45,7 @@ export namespace ConseillerMilo {
 
     async recupererEtMettreAJourStructure(
       idConseiller: string,
-      token: string
+      accessToken: string
     ): Promise<void> {
       try {
         const resultConseiller = await this.conseillerMiloRepository.get(
@@ -61,7 +61,7 @@ export namespace ConseillerMilo {
         }
 
         const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
-          token
+          accessToken
         )
         const structure = await this.miloClient.getStructureConseiller(idpToken)
 

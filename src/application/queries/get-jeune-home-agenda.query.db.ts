@@ -35,7 +35,7 @@ import { SessionJeuneMiloQueryModel } from './query-models/sessions.milo.query.m
 export interface GetJeuneHomeAgendaQuery extends Query {
   idJeune: string
   maintenant: string
-  token: string
+  accessToken: string
 }
 
 @Injectable()
@@ -93,7 +93,7 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
       }
       const sessionsQueryModels = await this.getSessionsJeuneQueryGetter.handle(
         jeuneSqlModel.idPartenaire,
-        query.token,
+        query.accessToken,
         {
           periode: {
             debut: lundiDernier,

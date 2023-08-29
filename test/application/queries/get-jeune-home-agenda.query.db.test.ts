@@ -73,18 +73,18 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
   })
 
   describe('handle', () => {
-    const token = 'token'
+    const accessToken = 'token'
     const homeQuery = {
       idJeune,
       maintenant: aujourdhuiDimanche,
-      token,
+      accessToken: accessToken,
       structure: Core.Structure.MILO
     }
     const lundiDernierString = '2022-08-08T00:00:00Z'
     const dimancheEnHuitString = '2022-08-22T00:00:00Z'
     beforeEach(async () => {
       sessionsQueryGetter.handle
-        .withArgs('idDossier', token, {
+        .withArgs('idDossier', accessToken, {
           periode: {
             debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
             fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
@@ -141,7 +141,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
           '2022-08-29T00:00:00-07:00'
         ])
       sessionsQueryGetter.handle
-        .withArgs('idDossier', token, {
+        .withArgs('idDossier', accessToken, {
           periode: {
             debut: DateTime.fromISO(_lundiDernier, { setZone: true }),
             fin: DateTime.fromISO(_dimancheEnHuit, { setZone: true })
@@ -154,7 +154,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         {
           idJeune: idJeune,
           maintenant: aujourdhuiMercredi,
-          token: token
+          accessToken: accessToken
         },
         utilisateurJeune
       )
@@ -262,7 +262,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
       it('renvoie un tableau vide si le jeune n’est inscrit à aucune session sur la période', async () => {
         // Given
         sessionsQueryGetter.handle
-          .withArgs('idDossier', token, {
+          .withArgs('idDossier', accessToken, {
             periode: {
               debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
               fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
@@ -294,7 +294,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
           inscription: SessionMilo.Inscription.Statut.INSCRIT
         }
         sessionsQueryGetter.handle
-          .withArgs('idDossier', token, {
+          .withArgs('idDossier', accessToken, {
             periode: {
               debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
               fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
@@ -347,7 +347,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
     const query = {
       idJeune: jeune.id,
       maintenant: aujourdhuiDimanche,
-      token: 'token',
+      accessToken: 'token',
       structure: Core.Structure.MILO
     }
 

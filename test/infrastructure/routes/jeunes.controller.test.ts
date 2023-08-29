@@ -933,7 +933,10 @@ describe('JeunesController', () => {
       const token = 'token'
       jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
       getJeuneHomeSuiviQueryHandler.execute
-        .withArgs({ idJeune, maintenant, token }, unUtilisateurDecode())
+        .withArgs(
+          { idJeune, maintenant, accessToken: token },
+          unUtilisateurDecode()
+        )
         .resolves(success(queryModel))
 
       // When

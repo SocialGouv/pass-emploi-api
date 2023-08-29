@@ -20,14 +20,14 @@ export class GetSessionsJeuneMiloQueryGetter {
 
   async handle(
     idPartenaire: string,
-    token: string,
+    accessToken: string,
     options?: {
       periode?: { debut: DateTime; fin: DateTime }
       filtrerEstInscrit?: boolean
     }
   ): Promise<Result<SessionJeuneMiloQueryModel[]>> {
     const idpToken = await this.keycloakClient.exchangeTokenJeune(
-      token,
+      accessToken,
       Core.Structure.MILO
     )
 

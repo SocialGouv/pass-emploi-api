@@ -54,7 +54,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
       // When
       const query = {
         idConseiller: 'idConseiller',
-        token: 'bearer un-token'
+        accessToken: 'bearer un-token'
       }
       getSessionsQueryHandler.authorize(query, unUtilisateurConseiller())
 
@@ -75,7 +75,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
         // Given
         const query = {
           idConseiller: 'idConseiller-1',
-          token: 'bearer un-token'
+          accessToken: 'bearer un-token'
         }
         conseillerRepository.get
           .withArgs(query.idConseiller)
@@ -96,7 +96,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
     describe('quand le conseiller existe', () => {
       const query = {
         idConseiller: 'idConseiller-1',
-        token: 'bearer un-token',
+        accessToken: 'bearer un-token',
         dateDebut: DateTime.fromISO('2023-04-12T00:00:00Z'),
         dateFin: DateTime.fromISO('2023-04-13T00:00:00Z')
       }

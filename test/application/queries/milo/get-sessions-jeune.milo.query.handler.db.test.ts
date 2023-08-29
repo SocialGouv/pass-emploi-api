@@ -21,7 +21,7 @@ import { SessionMilo } from '../../../../src/domain/milo/session.milo'
 import { testConfig } from 'test/utils/module-for-testing'
 
 describe('GetSessionsJeuneMiloQueryHandler', () => {
-  const query = { idJeune: 'idJeune', token: 'token' }
+  const query = { idJeune: 'idJeune', accessToken: 'token' }
   const utilisateur = unUtilisateurJeune()
 
   let getSessionsQueryHandler: GetSessionsJeuneMiloQueryHandler
@@ -153,7 +153,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
         it('renvoie le même success', async () => {
           const queryAvecFiltre = {
             idJeune: 'idJeune',
-            token: 'token',
+            accessToken: 'token',
             filtrerEstInscrit: true
           }
 

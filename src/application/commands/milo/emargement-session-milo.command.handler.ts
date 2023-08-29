@@ -21,7 +21,7 @@ import { DateService } from 'src/utils/date-service'
 export interface EmargementSessionMiloCommand extends Command {
   idSession: string
   idConseiller: string
-  token: string
+  accessToken: string
   emargements: SessionMilo.Modification.Emargement[]
 }
 
@@ -50,7 +50,7 @@ export class EmargementSessionMiloCommandHandler extends CommandHandler<
     const { structure: structureConseiller } = conseillerMiloResult.data
 
     const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
-      command.token
+      command.accessToken
     )
 
     const resultSession = await this.sessionMiloRepository.getForConseiller(

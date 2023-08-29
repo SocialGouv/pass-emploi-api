@@ -23,7 +23,7 @@ import { buildError } from '../../utils/logger.module'
 
 export interface RafraichirSuggestionsCommand extends Command {
   idJeune: string
-  token: string
+  accessToken: string
   structure: Core.Structure
   avecDiagoriente: boolean
 }
@@ -61,7 +61,7 @@ export class RafraichirSuggestionsCommandHandler extends CommandHandler<
     if (rafraichirSuggestionsPE) {
       try {
         const idpToken = await this.keycloakClient.exchangeTokenJeune(
-          command.token,
+          command.accessToken,
           jeune.structure
         )
 

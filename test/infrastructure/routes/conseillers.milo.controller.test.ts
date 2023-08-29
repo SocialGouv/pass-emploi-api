@@ -62,7 +62,7 @@ describe('ConseillersMiloController', () => {
         ).to.have.been.calledOnceWithExactly(
           {
             idConseiller: 'id-conseiller',
-            token: 'coucou',
+            accessToken: 'coucou',
             dateDebut: undefined,
             dateFin: undefined,
             filtrerAClore: undefined
@@ -113,7 +113,7 @@ describe('ConseillersMiloController', () => {
         {
           idSession,
           idConseiller: 'id-conseiller',
-          token: 'coucou'
+          accessToken: 'coucou'
         },
         unUtilisateurDecode()
       )
@@ -135,7 +135,7 @@ describe('ConseillersMiloController', () => {
         estVisible: true,
         idConseiller: idConseiller,
         idSession: idSession,
-        token: 'coucou',
+        accessToken: 'coucou',
         inscriptions: undefined
       }
 
@@ -181,7 +181,7 @@ describe('ConseillersMiloController', () => {
         estVisible: true,
         idConseiller: idConseiller,
         idSession: idSession,
-        token: 'coucou',
+        accessToken: 'coucou',
         inscriptions: listeInscrits
       }
 

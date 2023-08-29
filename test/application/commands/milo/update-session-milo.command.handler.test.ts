@@ -68,7 +68,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
     const commandSansInscription: UpdateSessionMiloCommand = {
       idSession: 'idSession',
       idConseiller: conseiller.id,
-      token: 'token',
+      accessToken: 'token',
       estVisible: true
     }
 
@@ -98,7 +98,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
         .resolves(success(conseiller))
       const erreurHttp = new ErreurHttp('', 404)
       keycloakClient.exchangeTokenConseillerMilo
-        .withArgs(commandSansInscription.token)
+        .withArgs(commandSansInscription.accessToken)
         .resolves(idpToken)
       sessionMiloRepository.getForConseiller
         .withArgs(
@@ -125,7 +125,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
           .withArgs(commandSansInscription.idConseiller)
           .resolves(success(conseiller))
         keycloakClient.exchangeTokenConseillerMilo
-          .withArgs(commandSansInscription.token)
+          .withArgs(commandSansInscription.accessToken)
           .resolves(idpToken)
         dateService.now.returns(uneDatetime())
         sessionMiloRepository.save.resolves(emptySuccess())
@@ -554,7 +554,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
         estVisible: true,
         idSession: 'idSession',
         idConseiller: conseiller.id,
-        token: 'token'
+        accessToken: 'token'
       }
       const utilisateur: Utilisateur = unUtilisateurConseiller()
 

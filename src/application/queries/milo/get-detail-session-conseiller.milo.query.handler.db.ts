@@ -19,7 +19,7 @@ import { DateService } from 'src/utils/date-service'
 export interface GetDetailSessionConseillerMiloQuery extends Query {
   idSession: string
   idConseiller: string
-  token: string
+  accessToken: string
 }
 
 @Injectable()
@@ -51,7 +51,7 @@ export class GetDetailSessionConseillerMiloQueryHandler extends QueryHandler<
     const { structure } = resultConseiller.data
 
     const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
-      query.token
+      query.accessToken
     )
 
     const resultat = await this.sessionRepository.getForConseiller(

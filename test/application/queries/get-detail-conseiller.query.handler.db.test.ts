@@ -70,7 +70,7 @@ describe('GetDetailConseillerQueryHandler', () => {
         const actual = await getDetailConseillerQueryHandler.handle({
           idConseiller,
           structure,
-          token
+          accessToken: token
         })
 
         expect(actual).to.deep.equal(
@@ -102,7 +102,7 @@ describe('GetDetailConseillerQueryHandler', () => {
         const actual = await getDetailConseillerQueryHandler.handle({
           idConseiller,
           structure,
-          token
+          accessToken: token
         })
 
         expect(actual).to.deep.equal(
@@ -124,7 +124,7 @@ describe('GetDetailConseillerQueryHandler', () => {
         const actual = await getDetailConseillerQueryHandler.handle({
           idConseiller: 'id-inexistant',
           structure,
-          token
+          accessToken: token
         })
 
         expect(actual).to.deep.equal(
@@ -154,7 +154,7 @@ describe('GetDetailConseillerQueryHandler', () => {
         const actual = await getDetailConseillerQueryHandler.handle({
           idConseiller,
           structure,
-          token
+          accessToken: token
         })
 
         // Then
@@ -189,7 +189,7 @@ describe('GetDetailConseillerQueryHandler', () => {
       const query: GetDetailConseillerQuery = {
         idConseiller: utilisateur.id,
         structure: Core.Structure.MILO,
-        token
+        accessToken: token
       }
 
       // When

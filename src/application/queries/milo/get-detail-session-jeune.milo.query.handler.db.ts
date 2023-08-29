@@ -30,7 +30,7 @@ import { DateTime } from 'luxon'
 export interface GetDetailSessionJeuneMiloQuery extends Query {
   idSession: string
   idJeune: string
-  token: string
+  accessToken: string
 }
 
 @Injectable()
@@ -60,7 +60,7 @@ export class GetDetailSessionJeuneMiloQueryHandler extends QueryHandler<
     }
 
     const idpToken = await this.keycloakClient.exchangeTokenJeune(
-      query.token,
+      query.accessToken,
       jeune.structure
     )
 

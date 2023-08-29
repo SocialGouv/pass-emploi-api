@@ -45,7 +45,7 @@ export class JeunesMiloController {
       {
         idJeune,
         maintenant: queryParams.maintenant,
-        token: accessToken
+        accessToken: accessToken
       },
       utilisateur
     )
@@ -75,7 +75,7 @@ export class JeunesMiloController {
     const result = await this.getSessionsQueryHandler.execute(
       {
         idJeune,
-        token: accessToken,
+        accessToken: accessToken,
         filtrerEstInscrit: getSessionsJeunesQueryParams.filtrerEstInscrit
       },
       utilisateur
@@ -102,7 +102,7 @@ export class JeunesMiloController {
     @AccessToken() accessToken: string
   ): Promise<DetailSessionJeuneMiloQueryModel> {
     const result = await this.getDetailSessionQueryHandler.execute(
-      { idSession, idJeune, token: accessToken },
+      { idSession, idJeune, accessToken: accessToken },
       utilisateur
     )
 

@@ -23,7 +23,7 @@ import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
 export interface UpdateSessionMiloCommand extends Command {
   idSession: string
   idConseiller: string
-  token: string
+  accessToken: string
   estVisible?: boolean
   inscriptions?: SessionMilo.Modification.Inscription[]
 }
@@ -56,7 +56,7 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
     const { structure: structureConseiller } = conseillerMiloResult.data
 
     const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
-      command.token
+      command.accessToken
     )
 
     const resultSession = await this.sessionMiloRepository.getForConseiller(

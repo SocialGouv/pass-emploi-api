@@ -56,7 +56,7 @@ describe('EmargementSessionMiloCommandHandler', () => {
     const commandSansEmargement: EmargementSessionMiloCommand = {
       idSession: 'idSession',
       idConseiller: conseiller.id,
-      token: 'token',
+      accessToken: 'token',
       emargements: []
     }
 
@@ -86,7 +86,7 @@ describe('EmargementSessionMiloCommandHandler', () => {
         .resolves(success(conseiller))
       const erreurHttp = new ErreurHttp('', 404)
       keycloakClient.exchangeTokenConseillerMilo
-        .withArgs(commandSansEmargement.token)
+        .withArgs(commandSansEmargement.accessToken)
         .resolves(idpToken)
       sessionMiloRepository.getForConseiller
         .withArgs(
@@ -110,7 +110,7 @@ describe('EmargementSessionMiloCommandHandler', () => {
       const commandAvecEmargements: EmargementSessionMiloCommand = {
         idSession: 'idSession',
         idConseiller: conseiller.id,
-        token: 'token',
+        accessToken: 'token',
         emargements: [
           {
             idJeune: 'id-hermione',
@@ -134,7 +134,7 @@ describe('EmargementSessionMiloCommandHandler', () => {
           .withArgs(commandSansEmargement.idConseiller)
           .resolves(success(conseiller))
         keycloakClient.exchangeTokenConseillerMilo
-          .withArgs(commandSansEmargement.token)
+          .withArgs(commandSansEmargement.accessToken)
           .resolves(idpToken)
         sessionMiloRepository.getForConseiller
           .withArgs(
@@ -217,7 +217,7 @@ describe('EmargementSessionMiloCommandHandler', () => {
       const command: EmargementSessionMiloCommand = {
         idSession: 'idSession',
         idConseiller: conseiller.id,
-        token: 'token',
+        accessToken: 'token',
         emargements: []
       }
       const utilisateur: Utilisateur = unUtilisateurConseiller()

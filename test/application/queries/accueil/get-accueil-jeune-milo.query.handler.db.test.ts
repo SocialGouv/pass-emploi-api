@@ -91,7 +91,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       accueilQuery = {
         idJeune: 'idJeune',
         maintenant: maintenantString,
-        token: token
+        accessToken: token
       }
 
       await AgenceSqlModel.bulkCreate([
@@ -513,7 +513,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       const query = {
         idJeune: 'idJeune',
         maintenant: '2023-12-12',
-        token: 'token',
+        accessToken: 'token',
         structure: Core.Structure.MILO
       }
 

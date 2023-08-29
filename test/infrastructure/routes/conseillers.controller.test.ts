@@ -246,7 +246,7 @@ describe('ConseillersController', () => {
         {
           idConseiller: '123',
           structure: Core.Structure.MILO,
-          token: 'coucou'
+          accessToken: 'coucou'
         },
         unUtilisateurDecode()
       )
