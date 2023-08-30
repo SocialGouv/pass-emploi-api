@@ -1,7 +1,10 @@
 import { describe } from 'mocha'
 import { createSandbox, SinonSandbox } from 'sinon'
 import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
-import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
+import {
+  GetSessionsJeuneMiloQuery,
+  GetSessionsJeuneMiloQueryHandler
+} from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
 import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import {
   JeuneMiloSansIdDossier,
@@ -21,7 +24,10 @@ import { SessionMilo } from '../../../../src/domain/milo/session.milo'
 import { testConfig } from 'test/utils/module-for-testing'
 
 describe('GetSessionsJeuneMiloQueryHandler', () => {
-  const query = { idJeune: 'idJeune', accessToken: 'token' }
+  const query: GetSessionsJeuneMiloQuery = {
+    idJeune: 'idJeune',
+    accessToken: 'token'
+  }
   const utilisateur = unUtilisateurJeune()
 
   let getSessionsQueryHandler: GetSessionsJeuneMiloQueryHandler
@@ -175,6 +181,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
           ])
           getSessionsQueryGetter.handle
             .withArgs('idDossier', 'token', {
+              periode: { debut: undefined, fin: undefined },
               filtrerEstInscrit: true
             })
             .resolves(unSuccess)

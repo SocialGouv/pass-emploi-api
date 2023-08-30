@@ -1,10 +1,23 @@
-import { IsBoolean, IsOptional } from 'class-validator'
-import { ApiPropertyOptional } from '@nestjs/swagger'
+import {
+  IsBoolean,
+  IsDateString,
+  IsNotEmpty,
+  IsOptional
+} from 'class-validator'
 import { Transform } from 'class-transformer'
 import { transformStringToBoolean } from './utils/transformers'
 
 export class GetSessionsJeunesQueryParams {
-  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNotEmpty()
+  @IsDateString()
+  dateDebut?: string
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsDateString()
+  dateFin?: string
+
   @IsOptional()
   @IsBoolean()
   @Transform(params => transformStringToBoolean(params, 'filtrerEstInscrit'))

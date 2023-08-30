@@ -16,6 +16,7 @@ import {
 import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
 import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
 import { GetSessionsJeunesQueryParams } from './validation/jeunes-milo.inputs'
+import { DateService } from '../../utils/date-service'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -76,6 +77,12 @@ export class JeunesMiloController {
       {
         idJeune,
         accessToken: accessToken,
+        dateDebut: DateService.fromStringToLocaleDateTime(
+          getSessionsJeunesQueryParams.dateDebut
+        ),
+        dateFin: DateService.fromStringToLocaleDateTime(
+          getSessionsJeunesQueryParams.dateFin
+        ),
         filtrerEstInscrit: getSessionsJeunesQueryParams.filtrerEstInscrit
       },
       utilisateur

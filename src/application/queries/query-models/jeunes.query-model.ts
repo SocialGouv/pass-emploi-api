@@ -111,6 +111,14 @@ export class HistoriqueConseillerJeuneQueryModel {
   date: string
 }
 
+class StructureMiloDuJeuneQueryModel {
+  @ApiProperty()
+  id: string
+
+  @ApiProperty({ required: false })
+  nom?: string
+}
+
 export class DetailJeuneQueryModel {
   @ApiProperty()
   id: string
@@ -141,6 +149,9 @@ export class DetailJeuneQueryModel {
 
   @ApiProperty({ required: false })
   situations?: SituationQueryModel[]
+
+  @ApiProperty({ required: false })
+  structureMilo?: StructureMiloDuJeuneQueryModel
 
   @ApiProperty({ required: false })
   urlDossier?: string

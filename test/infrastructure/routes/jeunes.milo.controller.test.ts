@@ -107,7 +107,13 @@ describe('JeunesMiloController', () => {
     it('renvoie la liste des sessions accessibles au jeune', async () => {
       getSessionsQueryHandler.execute
         .withArgs(
-          { idJeune, accessToken: token, filtrerEstInscrit: undefined },
+          {
+            idJeune,
+            accessToken: token,
+            dateDebut: undefined,
+            dateFin: undefined,
+            filtrerEstInscrit: undefined
+          },
           unUtilisateurDecode()
         )
         .resolves(success([uneSessionJeuneMiloQueryModel]))
@@ -122,7 +128,13 @@ describe('JeunesMiloController', () => {
     it('renvoie une erreur quand le jeune est un jeune PE', async () => {
       getSessionsQueryHandler.execute
         .withArgs(
-          { idJeune, accessToken: token, filtrerEstInscrit: undefined },
+          {
+            idJeune,
+            accessToken: token,
+            dateDebut: undefined,
+            dateFin: undefined,
+            filtrerEstInscrit: undefined
+          },
           unUtilisateurDecode()
         )
         .resolves(failure(new DroitsInsuffisants()))

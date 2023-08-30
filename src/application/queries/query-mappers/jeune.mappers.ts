@@ -34,6 +34,9 @@ export function fromSqlToDetailJeuneQueryModel(
       depuis: depuis.toISOString()
     },
     situations: jeuneSqlModel.situations?.situations,
+    structureMilo: jeuneSqlModel.idStructureMilo
+      ? { id: jeuneSqlModel.idStructureMilo }
+      : undefined,
     idPartenaire: jeuneSqlModel.idPartenaire ?? undefined,
     urlDossier:
       baseUrlDossier && jeuneSqlModel.idPartenaire

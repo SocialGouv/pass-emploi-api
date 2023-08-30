@@ -63,7 +63,6 @@ import {
 import { IndicateursPourConseillerQueryModel } from '../../application/queries/query-models/indicateurs-pour-conseiller.query-model'
 import {
   DetailJeuneConseillerQueryModel,
-  DetailJeuneQueryModel,
   IdentiteJeuneQueryModel,
   JeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
@@ -431,7 +430,7 @@ export class ConseillersController {
   })
   @Get('milo/jeunes/:idDossier')
   @ApiResponse({
-    type: DetailJeuneQueryModel
+    type: JeuneQueryModel
   })
   async getJeuneMiloByDossier(
     @Param('idDossier') idDossier: string,

@@ -22,7 +22,7 @@ export class GetSessionsJeuneMiloQueryGetter {
     idPartenaire: string,
     accessToken: string,
     options?: {
-      periode?: { debut: DateTime; fin: DateTime }
+      periode?: { debut?: DateTime; fin?: DateTime }
       filtrerEstInscrit?: boolean
     }
   ): Promise<Result<SessionJeuneMiloQueryModel[]>> {
