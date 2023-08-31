@@ -1,5 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { SessionMilo } from '../../../domain/milo/session.milo'
+import { PaginationQueryModel } from './common/pagination.query-model'
+import { IsArray } from 'class-validator'
+import { AnimationCollectiveResumeQueryModel } from './rendez-vous.query-model'
 
 export class InscritSessionMiloQueryModel {
   @ApiProperty()
@@ -49,6 +52,18 @@ export class SessionConseillerMiloQueryModel {
 
   @ApiProperty({ enum: SessionMilo.Statut })
   statut: SessionMilo.Statut
+}
+
+export class SessionsConseillerV2QueryModel {
+  @ApiProperty({ type: PaginationQueryModel })
+  pagination: PaginationQueryModel
+
+  @ApiProperty({
+    type: SessionConseillerMiloQueryModel,
+    isArray: true
+  })
+  @IsArray()
+  resultats: SessionConseillerMiloQueryModel[]
 }
 
 export class AgendaConseillerMiloSessionListItemQueryModel {
