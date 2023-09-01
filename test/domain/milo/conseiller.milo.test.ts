@@ -95,7 +95,9 @@ describe('Conseiller.Milo', () => {
         miloClient.getStructureConseiller
           .withArgs(idpToken)
           .resolves(
-            success(uneStructureConseillerMiloDto({ id: Number(idStructure) }))
+            success(
+              uneStructureConseillerMiloDto({ code: Number(idStructure) })
+            )
           )
 
         // When
@@ -126,13 +128,13 @@ describe('Conseiller.Milo', () => {
           .resolves(idpToken)
 
         const idNouvelleStructure = '11'
-        miloClient.getStructureConseiller
-          .withArgs(idpToken)
-          .resolves(
-            success(
-              uneStructureConseillerMiloDto({ id: Number(idNouvelleStructure) })
-            )
+        miloClient.getStructureConseiller.withArgs(idpToken).resolves(
+          success(
+            uneStructureConseillerMiloDto({
+              code: Number(idNouvelleStructure)
+            })
           )
+        )
         conseillerMiloRepository.structureExiste
           .withArgs(idNouvelleStructure)
           .resolves(true)
@@ -172,13 +174,13 @@ describe('Conseiller.Milo', () => {
           .resolves(idpToken)
 
         const idNouvelleStructure = '11'
-        miloClient.getStructureConseiller
-          .withArgs(idpToken)
-          .resolves(
-            success(
-              uneStructureConseillerMiloDto({ id: Number(idNouvelleStructure) })
-            )
+        miloClient.getStructureConseiller.withArgs(idpToken).resolves(
+          success(
+            uneStructureConseillerMiloDto({
+              code: Number(idNouvelleStructure)
+            })
           )
+        )
         conseillerMiloRepository.structureExiste
           .withArgs(idNouvelleStructure)
           .resolves(false)

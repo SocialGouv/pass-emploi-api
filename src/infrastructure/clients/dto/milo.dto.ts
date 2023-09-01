@@ -53,7 +53,7 @@ export interface ListeSessionsJeuneMiloDto {
 }
 
 export interface StructureConseillerMiloDto {
-  id: number
+  code: number
   nomOfficiel: string
   nomUsuel: string
   principale: boolean

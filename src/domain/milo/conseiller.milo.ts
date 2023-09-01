@@ -72,19 +72,20 @@ export namespace ConseillerMilo {
         // Conseiller trouvé mais structure Milo non modifiée
         if (isSuccess(resultConseiller)) {
           const structureConseillerNonModifiee =
-            resultConseiller.data.structure.id === structure.data.id.toString()
+            resultConseiller.data.structure.id ===
+            structure.data.code.toString()
           if (structureConseillerNonModifiee) {
             return
           }
         }
 
-        const idStructure = structure.data.id.toString()
+        const codeStructure = structure.data.code.toString()
         const structureExiste =
-          await this.conseillerMiloRepository.structureExiste(idStructure)
+          await this.conseillerMiloRepository.structureExiste(codeStructure)
 
         if (!structureExiste) {
           this.logger.warn(
-            `La structure ${idStructure} du conseiller Milo ${idConseiller} n'est pas présente dans le référentiel`
+            `La structure ${codeStructure} du conseiller Milo ${idConseiller} n'est pas présente dans le référentiel`
           )
           await this.conseillerMiloRepository.save({
             id: idConseiller,
@@ -93,9 +94,10 @@ export namespace ConseillerMilo {
           return
         }
 
+        // todo voir si on change tout le nemming relatif a idStructure a code structure dans la table conseiller -> et dans la table structure
         await this.conseillerMiloRepository.save({
           id: idConseiller,
-          idStructure
+          idStructure: codeStructure
         })
       } catch (e) {
         this.logger.error(
