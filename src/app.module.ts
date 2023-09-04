@@ -342,6 +342,9 @@ import { EmargementSessionMiloCommandHandler } from 'src/application/commands/mi
 import { GetSessionsConseillerMiloQueryGetter } from './application/queries/query-getters/milo/get-sessions-conseiller.milo.query.getter.db'
 import { ConseillerInterStructureMiloAuthorizer } from './application/authorizers/conseiller-inter-structure-milo-authorizer'
 import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
+import { GetSessionsConseillerMiloV2QueryGetter } from './application/queries/query-getters/milo/v2/get-sessions-conseiller.milo.v2.query.getter.db'
+import { GetSessionsConseillerMiloV2QueryHandler } from './application/queries/milo/v2/get-sessions-v2-conseiller.milo.query.handler.db'
+import { ConseillersMiloControllerv2 } from './infrastructure/routes/v2/conseillers.milo.controller.v2'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -366,6 +369,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     ConseillersController,
     ConseillersControllerV2,
     ConseillersMiloController,
+    ConseillersMiloControllerv2,
     ConseillersPoleEmploiController,
     RendezVousController,
     EtablissementsController,
@@ -746,6 +750,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetSessionsConseillerMiloQueryHandler,
     GetSessionsConseillerMiloQueryGetter,
     GetAgendaSessionsConseillerMiloQueryHandler,
+    GetSessionsConseillerMiloV2QueryHandler,
+    GetSessionsConseillerMiloV2QueryGetter,
     GetSessionsJeuneMiloQueryHandler,
     GetSessionsJeuneMiloQueryGetter,
     GetDetailSessionConseillerMiloQueryHandler,

@@ -89,39 +89,6 @@ export class ConseillersMiloController {
     throw handleFailure(result)
   }
 
-  //TODO a voir : definir une route metier (avec la notion de a clore)  ou technique ( avec la notion de pagination (/v2 ou /pagination))
-  // definir une recuperation par pagination serait peut etre plus correct je pense
-  @ApiOperation({
-    summary: 'Récupère la liste des sessions à clore de sa structure MILO',
-    description: 'Autorisé pour le conseiller Milo'
-  })
-  @Get('/:idConseiller/sessions/a-clore')
-  @ApiResponse({
-    type: SessionConseillerMiloQueryModel,
-    isArray: true
-  })
-  async getSessionsAClore(
-    @Param('idConseiller') idConseiller: string,
-    @Utilisateur() utilisateur: Authentification.Utilisateur,
-    @AccessToken() accessToken: string,
-    @Query() getSessionsACloreQueryParams: GetSessionsV2QueryParams
-  ): Promise<SessionsConseillerV2QueryModel> {
-    const result = await this.getSessionsV2QueryHandler.execute(
-      {
-        idConseiller,
-        accessToken: accessToken,
-        page: getSessionsACloreQueryParams.page,
-        filtrerAClore: getSessionsACloreQueryParams.filtrerAClore
-      },
-      utilisateur
-    )
-
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
-  }
-
   @ApiOperation({
     summary:
       'Récupère la liste des sessions de sa structure MILO auxquelles participent ses bénéficiaires',

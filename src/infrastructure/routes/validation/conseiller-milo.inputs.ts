@@ -47,7 +47,7 @@ export class GetSessionsV2QueryParams {
   @IsOptional()
   @IsBoolean()
   @IsIn([true, false])
-  @Transform(params => transformStringToBoolean(params, 'aClore'))
+  @Transform(params => transformStringToBoolean(params, 'filtrerAClore'))
   filtrerAClore?: boolean
 }
 
