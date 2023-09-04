@@ -67,7 +67,7 @@ export class MiloClient {
       params.append('dateFinRecherche', finRecherche.toISODate())
     }
     if (options.page) {
-      params.append('dateFinRecherche', options.page.toString())
+      params.append('page', options.page.toString())
     }
 
     // L'api ne renvoie que 50 sessions max par appel au delà, une pagination doit être mise en place. (voir doc 06/23)

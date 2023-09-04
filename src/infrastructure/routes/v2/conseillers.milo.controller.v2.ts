@@ -1,13 +1,12 @@
 import { Controller, Get, Param, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-sessions-conseiller.milo.query.handler.db'
 import {
   SessionConseillerMiloQueryModel,
   SessionsConseillerV2QueryModel
 } from 'src/application/queries/query-models/sessions.milo.query.model'
 import { isSuccess } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { GetSessionsConseillerMiloV2QueryHandler } from '../../../application/queries/milo/v2/get-sessions-v2-conseiller.milo.query.handler.db'
+import { GetSessionsConseillerMiloV2QueryHandler } from '../../../application/queries/milo/v2/get-sessions-conseiller.milo.v2.query.handler.db'
 import {
   AccessToken,
   Utilisateur
@@ -23,13 +22,12 @@ export class ConseillersMiloControllerv2 {
     private readonly getSessionsV2QueryHandler: GetSessionsConseillerMiloV2QueryHandler
   ) {}
 
-  //TODO a voir : definir une route metier (avec la notion de a clore)  ou technique ( avec la notion de pagination (/v2 ou /pagination))
-  // definir une recuperation par pagination serait peut etre plus correct je pense
   @ApiOperation({
-    summary: 'Récupère la liste des sessions à clore de sa structure MILO',
+    summary:
+      'Récupère la liste des sessions avec pagination de sa structure MILO',
     description: 'Autorisé pour le conseiller Milo'
   })
-  @Get('/:idConseiller/sessions/a-clore')
+  @Get('/:idConseiller/sessions')
   @ApiResponse({
     type: SessionConseillerMiloQueryModel,
     isArray: true

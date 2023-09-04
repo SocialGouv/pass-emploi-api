@@ -17,8 +17,7 @@ import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/m
 import {
   AgendaConseillerMiloSessionListItemQueryModel,
   DetailSessionConseillerMiloQueryModel,
-  SessionConseillerMiloQueryModel,
-  SessionsConseillerV2QueryModel
+  SessionConseillerMiloQueryModel
 } from 'src/application/queries/query-models/sessions.milo.query.model'
 import { isSuccess } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
@@ -33,10 +32,9 @@ import {
   EmargementsSessionMiloPayload,
   GetAgendaSessionsQueryParams,
   GetSessionsQueryParams,
-  GetSessionsV2QueryParams,
   UpdateSessionMiloPayload
 } from './validation/conseiller-milo.inputs'
-import { GetSessionsConseillerMiloV2QueryHandler } from '../../application/queries/milo/v2/get-sessions-v2-conseiller.milo.query.handler.db'
+import { GetSessionsConseillerMiloV2QueryHandler } from '../../application/queries/milo/v2/get-sessions-conseiller.milo.v2.query.handler.db'
 import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
 import { DateTime } from 'luxon'
 

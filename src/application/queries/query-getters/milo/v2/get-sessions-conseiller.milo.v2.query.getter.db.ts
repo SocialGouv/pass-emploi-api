@@ -17,7 +17,7 @@ import { SessionMilo } from '../../../../../domain/milo/session.milo'
 import { mapSessionConseillerDtoToQueryModel } from '../../../query-mappers/milo.mappers'
 import { SessionMiloSqlModel } from '../../../../../infrastructure/sequelize/models/session-milo.sql-model'
 
-const NOMBRE_MAX_SESSIONS_PAR_PAGE = 50
+const NOMBRE_MAX_SESSIONS_RECUPERE_PAR_PAGE_MILO_CLIENT = 50
 
 @Injectable()
 export class GetSessionsConseillerMiloV2QueryGetter {
@@ -39,7 +39,6 @@ export class GetSessionsConseillerMiloV2QueryGetter {
       accessToken
     )
 
-    // FIXME remettre au 2023-08-01
     const periode = {
       dateDebut: DateTime.fromISO('2023-08-01')
     }
@@ -56,7 +55,6 @@ export class GetSessionsConseillerMiloV2QueryGetter {
       return resultSessionMiloClient
     }
 
-    // la on recupere toutes les sessions
     const resultatSessionsPourPagination =
       await this.getAllSessionsForPagination(
         resultSessionMiloClient.data,
@@ -70,7 +68,6 @@ export class GetSessionsConseillerMiloV2QueryGetter {
       where: { idStructureMilo }
     })
 
-    // TODO passer toutes les sessions recuperer de Milo ( mapper sur les _resultatSessionsPourPagination)
     const sessionsQueryModels = resultatSessionsPourPagination.map(
       sessionMilo => {
         const sessionSqlModel = sessionsSqlModels.find(
@@ -102,18 +99,18 @@ export class GetSessionsConseillerMiloV2QueryGetter {
   ): Promise<SessionConseillerDetailDto[]> {
     const sessions: SessionConseillerDetailDto[] =
       resultSessionsMiloClient.sessions
-    if (calculerNbPageMiloClient(resultSessionsMiloClient.nbSessions) > 1) {
+    if (calculerNbPagesMiloClient(resultSessionsMiloClient.nbSessions) > 1) {
       for (
-        let i = 2;
-        i <= calculerNbPageMiloClient(resultSessionsMiloClient.nbSessions);
-        i++
+        let page = 2;
+        page <= calculerNbPagesMiloClient(resultSessionsMiloClient.nbSessions);
+        page++
       ) {
         const resultMiloClientParPage =
           await this.miloClient.getSessionsConseiller(
             idpToken,
             idStructureMilo,
             timezoneStructure,
-            { periode: { dateDebut }, page: i }
+            { periode: { dateDebut }, page: page }
           )
 
         if (isFailure(resultMiloClientParPage)) {
@@ -136,6 +133,8 @@ function filtrerSessionAClore(
   return sessionQueryModels.statut === SessionMilo.Statut.A_CLOTURER
 }
 
-function calculerNbPageMiloClient(nbSessions: number): number {
-  return Math.ceil(nbSessions / NOMBRE_MAX_SESSIONS_PAR_PAGE)
+function calculerNbPagesMiloClient(nbSessions: number): number {
+  return Math.ceil(
+    nbSessions / NOMBRE_MAX_SESSIONS_RECUPERE_PAR_PAGE_MILO_CLIENT
+  )
 }

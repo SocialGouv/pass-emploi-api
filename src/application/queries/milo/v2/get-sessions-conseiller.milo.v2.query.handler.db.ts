@@ -5,7 +5,6 @@ import { isFailure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Conseiller } from 'src/domain/conseiller/conseiller'
 import { estMilo } from 'src/domain/core'
-import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo'
 import { ConseillerAuthorizer } from '../../../authorizers/conseiller-authorizer'
 import { ConfigService } from '@nestjs/config'
 import {
@@ -13,6 +12,7 @@ import {
   SessionsConseillerV2QueryModel
 } from '../../query-models/sessions.milo.query.model'
 import { GetSessionsConseillerMiloV2QueryGetter } from '../../query-getters/milo/v2/get-sessions-conseiller.milo.v2.query.getter.db'
+import { ConseillerMiloRepositoryToken } from '../../../../domain/milo/conseiller.milo.db'
 
 export interface GetSessionsConseillerMiloV2Query extends Query {
   idConseiller: string
@@ -20,6 +20,8 @@ export interface GetSessionsConseillerMiloV2Query extends Query {
   page?: number
   filtrerAClore?: boolean
 }
+
+const NOMBRE_SESSIONS_PAGE = 10
 
 @Injectable()
 export class GetSessionsConseillerMiloV2QueryHandler extends QueryHandler<
@@ -62,12 +64,6 @@ export class GetSessionsConseillerMiloV2QueryHandler extends QueryHandler<
     const { id: idStructureMilo, timezone: timezoneStructure } =
       resultConseiller.data.structure
 
-    // todo faire l'appel au client milo une premiere fois
-    // voir combien de sessions remonte pour le conseiller dans sa structure
-    // mettre en place une fonction pour faire N nombre d'appel en fonction du nombre de session a récupérer
-    // -> pour la date de recuperation de cloture ne pas oublier de mettre comme pour le getSession
-    // créer une pagination de chez nous
-
     const resultSessionsMiloFromQueryGetter: Result<
       SessionConseillerMiloQueryModel[]
     > = await this.getSessionsConseillerMiloV2QueryGetter.handle(
@@ -81,14 +77,24 @@ export class GetSessionsConseillerMiloV2QueryHandler extends QueryHandler<
       return resultSessionsMiloFromQueryGetter
     }
 
-    //TODO gerer la pagination du front  pour renvoyer ce qui va bien selon la page demandé
+    const nbSessions = resultSessionsMiloFromQueryGetter.data.length
+    const getPage = query.page ?? 1
+
+    //TODO: generer une erreur si query.page > calculerNbPageSessions(nbSessions) ?? ou pas
+
+    const sessionsParPage = getSessionsParPage(
+      resultSessionsMiloFromQueryGetter.data,
+      getPage
+    )
+
+    // TODO :  pour la response pagination.page -> mettre nombre de page ou page courante ???
     return success({
       pagination: {
-        page: 1,
-        limit: 1,
-        total: 1
+        page: calculerNbPagesSessions(nbSessions),
+        limit: NOMBRE_SESSIONS_PAGE,
+        total: nbSessions
       },
-      resultats: resultSessionsMiloFromQueryGetter.data
+      resultats: sessionsParPage
     })
   }
 
@@ -106,4 +112,16 @@ export class GetSessionsConseillerMiloV2QueryHandler extends QueryHandler<
   async monitor(): Promise<void> {
     return
   }
+}
+
+function calculerNbPagesSessions(nbSessions: number): number {
+  return Math.ceil(nbSessions / NOMBRE_SESSIONS_PAGE)
+}
+
+function getSessionsParPage(
+  sessions: SessionConseillerMiloQueryModel[],
+  page: number
+): SessionConseillerMiloQueryModel[] {
+  const debutPagination = NOMBRE_SESSIONS_PAGE * (page - 1)
+  return sessions.slice(debutPagination, page * NOMBRE_SESSIONS_PAGE)
 }

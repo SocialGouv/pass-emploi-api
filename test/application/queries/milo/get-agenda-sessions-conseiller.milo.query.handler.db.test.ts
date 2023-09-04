@@ -184,8 +184,10 @@ function givenSessionsDuConseiller(
       conseiller.structure.id,
       conseiller.structure.timezone,
       {
-        dateDebut: query.dateDebut,
-        dateFin: query.dateFin
+        periode: {
+          dateDebut: query.dateDebut,
+          dateFin: query.dateFin
+        }
       }
     )
     .resolves(
