@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Run HawkScan
         uses: stackhawk/hawkscan-action@v2.1.0
         with:
