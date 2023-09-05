@@ -35,6 +35,7 @@ import { AccueilJeuneMiloQueryModel } from '../query-models/jeunes.milo.query-mo
 import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
 import { SessionJeuneMiloQueryModel } from '../query-models/sessions.milo.query.model'
 import { ConfigService } from '@nestjs/config'
+import { sessionsMiloSontActiveesPourLeJeune } from 'src/utils/feature-flip-session-helper'
 
 export interface GetAccueilJeuneMiloQuery extends Query {
   idJeune: string
@@ -102,11 +103,10 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
 
     let sessions: SessionJeuneMiloQueryModel[] = []
 
-    const FT_RECUPERER_SESSIONS_MILO = this.configService.get(
-      'features.recupererSessionsMilo'
-    )
-
-    if (FT_RECUPERER_SESSIONS_MILO && estMilo(jeuneSqlModel.structure)) {
+    if (
+      sessionsMiloSontActiveesPourLeJeune(this.configService, jeuneSqlModel) &&
+      estMilo(jeuneSqlModel.structure)
+    ) {
       if (!jeuneSqlModel.idPartenaire) {
         return failure(new JeuneMiloSansIdDossier(query.idJeune))
       }

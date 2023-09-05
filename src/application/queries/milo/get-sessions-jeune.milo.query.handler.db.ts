@@ -15,6 +15,7 @@ import { ConseillerSqlModel } from '../../../infrastructure/sequelize/models/con
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { ConfigService } from '@nestjs/config'
 import { DateTime } from 'luxon'
+import { sessionsMiloSontActiveesPourLeJeune } from 'src/utils/feature-flip-session-helper'
 
 export interface GetSessionsJeuneMiloQuery extends Query {
   idJeune: string
@@ -40,19 +41,19 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
   async handle(
     query: GetSessionsJeuneMiloQuery
   ): Promise<Result<SessionJeuneMiloQueryModel[]>> {
-    const FT_RECUPERER_SESSIONS_MILO = this.configService.get(
-      'features.recupererSessionsMilo'
-    )
-    if (!FT_RECUPERER_SESSIONS_MILO) {
-      return success([])
-    }
-
     const jeuneSqlModel = await JeuneSqlModel.findByPk(query.idJeune, {
       include: [{ model: ConseillerSqlModel, required: true }]
     })
     if (!jeuneSqlModel) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
+
+    if (
+      !sessionsMiloSontActiveesPourLeJeune(this.configService, jeuneSqlModel)
+    ) {
+      return success([])
+    }
+
     if (!jeuneSqlModel.idPartenaire) {
       return failure(new JeuneMiloSansIdDossier(query.idJeune))
     }

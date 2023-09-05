@@ -11,6 +11,7 @@ import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { SessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
 import { ConfigService } from '@nestjs/config'
 import { GetSessionsConseillerMiloQueryGetter } from '../query-getters/milo/get-sessions-conseiller.milo.query.getter.db'
+import { sessionsMiloSontActiveesPourLeConseiller } from 'src/utils/feature-flip-session-helper'
 
 export interface GetSessionsConseillerMiloQuery extends Query {
   idConseiller: string
@@ -38,19 +39,22 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
   async handle(
     query: GetSessionsConseillerMiloQuery
   ): Promise<Result<SessionConseillerMiloQueryModel[]>> {
-    const FT_RECUPERER_SESSIONS_MILO = this.configService.get(
-      'features.recupererSessionsMilo'
-    )
-    if (!FT_RECUPERER_SESSIONS_MILO) {
-      return success([])
-    }
-
     const resultConseiller = await this.conseillerMiloRepository.get(
       query.idConseiller
     )
     if (isFailure(resultConseiller)) {
       return resultConseiller
     }
+
+    if (
+      !sessionsMiloSontActiveesPourLeConseiller(
+        this.configService,
+        resultConseiller.data
+      )
+    ) {
+      return success([])
+    }
+
     const { id: idStructureMilo, timezone: timezoneStructure } =
       resultConseiller.data.structure
 

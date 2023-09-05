@@ -31,6 +31,7 @@ import { JeuneHomeAgendaQueryModel } from './query-models/home-jeune-suivi.query
 import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
 import { estMilo } from '../../domain/core'
 import { SessionJeuneMiloQueryModel } from './query-models/sessions.milo.query.model'
+import { sessionsMiloSontActiveesPourLeJeune } from 'src/utils/feature-flip-session-helper'
 
 export interface GetJeuneHomeAgendaQuery extends Query {
   idJeune: string
@@ -78,13 +79,9 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
       this.recupererLeNombreDactionsEnRetard(query)
     ])
 
-    const FT_RECUPERER_SESSIONS_MILO = this.configuration.get(
-      'features.recupererSessionsMilo'
-    )
-
     let sessionsMilo: SessionJeuneMiloQueryModel[]
     if (
-      FT_RECUPERER_SESSIONS_MILO &&
+      sessionsMiloSontActiveesPourLeJeune(this.configuration, jeuneSqlModel) &&
       estMilo(utilisateur.structure) &&
       Authentification.estJeune(utilisateur.type)
     ) {
