@@ -3,15 +3,19 @@ import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { firstValueFrom } from 'rxjs'
+import { Op } from 'sequelize'
 import { ErreurHttp } from '../../../building-blocks/types/domain-error'
 import { Result, failure, success } from '../../../building-blocks/types/result'
+import { Core } from '../../../domain/core'
 import { JeuneMilo } from '../../../domain/milo/jeune.milo'
 import { DateService } from '../../../utils/date-service'
 import { RateLimiterService } from '../../../utils/rate-limiter.service'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
 import { SituationsMiloSqlModel } from '../../sequelize/models/situations-milo.sql-model'
-import { StructureMiloSqlModel } from '../../sequelize/models/structure-milo.sql-model'
 import { DossierMiloDto } from '../dto/milo.dto'
+import { fromSqlToJeune } from '../mappers/jeunes.mappers'
+import { StructureMiloSqlModel } from '../../sequelize/models/structure-milo.sql-model'
+import { DateTime } from 'luxon'
 
 @Injectable()
 export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
@@ -60,7 +64,7 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
             dateFin: situation.dateFin ?? undefined
           }
         }),
-        nomStructure: dossierDto.data.structureRattachement.nomOfficiel
+        codeStructure: dossierDto.data.structureRattachement?.codeStructure
       })
     } catch (e) {
       this.logger.error(e)
@@ -128,23 +132,65 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
     )
   }
 
-  async saveStructureJeune(
-    idJeune: string,
-    nomOfficielStructureMilo: string
-  ): Promise<void> {
-    const structureSql = await StructureMiloSqlModel.findOne({
+  async getJeunesMiloAvecIdDossier(
+    offset: number,
+    limit: number
+  ): Promise<JeuneMilo[]> {
+    const jeunesMiloSqlModel = await JeuneSqlModel.findAll({
       where: {
-        nomOfficiel: nomOfficielStructureMilo
-      }
+        structure: Core.Structure.MILO,
+        idPartenaire: { [Op.ne]: null }
+      },
+      order: [['id', 'ASC']],
+      offset,
+      limit
     })
 
-    if (structureSql) {
-      await JeuneSqlModel.update(
-        {
-          idStructureMilo: structureSql.id
-        },
-        { where: { id: idJeune } }
+    return jeunesMiloSqlModel.map(jeuneSqlModel => {
+      const jeuneMilo: JeuneMilo = {
+        ...fromSqlToJeune(jeuneSqlModel),
+        idStructureMilo: jeuneSqlModel.idStructureMilo ?? undefined
+      }
+      return jeuneMilo
+    })
+  }
+
+  async save(
+    jeune: JeuneMilo,
+    dateFinCEJ?: DateTime,
+    codeStructureMilo?: string
+  ): Promise<void> {
+    const nouvelleDateFinCEJ = recupererModification(
+      dateFinCEJ,
+      jeune.dateFinCEJ
+    )
+    let nouveauCodeStructure = recupererModification(
+      codeStructureMilo,
+      jeune.idStructureMilo
+    )
+
+    if (nouveauCodeStructure) {
+      const structureSql = await StructureMiloSqlModel.findByPk(
+        codeStructureMilo
       )
+      if (!structureSql) {
+        nouveauCodeStructure = null
+      }
+    }
+    const updates: {
+      idStructureMilo?: string | null
+      dateFinCEJ?: Date | null
+    } = {}
+
+    if (nouvelleDateFinCEJ !== undefined) {
+      updates.dateFinCEJ = dateFinCEJ?.toJSDate() ?? null
+    }
+    if (nouveauCodeStructure !== undefined) {
+      updates.idStructureMilo = nouveauCodeStructure
+    }
+
+    if (Object.keys(updates).length !== 0) {
+      await JeuneSqlModel.update(updates, { where: { id: jeune.id } })
     }
   }
 
@@ -163,4 +209,15 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
         }
       : undefined
   }
+}
+
+function recupererModification<V>(
+  nouvelleValeur?: V,
+  ancienneValeur?: V
+): V | null | undefined {
+  let modification = undefined
+  if (nouvelleValeur !== ancienneValeur) {
+    modification = nouvelleValeur ?? null
+  }
+  return modification
 }

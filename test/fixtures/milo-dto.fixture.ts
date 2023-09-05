@@ -64,7 +64,7 @@ export const uneStructureConseillerMiloDto = (
   args: Partial<StructureConseillerMiloDto> = {}
 ): StructureConseillerMiloDto => {
   const defaults: StructureConseillerMiloDto = {
-    id: 1,
+    code: '1',
     nomOfficiel: 'ML_SUE',
     nomUsuel: '',
     principale: false
@@ -76,7 +76,7 @@ export const uneStructureConseillerMiloDto = (
 export const uneListeDeStructuresConseillerMiloDto: StructureConseillerMiloDto[] =
   [
     uneStructureConseillerMiloDto(),
-    uneStructureConseillerMiloDto({ id: 2, principale: true })
+    uneStructureConseillerMiloDto({ code: '2', principale: true })
   ]
 
 export const uneInscriptionSessionMiloDto = (

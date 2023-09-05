@@ -2,14 +2,14 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Job } from '../../building-blocks/types/job'
 import { JobHandler } from '../../building-blocks/types/job-handler'
 import { isFailure } from '../../building-blocks/types/result'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
-import { Planificateur, ProcessJobType } from '../../domain/planificateur'
-import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
-import { DateService } from '../../utils/date-service'
+import { Jeune } from '../../domain/jeune/jeune'
 import {
   JeuneMilo,
   MiloJeuneRepositoryToken
 } from '../../domain/milo/jeune.milo'
+import { Planificateur, ProcessJobType } from '../../domain/planificateur'
+import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
+import { DateService } from '../../utils/date-service'
 
 const PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM = 100
 
@@ -19,7 +19,6 @@ export class RecupererSituationsJeunesMiloJobHandler extends JobHandler<Job> {
   constructor(
     @Inject(MiloJeuneRepositoryToken)
     private miloRepository: JeuneMilo.Repository,
-    @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service,
     private dateService: DateService
@@ -51,7 +50,7 @@ export class RecupererSituationsJeunesMiloJobHandler extends JobHandler<Job> {
     let jeunes: Jeune[] = []
 
     do {
-      jeunes = await this.jeuneRepository.getJeunesMiloAvecIdDossier(
+      jeunes = await this.miloRepository.getJeunesMiloAvecIdDossier(
         offset,
         PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM
       )
@@ -67,13 +66,13 @@ export class RecupererSituationsJeunesMiloJobHandler extends JobHandler<Job> {
             return
           }
 
-          const dateFinCEJ = dossier.data.dateFinCEJ
-          const jeuneAvecDateFinCEJ = Jeune.mettreAJour(jeune, { dateFinCEJ })
-          await this.jeuneRepository.save(jeuneAvecDateFinCEJ)
+          const nouvelleDateFinCEJ = dossier.data.dateFinCEJ
+          const nouveauCodeStructure = dossier.data.codeStructure
 
-          await this.miloRepository.saveStructureJeune(
-            jeune.id,
-            dossier.data.nomStructure
+          await this.miloRepository.save(
+            jeune,
+            nouvelleDateFinCEJ,
+            nouveauCodeStructure
           )
 
           const situationsTriees = JeuneMilo.trierSituations(

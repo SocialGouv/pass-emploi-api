@@ -2,7 +2,6 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { Op, Sequelize } from 'sequelize'
 import { JeuneHomeQueryModel } from '../../../application/queries/query-models/home-jeune.query-model'
 import { Action } from '../../../domain/action/action'
-import { Core } from '../../../domain/core'
 import { Jeune } from '../../../domain/jeune/jeune'
 import { DateService } from '../../../utils/date-service'
 import { IdService } from '../../../utils/id-service'
@@ -188,25 +187,6 @@ export class JeuneSqlRepository implements Jeune.Repository {
       }
     })
     return fromSqlToJeuneHomeQueryModel(jeuneSqlModel, rdvJeuneSqlModel)
-  }
-
-  async getJeunesMiloAvecIdDossier(
-    offset: number,
-    limit: number
-  ): Promise<Jeune[]> {
-    const jeunesMiloSqlModel = await JeuneSqlModel.findAll({
-      where: {
-        structure: Core.Structure.MILO,
-        idPartenaire: { [Op.ne]: null }
-      },
-      order: [['id', 'ASC']],
-      offset,
-      limit
-    })
-
-    return jeunesMiloSqlModel.map(jeuneSqlModel =>
-      fromSqlToJeune(jeuneSqlModel)
-    )
   }
 
   private async saveAll(jeunes: Jeune[]): Promise<void> {

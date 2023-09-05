@@ -13,7 +13,7 @@ export const unDossierMilo = (
     codePostal: '91580',
     email: 'jack.dawson@milo.com',
     situations: [],
-    nomStructure: 'ML'
+    codeStructure: '9222000'
   }
   return { ...defaults, ...args }
 }
