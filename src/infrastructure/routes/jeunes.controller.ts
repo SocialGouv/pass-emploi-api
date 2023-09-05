@@ -89,7 +89,7 @@ import {
   SuiviSemainePoleEmploiQueryModel,
   JeuneHomeAgendaQueryModel
 } from 'src/application/queries/query-models/home-jeune-suivi.query-model'
-import { GetJeuneHomeAgendaQueryHandler } from 'src/application/queries/get-jeune-home-agenda.query.db'
+import { GetJeuneHomeAgendaQueryHandler } from 'src/application/queries/get-jeune-home-agenda.query.handler.db'
 import { GetSuiviSemainePoleEmploiQueryHandler } from 'src/application/queries/get-suivi-semaine-pole-emploi.query.handler'
 import { DateTime } from 'luxon'
 import { toDemarcheQueryModel } from 'src/application/queries/query-mappers/demarche.mappers'

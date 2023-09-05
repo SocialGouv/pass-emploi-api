@@ -80,23 +80,24 @@ export class MiloClient {
     idDossier: string,
     periode?: { debut?: DateTime; fin?: DateTime }
   ): Promise<Result<ListeSessionsJeuneMiloDto>> {
-    const params = new URLSearchParams()
-    params.append('idDossier', idDossier)
-    if (periode?.debut) {
-      params.append('dateDebutRecherche', periode.debut.toFormat('yyyy-MM-dd'))
-    }
-    if (periode?.fin) {
-      params.append('dateFinRecherche', periode.fin.toFormat('yyyy-MM-dd'))
-    }
+    return this.recupererSessionsJeune(
+      idpToken,
+      idDossier,
+      this.apiKeySessionsDetailEtListeJeune,
+      periode
+    )
+  }
 
-    // L'api ne renvoie que 50 sessions max par appel au delà, une pagination doit être mise en place. (voir doc 06/23)
-    return this.get<ListeSessionsJeuneMiloDto>(
-      `sessions`,
-      {
-        apiKey: this.apiKeySessionsDetailEtListeJeune,
-        idpToken
-      },
-      params
+  async getSessionsJeunePourConseiller(
+    idpToken: string,
+    idDossier: string,
+    periode?: { debut?: DateTime; fin?: DateTime }
+  ): Promise<Result<ListeSessionsJeuneMiloDto>> {
+    return this.recupererSessionsJeune(
+      idpToken,
+      idDossier,
+      this.apiKeySessionDetailConseiller,
+      periode
     )
   }
 
@@ -216,6 +217,32 @@ export class MiloClient {
     }
 
     return emptySuccess()
+  }
+
+  private recupererSessionsJeune(
+    idpToken: string,
+    idDossier: string,
+    apiKey: string,
+    periode?: { debut?: DateTime; fin?: DateTime }
+  ): Promise<Result<ListeSessionsJeuneMiloDto>> {
+    const params = new URLSearchParams()
+    params.append('idDossier', idDossier)
+    if (periode?.debut) {
+      params.append('dateDebutRecherche', periode.debut.toFormat('yyyy-MM-dd'))
+    }
+    if (periode?.fin) {
+      params.append('dateFinRecherche', periode.fin.toFormat('yyyy-MM-dd'))
+    }
+
+    // L'api ne renvoie que 50 sessions max par appel au delà, une pagination doit être mise en place. (voir doc 06/23)
+    return this.get<ListeSessionsJeuneMiloDto>(
+      `sessions`,
+      {
+        apiKey,
+        idpToken
+      },
+      params
+    )
   }
 
   private async get<T>(

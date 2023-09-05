@@ -51,6 +51,9 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
       keycloakClient.exchangeTokenJeune
         .withArgs('token', jeune.structure)
         .resolves(idpToken)
+      keycloakClient.exchangeTokenConseillerMilo
+        .withArgs('token')
+        .resolves(idpToken)
 
       await StructureMiloSqlModel.create({
         id: idStructureParis,
@@ -267,6 +270,43 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
             {
               ...uneSessionJeuneMiloQueryModel,
               id: idSession3.toString()
+            }
+          ])
+        )
+      })
+
+      it('permet au conseiller de récupérer les sessions du jeune', async () => {
+        // Given
+        miloClient.getSessionsJeunePourConseiller
+          .withArgs(idpToken, jeune.idPartenaire)
+          .resolves(
+            success({
+              page: 1,
+              nbSessions: 1,
+              sessions: [
+                {
+                  session: sessionVisibleACayenne,
+                  offre: uneOffreDto,
+                  sessionInstance: { statut: 'ONGOING' }
+                }
+              ]
+            })
+          )
+
+        // When
+        const result = await getSessionsQueryGetter.handle(
+          jeune.idPartenaire,
+          'token',
+          { pourConseiller: true }
+        )
+
+        // Then
+        expect(result).to.deep.equal(
+          success([
+            {
+              ...uneSessionJeuneMiloQueryModel,
+              id: idSession3.toString(),
+              inscription: SessionMilo.Inscription.Statut.INSCRIT
             }
           ])
         )
