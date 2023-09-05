@@ -16,10 +16,10 @@ export interface DossierMiloDto {
   prenom: string
   dateNaissance: string
   mail: string | null
-  structureRattachement: {
+  structureRattachement?: {
     nomUsuel: string
     nomOfficiel: string
-    codeStructure: string
+    codeStructure?: string
   }
   accompagnementCEJ: {
     accompagnementCEJ: boolean

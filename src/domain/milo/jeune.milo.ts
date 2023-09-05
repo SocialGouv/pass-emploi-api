@@ -1,7 +1,12 @@
 import { DateTime } from 'luxon'
 import { Result } from '../../building-blocks/types/result'
+import { Jeune } from '../jeune/jeune'
 
 export const MiloJeuneRepositoryToken = 'MiloJeuneRepository'
+
+export interface JeuneMilo extends Jeune {
+  idStructureMilo?: string
+}
 
 export namespace JeuneMilo {
   interface Situation {
@@ -24,7 +29,7 @@ export namespace JeuneMilo {
     codePostal: string
     situations: Situation[]
     dateFinCEJ?: DateTime
-    nomStructure: string
+    codeStructure?: string
   }
 
   export enum EtatSituation {
@@ -46,10 +51,15 @@ export namespace JeuneMilo {
   export interface Repository {
     getDossier(id: string): Promise<Result<Dossier>>
     saveSituationsJeune(situations: Situations): Promise<void>
-    saveStructureJeune(
-      idJeune: string,
-      nomOfficielStructureMilo: string
+    save(
+      jeune: JeuneMilo,
+      dateFinCEJ?: DateTime,
+      codeStructureMilo?: string
     ): Promise<void>
+    getJeunesMiloAvecIdDossier(
+      offset: number,
+      limit: number
+    ): Promise<JeuneMilo[]>
     getSituationsByJeune(idJeune: string): Promise<Situations | undefined>
     creerJeune(
       idDossier: string

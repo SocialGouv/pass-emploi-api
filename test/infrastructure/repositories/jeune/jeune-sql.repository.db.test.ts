@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon'
+import { before } from 'mocha'
 import { EvenementEngagementSqlModel } from 'src/infrastructure/sequelize/models/evenement-engagement.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { SituationsMiloSqlModel } from 'src/infrastructure/sequelize/models/situations-milo.sql-model'
@@ -36,22 +38,20 @@ import { AsSql } from '../../../../src/infrastructure/sequelize/types'
 import { uneDatetime } from '../../../fixtures/date.fixture'
 import {
   unConseillerDuJeune,
-  uneConfiguration,
   unJeune,
-  unJeuneSansConseiller
+  unJeuneSansConseiller,
+  uneConfiguration
 } from '../../../fixtures/jeune.fixture'
 import { uneRecherche } from '../../../fixtures/recherche.fixture'
 import { uneActionDto } from '../../../fixtures/sql-models/action.sql-model'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
-import { expect, StubbedClass, stubClass } from '../../../utils'
-import { before } from 'mocha'
+import { StubbedClass, expect, stubClass } from '../../../utils'
 import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
-import { DateTime } from 'luxon'
 
 describe('JeuneSqlRepository', () => {
   const uuid = '9e1a7d9f-4038-4631-9aa1-856ee90c7ff8'
@@ -452,57 +452,6 @@ describe('JeuneSqlRepository', () => {
 
         // Then
         expect(jeune).to.equal(undefined)
-      })
-    })
-  })
-
-  describe('getJeunesMilo', () => {
-    const idJeuneTest = 'jeune-a-retrouver'
-
-    beforeEach(async () => {
-      // Given
-      await JeuneSqlModel.bulkCreate([
-        unJeuneDto({
-          id: 'jeune-pas-milo',
-          idConseiller: undefined,
-          structure: Core.Structure.POLE_EMPLOI,
-          idPartenaire: undefined
-        }),
-        unJeuneDto({
-          id: 'jeune-sans-id-dossier',
-          idConseiller: undefined,
-          structure: Core.Structure.MILO,
-          idPartenaire: undefined
-        }),
-        unJeuneDto({
-          id: idJeuneTest,
-          idConseiller: undefined,
-          structure: Core.Structure.MILO,
-          idPartenaire: 'test-id-dossier'
-        })
-      ])
-    })
-
-    describe('quand un jeune Milo existe avec id dossier', () => {
-      it('retourne les jeunes', async () => {
-        // When
-        const result = await jeuneSqlRepository.getJeunesMiloAvecIdDossier(
-          0,
-          10
-        )
-
-        // Then
-        expect(result.length).to.equal(1)
-        expect(result[0].id).to.equal(idJeuneTest)
-      })
-    })
-    describe('quand la pagination atteint la limite', () => {
-      it('retourne liste vide', async () => {
-        // When
-        const result = await jeuneSqlRepository.getJeunesMiloAvecIdDossier(1, 1)
-
-        // Then
-        expect(result).to.deep.equal([])
       })
     })
   })

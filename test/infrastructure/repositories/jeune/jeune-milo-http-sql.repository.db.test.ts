@@ -24,6 +24,9 @@ import {
 } from '../../../utils/database-for-testing'
 import { StructureMiloSqlModel } from '../../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
+import { Core } from '../../../../src/domain/core'
+import { uneDatetime } from '../../../fixtures/date.fixture'
 
 describe('MiloHttpRepository', () => {
   let databaseForTesting: DatabaseForTesting
@@ -88,7 +91,7 @@ describe('MiloHttpRepository', () => {
                 dateFin: undefined
               }
             ],
-            nomStructure: '65-ML TARBES'
+            codeStructure: '65440S00'
           })
         )
       })
@@ -207,6 +210,67 @@ describe('MiloHttpRepository', () => {
     })
   })
 
+  describe('getJeunesMiloAvecIdDossier', () => {
+    const idJeuneTest = 'jeune-a-retrouver'
+
+    beforeEach(async () => {
+      // Given
+      await StructureMiloSqlModel.create({
+        id: 'test',
+        nomOfficiel: 'test',
+        timezone: 'Europe/Paris'
+      })
+      await JeuneSqlModel.bulkCreate([
+        unJeuneDto({
+          id: 'jeune-pas-milo',
+          idConseiller: undefined,
+          structure: Core.Structure.POLE_EMPLOI,
+          idPartenaire: undefined
+        }),
+        unJeuneDto({
+          id: 'jeune-sans-id-dossier',
+          idConseiller: undefined,
+          structure: Core.Structure.MILO,
+          idPartenaire: undefined
+        }),
+        unJeuneDto({
+          id: idJeuneTest,
+          idConseiller: undefined,
+          structure: Core.Structure.MILO,
+          idPartenaire: 'test-id-dossier',
+          idStructureMilo: 'test'
+        })
+      ])
+    })
+
+    describe('quand un jeune Milo existe avec id dossier', () => {
+      it('retourne les jeunes', async () => {
+        // When
+        const result = await miloHttpSqlRepository.getJeunesMiloAvecIdDossier(
+          0,
+          10
+        )
+
+        // Then
+        expect(result.length).to.equal(2)
+        expect(result[1].id).to.equal(idJeuneTest)
+        expect(result[1].idStructureMilo).to.equal('test')
+      })
+    })
+    describe('quand la pagination atteint la limite', () => {
+      it('retourne liste vide', async () => {
+        // When
+        const result = await miloHttpSqlRepository.getJeunesMiloAvecIdDossier(
+          2,
+          1
+        )
+
+        // Then
+        expect(result).to.deep.equal([])
+      })
+    })
+  })
+
   describe('saveSituationsJeune', () => {
     describe("quand le jeune n'a pas de situations", () => {
       it('sauvegarde les nouvelles situations', async () => {
@@ -249,37 +313,64 @@ describe('MiloHttpRepository', () => {
     })
   })
 
-  describe('saveStructureJeune', () => {
+  describe('save', () => {
     it('sauvegarde la structure du jeune quand trouvée', async () => {
       // Given
-      const idStructureMilo = 1
-      const nomOfficiel = 'structure-du-jeune'
+      const codeStructure = 'structure-du-jeune'
       await StructureMiloSqlModel.create({
-        id: idStructureMilo,
-        nomOfficiel,
+        id: codeStructure,
+        nomOfficiel: 'test',
         timezone: 'Europe/Paris'
       })
 
       // When
-      await miloHttpSqlRepository.saveStructureJeune(jeune.id, nomOfficiel)
+      await miloHttpSqlRepository.save(jeune, undefined, codeStructure)
 
       // Then
       const jeuneTrouve = await JeuneSqlModel.findByPk(jeune.id)
 
-      expect(jeuneTrouve?.idStructureMilo).to.equal(idStructureMilo.toString())
+      expect(jeuneTrouve?.idStructureMilo).to.equal(codeStructure)
+    })
+    it('met à null la dateFinCEJ et structure du jeune', async () => {
+      // Given
+      const codeStructure = 'structure-du-jeune'
+      await StructureMiloSqlModel.create({
+        id: codeStructure,
+        nomOfficiel: 'test',
+        timezone: 'Europe/Paris'
+      })
+      await JeuneSqlModel.update(
+        {
+          dateFinCEJ: uneDatetime().toJSDate(),
+          idStructureMilo: codeStructure
+        },
+        { where: { id: jeune.id } }
+      )
+
+      // When
+      await miloHttpSqlRepository.save(
+        { ...jeune, dateFinCEJ: uneDatetime(), idStructureMilo: codeStructure },
+        undefined,
+        undefined
+      )
+
+      // Then
+      const jeuneTrouve = await JeuneSqlModel.findByPk(jeune.id)
+
+      expect(jeuneTrouve?.dateFinCEJ).to.equal(null)
+      expect(jeuneTrouve?.idStructureMilo).to.equal(null)
     })
     it('ne sauvegarde pas la structure du jeune quand non trouvée', async () => {
       // Given
-      const idStructureMilo = 1
-      const nomOfficiel = 'structure-du-jeune'
+      const codeStructure = 'structure-du-jeune'
       await StructureMiloSqlModel.create({
-        id: idStructureMilo,
-        nomOfficiel: 'structure-pas-du-jeune',
+        id: 'structure-pas-du-jeune',
+        nomOfficiel: 'test',
         timezone: 'Europe/Paris'
       })
 
       // When
-      await miloHttpSqlRepository.saveStructureJeune(jeune.id, nomOfficiel)
+      await miloHttpSqlRepository.save(jeune, undefined, codeStructure)
 
       // Then
       const jeuneTrouve = await JeuneSqlModel.findByPk(jeune.id)

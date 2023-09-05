@@ -72,13 +72,13 @@ export namespace ConseillerMilo {
         // Conseiller trouvé mais structure Milo non modifiée
         if (isSuccess(resultConseiller)) {
           const structureConseillerNonModifiee =
-            resultConseiller.data.structure.id === structure.data.id.toString()
+            resultConseiller.data.structure.id === structure.data.code
           if (structureConseillerNonModifiee) {
             return
           }
         }
 
-        const idStructure = structure.data.id.toString()
+        const idStructure = structure.data.code
         const structureExiste =
           await this.conseillerMiloRepository.structureExiste(idStructure)
 

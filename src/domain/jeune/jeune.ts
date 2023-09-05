@@ -69,8 +69,6 @@ export namespace Jeune {
 
     findAll(ids: string[]): Promise<Jeune[]>
 
-    getJeunesMiloAvecIdDossier(offset: number, limit: number): Promise<Jeune[]>
-
     existe(id: string): Promise<boolean>
 
     getByEmail(email: string): Promise<Jeune | undefined>
@@ -199,16 +197,6 @@ export namespace Jeune {
 
   export function estSuiviTemporairement(jeune: Jeune): boolean {
     return Boolean(jeune.conseillerInitial)
-  }
-
-  export function mettreAJour(
-    jeune: Jeune,
-    infosJeuneAMettreAJour: Pick<Jeune, 'dateFinCEJ'>
-  ): Jeune {
-    return {
-      ...jeune,
-      dateFinCEJ: infosJeuneAMettreAJour.dateFinCEJ
-    }
   }
 }
 
