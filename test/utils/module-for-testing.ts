@@ -171,7 +171,8 @@ export const testConfig = (): ConfigService => {
       rendezVousMilo: true,
       notifierRendezVousMilo: true,
       recupererStructureMilo: true,
-      recupererSessionsMilo: true
+      recupererSessionsMilo: true,
+      idsStructuresEarlyAdoptersSession: []
     },
     oidc: {},
     values: {
