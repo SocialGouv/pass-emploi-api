@@ -209,4 +209,11 @@ describe('ConseillersMiloController', () => {
       '/conseillers/milo/1/sessions/id-session'
     )
   })
+
+  describe('GET /conseillers/milo/:idConseiller/agenda/sessions', () => {
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/conseillers/milo/1/agenda/sessions'
+    )
+  })
 })

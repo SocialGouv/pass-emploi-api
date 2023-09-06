@@ -8,9 +8,11 @@ import {
   SessionJeuneListeDto
 } from 'src/infrastructure/clients/dto/milo.dto'
 import {
+  AgendaConseillerMiloSessionListItemQueryModel,
   DetailSessionConseillerMiloQueryModel,
   DetailSessionConseillerQueryModel,
   DetailSessionJeuneMiloQueryModel,
+  InscritSessionMiloQueryModel,
   SessionConseillerMiloQueryModel,
   SessionJeuneMiloQueryModel,
   SessionTypeQueryModel
@@ -92,6 +94,34 @@ export function mapSessionConseillerDtoToQueryModel(
     dateHeureFin: dateHeureFin.toISO(),
     type: buildSessionTypeQueryModel(sessionDto.offre.type),
     statut: SessionMilo.calculerStatut(maintenant, dateHeureFin, dateCloture)
+  }
+}
+
+export function mapSessionConseillerDtoToAgendaQueryModel(
+  sessionDto: SessionConseillerDetailDto,
+  timezone: string,
+  inscrits: InscritSessionMiloQueryModel[]
+): AgendaConseillerMiloSessionListItemQueryModel {
+  return {
+    id: sessionDto.session.id.toString(),
+    nomSession: sessionDto.session.nom,
+    nomOffre: sessionDto.offre.nom,
+    dateHeureDebut: DateTime.fromFormat(
+      sessionDto.session.dateHeureDebut,
+      MILO_DATE_FORMAT,
+      { zone: timezone }
+    )
+      .toUTC()
+      .toISO(),
+    dateHeureFin: DateTime.fromFormat(
+      sessionDto.session.dateHeureFin,
+      MILO_DATE_FORMAT,
+      { zone: timezone }
+    )
+      .toUTC()
+      .toISO(),
+    type: buildSessionTypeQueryModel(sessionDto.offre.type),
+    beneficiaires: inscrits
   }
 }
 
@@ -180,7 +210,7 @@ export function mapSessionToDetailSessionConseillerQueryModel(
   }
 }
 
-function dtoToStatutInscription(
+export function dtoToStatutInscription(
   statut: string,
   idSession: number,
   idDossier: string
@@ -188,6 +218,8 @@ function dtoToStatutInscription(
   switch (statut) {
     case 'ONGOING':
       return SessionMilo.Inscription.Statut.INSCRIT
+    case 'ACHIEVED':
+      return SessionMilo.Inscription.Statut.PRESENT
     case 'REFUSAL':
       return SessionMilo.Inscription.Statut.REFUS_TIERS
     case 'REFUSAL_YOUNG':
