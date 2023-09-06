@@ -22,6 +22,15 @@ export class ConseillerMiloSansStructure implements DomainError {
     this.message = `Conseiller Milo ${critereRecherche} sans structure`
   }
 }
+export class JeuneMiloSansStructure implements DomainError {
+  static CODE = 'JEUNE_MILO_SANS_STRUCTURE'
+  readonly code: string = JeuneMiloSansStructure.CODE
+  readonly message: string
+
+  constructor(critereRecherche = '') {
+    this.message = `Jeune Milo ${critereRecherche} sans structure`
+  }
+}
 
 export class CampagneNonActive implements DomainError {
   static CODE = 'CAMPAGNE_NON_ACTIVE'

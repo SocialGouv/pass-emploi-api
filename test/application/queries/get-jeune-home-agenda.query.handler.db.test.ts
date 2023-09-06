@@ -85,13 +85,13 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
     const dimancheEnHuitString = '2022-08-22T00:00:00Z'
     beforeEach(async () => {
       sessionsQueryGetter.handle
-        .withArgs('idDossier', accessToken, {
+        .withArgs(idJeune, 'idDossier', accessToken, {
           periode: {
             debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
             fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
           },
           pourConseiller: false,
-          filtrerEstInscrit: false
+          filtrerEstInscrit: true
         })
         .resolves(success([]))
     })
@@ -144,13 +144,13 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
           '2022-08-29T00:00:00-07:00'
         ])
       sessionsQueryGetter.handle
-        .withArgs('idDossier', accessToken, {
+        .withArgs(idJeune, 'idDossier', accessToken, {
           periode: {
             debut: DateTime.fromISO(_lundiDernier, { setZone: true }),
             fin: DateTime.fromISO(_dimancheEnHuit, { setZone: true })
           },
           pourConseiller: false,
-          filtrerEstInscrit: false
+          filtrerEstInscrit: true
         })
         .resolves(success([]))
 
@@ -267,7 +267,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
       it('renvoie un tableau vide si le jeune n’est inscrit à aucune session sur la période', async () => {
         // Given
         sessionsQueryGetter.handle
-          .withArgs('idDossier', accessToken, {
+          .withArgs(idJeune, 'idDossier', accessToken, {
             periode: {
               debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
               fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
@@ -284,28 +284,27 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
 
       it('renvoie au jeune les sessions Milo triées par date si le jeune est inscrit à des sessions sur la période', async () => {
         // Given
-        const sessionAvecInscriptionAJPlus1 = {
-          ...uneSessionJeuneMiloQueryModel,
+        const sessionAvecInscriptionAJPlus1 = uneSessionJeuneMiloQueryModel({
           dateHeureDebut: DateTime.fromJSDate(demain)
             .plus({ days: 1 })
             .toISODate(),
           inscription: SessionMilo.Inscription.Statut.INSCRIT
-        }
-        const sessionAvecInscriptionAJPlus2 = {
-          ...uneSessionJeuneMiloQueryModel,
+        })
+
+        const sessionAvecInscriptionAJPlus2 = uneSessionJeuneMiloQueryModel({
           dateHeureDebut: DateTime.fromJSDate(demain)
             .plus({ days: 2 })
             .toISODate(),
           inscription: SessionMilo.Inscription.Statut.INSCRIT
-        }
+        })
         sessionsQueryGetter.handle
-          .withArgs('idDossier', accessToken, {
+          .withArgs(idJeune, 'idDossier', accessToken, {
             periode: {
               debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
               fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
             },
             pourConseiller: false,
-            filtrerEstInscrit: false
+            filtrerEstInscrit: true
           })
           .resolves(
             success([
@@ -326,22 +325,20 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
 
       it('renvoie au conseiller les sessions Milo triées par date si le jeune est inscrit à des sessions sur la période', async () => {
         // Given
-        const sessionAvecInscriptionAJPlus1 = {
-          ...uneSessionJeuneMiloQueryModel,
+        const sessionAvecInscriptionAJPlus1 = uneSessionJeuneMiloQueryModel({
           dateHeureDebut: DateTime.fromJSDate(demain)
             .plus({ days: 1 })
             .toISODate(),
           inscription: SessionMilo.Inscription.Statut.INSCRIT
-        }
-        const sessionAvecInscriptionAJPlus2 = {
-          ...uneSessionJeuneMiloQueryModel,
+        })
+        const sessionAvecInscriptionAJPlus2 = uneSessionJeuneMiloQueryModel({
           dateHeureDebut: DateTime.fromJSDate(demain)
             .plus({ days: 2 })
             .toISODate(),
           inscription: SessionMilo.Inscription.Statut.INSCRIT
-        }
+        })
         sessionsQueryGetter.handle
-          .withArgs('idDossier', accessToken, {
+          .withArgs(idJeune, 'idDossier', accessToken, {
             periode: {
               debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
               fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })

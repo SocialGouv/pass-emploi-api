@@ -88,6 +88,7 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
         return failure(new JeuneMiloSansIdDossier(query.idJeune))
       }
       const sessionsQueryModels = await this.getSessionsJeuneQueryGetter.handle(
+        query.idJeune,
         jeuneSqlModel.idPartenaire,
         query.accessToken,
         {
@@ -96,7 +97,7 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
             fin: dimancheEnHuit
           },
           pourConseiller: Authentification.estConseiller(utilisateur.type),
-          filtrerEstInscrit: Authentification.estConseiller(utilisateur.type)
+          filtrerEstInscrit: true
         }
       )
       if (isFailure(sessionsQueryModels)) return sessionsQueryModels

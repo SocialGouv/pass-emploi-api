@@ -21,6 +21,12 @@ import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { expect, sinon, StubbedClass, stubClass } from '../../../utils'
 import { getDatabase } from 'test/utils/database-for-testing'
+import {
+  MILO_INSCRIT,
+  MILO_PRESENT,
+  MILO_REFUS_JEUNE,
+  MILO_REFUS_TIERS
+} from '../../../../src/infrastructure/clients/dto/milo.dto'
 
 describe('SessionMiloHttpSqlRepository', () => {
   let miloClient: StubbedClass<MiloClient>
@@ -53,28 +59,28 @@ describe('SessionMiloHttpSqlRepository', () => {
             idInstanceSession: 1,
             nom: 'Granger',
             prenom: 'Hermione',
-            statut: 'ONGOING'
+            statut: MILO_INSCRIT
           }),
           uneInscriptionSessionMiloDto({
             idDossier: 2,
             idInstanceSession: 2,
             nom: 'Weasley',
             prenom: 'Ronald',
-            statut: 'REFUSAL'
+            statut: MILO_REFUS_TIERS
           }),
           uneInscriptionSessionMiloDto({
             idDossier: 3,
             idInstanceSession: 3,
             nom: 'Potter',
             prenom: 'Harry',
-            statut: 'REFUSAL_YOUNG'
+            statut: MILO_REFUS_JEUNE
           }),
           uneInscriptionSessionMiloDto({
             idDossier: 4,
             idInstanceSession: 4,
             nom: 'Hagrid',
             prenom: 'Rubeus',
-            statut: 'REFUSAL_YOUNG'
+            statut: MILO_REFUS_JEUNE
           })
         ])
       )
@@ -334,24 +340,24 @@ describe('SessionMiloHttpSqlRepository', () => {
         {
           idDossier: 'id-dossier-rogue',
           idInstanceSession: 'id-inscription-rogue',
-          statut: 'ACHIEVED',
+          statut: MILO_PRESENT,
           dateDebutReelle: '2020-04-06'
         },
         {
           idDossier: 'id-dossier-fred',
           idInstanceSession: 'id-inscription-fred',
-          statut: 'REFUSAL'
+          statut: MILO_REFUS_TIERS
         },
         {
           idDossier: 'id-dossier-luna',
           idInstanceSession: 'id-inscription-luna',
-          statut: 'REFUSAL_YOUNG',
+          statut: MILO_REFUS_JEUNE,
           commentaire: 'J’ai pas envie'
         },
         {
           idDossier: 'id-dossier-ginny',
           idInstanceSession: 'id-inscription-ginny',
-          statut: 'ONGOING'
+          statut: MILO_INSCRIT
         }
       ])
       expect(
