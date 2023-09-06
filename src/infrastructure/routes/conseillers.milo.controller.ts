@@ -16,6 +16,7 @@ import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/quer
 import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-sessions-conseiller.milo.query.handler.db'
 import {
   DetailSessionConseillerMiloQueryModel,
+  AgendaConseillerMiloSessionListItemQueryModel,
   SessionConseillerMiloQueryModel
 } from 'src/application/queries/query-models/sessions.milo.query.model'
 import { isSuccess } from 'src/building-blocks/types/result'
@@ -29,6 +30,7 @@ import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'
 import {
   EmargementsSessionMiloPayload,
+  GetAgendaSessionsQueryParams,
   GetSessionsQueryParams,
   UpdateSessionMiloPayload
 } from './validation/conseiller-milo.inputs'
@@ -78,6 +80,25 @@ export class ConseillersMiloController {
       return result.data
     }
     throw handleFailure(result)
+  }
+
+  @ApiOperation({
+    summary:
+      'Récupère la liste des sessions de sa structure MILO auxquelles participent ses bénéficiaires',
+    description: 'Autorisé pour le conseiller Milo'
+  })
+  @Get('/:idConseiller/agenda/sessions')
+  @ApiResponse({
+    type: AgendaConseillerMiloSessionListItemQueryModel,
+    isArray: true
+  })
+  async getAgendaSessions(
+    @Param('idConseiller') _idConseiller: string,
+    @Utilisateur() _utilisateur: Authentification.Utilisateur,
+    @AccessToken() _accessToken: string,
+    @Query() _getSessionsQueryParams: GetAgendaSessionsQueryParams
+  ): Promise<AgendaConseillerMiloSessionListItemQueryModel[]> {
+    throw new Error('not implemented')
   }
 
   @ApiOperation({

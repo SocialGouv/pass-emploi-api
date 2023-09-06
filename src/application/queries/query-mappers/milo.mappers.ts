@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { SessionMilo } from 'src/domain/milo/session.milo'
 import {
-  MILO_INSCRIT,
+  MILO_INSCRIT, MILO_PRESENT,
   MILO_REFUS_JEUNE,
   MILO_REFUS_TIERS,
   OffreTypeCode,
@@ -11,9 +11,11 @@ import {
   SessionJeuneListeDto
 } from 'src/infrastructure/clients/dto/milo.dto'
 import {
+  AgendaConseillerMiloSessionListItemQueryModel,
   DetailSessionConseillerMiloQueryModel,
   DetailSessionConseillerQueryModel,
   DetailSessionJeuneMiloQueryModel,
+  InscritSessionMiloQueryModel,
   SessionConseillerMiloQueryModel,
   SessionJeuneMiloQueryModel,
   SessionTypeQueryModel
@@ -95,6 +97,34 @@ export function mapSessionConseillerDtoToQueryModel(
     dateHeureFin: dateHeureFin.toISO(),
     type: buildSessionTypeQueryModel(sessionDto.offre.type),
     statut: SessionMilo.calculerStatut(maintenant, dateHeureFin, dateCloture)
+  }
+}
+
+export function mapSessionConseillerDtoToAgendaQueryModel(
+  sessionDto: SessionConseillerDetailDto,
+  timezone: string,
+  inscrits: InscritSessionMiloQueryModel[]
+): AgendaConseillerMiloSessionListItemQueryModel {
+  return {
+    id: sessionDto.session.id.toString(),
+    nomSession: sessionDto.session.nom,
+    nomOffre: sessionDto.offre.nom,
+    dateHeureDebut: DateTime.fromFormat(
+      sessionDto.session.dateHeureDebut,
+      MILO_DATE_FORMAT,
+      { zone: timezone }
+    )
+      .toUTC()
+      .toISO(),
+    dateHeureFin: DateTime.fromFormat(
+      sessionDto.session.dateHeureFin,
+      MILO_DATE_FORMAT,
+      { zone: timezone }
+    )
+      .toUTC()
+      .toISO(),
+    type: buildSessionTypeQueryModel(sessionDto.offre.type),
+    beneficiaires: inscrits
   }
 }
 
@@ -183,7 +213,7 @@ export function mapSessionToDetailSessionConseillerQueryModel(
   }
 }
 
-function dtoToStatutInscription(
+export function dtoToStatutInscription(
   statut: string,
   idSession: number,
   idDossier: string
@@ -191,6 +221,8 @@ function dtoToStatutInscription(
   switch (statut) {
     case MILO_INSCRIT:
       return SessionMilo.Inscription.Statut.INSCRIT
+    case MILO_PRESENT:
+      return SessionMilo.Inscription.Statut.PRESENT
     case MILO_REFUS_TIERS:
       return SessionMilo.Inscription.Statut.REFUS_TIERS
     case MILO_REFUS_JEUNE:

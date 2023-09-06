@@ -1,6 +1,20 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { SessionMilo } from '../../../domain/milo/session.milo'
 
+export class InscritSessionMiloQueryModel {
+  @ApiProperty()
+  idJeune: string
+
+  @ApiProperty()
+  nom: string
+
+  @ApiProperty()
+  prenom: string
+
+  @ApiProperty({ enum: SessionMilo.Inscription.Statut })
+  statut: SessionMilo.Inscription.Statut
+}
+
 export class SessionTypeQueryModel {
   @ApiProperty({
     description: '2 valeurs possibles: WORKSHOP ou COLLECTIVE_INFORMATION'
@@ -35,6 +49,29 @@ export class SessionConseillerMiloQueryModel {
 
   @ApiProperty({ enum: SessionMilo.Statut })
   statut: SessionMilo.Statut
+}
+
+export class AgendaConseillerMiloSessionListItemQueryModel {
+  @ApiProperty()
+  id: string
+
+  @ApiProperty()
+  nomSession: string
+
+  @ApiProperty()
+  nomOffre: string
+
+  @ApiProperty()
+  dateHeureDebut: string
+
+  @ApiProperty()
+  dateHeureFin: string
+
+  @ApiProperty()
+  type: SessionTypeQueryModel
+
+  @ApiProperty({ type: InscritSessionMiloQueryModel, isArray: true })
+  beneficiaires: InscritSessionMiloQueryModel[]
 }
 
 export class SessionJeuneMiloQueryModel {
@@ -113,20 +150,6 @@ class OffreSessionQueryModel {
 
   @ApiProperty({ required: false })
   nomPartenaire?: string
-}
-
-export class InscritSessionMiloQueryModel {
-  @ApiProperty()
-  idJeune: string
-
-  @ApiProperty()
-  nom: string
-
-  @ApiProperty()
-  prenom: string
-
-  @ApiProperty({ enum: SessionMilo.Inscription.Statut })
-  statut: SessionMilo.Inscription.Statut
 }
 
 export class DetailSessionConseillerMiloQueryModel {
