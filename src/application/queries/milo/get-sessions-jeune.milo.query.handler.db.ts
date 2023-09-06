@@ -16,6 +16,7 @@ import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sq
 import { ConfigService } from '@nestjs/config'
 import { DateTime } from 'luxon'
 import { sessionsMiloSontActiveesPourLeJeune } from 'src/utils/feature-flip-session-helper'
+import { ConseillerInterAgenceAuthorizer } from '../../authorizers/conseiller-inter-agence-authorizer'
 
 export interface GetSessionsJeuneMiloQuery extends Query {
   idJeune: string
@@ -33,13 +34,15 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
   constructor(
     private readonly getSessionsQueryGetter: GetSessionsJeuneMiloQueryGetter,
     private readonly jeuneAuthorizer: JeuneAuthorizer,
+    private readonly conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer,
     private readonly configService: ConfigService
   ) {
     super('GetSessionsJeuneMiloQueryHandler')
   }
 
   async handle(
-    query: GetSessionsJeuneMiloQuery
+    query: GetSessionsJeuneMiloQuery,
+    utilisateur: Authentification.Utilisateur
   ): Promise<Result<SessionJeuneMiloQueryModel[]>> {
     const jeuneSqlModel = await JeuneSqlModel.findByPk(query.idJeune, {
       include: [{ model: ConseillerSqlModel, required: true }]
@@ -63,6 +66,7 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
       query.accessToken,
       {
         periode: { debut: query.dateDebut, fin: query.dateFin },
+        pourConseiller: Authentification.estConseiller(utilisateur.type),
         filtrerEstInscrit: query.filtrerEstInscrit
       }
     )
@@ -72,6 +76,13 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
     query: GetSessionsJeuneMiloQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
+    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+      return this.conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo(
+        query.idJeune,
+        utilisateur
+      )
+    }
+
     return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
