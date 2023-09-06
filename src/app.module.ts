@@ -338,6 +338,7 @@ import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/m
 import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { EmargementSessionMiloCommandHandler } from 'src/application/commands/milo/emargement-session-milo.command.handler'
 import { GetSessionsConseillerMiloQueryGetter } from './application/queries/query-getters/milo/get-sessions-conseiller.milo.query.getter.db'
+import { ConseillerInterStructureMiloAuthorizer } from './application/authorizers/conseiller-inter-structure-milo-authorizer'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -601,6 +602,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     SuggestionAuthorizer,
     FavoriOffreServiceCiviqueAuthorizer,
     ConseillerInterAgenceAuthorizer,
+    ConseillerInterStructureMiloAuthorizer,
     ListeDeDiffusionAuthorizer,
     GetDetailActionQueryHandler,
     GetDetailJeuneQueryHandler,

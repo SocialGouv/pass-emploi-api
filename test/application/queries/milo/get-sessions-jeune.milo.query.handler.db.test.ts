@@ -11,17 +11,21 @@ import {
   NonTrouveError
 } from 'src/building-blocks/types/domain-error'
 import { failure, success } from 'src/building-blocks/types/result'
-import { unUtilisateurJeune } from 'test/fixtures/authentification.fixture'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from 'test/fixtures/authentification.fixture'
 import { uneSessionJeuneMiloQueryModel } from 'test/fixtures/sessions.fixture'
 import { expect, StubbedClass, stubClass } from 'test/utils'
+import { testConfig } from 'test/utils/module-for-testing'
+import { ConseillerInterStructureMiloAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-structure-milo-authorizer'
 import { Core } from '../../../../src/domain/core'
+import { SessionMilo } from '../../../../src/domain/milo/session.milo'
 import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { getDatabase } from '../../../utils/database-for-testing'
-import { SessionMilo } from '../../../../src/domain/milo/session.milo'
-import { testConfig } from 'test/utils/module-for-testing'
 
 describe('GetSessionsJeuneMiloQueryHandler', () => {
   const query: GetSessionsJeuneMiloQuery = {
@@ -32,6 +36,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
 
   let getSessionsQueryHandler: GetSessionsJeuneMiloQueryHandler
   let getSessionsQueryGetter: StubbedClass<GetSessionsJeuneMiloQueryGetter>
+  let conseillerAuthorizer: StubbedClass<ConseillerInterStructureMiloAuthorizer>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let sandbox: SinonSandbox
 
@@ -45,9 +50,11 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
 
     getSessionsQueryGetter = stubClass(GetSessionsJeuneMiloQueryGetter)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
+    conseillerAuthorizer = stubClass(ConseillerInterStructureMiloAuthorizer)
     getSessionsQueryHandler = new GetSessionsJeuneMiloQueryHandler(
       getSessionsQueryGetter,
       jeuneAuthorizer,
+      conseillerAuthorizer,
       testConfig()
     )
   })
@@ -68,13 +75,26 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
         true
       )
     })
+
+    it('autorise le conseiller d’un jeune Milo', () => {
+      // Given
+      const utilisateurConseiller = unUtilisateurConseiller()
+
+      // When
+      getSessionsQueryHandler.authorize(query, utilisateurConseiller)
+
+      // Then
+      expect(
+        conseillerAuthorizer.autoriserConseillerAvecLaMemeStructureQueLeJeune
+      ).to.have.been.calledWithExactly('idJeune', utilisateurConseiller)
+    })
   })
 
   describe('handle', () => {
     describe("quand le jeune n'existe pas", () => {
       it('renvoie une failure ', async () => {
         // When
-        const result = await getSessionsQueryHandler.handle(query)
+        const result = await getSessionsQueryHandler.handle(query, utilisateur)
 
         // Then
         expect(result).to.deep.equal(
@@ -96,7 +116,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
         })
 
         // When
-        const result = await getSessionsQueryHandler.handle(query)
+        const result = await getSessionsQueryHandler.handle(query, utilisateur)
 
         // Then
         expect(result).to.deep.equal(
@@ -123,7 +143,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
           .resolves(uneFailure)
 
         // When
-        const result = await getSessionsQueryHandler.handle(query)
+        const result = await getSessionsQueryHandler.handle(query, utilisateur)
 
         // Then
         expect(result).to.deep.equal(uneFailure)
@@ -149,12 +169,16 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
             .resolves(unSuccess)
 
           // When
-          const result = await getSessionsQueryHandler.handle(query)
+          const result = await getSessionsQueryHandler.handle(
+            query,
+            utilisateur
+          )
 
           // Then
           expect(result).to.deep.equal(unSuccess)
         })
       })
+
       describe('quand on passe un filtre pour ne récupérer que les sessions ou le jeune est inscrit', () => {
         it('renvoie le même success', async () => {
           const queryAvecFiltre = {
@@ -182,12 +206,58 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
           getSessionsQueryGetter.handle
             .withArgs('idDossier', 'token', {
               periode: { debut: undefined, fin: undefined },
-              filtrerEstInscrit: true
+              filtrerEstInscrit: true,
+              pourConseiller: false
             })
             .resolves(unSuccess)
 
           // When
-          const result = await getSessionsQueryHandler.handle(queryAvecFiltre)
+          const result = await getSessionsQueryHandler.handle(
+            queryAvecFiltre,
+            utilisateur
+          )
+
+          // Then
+          expect(result).to.deep.equal(unSuccess)
+        })
+      })
+
+      describe('permet au conseiller de récupérer les sessions du jeune', () => {
+        it('renvoie le même success', async () => {
+          const queryAvecFiltre = {
+            idJeune: 'idJeune',
+            accessToken: 'token'
+          }
+
+          // Given
+          await JeuneSqlModel.creer(
+            unJeuneDto({
+              id: 'idJeune',
+              idPartenaire: 'idDossier',
+              structure: Core.Structure.MILO,
+              instanceId: 'instanceId'
+            })
+          )
+
+          const unSuccess = success([
+            {
+              ...uneSessionJeuneMiloQueryModel,
+              inscription: SessionMilo.Inscription.Statut.INSCRIT
+            }
+          ])
+          getSessionsQueryGetter.handle
+            .withArgs('idDossier', 'token', {
+              periode: { debut: undefined, fin: undefined },
+              filtrerEstInscrit: undefined,
+              pourConseiller: true
+            })
+            .resolves(unSuccess)
+
+          // When
+          const result = await getSessionsQueryHandler.handle(
+            queryAvecFiltre,
+            unUtilisateurConseiller()
+          )
 
           // Then
           expect(result).to.deep.equal(unSuccess)

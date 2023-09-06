@@ -5,28 +5,31 @@ import { SituationsMiloSqlModel } from 'src/infrastructure/sequelize/models/situ
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import { uneSituationsMilo } from 'test/fixtures/milo.fixture'
-import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
+import {
+  ErreurHttp,
+  NonTrouveError
+} from '../../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../../src/building-blocks/types/result'
+import { Core } from '../../../../src/domain/core'
+import { JeuneMilo } from '../../../../src/domain/milo/jeune.milo'
+import { FirebaseClient } from '../../../../src/infrastructure/clients/firebase-client'
 import { ConseillerSqlRepository } from '../../../../src/infrastructure/repositories/conseiller-sql.repository.db'
 import { DossierMiloDto } from '../../../../src/infrastructure/repositories/dto/milo.dto'
-import { JeuneSqlRepository } from '../../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
 import { MiloJeuneHttpSqlRepository } from '../../../../src/infrastructure/repositories/jeune/jeune-milo-http-sql.repository.db'
+import { JeuneSqlRepository } from '../../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
+import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { StructureMiloSqlModel } from '../../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { RateLimiterService } from '../../../../src/utils/rate-limiter.service'
-import { unJeune } from '../../../fixtures/jeune.fixture'
-import { testConfig } from '../../../utils/module-for-testing'
 import { unConseiller } from '../../../fixtures/conseiller.fixture'
+import { uneDatetime } from '../../../fixtures/date.fixture'
+import { unJeune, uneConfiguration } from '../../../fixtures/jeune.fixture'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { stubClass } from '../../../utils'
-import { FirebaseClient } from '../../../../src/infrastructure/clients/firebase-client'
-import { JeuneMilo } from '../../../../src/domain/milo/jeune.milo'
 import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
-import { StructureMiloSqlModel } from '../../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
-import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
-import { Core } from '../../../../src/domain/core'
-import { uneDatetime } from '../../../fixtures/date.fixture'
+import { testConfig } from '../../../utils/module-for-testing'
 
 describe('MiloHttpRepository', () => {
   let databaseForTesting: DatabaseForTesting
@@ -36,6 +39,7 @@ describe('MiloHttpRepository', () => {
   const jeune = unJeune({ email: 'john@doe.io' })
   let idService: IdService
   let dateService: DateService
+  const conseiller = unConseiller()
 
   before(() => {
     databaseForTesting = getDatabase()
@@ -45,7 +49,7 @@ describe('MiloHttpRepository', () => {
     await databaseForTesting.cleanPG()
     const httpService = new HttpService()
     const conseillerSqlRepository = new ConseillerSqlRepository()
-    await conseillerSqlRepository.save(unConseiller())
+    await conseillerSqlRepository.save(conseiller)
     const firebaseClient = stubClass(FirebaseClient)
     const jeuneSqlRepository = new JeuneSqlRepository(
       databaseForTesting.sequelize,
@@ -60,6 +64,53 @@ describe('MiloHttpRepository', () => {
       configService,
       rateLimiterService
     )
+  })
+
+  describe('get', () => {
+    describe('quand le jeune existe', () => {
+      it('retourne le jeune', async () => {
+        // Given
+        const jeuneMilo: JeuneMilo = unJeune({
+          id: 'milo',
+          configuration: uneConfiguration({ idJeune: 'milo' })
+        })
+        jeuneMilo.idStructureMilo = 'test'
+
+        await StructureMiloSqlModel.create({
+          id: jeuneMilo.idStructureMilo,
+          nomOfficiel: 'test',
+          timezone: 'Europe/Paris'
+        })
+        await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: jeuneMilo.id,
+            idConseiller: conseiller.id,
+            dateCreation: jeuneMilo.creationDate.toJSDate(),
+            datePremiereConnexion: jeuneMilo.datePremiereConnexion!.toJSDate(),
+            idStructureMilo: jeuneMilo.idStructureMilo
+          })
+        )
+
+        // When
+        const result = await miloHttpSqlRepository.get(jeuneMilo.id)
+
+        // Then
+        delete jeuneMilo.conseiller
+        expect(result).to.deep.equal(success(jeuneMilo))
+      })
+    })
+
+    describe("quand le jeune n'existe pas", () => {
+      it('retourne une failure', async () => {
+        // When
+        const result = await miloHttpSqlRepository.get('ZIZOU')
+
+        // Then
+        expect(result).to.deep.equal(
+          failure(new NonTrouveError('Jeune', 'ZIZOU'))
+        )
+      })
+    })
   })
 
   describe('getDossier', () => {

@@ -60,7 +60,7 @@ export class JeunesMiloController {
   @ApiOperation({
     summary:
       "Récupère la liste des sessions d'un jeune MILO que les conseillers ont rendu visibles",
-    description: 'Autorisé pour les jeunes Milo'
+    description: 'Autorisé pour les jeunes Milo et leurs conseillers'
   })
   @Get('/milo/:idJeune/sessions')
   @ApiResponse({
