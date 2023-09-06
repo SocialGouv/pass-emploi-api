@@ -118,7 +118,12 @@ export class SupportController {
   @ApiOperation({
     summary:
       'Archive le jeune identifié par son ID (ID en base, et pas ID Authentification)',
-    description: 'Autorisé pour le support'
+    description:
+      ' l’API support pour archiver le jeune\n' +
+      '- Suppression de la BDD de son compte utilisateur\n' +
+      '- Suppression de l’authentification Keycloak\n' +
+      '- Suppression du chat firebase\n' +
+      '- Envoi d’un email au jeune\n'
   })
   @Post('archiver-jeune/:idJeune')
   @HttpCode(HttpStatus.NO_CONTENT)
