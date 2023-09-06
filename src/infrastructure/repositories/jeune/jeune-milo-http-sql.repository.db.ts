@@ -4,7 +4,10 @@ import { ConfigService } from '@nestjs/config'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { firstValueFrom } from 'rxjs'
 import { Op } from 'sequelize'
-import { ErreurHttp } from '../../../building-blocks/types/domain-error'
+import {
+  ErreurHttp,
+  NonTrouveError
+} from '../../../building-blocks/types/domain-error'
 import { Result, failure, success } from '../../../building-blocks/types/result'
 import { Core } from '../../../domain/core'
 import { JeuneMilo } from '../../../domain/milo/jeune.milo'
@@ -33,6 +36,18 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
     this.apiUrl = this.configService.get('milo').url
     this.apiKeyDossier = this.configService.get('milo').apiKeyDossier
     this.apiKeyCreerJeune = this.configService.get('milo').apiKeyCreerJeune
+  }
+
+  async get(id: string): Promise<Result<JeuneMilo>> {
+    const jeuneSqlModel = await JeuneSqlModel.findByPk(id)
+    if (!jeuneSqlModel) {
+      return failure(new NonTrouveError('Jeune', id))
+    }
+    const jeuneMilo: JeuneMilo = {
+      ...fromSqlToJeune(jeuneSqlModel),
+      idStructureMilo: jeuneSqlModel.idStructureMilo ?? undefined
+    }
+    return success(jeuneMilo)
   }
 
   async getDossier(idDossier: string): Promise<Result<JeuneMilo.Dossier>> {

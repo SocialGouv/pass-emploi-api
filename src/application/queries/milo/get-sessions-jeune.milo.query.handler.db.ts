@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { DateTime } from 'luxon'
 import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
 import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { SessionJeuneMiloQueryModel } from 'src/application/queries/query-models/sessions.milo.query.model'
@@ -8,15 +10,13 @@ import {
 } from 'src/building-blocks/types/domain-error'
 import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
-import { failure, Result, success } from 'src/building-blocks/types/result'
+import { Result, failure, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { estMilo } from 'src/domain/core'
+import { sessionsMiloSontActiveesPourLeJeune } from 'src/utils/feature-flip-session-helper'
 import { ConseillerSqlModel } from '../../../infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
-import { ConfigService } from '@nestjs/config'
-import { DateTime } from 'luxon'
-import { sessionsMiloSontActiveesPourLeJeune } from 'src/utils/feature-flip-session-helper'
-import { ConseillerInterAgenceAuthorizer } from '../../authorizers/conseiller-inter-agence-authorizer'
+import { ConseillerInterStructureMiloAuthorizer } from '../../authorizers/conseiller-inter-structure-milo-authorizer'
 
 export interface GetSessionsJeuneMiloQuery extends Query {
   idJeune: string
@@ -34,7 +34,7 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
   constructor(
     private readonly getSessionsQueryGetter: GetSessionsJeuneMiloQueryGetter,
     private readonly jeuneAuthorizer: JeuneAuthorizer,
-    private readonly conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer,
+    private readonly conseillerStructureMiloAuthorizer: ConseillerInterStructureMiloAuthorizer,
     private readonly configService: ConfigService
   ) {
     super('GetSessionsJeuneMiloQueryHandler')
@@ -76,8 +76,8 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
     query: GetSessionsJeuneMiloQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      return this.conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo(
+    if (Authentification.estConseiller(utilisateur.type)) {
+      return this.conseillerStructureMiloAuthorizer.autoriserConseillerAvecLaMemeStructureQueLeJeune(
         query.idJeune,
         utilisateur
       )

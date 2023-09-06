@@ -17,15 +17,15 @@ import {
 } from 'test/fixtures/authentification.fixture'
 import { uneSessionJeuneMiloQueryModel } from 'test/fixtures/sessions.fixture'
 import { expect, StubbedClass, stubClass } from 'test/utils'
-import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
+import { testConfig } from 'test/utils/module-for-testing'
+import { ConseillerInterStructureMiloAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-structure-milo-authorizer'
 import { Core } from '../../../../src/domain/core'
+import { SessionMilo } from '../../../../src/domain/milo/session.milo'
 import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { getDatabase } from '../../../utils/database-for-testing'
-import { SessionMilo } from '../../../../src/domain/milo/session.milo'
-import { testConfig } from 'test/utils/module-for-testing'
 
 describe('GetSessionsJeuneMiloQueryHandler', () => {
   const query: GetSessionsJeuneMiloQuery = {
@@ -36,7 +36,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
 
   let getSessionsQueryHandler: GetSessionsJeuneMiloQueryHandler
   let getSessionsQueryGetter: StubbedClass<GetSessionsJeuneMiloQueryGetter>
-  let conseillerAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
+  let conseillerAuthorizer: StubbedClass<ConseillerInterStructureMiloAuthorizer>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let sandbox: SinonSandbox
 
@@ -50,7 +50,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
 
     getSessionsQueryGetter = stubClass(GetSessionsJeuneMiloQueryGetter)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
-    conseillerAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
+    conseillerAuthorizer = stubClass(ConseillerInterStructureMiloAuthorizer)
     getSessionsQueryHandler = new GetSessionsJeuneMiloQueryHandler(
       getSessionsQueryGetter,
       jeuneAuthorizer,
@@ -85,7 +85,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
 
       // Then
       expect(
-        conseillerAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo
+        conseillerAuthorizer.autoriserConseillerAvecLaMemeStructureQueLeJeune
       ).to.have.been.calledWithExactly('idJeune', utilisateurConseiller)
     })
   })
