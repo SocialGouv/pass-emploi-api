@@ -226,7 +226,7 @@ import { AddCommentaireActionCommandHandler } from './application/commands/actio
 import { ModifierJeuneDuConseillerCommandHandler } from './application/commands/modifier-jeune-du-conseiller.command.handler'
 import { CommentaireActionSqlRepositoryDb } from './infrastructure/repositories/action/commentaire-action-sql.repository.db'
 import { GetCommentairesActionQueryHandler } from './application/queries/action/get-commentaires-action.query.handler.db'
-import { GetJeuneHomeAgendaQueryHandler } from './application/queries/get-jeune-home-agenda.query.db'
+import { GetJeuneHomeAgendaQueryHandler } from './application/queries/get-jeune-home-agenda.query.handler.db'
 import { JeunePoleEmploiSqlRepository } from './infrastructure/repositories/jeune/jeune-pole-emploi-sql.repository.db'
 import { GetTypesQualificationsQueryHandler } from './application/queries/action/get-types-qualifications.query.handler'
 import { ActionMiloHttpRepository } from './infrastructure/repositories/action/action-milo-http-sql.repository'

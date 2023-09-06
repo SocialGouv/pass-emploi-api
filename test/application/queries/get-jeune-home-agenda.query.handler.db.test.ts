@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { ConseillerInterAgenceAuthorizer } from 'src/application/authorizers/conseiller-inter-agence-authorizer'
 import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
-import { GetJeuneHomeAgendaQueryHandler } from 'src/application/queries/get-jeune-home-agenda.query.db'
+import { GetJeuneHomeAgendaQueryHandler } from 'src/application/queries/get-jeune-home-agenda.query.handler.db'
 import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { ActionQueryModel } from 'src/application/queries/query-models/actions.query-model'
 import { JeuneHomeAgendaQueryModel } from 'src/application/queries/query-models/home-jeune-suivi.query-model'
@@ -47,6 +47,7 @@ import {
 
 describe('GetJeuneHomeAgendaQueryHandler', () => {
   const utilisateurJeune = unUtilisateurJeune()
+  const utilisateurConseiller = unUtilisateurConseiller()
   const idJeune = utilisateurJeune.id
   let handler: GetJeuneHomeAgendaQueryHandler
   let sessionsQueryGetter: StubbedClass<GetSessionsJeuneMiloQueryGetter>
@@ -88,7 +89,9 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
           periode: {
             debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
             fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
-          }
+          },
+          pourConseiller: false,
+          filtrerEstInscrit: false
         })
         .resolves(success([]))
     })
@@ -145,7 +148,9 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
           periode: {
             debut: DateTime.fromISO(_lundiDernier, { setZone: true }),
             fin: DateTime.fromISO(_dimancheEnHuit, { setZone: true })
-          }
+          },
+          pourConseiller: false,
+          filtrerEstInscrit: false
         })
         .resolves(success([]))
 
@@ -277,7 +282,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         expect(isSuccess(result) && result.data.sessionsMilo).to.be.empty()
       })
 
-      it('renvoie les sessions Milo triées par date si le jeune est inscrit à des sessions sur la période', async () => {
+      it('renvoie au jeune les sessions Milo triées par date si le jeune est inscrit à des sessions sur la période', async () => {
         // Given
         const sessionAvecInscriptionAJPlus1 = {
           ...uneSessionJeuneMiloQueryModel,
@@ -298,7 +303,9 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
             periode: {
               debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
               fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
-            }
+            },
+            pourConseiller: false,
+            filtrerEstInscrit: false
           })
           .resolves(
             success([
@@ -309,6 +316,48 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
 
         // When
         const result = await handler.handle(homeQuery, utilisateurJeune)
+
+        // Then
+        expect(isSuccess(result) && result.data.sessionsMilo).to.be.deep.equal([
+          sessionAvecInscriptionAJPlus1,
+          sessionAvecInscriptionAJPlus2
+        ])
+      })
+
+      it('renvoie au conseiller les sessions Milo triées par date si le jeune est inscrit à des sessions sur la période', async () => {
+        // Given
+        const sessionAvecInscriptionAJPlus1 = {
+          ...uneSessionJeuneMiloQueryModel,
+          dateHeureDebut: DateTime.fromJSDate(demain)
+            .plus({ days: 1 })
+            .toISODate(),
+          inscription: SessionMilo.Inscription.Statut.INSCRIT
+        }
+        const sessionAvecInscriptionAJPlus2 = {
+          ...uneSessionJeuneMiloQueryModel,
+          dateHeureDebut: DateTime.fromJSDate(demain)
+            .plus({ days: 2 })
+            .toISODate(),
+          inscription: SessionMilo.Inscription.Statut.INSCRIT
+        }
+        sessionsQueryGetter.handle
+          .withArgs('idDossier', accessToken, {
+            periode: {
+              debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
+              fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
+            },
+            pourConseiller: true,
+            filtrerEstInscrit: true
+          })
+          .resolves(
+            success([
+              sessionAvecInscriptionAJPlus1,
+              sessionAvecInscriptionAJPlus2
+            ])
+          )
+
+        // When
+        const result = await handler.handle(homeQuery, utilisateurConseiller)
 
         // Then
         expect(isSuccess(result) && result.data.sessionsMilo).to.be.deep.equal([

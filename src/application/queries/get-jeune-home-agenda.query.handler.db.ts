@@ -81,9 +81,8 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
 
     let sessionsMilo: SessionJeuneMiloQueryModel[]
     if (
-      sessionsMiloSontActiveesPourLeJeune(this.configuration, jeuneSqlModel) &&
       estMilo(utilisateur.structure) &&
-      Authentification.estJeune(utilisateur.type)
+      sessionsMiloSontActiveesPourLeJeune(this.configuration, jeuneSqlModel)
     ) {
       if (!jeuneSqlModel.idPartenaire) {
         return failure(new JeuneMiloSansIdDossier(query.idJeune))
@@ -95,7 +94,9 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
           periode: {
             debut: lundiDernier,
             fin: dimancheEnHuit
-          }
+          },
+          pourConseiller: Authentification.estConseiller(utilisateur.type),
+          filtrerEstInscrit: Authentification.estConseiller(utilisateur.type)
         }
       )
       if (isFailure(sessionsQueryModels)) return sessionsQueryModels

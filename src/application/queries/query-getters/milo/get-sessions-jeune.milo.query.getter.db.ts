@@ -5,7 +5,10 @@ import { SessionJeuneMiloQueryModel } from 'src/application/queries/query-models
 import { isFailure, Result, success } from 'src/building-blocks/types/result'
 import { Core } from 'src/domain/core'
 import { SessionMilo } from 'src/domain/milo/session.milo'
-import { SessionJeuneListeDto } from 'src/infrastructure/clients/dto/milo.dto'
+import {
+  ListeSessionsJeuneMiloDto,
+  SessionJeuneListeDto
+} from 'src/infrastructure/clients/dto/milo.dto'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
@@ -24,18 +27,23 @@ export class GetSessionsJeuneMiloQueryGetter {
     options?: {
       periode?: { debut?: DateTime; fin?: DateTime }
       filtrerEstInscrit?: boolean
+      pourConseiller?: boolean
     }
   ): Promise<Result<SessionJeuneMiloQueryModel[]>> {
-    const idpToken = await this.keycloakClient.exchangeTokenJeune(
-      accessToken,
-      Core.Structure.MILO
-    )
-
-    const resultSessionMiloClient = await this.miloClient.getSessionsJeune(
-      idpToken,
-      idPartenaire,
-      options?.periode
-    )
+    let resultSessionMiloClient: Result<ListeSessionsJeuneMiloDto>
+    if (options?.pourConseiller) {
+      resultSessionMiloClient = await this.getSessionsJeunePourConseiller(
+        accessToken,
+        idPartenaire,
+        options?.periode
+      )
+    } else {
+      resultSessionMiloClient = await this.getSessionsJeune(
+        accessToken,
+        idPartenaire,
+        options?.periode
+      )
+    }
 
     if (isFailure(resultSessionMiloClient)) {
       return resultSessionMiloClient
@@ -49,6 +57,35 @@ export class GetSessionsJeuneMiloQueryGetter {
     if (options?.filtrerEstInscrit)
       return success(trierSessionsAvecInscriptions(sessionsVisiblesQueryModels))
     return success(sessionsVisiblesQueryModels)
+  }
+
+  private async getSessionsJeune(
+    accessToken: string,
+    idPartenaire: string,
+    periode?: { debut?: DateTime; fin?: DateTime }
+  ): Promise<Result<ListeSessionsJeuneMiloDto>> {
+    const idpToken = await this.keycloakClient.exchangeTokenJeune(
+      accessToken,
+      Core.Structure.MILO
+    )
+
+    return this.miloClient.getSessionsJeune(idpToken, idPartenaire, periode)
+  }
+
+  private async getSessionsJeunePourConseiller(
+    accessToken: string,
+    idPartenaire: string,
+    periode?: { debut?: DateTime; fin?: DateTime }
+  ): Promise<Result<ListeSessionsJeuneMiloDto>> {
+    const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
+      accessToken
+    )
+
+    return this.miloClient.getSessionsJeunePourConseiller(
+      idpToken,
+      idPartenaire,
+      periode
+    )
   }
 }
 

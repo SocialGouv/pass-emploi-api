@@ -53,6 +53,10 @@ export namespace Authentification {
     return type === Authentification.Type.JEUNE
   }
 
+  export function estConseiller(type: Authentification.Type): boolean {
+    return type === Authentification.Type.CONSEILLER
+  }
+
   export interface Repository {
     get(
       id: string,
