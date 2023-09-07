@@ -36,6 +36,7 @@ import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
 import { SessionJeuneMiloQueryModel } from '../query-models/sessions.milo.query.model'
 import { ConfigService } from '@nestjs/config'
 import { sessionsMiloSontActiveesPourLeJeune } from 'src/utils/feature-flip-session-helper'
+import { buildError } from '../../../utils/logger.module'
 
 export interface GetAccueilJeuneMiloQuery extends Query {
   idJeune: string
@@ -110,17 +111,26 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       if (!jeuneSqlModel.idPartenaire) {
         return failure(new JeuneMiloSansIdDossier(query.idJeune))
       }
-      const sessionsQueryModels = await this.getSessionsQueryGetter.handle(
-        query.idJeune,
-        jeuneSqlModel.idPartenaire,
-        query.accessToken,
-        {
-          periode: { debut: maintenant, fin: dateFinDeSemaine },
-          filtrerEstInscrit: true
+      try {
+        const sessionsQueryModels = await this.getSessionsQueryGetter.handle(
+          query.idJeune,
+          jeuneSqlModel.idPartenaire,
+          query.accessToken,
+          {
+            periode: { debut: maintenant, fin: dateFinDeSemaine },
+            filtrerEstInscrit: true
+          }
+        )
+        if (isSuccess(sessionsQueryModels)) {
+          sessions = sessionsQueryModels.data
         }
-      )
-      if (isSuccess(sessionsQueryModels)) {
-        sessions = sessionsQueryModels.data
+      } catch (e) {
+        this.logger.error(
+          buildError(
+            `La récupération des sessions de l'accueil du jeune ${query.idJeune} a échoué`,
+            e
+          )
+        )
       }
     }
 

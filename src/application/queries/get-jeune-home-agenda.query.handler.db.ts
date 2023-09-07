@@ -32,6 +32,7 @@ import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-mode
 import { estMilo } from '../../domain/core'
 import { SessionJeuneMiloQueryModel } from './query-models/sessions.milo.query.model'
 import { sessionsMiloSontActiveesPourLeJeune } from 'src/utils/feature-flip-session-helper'
+import { buildError } from '../../utils/logger.module'
 
 export interface GetJeuneHomeAgendaQuery extends Query {
   idJeune: string
@@ -79,7 +80,7 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
       this.recupererLeNombreDactionsEnRetard(query)
     ])
 
-    let sessionsMilo: SessionJeuneMiloQueryModel[]
+    let sessionsMilo: SessionJeuneMiloQueryModel[] = []
     if (
       estMilo(utilisateur.structure) &&
       sessionsMiloSontActiveesPourLeJeune(this.configuration, jeuneSqlModel)
@@ -87,23 +88,33 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
       if (!jeuneSqlModel.idPartenaire) {
         return failure(new JeuneMiloSansIdDossier(query.idJeune))
       }
-      const sessionsQueryModels = await this.getSessionsJeuneQueryGetter.handle(
-        query.idJeune,
-        jeuneSqlModel.idPartenaire,
-        query.accessToken,
-        {
-          periode: {
-            debut: lundiDernier,
-            fin: dimancheEnHuit
-          },
-          pourConseiller: Authentification.estConseiller(utilisateur.type),
-          filtrerEstInscrit: true
+      try {
+        const sessionsQueryModels =
+          await this.getSessionsJeuneQueryGetter.handle(
+            query.idJeune,
+            jeuneSqlModel.idPartenaire,
+            query.accessToken,
+            {
+              periode: {
+                debut: lundiDernier,
+                fin: dimancheEnHuit
+              },
+              pourConseiller: Authentification.estConseiller(utilisateur.type),
+              filtrerEstInscrit: true
+            }
+          )
+        if (isFailure(sessionsQueryModels)) {
+          return sessionsQueryModels
         }
-      )
-      if (isFailure(sessionsQueryModels)) return sessionsQueryModels
-      sessionsMilo = sessionsQueryModels.data
-    } else {
-      sessionsMilo = []
+        sessionsMilo = sessionsQueryModels.data
+      } catch (e) {
+        this.logger.error(
+          buildError(
+            `La récupération des sessions de l'agenda du jeune ${query.idJeune} a échoué`,
+            e
+          )
+        )
+      }
     }
 
     return success({
