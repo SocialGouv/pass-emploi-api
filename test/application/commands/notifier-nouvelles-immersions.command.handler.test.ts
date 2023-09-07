@@ -20,7 +20,7 @@ describe('NotifierNouvellesImmersionsCommandHandler', () => {
   const jeune = unJeune()
   const recherche = uneRecherche()
   let rechercheRepository: StubbedType<Recherche.Repository>
-  let jeuneRepository: StubbedType<Jeune.Repository>
+  let jeuneRepository: StubbedType<Jeune.ConfigurationApplication.Repository>
   let notificationService: StubbedClass<Notification.Service>
 
   beforeEach(async () => {
