@@ -136,6 +136,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
         jeune
       )
 
+      // TODO(7 septembre 2023): supprimer ce comportement pour tout le monde quand les sessions seront déployées à tous
       if (!this.estUnEarlyAdopter(jeune)) {
         await this.rendezVousRepository.save(newRendezVousCEJ)
         this.planifierLesRappelsDeRendezVous(newRendezVousCEJ)
@@ -190,6 +191,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
             rendezVousMILO
           )
 
+        // TODO(7 septembre 2023): supprimer ce comportement pour tout le monde quand les sessions seront déployées à tous
         if (!this.estUnEarlyAdopter(jeune)) {
           await this.rendezVousRepository.save(rendezVousCEJUpdated)
           this.replanifierLesRappelsDeRendezVous(
@@ -235,6 +237,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
     FT_NOTIFIER_RDV_MILO?: boolean
   ): Promise<SuiviJob> {
     if (rendezVousCEJExistant) {
+      // TODO(7 septembre 2023): supprimer ce comportement pour tout le monde quand les sessions seront déployées à tous
       if (!this.estUnEarlyAdopter(jeune)) {
         await this.rendezVousRepository.delete(rendezVousCEJExistant.id)
         this.supprimerLesRappelsDeRendezVous(rendezVousCEJExistant)
