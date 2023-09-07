@@ -25,6 +25,7 @@ import {
 import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
 import { DateService } from '../../utils/date-service'
 import { buildError } from '../../utils/logger.module'
+import { estUnEarlyAdopter } from 'src/utils/feature-flip-session-helper'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.TRAITER_EVENEMENT_MILO)
@@ -110,18 +111,8 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
     }
   }
 
-  private estUnEarlyAdopter(jeune: JeuneMilo): boolean {
-    const idStructureMilo = jeune.idStructureMilo
-    const FT_IDS_STRUCTURES_EARLY_ADOPTERS: string[] =
-      this.configuration.get('features.idsStructuresEarlyAdoptersSession') ?? []
-
-    return idStructureMilo
-      ? FT_IDS_STRUCTURES_EARLY_ADOPTERS.includes(idStructureMilo)
-      : false
-  }
-
   private async createRendezVousMILO(
-    jeune: Jeune,
+    jeune: JeuneMilo,
     maintenant: DateTime,
     rendezVousMILO?: RendezVousMilo,
     FT_NOTIFIER_RDV_MILO?: boolean
@@ -137,7 +128,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
       )
 
       // TODO(7 septembre 2023): supprimer ce comportement pour tout le monde quand les sessions seront déployées à tous
-      if (!this.estUnEarlyAdopter(jeune)) {
+      if (!estUnEarlyAdopter(this.configuration, jeune.idStructureMilo)) {
         await this.rendezVousRepository.save(newRendezVousCEJ)
         this.planifierLesRappelsDeRendezVous(newRendezVousCEJ)
       }
@@ -164,7 +155,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
   }
 
   private async updateRendezVousMILO(
-    jeune: Jeune,
+    jeune: JeuneMilo,
     maintenant: DateTime,
     rendezVousMILO?: RendezVousMilo,
     rendezVousCEJExistant?: RendezVous,
@@ -192,7 +183,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
           )
 
         // TODO(7 septembre 2023): supprimer ce comportement pour tout le monde quand les sessions seront déployées à tous
-        if (!this.estUnEarlyAdopter(jeune)) {
+        if (!estUnEarlyAdopter(this.configuration, jeune.idStructureMilo)) {
           await this.rendezVousRepository.save(rendezVousCEJUpdated)
           this.replanifierLesRappelsDeRendezVous(
             rendezVousCEJUpdated,
@@ -230,7 +221,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
   }
 
   private async deleteRendezVousMILO(
-    jeune: Jeune,
+    jeune: JeuneMilo,
     maintenant: DateTime,
     rendezVousMILO?: RendezVousMilo,
     rendezVousCEJExistant?: RendezVous,
@@ -238,7 +229,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
   ): Promise<SuiviJob> {
     if (rendezVousCEJExistant) {
       // TODO(7 septembre 2023): supprimer ce comportement pour tout le monde quand les sessions seront déployées à tous
-      if (!this.estUnEarlyAdopter(jeune)) {
+      if (!estUnEarlyAdopter(this.configuration, jeune.idStructureMilo)) {
         await this.rendezVousRepository.delete(rendezVousCEJExistant.id)
         this.supprimerLesRappelsDeRendezVous(rendezVousCEJExistant)
       }
