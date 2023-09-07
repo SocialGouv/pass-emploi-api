@@ -22,7 +22,11 @@ import { StructureMiloSqlModel } from '../../../../src/infrastructure/sequelize/
 import { RateLimiterService } from '../../../../src/utils/rate-limiter.service'
 import { unConseiller } from '../../../fixtures/conseiller.fixture'
 import { uneDatetime } from '../../../fixtures/date.fixture'
-import { unJeune, uneConfiguration } from '../../../fixtures/jeune.fixture'
+import {
+  unJeune,
+  unJeuneSansConseiller,
+  uneConfiguration
+} from '../../../fixtures/jeune.fixture'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { stubClass } from '../../../utils'
 import {
@@ -164,6 +168,69 @@ describe('MiloHttpRepository', () => {
         // Then
         expect(dossier).to.deep.equal(
           failure(new ErreurHttp('un message', 404))
+        )
+      })
+    })
+  })
+
+  describe.only('getByIdDossier', () => {
+    describe('quand un jeune existe avec cet id dossier', () => {
+      it('retourne le jeune avec sa structure Milo', async () => {
+        // Given
+        const idDossier = 'test-id-dossier'
+        const idStructure = 'test2'
+        const idJeuneAvecDossier = 'test2'
+
+        const jeuneAttendu: JeuneMilo = {
+          ...unJeuneSansConseiller(),
+          id: idJeuneAvecDossier,
+          idPartenaire: idDossier,
+          configuration: uneConfiguration({
+            idJeune: idJeuneAvecDossier,
+            dateDerniereActualisationToken: uneDatetime().toJSDate()
+          }),
+          idStructureMilo: idStructure
+        }
+        await StructureMiloSqlModel.create({
+          id: idStructure,
+          nomOfficiel: 'test',
+          timezone: 'Europe/Paris'
+        })
+        await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: idJeuneAvecDossier,
+            idConseiller: undefined,
+            dateCreation: jeuneAttendu.creationDate.toJSDate(),
+            pushNotificationToken: 'token',
+            dateDerniereActualisationToken: uneDatetime().toJSDate(),
+            idPartenaire: idDossier,
+            datePremiereConnexion: uneDatetime().plus({ day: 1 }).toJSDate(),
+            installationId: '123456',
+            instanceId: 'abcdef',
+            appVersion: '1.8.1',
+            timezone: 'Europe/Paris',
+            idStructureMilo: idStructure
+          })
+        )
+
+        // When
+        const result = await miloHttpSqlRepository.getByIdDossier(idDossier)
+
+        // Then
+        expect(result).to.deep.equal(success(jeuneAttendu))
+      })
+    })
+
+    describe("quand aucun jeune n'existe avec cet id dossier", () => {
+      it('retourne undefined', async () => {
+        // When
+        const jeune = await miloHttpSqlRepository.getByIdDossier(
+          'test-id-dossier-inconnu'
+        )
+
+        // Then
+        expect(jeune).to.deep.equal(
+          failure(new NonTrouveError('Dossier Milo', 'test-id-dossier-inconnu'))
         )
       })
     })

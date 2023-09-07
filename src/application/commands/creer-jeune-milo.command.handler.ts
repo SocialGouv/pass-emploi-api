@@ -10,6 +10,7 @@ import {
 import {
   failure,
   isFailure,
+  isSuccess,
   Result,
   success
 } from '../../building-blocks/types/result'
@@ -70,12 +71,12 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     const lowerCaseEmail = command.email.toLocaleLowerCase()
     const [jeuneByEmail, jeuneByIdDossier] = await Promise.all([
       this.jeuneRepository.getByEmail(lowerCaseEmail),
-      this.jeuneRepository.getByIdPartenaire(command.idPartenaire)
+      this.miloJeuneRepository.getByIdDossier(command.idPartenaire)
     ])
     if (jeuneByEmail) {
       return failure(new EmailExisteDejaError(lowerCaseEmail))
     }
-    if (jeuneByIdDossier) {
+    if (isSuccess(jeuneByIdDossier)) {
       return failure(new DossierExisteDejaError(command.idPartenaire))
     }
 

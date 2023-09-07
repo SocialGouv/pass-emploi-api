@@ -1,34 +1,37 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { createSandbox } from 'sinon'
 import {
-  TraiterEvenementMiloJobHandler,
-  Traitement
+  Traitement,
+  TraiterEvenementMiloJobHandler
 } from '../../../src/application/jobs/traiter-evenement-milo.job.handler'
 import { Jeune } from '../../../src/domain/jeune/jeune'
+import { JeuneMilo } from '../../../src/domain/milo/jeune.milo'
+import { Notification } from '../../../src/domain/notification/notification'
 import {
   Planificateur,
   PlanificateurService
 } from '../../../src/domain/planificateur'
 import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
+import { RendezVousMilo } from '../../../src/domain/rendez-vous/rendez-vous.milo'
 import { SuiviJob } from '../../../src/domain/suivi-job'
 import { DateService } from '../../../src/utils/date-service'
 import { uneDate, uneDatetime } from '../../fixtures/date.fixture'
+import { unJeune } from '../../fixtures/jeune.fixture'
 import {
   unEvenementMilo,
   unRendezVousMilo
 } from '../../fixtures/partenaire.fixture'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { RendezVousMilo } from '../../../src/domain/rendez-vous/rendez-vous.milo'
-import { Notification } from '../../../src/domain/notification/notification'
+import { StubbedClass, expect, stubClass } from '../../utils'
 import { testConfig } from '../../utils/module-for-testing'
+import { failure, success } from '../../../src/building-blocks/types/result'
+import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 
 describe('TraiterEvenementMiloJobHandler', () => {
   let handler: TraiterEvenementMiloJobHandler
   let suiviJobService: StubbedType<SuiviJob.Service>
   let dateService: StubbedClass<DateService>
-  let jeuneRepository: StubbedType<Jeune.Repository>
+  let jeuneRepository: StubbedType<JeuneMilo.Repository>
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let miloRendezVousRepository: StubbedType<RendezVousMilo.Repository>
   let rendezVousMiloFactory: StubbedClass<RendezVousMilo.Factory>
@@ -132,9 +135,9 @@ describe('TraiterEvenementMiloJobHandler', () => {
           type: Planificateur.JobType.TRAITER_EVENEMENT_MILO,
           contenu: evenement
         }
-        jeuneRepository.getByIdPartenaire
+        jeuneRepository.getByIdDossier
           .withArgs(idPartenaireBeneficiaire)
-          .resolves(undefined)
+          .resolves(failure(new NonTrouveError('Dossier Milo')))
 
         // When
         const result: SuiviJob = await handler.handle(job)
@@ -151,9 +154,9 @@ describe('TraiterEvenementMiloJobHandler', () => {
 
     describe('quand traitable et JEUNE existant', () => {
       beforeEach(() => {
-        jeuneRepository.getByIdPartenaire
+        jeuneRepository.getByIdDossier
           .withArgs(idPartenaireBeneficiaire)
-          .resolves(jeune)
+          .resolves(success(jeune))
       })
 
       describe('quand traitement CREATE', () => {

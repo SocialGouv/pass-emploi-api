@@ -69,16 +69,6 @@ export class JeuneSqlRepository implements Jeune.Repository {
     return fromSqlToJeune(jeuneSqlModel)
   }
 
-  async getByIdPartenaire(idPartenaire: string): Promise<Jeune | undefined> {
-    const jeuneSqlModel = await JeuneSqlModel.findOne({
-      where: { idPartenaire }
-    })
-    if (!jeuneSqlModel) {
-      return undefined
-    }
-    return fromSqlToJeune(jeuneSqlModel)
-  }
-
   async transferAndSaveAll(
     jeunes: Jeune[],
     idConseillerCible: string,

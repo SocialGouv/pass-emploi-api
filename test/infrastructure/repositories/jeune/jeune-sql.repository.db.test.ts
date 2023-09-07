@@ -403,59 +403,6 @@ describe('JeuneSqlRepository', () => {
     })
   })
 
-  describe('getByIdPartenaire', () => {
-    let jeuneAttendu: Jeune
-
-    beforeEach(async () => {
-      // Given
-      jeuneAttendu = {
-        ...unJeuneSansConseiller(),
-        idPartenaire: 'test-id-dossier',
-        configuration: uneConfiguration({
-          dateDerniereActualisationToken: uneDatetime().toJSDate()
-        })
-      }
-      await JeuneSqlModel.creer(
-        unJeuneDto({
-          idConseiller: undefined,
-          dateCreation: jeuneAttendu.creationDate.toJSDate(),
-          pushNotificationToken: 'token',
-          dateDerniereActualisationToken: uneDatetime().toJSDate(),
-          idPartenaire: 'test-id-dossier',
-          datePremiereConnexion: uneDatetime().plus({ day: 1 }).toJSDate(),
-          installationId: '123456',
-          instanceId: 'abcdef',
-          appVersion: '1.8.1',
-          timezone: 'Europe/Paris'
-        })
-      )
-    })
-
-    describe('quand un jeune existe avec cet id partenaire', () => {
-      it('retourne le jeune avec sa configuration', async () => {
-        // When
-        const result = await jeuneSqlRepository.getByIdPartenaire(
-          'test-id-dossier'
-        )
-
-        // Then
-        expect(result).to.deep.equal(jeuneAttendu)
-      })
-    })
-
-    describe("quand aucun jeune n'existe avec cet id partenaire", () => {
-      it('retourne undefined', async () => {
-        // When
-        const jeune = await jeuneSqlRepository.getByIdPartenaire(
-          'test-id-dossier-inconnu'
-        )
-
-        // Then
-        expect(jeune).to.equal(undefined)
-      })
-    })
-  })
-
   describe('supprimer', () => {
     it('supprime le jeune', async () => {
       // Given

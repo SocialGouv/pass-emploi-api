@@ -73,8 +73,6 @@ export namespace Jeune {
 
     getByEmail(email: string): Promise<Jeune | undefined>
 
-    getByIdPartenaire(idPartenaire: string): Promise<Jeune | undefined>
-
     save(jeune: Jeune): Promise<void>
 
     findAllJeunesByConseiller(idConseiller: string): Promise<Jeune[]>

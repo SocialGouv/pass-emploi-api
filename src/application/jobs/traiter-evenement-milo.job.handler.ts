@@ -2,7 +2,12 @@ import { Inject, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { DateTime } from 'luxon'
 import { JobHandler } from '../../building-blocks/types/job-handler'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { isFailure } from '../../building-blocks/types/result'
+import { Jeune } from '../../domain/jeune/jeune'
+import {
+  JeuneMilo,
+  MiloJeuneRepositoryToken
+} from '../../domain/milo/jeune.milo'
 import { Notification } from '../../domain/notification/notification'
 import {
   Planificateur,
@@ -30,8 +35,8 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service,
     private dateService: DateService,
-    @Inject(JeunesRepositoryToken)
-    private jeuneRepository: Jeune.Repository,
+    @Inject(MiloJeuneRepositoryToken)
+    private jeuneRepository: JeuneMilo.Repository,
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
     @Inject(MiloRendezVousRepositoryToken)
@@ -61,10 +66,10 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
       return this.buildSuiviJob(maintenant, Traitement.OBJET_NON_TRAITABLE)
     }
 
-    const jeune = await this.jeuneRepository.getByIdPartenaire(
+    const resultJeune = await this.jeuneRepository.getByIdDossier(
       evenement.idPartenaireBeneficiaire
     )
-    if (!jeune) {
+    if (isFailure(resultJeune)) {
       return this.buildSuiviJob(maintenant, Traitement.JEUNE_INEXISTANT)
     }
 
@@ -81,14 +86,14 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
     switch (evenement.type) {
       case RendezVousMilo.TypeEvenement.CREATE:
         return this.createRendezVousMILO(
-          jeune,
+          resultJeune.data,
           maintenant,
           rendezVousMILO,
           FT_NOTIFIER_RDV_MILO
         )
       case RendezVousMilo.TypeEvenement.UPDATE:
         return this.updateRendezVousMILO(
-          jeune,
+          resultJeune.data,
           maintenant,
           rendezVousMILO,
           rendezVousCEJExistant,
@@ -96,7 +101,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
         )
       case RendezVousMilo.TypeEvenement.DELETE:
         return this.deleteRendezVousMILO(
-          jeune,
+          resultJeune.data,
           maintenant,
           rendezVousMILO,
           rendezVousCEJExistant,
