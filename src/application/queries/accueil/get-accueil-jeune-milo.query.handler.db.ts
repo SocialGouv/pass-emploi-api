@@ -111,9 +111,13 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
         return failure(new JeuneMiloSansIdDossier(query.idJeune))
       }
       const sessionsQueryModels = await this.getSessionsQueryGetter.handle(
+        query.idJeune,
         jeuneSqlModel.idPartenaire,
         query.accessToken,
-        { periode: { debut: maintenant, fin: dateFinDeSemaine } }
+        {
+          periode: { debut: maintenant, fin: dateFinDeSemaine },
+          filtrerEstInscrit: true
+        }
       )
       if (isSuccess(sessionsQueryModels)) {
         sessions = sessionsQueryModels.data

@@ -39,6 +39,6 @@ export class SessionMiloDto extends Model {
 
 @Table({ timestamps: false, tableName: 'session_milo' })
 export class SessionMiloSqlModel extends SessionMiloDto {
-  @BelongsTo(() => StructureMiloSqlModel, 'id_structure_milo')
+  @BelongsTo(() => StructureMiloSqlModel)
   structure?: StructureMiloSqlModel
 }

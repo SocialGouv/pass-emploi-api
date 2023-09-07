@@ -13,6 +13,12 @@ import {
   uneListeSessionsJeuneDto
 } from 'test/fixtures/milo-dto.fixture'
 import { testConfig } from 'test/utils/module-for-testing'
+import {
+  MILO_INSCRIT,
+  MILO_PRESENT,
+  MILO_REFUS_JEUNE,
+  MILO_REFUS_TIERS
+} from '../../../src/infrastructure/clients/dto/milo.dto'
 
 describe('MiloClient', () => {
   const configService = testConfig()
@@ -308,23 +314,23 @@ describe('MiloClient', () => {
         {
           idDossier: 'id-dossier-1',
           idInstanceSession: 'id-inscription-1',
-          statut: 'ONGOING'
+          statut: MILO_INSCRIT
         },
         {
           idDossier: 'id-dossier-2',
           idInstanceSession: 'id-inscription-2',
-          statut: 'REFUSAL'
+          statut: MILO_REFUS_TIERS
         },
         {
           idDossier: 'id-dossier-3',
           idInstanceSession: 'id-inscription-3',
-          statut: 'REFUSAL_YOUNG',
+          statut: MILO_REFUS_JEUNE,
           commentaire: 'J’ai pas envie'
         },
         {
           idDossier: 'id-dossier-4',
           idInstanceSession: 'id-inscription-4',
-          statut: 'ACHIEVED',
+          statut: MILO_PRESENT,
           dateDebutReelle: '2020-04-08'
         }
       ]
@@ -332,25 +338,25 @@ describe('MiloClient', () => {
       const scope1 = nock(MILO_BASE_URL)
         .put(
           `/operateurs/dossiers/${aModifier[0].idDossier}/instances-session/${aModifier[0].idInstanceSession}`,
-          { statut: 'ONGOING' }
+          { statut: MILO_INSCRIT }
         )
         .reply(201)
       const scope2 = nock(MILO_BASE_URL)
         .put(
           `/operateurs/dossiers/${aModifier[1].idDossier}/instances-session/${aModifier[1].idInstanceSession}`,
-          { statut: 'REFUSAL' }
+          { statut: MILO_REFUS_TIERS }
         )
         .reply(201)
       const scope3 = nock(MILO_BASE_URL)
         .put(
           `/operateurs/dossiers/${aModifier[2].idDossier}/instances-session/${aModifier[2].idInstanceSession}`,
-          { statut: 'REFUSAL_YOUNG', commentaire: 'J’ai pas envie' }
+          { statut: MILO_REFUS_JEUNE, commentaire: 'J’ai pas envie' }
         )
         .reply(201)
       const scope4 = nock(MILO_BASE_URL)
         .put(
           `/operateurs/dossiers/${aModifier[3].idDossier}/instances-session/${aModifier[3].idInstanceSession}`,
-          { statut: 'ACHIEVED', dateDebutReelle: '2020-04-08' }
+          { statut: MILO_PRESENT, dateDebutReelle: '2020-04-08' }
         )
         .reply(201)
 

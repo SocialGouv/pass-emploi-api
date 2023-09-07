@@ -8,7 +8,8 @@ import {
   SessionJeuneDetailDto,
   SessionJeuneListeDto,
   ListeSessionsJeuneMiloDto,
-  StructureConseillerMiloDto
+  StructureConseillerMiloDto,
+  MILO_INSCRIT
 } from 'src/infrastructure/clients/dto/milo.dto'
 
 export const uneSessionDto: SessionDto = {
@@ -40,7 +41,7 @@ export const unDetailSessionConseillerDto: SessionConseillerDetailDto = {
 export const uneSessionListeJeuneDto: SessionJeuneListeDto = {
   session: uneSessionDto,
   offre: uneOffreDto,
-  sessionInstance: { statut: 'ONGOING' }
+  sessionInstance: { statut: MILO_INSCRIT }
 }
 
 export const unDetailSessionJeuneDto: SessionJeuneDetailDto = {
@@ -87,7 +88,7 @@ export const uneInscriptionSessionMiloDto = (
     idInstanceSession: 67890,
     nom: 'Granger',
     prenom: 'Hermione',
-    statut: 'ONGOING'
+    statut: MILO_INSCRIT
   }
 
   return { ...defaults, ...args }

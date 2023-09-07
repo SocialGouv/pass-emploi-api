@@ -1,15 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { InscriptionsATraiter, SessionMilo } from 'src/domain/milo/session.milo'
 import {
+  Result,
   emptySuccess,
   isFailure,
-  Result,
   success
 } from 'src/building-blocks/types/result'
 import { ConseillerMilo } from 'src/domain/milo/conseiller.milo'
+import { InscriptionsATraiter, SessionMilo } from 'src/domain/milo/session.milo'
 import {
   InscritSessionMiloDto,
+  MILO_INSCRIT,
+  MILO_PRESENT,
+  MILO_REFUS_JEUNE,
+  MILO_REFUS_TIERS,
   OffreDto,
   OffreTypeCode,
   SessionConseillerDetailDto
@@ -170,11 +174,6 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     return this.miloClient.desinscrireJeunesSession(tokenMilo, desinscriptions)
   }
 }
-
-const MILO_INSCRIT = 'ONGOING'
-const MILO_REFUS_TIERS = 'REFUSAL'
-const MILO_REFUS_JEUNE = 'REFUSAL_YOUNG'
-const MILO_PRESENT = 'ACHIEVED'
 
 function dtoToSessionMilo(
   { session: sessionDto, offre: offreDto }: SessionConseillerDetailDto,

@@ -116,13 +116,13 @@ describe('JeunesMiloController', () => {
           },
           unUtilisateurDecode()
         )
-        .resolves(success([uneSessionJeuneMiloQueryModel]))
+        .resolves(success([uneSessionJeuneMiloQueryModel()]))
 
       await request(app.getHttpServer())
         .get(`/jeunes/milo/${idJeune}/sessions`)
         .set('authorization', `bearer ${token}`)
         .expect(HttpStatus.OK)
-        .expect([uneSessionJeuneMiloQueryModel])
+        .expect([uneSessionJeuneMiloQueryModel()])
     })
 
     it('renvoie une erreur quand le jeune est un jeune PE', async () => {

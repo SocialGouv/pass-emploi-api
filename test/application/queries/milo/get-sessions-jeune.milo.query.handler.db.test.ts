@@ -139,7 +139,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
 
         const uneFailure = failure(new NonTrouveError('Jeune', query.idJeune))
         getSessionsQueryGetter.handle
-          .withArgs('idDossier', 'token')
+          .withArgs('idJeune', 'idDossier', 'token')
           .resolves(uneFailure)
 
         // When
@@ -163,9 +163,9 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
             })
           )
 
-          const unSuccess = success([uneSessionJeuneMiloQueryModel])
+          const unSuccess = success([uneSessionJeuneMiloQueryModel()])
           getSessionsQueryGetter.handle
-            .withArgs('idDossier', 'token')
+            .withArgs('idJeune', 'idDossier', 'token')
             .resolves(unSuccess)
 
           // When
@@ -198,13 +198,12 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
           )
 
           const unSuccess = success([
-            {
-              ...uneSessionJeuneMiloQueryModel,
+            uneSessionJeuneMiloQueryModel({
               inscription: SessionMilo.Inscription.Statut.INSCRIT
-            }
+            })
           ])
           getSessionsQueryGetter.handle
-            .withArgs('idDossier', 'token', {
+            .withArgs('idJeune', 'idDossier', 'token', {
               periode: { debut: undefined, fin: undefined },
               filtrerEstInscrit: true,
               pourConseiller: false
@@ -240,13 +239,12 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
           )
 
           const unSuccess = success([
-            {
-              ...uneSessionJeuneMiloQueryModel,
+            uneSessionJeuneMiloQueryModel({
               inscription: SessionMilo.Inscription.Statut.INSCRIT
-            }
+            })
           ])
           getSessionsQueryGetter.handle
-            .withArgs('idDossier', 'token', {
+            .withArgs('idJeune', 'idDossier', 'token', {
               periode: { debut: undefined, fin: undefined },
               filtrerEstInscrit: undefined,
               pourConseiller: true

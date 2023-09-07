@@ -23,16 +23,21 @@ export const uneSessionConseillerMiloQueryModel: SessionConseillerMiloQueryModel
     statut: SessionMilo.Statut.A_CLOTURER
   }
 
-export const uneSessionJeuneMiloQueryModel: SessionJeuneMiloQueryModel = {
-  id: '1',
-  nomSession: 'Une-session',
-  nomOffre: 'Une-offre',
-  dateHeureDebut: '2020-04-06T13:20:00.000Z',
-  dateHeureFin: '2020-04-08T13:20:00.000Z',
-  type: {
-    code: OffreTypeCode.WORKSHOP,
-    label: 'Atelier'
+export const uneSessionJeuneMiloQueryModel = (
+  args: Partial<SessionJeuneMiloQueryModel> = {}
+): SessionJeuneMiloQueryModel => {
+  const defaults: SessionJeuneMiloQueryModel = {
+    id: '1',
+    nomSession: 'Une-session',
+    nomOffre: 'Une-offre',
+    dateHeureDebut: '2020-04-06T13:20:00.000Z',
+    dateHeureFin: '2020-04-08T13:20:00.000Z',
+    type: {
+      code: OffreTypeCode.WORKSHOP,
+      label: 'Atelier'
+    }
   }
+  return { ...defaults, ...args }
 }
 
 export const unDetailSessionConseillerMiloQueryModel: DetailSessionConseillerMiloQueryModel =
