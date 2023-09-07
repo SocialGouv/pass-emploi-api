@@ -339,6 +339,7 @@ import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-g
 import { EmargementSessionMiloCommandHandler } from 'src/application/commands/milo/emargement-session-milo.command.handler'
 import { GetSessionsConseillerMiloQueryGetter } from './application/queries/query-getters/milo/get-sessions-conseiller.milo.query.getter.db'
 import { ConseillerInterStructureMiloAuthorizer } from './application/authorizers/conseiller-inter-structure-milo-authorizer'
+import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -740,6 +741,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetEvenementEmploiQueryHandler,
     GetSessionsConseillerMiloQueryHandler,
     GetSessionsConseillerMiloQueryGetter,
+    GetAgendaSessionsConseillerMiloQueryHandler,
     GetSessionsJeuneMiloQueryHandler,
     GetSessionsJeuneMiloQueryGetter,
     GetDetailSessionConseillerMiloQueryHandler,

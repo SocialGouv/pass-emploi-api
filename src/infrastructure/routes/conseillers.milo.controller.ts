@@ -15,8 +15,8 @@ import {
 import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-conseiller.milo.query.handler.db'
 import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-sessions-conseiller.milo.query.handler.db'
 import {
-  DetailSessionConseillerMiloQueryModel,
   AgendaConseillerMiloSessionListItemQueryModel,
+  DetailSessionConseillerMiloQueryModel,
   SessionConseillerMiloQueryModel
 } from 'src/application/queries/query-models/sessions.milo.query.model'
 import { isSuccess } from 'src/building-blocks/types/result'
@@ -34,6 +34,8 @@ import {
   GetSessionsQueryParams,
   UpdateSessionMiloPayload
 } from './validation/conseiller-milo.inputs'
+import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
+import { DateTime } from 'luxon'
 
 @Controller('conseillers/milo')
 @ApiOAuth2([])
@@ -42,6 +44,7 @@ export class ConseillersMiloController {
   constructor(
     private readonly getSessionsQueryHandler: GetSessionsConseillerMiloQueryHandler,
     private readonly getDetailSessionQueryHandler: GetDetailSessionConseillerMiloQueryHandler,
+    private readonly getAgendaSessionsQueryHandler: GetAgendaSessionsConseillerMiloQueryHandler,
     private readonly updateSessionCommandHandler: UpdateSessionMiloCommandHandler,
     private readonly emargementSessionCommandHandler: EmargementSessionMiloCommandHandler
   ) {}
@@ -93,12 +96,25 @@ export class ConseillersMiloController {
     isArray: true
   })
   async getAgendaSessions(
-    @Param('idConseiller') _idConseiller: string,
-    @Utilisateur() _utilisateur: Authentification.Utilisateur,
-    @AccessToken() _accessToken: string,
-    @Query() _getSessionsQueryParams: GetAgendaSessionsQueryParams
+    @Param('idConseiller') idConseiller: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string,
+    @Query() getSessionsQueryParams: GetAgendaSessionsQueryParams
   ): Promise<AgendaConseillerMiloSessionListItemQueryModel[]> {
-    throw new Error('not implemented')
+    const result = await this.getAgendaSessionsQueryHandler.execute(
+      {
+        idConseiller,
+        accessToken,
+        dateDebut: DateTime.fromISO(getSessionsQueryParams.dateDebut),
+        dateFin: DateTime.fromISO(getSessionsQueryParams.dateFin)
+      },
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
   }
 
   @ApiOperation({

@@ -23,6 +23,7 @@ import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-mod
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { getDatabase } from '../../../utils/database-for-testing'
 import { testConfig } from '../../../utils/module-for-testing'
+import { unAgendaConseillerMiloSessionListItemQueryModel } from 'test/fixtures/sessions.fixture'
 
 describe('GetAgendaSessionsConseillerMiloQueryHandler', () => {
   let getAgendaSessionsQueryHandler: GetAgendaSessionsConseillerMiloQueryHandler
@@ -208,27 +209,7 @@ describe('GetAgendaSessionsConseillerMiloQueryHandler', () => {
 
         // Then
         expect(result).to.deep.equal(
-          success([
-            {
-              id: '1',
-              nomSession: 'Une-session',
-              nomOffre: 'Une-offre',
-              dateHeureDebut: '2020-04-06T13:20:00.000Z',
-              dateHeureFin: '2020-04-08T13:20:00.000Z',
-              type: {
-                code: 'WORKSHOP',
-                label: 'Atelier'
-              },
-              beneficiaires: [
-                {
-                  idJeune: 'id-hermione',
-                  prenom: 'John',
-                  nom: 'Doe',
-                  statut: 'INSCRIT'
-                }
-              ]
-            }
-          ])
+          success([unAgendaConseillerMiloSessionListItemQueryModel])
         )
       })
     })
