@@ -94,6 +94,20 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
     }
   }
 
+  async getByIdDossier(idDossier: string): Promise<Result<JeuneMilo>> {
+    const jeuneSqlModel = await JeuneSqlModel.findOne({
+      where: { idPartenaire: idDossier }
+    })
+    if (!jeuneSqlModel) {
+      return failure(new NonTrouveError('Dossier Milo', idDossier))
+    }
+    const jeuneMilo: JeuneMilo = {
+      ...fromSqlToJeune(jeuneSqlModel),
+      idStructureMilo: jeuneSqlModel.idStructureMilo ?? undefined
+    }
+    return success(jeuneMilo)
+  }
+
   async creerJeune(
     idDossier: string
   ): Promise<

@@ -17,6 +17,18 @@ export function sessionsMiloSontActiveesPourLeConseiller(
   return sessionsMiloSontActivees(configuration, conseillerMilo.structure.id)
 }
 
+export function estUnEarlyAdopter(
+  configuration: ConfigService,
+  idStructure: string | null | undefined
+): boolean {
+  const FT_IDS_STRUCTURES_EARLY_ADOPTERS: string[] =
+    configuration.get('features.idsStructuresEarlyAdoptersSession') ?? []
+
+  return idStructure
+    ? FT_IDS_STRUCTURES_EARLY_ADOPTERS.includes(idStructure)
+    : false
+}
+
 function sessionsMiloSontActivees(
   configuration: ConfigService,
   idStructure: string | null | undefined
@@ -25,12 +37,7 @@ function sessionsMiloSontActivees(
     'features.recupererSessionsMilo'
   )
 
-  const FT_IDS_STRUCTURES_EARLY_ADOPTERS: string[] =
-    configuration.get('features.idsStructuresEarlyAdoptersSession') ?? []
-
-  const estUnEarlyAdopter = idStructure
-    ? FT_IDS_STRUCTURES_EARLY_ADOPTERS.includes(idStructure)
-    : false
-
-  return FT_RECUPERER_SESSIONS_MILO || estUnEarlyAdopter
+  return (
+    FT_RECUPERER_SESSIONS_MILO || estUnEarlyAdopter(configuration, idStructure)
+  )
 }

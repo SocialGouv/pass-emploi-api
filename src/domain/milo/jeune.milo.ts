@@ -51,6 +51,7 @@ export namespace JeuneMilo {
   export interface Repository {
     get(id: string): Promise<Result<JeuneMilo>>
     getDossier(id: string): Promise<Result<Dossier>>
+    getByIdDossier(idDossier: string): Promise<Result<JeuneMilo>>
     saveSituationsJeune(situations: Situations): Promise<void>
     save(
       jeune: JeuneMilo,
