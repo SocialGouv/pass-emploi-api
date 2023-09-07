@@ -110,6 +110,16 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
     }
   }
 
+  private estUnEarlyAdopter(jeune: JeuneMilo): boolean {
+    const idStructureMilo = jeune.idStructureMilo
+    const FT_IDS_STRUCTURES_EARLY_ADOPTERS: string[] =
+      this.configuration.get('features.idsStructuresEarlyAdoptersSession') ?? []
+
+    return idStructureMilo
+      ? FT_IDS_STRUCTURES_EARLY_ADOPTERS.includes(idStructureMilo)
+      : false
+  }
+
   private async createRendezVousMILO(
     jeune: Jeune,
     maintenant: DateTime,
@@ -126,8 +136,10 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
         jeune
       )
 
-      await this.rendezVousRepository.save(newRendezVousCEJ)
-      this.planifierLesRappelsDeRendezVous(newRendezVousCEJ)
+      if (!this.estUnEarlyAdopter(jeune)) {
+        await this.rendezVousRepository.save(newRendezVousCEJ)
+        this.planifierLesRappelsDeRendezVous(newRendezVousCEJ)
+      }
 
       this.notifier(
         rendezVousMILO,
@@ -177,11 +189,14 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
             rendezVousCEJExistant,
             rendezVousMILO
           )
-        await this.rendezVousRepository.save(rendezVousCEJUpdated)
-        this.replanifierLesRappelsDeRendezVous(
-          rendezVousCEJUpdated,
-          rendezVousCEJExistant
-        )
+
+        if (!this.estUnEarlyAdopter(jeune)) {
+          await this.rendezVousRepository.save(rendezVousCEJUpdated)
+          this.replanifierLesRappelsDeRendezVous(
+            rendezVousCEJUpdated,
+            rendezVousCEJExistant
+          )
+        }
 
         this.notifier(
           rendezVousMILO,
@@ -220,8 +235,10 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
     FT_NOTIFIER_RDV_MILO?: boolean
   ): Promise<SuiviJob> {
     if (rendezVousCEJExistant) {
-      await this.rendezVousRepository.delete(rendezVousCEJExistant.id)
-      this.supprimerLesRappelsDeRendezVous(rendezVousCEJExistant)
+      if (!this.estUnEarlyAdopter(jeune)) {
+        await this.rendezVousRepository.delete(rendezVousCEJExistant.id)
+        this.supprimerLesRappelsDeRendezVous(rendezVousCEJExistant)
+      }
 
       if (rendezVousMILO) {
         this.notifier(

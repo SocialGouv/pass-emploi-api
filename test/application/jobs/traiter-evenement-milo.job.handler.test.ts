@@ -4,7 +4,6 @@ import {
   Traitement,
   TraiterEvenementMiloJobHandler
 } from '../../../src/application/jobs/traiter-evenement-milo.job.handler'
-import { Jeune } from '../../../src/domain/jeune/jeune'
 import { JeuneMilo } from '../../../src/domain/milo/jeune.milo'
 import { Notification } from '../../../src/domain/notification/notification'
 import {
@@ -22,7 +21,7 @@ import {
   unRendezVousMilo
 } from '../../fixtures/partenaire.fixture'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
-import { StubbedClass, expect, stubClass } from '../../utils'
+import { expect, StubbedClass, stubClass } from '../../utils'
 import { testConfig } from '../../utils/module-for-testing'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
@@ -40,7 +39,10 @@ describe('TraiterEvenementMiloJobHandler', () => {
 
   const maintenant = uneDatetime()
 
-  const jeune: Jeune = unJeune()
+  const jeune: JeuneMilo = {
+    ...unJeune(),
+    idStructureMilo: 'id-structure-pas-ea'
+  }
   const idPartenaireBeneficiaire = '123456'
 
   beforeEach(() => {
