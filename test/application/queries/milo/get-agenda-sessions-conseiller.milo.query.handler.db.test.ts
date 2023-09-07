@@ -130,74 +130,11 @@ describe('GetAgendaSessionsConseillerMiloQueryHandler', () => {
           .resolves('idpToken')
       })
 
-      it('récupère la liste des sessions de sa structure Milo auxquelles participent ses bénéficiaires', async () => {
+      it('récupère la liste des sessions de sa structure Milo auxquelles participent ses jeunes', async () => {
         // Given
-        const sessionsDto: SessionConseillerDetailDto[] = [
-          {
-            ...unDetailSessionConseillerDto,
-            session: {
-              ...unDetailSessionConseillerDto.session,
-              id: 1
-            }
-          },
-          {
-            ...unDetailSessionConseillerDto,
-            session: {
-              ...unDetailSessionConseillerDto.session,
-              id: 2
-            }
-          }
-        ]
-        miloClient.getSessionsConseiller
-          .withArgs(
-            'idpToken',
-            conseiller.structure.id,
-            conseiller.structure.timezone,
-            {
-              dateDebut: query.dateDebut,
-              dateFin: query.dateFin
-            }
-          )
-          .resolves(
-            success({
-              page: 1,
-              nbSessions: 2,
-              sessions: sessionsDto
-            })
-          )
-        miloClient.getListeInscritsSession
-          .withArgs('idpToken', sessionsDto[0].session.id.toString())
-          .resolves(
-            success([
-              {
-                idDossier: 12345,
-                idInstanceSession: 13579,
-                nom: 'Granger',
-                prenom: 'Hermione',
-                statut: 'ONGOING'
-              },
-              {
-                idDossier: 67890,
-                idInstanceSession: 24680,
-                nom: 'Potter',
-                prenom: 'Harry',
-                statut: 'REFUSAL'
-              }
-            ])
-          )
-        miloClient.getListeInscritsSession
-          .withArgs('idpToken', sessionsDto[1].session.id.toString())
-          .resolves(
-            success([
-              {
-                idDossier: 666,
-                idInstanceSession: 42,
-                nom: 'Weasley',
-                prenom: 'Ronald',
-                statut: 'ONGOING'
-              }
-            ])
-          )
+        const sessionsDto: SessionConseillerDetailDto[] = getSessionsDto()
+        givenSessionsDuConseiller(miloClient, conseiller, query, sessionsDto)
+        givenInscritsAuxSessions(miloClient, sessionsDto)
         await ConseillerSqlModel.create(unConseillerDto())
         await JeuneSqlModel.bulkCreate([
           unJeuneDto({ id: 'id-hermione', idPartenaire: '12345' }),
@@ -215,3 +152,87 @@ describe('GetAgendaSessionsConseillerMiloQueryHandler', () => {
     })
   })
 })
+
+function getSessionsDto(): SessionConseillerDetailDto[] {
+  return [
+    {
+      ...unDetailSessionConseillerDto,
+      session: {
+        ...unDetailSessionConseillerDto.session,
+        id: 1
+      }
+    },
+    {
+      ...unDetailSessionConseillerDto,
+      session: {
+        ...unDetailSessionConseillerDto.session,
+        id: 2
+      }
+    }
+  ]
+}
+
+function givenSessionsDuConseiller(
+  miloClient: StubbedClass<MiloClient>,
+  conseiller: ConseillerMilo,
+  query: GetAgendaSessionsConseillerMiloQuery,
+  sessionsDto: SessionConseillerDetailDto[]
+): void {
+  miloClient.getSessionsConseiller
+    .withArgs(
+      'idpToken',
+      conseiller.structure.id,
+      conseiller.structure.timezone,
+      {
+        dateDebut: query.dateDebut,
+        dateFin: query.dateFin
+      }
+    )
+    .resolves(
+      success({
+        page: 1,
+        nbSessions: 2,
+        sessions: sessionsDto
+      })
+    )
+}
+
+function givenInscritsAuxSessions(
+  miloClient: StubbedClass<MiloClient>,
+  sessionsDto: SessionConseillerDetailDto[]
+): void {
+  miloClient.getListeInscritsSession
+    .withArgs('idpToken', sessionsDto[0].session.id.toString())
+    .resolves(
+      success([
+        {
+          idDossier: 12345,
+          idInstanceSession: 13579,
+          nom: 'Granger',
+          prenom: 'Hermione',
+          statut: 'ONGOING'
+        },
+        {
+          idDossier: 67890,
+          idInstanceSession: 24680,
+          nom: 'Potter',
+          prenom: 'Harry',
+          statut: 'REFUSAL'
+        }
+      ])
+    )
+
+  miloClient.getListeInscritsSession
+    .withArgs('idpToken', sessionsDto[1].session.id.toString())
+    .resolves(
+      success([
+        {
+          idDossier: 666,
+          idInstanceSession: 42,
+          nom: 'Weasley',
+          prenom: 'Ronald',
+          statut: 'ONGOING'
+        }
+      ])
+    )
+}

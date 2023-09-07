@@ -10,9 +10,10 @@ import { estMilo } from 'src/domain/core'
 import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo'
 import { sessionsMiloSontActiveesPourLeConseiller } from 'src/utils/feature-flip-session-helper'
 import {
-  ListeSessionsConseillerMiloDto,
+  InscritSessionMiloDto,
   MILO_INSCRIT,
-  MILO_PRESENT
+  MILO_PRESENT,
+  SessionConseillerDetailDto
 } from '../../../infrastructure/clients/dto/milo.dto'
 import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client'
 import { MiloClient } from '../../../infrastructure/clients/milo-client'
@@ -73,17 +74,15 @@ export class GetAgendaSessionsConseillerMiloQueryHandler extends QueryHandler<
 
     const { id: idStructureMilo, timezone: timezoneStructure } =
       conseiller.structure
-    const periode = {
-      dateDebut: query.dateDebut,
-      dateFin: query.dateFin
-    }
-    const resultSessionMiloClient: Result<ListeSessionsConseillerMiloDto> =
-      await this.miloClient.getSessionsConseiller(
-        idpToken,
-        idStructureMilo,
-        timezoneStructure,
-        periode
-      )
+    const resultSessionMiloClient = await this.miloClient.getSessionsConseiller(
+      idpToken,
+      idStructureMilo,
+      timezoneStructure,
+      {
+        dateDebut: query.dateDebut,
+        dateFin: query.dateFin
+      }
+    )
 
     if (isFailure(resultSessionMiloClient)) {
       return resultSessionMiloClient
@@ -92,13 +91,9 @@ export class GetAgendaSessionsConseillerMiloQueryHandler extends QueryHandler<
     const sessionsDto = resultSessionMiloClient.data.sessions
     if (!sessionsDto.length) return success([])
 
-    const jeunesSqlModels = await JeuneSqlModel.findAll({
-      where: { idConseiller: conseiller.id }
-    })
-    const jeunesByIdPartenaire = jeunesSqlModels.reduce((tata, sqlModel) => {
-      if (sqlModel.idPartenaire) tata.set(sqlModel.idPartenaire, sqlModel)
-      return tata
-    }, new Map<string, JeuneSqlModel>())
+    const jeunesByIdPartenaire = await this.mapJeunesConseillerByIdPartenaire(
+      conseiller.id
+    )
 
     const resultData: AgendaConseillerMiloSessionListItemQueryModel[] = []
     for (const sessionDto of sessionsDto) {
@@ -106,32 +101,13 @@ export class GetAgendaSessionsConseillerMiloQueryHandler extends QueryHandler<
         idpToken,
         sessionDto.session.id.toString()
       )
-
       if (isFailure(resultInscrits)) continue
-
-      const listeInscritsQueryModels: InscritSessionMiloQueryModel[] =
-        resultInscrits.data
-          .filter(({ idDossier }) =>
-            jeunesByIdPartenaire.has(idDossier.toString())
-          )
-          .filter(
-            ({ statut }) => statut === MILO_INSCRIT || statut === MILO_PRESENT
-          )
-          .map(inscrit => {
-            const sqlModel = jeunesByIdPartenaire.get(
-              inscrit.idDossier.toString()
-            )!
-            return {
-              idJeune: sqlModel.id,
-              nom: sqlModel.nom,
-              prenom: sqlModel.prenom,
-              statut: dtoToStatutInscription(
-                inscrit.statut,
-                sessionDto.session.id,
-                inscrit.idDossier.toString()
-              )
-            }
-          })
+      const listeInscritsQueryModels =
+        this.extractJeunesDuConseillerParticipants(
+          resultInscrits.data,
+          jeunesByIdPartenaire,
+          sessionDto
+        )
 
       if (listeInscritsQueryModels.length) {
         resultData.push(
@@ -144,6 +120,44 @@ export class GetAgendaSessionsConseillerMiloQueryHandler extends QueryHandler<
       }
     }
     return success(resultData)
+  }
+
+  private async mapJeunesConseillerByIdPartenaire(
+    idConseiller: string
+  ): Promise<Map<string, JeuneSqlModel>> {
+    const jeunesSqlModels = await JeuneSqlModel.findAll({
+      where: { idConseiller }
+    })
+    return jeunesSqlModels.reduce((jeunesByIdPartenaire, sqlModel) => {
+      if (sqlModel.idPartenaire)
+        jeunesByIdPartenaire.set(sqlModel.idPartenaire, sqlModel)
+      return jeunesByIdPartenaire
+    }, new Map<string, JeuneSqlModel>())
+  }
+
+  private extractJeunesDuConseillerParticipants(
+    inscrits: InscritSessionMiloDto[],
+    jeunesByIdPartenaire: Map<string, JeuneSqlModel>,
+    sessionDto: SessionConseillerDetailDto
+  ): InscritSessionMiloQueryModel[] {
+    return inscrits
+      .filter(({ idDossier }) => jeunesByIdPartenaire.has(idDossier.toString()))
+      .filter(
+        ({ statut }) => statut === MILO_INSCRIT || statut === MILO_PRESENT
+      )
+      .map(inscrit => {
+        const sqlModel = jeunesByIdPartenaire.get(inscrit.idDossier.toString())!
+        return {
+          idJeune: sqlModel.id,
+          nom: sqlModel.nom,
+          prenom: sqlModel.prenom,
+          statut: dtoToStatutInscription(
+            inscrit.statut,
+            sessionDto.session.id,
+            inscrit.idDossier.toString()
+          )
+        }
+      })
   }
 
   async authorize(

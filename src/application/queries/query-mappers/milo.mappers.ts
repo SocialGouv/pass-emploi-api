@@ -2,7 +2,8 @@ import { Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { SessionMilo } from 'src/domain/milo/session.milo'
 import {
-  MILO_INSCRIT, MILO_PRESENT,
+  MILO_INSCRIT,
+  MILO_PRESENT,
   MILO_REFUS_JEUNE,
   MILO_REFUS_TIERS,
   OffreTypeCode,
