@@ -27,7 +27,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
   let rechercheRepository: StubbedType<Recherche.Repository>
   let findAllOffresEmploiQueryGetter: StubbedClass<FindAllOffresEmploiQueryGetter>
   let notificationService: StubbedClass<Notification.Service>
-  let jeuneRepository: StubbedType<Jeune.Repository>
+  let jeuneRepository: StubbedType<Jeune.ConfigurationApplication.Repository>
   let suiviJobService: StubbedType<SuiviJob.Service>
 
   const date = uneDatetime()
