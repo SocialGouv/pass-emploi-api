@@ -128,7 +128,10 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
       )
 
       // TODO(7 septembre 2023): supprimer ce comportement pour tout le monde quand les sessions seront déployées à tous
-      if (!estUnEarlyAdopter(this.configuration, jeune.idStructureMilo)) {
+      if (
+        !estUnEarlyAdopter(this.configuration, jeune.idStructureMilo) ||
+        rendezVousMILO?.type !== RendezVousMilo.Type.SESSION
+      ) {
         await this.rendezVousRepository.save(newRendezVousCEJ)
         this.planifierLesRappelsDeRendezVous(newRendezVousCEJ)
       }
@@ -183,7 +186,10 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
           )
 
         // TODO(7 septembre 2023): supprimer ce comportement pour tout le monde quand les sessions seront déployées à tous
-        if (!estUnEarlyAdopter(this.configuration, jeune.idStructureMilo)) {
+        if (
+          !estUnEarlyAdopter(this.configuration, jeune.idStructureMilo) ||
+          rendezVousMILO?.type !== RendezVousMilo.Type.SESSION
+        ) {
           await this.rendezVousRepository.save(rendezVousCEJUpdated)
           this.replanifierLesRappelsDeRendezVous(
             rendezVousCEJUpdated,
@@ -229,7 +235,10 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
   ): Promise<SuiviJob> {
     if (rendezVousCEJExistant) {
       // TODO(7 septembre 2023): supprimer ce comportement pour tout le monde quand les sessions seront déployées à tous
-      if (!estUnEarlyAdopter(this.configuration, jeune.idStructureMilo)) {
+      if (
+        !estUnEarlyAdopter(this.configuration, jeune.idStructureMilo) ||
+        rendezVousMILO?.type !== RendezVousMilo.Type.SESSION
+      ) {
         await this.rendezVousRepository.delete(rendezVousCEJExistant.id)
         this.supprimerLesRappelsDeRendezVous(rendezVousCEJExistant)
       }
