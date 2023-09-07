@@ -14,12 +14,12 @@ import { DateService } from '../../../src/utils/date-service'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneOffreServiceCivique } from '../../fixtures/offre-service-civique.fixture'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
-import { StubbedClass, expect, stubClass } from '../../utils'
+import { expect, StubbedClass, stubClass } from '../../utils'
 
 describe('NotifierRecherchesServiceCiviqueJobHandler', () => {
   describe('handle', () => {
     let rechercheRepository: StubbedType<Recherche.Repository>
-    let jeuneRepository: StubbedType<Jeune.Repository>
+    let jeuneRepository: StubbedType<Jeune.ConfigurationApplication.Repository>
     let notificationService: StubbedClass<Notification.Service>
     let findAllOffresServicesCiviqueQueryGetter: StubbedClass<FindAllOffresServicesCiviqueQueryGetter>
     let dateService: StubbedClass<DateService>
