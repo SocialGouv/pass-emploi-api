@@ -23,9 +23,9 @@ import { RateLimiterService } from '../../../../src/utils/rate-limiter.service'
 import { unConseiller } from '../../../fixtures/conseiller.fixture'
 import { uneDatetime } from '../../../fixtures/date.fixture'
 import {
+  uneConfiguration,
   unJeune,
-  unJeuneSansConseiller,
-  uneConfiguration
+  unJeuneSansConseiller
 } from '../../../fixtures/jeune.fixture'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { stubClass } from '../../../utils'
@@ -173,7 +173,7 @@ describe('MiloHttpRepository', () => {
     })
   })
 
-  describe.only('getByIdDossier', () => {
+  describe('getByIdDossier', () => {
     describe('quand un jeune existe avec cet id dossier', () => {
       it('retourne le jeune avec sa structure Milo', async () => {
         // Given
