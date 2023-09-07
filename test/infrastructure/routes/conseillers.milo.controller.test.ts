@@ -13,8 +13,12 @@ import {
   success
 } from 'src/building-blocks/types/result'
 import * as request from 'supertest'
-import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import {
+  ErreurHttp,
+  NonTrouveError
+} from 'src/building-blocks/types/domain-error'
+import {
+  unAgendaConseillerMiloSessionListItemQueryModel,
   unDetailSessionConseillerMiloQueryModel,
   uneSessionConseillerMiloQueryModel
 } from 'test/fixtures/sessions.fixture'
@@ -24,10 +28,13 @@ import {
   UpdateSessionMiloCommandHandler
 } from 'src/application/commands/milo/update-session-milo.command.handler'
 import { SessionMilo } from 'src/domain/milo/session.milo'
+import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
+import { DateTime } from 'luxon'
 
 describe('ConseillersMiloController', () => {
   let getSessionsQueryHandler: StubbedClass<GetSessionsConseillerMiloQueryHandler>
   let getDetailSessionQueryHandler: StubbedClass<GetDetailSessionConseillerMiloQueryHandler>
+  let getAgendaSessionsQueryHandler: StubbedClass<GetAgendaSessionsConseillerMiloQueryHandler>
   let updateSessionCommandHandler: StubbedClass<UpdateSessionMiloCommandHandler>
 
   let app: INestApplication
@@ -38,6 +45,9 @@ describe('ConseillersMiloController', () => {
     getSessionsQueryHandler = app.get(GetSessionsConseillerMiloQueryHandler)
     getDetailSessionQueryHandler = app.get(
       GetDetailSessionConseillerMiloQueryHandler
+    )
+    getAgendaSessionsQueryHandler = app.get(
+      GetAgendaSessionsConseillerMiloQueryHandler
     )
     updateSessionCommandHandler = app.get(UpdateSessionMiloCommandHandler)
   })
@@ -122,6 +132,56 @@ describe('ConseillersMiloController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       '/conseillers/milo/1/sessions'
+    )
+  })
+
+  describe('GET /conseillers/milo/:idConseiller/agenda/sessions', () => {
+    it('renvoie une 200 quand tout va bien', async () => {
+      // Given
+      getAgendaSessionsQueryHandler.execute.resolves(
+        success([unAgendaConseillerMiloSessionListItemQueryModel])
+      )
+
+      // When - Then
+      await request(app.getHttpServer())
+        .get(
+          `/conseillers/milo/id-conseiller/agenda/sessions?dateDebut=2023-01-01&dateFin=2023-01-08`
+        )
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+        .expect([unAgendaConseillerMiloSessionListItemQueryModel])
+
+      expect(
+        getAgendaSessionsQueryHandler.execute
+      ).to.have.been.calledOnceWithExactly(
+        {
+          idConseiller: 'id-conseiller',
+          accessToken: 'coucou',
+          dateDebut: DateTime.fromISO('2023-01-01'),
+          dateFin: DateTime.fromISO('2023-01-08')
+        },
+        unUtilisateurDecode()
+      )
+    })
+
+    it('renvoie une 404 quand quelque chose se passe mal', async () => {
+      // Given
+      getAgendaSessionsQueryHandler.execute.resolves(
+        failure(new ErreurHttp('Ressource Milo introuvable', 404))
+      )
+
+      // When - Then
+      await request(app.getHttpServer())
+        .get(
+          `/conseillers/milo/id-conseiller/agenda/sessions?dateDebut=2023-01-01&dateFin=2023-01-08`
+        )
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.NOT_FOUND)
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/conseillers/milo/1/agenda/sessions'
     )
   })
 

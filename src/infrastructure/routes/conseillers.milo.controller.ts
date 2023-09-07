@@ -15,6 +15,7 @@ import {
 import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-conseiller.milo.query.handler.db'
 import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-sessions-conseiller.milo.query.handler.db'
 import {
+  AgendaConseillerMiloSessionListItemQueryModel,
   DetailSessionConseillerMiloQueryModel,
   SessionConseillerMiloQueryModel
 } from 'src/application/queries/query-models/sessions.milo.query.model'
@@ -29,9 +30,12 @@ import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'
 import {
   EmargementsSessionMiloPayload,
+  GetAgendaSessionsQueryParams,
   GetSessionsQueryParams,
   UpdateSessionMiloPayload
 } from './validation/conseiller-milo.inputs'
+import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
+import { DateTime } from 'luxon'
 
 @Controller('conseillers/milo')
 @ApiOAuth2([])
@@ -40,6 +44,7 @@ export class ConseillersMiloController {
   constructor(
     private readonly getSessionsQueryHandler: GetSessionsConseillerMiloQueryHandler,
     private readonly getDetailSessionQueryHandler: GetDetailSessionConseillerMiloQueryHandler,
+    private readonly getAgendaSessionsQueryHandler: GetAgendaSessionsConseillerMiloQueryHandler,
     private readonly updateSessionCommandHandler: UpdateSessionMiloCommandHandler,
     private readonly emargementSessionCommandHandler: EmargementSessionMiloCommandHandler
   ) {}
@@ -70,6 +75,38 @@ export class ConseillersMiloController {
           getSessionsQueryParams.dateFin
         ),
         filtrerAClore: getSessionsQueryParams.filtrerAClore
+      },
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
+  }
+
+  @ApiOperation({
+    summary:
+      'Récupère la liste des sessions de sa structure MILO auxquelles participent ses bénéficiaires',
+    description: 'Autorisé pour le conseiller Milo'
+  })
+  @Get('/:idConseiller/agenda/sessions')
+  @ApiResponse({
+    type: AgendaConseillerMiloSessionListItemQueryModel,
+    isArray: true
+  })
+  async getAgendaSessions(
+    @Param('idConseiller') idConseiller: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string,
+    @Query() getSessionsQueryParams: GetAgendaSessionsQueryParams
+  ): Promise<AgendaConseillerMiloSessionListItemQueryModel[]> {
+    const result = await this.getAgendaSessionsQueryHandler.execute(
+      {
+        idConseiller,
+        accessToken,
+        dateDebut: DateTime.fromISO(getSessionsQueryParams.dateDebut),
+        dateFin: DateTime.fromISO(getSessionsQueryParams.dateFin)
       },
       utilisateur
     )

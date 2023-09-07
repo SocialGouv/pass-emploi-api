@@ -34,6 +34,16 @@ export class GetSessionsQueryParams {
   filtrerAClore?: boolean
 }
 
+export class GetAgendaSessionsQueryParams {
+  @IsNotEmpty()
+  @IsDateString()
+  dateDebut: string
+
+  @IsNotEmpty()
+  @IsDateString()
+  dateFin: string
+}
+
 class InscriptionSessionMiloPayload {
   @ApiProperty()
   @IsString()

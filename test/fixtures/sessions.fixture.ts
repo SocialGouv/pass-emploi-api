@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
 import {
+  AgendaConseillerMiloSessionListItemQueryModel,
   DetailSessionConseillerMiloQueryModel,
   DetailSessionJeuneMiloQueryModel,
   SessionConseillerMiloQueryModel,
@@ -82,6 +83,27 @@ export const unDetailSessionJeuneMiloQueryModel: DetailSessionJeuneMiloQueryMode
     commentaire: 'Un-commentaire',
     dateMaxInscription: '2020-04-07T10:20:00.000Z',
     nbPlacesDisponibles: 10
+  }
+
+export const unAgendaConseillerMiloSessionListItemQueryModel: AgendaConseillerMiloSessionListItemQueryModel =
+  {
+    id: '1',
+    nomSession: 'Une-session',
+    nomOffre: 'Une-offre',
+    dateHeureDebut: '2020-04-06T13:20:00.000Z',
+    dateHeureFin: '2020-04-08T13:20:00.000Z',
+    type: {
+      code: 'WORKSHOP',
+      label: 'Atelier'
+    },
+    beneficiaires: [
+      {
+        idJeune: 'id-hermione',
+        prenom: 'John',
+        nom: 'Doe',
+        statut: SessionMilo.Inscription.Statut.INSCRIT
+      }
+    ]
   }
 
 export const uneSessionMilo = (
