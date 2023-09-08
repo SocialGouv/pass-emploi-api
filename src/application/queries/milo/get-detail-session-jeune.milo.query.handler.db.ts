@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
 import {
@@ -21,7 +21,6 @@ import {
 } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { estMilo } from 'src/domain/core'
-import { JeunesRepositoryToken } from 'src/domain/jeune/jeune'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
@@ -39,7 +38,6 @@ export class GetDetailSessionJeuneMiloQueryHandler extends QueryHandler<
   Result<DetailSessionJeuneMiloQueryModel>
 > {
   constructor(
-    @Inject(JeunesRepositoryToken)
     private readonly keycloakClient: KeycloakClient,
     private readonly miloClient: MiloClient,
     private readonly jeuneAuthorizer: JeuneAuthorizer
