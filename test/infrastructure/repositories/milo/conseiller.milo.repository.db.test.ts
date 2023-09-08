@@ -6,6 +6,7 @@ import { failure, success } from '../../../../src/building-blocks/types/result'
 import { ConseillerMiloSqlRepository } from '../../../../src/infrastructure/repositories/milo/conseiller.milo.repository.db'
 import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { StructureMiloSqlModel } from '../../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
+import { uneDatetime } from '../../../fixtures/date.fixture'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { expect } from '../../../utils'
 import { getDatabase } from '../../../utils/database-for-testing'
@@ -86,6 +87,31 @@ describe('ConseillerMiloSqlRepository', () => {
       // Then
       const conseillerTrouve = await ConseillerSqlModel.findByPk(idConseiller)
       expect(conseillerTrouve?.idStructureMilo).to.equal(idStructureMilo)
+      expect(conseillerTrouve?.dateMajStructureMilo).to.equal(null)
+    })
+    it('met à jour la dateMajStructure Milo du conseiller', async () => {
+      // Given
+      const idStructureMilo = '1'
+      await StructureMiloSqlModel.create({
+        id: idStructureMilo,
+        nomOfficiel: 'Structure',
+        timezone: 'Europe/Paris'
+      })
+      await ConseillerSqlModel.create(unConseillerDto({ id: idConseiller }))
+
+      // When
+      await conseillerMiloSqlRepository.save({
+        id: idConseiller,
+        idStructure: idStructureMilo,
+        dateMajStructureMilo: uneDatetime()
+      })
+
+      // Then
+      const conseillerTrouve = await ConseillerSqlModel.findByPk(idConseiller)
+      expect(conseillerTrouve?.idStructureMilo).to.equal(idStructureMilo)
+      expect(conseillerTrouve?.dateMajStructureMilo).to.deep.equal(
+        uneDatetime().toJSDate()
+      )
     })
     it('met un idStructureMilo à null pour le conseiller', async () => {
       // Given

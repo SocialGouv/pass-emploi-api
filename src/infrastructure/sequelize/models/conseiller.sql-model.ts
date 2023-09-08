@@ -65,6 +65,12 @@ export class ConseillerDto extends Model {
   dateVerificationMessages: Date
 
   @Column({
+    field: 'date_maj_structure_milo',
+    type: DataType.DATE
+  })
+  dateMajStructureMilo: Date | null
+
+  @Column({
     field: 'date_derniere_connexion',
     type: DataType.DATE
   })

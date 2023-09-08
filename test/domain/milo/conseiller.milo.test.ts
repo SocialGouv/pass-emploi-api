@@ -12,6 +12,10 @@ import { MiloClient } from '../../../src/infrastructure/clients/milo-client'
 import { unConseillerMilo } from '../../fixtures/conseiller-milo.fixture'
 import { uneStructureConseillerMiloDto } from '../../fixtures/milo-dto.fixture'
 import { StubbedClass, stubClass } from '../../utils'
+import { DateService } from '../../../src/utils/date-service'
+import { uneDatetime } from '../../fixtures/date.fixture'
+
+const maintenant = uneDatetime()
 
 describe('Conseiller.Milo', () => {
   describe('Service', () => {
@@ -19,16 +23,20 @@ describe('Conseiller.Milo', () => {
     let conseillerMiloRepository: StubbedType<Conseiller.Milo.Repository>
     let miloClient: StubbedClass<MiloClient>
     let keycloakClient: StubbedClass<KeycloakClient>
+    let dateService: StubbedClass<DateService>
 
     beforeEach(() => {
       const sandbox = createSandbox()
       conseillerMiloRepository = stubInterface(sandbox)
       miloClient = stubClass(MiloClient)
       keycloakClient = stubClass(KeycloakClient)
+      dateService = stubClass(DateService)
+      dateService.now.returns(maintenant)
       conseillerMiloService = new Conseiller.Milo.Service(
         conseillerMiloRepository,
         miloClient,
-        keycloakClient
+        keycloakClient,
+        dateService
       )
     })
 
@@ -139,7 +147,8 @@ describe('Conseiller.Milo', () => {
 
         const conseillerMiloAvecStructure = {
           id: idConseiller,
-          idStructure: idNouvelleStructure
+          idStructure: idNouvelleStructure,
+          dateMajStructureMilo: maintenant
         }
 
         // When
@@ -185,7 +194,8 @@ describe('Conseiller.Milo', () => {
 
         const conseillerMiloAvecStructure = {
           id: idConseiller,
-          idStructure: null
+          idStructure: null,
+          dateMajStructureMilo: maintenant
         }
 
         // When

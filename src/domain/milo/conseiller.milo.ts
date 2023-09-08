@@ -11,6 +11,8 @@ import { MiloClient } from '../../infrastructure/clients/milo-client'
 import { getAPMInstance } from '../../infrastructure/monitoring/apm.init'
 import { buildError } from '../../utils/logger.module'
 import { Conseiller } from '../conseiller/conseiller'
+import { DateTime } from 'luxon'
+import { DateService } from '../../utils/date-service'
 
 export const ConseillerMiloRepositoryToken = 'ConseillerMilo.Repository'
 
@@ -24,7 +26,11 @@ export namespace ConseillerMilo {
 
   export interface Repository {
     get(idConseiller: string): Promise<Result<ConseillerMilo>>
-    save(conseiller: { id: string; idStructure: string | null }): Promise<void>
+    save(conseiller: {
+      id: string
+      idStructure: string | null
+      dateMajStructureMilo?: DateTime
+    }): Promise<void>
     structureExiste(idStructure: string): Promise<boolean>
   }
 
@@ -37,7 +43,8 @@ export namespace ConseillerMilo {
       @Inject(ConseillerMiloRepositoryToken)
       private conseillerMiloRepository: Conseiller.Milo.Repository,
       private miloClient: MiloClient,
-      private keycloakClient: KeycloakClient
+      private keycloakClient: KeycloakClient,
+      private dateService: DateService
     ) {
       this.logger = new Logger('ConseillerMiloService')
       this.apmService = getAPMInstance()
@@ -88,14 +95,16 @@ export namespace ConseillerMilo {
           )
           await this.conseillerMiloRepository.save({
             id: idConseiller,
-            idStructure: null
+            idStructure: null,
+            dateMajStructureMilo: this.dateService.now()
           })
           return
         }
 
         await this.conseillerMiloRepository.save({
           id: idConseiller,
-          idStructure
+          idStructure,
+          dateMajStructureMilo: this.dateService.now()
         })
       } catch (e) {
         this.logger.error(
