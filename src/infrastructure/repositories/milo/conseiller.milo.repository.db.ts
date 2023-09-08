@@ -7,6 +7,7 @@ import { Result, failure, success } from '../../../building-blocks/types/result'
 import { Conseiller } from '../../../domain/conseiller/conseiller'
 import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
 import { StructureMiloSqlModel } from '../../sequelize/models/structure-milo.sql-model'
+import { DateTime } from 'luxon'
 
 @Injectable()
 export class ConseillerMiloSqlRepository implements Conseiller.Milo.Repository {
@@ -36,10 +37,13 @@ export class ConseillerMiloSqlRepository implements Conseiller.Milo.Repository {
   async save(conseiller: {
     id: string
     idStructure: string | null
+    dateMajStructureMilo?: DateTime
   }): Promise<void> {
     await ConseillerSqlModel.update(
       {
-        idStructureMilo: conseiller.idStructure
+        idStructureMilo: conseiller.idStructure,
+        dateMajStructureMilo:
+          conseiller.dateMajStructureMilo?.toJSDate() ?? null
       },
       { where: { id: conseiller.id } }
     )
