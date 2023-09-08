@@ -20,7 +20,7 @@ sequelize.transaction(async transaction => {
 
   for (jeune of jeunesEarlyAdopters) {
     await sequelize.query(
-      `DELETE FROM rendez_vous 
+      `UPDATE rendez_vous SET date_suppression = NOW()
       WHERE rendez_vous.id IN (SELECT rendez_vous.id FROM rendez_vous JOIN rendez_vous_jeune_association 
       ON 
       rendez_vous_jeune_association.id_rendez_vous = rendez_vous.id 
