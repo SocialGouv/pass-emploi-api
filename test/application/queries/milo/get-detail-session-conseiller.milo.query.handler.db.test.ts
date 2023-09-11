@@ -5,7 +5,7 @@ import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-aut
 import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-conseiller.milo.query.handler.db'
 import { ConseillerMiloSansStructure } from 'src/building-blocks/types/domain-error'
 import { failure, isSuccess, success } from 'src/building-blocks/types/result'
-import { ConseillerMilo } from 'src/domain/milo/conseiller.milo'
+import { ConseillerMilo } from 'src/domain/milo/conseiller.milo.db'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'

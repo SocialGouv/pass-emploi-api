@@ -9,7 +9,7 @@ import {
 } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
 import { ConseillerMiloSansStructure } from 'src/building-blocks/types/domain-error'
 import { failure, success } from 'src/building-blocks/types/result'
-import { ConseillerMilo } from 'src/domain/milo/conseiller.milo'
+import { ConseillerMilo } from 'src/domain/milo/conseiller.milo.db'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
 import { unDetailSessionConseillerDto } from 'test/fixtures/milo-dto.fixture'
