@@ -1,7 +1,6 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
 import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import * as request from 'supertest'
-import { unHeaderAuthorization } from 'test/fixtures/authentification.fixture'
 import { expect, StubbedClass } from 'test/utils'
 import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
 import { SendNotificationsNouveauxMessagesExterneCommandHandler } from '../../../src/application/commands/send-notifications-nouveaux-messages-externe.command.handler'
@@ -42,8 +41,8 @@ describe('ConseillersPoleEmploiController', () => {
           .post(
             '/conseillers/pole-emploi/id-auth-conseiller/beneficiaires/notifier-message'
           )
+          .set({ 'X-API-KEY': 'ceci-est-encore-une-autre-api-key' })
           .send(payload)
-          .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.CREATED)
 
         expect(
@@ -81,8 +80,8 @@ describe('ConseillersPoleEmploiController', () => {
           .post(
             '/conseillers/pole-emploi/id-auth-conseiller/beneficiaires/notifier-message'
           )
+          .set({ 'X-API-KEY': 'ceci-est-encore-une-autre-api-key' })
           .send(payload)
-          .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.NOT_FOUND)
       })
     })
@@ -106,9 +105,44 @@ describe('ConseillersPoleEmploiController', () => {
           .post(
             '/conseillers/pole-emploi/id-auth-conseiller/beneficiaires/notifier-message'
           )
+          .set({ 'X-API-KEY': 'ceci-est-encore-une-autre-api-key' })
           .send(payload)
-          .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.FORBIDDEN)
+      })
+    })
+
+    describe('est sécurisée', () => {
+      it('retourne 401 API KEY non présente', async () => {
+        // When
+        const result = await request(app.getHttpServer())
+          .post(
+            '/conseillers/pole-emploi/id-auth-conseiller/beneficiaires/notifier-message'
+          )
+          .send({})
+
+        // Then
+        expect(result.body).to.deep.equal({
+          statusCode: 401,
+          message: "API KEY non présent dans le header 'X-API-KEY'",
+          error: 'Unauthorized'
+        })
+      })
+
+      it('retourne 401 API KEY non valide', async () => {
+        // When
+        const result = await request(app.getHttpServer())
+          .post(
+            '/conseillers/pole-emploi/id-auth-conseiller/beneficiaires/notifier-message'
+          )
+          .send({})
+          .set({ 'X-API-KEY': 'ceci-est-une-api-key-invalide' })
+
+        // Then
+        expect(result.body).to.deep.equal({
+          statusCode: 401,
+          message: 'API KEY non valide',
+          error: 'Unauthorized'
+        })
       })
     })
   })
