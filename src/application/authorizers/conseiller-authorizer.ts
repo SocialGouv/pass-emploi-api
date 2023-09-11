@@ -1,16 +1,21 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
 import {
-  Result,
+  DroitsInsuffisants,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
+import {
   emptySuccess,
-  failure
+  failure,
+  Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import {
   Conseiller,
   ConseillersRepositoryToken
 } from '../../domain/conseiller/conseiller'
+import { Core } from '../../domain/core'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import Structure = Core.Structure
 
 @Injectable()
 export class ConseillerAuthorizer {
@@ -167,5 +172,28 @@ export class ConseillerAuthorizer {
     }
 
     return failure(new DroitsInsuffisants())
+  }
+
+  async autoriserLeConseillerExterne(
+    idAuthentificationConseiller: string
+  ): Promise<Result> {
+    const conseiller = await this.conseillerRepository.getByAuthentification(
+      idAuthentificationConseiller
+    )
+    if (!conseiller)
+      return failure(
+        new NonTrouveError(
+          'Conseiller',
+          'idAuthentification ' + idAuthentificationConseiller
+        )
+      )
+
+    if (
+      conseiller.structure !== Structure.POLE_EMPLOI &&
+      conseiller.structure !== Structure.POLE_EMPLOI_BRSA
+    )
+      return failure(new DroitsInsuffisants())
+
+    return emptySuccess()
   }
 }

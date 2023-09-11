@@ -34,6 +34,7 @@ import { DeleteRendezVousCommandHandler } from './application/commands/delete-re
 import { DeleteSuperviseursCommandHandler } from './application/commands/delete-superviseurs.command.handler'
 import { EnvoyerMessageGroupeCommandHandler } from './application/commands/envoyer-message-groupe.command.handler'
 import { NotifierNouvellesImmersionsCommandHandler } from './application/commands/notifier-nouvelles-immersions.command.handler'
+import { SendNotificationsNouveauxMessagesExterneCommandHandler } from './application/commands/send-notifications-nouveaux-messages-externe.command.handler'
 import { SendNotificationsNouveauxMessagesCommandHandler } from './application/commands/send-notifications-nouveaux-messages.command.handler'
 import { PlanifierExecutionCronCommandHandler } from './application/tasks/planifier-execution-cron.command.handler'
 import { InitCronsCommandHandler } from './application/tasks/init-crons.command'
@@ -154,6 +155,7 @@ import { SuperviseurSqlRepository } from './infrastructure/repositories/supervis
 import { ActionsController } from './infrastructure/routes/actions.controller'
 import { AuthentificationController } from './infrastructure/routes/authentification.controller'
 import { ConseillersController } from './infrastructure/routes/conseillers.controller'
+import { ConseillersPoleEmploiController } from './infrastructure/routes/conseillers.pole-emploi.controller'
 import { EvenementsController } from './infrastructure/routes/evenements.controller'
 import { FavorisController } from './infrastructure/routes/favoris.controller'
 import { HealthController } from './infrastructure/routes/health.controller'
@@ -364,6 +366,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     ConseillersController,
     ConseillersControllerV2,
     ConseillersMiloController,
+    ConseillersPoleEmploiController,
     RendezVousController,
     EtablissementsController,
     EtablissementsControllerV2,
@@ -633,6 +636,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetRendezVousJeuneQueryHandler,
     GetRendezVousJeunePoleEmploiQueryHandler,
     SendNotificationsNouveauxMessagesCommandHandler,
+    SendNotificationsNouveauxMessagesExterneCommandHandler,
     DeleteActionCommandHandler,
     CreateRechercheCommandHandler,
     GetRecherchesQueryHandler,
