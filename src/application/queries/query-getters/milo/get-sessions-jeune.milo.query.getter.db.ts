@@ -7,6 +7,7 @@ import { Core } from 'src/domain/core'
 import {
   ListeSessionsJeuneMiloDto,
   MILO_INSCRIT,
+  MILO_PRESENT,
   SessionJeuneListeDto
 } from 'src/infrastructure/clients/dto/milo.dto'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
@@ -148,7 +149,9 @@ function recupererSessionsAuxquellesLeJeuneEstInscrit(
   sessions: SessionJeuneListeDto[]
 ): SessionJeuneListeDto[] {
   return sessions.filter(
-    session => session.sessionInstance?.statut === MILO_INSCRIT
+    session =>
+      session.sessionInstance?.statut === MILO_INSCRIT ||
+      session.sessionInstance?.statut === MILO_PRESENT
   )
 }
 
