@@ -87,7 +87,7 @@ describe('ConseillerMiloSqlRepository', () => {
       // Then
       const conseillerTrouve = await ConseillerSqlModel.findByPk(idConseiller)
       expect(conseillerTrouve?.idStructureMilo).to.equal(idStructureMilo)
-      expect(conseillerTrouve?.dateMajStructureMilo).to.equal(null)
+      expect(conseillerTrouve?.dateVerificationStructureMilo).to.equal(null)
     })
     it('met à jour la dateMajStructure Milo du conseiller', async () => {
       // Given
@@ -103,13 +103,13 @@ describe('ConseillerMiloSqlRepository', () => {
       await conseillerMiloSqlRepository.save({
         id: idConseiller,
         idStructure: idStructureMilo,
-        dateMajStructureMilo: uneDatetime()
+        dateVerificationStructureMilo: uneDatetime()
       })
 
       // Then
       const conseillerTrouve = await ConseillerSqlModel.findByPk(idConseiller)
       expect(conseillerTrouve?.idStructureMilo).to.equal(idStructureMilo)
-      expect(conseillerTrouve?.dateMajStructureMilo).to.deep.equal(
+      expect(conseillerTrouve?.dateVerificationStructureMilo).to.deep.equal(
         uneDatetime().toJSDate()
       )
     })

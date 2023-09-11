@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
-import { ConseillerMilo } from 'src/domain/milo/conseiller.milo'
+import { ConseillerMilo } from 'src/domain/milo/conseiller.milo.db'
 
 // TODO(5 septembre 2023): supprimer ce fichier quand les sessions seront déployées à tout le monde
 export function sessionsMiloSontActiveesPourLeJeune(

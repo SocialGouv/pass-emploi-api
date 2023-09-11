@@ -6,7 +6,7 @@ import {
   isFailure,
   success
 } from 'src/building-blocks/types/result'
-import { ConseillerMilo } from 'src/domain/milo/conseiller.milo'
+import { ConseillerMilo } from 'src/domain/milo/conseiller.milo.db'
 import { InscriptionsATraiter, SessionMilo } from 'src/domain/milo/session.milo'
 import {
   InscritSessionMiloDto,

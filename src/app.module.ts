@@ -310,7 +310,7 @@ import { GetEvenementsEmploiQueryHandler } from './application/queries/get-evene
 import { GetEvenementEmploiQueryHandler } from './application/queries/get-evenement-emploi.query.handler'
 import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-sessions-conseiller.milo.query.handler.db'
 import { MiloClient } from './infrastructure/clients/milo-client'
-import { ConseillerMiloRepositoryToken } from './domain/milo/conseiller.milo'
+import { ConseillerMiloRepositoryToken } from './domain/milo/conseiller.milo.db'
 import { ConseillerMiloSqlRepository } from './infrastructure/repositories/milo/conseiller.milo.repository.db'
 import { ConseillersMiloController } from './infrastructure/routes/conseillers.milo.controller'
 import { EvenementEmploiCodePostalQueryGetter } from 'src/application/queries/query-getters/evenement-emploi-code-postal.query.getter'

@@ -16,7 +16,7 @@ export function unConseillerDto(
     dateCreation: uneDatetime().toJSDate(),
     dateVerificationMessages: uneDatetime().toJSDate(),
     dateDerniereConnexion: null,
-    dateMajStructureMilo: null,
+    dateVerificationStructureMilo: null,
     idAgence: undefined,
     nomManuelAgence: undefined,
     notificationsSonores: false,

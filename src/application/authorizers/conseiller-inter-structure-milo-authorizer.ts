@@ -8,7 +8,7 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Conseiller } from '../../domain/conseiller/conseiller'
-import { ConseillerMiloRepositoryToken } from '../../domain/milo/conseiller.milo'
+import { ConseillerMiloRepositoryToken } from '../../domain/milo/conseiller.milo.db'
 import {
   JeuneMilo,
   MiloJeuneRepositoryToken

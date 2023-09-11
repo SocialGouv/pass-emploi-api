@@ -13,7 +13,7 @@ import {
   SessionMiloRepositoryToken
 } from 'src/domain/milo/session.milo'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
-import { ConseillerMiloRepositoryToken } from '../../../domain/milo/conseiller.milo'
+import { ConseillerMiloRepositoryToken } from '../../../domain/milo/conseiller.milo.db'
 import { Conseiller } from '../../../domain/conseiller/conseiller'
 import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client'
 import { DateService } from 'src/utils/date-service'

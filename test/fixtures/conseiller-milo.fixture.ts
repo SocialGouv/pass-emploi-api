@@ -1,4 +1,4 @@
-import { ConseillerMilo } from '../../src/domain/milo/conseiller.milo'
+import { ConseillerMilo } from '../../src/domain/milo/conseiller.milo.db'
 
 export const unConseillerMilo = (
   args: Partial<ConseillerMilo> = {}

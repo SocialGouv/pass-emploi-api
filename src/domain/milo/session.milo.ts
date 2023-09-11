@@ -10,7 +10,7 @@ import {
   Result,
   success
 } from 'src/building-blocks/types/result'
-import { ConseillerMilo } from './conseiller.milo'
+import { ConseillerMilo } from './conseiller.milo.db'
 
 export const SessionMiloRepositoryToken = 'SessionMilo.Repository'
 

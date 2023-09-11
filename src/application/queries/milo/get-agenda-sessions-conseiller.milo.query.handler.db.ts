@@ -7,7 +7,7 @@ import { isFailure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Conseiller } from 'src/domain/conseiller/conseiller'
 import { estMilo } from 'src/domain/core'
-import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo'
+import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo.db'
 import { sessionsMiloSontActiveesPourLeConseiller } from 'src/utils/feature-flip-session-helper'
 import {
   InscritSessionMiloDto,
