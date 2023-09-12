@@ -206,8 +206,14 @@ function dtoToSessionMilo(
       : undefined
   }
 
-  if (sessionDto.dateMaxInscription)
-    session.dateMaxInscription = DateTime.fromISO(sessionDto.dateMaxInscription)
+  if (sessionDto.dateMaxInscription) {
+    session.dateMaxInscription = DateTime.fromISO(
+      sessionDto.dateMaxInscription,
+      {
+        zone: structureMilo.timezone
+      }
+    )
+  }
   if (sessionSql) {
     session.estVisible = sessionSql.estVisible
     session.dateModification = DateTime.fromJSDate(sessionSql.dateModification)

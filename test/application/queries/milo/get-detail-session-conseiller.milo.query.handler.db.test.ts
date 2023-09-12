@@ -133,6 +133,7 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
         expect(result).to.deep.equal(
           success({
             ...unDetailSessionConseillerMiloQueryModel,
+            dateMaxInscription: '2020-04-07T23:59:59.999Z',
             inscriptions: [
               {
                 idJeune: 'id-hermione',

@@ -160,7 +160,14 @@ export function mapDetailSessionJeuneDtoToQueryModel(
     nomPartenaire: sessionDto.offre.nomPartenaire ?? undefined,
     description: sessionDto.offre.description ?? undefined,
     commentaire: sessionDto.session.commentaire ?? undefined,
-    dateMaxInscription: sessionDto.session.dateMaxInscription ?? undefined,
+    dateMaxInscription: sessionDto.session.dateMaxInscription
+      ? DateTime.fromISO(sessionDto.session.dateMaxInscription, {
+          zone: timezone
+        })
+          .endOf('day')
+          .toUTC()
+          .toISO()
+      : undefined,
     nbPlacesDisponibles: sessionDto.session.nbPlacesDisponibles ?? undefined
   }
   if (inscription)
@@ -194,10 +201,12 @@ export function mapSessionToDetailSessionConseillerQueryModel(
     )
   }
 
-  if (session.dateMaxInscription)
+  if (session.dateMaxInscription) {
     sessionQueryModel.dateMaxInscription = session.dateMaxInscription
       .toUTC()
+      .endOf('day')
       .toISO()
+  }
   if (session.nbPlacesDisponibles)
     sessionQueryModel.nbPlacesDisponibles = session.nbPlacesDisponibles
   if (session.commentaire) sessionQueryModel.commentaire = session.commentaire

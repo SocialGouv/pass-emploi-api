@@ -27,6 +27,10 @@ import {
   MILO_REFUS_JEUNE,
   MILO_REFUS_TIERS
 } from '../../../../src/infrastructure/clients/dto/milo.dto'
+const structureConseiller = {
+  id: 'structure-milo',
+  timezone: 'America/Cayenne'
+}
 
 describe('SessionMiloHttpSqlRepository', () => {
   let miloClient: StubbedClass<MiloClient>
@@ -41,10 +45,6 @@ describe('SessionMiloHttpSqlRepository', () => {
 
   describe('.getForConseiller', () => {
     const idSession = 'idSession'
-    const structureConseiller = {
-      id: 'structure-milo',
-      timezone: 'America/Cayenne'
-    }
     const tokenMilo = 'token-milo'
 
     beforeEach(async () => {
@@ -126,6 +126,9 @@ describe('SessionMiloHttpSqlRepository', () => {
       expect(actual).to.deep.equal(
         success(
           uneSessionMilo({
+            dateMaxInscription: DateTime.fromISO('2020-04-07', {
+              zone: structureConseiller.timezone
+            }),
             inscriptions: [
               {
                 idJeune: 'id-hermione',
