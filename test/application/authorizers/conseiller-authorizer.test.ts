@@ -101,7 +101,7 @@ describe('ConseillerAuthorizer', () => {
     describe("quand le conseiller n'existe pas", () => {
       it('retourne une failure', async () => {
         // Given
-        conseillerRepository.getByAuthentification
+        conseillerRepository.getByIdAuthentification
           .withArgs('id-authentifiation')
           .resolves(undefined)
 
@@ -125,7 +125,7 @@ describe('ConseillerAuthorizer', () => {
     describe('quand le conseiller n’est pas Pôle emploi', () => {
       it('retourne une failure', async () => {
         // Given
-        conseillerRepository.getByAuthentification
+        conseillerRepository.getByIdAuthentification
           .withArgs('id-authentification')
           .resolves(unConseiller({ structure: Core.Structure.MILO }))
 
@@ -142,7 +142,7 @@ describe('ConseillerAuthorizer', () => {
     describe('quand le conseiller est Pôle emploi', () => {
       it('retourne une success', async () => {
         // Given
-        conseillerRepository.getByAuthentification
+        conseillerRepository.getByIdAuthentification
           .withArgs('id-authentification')
           .resolves(unConseiller({ structure: Core.Structure.POLE_EMPLOI }))
 
@@ -159,7 +159,7 @@ describe('ConseillerAuthorizer', () => {
     describe('quand le conseiller est Pôle emploi BRSA', () => {
       it('retourne une success', async () => {
         // Given
-        conseillerRepository.getByAuthentification
+        conseillerRepository.getByIdAuthentification
           .withArgs('id-authentification')
           .resolves(
             unConseiller({ structure: Core.Structure.POLE_EMPLOI_BRSA })

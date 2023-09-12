@@ -106,7 +106,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
     return jeunesSqlModel.map(fromSqlToJeune)
   }
 
-  async findAllJeunesByAuthentificationAndConseiller(
+  async findAllJeunesByIdsAuthentificationAndConseiller(
     idsAuthentificationJeunes: string[],
     idAuthentificationConseiller: string
   ): Promise<Array<Jeune & { idAuthentification: string }>> {

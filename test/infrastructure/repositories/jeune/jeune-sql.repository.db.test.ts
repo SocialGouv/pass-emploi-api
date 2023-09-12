@@ -267,7 +267,7 @@ describe('JeuneSqlRepository', () => {
     })
   })
 
-  describe('findAllJeunesByAuthentificationAndConseiller', () => {
+  describe('findAllJeunesByIdsAuthentificationAndConseiller', () => {
     const conseiller = unConseiller({ id: 'test' })
     const conseiller3 = unConseiller({ id: 'test3' })
     const jeune1Id = '1'
@@ -315,7 +315,7 @@ describe('JeuneSqlRepository', () => {
       it('retourne la liste des jeunes', async () => {
         // When
         const result =
-          await jeuneSqlRepository.findAllJeunesByAuthentificationAndConseiller(
+          await jeuneSqlRepository.findAllJeunesByIdsAuthentificationAndConseiller(
             ['id-auth-1', 'id-auth-2', 'id-auth-3'],
             'id-auth-conseiller-1'
           )
@@ -331,7 +331,7 @@ describe('JeuneSqlRepository', () => {
       it('retourne une liste vide', async () => {
         // When
         const result =
-          await jeuneSqlRepository.findAllJeunesByAuthentificationAndConseiller(
+          await jeuneSqlRepository.findAllJeunesByIdsAuthentificationAndConseiller(
             ['FAUX_ID'],
             conseiller.id
           )

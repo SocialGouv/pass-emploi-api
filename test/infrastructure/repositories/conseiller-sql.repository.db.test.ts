@@ -62,7 +62,7 @@ describe('ConseillerSqlRepository', () => {
     })
   })
 
-  describe('getByAuthentification', () => {
+  describe('getByIdAuthentification', () => {
     it('retourne le conseiller', async () => {
       // Given
       const conseiller: Conseiller = {
@@ -92,7 +92,7 @@ describe('ConseillerSqlRepository', () => {
       )
 
       // When
-      const result = await conseillerSqlRepository.getByAuthentification(
+      const result = await conseillerSqlRepository.getByIdAuthentification(
         'id-authentification'
       )
 

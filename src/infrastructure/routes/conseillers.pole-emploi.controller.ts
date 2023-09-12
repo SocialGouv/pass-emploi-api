@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  HttpStatus,
   Param,
   Post,
   SetMetadata,
@@ -13,12 +14,12 @@ import {
   ApiSecurity,
   ApiTags
 } from '@nestjs/swagger'
-import { isFailure, isSuccess } from 'src/building-blocks/types/result'
+import { isSuccess } from 'src/building-blocks/types/result'
 import { CreerJeunePoleEmploiCommandHandler } from '../../application/commands/creer-jeune-pole-emploi.command.handler'
 import {
-  SendNotificationsNouveauxMessagesExterneCommand,
-  SendNotificationsNouveauxMessagesExterneCommandHandler
-} from '../../application/commands/send-notifications-nouveaux-messages-externe.command.handler'
+  SendNotificationsNouveauxMessagesExternesCommand,
+  SendNotificationsNouveauxMessagesExternesCommandHandler
+} from '../../application/commands/send-notifications-nouveaux-messages-externes.command.handler'
 import { JeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
 import { Authentification } from '../../domain/authentification'
 import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
@@ -34,7 +35,7 @@ import { CreateJeunePoleEmploiPayload } from './validation/conseillers.inputs'
 export class ConseillersPoleEmploiController {
   constructor(
     private readonly creerJeunePoleEmploiCommandHandler: CreerJeunePoleEmploiCommandHandler,
-    private readonly sendNotificationsNouveauxMessagesExterne: SendNotificationsNouveauxMessagesExterneCommandHandler
+    private readonly sendNotificationsNouveauxMessagesExternes: SendNotificationsNouveauxMessagesExternesCommandHandler
   ) {}
 
   @ApiOperation({
@@ -70,7 +71,8 @@ export class ConseillersPoleEmploiController {
   }
 
   @ApiOperation({
-    summary: "Envoie une notification d'un nouveau message à des jeunes",
+    summary:
+      "Envoie une notification d'un nouveau message à des bénéficiaires du conseiller",
     description: 'Autorisé pour un conseiller'
   })
   @SkipOidcAuth()
@@ -80,22 +82,30 @@ export class ConseillersPoleEmploiController {
     Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
     Authentification.Partenaire.POLE_EMPLOI
   )
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description:
+      'Les notifications sont envoyées aux bénéficiaires du conseiller'
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description:
+      'Si au moins l’un des bénéficiaires n’est pas trouvé dans la système du CEJ (aucune notification ne sera envoyée)'
+  })
   @Post(':idAuthentificationConseiller/beneficiaires/notifier-message')
   async postNotifications(
     @Param('idAuthentificationConseiller') idAuthentificationConseiller: string,
     @Body() envoyerNotificationsPayload: EnvoyerNotificationsExternePayload
   ): Promise<void> {
-    const command: SendNotificationsNouveauxMessagesExterneCommand = {
+    const command: SendNotificationsNouveauxMessagesExternesCommand = {
       idAuthentificationConseiller: idAuthentificationConseiller,
       idsAuthentificationJeunes:
         envoyerNotificationsPayload.idsAuthentificationBeneficiaires
     }
-    const result = await this.sendNotificationsNouveauxMessagesExterne.execute(
+    const result = await this.sendNotificationsNouveauxMessagesExternes.execute(
       command
     )
 
-    if (isFailure(result)) {
-      handleFailure(result)
-    }
+    handleFailure(result)
   }
 }

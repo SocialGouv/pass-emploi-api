@@ -3,7 +3,7 @@ import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import * as request from 'supertest'
 import { expect, StubbedClass } from 'test/utils'
 import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
-import { SendNotificationsNouveauxMessagesExterneCommandHandler } from '../../../src/application/commands/send-notifications-nouveaux-messages-externe.command.handler'
+import { SendNotificationsNouveauxMessagesExternesCommandHandler } from '../../../src/application/commands/send-notifications-nouveaux-messages-externes.command.handler'
 import {
   DroitsInsuffisants,
   NonTrouveError
@@ -11,13 +11,13 @@ import {
 import { EnvoyerNotificationsExternePayload } from '../../../src/infrastructure/routes/validation/conseiller-pole-emploi.inputs'
 
 describe('ConseillersPoleEmploiController', () => {
-  let notifierNouveauxMessagesExterne: StubbedClass<SendNotificationsNouveauxMessagesExterneCommandHandler>
+  let notifierNouveauxMessagesExternes: StubbedClass<SendNotificationsNouveauxMessagesExternesCommandHandler>
   let app: INestApplication
   before(async () => {
     app = await getApplicationWithStubbedDependencies()
 
-    notifierNouveauxMessagesExterne = app.get(
-      SendNotificationsNouveauxMessagesExterneCommandHandler
+    notifierNouveauxMessagesExternes = app.get(
+      SendNotificationsNouveauxMessagesExternesCommandHandler
     )
   })
 
@@ -29,7 +29,7 @@ describe('ConseillersPoleEmploiController', () => {
           idsAuthentificationBeneficiaires: ['id-auth-1', 'id-auth-2']
         }
 
-        notifierNouveauxMessagesExterne.execute
+        notifierNouveauxMessagesExternes.execute
           .withArgs({
             idAuthentificationConseiller: 'id-auth-conseiller',
             idsAuthentificationJeunes: ['id-auth-1', 'id-auth-2']
@@ -41,12 +41,12 @@ describe('ConseillersPoleEmploiController', () => {
           .post(
             '/conseillers/pole-emploi/id-auth-conseiller/beneficiaires/notifier-message'
           )
-          .set({ 'X-API-KEY': 'ceci-est-encore-une-autre-api-key' })
+          .set({ 'X-API-KEY': 'api-key-consumer-pole-emploi' })
           .send(payload)
           .expect(HttpStatus.CREATED)
 
         expect(
-          notifierNouveauxMessagesExterne.execute
+          notifierNouveauxMessagesExternes.execute
         ).to.have.been.calledWithExactly({
           idAuthentificationConseiller: 'id-auth-conseiller',
           idsAuthentificationJeunes: ['id-auth-1', 'id-auth-2']
@@ -61,7 +61,7 @@ describe('ConseillersPoleEmploiController', () => {
           idsAuthentificationBeneficiaires: ['id-auth-1', 'id-auth-2']
         }
 
-        notifierNouveauxMessagesExterne.execute
+        notifierNouveauxMessagesExternes.execute
           .withArgs({
             idAuthentificationConseiller: 'id-auth-conseiller',
             idsAuthentificationJeunes: ['id-auth-1', 'id-auth-2']
@@ -80,7 +80,7 @@ describe('ConseillersPoleEmploiController', () => {
           .post(
             '/conseillers/pole-emploi/id-auth-conseiller/beneficiaires/notifier-message'
           )
-          .set({ 'X-API-KEY': 'ceci-est-encore-une-autre-api-key' })
+          .set({ 'X-API-KEY': 'api-key-consumer-pole-emploi' })
           .send(payload)
           .expect(HttpStatus.NOT_FOUND)
       })
@@ -93,7 +93,7 @@ describe('ConseillersPoleEmploiController', () => {
           idsAuthentificationBeneficiaires: ['id-auth-1', 'id-auth-2']
         }
 
-        notifierNouveauxMessagesExterne.execute
+        notifierNouveauxMessagesExternes.execute
           .withArgs({
             idAuthentificationConseiller: 'id-auth-conseiller',
             idsAuthentificationJeunes: ['id-auth-1', 'id-auth-2']
@@ -105,7 +105,7 @@ describe('ConseillersPoleEmploiController', () => {
           .post(
             '/conseillers/pole-emploi/id-auth-conseiller/beneficiaires/notifier-message'
           )
-          .set({ 'X-API-KEY': 'ceci-est-encore-une-autre-api-key' })
+          .set({ 'X-API-KEY': 'api-key-consumer-pole-emploi' })
           .send(payload)
           .expect(HttpStatus.FORBIDDEN)
       })
@@ -135,7 +135,7 @@ describe('ConseillersPoleEmploiController', () => {
             '/conseillers/pole-emploi/id-auth-conseiller/beneficiaires/notifier-message'
           )
           .send({})
-          .set({ 'X-API-KEY': 'ceci-est-une-api-key-invalide' })
+          .set({ 'X-API-KEY': 'api-key-keycloak-invalide' })
 
         // Then
         expect(result.body).to.deep.equal({

@@ -79,7 +79,7 @@ export class ConseillerSqlRepository implements Conseiller.Repository {
     return fromSqlConseillerToAggregate(conseillerSqlModel)
   }
 
-  async getByAuthentification(
+  async getByIdAuthentification(
     idAuthentification: string
   ): Promise<Conseiller | undefined> {
     const conseillerSqlModel = await ConseillerSqlModel.findOne({

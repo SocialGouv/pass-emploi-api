@@ -177,7 +177,7 @@ export class ConseillerAuthorizer {
   async autoriserLeConseillerExterne(
     idAuthentificationConseiller: string
   ): Promise<Result> {
-    const conseiller = await this.conseillerRepository.getByAuthentification(
+    const conseiller = await this.conseillerRepository.getByIdAuthentification(
       idAuthentificationConseiller
     )
     if (!conseiller)

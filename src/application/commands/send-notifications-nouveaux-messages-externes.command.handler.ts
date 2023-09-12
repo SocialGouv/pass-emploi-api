@@ -11,15 +11,15 @@ import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Notification } from '../../domain/notification/notification'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 
-export interface SendNotificationsNouveauxMessagesExterneCommand
+export interface SendNotificationsNouveauxMessagesExternesCommand
   extends Command {
   idsAuthentificationJeunes: string[]
   idAuthentificationConseiller: string
 }
 
 @Injectable()
-export class SendNotificationsNouveauxMessagesExterneCommandHandler extends CommandHandler<
-  SendNotificationsNouveauxMessagesExterneCommand,
+export class SendNotificationsNouveauxMessagesExternesCommandHandler extends CommandHandler<
+  SendNotificationsNouveauxMessagesExternesCommand,
   void
 > {
   constructor(
@@ -28,14 +28,14 @@ export class SendNotificationsNouveauxMessagesExterneCommandHandler extends Comm
     private notificationService: Notification.Service,
     private conseillerAuthorizer: ConseillerAuthorizer
   ) {
-    super('SendNotificationsNouveauxMessagesExterneCommandHandler')
+    super('SendNotificationsNouveauxMessagesExternesCommandHandler')
   }
 
   async handle(
-    command: SendNotificationsNouveauxMessagesExterneCommand
+    command: SendNotificationsNouveauxMessagesExternesCommand
   ): Promise<Result> {
     const jeunes =
-      await this.jeuneRepository.findAllJeunesByAuthentificationAndConseiller(
+      await this.jeuneRepository.findAllJeunesByIdsAuthentificationAndConseiller(
         command.idsAuthentificationJeunes,
         command.idAuthentificationConseiller
       )
@@ -64,7 +64,7 @@ export class SendNotificationsNouveauxMessagesExterneCommandHandler extends Comm
   }
 
   async authorize(
-    command: SendNotificationsNouveauxMessagesExterneCommand
+    command: SendNotificationsNouveauxMessagesExternesCommand
   ): Promise<Result> {
     return this.conseillerAuthorizer.autoriserLeConseillerExterne(
       command.idAuthentificationConseiller

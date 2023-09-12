@@ -34,7 +34,7 @@ import { DeleteRendezVousCommandHandler } from './application/commands/delete-re
 import { DeleteSuperviseursCommandHandler } from './application/commands/delete-superviseurs.command.handler'
 import { EnvoyerMessageGroupeCommandHandler } from './application/commands/envoyer-message-groupe.command.handler'
 import { NotifierNouvellesImmersionsCommandHandler } from './application/commands/notifier-nouvelles-immersions.command.handler'
-import { SendNotificationsNouveauxMessagesExterneCommandHandler } from './application/commands/send-notifications-nouveaux-messages-externe.command.handler'
+import { SendNotificationsNouveauxMessagesExternesCommandHandler } from './application/commands/send-notifications-nouveaux-messages-externes.command.handler'
 import { SendNotificationsNouveauxMessagesCommandHandler } from './application/commands/send-notifications-nouveaux-messages.command.handler'
 import { PlanifierExecutionCronCommandHandler } from './application/tasks/planifier-execution-cron.command.handler'
 import { InitCronsCommandHandler } from './application/tasks/init-crons.command'
@@ -636,7 +636,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetRendezVousJeuneQueryHandler,
     GetRendezVousJeunePoleEmploiQueryHandler,
     SendNotificationsNouveauxMessagesCommandHandler,
-    SendNotificationsNouveauxMessagesExterneCommandHandler,
+    SendNotificationsNouveauxMessagesExternesCommandHandler,
     DeleteActionCommandHandler,
     CreateRechercheCommandHandler,
     GetRecherchesQueryHandler,

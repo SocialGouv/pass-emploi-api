@@ -30,7 +30,7 @@ export namespace Conseiller {
   export interface Repository {
     get(id: string): Promise<Conseiller | undefined>
 
-    getByAuthentification(
+    getByIdAuthentification(
       idAuthentification: string
     ): Promise<Conseiller | undefined>
 

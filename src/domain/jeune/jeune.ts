@@ -82,7 +82,7 @@ export namespace Jeune {
       idConseiller: string
     ): Promise<Jeune[]>
 
-    findAllJeunesByAuthentificationAndConseiller(
+    findAllJeunesByIdsAuthentificationAndConseiller(
       idsAuthentificationJeunes: string[],
       idConseiller: string
     ): Promise<Array<Jeune & { idAuthentification: string }>>

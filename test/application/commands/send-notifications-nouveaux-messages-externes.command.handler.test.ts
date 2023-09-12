@@ -3,17 +3,17 @@ import { Jeune } from 'src/domain/jeune/jeune'
 import { stubClassSandbox } from 'test/utils/types'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import {
-  SendNotificationsNouveauxMessagesExterneCommand,
-  SendNotificationsNouveauxMessagesExterneCommandHandler
-} from '../../../src/application/commands/send-notifications-nouveaux-messages-externe.command.handler'
+  SendNotificationsNouveauxMessagesExternesCommand,
+  SendNotificationsNouveauxMessagesExternesCommandHandler
+} from '../../../src/application/commands/send-notifications-nouveaux-messages-externes.command.handler'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { failure } from '../../../src/building-blocks/types/result'
 import { Notification } from '../../../src/domain/notification/notification'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
-describe('SendNotificationsNouveauxMessagesExterneCommandHandler', () => {
-  let sendNotificationsNouveauxMessagesCommandHandler: SendNotificationsNouveauxMessagesExterneCommandHandler
+describe('SendNotificationsNouveauxMessagesExternesCommandHandler', () => {
+  let sendNotificationsNouveauxMessagesCommandHandler: SendNotificationsNouveauxMessagesExternesCommandHandler
 
   const jeune1 = { ...unJeune({ id: '1' }), idAuthentification: 'id-auth-1' }
   const jeune2 = { ...unJeune({ id: '2' }), idAuthentification: 'id-auth-2' }
@@ -29,7 +29,7 @@ describe('SendNotificationsNouveauxMessagesExterneCommandHandler', () => {
     notificationService.notifierLesJeunesDuNouveauMessage.resolves()
 
     sendNotificationsNouveauxMessagesCommandHandler =
-      new SendNotificationsNouveauxMessagesExterneCommandHandler(
+      new SendNotificationsNouveauxMessagesExternesCommandHandler(
         jeuneRepository,
         notificationService,
         conseillerAuthorizer
@@ -40,13 +40,13 @@ describe('SendNotificationsNouveauxMessagesExterneCommandHandler', () => {
     describe("quand tous les jeunes se sont connectés au moins une fois à l'application", () => {
       it('envoie une notification de type nouveau message aux jeunes', async () => {
         // Given
-        const command: SendNotificationsNouveauxMessagesExterneCommand = {
+        const command: SendNotificationsNouveauxMessagesExternesCommand = {
           idsAuthentificationJeunes: ['id-auth-1', 'id-auth-2'],
           idAuthentificationConseiller: 'id-authentification-conseiller'
         }
 
         const jeunes = [jeune1, jeune2]
-        jeuneRepository.findAllJeunesByAuthentificationAndConseiller
+        jeuneRepository.findAllJeunesByIdsAuthentificationAndConseiller
           .withArgs(
             command.idsAuthentificationJeunes,
             command.idAuthentificationConseiller
@@ -66,7 +66,7 @@ describe('SendNotificationsNouveauxMessagesExterneCommandHandler', () => {
     describe('quand certains jeunes n’existent pas', () => {
       it('renvoie une NonTrouveError', async () => {
         // Given
-        const command: SendNotificationsNouveauxMessagesExterneCommand = {
+        const command: SendNotificationsNouveauxMessagesExternesCommand = {
           idsAuthentificationJeunes: [
             'id-auth-1',
             'id-auth-2',
@@ -75,7 +75,7 @@ describe('SendNotificationsNouveauxMessagesExterneCommandHandler', () => {
           idAuthentificationConseiller: 'id-authentification-conseiller'
         }
 
-        jeuneRepository.findAllJeunesByAuthentificationAndConseiller
+        jeuneRepository.findAllJeunesByIdsAuthentificationAndConseiller
           .withArgs(
             command.idsAuthentificationJeunes,
             command.idAuthentificationConseiller
@@ -102,7 +102,7 @@ describe('SendNotificationsNouveauxMessagesExterneCommandHandler', () => {
   describe('authorize', () => {
     it('autorise un conseiller à envoyer des notifications à plusieurs jeunes', async () => {
       // Given
-      const command: SendNotificationsNouveauxMessagesExterneCommand = {
+      const command: SendNotificationsNouveauxMessagesExternesCommand = {
         idsAuthentificationJeunes: ['id-auth-1', 'id-auth-2'],
         idAuthentificationConseiller: 'id-authentification-conseiller'
       }
