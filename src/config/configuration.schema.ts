@@ -73,7 +73,8 @@ export const configurationSchema = Joi.object({
   }),
   apiKeys: Joi.object({
     keycloak: Joi.string().required(),
-    immersion: Joi.string().required()
+    immersion: Joi.string().required(),
+    poleEmploi: Joi.string().required()
   }),
   redis: Joi.object({
     url: Joi.string().uri()

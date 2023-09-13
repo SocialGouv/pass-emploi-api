@@ -41,6 +41,9 @@ export class ApiKeyAuthGuard implements CanActivate {
       case Authentification.Partenaire.KEYCLOAK:
         apiKey = this.configService.get('apiKeys.keycloak')!
         break
+      case Authentification.Partenaire.POLE_EMPLOI:
+        apiKey = this.configService.get('apiKeys.poleEmploi')!
+        break
     }
 
     if (apiKeyRequest === apiKey) {

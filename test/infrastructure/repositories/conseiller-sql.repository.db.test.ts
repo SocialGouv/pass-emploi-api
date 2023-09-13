@@ -62,6 +62,58 @@ describe('ConseillerSqlRepository', () => {
     })
   })
 
+  describe('getByIdAuthentification', () => {
+    it('retourne le conseiller', async () => {
+      // Given
+      const conseiller: Conseiller = {
+        id: '1',
+        lastName: 'Tavernier',
+        firstName: 'Nils',
+        structure: Core.Structure.POLE_EMPLOI,
+        email: 'nils.tavernier@passemploi.com',
+        notificationsSonores: false,
+        agence: {
+          id: 'id'
+        }
+      }
+      await AgenceSqlModel.create({
+        id: 'id',
+        nomAgence: 'nom',
+        nomRegion: 'nomRegion',
+        codeDepartement: 'codeDepartement',
+        structure: 'MILO'
+      })
+      await conseillerSqlRepository.save(conseiller)
+      await ConseillerSqlModel.update(
+        {
+          idAuthentification: 'id-authentification'
+        },
+        { where: { id: conseiller.id } }
+      )
+
+      // When
+      const result = await conseillerSqlRepository.getByIdAuthentification(
+        'id-authentification'
+      )
+
+      // Then
+      const expected: Conseiller = {
+        id: '1',
+        lastName: 'Tavernier',
+        firstName: 'Nils',
+        structure: Core.Structure.POLE_EMPLOI,
+        email: 'nils.tavernier@passemploi.com',
+        agence: {
+          id: 'id',
+          nom: 'nom'
+        },
+        nomAgenceManuel: undefined,
+        notificationsSonores: false
+      }
+      expect(result).to.deep.equal(expected)
+    })
+  })
+
   describe('getAllIds', () => {
     it('retourne les ids conseiller', async () => {
       // Given

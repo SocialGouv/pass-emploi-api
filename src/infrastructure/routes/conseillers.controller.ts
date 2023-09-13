@@ -37,7 +37,6 @@ import {
   CreerJeuneMiloCommand,
   CreerJeuneMiloCommandHandler
 } from '../../application/commands/creer-jeune-milo.command.handler'
-import { CreerJeunePoleEmploiCommandHandler } from '../../application/commands/creer-jeune-pole-emploi.command.handler'
 import { ModifierConseillerCommandHandler } from '../../application/commands/modifier-conseiller.command.handler'
 import { ModifierJeuneDuConseillerCommandHandler } from '../../application/commands/modifier-jeune-du-conseiller.command.handler'
 import { RecupererJeunesDuConseillerCommandHandler } from '../../application/commands/recuperer-jeunes-du-conseiller.command.handler'
@@ -72,9 +71,9 @@ import { RendezVousConseillerFutursEtPassesQueryModel } from '../../application/
 import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
 import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import {
-  Result,
   isFailure,
-  isSuccess
+  isSuccess,
+  Result
 } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
@@ -84,7 +83,6 @@ import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'
 import { CreateActionPayload } from './validation/actions.inputs'
 import {
-  CreateJeunePoleEmploiPayload,
   CreateListeDeDiffusionPayload,
   CreerJeuneMiloPayload,
   DetailConseillerPayload,
@@ -108,7 +106,6 @@ export class ConseillersController {
     private readonly getJeunesByConseillerQueryHandler: GetJeunesByConseillerQueryHandler,
     private readonly getResumeActionsDesJeunesDuConseillerQueryHandler: GetResumeActionsDesJeunesDuConseillerQueryHandlerDb,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
-    private readonly creerJeunePoleEmploiCommandHandler: CreerJeunePoleEmploiCommandHandler,
     private readonly sendNotificationsNouveauxMessages: SendNotificationsNouveauxMessagesCommandHandler,
     private readonly getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler,
     private readonly createRendezVousCommandHandler: CreateRendezVousCommandHandler,
@@ -222,38 +219,6 @@ export class ConseillersController {
 
     if (isSuccess(result)) {
       return result.data
-    }
-
-    throw handleFailure(result)
-  }
-
-  @ApiOperation({
-    summary: 'Crée un jeune PE',
-    description: 'Autorisé pour un conseiller PE'
-  })
-  @Post('pole-emploi/jeunes')
-  @ApiResponse({
-    type: JeuneQueryModel
-  })
-  async createJeunePoleEmploi(
-    @Body() createJeunePayload: CreateJeunePoleEmploiPayload,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<JeuneQueryModel> {
-    const result = await this.creerJeunePoleEmploiCommandHandler.execute(
-      {
-        ...createJeunePayload
-      },
-      utilisateur
-    )
-
-    if (isSuccess(result)) {
-      const jeune = result.data
-      return {
-        id: jeune.id,
-        firstName: jeune.firstName,
-        lastName: jeune.lastName,
-        idConseiller: jeune.conseiller!.id
-      }
     }
 
     throw handleFailure(result)

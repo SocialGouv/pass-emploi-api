@@ -205,7 +205,7 @@ describe('OffresImmersionController', () => {
         await request(app.getHttpServer())
           .post('/offres-immersion')
           .send(uneNouvelleImmersion)
-          .set({ 'X-API-KEY': 'ceci-est-une-autre-api-key' })
+          .set({ 'X-API-KEY': 'api-key-immersion' })
           // Then
           .expect(HttpStatus.ACCEPTED)
 
@@ -220,7 +220,7 @@ describe('OffresImmersionController', () => {
         await request(app.getHttpServer())
           .post('/offres-immersion')
           .send({ immersions: [{ plop: 'john' }] })
-          .set({ 'X-API-KEY': 'ceci-est-une-autre-api-key' })
+          .set({ 'X-API-KEY': 'api-key-immersion' })
           // Then
           .expect(HttpStatus.BAD_REQUEST)
       })

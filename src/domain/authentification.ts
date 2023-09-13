@@ -22,7 +22,8 @@ export namespace Authentification {
 
   export enum Partenaire {
     KEYCLOAK = 'KEYCLOAK',
-    IMMERSION = 'IMMERSION'
+    IMMERSION = 'IMMERSION',
+    POLE_EMPLOI = 'POLE_EMPLOI'
   }
 
   export interface Utilisateur {

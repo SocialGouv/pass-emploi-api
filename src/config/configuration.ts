@@ -102,7 +102,8 @@ export default () => {
     },
     apiKeys: {
       keycloak: process.env.API_KEY_KEYCLOAK,
-      immersion: process.env.API_KEY_PARTENAIRE_IMMERSION
+      immersion: process.env.API_KEY_PARTENAIRE_IMMERSION,
+      poleEmploi: process.env.API_KEY_CONSUMER_POLE_EMPLOI
     },
     redis: {
       url: process.env.REDIS_URL

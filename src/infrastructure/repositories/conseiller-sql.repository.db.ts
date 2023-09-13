@@ -79,6 +79,19 @@ export class ConseillerSqlRepository implements Conseiller.Repository {
     return fromSqlConseillerToAggregate(conseillerSqlModel)
   }
 
+  async getByIdAuthentification(
+    idAuthentification: string
+  ): Promise<Conseiller | undefined> {
+    const conseillerSqlModel = await ConseillerSqlModel.findOne({
+      where: { idAuthentification },
+      include: [AgenceSqlModel]
+    })
+    if (!conseillerSqlModel) {
+      return undefined
+    }
+    return fromSqlConseillerToAggregate(conseillerSqlModel)
+  }
+
   async save(conseiller: Conseiller): Promise<void> {
     await ConseillerSqlModel.upsert({
       id: conseiller.id,
