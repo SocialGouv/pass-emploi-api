@@ -114,9 +114,6 @@ export class HistoriqueConseillerJeuneQueryModel {
 class StructureMiloDuJeuneQueryModel {
   @ApiProperty()
   id: string
-
-  @ApiProperty({ required: false })
-  nom?: string
 }
 
 export class DetailJeuneQueryModel {
@@ -193,6 +190,9 @@ export class DetailJeuneConseillerQueryModel {
 
   @ApiProperty({ required: false })
   situationCourante?: SituationQueryModel
+
+  @ApiProperty({ required: false })
+  structureMilo?: StructureMiloDuJeuneQueryModel
 }
 
 export class ResumeActionsDuJeuneQueryModel {
