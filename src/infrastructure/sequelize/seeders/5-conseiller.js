@@ -44,7 +44,7 @@ module.exports = {
         id_authentification: '8f4118cc-525a-404b-ac8b-c1f36974c7ec',
         notifications_sonores: false,
         id_agence: '9999',
-        id_structure_milo: '12506'
+        id_structure_milo: '80620S00'
       },
       {
         id: '20097302-448d-4048-a0ae-306964aab60e',
@@ -52,7 +52,8 @@ module.exports = {
         nom: 'Dumont',
         structure: 'MILO',
         id_authentification: 'e6d4a5bf-0189-4581-8350-f772bca0d4a1',
-        notifications_sonores: false
+        notifications_sonores: false,
+        id_structure_milo: '80620S00'
       }
     ])
   },
