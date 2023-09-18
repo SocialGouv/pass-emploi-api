@@ -67,6 +67,7 @@ export function unDetailJeuneConseillerQueryModel(
     isActivated: true,
     isReaffectationTemporaire: false,
     situationCourante: undefined,
+    structureMilo: undefined,
     lastActivity: '2022-03-01T02:24:00.000Z'
   }
 

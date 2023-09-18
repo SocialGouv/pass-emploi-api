@@ -25,6 +25,7 @@ import {
   DatabaseForTesting,
   getDatabase
 } from '../../utils/database-for-testing'
+import { StructureMiloSqlModel } from '../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
 
 describe('GetJeunesByConseillerQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
@@ -189,17 +190,24 @@ describe('GetJeunesByConseillerQueryHandler', () => {
         ])
       )
     })
-    it("retourne les jeunes d'un conseiller avec situation courante", async () => {
+    it("retourne les jeunes d'un conseiller avec situation courante + id structure milo", async () => {
       // Given
       const idJeune = '1'
+      const idStructure = '1'
       const dateEvenement = uneDatetime().toJSDate()
       const situationsDuJeune = uneSituationsMiloDto({ idJeune })
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
+      await StructureMiloSqlModel.create({
+        id: idStructure,
+        nomOfficiel: 'test',
+        timezone: 'Europe/Paris'
+      })
       await JeuneSqlModel.creer(
         unJeuneDto({
           id: idJeune,
           idConseiller,
-          dateDerniereActualisationToken: dateEvenement
+          dateDerniereActualisationToken: dateEvenement,
+          idStructureMilo: idStructure
         })
       )
       await SituationsMiloSqlModel.create(situationsDuJeune)
@@ -214,7 +222,8 @@ describe('GetJeunesByConseillerQueryHandler', () => {
           unDetailJeuneConseillerQueryModel({
             id: idJeune,
             situationCourante: situationsDuJeune.situationCourante ?? undefined,
-            lastActivity: dateEvenement.toISOString()
+            lastActivity: dateEvenement.toISOString(),
+            structureMilo: { id: idStructure }
           })
         ])
       )
