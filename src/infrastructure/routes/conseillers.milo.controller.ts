@@ -34,7 +34,6 @@ import {
   GetSessionsQueryParams,
   UpdateSessionMiloPayload
 } from './validation/conseiller-milo.inputs'
-import { GetSessionsConseillerMiloV2QueryHandler } from '../../application/queries/milo/v2/get-sessions-conseiller.milo.v2.query.handler.db'
 import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
 import { DateTime } from 'luxon'
 
@@ -44,7 +43,6 @@ import { DateTime } from 'luxon'
 export class ConseillersMiloController {
   constructor(
     private readonly getSessionsQueryHandler: GetSessionsConseillerMiloQueryHandler,
-    private readonly getSessionsV2QueryHandler: GetSessionsConseillerMiloV2QueryHandler,
     private readonly getDetailSessionQueryHandler: GetDetailSessionConseillerMiloQueryHandler,
     private readonly getAgendaSessionsQueryHandler: GetAgendaSessionsConseillerMiloQueryHandler,
     private readonly updateSessionCommandHandler: UpdateSessionMiloCommandHandler,

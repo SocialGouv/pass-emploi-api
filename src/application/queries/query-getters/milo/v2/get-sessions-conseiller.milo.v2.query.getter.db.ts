@@ -64,15 +64,25 @@ export class GetSessionsConseillerMiloV2QueryGetter {
         periode.dateDebut
       )
 
+    if (isFailure(resultatSessionsPourPagination)) {
+      return resultatSessionsPourPagination
+    }
+
     const sessionsSqlModels = await SessionMiloSqlModel.findAll({
       where: { idStructureMilo }
     })
 
-    const sessionsQueryModels = resultatSessionsPourPagination.map(
+    const sessionsSqlModelMap = sessionsSqlModels.reduce(
+      (map, session) => map.set(session.id, session),
+      new Map<string, SessionMiloSqlModel>()
+    )
+
+    const sessionsQueryModels = resultatSessionsPourPagination.data.map(
       sessionMilo => {
-        const sessionSqlModel = sessionsSqlModels.find(
-          ({ id }) => id === sessionMilo.session.id.toString()
+        const sessionSqlModel = sessionsSqlModelMap.get(
+          sessionMilo.session.id.toString()
         )
+
         const dateCloture = sessionSqlModel?.dateCloture
         return mapSessionConseillerDtoToQueryModel(
           sessionMilo,
@@ -96,15 +106,15 @@ export class GetSessionsConseillerMiloV2QueryGetter {
     idStructureMilo: string,
     timezoneStructure: string,
     dateDebut: DateTime
-  ): Promise<SessionConseillerDetailDto[]> {
+  ): Promise<Result<SessionConseillerDetailDto[]>> {
     const sessions: SessionConseillerDetailDto[] =
       resultSessionsMiloClient.sessions
-    if (calculerNbPagesMiloClient(resultSessionsMiloClient.nbSessions) > 1) {
-      for (
-        let page = 2;
-        page <= calculerNbPagesMiloClient(resultSessionsMiloClient.nbSessions);
-        page++
-      ) {
+
+    const nbPagesMilo = calculerNbPagesMiloClient(
+      resultSessionsMiloClient.nbSessions
+    )
+    if (nbPagesMilo > 1) {
+      for (let page = 2; page <= nbPagesMilo; page++) {
         const resultMiloClientParPage =
           await this.miloClient.getSessionsConseiller(
             idpToken,
@@ -114,16 +124,13 @@ export class GetSessionsConseillerMiloV2QueryGetter {
           )
 
         if (isFailure(resultMiloClientParPage)) {
-          // TODO gerer erreur
-          // TODO gerer erreur
-          // TODO gerer erreur
-          return []
+          return resultMiloClientParPage
         }
 
         sessions.push(...resultMiloClientParPage.data.sessions)
       }
     }
-    return sessions
+    return success(sessions)
   }
 }
 

@@ -13,6 +13,7 @@ import {
 } from '../../query-models/sessions.milo.query.model'
 import { GetSessionsConseillerMiloV2QueryGetter } from '../../query-getters/milo/v2/get-sessions-conseiller.milo.v2.query.getter.db'
 import { ConseillerMiloRepositoryToken } from '../../../../domain/milo/conseiller.milo.db'
+import { sessionsMiloSontActiveesPourLeConseiller } from '../../../../utils/feature-flip-session-helper'
 
 export interface GetSessionsConseillerMiloV2Query extends Query {
   idConseiller: string
@@ -41,10 +42,19 @@ export class GetSessionsConseillerMiloV2QueryHandler extends QueryHandler<
   async handle(
     query: GetSessionsConseillerMiloV2Query
   ): Promise<Result<SessionsConseillerV2QueryModel>> {
-    const FT_RECUPERER_SESSIONS_MILO = this.configService.get(
-      'features.recupererSessionsMilo'
+    const resultConseiller = await this.conseillerMiloRepository.get(
+      query.idConseiller
     )
-    if (!FT_RECUPERER_SESSIONS_MILO) {
+    if (isFailure(resultConseiller)) {
+      return resultConseiller
+    }
+
+    if (
+      !sessionsMiloSontActiveesPourLeConseiller(
+        this.configService,
+        resultConseiller.data
+      )
+    ) {
       return success({
         pagination: {
           page: 1,
@@ -55,12 +65,6 @@ export class GetSessionsConseillerMiloV2QueryHandler extends QueryHandler<
       })
     }
 
-    const resultConseiller = await this.conseillerMiloRepository.get(
-      query.idConseiller
-    )
-    if (isFailure(resultConseiller)) {
-      return resultConseiller
-    }
     const { id: idStructureMilo, timezone: timezoneStructure } =
       resultConseiller.data.structure
 
@@ -80,17 +84,14 @@ export class GetSessionsConseillerMiloV2QueryHandler extends QueryHandler<
     const nbSessions = resultSessionsMiloFromQueryGetter.data.length
     const getPage = query.page ?? 1
 
-    //TODO: generer une erreur si query.page > calculerNbPageSessions(nbSessions) ?? ou pas
-
-    const sessionsParPage = getSessionsParPage(
+    const sessionsParPage = getPageSessions(
       resultSessionsMiloFromQueryGetter.data,
       getPage
     )
 
-    // TODO :  pour la response pagination.page -> mettre nombre de page ou page courante ???
     return success({
       pagination: {
-        page: calculerNbPagesSessions(nbSessions),
+        page: getPage,
         limit: NOMBRE_SESSIONS_PAGE,
         total: nbSessions
       },
@@ -114,14 +115,11 @@ export class GetSessionsConseillerMiloV2QueryHandler extends QueryHandler<
   }
 }
 
-function calculerNbPagesSessions(nbSessions: number): number {
-  return Math.ceil(nbSessions / NOMBRE_SESSIONS_PAGE)
-}
-
-function getSessionsParPage(
+function getPageSessions(
   sessions: SessionConseillerMiloQueryModel[],
   page: number
 ): SessionConseillerMiloQueryModel[] {
-  const debutPagination = NOMBRE_SESSIONS_PAGE * (page - 1)
-  return sessions.slice(debutPagination, page * NOMBRE_SESSIONS_PAGE)
+  const premiereSessionPage = NOMBRE_SESSIONS_PAGE * (page - 1)
+  const premiereSessionPageSuivante = page * NOMBRE_SESSIONS_PAGE
+  return sessions.slice(premiereSessionPage, premiereSessionPageSuivante)
 }
