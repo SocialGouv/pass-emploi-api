@@ -56,7 +56,7 @@ export class GetSessionsConseillerMiloQueryGetter {
         idpToken,
         idStructureMilo,
         timezoneStructure,
-        periode
+        { periode }
       )
 
     if (isFailure(resultSessionMiloClient)) {

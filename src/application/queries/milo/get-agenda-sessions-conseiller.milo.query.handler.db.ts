@@ -79,8 +79,10 @@ export class GetAgendaSessionsConseillerMiloQueryHandler extends QueryHandler<
       idStructureMilo,
       timezoneStructure,
       {
-        dateDebut: query.dateDebut,
-        dateFin: query.dateFin
+        periode: {
+          dateDebut: query.dateDebut,
+          dateFin: query.dateFin
+        }
       }
     )
 

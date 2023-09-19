@@ -9,7 +9,9 @@ import {
   IsString,
   IsEnum,
   ValidateIf,
-  IsDefined
+  IsDefined,
+  IsNumber,
+  IsIn
 } from 'class-validator'
 import { Transform, Type } from 'class-transformer'
 import { SessionMilo } from '../../../domain/milo/session.milo'
@@ -30,6 +32,21 @@ export class GetSessionsQueryParams {
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
+  @Transform(params => transformStringToBoolean(params, 'filtrerAClore'))
+  filtrerAClore?: boolean
+}
+
+export class GetSessionsV2QueryParams {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  page?: number
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  @IsIn([true, false])
   @Transform(params => transformStringToBoolean(params, 'filtrerAClore'))
   filtrerAClore?: boolean
 }

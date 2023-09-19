@@ -103,8 +103,10 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
             conseiller.structure.id,
             conseiller.structure.timezone,
             {
-              dateDebut: query.options.periode.debut,
-              dateFin: query.options.periode.fin
+              periode: {
+                dateDebut: query.options.periode.debut,
+                dateFin: query.options.periode.fin
+              }
             }
           )
           .resolves(success(uneListeSessionsConseillerDto))
@@ -168,8 +170,10 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
             conseiller.structure.id,
             conseiller.structure.timezone,
             {
-              dateDebut: query.options.periode.debut,
-              dateFin: query.options.periode.fin
+              periode: {
+                dateDebut: query.options.periode.debut,
+                dateFin: query.options.periode.fin
+              }
             }
           )
           .resolves(success(uneListeSessionsConseillerDto))
@@ -294,8 +298,10 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
             conseiller.structure.id,
             conseiller.structure.timezone,
             {
-              dateDebut: query.options.periode.debut,
-              dateFin: query.options.periode.fin
+              periode: {
+                dateDebut: query.options.periode.debut,
+                dateFin: query.options.periode.fin
+              }
             }
           )
           .resolves(
