@@ -204,7 +204,6 @@ export function mapSessionToDetailSessionConseillerQueryModel(
   if (session.dateMaxInscription) {
     sessionQueryModel.dateMaxInscription = session.dateMaxInscription
       .toUTC()
-      .endOf('day')
       .toISO()
   }
   if (session.nbPlacesDisponibles)

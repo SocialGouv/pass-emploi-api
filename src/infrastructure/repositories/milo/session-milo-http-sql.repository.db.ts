@@ -212,7 +212,7 @@ function dtoToSessionMilo(
       {
         zone: structureMilo.timezone
       }
-    )
+    ).endOf('day')
   }
   if (sessionSql) {
     session.estVisible = sessionSql.estVisible
