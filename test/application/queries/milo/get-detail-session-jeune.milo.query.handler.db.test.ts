@@ -200,7 +200,8 @@ describe('GetDetailSessionJeuneMiloQueryHandler', () => {
             id: query.idSession,
             inscription: {
               statut: SessionMilo.Inscription.Statut.REFUS_JEUNE
-            }
+            },
+            dateMaxInscription: '2020-04-08T02:59:59.999Z'
           })
         )
       })

@@ -48,7 +48,7 @@ export const unDetailSessionConseillerMiloQueryModel: DetailSessionConseillerMil
       nom: 'Une-session',
       dateHeureDebut: '2020-04-06T13:20:00.000Z',
       dateHeureFin: '2020-04-08T13:20:00.000Z',
-      dateMaxInscription: '2020-04-07T10:20:00.000Z',
+      dateMaxInscription: '2020-04-07T23:59:59.999Z',
       animateur: 'Un-animateur',
       lieu: 'Un-lieu',
       estVisible: false,
@@ -115,7 +115,7 @@ export const uneSessionMilo = (
     animateur: 'Un-animateur',
     commentaire: 'Un-commentaire',
     estVisible: false,
-    dateMaxInscription: DateTime.fromISO('2020-04-07T10:20:00.000Z'),
+    dateMaxInscription: DateTime.fromISO('2020-04-07T23:59:59.999Z'),
     debut: DateTime.fromISO('2020-04-06T13:20:00.000Z', {
       zone: 'America/Cayenne'
     }),
