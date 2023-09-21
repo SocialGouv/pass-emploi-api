@@ -345,6 +345,7 @@ import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/que
 import { GetSessionsConseillerMiloV2QueryGetter } from './application/queries/query-getters/milo/v2/get-sessions-conseiller.milo.v2.query.getter.db'
 import { GetSessionsConseillerMiloV2QueryHandler } from './application/queries/milo/v2/get-sessions-conseiller.milo.v2.query.handler.db'
 import { ConseillersMiloControllerv2 } from './infrastructure/routes/v2/conseillers.milo.controller.v2'
+import { MatomoClient } from './infrastructure/clients/matomo-client'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -413,6 +414,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     MiloClient,
     ImmersionClient,
     EngagementClient,
+    MatomoClient,
     ObjectStorageClient,
     Action.Factory,
     Action.Commentaire.Factory,

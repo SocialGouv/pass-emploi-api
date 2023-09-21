@@ -165,6 +165,10 @@ export default () => {
           process.env.RATE_LIMITER_GET_NOTIFICATIONS_PE_INTERVAL ?? '1100'
       }
     },
+    matomo: {
+      siteId: process.env.MATOMO_SOCIALGOUV_SITE_ID,
+      url: process.env.MATOMO_SOCIALGOUV_URL
+    },
     mattermost: {
       jobWebhookUrl: process.env.MATTERMOST_JOBS_WEBHOOK_URL
     },

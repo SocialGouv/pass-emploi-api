@@ -126,6 +126,10 @@ export const configurationSchema = Joi.object({
       interval: Joi.number().required()
     })
   }),
+  matomo: Joi.object({
+    siteId: Joi.number().required(),
+    url: Joi.string().uri().required()
+  }),
   mattermost: Joi.object({ jobWebhookUrl: Joi.string().uri().required() }),
   monitoring: Joi.object({ dashboardUrl: Joi.string().uri().required() }),
   task: Joi.object({

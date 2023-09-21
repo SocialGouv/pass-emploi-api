@@ -149,6 +149,10 @@ export const testConfig = (): ConfigService => {
     },
     passEmploiContactEmail: 'pass.emploi.contact@gmail.com',
     frontEndUrl: 'http://frontend.com',
+    matomo: {
+      siteId: 0,
+      url: 'https://url.matomo.test'
+    },
     mattermost: {
       jobWebhookUrl: 'https://mattermost.incubateur.net/hooks/xxx'
     },
