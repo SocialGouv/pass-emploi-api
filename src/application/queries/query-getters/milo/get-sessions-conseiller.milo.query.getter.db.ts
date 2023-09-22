@@ -14,6 +14,8 @@ import { DateService } from '../../../../utils/date-service'
 import { SessionConseillerMiloQueryModel } from '../../query-models/sessions.milo.query.model'
 import { SessionMilo } from '../../../../domain/milo/session.milo'
 
+export const DATE_DEBUT_SESSIONS_A_CLORE = '2023-10-01T00:00:00Z'
+
 @Injectable()
 export class GetSessionsConseillerMiloQueryGetter {
   constructor(
@@ -38,7 +40,8 @@ export class GetSessionsConseillerMiloQueryGetter {
     let periode
     if (options && options.filtrerAClore) {
       periode = {
-        dateDebut: DateTime.fromISO('2023-08-01')
+        dateDebut: DateTime.fromISO(DATE_DEBUT_SESSIONS_A_CLORE),
+        dateFin: undefined
       }
     }
     if (
