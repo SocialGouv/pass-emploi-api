@@ -19,7 +19,10 @@ import { getDatabase } from 'test/utils/database-for-testing'
 import { DateService } from 'src/utils/date-service'
 import { SessionMilo } from 'src/domain/milo/session.milo'
 import { SessionConseillerDetailDto } from 'src/infrastructure/clients/dto/milo.dto'
-import { GetSessionsConseillerMiloQueryGetter } from '../../../../../src/application/queries/query-getters/milo/get-sessions-conseiller.milo.query.getter.db'
+import {
+  DATE_DEBUT_SESSIONS_A_CLORE,
+  GetSessionsConseillerMiloQueryGetter
+} from '../../../../../src/application/queries/query-getters/milo/get-sessions-conseiller.milo.query.getter.db'
 
 describe('GetSessionsConseillerMiloQueryHandler', () => {
   const maintenantEn2023 = DateTime.local(2023)
@@ -171,8 +174,8 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
             conseiller.structure.timezone,
             {
               periode: {
-                dateDebut: query.options.periode.debut,
-                dateFin: query.options.periode.fin
+                dateDebut: DateTime.fromISO(DATE_DEBUT_SESSIONS_A_CLORE),
+                dateFin: undefined
               }
             }
           )
@@ -185,8 +188,8 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
           query.timezoneStructure,
           {
             periode: {
-              debut: query.options.periode.debut,
-              fin: query.options.periode.fin
+              debut: undefined,
+              fin: undefined
             },
             filtrerAClore: query.options.filtreAClore
           }
@@ -195,6 +198,17 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
         // Then
         expect(result).to.deep.equal(
           success([{ ...uneSessionConseillerMiloQueryModel, estVisible: true }])
+        )
+        expect(miloClient.getSessionsConseiller).to.have.been.calledWith(
+          idpToken,
+          conseiller.structure.id,
+          conseiller.structure.timezone,
+          {
+            periode: {
+              dateDebut: DateTime.fromISO(DATE_DEBUT_SESSIONS_A_CLORE),
+              dateFin: undefined
+            }
+          }
         )
       })
 
