@@ -6,12 +6,10 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
 })
 
 sequelize.transaction(async transaction => {
-  for (jeune of jeunesEarlyAdopters) {
-    await sequelize.query(
-      `DELETE FROM rendez_vous WHERE rendez_vous.type = 'SESSION_MILO'`,
-      {
-        transaction
-      }
-    )
-  }
+  await sequelize.query(
+    `DELETE FROM rendez_vous WHERE rendez_vous.type = 'SESSION_MILO'`,
+    {
+      transaction
+    }
+  )
 })
