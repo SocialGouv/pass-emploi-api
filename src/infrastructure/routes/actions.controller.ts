@@ -39,7 +39,7 @@ import {
   AddCommentaireActionCommand,
   AddCommentaireActionCommandHandler
 } from '../../application/commands/action/add-commentaire-action.command.handler'
-import { handleFailure } from './failure.handler'
+import { handleFailure } from './result.handler'
 import { GetCommentairesActionQueryHandler } from '../../application/queries/action/get-commentaires-action.query.handler.db'
 import {
   QualifierActionCommand,

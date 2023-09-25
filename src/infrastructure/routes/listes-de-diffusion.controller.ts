@@ -18,7 +18,7 @@ import { DeleteListeDeDiffusionCommandHandler } from '../../application/commands
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './failure.handler'
+import { handleFailure } from './result.handler'
 import {
   CreateListeDeDiffusionPayload,
   UpdateListeDeDiffusionPayload

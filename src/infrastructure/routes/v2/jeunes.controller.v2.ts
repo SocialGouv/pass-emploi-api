@@ -27,7 +27,7 @@ import {
   AccessToken,
   Utilisateur
 } from '../../decorators/authenticated.decorator'
-import { handleFailure } from '../failure.handler'
+import { handleFailure } from '../result.handler'
 import {
   GetActionsByJeuneV2QueryParams,
   GetRendezVousJeuneQueryParams,

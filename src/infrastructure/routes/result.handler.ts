@@ -30,7 +30,11 @@ import {
   ReponsesCampagneInvalide,
   RessourceIndisponibleError
 } from '../../building-blocks/types/domain-error'
-import { isFailure, Result } from '../../building-blocks/types/result'
+import {
+  isFailure,
+  isSuccess,
+  Result
+} from '../../building-blocks/types/result'
 import { Action } from '../../domain/action/action'
 
 export function handleFailure(result: Result): void {
@@ -72,4 +76,11 @@ export function handleFailure(result: Result): void {
         throw new RuntimeException(result.error.message)
     }
   }
+}
+
+export function handleResult<T>(result: Result<T>): T {
+  if (isSuccess(result)) {
+    return result.data
+  }
+  throw handleFailure(result)
 }

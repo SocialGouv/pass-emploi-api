@@ -6,7 +6,7 @@ import { AccueilJeuneMiloQueryModel } from 'src/application/queries/query-models
 import { isSuccess } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './failure.handler'
+import { handleFailure } from './result.handler'
 
 import { MaintenantQueryParams } from './validation/jeunes.inputs'
 import {

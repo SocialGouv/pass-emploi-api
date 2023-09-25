@@ -3,7 +3,7 @@ import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './failure.handler'
+import { handleFailure } from './result.handler'
 import { FindEvenementsEmploiQueryParams } from './validation/evenements-emploi.inputs'
 import {
   EvenementsEmploiQueryModel,

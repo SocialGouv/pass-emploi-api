@@ -80,7 +80,7 @@ import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { DateService } from '../../utils/date-service'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './failure.handler'
+import { handleFailure } from './result.handler'
 import { CreateActionPayload } from './validation/actions.inputs'
 import {
   CreateListeDeDiffusionPayload,

@@ -12,7 +12,7 @@ import { isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { DateService } from '../../utils/date-service'
 import { Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './failure.handler'
+import { handleFailure } from './result.handler'
 import {
   ClotureAnimationCollectivePayload,
   GetAnimationsCollectivesQueryParams

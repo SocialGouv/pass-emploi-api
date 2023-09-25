@@ -3,7 +3,7 @@ import {
   GetJeunesEtablissementV2QueryParams
 } from '../validation/etablissements.inputs'
 import { GetAnimationCollectiveV2QueryModel } from '../../../application/queries/query-models/rendez-vous.query-model'
-import { handleFailure } from '../failure.handler'
+import { handleFailure } from '../result.handler'
 import { Controller, Get, Param, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GetJeunesEtablissementV2QueryModel } from '../../../application/queries/query-models/agence.query-model'

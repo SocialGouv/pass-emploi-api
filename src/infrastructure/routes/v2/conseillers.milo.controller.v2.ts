@@ -11,7 +11,7 @@ import {
   AccessToken,
   Utilisateur
 } from '../../decorators/authenticated.decorator'
-import { handleFailure } from '../failure.handler'
+import { handleFailure } from '../result.handler'
 import { GetSessionsV2QueryParams } from '../validation/conseiller-milo.inputs'
 
 @Controller('v2/conseillers/milo')

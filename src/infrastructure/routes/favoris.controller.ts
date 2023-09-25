@@ -61,7 +61,7 @@ import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './failure.handler'
+import { handleFailure } from './result.handler'
 import {
   AddFavoriImmersionPayload,
   AddFavoriOffresEmploiPayload,

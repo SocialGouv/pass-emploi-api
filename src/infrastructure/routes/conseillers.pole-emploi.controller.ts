@@ -25,7 +25,7 @@ import { Authentification } from '../../domain/authentification'
 import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { SkipOidcAuth } from '../decorators/skip-oidc-auth.decorator'
-import { handleFailure } from './failure.handler'
+import { handleFailure } from './result.handler'
 import { EnvoyerNotificationsExternePayload } from './validation/conseiller-pole-emploi.inputs'
 import { CreateJeunePoleEmploiPayload } from './validation/conseillers.inputs'
 

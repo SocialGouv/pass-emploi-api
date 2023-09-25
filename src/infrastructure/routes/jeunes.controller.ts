@@ -71,7 +71,7 @@ import { isFailure, isSuccess, Result } from 'src/building-blocks/types/result'
 import { Action } from 'src/domain/action/action'
 import { Authentification } from 'src/domain/authentification'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './failure.handler'
+import { handleFailure } from './result.handler'
 import { CreateActionParLeJeunePayload } from './validation/actions.inputs'
 import {
   CreateDemarchePayload,

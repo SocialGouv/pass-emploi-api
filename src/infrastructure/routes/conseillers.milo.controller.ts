@@ -27,7 +27,7 @@ import {
   EmargementSessionMiloCommandHandler
 } from '../../application/commands/milo/emargement-session-milo.command.handler'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './failure.handler'
+import { handleFailure } from './result.handler'
 import {
   EmargementsSessionMiloPayload,
   GetAgendaSessionsQueryParams,

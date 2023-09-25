@@ -33,7 +33,7 @@ import { isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Recherche } from '../../domain/offre/recherche/recherche'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './failure.handler'
+import { handleFailure } from './result.handler'
 import {
   CreateRechercheImmersionPayload,
   CreateRechercheOffresEmploiPayload,

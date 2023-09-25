@@ -21,7 +21,7 @@ import {
 } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
 import { Utilisateur } from '../../decorators/authenticated.decorator'
-import { handleFailure } from '../failure.handler'
+import { handleFailure } from '../result.handler'
 import {
   GetActionsConseillerV2QueryParams,
   GetRendezVousConseillerV2QueryParams

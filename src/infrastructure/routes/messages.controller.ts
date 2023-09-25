@@ -3,7 +3,7 @@ import { ApiOAuth2, ApiTags } from '@nestjs/swagger'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { Authentification } from '../../domain/authentification'
 import { isFailure } from '../../building-blocks/types/result'
-import { handleFailure } from './failure.handler'
+import { handleFailure } from './result.handler'
 import { EnvoyerMessageGroupeCommandHandler } from '../../application/commands/envoyer-message-groupe.command.handler'
 import { EnvoyerMessagePayload } from './validation/messages.input'
 

@@ -27,7 +27,7 @@ import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { UpdateRendezVousPayload } from './validation/rendez-vous.inputs'
-import { handleFailure } from './failure.handler'
+import { handleFailure } from './result.handler'
 
 @Controller('rendezvous')
 @ApiOAuth2([])

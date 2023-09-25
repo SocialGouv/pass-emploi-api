@@ -25,7 +25,7 @@ import {
 import { isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './failure.handler'
+import { handleFailure } from './result.handler'
 import { GetServicesCiviqueQueryParams } from './validation/services-civique.inputs'
 
 @Controller()

@@ -25,7 +25,7 @@ import { isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { OidcQueryToken } from '../decorators/skip-oidc-auth.decorator'
-import { handleFailure } from './failure.handler'
+import { handleFailure } from './result.handler'
 import { TeleverserFichierPayload } from './validation/fichiers.inputs'
 
 @Controller('fichiers')
