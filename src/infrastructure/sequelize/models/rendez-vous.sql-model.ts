@@ -49,6 +49,9 @@ export class RendezVousDto extends Model {
   @Column({ field: 'date_cloture', type: DataType.DATE })
   dateCloture: Date | null
 
+  @Column({ field: 'date_creation', type: DataType.DATE })
+  dateCreation: Date | null
+
   @Column({ field: 'type', type: DataType.STRING })
   type: CodeTypeRendezVous
 

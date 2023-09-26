@@ -20,6 +20,7 @@ import {
   unRendezVous
 } from '../../fixtures/rendez-vous.fixture'
 import { DateTime } from 'luxon'
+import { DateService } from '../../../src/utils/date-service'
 
 describe('Rendez-vous', () => {
   const id = '26279b34-318a-45e4-a8ad-514a1090462c'
@@ -27,11 +28,15 @@ describe('Rendez-vous', () => {
 
   describe('Factory', () => {
     let factory: RendezVous.Factory
+    let dateService: StubbedClass<DateService>
+    const now = uneDatetime()
 
     beforeEach(() => {
       idService = stubClass(IdService)
       idService.uuid.returns(id)
-      factory = new RendezVous.Factory(idService)
+      dateService = stubClass(DateService)
+      dateService.now.returns(now)
+      factory = new RendezVous.Factory(idService, dateService)
     })
 
     describe('creer', () => {
@@ -91,6 +96,7 @@ describe('Rendez-vous', () => {
                 prenom: 'Nils'
               },
               date: dateAujourdhui,
+              dateCreation: now,
               duree: 10,
               id: '26279b34-318a-45e4-a8ad-514a1090462c',
               source: RendezVous.Source.PASS_EMPLOI,
