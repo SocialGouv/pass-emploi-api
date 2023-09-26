@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
+  GetJeunesByStructureMiloQuery,
   GetJeunesByStructureMiloQueryHandler,
   GetJeunesByStructureMiloQueryModel
 } from '../../application/queries/milo/get-jeunes-by-structure-milo.query.handler.db'
@@ -20,7 +21,10 @@ export class StructuresMiloController {
 
   @ApiOperation({
     summary: "Récupère les jeunes d'une structure Milo avec filtres optionnels",
-    description: 'Autorisé pour un conseiller Milo appartenant à la structure'
+    description:
+      'Autorisé pour un conseiller Milo appartenant à la structure\n' +
+      '- Si une page est demandée alors le résultat sera paginé\n' +
+      '- Quand le résultat est paginé, la limite par défaut est de 10 résultats'
   })
   @Get(':idStructureMilo/jeunes')
   @ApiResponse({
@@ -33,13 +37,14 @@ export class StructuresMiloController {
     @Query()
     getJeunesStructureMiloQueryParams: GetJeunesStructureMiloQueryParams
   ): Promise<GetJeunesByStructureMiloQueryModel> {
+    const query: GetJeunesByStructureMiloQuery = {
+      idStructureMilo,
+      page: getJeunesStructureMiloQueryParams.page,
+      limit: getJeunesStructureMiloQueryParams.limit,
+      q: getJeunesStructureMiloQueryParams.q
+    }
     const result = await this.getJeunesByStructureMilo.execute(
-      {
-        idStructureMilo,
-        page: getJeunesStructureMiloQueryParams.page,
-        limit: getJeunesStructureMiloQueryParams.limit,
-        q: getJeunesStructureMiloQueryParams.q
-      },
+      query,
       utilisateur
     )
 

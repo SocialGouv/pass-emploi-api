@@ -57,29 +57,34 @@ export class GetJeunesByStructureMiloQueryHandler extends QueryHandler<
   async handle(
     query: GetJeunesByStructureMiloQuery
   ): Promise<Result<GetJeunesByStructureMiloQueryModel>> {
-    const page = query.page
-    const limit = query.page ? query.limit ?? NOMBRE_JEUNES_MAX : undefined
-    const recherche = query.q
-
     let replacements: unknown[] = []
+
+    const critereDeRecherche = query.q
 
     let rechercheSelect = ''
     let rechercheWhere = ''
     let rechercheOrder = ''
-    if (recherche) {
+    if (critereDeRecherche) {
       rechercheSelect = `SIMILARITY(CONCAT(jeune.nom, ' ', jeune.prenom), ?) AS "score",`
       rechercheWhere = `SIMILARITY(CONCAT(jeune.nom, ' ', jeune.prenom), ?) > 0.1 AND`
       rechercheOrder = `ORDER BY "score" DESC`
-      replacements = [recherche, recherche]
+      replacements = [critereDeRecherche, critereDeRecherche]
     }
 
     replacements.push(query.idStructureMilo)
 
+    const pageDemandee = query.page
+    const nombreResultatsDemandes = query.limit
+
     let paginationSql = ''
-    if (page && limit) {
-      paginationSql = `OFFSET ? 
-      LIMIT ?`
-      replacements = replacements.concat([(page - 1) * limit, limit])
+
+    if (pageDemandee) {
+      const limit = nombreResultatsDemandes ?? NOMBRE_JEUNES_MAX
+      paginationSql = `OFFSET ? LIMIT ?`
+      replacements = replacements.concat([(pageDemandee - 1) * limit, limit])
+    } else if (nombreResultatsDemandes) {
+      paginationSql = `LIMIT ?`
+      replacements.push(nombreResultatsDemandes)
     }
 
     const sqlJeunes: JeuneByStructureMiloRawSql[] = await this.sequelize.query(
@@ -111,8 +116,8 @@ export class GetJeunesByStructureMiloQueryHandler extends QueryHandler<
 
     return success({
       pagination: {
-        page: page ?? DEFAULT_PAGE,
-        limit: limit ?? total,
+        page: pageDemandee ?? DEFAULT_PAGE,
+        limit: nombreResultatsDemandes ?? total,
         total
       },
       resultats: sqlJeunes.map(jeuneSql => {

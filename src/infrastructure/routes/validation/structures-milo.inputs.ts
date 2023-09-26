@@ -1,21 +1,25 @@
-import { ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator'
 
 export class GetJeunesStructureMiloQueryParams {
-  @ApiPropertyOptional()
+  @ApiProperty({ description: 'applique une pagination aux résultats' })
   @IsOptional()
   @IsNumber()
   @Type(() => Number)
   page?: number
 
-  @ApiPropertyOptional()
+  @ApiProperty({
+    description: 'si pagination appliquée, par défaut à 10 résultats'
+  })
   @IsOptional()
   @IsNumber()
   @Type(() => Number)
   limit?: number
 
-  @ApiPropertyOptional()
+  @ApiProperty({
+    description: 'critère de recherche par nom et prénom de bénéficiaire'
+  })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
