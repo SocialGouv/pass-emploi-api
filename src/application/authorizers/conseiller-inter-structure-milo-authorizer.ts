@@ -23,6 +23,23 @@ export class ConseillerInterStructureMiloAuthorizer {
     private jeuneRepository: JeuneMilo.Repository
   ) {}
 
+  async autoriserConseillerPourUneStructureMilo(
+    idStructureMilo: string,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<Result> {
+    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+      const conseiller = await this.conseillerMiloRepository.get(utilisateur.id)
+
+      if (
+        isSuccess(conseiller) &&
+        conseiller.data.structure.id === idStructureMilo
+      ) {
+        return emptySuccess()
+      }
+    }
+    return failure(new DroitsInsuffisants())
+  }
+
   async autoriserConseillerAvecLaMemeStructureQueLeJeune(
     idJeune: string,
     utilisateur: Authentification.Utilisateur

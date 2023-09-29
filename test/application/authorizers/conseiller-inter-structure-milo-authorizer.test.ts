@@ -28,6 +28,47 @@ describe('ConseillerInterStructureMiloAuthorizer', () => {
     )
   })
 
+  describe('autoriserConseillerPourUneStructureMilo', () => {
+    describe('quand le conseiller est sur la bonne strucutre', () => {
+      it('retourne un success', async () => {
+        // Given
+        const conseiller = unConseillerMilo()
+        const utilisateur = unUtilisateurConseiller({ id: conseiller.id })
+
+        conseillerRepository.get
+          .withArgs(conseiller.id)
+          .resolves(success(conseiller))
+
+        // When
+        const result = await authorizer.autoriserConseillerPourUneStructureMilo(
+          conseiller.structure.id,
+          utilisateur
+        )
+
+        // Then
+        expect(result).to.deep.equal(emptySuccess())
+      })
+    })
+    describe('quand le conseiller est sur une mauvaise strucutre', () => {
+      it('retourne une failure', async () => {
+        // Given
+        const conseiller = unConseillerMilo()
+        const utilisateur = unUtilisateurConseiller({ id: conseiller.id })
+
+        conseillerRepository.get.withArgs(conseiller.id).resolves(conseiller)
+
+        // When
+        const result = await authorizer.autoriserConseillerPourUneStructureMilo(
+          'autre',
+          utilisateur
+        )
+
+        // Then
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
+      })
+    })
+  })
+
   describe('autoriserConseillerAvecLaMemeStructureQueLeJeune', () => {
     describe('quand le conseiller est sur la strucutre du jeune', () => {
       it('retourne un success', async () => {
