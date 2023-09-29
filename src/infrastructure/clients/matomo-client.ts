@@ -5,6 +5,7 @@ import * as APM from 'elastic-apm-node'
 import { firstValueFrom } from 'rxjs'
 import { Notification } from '../../domain/notification/notification'
 import { buildError } from '../../utils/logger.module'
+import { getAPMInstance } from '../monitoring/apm.init'
 
 @Injectable()
 export class MatomoClient {
@@ -18,6 +19,7 @@ export class MatomoClient {
     private configService: ConfigService
   ) {
     this.logger = new Logger('MatomoClient')
+    this.apmService = getAPMInstance()
     this.url = this.configService.get('matomo').url
     this.siteId = this.configService.get('matomo').siteId
   }
