@@ -46,7 +46,6 @@ import { UpdateUtilisateurCommandHandler } from './application/commands/update-u
 import { TeleverserFichierCommandHandler } from './application/commands/televerser-fichier.command.handler'
 import { GetActionsPredefiniesQueryHandler } from './application/queries/action/get-actions-predefinies.query.handler'
 import { GetJeunesIdentitesQueryHandler } from './application/queries/get-jeunes-identites.query.handler.db'
-import { GetJeunesByEtablissementQueryHandler } from './application/queries/get-jeunes-by-etablissement.query.handler.db'
 import { Context } from './building-blocks/context'
 import { GetActionsJeuneQueryHandler } from './application/queries/action/get-actions-jeune.query.handler.db'
 import { GetChatSecretsQueryHandler } from './application/queries/get-chat-secrets.query.handler'
@@ -76,7 +75,6 @@ import { GetOffresServicesCiviqueQueryHandler } from './application/queries/get-
 import { GetTypesRendezVousQueryHandler } from './application/queries/rendez-vous/get-types-rendez-vous.query.handler'
 import { TaskService } from './application/task.service'
 import { WorkerService } from './application/worker.service.db'
-import { GetJeunesEtablissementV2QueryHandler } from './application/queries/get-jeunes-etablissement-v2.query.handler.db'
 import configuration from './config/configuration'
 import {
   Action,
@@ -346,6 +344,10 @@ import { GetSessionsConseillerMiloV2QueryGetter } from './application/queries/qu
 import { GetSessionsConseillerMiloV2QueryHandler } from './application/queries/milo/v2/get-sessions-conseiller.milo.v2.query.handler.db'
 import { ConseillersMiloControllerv2 } from './infrastructure/routes/v2/conseillers.milo.controller.v2'
 import { MatomoClient } from './infrastructure/clients/matomo-client'
+import { GetJeunesByStructureMiloQueryHandler } from './application/queries/milo/get-jeunes-by-structure-milo.query.handler.db'
+import { StructuresMiloController } from './infrastructure/routes/structures-milo.controller'
+import { GetJeunesEtablissementV2QueryHandler } from './application/queries/get-jeunes-etablissement-v2.query.handler.db'
+import { GetJeunesByEtablissementQueryHandler } from './application/queries/get-jeunes-by-etablissement.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -375,6 +377,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     RendezVousController,
     EtablissementsController,
     EtablissementsControllerV2,
+    StructuresMiloController,
     // Recherche
     OffresEmploiController,
     OffresImmersionController,
@@ -616,7 +619,9 @@ export function buildQueryCommandsProviders(): Provider[] {
     ListeDeDiffusionAuthorizer,
     GetDetailActionQueryHandler,
     GetDetailJeuneQueryHandler,
+    GetJeunesByEtablissementQueryHandler,
     GetJeunesEtablissementV2QueryHandler,
+    GetJeunesByStructureMiloQueryHandler,
     GetActionsJeuneQueryHandler,
     CreateActionCommandHandler,
     CreerJeunePoleEmploiCommandHandler,
@@ -724,7 +729,6 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetActionsPredefiniesQueryHandler,
     GetAnimationsCollectivesQueryHandler,
     GetAnimationsCollectivesV2QueryHandler,
-    GetJeunesByEtablissementQueryHandler,
     GetAccueilJeuneMiloQueryHandler,
     GetAccueilJeunePoleEmploiQueryHandler,
     CloturerAnimationCollectiveCommandHandler,

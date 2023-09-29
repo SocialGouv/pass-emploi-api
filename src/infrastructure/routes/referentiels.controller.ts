@@ -17,7 +17,6 @@ import {
   ActionPredefinieQueryModel,
   TypeQualificationQueryModel
 } from '../../application/queries/query-models/actions.query-model'
-import { AgenceQueryModel } from '../../application/queries/query-models/agence.query-model'
 import { CommunesEtDepartementsQueryModel } from '../../application/queries/query-models/communes-et-departements.query-model'
 import { MotifSuppressionJeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
 import { MetiersRomeQueryModel } from '../../application/queries/query-models/metiers-rome.query-model'
@@ -33,6 +32,7 @@ import { GetAgencesQueryParams } from './validation/agences.inputs'
 import { TypesDemarchesQueryParams } from './validation/demarches.inputs'
 import { ThematiqueQueryModel } from 'src/application/queries/query-models/catalogue.query-model'
 import { GetCatalogueDemarchesQueryHandler } from 'src/application/queries/get-catalogue-demarches.query.handler'
+import { AgenceQueryModel } from '../../application/queries/query-models/agence.query-model'
 
 @Controller('referentiels')
 @ApiTags('Referentiels')
