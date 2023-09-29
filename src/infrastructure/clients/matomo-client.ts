@@ -1,16 +1,17 @@
+import { HttpService } from '@nestjs/axios'
 import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { Notification } from '../../domain/notification/notification'
-import { HttpService } from '@nestjs/axios'
-import { emptySuccess, Result } from '../../building-blocks/types/result'
+import * as APM from 'elastic-apm-node'
 import { firstValueFrom } from 'rxjs'
-import { handleAxiosError } from './utils/axios-error-handler'
+import { Notification } from '../../domain/notification/notification'
+import { buildError } from '../../utils/logger.module'
 
 @Injectable()
 export class MatomoClient {
   private readonly url: string
   private readonly siteId: string
   private readonly logger: Logger
+  private apmService: APM.Agent
 
   constructor(
     private httpService: HttpService,
@@ -23,7 +24,7 @@ export class MatomoClient {
 
   async trackEventPushNotificationEnvoyee(
     message: Notification.Message
-  ): Promise<Result> {
+  ): Promise<void> {
     const categorieEvent = 'Push notifications sur mobile'
     const actionEvent = 'Envoi push notification'
     const nomEvent = message.data.type
@@ -40,9 +41,9 @@ export class MatomoClient {
           }
         })
       )
-      return emptySuccess()
     } catch (e) {
-      return handleAxiosError(e, this.logger, 'Erreur POST Matomo')
+      this.logger.error(buildError(`Erreur POST Matomo`, e))
+      this.apmService.captureError(e)
     }
   }
 }
