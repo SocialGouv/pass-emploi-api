@@ -11,6 +11,7 @@ import { getAPMInstance } from '../monitoring/apm.init'
 export class MatomoClient {
   private readonly url: string
   private readonly siteId: string
+  private readonly isActive: boolean
   private readonly logger: Logger
   private apmService: APM.Agent
 
@@ -22,30 +23,33 @@ export class MatomoClient {
     this.apmService = getAPMInstance()
     this.url = this.configService.get('matomo').url
     this.siteId = this.configService.get('matomo').siteId
+    this.isActive = this.configService.get('features').envoyerStatsMatomo
   }
 
   async trackEventPushNotificationEnvoyee(
     message: Notification.Message
   ): Promise<void> {
-    const categorieEvent = 'Push notifications sur mobile'
-    const actionEvent = 'Envoi push notification'
-    const nomEvent = message.data.type
+    if (this.isActive) {
+      const categorieEvent = 'Push notifications sur mobile'
+      const actionEvent = 'Envoi push notification'
+      const nomEvent = message.data.type
 
-    try {
-      await firstValueFrom(
-        this.httpService.post(this.url, null, {
-          params: {
-            idsite: this.siteId,
-            rec: 1,
-            e_c: categorieEvent,
-            e_a: actionEvent,
-            e_n: nomEvent
-          }
-        })
-      )
-    } catch (e) {
-      this.logger.error(buildError(`Erreur POST Matomo`, e))
-      this.apmService.captureError(e)
+      try {
+        await firstValueFrom(
+          this.httpService.post(this.url, null, {
+            params: {
+              idsite: this.siteId,
+              rec: 1,
+              e_c: categorieEvent,
+              e_a: actionEvent,
+              e_n: nomEvent
+            }
+          })
+        )
+      } catch (e) {
+        this.logger.error(buildError(`Erreur POST Matomo`, e))
+        this.apmService.captureError(e)
+      }
     }
   }
 }
