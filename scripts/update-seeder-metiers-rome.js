@@ -1,5 +1,7 @@
 const fs = require('fs')
-const metiersRome = require('../src/infrastructure/sequelize/seeders/data/metiers-rome.json')
+const metiersRomeJson = require('../src/infrastructure/sequelize/seeders/data/metiers-rome.json')
+
+let newMetiersRomeReferentiel = []
 
 fs.readFile('./ROME_ArboPrincipale.csv', function (err, csv) {
   if (err) {
@@ -8,18 +10,39 @@ fs.readFile('./ROME_ArboPrincipale.csv', function (err, csv) {
 
   const bufferString = csv.toString()
   const csvLines = bufferString.split('\n')
-
   const headers = csvLines[0].split(';')
-  let newMetiersRome = []
 
-  for (let i = 1; i < csvLines.length; i++) {
+  const metierRomeJsonMap = metiersRomeJson.reduce((map, metier) => {
+    if (metier.libelle) map.set(metier.libelle, metier)
+    return map
+  }, new Map())
+
+  const length = csvLines.length
+  //const length = 10
+
+  for (let i = 1; i < length; i++) {
     let libelleAppellation = csvLines[i].split(';')
     let obj = {}
     for (let j = 0; j < libelleAppellation.length; j++) {
       obj[headers[j].trim()] = libelleAppellation[j].trim()
     }
     if (obj.appellation_code !== '') {
-      metiersRome.find(item => item.libelle === obj.libelle)
+      if (metierRomeJsonMap.get(obj.libelle)) {
+        newMetiersRomeReferentiel.push({
+          ...metierRomeJsonMap.get(obj.libelle),
+          appellationCode: obj.appellation_code
+        })
+      }
     }
   }
+
+  console.log(newMetiersRomeReferentiel)
+
+  fs.writeFile(
+    './ROME_with_appellationCode.json',
+    JSON.stringify(newMetiersRomeReferentiel),
+    error => {
+      console.error(error)
+    }
+  )
 })
