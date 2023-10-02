@@ -87,8 +87,8 @@ export class GetJeunesByStructureMiloQueryHandler extends QueryHandler<
       replacements.push(nombreResultatsDemandes)
     }
 
-    // NOSONAR
     const sqlJeunes: JeuneByStructureMiloRawSql[] = await this.sequelize.query(
+      // NOSONAR
       `SELECT
       jeune.id as id_jeune,
       jeune.nom as nom_jeune,
