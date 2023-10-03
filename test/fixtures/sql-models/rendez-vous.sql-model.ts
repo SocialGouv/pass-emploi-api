@@ -33,8 +33,7 @@ export function unRendezVousDto(
     source: RendezVous.Source.PASS_EMPLOI,
     typePartenaire: null,
     idPartenaire: null,
-    nombreMaxParticipants: null,
-    dateCreation: new Date()
+    nombreMaxParticipants: null
   }
 
   return { ...defaults, ...args }

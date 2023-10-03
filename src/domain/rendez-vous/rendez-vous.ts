@@ -130,7 +130,6 @@ export interface RendezVous {
   dateCloture?: DateTime
   informationsPartenaire?: RendezVous.InformationsPartenaire
   nombreMaxParticipants?: number
-  dateCreation?: DateTime
 }
 
 export interface InfosRendezVousACreer {
@@ -238,10 +237,7 @@ export namespace RendezVous {
 
   @Injectable()
   export class Factory {
-    constructor(
-      private idService: IdService,
-      private readonly dateService: DateService
-    ) {}
+    constructor(private idService: IdService) {}
 
     creer(
       infosRendezVousACreer: InfosRendezVousACreer,
@@ -328,8 +324,7 @@ export namespace RendezVous {
           prenom: conseiller.firstName
         },
         idAgence,
-        nombreMaxParticipants: infosRendezVousACreer.nombreMaxParticipants,
-        dateCreation: this.dateService.now()
+        nombreMaxParticipants: infosRendezVousACreer.nombreMaxParticipants
       })
     }
 
