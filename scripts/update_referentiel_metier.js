@@ -1,5 +1,5 @@
 const Pg = require('pg')
-const metiersRomeJson = require('./ROME_with_appellationCode.json')
+const metiersRomeJson = require('../src/infrastructure/sequelize/seeders/data/metiers-rome.json')
 
 const databaseConfiguration = {
   user: 'passemploi',
@@ -17,15 +17,14 @@ async function updateReferentiel() {
 
   const referentielMetiersRomeJson = metiersRomeJson
 
-  console.log('ici')
-  console.log(referentielMetiersRomeJson.length)
-  // todo fonctionne super
+  console.log('nombre de ligne : ', referentielMetiersRomeJson.length)
+
   for (let i = 0; i < referentielMetiersRomeJson.length; i++) {
     try {
       await client.query(
         'UPDATE referentiel_metier_rome SET appellation_code=$1 WHERE libelle=$2',
         [
-          referentielMetiersRomeJson[i].appellationCode,
+          referentielMetiersRomeJson[i].appellation_code,
           referentielMetiersRomeJson[i].libelle
         ]
       )
@@ -35,19 +34,5 @@ async function updateReferentiel() {
     }
   }
 
-  // todo voir pourquoi ce code  ne marche pas
-  // referentielMetiersRomeJson.map(async function (metier) {
-  //   try {
-  //     await client.query(
-  //       'UPDATE referentiel_metier_rome SET appellation_code=$1 WHERE libelle=$2',
-  //       [metier.appellationCode, metier.libelle]
-  //     )
-  //   } catch (err) {
-  //     console.log(err)
-  //     console.log(err.stack)
-  //   }
-  // })
-
   client.end()
-  //return commande
 }

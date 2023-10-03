@@ -26,20 +26,19 @@ fs.readFile('./ROME_ArboPrincipale.csv', function (err, csv) {
     for (let j = 0; j < libelleAppellation.length; j++) {
       obj[headers[j].trim()] = libelleAppellation[j].trim()
     }
-    if (obj.appellation_code !== '') {
-      if (metierRomeJsonMap.get(obj.libelle)) {
-        newMetiersRomeReferentiel.push({
-          ...metierRomeJsonMap.get(obj.libelle),
-          appellationCode: obj.appellation_code
-        })
-      }
+
+    if (metierRomeJsonMap.get(obj.libelle)) {
+      newMetiersRomeReferentiel.push({
+        ...metierRomeJsonMap.get(obj.libelle),
+        appellation_code: obj.appellation_code
+      })
     }
   }
 
   console.log(newMetiersRomeReferentiel)
 
   fs.writeFile(
-    './ROME_with_appellationCode.json',
+    '../src/infrastructure/sequelize/seeders/data/metiers-rome.json',
     JSON.stringify(newMetiersRomeReferentiel),
     error => {
       console.error(error)
