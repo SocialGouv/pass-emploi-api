@@ -1,11 +1,23 @@
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import {
+  Inject,
+  Injectable,
+  Logger,
+  UnauthorizedException
+} from '@nestjs/common'
 import * as APM from 'elastic-apm-node'
 import { DateTime } from 'luxon'
-import { Result, isFailure } from '../../building-blocks/types/result'
+import {
+  Result,
+  isFailure,
+  isSuccess
+} from '../../building-blocks/types/result'
+import { StructureMiloDto } from '../../infrastructure/clients/dto/milo.dto'
 import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
 import { MiloClient } from '../../infrastructure/clients/milo-client'
 import { getAPMInstance } from '../../infrastructure/monitoring/apm.init'
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
+import { StructureMiloSqlModel } from '../../infrastructure/sequelize/models/structure-milo.sql-model'
+import { AsSql } from '../../infrastructure/sequelize/types'
 import { DateService } from '../../utils/date-service'
 import { buildError } from '../../utils/logger.module'
 import { Conseiller } from '../conseiller/conseiller'
@@ -86,21 +98,23 @@ export namespace ConseillerMilo {
             return
           }
 
-          const idStructure = structure.data.code
+          const codeStructure = structure.data.code
 
           const structureModifiee =
-            conseillerSql.idStructureMilo !== idStructure
+            conseillerSql.idStructureMilo !== codeStructure
           if (structureModifiee) {
             const structureExiste =
-              await this.conseillerMiloRepository.structureExiste(idStructure)
+              await this.conseillerMiloRepository.structureExiste(codeStructure)
 
             if (!structureExiste) {
-              this.logger.warn(
-                `La structure ${idStructure} du conseiller Milo ${idConseiller} n'est pas présente dans le référentiel`
-              )
+              const codeStructureAjouteeOuNull =
+                await this.ajouterLaNouvelleStructureSiInfosSuffisantes(
+                  codeStructure
+                )
+
               await this.conseillerMiloRepository.save({
                 id: idConseiller,
-                idStructure: null,
+                idStructure: codeStructureAjouteeOuNull,
                 dateVerificationStructureMilo: maintenant
               })
               return
@@ -109,7 +123,7 @@ export namespace ConseillerMilo {
 
           await this.conseillerMiloRepository.save({
             id: idConseiller,
-            idStructure,
+            idStructure: codeStructure,
             dateVerificationStructureMilo: maintenant
           })
         }
@@ -121,7 +135,66 @@ export namespace ConseillerMilo {
           )
         )
         this.apmService.captureError(e)
+        if (e instanceof UnauthorizedException) {
+          throw e
+        }
       }
     }
+
+    private async ajouterLaNouvelleStructureSiInfosSuffisantes(
+      codeStructure: string
+    ): Promise<string | null> {
+      try {
+        const prefixCodeStructureMilo = codeStructure.substring(0, 5)
+        const structureMiloDtoResult =
+          await this.miloClient.getStructureDuReferentiel(
+            prefixCodeStructureMilo
+          )
+
+        if (isSuccess(structureMiloDtoResult)) {
+          const structureACreer =
+            await construireStructureSqlAvecInfosExistantes(
+              codeStructure,
+              structureMiloDtoResult.data
+            )
+
+          if (structureACreer) {
+            await StructureMiloSqlModel.create(structureACreer)
+            return codeStructure
+          }
+        }
+      } catch (e) {
+        this.logger.warn(e)
+      }
+      return null
+    }
+  }
+}
+
+async function construireStructureSqlAvecInfosExistantes(
+  codeStructure: string,
+  structureMiloDto: StructureMiloDto
+): Promise<AsSql<StructureMiloSqlModel> | null> {
+  const codePostal = structureMiloDto.adresse.codePostal
+  const codeDepartement =
+    codePostal?.substring(0, 2) ?? codeStructure.substring(0, 2)
+  const structureDansLeDepartementSql = await StructureMiloSqlModel.findOne({
+    where: {
+      codeDepartement
+    }
+  })
+
+  if (!structureDansLeDepartementSql) {
+    return null
+  }
+  return {
+    id: codeStructure,
+    nomOfficiel: structureMiloDto.nomOfficiel,
+    nomUsuel: structureMiloDto.nomUsuel,
+    nomRegion: structureDansLeDepartementSql.nomRegion,
+    codeRegion: structureDansLeDepartementSql.codeRegion,
+    nomDepartement: structureDansLeDepartementSql.nomDepartement,
+    codeDepartement: structureDansLeDepartementSql.codeDepartement,
+    timezone: structureDansLeDepartementSql.timezone
   }
 }

@@ -101,6 +101,7 @@ export const testConfig = (): ConfigService => {
       urlWeb: 'https://milo.com',
       apiKeyDossier: 'apiKeyDossier',
       apiKeyCreerJeune: 'apiKeyCreerJeune',
+      apiKeyReferentielStructures: 'apiKeyReferentielStructures',
       apiKeyEvents: 'apiKeyEvents',
       apiKeyDetailRendezVous: 'apiKeyDetailRendezVous',
       apiKeyInstanceSessionLecture: 'apiKeyInstanceSessionLecture',

@@ -71,3 +71,23 @@ export interface InscritSessionMiloDto {
   prenom: string
   statut: string
 }
+
+export interface StructureMiloDto {
+  codeStructure: string
+  nomOfficiel: string
+  nomUsuel: string | null
+  siret: string
+  adresse: {
+    numero: string | null
+    libelleVoie: string | null
+    complement: string | null
+    codePostal: string
+    commune: string
+  }
+  telephone: string | null
+  fax: string | null
+  mail: string | null
+  siteInternet: string | null
+  codeCommune: string | null
+  zoneCouverture: string[]
+}
