@@ -30,7 +30,8 @@ describe('ConseillerSqlRepository', () => {
         notificationsSonores: false,
         agence: {
           id: 'id'
-        }
+        },
+        dateSignatureCGU: undefined
       }
       await AgenceSqlModel.create({
         id: 'id',
@@ -55,8 +56,8 @@ describe('ConseillerSqlRepository', () => {
           id: 'id',
           nom: 'nom'
         },
-        nomAgenceManuel: undefined,
-        notificationsSonores: false
+        notificationsSonores: false,
+        dateSignatureCGU: undefined
       }
       expect(result).to.deep.equal(expected)
     })
@@ -74,7 +75,8 @@ describe('ConseillerSqlRepository', () => {
         notificationsSonores: false,
         agence: {
           id: 'id'
-        }
+        },
+        dateSignatureCGU: undefined
       }
       await AgenceSqlModel.create({
         id: 'id',
@@ -107,8 +109,8 @@ describe('ConseillerSqlRepository', () => {
           id: 'id',
           nom: 'nom'
         },
-        nomAgenceManuel: undefined,
-        notificationsSonores: false
+        notificationsSonores: false,
+        dateSignatureCGU: undefined
       }
       expect(result).to.deep.equal(expected)
     })

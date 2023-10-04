@@ -31,6 +31,7 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
         lastName: 'Tavernier',
         email: 'nils.tavernier@passemploi.com',
         agence: undefined,
+        dateSignatureCGU: undefined,
         notificationsSonores: false,
         aDesBeneficiairesARecuperer: false
       }
@@ -60,6 +61,7 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
           id: undefined,
           nom: "nom d'agence"
         },
+        dateSignatureCGU: undefined,
         notificationsSonores: false,
         aDesBeneficiairesARecuperer: false
       }
@@ -101,6 +103,7 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
           id: "id d'agence",
           nom: 'Bonjour je suis une agence'
         },
+        dateSignatureCGU: undefined,
         notificationsSonores: false,
         aDesBeneficiairesARecuperer: false
       }

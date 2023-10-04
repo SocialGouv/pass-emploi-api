@@ -15,10 +15,12 @@ import {
   ConseillersRepositoryToken
 } from '../../domain/conseiller/conseiller'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
+import { DateTime } from 'luxon'
 
 export interface ModifierConseillerCommand extends Query {
   idConseiller: string
   agence?: Agence
+  dateSignatureCGU?: DateTime
   notificationsSonores?: boolean
 }
 
@@ -58,7 +60,9 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
     const infosDeMiseAJour: Conseiller.InfosDeMiseAJour = {
       notificationsSonores:
         command.notificationsSonores ?? conseillerActuel.notificationsSonores,
-      agence: command.agence ?? conseillerActuel.agence
+      agence: command.agence ?? conseillerActuel.agence,
+      dateSignatureCGU:
+        command.dateSignatureCGU ?? conseillerActuel.dateSignatureCGU
     }
 
     const conseillerResult = Conseiller.mettreAJour(

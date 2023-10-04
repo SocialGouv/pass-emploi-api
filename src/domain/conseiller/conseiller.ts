@@ -14,8 +14,8 @@ export interface Conseiller {
   structure: Core.Structure
   email?: string
   dateVerificationMessages?: DateTime
+  dateSignatureCGU?: DateTime
   agence?: Agence
-  nomAgenceManuel?: string
   notificationsSonores: boolean
 }
 
@@ -97,6 +97,7 @@ export namespace Conseiller {
 
   export interface InfosDeMiseAJour {
     agence?: Agence
+    dateSignatureCGU?: DateTime
     notificationsSonores?: boolean
   }
 }

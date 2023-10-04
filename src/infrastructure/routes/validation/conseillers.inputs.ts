@@ -24,6 +24,7 @@ import {
   transformStringToArray,
   transformStringToBoolean
 } from './utils/transformers'
+import { DateTime } from 'luxon'
 
 export class GetConseillersQueryParams {
   @ApiProperty()
@@ -164,6 +165,11 @@ export class DetailConseillerPayload {
   @ValidateNested({ each: true })
   @Type(() => AgenceInput)
   agence?: AgenceInput
+
+  @IsOptional()
+  @IsDate()
+  @IsNotEmpty()
+  dateSignatureCGU?: DateTime
 
   @ApiPropertyOptional()
   @IsBoolean()

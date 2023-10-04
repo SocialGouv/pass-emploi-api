@@ -13,6 +13,7 @@ import { AsSql } from '../types'
 import { JeuneSqlModel } from './jeune.sql-model'
 import { AgenceSqlModel } from './agence.sql-model'
 import { StructureMiloSqlModel } from './structure-milo.sql-model'
+import { DateTime } from 'luxon'
 
 export class ConseillerDto extends Model {
   @PrimaryKey
@@ -82,6 +83,12 @@ export class ConseillerDto extends Model {
     type: DataType.STRING
   })
   idAgence?: string | null
+
+  @Column({
+    field: 'date_signature_cgu',
+    type: DataType.DATE
+  })
+  dateSignatureCGU: DateTime | null
 
   @Column({
     field: 'nom_manuel_agence',

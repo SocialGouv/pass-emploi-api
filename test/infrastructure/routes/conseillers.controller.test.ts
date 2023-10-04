@@ -62,6 +62,7 @@ import { unJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-mode
 import { StubbedClass, expect } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
+import { DateTime } from 'luxon'
 
 describe('ConseillersController', () => {
   let getDetailConseillerQueryHandler: StubbedClass<GetDetailConseillerQueryHandler>
@@ -1045,6 +1046,9 @@ describe('ConseillersController', () => {
   describe('PUT /conseillers/{idConseiller}', () => {
     const conseiller = unConseiller()
     const agence = uneAgence()
+    const nouvelleDateSignatureCGU = DateTime.fromISO(
+      '2020-04-12T12:00:00.000Z'
+    )
 
     describe('quand le payload est valide', () => {
       it('met à jour le conseiller', async () => {
@@ -1052,7 +1056,8 @@ describe('ConseillersController', () => {
         const command: ModifierConseillerCommand = {
           notificationsSonores: true,
           agence: agence,
-          idConseiller: conseiller.id
+          idConseiller: conseiller.id,
+          dateSignatureCGU: nouvelleDateSignatureCGU
         }
 
         modifierConseillerCommandHandler.execute
@@ -1064,7 +1069,8 @@ describe('ConseillersController', () => {
           .put(`/conseillers/${conseiller.id}`)
           .send({
             notificationsSonores: true,
-            agence: agence
+            agence: agence,
+            dateSignatureCGU: nouvelleDateSignatureCGU
           })
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.OK)
@@ -1092,7 +1098,8 @@ describe('ConseillersController', () => {
         const command: ModifierConseillerCommand = {
           notificationsSonores: true,
           agence: agence,
-          idConseiller: conseiller.id
+          idConseiller: conseiller.id,
+          dateSignatureCGU: nouvelleDateSignatureCGU
         }
 
         modifierConseillerCommandHandler.execute
@@ -1104,7 +1111,8 @@ describe('ConseillersController', () => {
           .put(`/conseillers/${conseiller.id}`)
           .send({
             notificationsSonores: true,
-            agence: uneAgence()
+            agence: uneAgence(),
+            dateSignatureCGU: nouvelleDateSignatureCGU
           })
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.NOT_FOUND)

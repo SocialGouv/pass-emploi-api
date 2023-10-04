@@ -101,6 +101,7 @@ export class ConseillerSqlRepository implements Conseiller.Repository {
       email: conseiller.email || null,
       dateVerificationMessages:
         conseiller.dateVerificationMessages ?? undefined,
+      dateSignatureCGU: conseiller.dateSignatureCGU ?? null,
       idAgence: conseiller.agence?.id ?? null,
       nomManuelAgence:
         !conseiller.agence?.id && conseiller.agence?.nom
@@ -136,8 +137,8 @@ export function fromSqlConseillerToAggregate(
     lastName: conseillerSqlModel.nom,
     structure: conseillerSqlModel.structure,
     email: conseillerSqlModel.email || undefined,
+    dateSignatureCGU: conseillerSqlModel.dateSignatureCGU ?? undefined,
     agence: conseillerSqlModel.agence,
-    nomAgenceManuel: conseillerSqlModel.nomManuelAgence ?? undefined,
     notificationsSonores: conseillerSqlModel.notificationsSonores
   }
   if (conseillerSqlModel.agence) {

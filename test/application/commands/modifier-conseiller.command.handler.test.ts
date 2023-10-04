@@ -31,7 +31,6 @@ describe('ModifierConseillerCommandHandler', () => {
     email: 'mail@mail.mail',
     dateVerificationMessages: undefined,
     agence: undefined,
-    nomAgenceManuel: undefined,
     notificationsSonores: false
   }
 
