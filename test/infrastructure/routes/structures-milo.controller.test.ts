@@ -60,4 +60,13 @@ describe('StructuresMiloController', () => {
       '/structures-milo/paris/jeunes'
     )
   })
+  describe('POST animation-collectives/:idAnimationCollective/cloturer', () => {
+    it('cloture une animation collective', async () => {
+      //Given
+      /*const idJeunes = ['1']
+      const idAnimationCollective = '15916d7e-f13a-4158-b7eb-3936aa937a0a'*/
+      //When
+      //Then
+    })
+  })
 })
