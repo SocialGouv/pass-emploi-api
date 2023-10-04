@@ -5,6 +5,7 @@ import {
   IsArray,
   IsBoolean,
   IsDate,
+  IsDateString,
   IsEmail,
   IsEnum,
   IsIn,
@@ -24,7 +25,6 @@ import {
   transformStringToArray,
   transformStringToBoolean
 } from './utils/transformers'
-import { DateTime } from 'luxon'
 
 export class GetConseillersQueryParams {
   @ApiProperty()
@@ -167,9 +167,9 @@ export class DetailConseillerPayload {
   agence?: AgenceInput
 
   @IsOptional()
-  @IsDate()
+  @IsDateString()
   @IsNotEmpty()
-  dateSignatureCGU?: DateTime
+  dateSignatureCGU?: string
 
   @ApiPropertyOptional()
   @IsBoolean()

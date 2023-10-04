@@ -20,7 +20,7 @@ import { DateTime } from 'luxon'
 export interface ModifierConseillerCommand extends Query {
   idConseiller: string
   agence?: Agence
-  dateSignatureCGU?: DateTime
+  dateSignatureCGU?: string
   notificationsSonores?: boolean
 }
 
@@ -61,8 +61,9 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
       notificationsSonores:
         command.notificationsSonores ?? conseillerActuel.notificationsSonores,
       agence: command.agence ?? conseillerActuel.agence,
-      dateSignatureCGU:
-        command.dateSignatureCGU ?? conseillerActuel.dateSignatureCGU
+      dateSignatureCGU: command.dateSignatureCGU
+        ? DateTime.fromISO(command.dateSignatureCGU)
+        : conseillerActuel.dateSignatureCGU
     }
 
     const conseillerResult = Conseiller.mettreAJour(
