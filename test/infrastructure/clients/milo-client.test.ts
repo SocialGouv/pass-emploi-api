@@ -19,6 +19,9 @@ import {
   MILO_REFUS_JEUNE,
   MILO_REFUS_TIERS
 } from '../../../src/infrastructure/clients/dto/milo.dto'
+import { initializeAPMAgent } from '../../../src/infrastructure/monitoring/apm.init'
+
+initializeAPMAgent()
 
 describe('MiloClient', () => {
   const configService = testConfig()

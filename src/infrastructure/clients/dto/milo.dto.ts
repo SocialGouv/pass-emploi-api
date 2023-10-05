@@ -60,7 +60,7 @@ export interface ListeSessionsJeuneMiloDto {
 export interface StructureConseillerMiloDto {
   code: string
   nomOfficiel: string
-  nomUsuel: string
+  nomUsuel: string | null
   principale: boolean
 }
 

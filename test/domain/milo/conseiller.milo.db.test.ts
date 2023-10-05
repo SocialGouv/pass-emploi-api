@@ -1,3 +1,4 @@
+import { UnauthorizedException } from '@nestjs/common'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { expect } from 'chai'
 import { createSandbox } from 'sinon'
@@ -49,336 +50,482 @@ describe('Conseiller.Milo', () => {
         await getDatabase().cleanPG()
       })
 
-      it("ne met pas à jour quand le conseiller Milo n'existe pas", async () => {
-        // Given
-        const idConseillerInconnu = 'inconnu'
-
-        // When
-        await conseillerMiloService.recupererEtMettreAJourStructure(
-          idConseillerInconnu,
-          token
-        )
-
-        // Then
-        expect(conseillerMiloRepository.save).not.have.been.called()
-      })
-      it('ne met pas à jour quand la récupération de la structure Milo échoue', async () => {
-        // Given
-        await ConseillerSqlModel.create(
-          unConseillerDto({
-            id: idConseiller,
-            structure: Core.Structure.MILO
-          })
-        )
-        keycloakClient.exchangeTokenConseillerMilo
-          .withArgs(token)
-          .resolves(idpToken)
-        miloClient.getStructureConseiller
-          .withArgs(idpToken)
-          .resolves(failure(new ErreurHttp('test', 400)))
-
-        // When
-        await conseillerMiloService.recupererEtMettreAJourStructure(
-          idConseiller,
-          token
-        )
-
-        // Then
-        expect(conseillerMiloRepository.save).not.have.been.called()
-      })
-      it('ne met à jour quand dates connexion et verification invalides', async () => {
-        // Given
-        const idStructureMilo = '10'
-        await StructureMiloSqlModel.create({
-          id: idStructureMilo,
-          nomOfficiel: 'test',
-          timezone: 'Europe/Paris'
-        })
-        await ConseillerSqlModel.create(
-          unConseillerDto({
-            id: idConseiller,
-            structure: Core.Structure.MILO,
-            idStructureMilo,
-            dateDerniereConnexion: maintenant.minus({ minutes: 1 }).toJSDate(),
-            dateVerificationStructureMilo: maintenant.toJSDate()
-          })
-        )
-
-        // When
-        await conseillerMiloService.recupererEtMettreAJourStructure(
-          idConseiller,
-          token
-        )
-
-        // Then
-        expect(conseillerMiloRepository.save).not.to.have.been.called()
-      })
-      it('met à jour date vérification quand la structure Milo est inchangée', async () => {
-        // Given
-        const idStructureMilo = '10'
-        await StructureMiloSqlModel.create({
-          id: idStructureMilo,
-          nomOfficiel: 'test',
-          timezone: 'Europe/Paris'
-        })
-        await ConseillerSqlModel.create(
-          unConseillerDto({
-            id: idConseiller,
-            structure: Core.Structure.MILO,
-            idStructureMilo
-          })
-        )
-
-        keycloakClient.exchangeTokenConseillerMilo
-          .withArgs(token)
-          .resolves(idpToken)
-        miloClient.getStructureConseiller
-          .withArgs(idpToken)
-          .resolves(
-            success(uneStructureConseillerMiloDto({ code: idStructureMilo }))
+      describe("cas d'erreur", () => {
+        it("throw l'erreur lorsque c'est une UnauthorizedException", async () => {
+          // Given
+          await ConseillerSqlModel.create(
+            unConseillerDto({
+              id: idConseiller,
+              structure: Core.Structure.MILO
+            })
+          )
+          keycloakClient.exchangeTokenConseillerMilo.withArgs(token).rejects(
+            new UnauthorizedException({
+              statusCode: 401,
+              code: 'Unauthorized',
+              message: 'token_milo_expired'
+            })
           )
 
-        // When
-        await conseillerMiloService.recupererEtMettreAJourStructure(
-          idConseiller,
-          token
-        )
-
-        // Then
-        expect(
-          conseillerMiloRepository.save
-        ).to.have.been.calledOnceWithExactly({
-          id: idConseiller,
-          idStructure: idStructureMilo,
-          dateVerificationStructureMilo: maintenant
-        })
-      })
-      it('met à jour la structure Milo quand elle existe dans le referentiel', async () => {
-        // Given
-        const idStructureMilo = '10'
-        await StructureMiloSqlModel.create({
-          id: idStructureMilo,
-          nomOfficiel: 'test',
-          timezone: 'Europe/Paris'
-        })
-        await ConseillerSqlModel.create(
-          unConseillerDto({
-            id: idConseiller,
-            structure: Core.Structure.MILO,
-            idStructureMilo
-          })
-        )
-        const token = 'tok'
-        const idpToken = 'idpTok'
-        keycloakClient.exchangeTokenConseillerMilo
-          .withArgs(token)
-          .resolves(idpToken)
-
-        const idNouvelleStructure = '11'
-        miloClient.getStructureConseiller
-          .withArgs(idpToken)
-          .resolves(
-            success(
-              uneStructureConseillerMiloDto({ code: idNouvelleStructure })
+          // When
+          try {
+            await conseillerMiloService.recupererEtMettreAJourStructure(
+              idConseiller,
+              token
             )
-          )
-        conseillerMiloRepository.structureExiste
-          .withArgs(idNouvelleStructure)
-          .resolves(true)
-
-        const conseillerMiloAvecStructure = {
-          id: idConseiller,
-          idStructure: idNouvelleStructure,
-          dateVerificationStructureMilo: maintenant
-        }
-
-        // When
-        await conseillerMiloService.recupererEtMettreAJourStructure(
-          idConseiller,
-          token
-        )
-
-        // Then
-        expect(
-          conseillerMiloRepository.save
-        ).to.have.been.calledOnceWithExactly(conseillerMiloAvecStructure)
-      })
-      it("met à null la structure Milo quand elle n'existe dans le referentiel", async () => {
-        // Given
-        const idStructureMilo = '10'
-        await StructureMiloSqlModel.create({
-          id: idStructureMilo,
-          nomOfficiel: 'test',
-          timezone: 'Europe/Paris'
-        })
-        await ConseillerSqlModel.create(
-          unConseillerDto({
-            id: idConseiller,
-            structure: Core.Structure.MILO,
-            idStructureMilo
-          })
-        )
-        keycloakClient.exchangeTokenConseillerMilo
-          .withArgs(token)
-          .resolves(idpToken)
-
-        const idNouvelleStructure = '11'
-        miloClient.getStructureConseiller
-          .withArgs(idpToken)
-          .resolves(
-            success(
-              uneStructureConseillerMiloDto({ code: idNouvelleStructure })
+            expect.fail(null, null, 'handle test did not reject with an error')
+          } catch (e) {
+            // Then
+            expect(e).to.deep.equal(
+              new UnauthorizedException({
+                statusCode: 401,
+                code: 'Unauthorized',
+                message: 'token_milo_expired'
+              })
             )
-          )
-        conseillerMiloRepository.structureExiste
-          .withArgs(idNouvelleStructure)
-          .resolves(false)
-
-        const conseillerMiloAvecStructure = {
-          id: idConseiller,
-          idStructure: null,
-          dateVerificationStructureMilo: maintenant
-        }
-
-        // When
-        await conseillerMiloService.recupererEtMettreAJourStructure(
-          idConseiller,
-          token
-        )
-
-        // Then
-        expect(
-          conseillerMiloRepository.save
-        ).to.have.been.calledOnceWithExactly(conseillerMiloAvecStructure)
-      })
-      it('met à jour date quand date connexion valide et verification invalide', async () => {
-        // Given
-        const idStructureMilo = '10'
-        await StructureMiloSqlModel.create({
-          id: idStructureMilo,
-          nomOfficiel: 'test',
-          timezone: 'Europe/Paris'
+          }
         })
-        await ConseillerSqlModel.create(
-          unConseillerDto({
-            id: idConseiller,
-            structure: Core.Structure.MILO,
-            idStructureMilo,
-            dateDerniereConnexion: maintenant.toJSDate(),
-            dateVerificationStructureMilo: maintenant.toJSDate()
+      })
+      describe('cas de non mise à jour', () => {})
+      describe('cas de non mise à jour', () => {
+        it("ne met pas à jour quand le conseiller Milo n'existe pas", async () => {
+          // Given
+          const idConseillerInconnu = 'inconnu'
+
+          // When
+          await conseillerMiloService.recupererEtMettreAJourStructure(
+            idConseillerInconnu,
+            token
+          )
+
+          // Then
+          expect(conseillerMiloRepository.save).not.have.been.called()
+        })
+        it('ne met pas à jour quand la récupération de la structure Milo échoue', async () => {
+          // Given
+          await ConseillerSqlModel.create(
+            unConseillerDto({
+              id: idConseiller,
+              structure: Core.Structure.MILO
+            })
+          )
+          keycloakClient.exchangeTokenConseillerMilo
+            .withArgs(token)
+            .resolves(idpToken)
+          miloClient.getStructureConseiller
+            .withArgs(idpToken)
+            .resolves(failure(new ErreurHttp('test', 400)))
+
+          // When
+          await conseillerMiloService.recupererEtMettreAJourStructure(
+            idConseiller,
+            token
+          )
+
+          // Then
+          expect(conseillerMiloRepository.save).not.have.been.called()
+        })
+        it('ne met à jour quand dates connexion et verification invalides', async () => {
+          // Given
+          const idStructureMilo = '10'
+          await StructureMiloSqlModel.create({
+            id: idStructureMilo,
+            nomOfficiel: 'test',
+            timezone: 'Europe/Paris'
           })
-        )
-
-        keycloakClient.exchangeTokenConseillerMilo
-          .withArgs(token)
-          .resolves(idpToken)
-        miloClient.getStructureConseiller
-          .withArgs(idpToken)
-          .resolves(
-            success(uneStructureConseillerMiloDto({ code: idStructureMilo }))
+          await ConseillerSqlModel.create(
+            unConseillerDto({
+              id: idConseiller,
+              structure: Core.Structure.MILO,
+              idStructureMilo,
+              dateDerniereConnexion: maintenant
+                .minus({ minutes: 1 })
+                .toJSDate(),
+              dateVerificationStructureMilo: maintenant.toJSDate()
+            })
           )
 
-        // When
-        await conseillerMiloService.recupererEtMettreAJourStructure(
-          idConseiller,
-          token
-        )
+          // When
+          await conseillerMiloService.recupererEtMettreAJourStructure(
+            idConseiller,
+            token
+          )
 
-        // Then
-        expect(
-          conseillerMiloRepository.save
-        ).to.have.been.calledOnceWithExactly({
-          id: idConseiller,
-          idStructure: idStructureMilo,
-          dateVerificationStructureMilo: maintenant
+          // Then
+          expect(conseillerMiloRepository.save).not.to.have.been.called()
         })
       })
-      it('met à jour date quand date connexion invalide et verification valide', async () => {
-        // Given
-        const idStructureMilo = '10'
-        await StructureMiloSqlModel.create({
-          id: idStructureMilo,
-          nomOfficiel: 'test',
-          timezone: 'Europe/Paris'
-        })
-        await ConseillerSqlModel.create(
-          unConseillerDto({
+      describe('cas de mise à jour', () => {
+        it('met à jour date vérification quand la structure Milo est inchangée', async () => {
+          // Given
+          const idStructureMilo = '10'
+          await StructureMiloSqlModel.create({
+            id: idStructureMilo,
+            nomOfficiel: 'test',
+            timezone: 'Europe/Paris'
+          })
+          await ConseillerSqlModel.create(
+            unConseillerDto({
+              id: idConseiller,
+              structure: Core.Structure.MILO,
+              idStructureMilo
+            })
+          )
+
+          keycloakClient.exchangeTokenConseillerMilo
+            .withArgs(token)
+            .resolves(idpToken)
+          miloClient.getStructureConseiller
+            .withArgs(idpToken)
+            .resolves(
+              success(uneStructureConseillerMiloDto({ code: idStructureMilo }))
+            )
+
+          // When
+          await conseillerMiloService.recupererEtMettreAJourStructure(
+            idConseiller,
+            token
+          )
+
+          // Then
+          expect(
+            conseillerMiloRepository.save
+          ).to.have.been.calledOnceWithExactly({
             id: idConseiller,
-            structure: Core.Structure.MILO,
-            idStructureMilo,
-            dateDerniereConnexion: maintenant.minus({ minutes: 1 }).toJSDate(),
+            idStructure: idStructureMilo,
             dateVerificationStructureMilo: maintenant
-              .minus({ hours: 25 })
-              .toJSDate()
           })
-        )
+        })
+        it('met à jour la structure Milo quand elle existe dans le referentiel', async () => {
+          // Given
+          const idStructureMilo = '10'
+          await StructureMiloSqlModel.create({
+            id: idStructureMilo,
+            nomOfficiel: 'test',
+            timezone: 'Europe/Paris'
+          })
+          await ConseillerSqlModel.create(
+            unConseillerDto({
+              id: idConseiller,
+              structure: Core.Structure.MILO,
+              idStructureMilo
+            })
+          )
+          const token = 'tok'
+          const idpToken = 'idpTok'
+          keycloakClient.exchangeTokenConseillerMilo
+            .withArgs(token)
+            .resolves(idpToken)
 
-        keycloakClient.exchangeTokenConseillerMilo
-          .withArgs(token)
-          .resolves(idpToken)
-        miloClient.getStructureConseiller
-          .withArgs(idpToken)
-          .resolves(
-            success(uneStructureConseillerMiloDto({ code: idStructureMilo }))
+          const idNouvelleStructure = '11'
+          miloClient.getStructureConseiller
+            .withArgs(idpToken)
+            .resolves(
+              success(
+                uneStructureConseillerMiloDto({ code: idNouvelleStructure })
+              )
+            )
+          conseillerMiloRepository.structureExiste
+            .withArgs(idNouvelleStructure)
+            .resolves(true)
+
+          const conseillerMiloAvecStructure = {
+            id: idConseiller,
+            idStructure: idNouvelleStructure,
+            dateVerificationStructureMilo: maintenant
+          }
+
+          // When
+          await conseillerMiloService.recupererEtMettreAJourStructure(
+            idConseiller,
+            token
           )
 
-        // When
-        await conseillerMiloService.recupererEtMettreAJourStructure(
-          idConseiller,
-          token
-        )
+          // Then
+          expect(
+            conseillerMiloRepository.save
+          ).to.have.been.calledOnceWithExactly(conseillerMiloAvecStructure)
+        })
+        it('met à jour date quand date connexion valide et verification valide', async () => {
+          // Given
+          const idStructureMilo = '10'
+          await StructureMiloSqlModel.create({
+            id: idStructureMilo,
+            nomOfficiel: 'test',
+            timezone: 'Europe/Paris'
+          })
+          await ConseillerSqlModel.create(
+            unConseillerDto({
+              id: idConseiller,
+              structure: Core.Structure.MILO,
+              idStructureMilo,
+              dateDerniereConnexion: maintenant.toJSDate(),
+              dateVerificationStructureMilo: maintenant.toJSDate()
+            })
+          )
 
-        // Then
-        expect(
-          conseillerMiloRepository.save
-        ).to.have.been.calledOnceWithExactly({
-          id: idConseiller,
-          idStructure: idStructureMilo,
-          dateVerificationStructureMilo: maintenant
+          keycloakClient.exchangeTokenConseillerMilo
+            .withArgs(token)
+            .resolves(idpToken)
+          miloClient.getStructureConseiller
+            .withArgs(idpToken)
+            .resolves(
+              success(uneStructureConseillerMiloDto({ code: idStructureMilo }))
+            )
+
+          // When
+          await conseillerMiloService.recupererEtMettreAJourStructure(
+            idConseiller,
+            token
+          )
+
+          // Then
+          expect(
+            conseillerMiloRepository.save
+          ).to.have.been.calledOnceWithExactly({
+            id: idConseiller,
+            idStructure: idStructureMilo,
+            dateVerificationStructureMilo: maintenant
+          })
+        })
+        it('met à jour date quand date connexion invalide et verification valide', async () => {
+          // Given
+          const idStructureMilo = '10'
+          await StructureMiloSqlModel.create({
+            id: idStructureMilo,
+            nomOfficiel: 'test',
+            timezone: 'Europe/Paris'
+          })
+          await ConseillerSqlModel.create(
+            unConseillerDto({
+              id: idConseiller,
+              structure: Core.Structure.MILO,
+              idStructureMilo,
+              dateDerniereConnexion: maintenant
+                .minus({ minutes: 1 })
+                .toJSDate(),
+              dateVerificationStructureMilo: maintenant
+                .minus({ hours: 25 })
+                .toJSDate()
+            })
+          )
+
+          keycloakClient.exchangeTokenConseillerMilo
+            .withArgs(token)
+            .resolves(idpToken)
+          miloClient.getStructureConseiller
+            .withArgs(idpToken)
+            .resolves(
+              success(uneStructureConseillerMiloDto({ code: idStructureMilo }))
+            )
+
+          // When
+          await conseillerMiloService.recupererEtMettreAJourStructure(
+            idConseiller,
+            token
+          )
+
+          // Then
+          expect(
+            conseillerMiloRepository.save
+          ).to.have.been.calledOnceWithExactly({
+            id: idConseiller,
+            idStructure: idStructureMilo,
+            dateVerificationStructureMilo: maintenant
+          })
+        })
+        it('met à jour date quand date connexion valide et verification invalide', async () => {
+          // Given
+          const idStructureMilo = '10'
+          await StructureMiloSqlModel.create({
+            id: idStructureMilo,
+            nomOfficiel: 'test',
+            timezone: 'Europe/Paris'
+          })
+          await ConseillerSqlModel.create(
+            unConseillerDto({
+              id: idConseiller,
+              structure: Core.Structure.MILO,
+              idStructureMilo,
+              dateDerniereConnexion: maintenant.toJSDate(),
+              dateVerificationStructureMilo: maintenant
+                .minus({ hours: 25 })
+                .toJSDate()
+            })
+          )
+
+          keycloakClient.exchangeTokenConseillerMilo
+            .withArgs(token)
+            .resolves(idpToken)
+          miloClient.getStructureConseiller
+            .withArgs(idpToken)
+            .resolves(
+              success(uneStructureConseillerMiloDto({ code: idStructureMilo }))
+            )
+
+          // When
+          await conseillerMiloService.recupererEtMettreAJourStructure(
+            idConseiller,
+            token
+          )
+
+          // Then
+          expect(
+            conseillerMiloRepository.save
+          ).to.have.been.calledOnceWithExactly({
+            id: idConseiller,
+            idStructure: idStructureMilo,
+            dateVerificationStructureMilo: maintenant
+          })
         })
       })
-      it('met à jour date quand date connexion valide et verification invalide', async () => {
-        // Given
-        const idStructureMilo = '10'
-        await StructureMiloSqlModel.create({
-          id: idStructureMilo,
-          nomOfficiel: 'test',
-          timezone: 'Europe/Paris'
-        })
-        await ConseillerSqlModel.create(
-          unConseillerDto({
-            id: idConseiller,
-            structure: Core.Structure.MILO,
-            idStructureMilo,
-            dateDerniereConnexion: maintenant.toJSDate(),
-            dateVerificationStructureMilo: maintenant
-              .minus({ hours: 25 })
-              .toJSDate()
+      describe('cas de nouvelle structure', () => {
+        it('crée et met à jour la structure Milo du Conseiller', async () => {
+          // Given
+          const idStructureMilo = '10'
+          await StructureMiloSqlModel.create({
+            id: idStructureMilo,
+            codeDepartement: '92',
+            nomOfficiel: 'test',
+            timezone: 'Europe/Paris'
           })
-        )
+          await ConseillerSqlModel.create(
+            unConseillerDto({
+              id: idConseiller,
+              structure: Core.Structure.MILO,
+              idStructureMilo
+            })
+          )
+          keycloakClient.exchangeTokenConseillerMilo
+            .withArgs(token)
+            .resolves(idpToken)
 
-        keycloakClient.exchangeTokenConseillerMilo
-          .withArgs(token)
-          .resolves(idpToken)
-        miloClient.getStructureConseiller
-          .withArgs(idpToken)
-          .resolves(
-            success(uneStructureConseillerMiloDto({ code: idStructureMilo }))
+          const idNouvelleStructure = '92063S00'
+          miloClient.getStructureConseiller
+            .withArgs(idpToken)
+            .resolves(
+              success(
+                uneStructureConseillerMiloDto({ code: idNouvelleStructure })
+              )
+            )
+          conseillerMiloRepository.structureExiste
+            .withArgs(idNouvelleStructure)
+            .resolves(false)
+
+          const conseillerMiloAvecStructure = {
+            id: idConseiller,
+            idStructure: idNouvelleStructure,
+            dateVerificationStructureMilo: maintenant
+          }
+
+          // When
+          await conseillerMiloService.recupererEtMettreAJourStructure(
+            idConseiller,
+            token
           )
 
-        // When
-        await conseillerMiloService.recupererEtMettreAJourStructure(
-          idConseiller,
-          token
-        )
+          // Then
+          expect(
+            conseillerMiloRepository.save
+          ).to.have.been.calledOnceWithExactly(conseillerMiloAvecStructure)
+        })
+        it('crée et met à jour la structure Milo du Conseiller pour un DOM', async () => {
+          // Given
+          const idStructureMilo = '10'
+          await StructureMiloSqlModel.create({
+            id: idStructureMilo,
+            codeDepartement: '972',
+            nomOfficiel: 'test',
+            timezone: 'America/Martinique'
+          })
+          await ConseillerSqlModel.create(
+            unConseillerDto({
+              id: idConseiller,
+              structure: Core.Structure.MILO,
+              idStructureMilo
+            })
+          )
+          keycloakClient.exchangeTokenConseillerMilo
+            .withArgs(token)
+            .resolves(idpToken)
 
-        // Then
-        expect(
-          conseillerMiloRepository.save
-        ).to.have.been.calledOnceWithExactly({
-          id: idConseiller,
-          idStructure: idStructureMilo,
-          dateVerificationStructureMilo: maintenant
+          const idNouvelleStructure = '97213S00'
+          miloClient.getStructureConseiller
+            .withArgs(idpToken)
+            .resolves(
+              success(
+                uneStructureConseillerMiloDto({ code: idNouvelleStructure })
+              )
+            )
+          conseillerMiloRepository.structureExiste
+            .withArgs(idNouvelleStructure)
+            .resolves(false)
+
+          const conseillerMiloAvecStructure = {
+            id: idConseiller,
+            idStructure: idNouvelleStructure,
+            dateVerificationStructureMilo: maintenant
+          }
+
+          // When
+          await conseillerMiloService.recupererEtMettreAJourStructure(
+            idConseiller,
+            token
+          )
+
+          // Then
+          expect(
+            conseillerMiloRepository.save
+          ).to.have.been.calledOnceWithExactly(conseillerMiloAvecStructure)
+        })
+        it('met à null la structure Milo du Conseiller lorsque la récupération du département échoue', async () => {
+          // Given
+          const idStructureMilo = '10'
+          await StructureMiloSqlModel.create({
+            id: idStructureMilo,
+            codeDepartement: '92',
+            nomOfficiel: 'test',
+            timezone: 'Europe/Paris'
+          })
+          await ConseillerSqlModel.create(
+            unConseillerDto({
+              id: idConseiller,
+              structure: Core.Structure.MILO,
+              idStructureMilo
+            })
+          )
+          keycloakClient.exchangeTokenConseillerMilo
+            .withArgs(token)
+            .resolves(idpToken)
+
+          const idNouvelleStructure = '94063S00'
+          miloClient.getStructureConseiller
+            .withArgs(idpToken)
+            .resolves(
+              success(
+                uneStructureConseillerMiloDto({ code: idNouvelleStructure })
+              )
+            )
+          conseillerMiloRepository.structureExiste
+            .withArgs(idNouvelleStructure)
+            .resolves(false)
+
+          const conseillerMiloAvecStructure = {
+            id: idConseiller,
+            idStructure: null,
+            dateVerificationStructureMilo: maintenant
+          }
+
+          // When
+          await conseillerMiloService.recupererEtMettreAJourStructure(
+            idConseiller,
+            token
+          )
+
+          // Then
+          expect(
+            conseillerMiloRepository.save
+          ).to.have.been.calledOnceWithExactly(conseillerMiloAvecStructure)
         })
       })
     })

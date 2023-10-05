@@ -1,14 +1,22 @@
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import {
+  Inject,
+  Injectable,
+  Logger,
+  UnauthorizedException
+} from '@nestjs/common'
 import * as APM from 'elastic-apm-node'
 import { DateTime } from 'luxon'
 import { Result, isFailure } from '../../building-blocks/types/result'
+import { StructureConseillerMiloDto } from '../../infrastructure/clients/dto/milo.dto'
 import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
 import { MiloClient } from '../../infrastructure/clients/milo-client'
 import { getAPMInstance } from '../../infrastructure/monitoring/apm.init'
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
+import { StructureMiloSqlModel } from '../../infrastructure/sequelize/models/structure-milo.sql-model'
 import { DateService } from '../../utils/date-service'
 import { buildError } from '../../utils/logger.module'
 import { Conseiller } from '../conseiller/conseiller'
+import { AsSql } from '../../infrastructure/sequelize/types'
 
 export const ConseillerMiloRepositoryToken = 'ConseillerMilo.Repository'
 
@@ -78,29 +86,30 @@ export namespace ConseillerMilo {
         if (moinsDe30sPasseesDepuisConnexion || passees24hDepuisVerification) {
           const idpToken =
             await this.keycloakClient.exchangeTokenConseillerMilo(accessToken)
-          const structure = await this.miloClient.getStructureConseiller(
-            idpToken
-          )
+          const resultStructureMiloConseiller =
+            await this.miloClient.getStructureConseiller(idpToken)
 
-          if (isFailure(structure)) {
+          if (isFailure(resultStructureMiloConseiller)) {
             return
           }
 
-          const idStructure = structure.data.code
+          const codeStructure = resultStructureMiloConseiller.data.code
 
           const structureModifiee =
-            conseillerSql.idStructureMilo !== idStructure
+            conseillerSql.idStructureMilo !== codeStructure
           if (structureModifiee) {
             const structureExiste =
-              await this.conseillerMiloRepository.structureExiste(idStructure)
+              await this.conseillerMiloRepository.structureExiste(codeStructure)
 
             if (!structureExiste) {
-              this.logger.warn(
-                `La structure ${idStructure} du conseiller Milo ${idConseiller} n'est pas présente dans le référentiel`
-              )
+              const codeStructureAjouteeOuNull =
+                await this.ajouterLaNouvelleStructureSiInfosSuffisantes(
+                  resultStructureMiloConseiller.data
+                )
+
               await this.conseillerMiloRepository.save({
                 id: idConseiller,
-                idStructure: null,
+                idStructure: codeStructureAjouteeOuNull,
                 dateVerificationStructureMilo: maintenant
               })
               return
@@ -109,7 +118,7 @@ export namespace ConseillerMilo {
 
           await this.conseillerMiloRepository.save({
             id: idConseiller,
-            idStructure,
+            idStructure: codeStructure,
             dateVerificationStructureMilo: maintenant
           })
         }
@@ -121,7 +130,49 @@ export namespace ConseillerMilo {
           )
         )
         this.apmService.captureError(e)
+        if (e instanceof UnauthorizedException) {
+          throw e
+        }
       }
+    }
+
+    private async ajouterLaNouvelleStructureSiInfosSuffisantes(
+      structureMilo: StructureConseillerMiloDto
+    ): Promise<string | null> {
+      try {
+        const PREFIX_CODE_DOM = '97'
+        let codeDepartement = structureMilo.code.substring(0, 2)
+        if (codeDepartement == PREFIX_CODE_DOM) {
+          codeDepartement = structureMilo.code.substring(0, 3)
+        }
+
+        const structureDansLeDepartementSql =
+          await StructureMiloSqlModel.findOne({
+            where: {
+              codeDepartement
+            }
+          })
+
+        if (!structureDansLeDepartementSql) {
+          return null
+        }
+        const structureACreer: AsSql<StructureMiloSqlModel> = {
+          id: structureMilo.code,
+          nomOfficiel: structureMilo.nomOfficiel,
+          nomUsuel: structureMilo.nomUsuel,
+          nomRegion: structureDansLeDepartementSql.nomRegion,
+          codeRegion: structureDansLeDepartementSql.codeRegion,
+          nomDepartement: structureDansLeDepartementSql.nomDepartement,
+          codeDepartement: structureDansLeDepartementSql.codeDepartement,
+          timezone: structureDansLeDepartementSql.timezone
+        }
+
+        await StructureMiloSqlModel.create(structureACreer)
+        return structureMilo.code
+      } catch (e) {
+        this.logger.warn(e)
+      }
+      return null
     }
   }
 }

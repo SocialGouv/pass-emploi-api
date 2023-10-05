@@ -20,6 +20,8 @@ import {
   StructureConseillerMiloDto
 } from './dto/milo.dto'
 import { handleAxiosError } from './utils/axios-error-handler'
+import * as APM from 'elastic-apm-node'
+import { getAPMInstance } from '../monitoring/apm.init'
 
 @Injectable()
 export class MiloClient {
@@ -30,12 +32,14 @@ export class MiloClient {
   private readonly apiKeyInstanceSessionEcritureConseiller: string
   private readonly apiKeyUtilisateurs: string
   private readonly logger: Logger
+  private readonly apmService: APM.Agent
 
   constructor(
     private httpService: HttpService,
     private configService: ConfigService
   ) {
     this.logger = new Logger('MiloClient')
+    this.apmService = getAPMInstance()
     this.apiUrl = this.configService.get('milo').url
     this.apiKeySessionsListeConseiller =
       this.configService.get('milo').apiKeySessionsListeConseiller
@@ -264,7 +268,9 @@ export class MiloClient {
         'X-Gravitee-Api-Key': auth.apiKey,
         operateur: 'APPLICATION_CEJ'
       }
-      if (auth.idpToken) headers.Authorization = `Bearer ${auth.idpToken}`
+      if (auth.idpToken) {
+        headers.Authorization = `Bearer ${auth.idpToken}`
+      }
 
       const response = await firstValueFrom(
         this.httpService.get<T>(`${this.apiUrl}/operateurs/${suffixUrl}`, {
@@ -277,6 +283,7 @@ export class MiloClient {
       }
       return success(response.data)
     } catch (e) {
+      this.apmService.captureError(e)
       return handleAxiosError(e, this.logger, 'Erreur GET Milo')
     }
   }
@@ -304,6 +311,7 @@ export class MiloClient {
       )
       return emptySuccess()
     } catch (e) {
+      this.apmService.captureError(e)
       return handleAxiosError(e, this.logger, 'Erreur POST Milo')
     }
   }
@@ -331,6 +339,7 @@ export class MiloClient {
       )
       return emptySuccess()
     } catch (e) {
+      this.apmService.captureError(e)
       return handleAxiosError(e, this.logger, 'Erreur POST Milo')
     }
   }
@@ -352,6 +361,7 @@ export class MiloClient {
       )
       return emptySuccess()
     } catch (e) {
+      this.apmService.captureError(e)
       return handleAxiosError(e, this.logger, 'Erreur DELETE Milo')
     }
   }

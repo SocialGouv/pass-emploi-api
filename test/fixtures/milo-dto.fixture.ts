@@ -1,15 +1,15 @@
 import {
   InscritSessionMiloDto,
+  ListeSessionsConseillerMiloDto,
+  ListeSessionsJeuneMiloDto,
+  MILO_INSCRIT,
   OffreDto,
   OffreTypeCode,
   SessionConseillerDetailDto,
-  ListeSessionsConseillerMiloDto,
   SessionDto,
   SessionJeuneDetailDto,
   SessionJeuneListeDto,
-  ListeSessionsJeuneMiloDto,
-  StructureConseillerMiloDto,
-  MILO_INSCRIT
+  StructureConseillerMiloDto
 } from 'src/infrastructure/clients/dto/milo.dto'
 
 export const uneSessionDto: SessionDto = {
