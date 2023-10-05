@@ -145,6 +145,13 @@ export default () => {
         limit: process.env.RATE_LIMITER_GET_DOSSIER_MILO_LIMIT ?? '10',
         interval: process.env.RATE_LIMITER_GET_DOSSIER_MILO_INTERVAL ?? '1500'
       },
+      getSessionsStructureMilo: {
+        limit:
+          process.env.RATE_LIMITER_GET_SESSIONS_STRUCTURE_MILO_LIMIT ?? '10',
+        interval:
+          process.env.RATE_LIMITER_GET_SESSIONS_STRUCTURE_MILO_INTERVAL ??
+          '1500'
+      },
       getAckEvenementMilo: {
         limit: process.env.RATE_LIMITER_GET_ACK_EVENEMENT_MILO_LIMIT ?? '10',
         interval:
