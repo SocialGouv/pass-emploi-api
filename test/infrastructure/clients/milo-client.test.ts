@@ -20,17 +20,19 @@ import {
   MILO_REFUS_TIERS
 } from '../../../src/infrastructure/clients/dto/milo.dto'
 import { initializeAPMAgent } from '../../../src/infrastructure/monitoring/apm.init'
+import { RateLimiterService } from '../../../src/utils/rate-limiter.service'
 
 initializeAPMAgent()
 
 describe('MiloClient', () => {
   const configService = testConfig()
+  const rateLimiterService = new RateLimiterService(configService)
   let miloClient: MiloClient
   const MILO_BASE_URL = 'https://milo.com'
 
   beforeEach(() => {
     const httpService = new HttpService()
-    miloClient = new MiloClient(httpService, configService)
+    miloClient = new MiloClient(httpService, configService, rateLimiterService)
   })
 
   describe('getSessionsConseiller', () => {

@@ -109,6 +109,10 @@ export const configurationSchema = Joi.object({
       limit: Joi.number().required(),
       interval: Joi.number().required()
     }),
+    getSessionsStructureMilo: Joi.object({
+      limit: Joi.number().required(),
+      interval: Joi.number().required()
+    }),
     getAckEvenementMilo: Joi.object({
       limit: Joi.number().required(),
       interval: Joi.number().required()

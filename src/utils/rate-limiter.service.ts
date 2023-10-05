@@ -8,6 +8,7 @@ export class RateLimiterService {
   public readonly getDossierMilo: RateLimiter
   public readonly getRendezVousMilo: RateLimiter
   public readonly getSessionMilo: RateLimiter
+  public readonly getSessionsStructureMilo: RateLimiter
   public readonly getEvenementMilo: RateLimiter
   public readonly getNotificationsPE: RateLimiter
 
@@ -16,6 +17,7 @@ export class RateLimiterService {
     this.getEvenementMilo = this.buildGetEvenementMilo()
     this.getRendezVousMilo = this.buildGetRendezVousMilo()
     this.getSessionMilo = this.buildGetSessionMilo()
+    this.getSessionsStructureMilo = this.buildGetSessionsStructureMilo()
     this.getNotificationsPE = this.buildGetNotificationsPE()
   }
 
@@ -29,6 +31,21 @@ export class RateLimiterService {
       ),
       tokensToAddPerInterval: parseInt(
         this.configService.get('rateLimiter.getDossierMilo.limit')!
+      )
+    }
+    return new RateLimiter(options)
+  }
+
+  private buildGetSessionsStructureMilo(): RateLimiter {
+    const options: RateLimiter.Options = {
+      size: parseInt(
+        this.configService.get('rateLimiter.getSessionsStructureMilo.limit')!
+      ),
+      interval: parseInt(
+        this.configService.get('rateLimiter.getSessionsStructureMilo.interval')!
+      ),
+      tokensToAddPerInterval: parseInt(
+        this.configService.get('rateLimiter.getSessionsStructureMilo.limit')!
       )
     }
     return new RateLimiter(options)

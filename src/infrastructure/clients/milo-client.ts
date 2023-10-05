@@ -22,6 +22,7 @@ import {
 import { handleAxiosError } from './utils/axios-error-handler'
 import * as APM from 'elastic-apm-node'
 import { getAPMInstance } from '../monitoring/apm.init'
+import { RateLimiterService } from '../../utils/rate-limiter.service'
 
 @Injectable()
 export class MiloClient {
@@ -36,7 +37,8 @@ export class MiloClient {
 
   constructor(
     private httpService: HttpService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private rateLimiterService: RateLimiterService
   ) {
     this.logger = new Logger('MiloClient')
     this.apmService = getAPMInstance()
@@ -74,6 +76,7 @@ export class MiloClient {
       params.append('page', options.page.toString())
     }
 
+    await this.rateLimiterService.getSessionsStructureMilo.attendreLaProchaineDisponibilite()
     // L'api ne renvoie que 50 sessions max par appel au delà, une pagination doit être mise en place. (voir doc 06/23)
     return this.get<ListeSessionsConseillerMiloDto>(
       `structures/${idStructure}/sessions`,
