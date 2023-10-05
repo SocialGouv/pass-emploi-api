@@ -17,8 +17,8 @@ import { CloturerAnimationCollectiveCommandHandler } from '../../application/com
 @ApiOAuth2([])
 @ApiTags('Structures Milo')
 export class StructuresMiloController {
-  private cloturerAnimationCollectiveCommandHandler: CloturerAnimationCollectiveCommandHandler
   constructor(
+    private readonly cloturerAnimationCollectiveCommandHandler: CloturerAnimationCollectiveCommandHandler,
     private readonly getJeunesByStructureMilo: GetJeunesByStructureMiloQueryHandler
   ) {}
 
@@ -65,7 +65,6 @@ export class StructuresMiloController {
     @Body() payload: ClotureAnimationCollectivePayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    console.log('test')
     const result = await this.cloturerAnimationCollectiveCommandHandler.execute(
       {
         idAnimationCollective,

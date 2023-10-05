@@ -74,7 +74,7 @@ describe('StructuresMiloController', () => {
   describe('POST animation-collectives/:idAnimationCollective/cloturer', () => {
     it('cloture une animation collective', async () => {
       //Given
-      const idJeunes = ['1']
+      const idsJeunes = ['1']
       const idAnimationCollective = '15916d7e-f13a-4158-b7eb-3936aa937a0a'
       cloturerAnimationCollectiveCommandHandler.execute.resolves(emptySuccess())
 
@@ -84,13 +84,13 @@ describe('StructuresMiloController', () => {
           `/structures-milo/animations-collectives/${idAnimationCollective}/cloturer`
         )
         .set('authorization', unHeaderAuthorization())
-        .send({ idJeunes })
+        .send({ idsJeunes })
         .expect(HttpStatus.CREATED)
       //Then
       expect(
         cloturerAnimationCollectiveCommandHandler.execute
       ).to.have.been.calledWithExactly(
-        { idAnimationCollective, idJeunes },
+        { idAnimationCollective, idsJeunes },
         unUtilisateurDecode()
       )
     })
