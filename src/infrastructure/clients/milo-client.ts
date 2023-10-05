@@ -17,26 +17,36 @@ import {
   ListeSessionsJeuneMiloDto,
   SessionConseillerDetailDto,
   SessionJeuneDetailDto,
-  StructureConseillerMiloDto
+  StructureConseillerMiloDto,
+  StructureMiloDto
 } from './dto/milo.dto'
 import { handleAxiosError } from './utils/axios-error-handler'
+import * as APM from 'elastic-apm-node'
+import { getAPMInstance } from '../monitoring/apm.init'
+import { RateLimiterService } from '../../utils/rate-limiter.service'
 
 @Injectable()
 export class MiloClient {
   private readonly apiUrl: string
+  private readonly apiKeyReferentielStructures: string
   private readonly apiKeySessionsListeConseiller: string
   private readonly apiKeySessionsDetailEtListeJeune: string
   private readonly apiKeySessionDetailConseiller: string
   private readonly apiKeyInstanceSessionEcritureConseiller: string
   private readonly apiKeyUtilisateurs: string
   private readonly logger: Logger
+  private readonly apmService: APM.Agent
 
   constructor(
     private httpService: HttpService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private rateLimiterService: RateLimiterService
   ) {
     this.logger = new Logger('MiloClient')
+    this.apmService = getAPMInstance()
     this.apiUrl = this.configService.get('milo').url
+    this.apiKeyReferentielStructures =
+      this.configService.get('milo').apiKeyReferentielStructures
     this.apiKeySessionsListeConseiller =
       this.configService.get('milo').apiKeySessionsListeConseiller
     this.apiKeySessionsDetailEtListeJeune =
@@ -46,6 +56,15 @@ export class MiloClient {
     this.apiKeyInstanceSessionEcritureConseiller =
       this.configService.get('milo').apiKeyInstanceSessionEcritureConseiller
     this.apiKeyUtilisateurs = this.configService.get('milo').apiKeyUtilisateurs
+  }
+
+  async getStructureDuReferentiel(
+    prefixCodeStructureMilo: string
+  ): Promise<Result<StructureMiloDto>> {
+    await this.rateLimiterService.getReferentielStructuresMilo.attendreLaProchaineDisponibilite()
+    return this.get<StructureMiloDto>(`structures/${prefixCodeStructureMilo}`, {
+      apiKey: this.apiKeyReferentielStructures
+    })
   }
 
   async getSessionsConseiller(
@@ -264,7 +283,9 @@ export class MiloClient {
         'X-Gravitee-Api-Key': auth.apiKey,
         operateur: 'APPLICATION_CEJ'
       }
-      if (auth.idpToken) headers.Authorization = `Bearer ${auth.idpToken}`
+      if (auth.idpToken) {
+        headers.Authorization = `Bearer ${auth.idpToken}`
+      }
 
       const response = await firstValueFrom(
         this.httpService.get<T>(`${this.apiUrl}/operateurs/${suffixUrl}`, {
@@ -277,6 +298,7 @@ export class MiloClient {
       }
       return success(response.data)
     } catch (e) {
+      this.apmService.captureError(e)
       return handleAxiosError(e, this.logger, 'Erreur GET Milo')
     }
   }
@@ -304,6 +326,7 @@ export class MiloClient {
       )
       return emptySuccess()
     } catch (e) {
+      this.apmService.captureError(e)
       return handleAxiosError(e, this.logger, 'Erreur POST Milo')
     }
   }
@@ -331,6 +354,7 @@ export class MiloClient {
       )
       return emptySuccess()
     } catch (e) {
+      this.apmService.captureError(e)
       return handleAxiosError(e, this.logger, 'Erreur POST Milo')
     }
   }
@@ -352,6 +376,7 @@ export class MiloClient {
       )
       return emptySuccess()
     } catch (e) {
+      this.apmService.captureError(e)
       return handleAxiosError(e, this.logger, 'Erreur DELETE Milo')
     }
   }

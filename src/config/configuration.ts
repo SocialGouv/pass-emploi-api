@@ -53,6 +53,8 @@ export default () => {
     milo: {
       url: process.env.MILO_API_URL,
       apiKeyDossier: process.env.MILO_DOSSIER_API_KEY,
+      apiKeyReferentielStructures:
+        process.env.MILO_REFERENTIEL_STRUCTURES_API_KEY,
       apiKeyCreerJeune: process.env.MILO_JEUNE_API_KEY,
       apiKeyEvents: process.env.MILO_EVENTS_API_KEY,
       apiKeyDetailRendezVous: process.env.MILO_RENDEZ_VOUS_API_KEY,
@@ -144,6 +146,14 @@ export default () => {
       getDossierMilo: {
         limit: process.env.RATE_LIMITER_GET_DOSSIER_MILO_LIMIT ?? '10',
         interval: process.env.RATE_LIMITER_GET_DOSSIER_MILO_INTERVAL ?? '1500'
+      },
+      getReferentielStructuresMilo: {
+        limit:
+          process.env.RATE_LIMITER_GET_REFERENTIEL_STRUCTURES_MILO_LIMIT ??
+          '10',
+        interval:
+          process.env.RATE_LIMITER_GET_REFERENTIEL_STRUCTURES_MILO_INTERVAL ??
+          '1500'
       },
       getAckEvenementMilo: {
         limit: process.env.RATE_LIMITER_GET_ACK_EVENEMENT_MILO_LIMIT ?? '10',

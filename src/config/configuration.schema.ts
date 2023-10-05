@@ -37,6 +37,7 @@ export const configurationSchema = Joi.object({
       .uri()
       .description("feature flipping pour ajouter l'url du dossier du jeune"),
     apiKeyDossier: Joi.string().required(),
+    apiKeyReferentielStructures: Joi.string().required(),
     apiKeyCreerJeune: Joi.string().required(),
     apiKeyEvents: Joi.string().required(),
     apiKeyDetailRendezVous: Joi.string().required(),
@@ -106,6 +107,10 @@ export const configurationSchema = Joi.object({
   }),
   rateLimiter: Joi.object({
     getDossierMilo: Joi.object({
+      limit: Joi.number().required(),
+      interval: Joi.number().required()
+    }),
+    getReferentielStructuresMilo: Joi.object({
       limit: Joi.number().required(),
       interval: Joi.number().required()
     }),

@@ -9,7 +9,8 @@ import {
   SessionJeuneListeDto,
   ListeSessionsJeuneMiloDto,
   StructureConseillerMiloDto,
-  MILO_INSCRIT
+  MILO_INSCRIT,
+  StructureMiloDto
 } from 'src/infrastructure/clients/dto/milo.dto'
 
 export const uneSessionDto: SessionDto = {
@@ -59,6 +60,32 @@ export const uneListeSessionsJeuneDto: ListeSessionsJeuneMiloDto = {
   page: 1,
   nbSessions: 1,
   sessions: [uneSessionListeJeuneDto]
+}
+
+export const uneStructureMiloDto = (
+  args: Partial<StructureMiloDto> = {}
+): StructureMiloDto => {
+  const defaults: StructureMiloDto = {
+    codeStructure: '92063',
+    nomOfficiel: '92-ML',
+    nomUsuel: 'ML',
+    siret: 'string',
+    adresse: {
+      numero: 'string',
+      libelleVoie: 'string',
+      complement: 'string',
+      codePostal: '92270',
+      commune: 'string'
+    },
+    telephone: 'string',
+    fax: 'string',
+    mail: 'string',
+    siteInternet: 'string',
+    codeCommune: 'string',
+    zoneCouverture: []
+  }
+
+  return { ...defaults, ...args }
 }
 
 export const uneStructureConseillerMiloDto = (

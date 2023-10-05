@@ -10,7 +10,8 @@ import {
   uneInscriptionSessionMiloDto,
   uneListeDeStructuresConseillerMiloDto,
   uneListeSessionsConseillerDto,
-  uneListeSessionsJeuneDto
+  uneListeSessionsJeuneDto,
+  uneStructureMiloDto
 } from 'test/fixtures/milo-dto.fixture'
 import { testConfig } from 'test/utils/module-for-testing'
 import {
@@ -19,15 +20,38 @@ import {
   MILO_REFUS_JEUNE,
   MILO_REFUS_TIERS
 } from '../../../src/infrastructure/clients/dto/milo.dto'
+import { RateLimiterService } from '../../../src/utils/rate-limiter.service'
+import { initializeAPMAgent } from '../../../src/infrastructure/monitoring/apm.init'
+
+initializeAPMAgent()
 
 describe('MiloClient', () => {
   const configService = testConfig()
+  const rateLimiterService = new RateLimiterService(configService)
   let miloClient: MiloClient
   const MILO_BASE_URL = 'https://milo.com'
 
   beforeEach(() => {
     const httpService = new HttpService()
-    miloClient = new MiloClient(httpService, configService)
+    miloClient = new MiloClient(httpService, configService, rateLimiterService)
+  })
+
+  describe('getStructureDuReferentiel', () => {
+    it('recupere une structure par code', async () => {
+      // Given
+      const code = 'test'
+
+      nock(MILO_BASE_URL)
+        .get(`/operateurs/structures/${code}`)
+        .reply(200, uneStructureMiloDto())
+        .isDone()
+
+      // When
+      const result = await miloClient.getStructureDuReferentiel(code)
+
+      // Then
+      expect(result).to.deep.equal(success(uneStructureMiloDto()))
+    })
   })
 
   describe('getSessionsConseiller', () => {

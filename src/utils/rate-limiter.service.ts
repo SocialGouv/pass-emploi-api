@@ -6,6 +6,7 @@ const TokenBucket = require('tokenbucket')
 @Injectable()
 export class RateLimiterService {
   public readonly getDossierMilo: RateLimiter
+  public readonly getReferentielStructuresMilo: RateLimiter
   public readonly getRendezVousMilo: RateLimiter
   public readonly getSessionMilo: RateLimiter
   public readonly getEvenementMilo: RateLimiter
@@ -13,6 +14,7 @@ export class RateLimiterService {
 
   constructor(private configService: ConfigService) {
     this.getDossierMilo = this.buildGetDossierMilo()
+    this.getReferentielStructuresMilo = this.buildGetReferentielStructuresMilo()
     this.getEvenementMilo = this.buildGetEvenementMilo()
     this.getRendezVousMilo = this.buildGetRendezVousMilo()
     this.getSessionMilo = this.buildGetSessionMilo()
@@ -29,6 +31,27 @@ export class RateLimiterService {
       ),
       tokensToAddPerInterval: parseInt(
         this.configService.get('rateLimiter.getDossierMilo.limit')!
+      )
+    }
+    return new RateLimiter(options)
+  }
+
+  private buildGetReferentielStructuresMilo(): RateLimiter {
+    const options: RateLimiter.Options = {
+      size: parseInt(
+        this.configService.get(
+          'rateLimiter.getReferentielStructuresMilo.limit'
+        )!
+      ),
+      interval: parseInt(
+        this.configService.get(
+          'rateLimiter.getReferentielStructuresMilo.interval'
+        )!
+      ),
+      tokensToAddPerInterval: parseInt(
+        this.configService.get(
+          'rateLimiter.getReferentielStructuresMilo.limit'
+        )!
       )
     }
     return new RateLimiter(options)
