@@ -57,7 +57,7 @@ export class StructuresMiloController {
   @ApiOperation({
     summary: 'clore animation-collectives de structure-milo',
     description:
-      'Autorisé pour un conseiller appartenant à l`établissement de l`animation collective'
+      'Autorisé pour un conseiller appartenant à létablissement de lanimation collective'
   })
   @Post('animations-collectives/:idAnimationCollective/cloturer')
   async postCloture(
@@ -65,6 +65,7 @@ export class StructuresMiloController {
     @Body() payload: ClotureAnimationCollectivePayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
+    console.log('test')
     const result = await this.cloturerAnimationCollectiveCommandHandler.execute(
       {
         idAnimationCollective,
