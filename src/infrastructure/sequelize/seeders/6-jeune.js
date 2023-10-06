@@ -101,6 +101,8 @@ module.exports = {
         date_creation: '2021-11-24T10:00:00.000Z',
         date_premiere_connexion: '2021-11-24T10:00:00.000Z',
         structure: 'MILO',
+        id_structure_milo: '80620S00',
+        id_partenaire: '6473472',
         id_authentification: 'fc075265-0464-4530-a15c-f9483725bac7'
       },
       {
