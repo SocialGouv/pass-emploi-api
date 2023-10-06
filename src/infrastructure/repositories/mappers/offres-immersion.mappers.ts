@@ -50,14 +50,14 @@ export function fromSqlToFavorisOffreImmersionQueryModel(
 }
 
 export function toOffreImmersionQueryModel(
-  offreImmersionDto: PartenaireImmersion.DtoV1
+  offreImmersionDto: PartenaireImmersion.DtoV2
 ): OffreImmersionQueryModel {
   return {
     id: `${offreImmersionDto.siret}-${offreImmersionDto.rome}`,
     metier: offreImmersionDto.romeLabel,
     nomEtablissement: offreImmersionDto.name,
     secteurActivite: offreImmersionDto.nafLabel,
-    ville: offreImmersionDto.city,
+    ville: offreImmersionDto.address.city,
     estVolontaire: offreImmersionDto.voluntaryToImmersion
   }
 }

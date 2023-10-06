@@ -8,7 +8,8 @@ export function unMetierRomeDto(
     id: 12345,
     code: 'D1104',
     libelle: 'Pâtissier tourier / Pâtissière tourière',
-    libelleSanitized: 'Patissier tourier / Patissière tourière'
+    libelleSanitized: 'Patissier tourier / Patissière tourière',
+    appellationCode: '11573'
   }
   return { ...defaults, ...args }
 }

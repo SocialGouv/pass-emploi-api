@@ -7,15 +7,28 @@ import { TIMEOUT } from 'dns'
 import { ImmersionClient } from '../../../../src/infrastructure/clients/immersion-client'
 import { FindAllOffresImmersionQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-immersion.query.getter'
 import { StubbedClass, stubClass } from '../../../utils'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../../utils/database-for-testing'
+import { unMetierRomeDto } from '../../../fixtures/sql-models/metier-rome.sql-model'
+import { MetierRomeSqlModel } from '../../../../src/infrastructure/sequelize/models/metier-rome.sql-model'
 
 describe('', () => {
+  let databaseForTesting: DatabaseForTesting
   let immersionClient: StubbedClass<ImmersionClient>
   let findAllOffresImmersionQueryGetter: FindAllOffresImmersionQueryGetter
 
-  beforeEach(() => {
+  before(() => {
+    databaseForTesting = getDatabase()
+  })
+
+  beforeEach(async () => {
+    await databaseForTesting.cleanPG()
     immersionClient = stubClass(ImmersionClient)
     findAllOffresImmersionQueryGetter = new FindAllOffresImmersionQueryGetter(
-      immersionClient
+      immersionClient,
+      databaseForTesting.sequelize
     )
   })
 
@@ -23,6 +36,34 @@ describe('', () => {
     describe('quand la requête est correcte', () => {
       it('renvoie les offres', async () => {
         // Given
+        const metiers = [
+          unMetierRomeDto({
+            id: 1,
+            code: 'D1102',
+            libelle: 'Aide-Boulanger',
+            appellationCode: '10868'
+          }),
+          unMetierRomeDto({
+            id: 2,
+            code: 'D1102',
+            libelle: 'Boulanger',
+            appellationCode: '11573'
+          }),
+          unMetierRomeDto({
+            id: 3,
+            code: 'D1102',
+            libelle: 'Boulanger-Patissier',
+            appellationCode: '11574'
+          }),
+          unMetierRomeDto({
+            id: 4,
+            code: 'D1102',
+            libelle: 'Boulanger-Traiteur',
+            appellationCode: '11576'
+          })
+        ]
+
+        await MetierRomeSqlModel.bulkCreate(metiers)
         const query = {
           rome: 'D1102',
           location: {
@@ -31,6 +72,7 @@ describe('', () => {
           },
           distance_km: 30
         }
+        const appellationCodes = ['10868', '11573', '11574', '11576']
 
         const response: AxiosResponse = {
           data: [
@@ -41,7 +83,7 @@ describe('', () => {
               romeLabel: 'romeLabel',
               name: 'name',
               nafLabel: 'nafLabel',
-              city: 'city',
+              address: { city: 'city' },
               voluntaryToImmersion: true
             }
           ],
@@ -53,14 +95,17 @@ describe('', () => {
         }
 
         const params = new URLSearchParams()
-        params.append('rome', query.rome)
+        params.append('distanceKm', query.distance_km.toString())
         params.append('longitude', query.location.lon.toString())
         params.append('latitude', query.location.lat.toString())
-        params.append('distance_km', query.distance_km.toString())
+        params.append('appellationCodes[]', appellationCodes[0])
+        params.append('appellationCodes[]', appellationCodes[1])
+        params.append('appellationCodes[]', appellationCodes[2])
+        params.append('appellationCodes[]', appellationCodes[3])
         params.append('sortedBy', 'date')
         params.append('voluntaryToImmersion', 'true')
 
-        immersionClient.get.withArgs('v1/immersion-offers').resolves(response)
+        immersionClient.get.withArgs('v2/search').resolves(response)
 
         // When
         const offres = await findAllOffresImmersionQueryGetter.handle({
@@ -72,7 +117,7 @@ describe('', () => {
 
         // Then
         expect(immersionClient.get.getCall(0).args).to.be.deep.equal([
-          'v1/immersion-offers',
+          'v2/search',
           params
         ])
         expect(offres).to.deep.equal(
@@ -89,7 +134,6 @@ describe('', () => {
         )
       })
     })
-
     describe('quand la requête est mauvaise', () => {
       it('renvoie une erreur', async () => {
         // Given
