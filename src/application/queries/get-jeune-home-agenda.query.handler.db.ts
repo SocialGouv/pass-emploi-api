@@ -155,7 +155,7 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
     const dateDebut = DateTime.fromISO(maintenant, {
       setZone: true
     }).startOf('week')
-    const dimancheEnHuit = dateDebut.plus({ day: 14 })
+    const dimancheEnHuit = dateDebut.plus({ day: 13 }).endOf('day')
     return { lundiDernier: dateDebut, dimancheEnHuit: dimancheEnHuit }
   }
 

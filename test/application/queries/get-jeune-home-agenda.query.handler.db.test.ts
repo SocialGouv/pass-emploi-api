@@ -82,7 +82,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
       structure: Core.Structure.MILO
     }
     const lundiDernierString = '2022-08-08T00:00:00Z'
-    const dimancheEnHuitString = '2022-08-22T00:00:00Z'
+    const dimancheEnHuitString = '2022-08-21T23:59:59.999Z'
     beforeEach(async () => {
       sessionsQueryGetter.handle
         .withArgs(idJeune, 'idDossier', accessToken, {
@@ -183,7 +183,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         metadata: {
           actionsEnRetard: 2,
           dateDeDebut: lundiDernier.dateEcheance,
-          dateDeFin: new Date('2022-08-29T07:00:00.000Z')
+          dateDeFin: new Date('2022-08-29T06:59:59.999Z')
         }
       }
       expect(result).to.deep.equal(success(expected))
@@ -382,7 +382,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         expect(result._isSuccess && result.data.metadata).to.deep.equal({
           actionsEnRetard: 1,
           dateDeDebut: new Date('2022-08-08T00:00:00.000Z'),
-          dateDeFin: new Date('2022-08-22T00:00:00.000Z')
+          dateDeFin: new Date('2022-08-21T23:59:59.999Z')
         })
       })
     })

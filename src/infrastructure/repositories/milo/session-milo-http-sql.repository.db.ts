@@ -197,6 +197,7 @@ function dtoToSessionMilo(
     }),
     animateur: sessionDto.animateur,
     lieu: sessionDto.lieu,
+    nbPlacesDisponibles: sessionDto.nbPlacesDisponibles ?? undefined,
     estVisible: false,
     idStructureMilo: structureMilo.id,
     offre: dtoToOffre(offreDto),
@@ -218,8 +219,6 @@ function dtoToSessionMilo(
     session.estVisible = sessionSql.estVisible
     session.dateModification = DateTime.fromJSDate(sessionSql.dateModification)
   }
-  if (sessionDto.nbPlacesDisponibles)
-    session.nbPlacesDisponibles = sessionDto.nbPlacesDisponibles
   if (sessionDto.commentaire) session.commentaire = sessionDto.commentaire
 
   return session

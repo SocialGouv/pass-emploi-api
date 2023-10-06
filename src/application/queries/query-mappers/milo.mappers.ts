@@ -206,7 +206,7 @@ export function mapSessionToDetailSessionConseillerQueryModel(
       .toUTC()
       .toISO()
   }
-  if (session.nbPlacesDisponibles)
+  if (session.nbPlacesDisponibles !== undefined)
     sessionQueryModel.nbPlacesDisponibles = session.nbPlacesDisponibles
   if (session.commentaire) sessionQueryModel.commentaire = session.commentaire
 
