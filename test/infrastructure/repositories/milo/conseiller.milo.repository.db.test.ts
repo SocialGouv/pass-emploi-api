@@ -113,6 +113,31 @@ describe('ConseillerMiloSqlRepository', () => {
         uneDatetime().toJSDate()
       )
     })
+    it("met à jour la dateMajStructure Milo du conseiller sans touche à l'idStructure", async () => {
+      // Given
+      const idStructureMilo = '1'
+      await StructureMiloSqlModel.create({
+        id: idStructureMilo,
+        nomOfficiel: 'Structure',
+        timezone: 'Europe/Paris'
+      })
+      await ConseillerSqlModel.create(
+        unConseillerDto({ id: idConseiller, idStructureMilo })
+      )
+
+      // When
+      await conseillerMiloSqlRepository.save({
+        id: idConseiller,
+        dateVerificationStructureMilo: uneDatetime()
+      })
+
+      // Then
+      const conseillerTrouve = await ConseillerSqlModel.findByPk(idConseiller)
+      expect(conseillerTrouve?.idStructureMilo).to.equal(idStructureMilo)
+      expect(conseillerTrouve?.dateVerificationStructureMilo).to.deep.equal(
+        uneDatetime().toJSDate()
+      )
+    })
     it('met un idStructureMilo à null pour le conseiller', async () => {
       // Given
       const idStructureMilo = '1'

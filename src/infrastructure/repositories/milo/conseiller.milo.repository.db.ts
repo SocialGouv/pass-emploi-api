@@ -36,7 +36,7 @@ export class ConseillerMiloSqlRepository implements Conseiller.Milo.Repository {
 
   async save(conseiller: {
     id: string
-    idStructure: string | null
+    idStructure?: string | null
     dateVerificationStructureMilo?: DateTime
   }): Promise<void> {
     await ConseillerSqlModel.update(

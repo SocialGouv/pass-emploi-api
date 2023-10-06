@@ -84,9 +84,14 @@ describe('Conseiller.Milo', () => {
               })
             )
           }
+          expect(
+            conseillerMiloRepository.save
+          ).to.have.been.calledOnceWithExactly({
+            id: idConseiller,
+            dateVerificationStructureMilo: maintenant
+          })
         })
       })
-      describe('cas de non mise à jour', () => {})
       describe('cas de non mise à jour', () => {
         it("ne met pas à jour quand le conseiller Milo n'existe pas", async () => {
           // Given
@@ -123,7 +128,12 @@ describe('Conseiller.Milo', () => {
           )
 
           // Then
-          expect(conseillerMiloRepository.save).not.have.been.called()
+          expect(
+            conseillerMiloRepository.save
+          ).to.have.been.calledOnceWithExactly({
+            id: idConseiller,
+            dateVerificationStructureMilo: maintenant
+          })
         })
         it('ne met à jour quand dates connexion et verification invalides', async () => {
           // Given
