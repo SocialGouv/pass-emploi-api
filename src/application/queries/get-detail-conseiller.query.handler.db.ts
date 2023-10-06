@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
@@ -13,8 +14,6 @@ import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-m
 import { StructureMiloSqlModel } from '../../infrastructure/sequelize/models/structure-milo.sql-model'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { DetailConseillerQueryModel } from './query-models/conseillers.query-model'
-import { ConfigService } from '@nestjs/config'
-import { Includeable } from 'sequelize'
 
 export interface GetDetailConseillerQuery extends Query {
   idConseiller: string
@@ -42,20 +41,17 @@ export class GetDetailConseillerQueryHandler extends QueryHandler<
       'features.recupererStructureMilo'
     )
 
-    const include: Includeable[] = [AgenceSqlModel]
-
     if (estMilo(query.structure) && FT_RECUPERER_STRUCTURE_MILO) {
       await this.conseillerMiloService.recupererEtMettreAJourStructure(
         query.idConseiller,
         query.accessToken
       )
-      include.push(StructureMiloSqlModel)
     }
 
     const conseillerSqlModel = await ConseillerSqlModel.findByPk(
       query.idConseiller,
       {
-        include
+        include: [AgenceSqlModel, StructureMiloSqlModel]
       }
     )
 
