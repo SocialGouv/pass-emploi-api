@@ -32,7 +32,7 @@ export namespace ConseillerMilo {
     get(idConseiller: string): Promise<Result<ConseillerMilo>>
     save(conseiller: {
       id: string
-      idStructure: string | null
+      idStructure?: string | null
       dateVerificationStructureMilo?: DateTime
     }): Promise<void>
     structureExiste(idStructure: string): Promise<boolean>
@@ -58,6 +58,7 @@ export namespace ConseillerMilo {
       idConseiller: string,
       accessToken: string
     ): Promise<void> {
+      const maintenant = this.dateService.now()
       try {
         const conseillerSql = await ConseillerSqlModel.findByPk(idConseiller)
 
@@ -72,7 +73,6 @@ export namespace ConseillerMilo {
         const dateVerificationStructureMilo = DateService.fromJSDateToDateTime(
           conseillerSql.dateVerificationStructureMilo
         )
-        const maintenant = this.dateService.now()
         const ilYa30s = maintenant.minus({ seconds: 30 })
         const ilYa24h = maintenant.minus({ hours: 24 })
 
@@ -90,6 +90,10 @@ export namespace ConseillerMilo {
             await this.miloClient.getStructureConseiller(idpToken)
 
           if (isFailure(resultStructureMiloConseiller)) {
+            await this.conseillerMiloRepository.save({
+              id: idConseiller,
+              dateVerificationStructureMilo: maintenant
+            })
             return
           }
 
@@ -130,6 +134,12 @@ export namespace ConseillerMilo {
           )
         )
         this.apmService.captureError(e)
+
+        await this.conseillerMiloRepository.save({
+          id: idConseiller,
+          dateVerificationStructureMilo: maintenant
+        })
+
         if (e instanceof UnauthorizedException) {
           throw e
         }

@@ -36,14 +36,14 @@ export class ConseillerMiloSqlRepository implements Conseiller.Milo.Repository {
 
   async save(conseiller: {
     id: string
-    idStructure: string | null
-    dateVerificationStructureMilo?: DateTime
+    idStructure?: string | null
+    dateVerificationStructureMilo: DateTime
   }): Promise<void> {
     await ConseillerSqlModel.update(
       {
         idStructureMilo: conseiller.idStructure,
         dateVerificationStructureMilo:
-          conseiller.dateVerificationStructureMilo?.toJSDate() ?? null
+          conseiller.dateVerificationStructureMilo?.toJSDate()
       },
       { where: { id: conseiller.id } }
     )
