@@ -189,16 +189,12 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
     dateFinCEJ?: DateTime,
     codeStructureMilo?: string
   ): Promise<void> {
-    const nouvelleDateFinCEJ = recupererModification(
-      dateFinCEJ,
-      jeune.dateFinCEJ
-    )
-    let nouveauCodeStructure = recupererModification(
-      codeStructureMilo,
-      jeune.idStructureMilo
-    )
+    let nouveauCodeStructure: string | null = codeStructureMilo ?? null
 
-    if (nouveauCodeStructure) {
+    if (
+      nouveauCodeStructure &&
+      nouveauCodeStructure !== jeune.idStructureMilo
+    ) {
       const structureSql = await StructureMiloSqlModel.findByPk(
         codeStructureMilo
       )
@@ -206,21 +202,14 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
         nouveauCodeStructure = null
       }
     }
-    const updates: {
-      idStructureMilo?: string | null
-      dateFinCEJ?: Date | null
-    } = {}
 
-    if (nouvelleDateFinCEJ !== undefined) {
-      updates.dateFinCEJ = dateFinCEJ?.toJSDate() ?? null
-    }
-    if (nouveauCodeStructure !== undefined) {
-      updates.idStructureMilo = nouveauCodeStructure
-    }
-
-    if (Object.keys(updates).length !== 0) {
-      await JeuneSqlModel.update(updates, { where: { id: jeune.id } })
-    }
+    await JeuneSqlModel.update(
+      {
+        dateFinCEJ: dateFinCEJ?.toJSDate() ?? null,
+        idStructureMilo: nouveauCodeStructure
+      },
+      { where: { id: jeune.id } }
+    )
   }
 
   async getSituationsByJeune(
@@ -238,15 +227,4 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
         }
       : undefined
   }
-}
-
-function recupererModification<V>(
-  nouvelleValeur?: V,
-  ancienneValeur?: V
-): V | null | undefined {
-  let modification = undefined
-  if (nouvelleValeur !== ancienneValeur) {
-    modification = nouvelleValeur ?? null
-  }
-  return modification
 }
