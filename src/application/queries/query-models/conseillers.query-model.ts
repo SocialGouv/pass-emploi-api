@@ -1,6 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { PaginationQueryModel } from './common/pagination.query-model'
-import { DateTime } from 'luxon'
 
 class AgenceDuConseillerQueryModel {
   @ApiProperty({ required: false })
@@ -58,7 +57,7 @@ export class DetailConseillerQueryModel {
   aDesBeneficiairesARecuperer: boolean
 
   @ApiProperty()
-  dateSignatureCGU?: DateTime
+  dateSignatureCGU?: string
 }
 
 class JeuneDuConseillerQueryModel {
