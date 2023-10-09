@@ -81,7 +81,8 @@ describe('GetDetailConseillerQueryHandler', () => {
               lastName: 'tata',
               email: 'nils.tavernier@passemploi.com',
               agence: { id: agenceSql.id, nom: agenceSql.nomAgence },
-              notificationsSonores: false
+              notificationsSonores: false,
+              dateSignatureCGU: undefined
             })
           )
         )
@@ -114,7 +115,8 @@ describe('GetDetailConseillerQueryHandler', () => {
               email: 'nils.tavernier@passemploi.com',
               agence: undefined,
               notificationsSonores: false,
-              aDesBeneficiairesARecuperer: true
+              aDesBeneficiairesARecuperer: true,
+              dateSignatureCGU: undefined
             })
           )
         )
@@ -169,6 +171,7 @@ describe('GetDetailConseillerQueryHandler', () => {
                 id: structureMiloSql.id,
                 nom: structureMiloSql.nomOfficiel
               },
+              dateSignatureCGU: undefined,
               notificationsSonores: false,
               agence: undefined
             })

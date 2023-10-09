@@ -439,7 +439,8 @@ export class ConseillersController {
   }
 
   @ApiOperation({
-    summary: "Modifie l'agence et les notifications sonores d'un conseiller",
+    summary:
+      "Permet d'ajouter l'agence ou de modifier les notifications sonores ou la date de signature des CGU d'un conseiller",
     description:
       'Autorisé pour un conseiller - Ne supprime pas les champs quand ils sont vides'
   })
@@ -459,7 +460,8 @@ export class ConseillersController {
       {
         idConseiller: idConseiller,
         agence: modifierConseillerPayload.agence,
-        notificationsSonores: modifierConseillerPayload.notificationsSonores
+        notificationsSonores: modifierConseillerPayload.notificationsSonores,
+        dateSignatureCGU: modifierConseillerPayload.dateSignatureCGU
       },
       utilisateur
     )

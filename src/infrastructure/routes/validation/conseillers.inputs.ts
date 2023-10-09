@@ -5,6 +5,7 @@ import {
   IsArray,
   IsBoolean,
   IsDate,
+  IsDateString,
   IsEmail,
   IsEnum,
   IsIn,
@@ -164,6 +165,11 @@ export class DetailConseillerPayload {
   @ValidateNested({ each: true })
   @Type(() => AgenceInput)
   agence?: AgenceInput
+
+  @IsOptional()
+  @IsDateString()
+  @IsNotEmpty()
+  dateSignatureCGU?: string
 
   @ApiPropertyOptional()
   @IsBoolean()

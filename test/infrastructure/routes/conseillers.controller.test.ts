@@ -1045,6 +1045,7 @@ describe('ConseillersController', () => {
   describe('PUT /conseillers/{idConseiller}', () => {
     const conseiller = unConseiller()
     const agence = uneAgence()
+    const nouvelleDateSignatureCGU = '2020-04-12T12:00:00.000Z'
 
     describe('quand le payload est valide', () => {
       it('met à jour le conseiller', async () => {
@@ -1052,7 +1053,8 @@ describe('ConseillersController', () => {
         const command: ModifierConseillerCommand = {
           notificationsSonores: true,
           agence: agence,
-          idConseiller: conseiller.id
+          idConseiller: conseiller.id,
+          dateSignatureCGU: nouvelleDateSignatureCGU
         }
 
         modifierConseillerCommandHandler.execute
@@ -1064,7 +1066,8 @@ describe('ConseillersController', () => {
           .put(`/conseillers/${conseiller.id}`)
           .send({
             notificationsSonores: true,
-            agence: agence
+            agence: agence,
+            dateSignatureCGU: nouvelleDateSignatureCGU
           })
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.OK)
@@ -1092,7 +1095,8 @@ describe('ConseillersController', () => {
         const command: ModifierConseillerCommand = {
           notificationsSonores: true,
           agence: agence,
-          idConseiller: conseiller.id
+          idConseiller: conseiller.id,
+          dateSignatureCGU: nouvelleDateSignatureCGU
         }
 
         modifierConseillerCommandHandler.execute
@@ -1104,7 +1108,8 @@ describe('ConseillersController', () => {
           .put(`/conseillers/${conseiller.id}`)
           .send({
             notificationsSonores: true,
-            agence: uneAgence()
+            agence: uneAgence(),
+            dateSignatureCGU: nouvelleDateSignatureCGU
           })
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.NOT_FOUND)
