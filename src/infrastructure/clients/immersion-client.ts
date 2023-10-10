@@ -12,20 +12,21 @@ import {
 import { URLSearchParams } from 'url'
 import { handleAxiosError } from './utils/axios-error-handler'
 import { PartenaireImmersion } from '../repositories/dto/immersion.dto'
-import { RechercheOffreInvalide } from '../../building-blocks/types/domain-error'
-
-type Offer = {
-  romeCode: string
-  romeLabel: string
-}
+import {
+  RechercheDetailOffreInvalide,
+  RechercheDetailOffreNonTrouve,
+  RechercheOffreInvalide
+} from '../../building-blocks/types/domain-error'
 
 export interface FormulaireImmersionPayload {
-  offer: Offer
+  appellationCode: string
   siret: string
   potentialBeneficiaryFirstName: string
   potentialBeneficiaryLastName: string
   potentialBeneficiaryEmail: string
   contactMode: string
+  potentialBeneficiaryPhone: string
+  immersionObjective: string
   message?: string
 }
 
@@ -65,7 +66,29 @@ export class ImmersionClient {
     }
   }
 
-  async postFormulaireImmersion(
+  async getDetailOffre(
+    params: string
+  ): Promise<Result<PartenaireImmersion.DtoV2>> {
+    try {
+      const response = await this.get<PartenaireImmersion.DtoV2>(
+        `v2/search/${params}`
+      )
+      return success(response.data)
+    } catch (e) {
+      if (e.response?.status === 404) {
+        const message = `Offre d'immersion ${params} not found`
+        return failure(new RechercheDetailOffreNonTrouve(message))
+      }
+      if (e.response?.status === 400) {
+        return failure(
+          new RechercheDetailOffreInvalide(e.response.data.errors.message)
+        )
+      }
+      throw e
+    }
+  }
+
+  async envoyerFormulaireImmersion(
     params: FormulaireImmersionPayload
   ): Promise<Result> {
     try {

@@ -151,22 +151,6 @@ describe('', () => {
           distance_km: 30
         }
 
-        // const badResponse: AxiosResponse = {
-        //   data: {
-        //     errors: [
-        //       {
-        //         message: 'Le champs Rome est pas bon'
-        //       }
-        //     ]
-        //   },
-        //   status: 400,
-        //   statusText: 'BAD_REQUEST',
-        //   request: '',
-        //   headers: '',
-        //   config: ''
-        // }
-
-        // immersionClient.get.rejects({ response: badResponse })
         immersionClient.getOffres.resolves(
           failure(new RechercheOffreInvalide('Le champs Rome est pas bon'))
         )
@@ -199,7 +183,6 @@ describe('', () => {
 
         const error: Error = new Error(TIMEOUT)
 
-        immersionClient.get.rejects(error)
         immersionClient.getOffres.rejects(error)
 
         // When

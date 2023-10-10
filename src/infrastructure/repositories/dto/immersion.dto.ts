@@ -53,6 +53,7 @@ export namespace PartenaireImmersion {
     numberOfEmployeeRange?: string
   }
 
+  // todo a supprimer si n'est plus utiliser
   export interface Dto {
     id: string
     rome: string

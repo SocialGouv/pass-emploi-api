@@ -44,7 +44,7 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
           data: uneOffreImmersionDtov2()
         }
 
-        immersionClient.get.resolves(response)
+        immersionClient.getDetailOffre.resolves(success(response.data))
 
         // When
         const detailOffre = await getDetailOffreImmersionQueryHandler.handle({
@@ -52,8 +52,8 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
         })
 
         // Then
-        expect(immersionClient.get).to.have.been.calledWith(
-          `v2/search/siret/appellationCode`
+        expect(immersionClient.getDetailOffre).to.have.been.calledWith(
+          `siret/appellationCode`
         )
         expect(detailOffre).to.deep.equal(
           success({
@@ -84,20 +84,9 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
           idOffreImmersion: 'fauxId'
         }
 
-        const badResponse: AxiosResponse = {
-          data: {
-            errors: {
-              message: "L'id fauxId n'est pas bon"
-            }
-          },
-          status: 400,
-          statusText: 'BAD_REQUEST',
-          request: '',
-          headers: '',
-          config: ''
-        }
-
-        immersionClient.get.rejects({ response: badResponse })
+        immersionClient.getDetailOffre.resolves(
+          failure(new RechercheDetailOffreInvalide("L'id fauxId n'est pas bon"))
+        )
 
         // When
         const offres = await getDetailOffreImmersionQueryHandler.handle({
@@ -115,20 +104,11 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
           idOffreImmersion: 'id'
         }
 
-        const badResponse: AxiosResponse = {
-          data: {
-            errors: {
-              message: "Offre d'immersion id not found"
-            }
-          },
-          status: 404,
-          statusText: 'NOT_FOUND',
-          request: '',
-          headers: '',
-          config: ''
-        }
-
-        immersionClient.get.rejects({ response: badResponse })
+        immersionClient.getDetailOffre.resolves(
+          failure(
+            new RechercheDetailOffreNonTrouve("Offre d'immersion id not found")
+          )
+        )
 
         // When
         const offres = await getDetailOffreImmersionQueryHandler.handle({
@@ -148,7 +128,7 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
           idOffreImmersion: 'id'
         }
         const error = new Error('Erreur inconnue')
-        immersionClient.get.rejects(error)
+        immersionClient.getDetailOffre.rejects(error)
 
         // When
         const offres = getDetailOffreImmersionQueryHandler.handle({

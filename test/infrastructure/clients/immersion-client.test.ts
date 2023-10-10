@@ -102,18 +102,59 @@ describe('ImmersionClient', () => {
       expect(response).to.deep.equal(success(resultat))
     })
   })
+
+  describe('getDetailOffre', () => {
+    it('fait un http get avec les bons paramètres', async () => {
+      // Given
+
+      const resultat = {
+        data: {
+          rome: 'mon-rome',
+          siret: 'siret',
+          romeLabel: 'romeLabel',
+          name: 'name',
+          nafLabel: 'nafLabel',
+          address: { city: 'city' },
+          voluntaryToImmersion: true,
+          appellations: [
+            {
+              appellationCode: 'appellationCode',
+              appellationLabel: 'appellationCodeLabel'
+            }
+          ]
+        },
+        status: 200,
+        statusText: 'OK',
+        request: '',
+        headers: '',
+        config: ''
+      }
+
+      nock('https://api.api-immersion.beta.gouv.op')
+        .get('/v2/search/siret/appellationCode')
+        .reply(200, resultat)
+        .isDone()
+
+      // When
+      const response = await immersionClient.getDetailOffre(
+        'siret/appellationCode'
+      )
+
+      // Then
+      expect(response).to.deep.equal(success(resultat))
+    })
+  })
   describe('postFormulaireImmersion', () => {
     it('fait un appel en succes', async () => {
       // Given
       const params = {
-        offer: {
-          romeCode: 'romeCode',
-          romeLabel: 'romeLabel'
-        },
+        appellationCode: '11573',
         siret: 'siret',
         potentialBeneficiaryFirstName: 'potentialBeneficiaryFirstName',
         potentialBeneficiaryLastName: 'potentialBeneficiaryLastName',
         potentialBeneficiaryEmail: 'potentialBeneficiaryEmail',
+        potentialBeneficiaryPhone: 'non communiqué',
+        immersionObjective: "Découvrir un métier ou un secteur d'activité",
         contactMode: 'EMAIL',
         message: 'test'
       }
@@ -124,7 +165,7 @@ describe('ImmersionClient', () => {
         .isDone()
 
       // When
-      const response = await immersionClient.postFormulaireImmersion(params)
+      const response = await immersionClient.envoyerFormulaireImmersion(params)
 
       // Then
       expect(response._isSuccess).to.equal(true)
@@ -132,14 +173,13 @@ describe('ImmersionClient', () => {
     it('fait un appel en echec et renvoie une failure', async () => {
       // Given
       const params = {
-        offer: {
-          romeCode: 'romeCode',
-          romeLabel: 'romeLabel'
-        },
+        appellationCode: '11573',
         siret: 'siret',
         potentialBeneficiaryFirstName: 'potentialBeneficiaryFirstName',
         potentialBeneficiaryLastName: 'potentialBeneficiaryLastName',
         potentialBeneficiaryEmail: 'potentialBeneficiaryEmail',
+        potentialBeneficiaryPhone: 'non communiqué',
+        immersionObjective: "Découvrir un métier ou un secteur d'activité",
         contactMode: 'EMAIL',
         message: 'test'
       }
@@ -150,7 +190,7 @@ describe('ImmersionClient', () => {
         .isDone()
 
       // When
-      const response = await immersionClient.postFormulaireImmersion(params)
+      const response = await immersionClient.envoyerFormulaireImmersion(params)
 
       // Then
       expect(response._isSuccess).to.equal(false)
