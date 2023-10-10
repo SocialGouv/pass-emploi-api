@@ -35,6 +35,8 @@ export namespace Notification {
     | Type.DELETED_RENDEZVOUS
     | Type.UPDATED_RENDEZVOUS
 
+  export type TypeSession = Type.DETAIL_SESSION_MILO | Type.DELETED_SESSION_MILO
+
   export interface Message {
     token: string
     notification: {

@@ -67,8 +67,9 @@ export interface RendezVousMiloDto {
     | 'Reporté'
 }
 
-export interface SessionMiloDto {
+export interface InstanceSessionMiloDto {
   id: string
+  idSession: string
   nom: string
   dateHeureDebut: string
   dateHeureFin?: string
