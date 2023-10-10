@@ -4,7 +4,7 @@ import { DateService } from '../utils/date-service'
 import { Action } from './action/action'
 import { RendezVous } from './rendez-vous/rendez-vous'
 import { NettoyageJobsStats } from './suivi-job'
-import { RendezVousMilo } from './rendez-vous/rendez-vous.milo'
+import { RendezVousMilo } from './milo/rendez-vous.milo'
 
 export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
 

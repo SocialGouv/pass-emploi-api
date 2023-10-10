@@ -11,7 +11,7 @@ import {
   unRendezVous
 } from '../../fixtures/rendez-vous.fixture'
 import { uneConfiguration, unJeune } from '../../fixtures/jeune.fixture'
-import { RendezVousMilo } from '../../../src/domain/rendez-vous/rendez-vous.milo'
+import { RendezVousMilo } from '../../../src/domain/milo/rendez-vous.milo'
 
 describe('MiloRendezVous', () => {
   describe('Factory', () => {

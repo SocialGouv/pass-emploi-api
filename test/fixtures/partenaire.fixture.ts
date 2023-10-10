@@ -1,5 +1,5 @@
 import { EvenementMiloDto } from 'src/infrastructure/repositories/dto/milo.dto'
-import { RendezVousMilo } from '../../src/domain/rendez-vous/rendez-vous.milo'
+import { RendezVousMilo } from '../../src/domain/milo/rendez-vous.milo'
 
 export const unEvenementMilo = (
   args: Partial<RendezVousMilo.Evenement> = {}

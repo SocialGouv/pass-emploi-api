@@ -8,12 +8,12 @@ import {
   failure,
   Result
 } from '../../../building-blocks/types/result'
-import { RendezVousMilo } from '../../../domain/rendez-vous/rendez-vous.milo'
+import { RendezVousMilo } from '../../../domain/milo/rendez-vous.milo'
 import { RateLimiterService } from '../../../utils/rate-limiter.service'
 import {
   EvenementMiloDto,
   RendezVousMiloDto,
-  SessionMiloDto
+  InstanceSessionMiloDto
 } from '../dto/milo.dto'
 
 @Injectable()
@@ -90,7 +90,7 @@ export class MiloRendezVousHttpRepository implements RendezVousMilo.Repository {
       if (evenement.objet === RendezVousMilo.ObjetEvenement.SESSION) {
         await this.rateLimiterService.getSessionMilo.attendreLaProchaineDisponibilite()
         const sessionMilo = await firstValueFrom(
-          this.httpService.get<SessionMiloDto>(
+          this.httpService.get<InstanceSessionMiloDto>(
             `${this.apiUrl}/operateurs/dossiers/${evenement.idPartenaireBeneficiaire}/sessions/${evenement.idObjet}`,
             {
               headers: {
@@ -102,7 +102,7 @@ export class MiloRendezVousHttpRepository implements RendezVousMilo.Repository {
         )
 
         return {
-          id: sessionMilo.data.id,
+          id: sessionMilo.data.idSession,
           dateHeureDebut: sessionMilo.data.dateHeureDebut,
           dateHeureFin: sessionMilo.data.dateHeureFin,
           titre: sessionMilo.data.nom,

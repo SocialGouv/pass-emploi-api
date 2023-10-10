@@ -14,10 +14,10 @@ import {
 } from '../../../../src/building-blocks/types/result'
 import {
   RendezVousMiloDto,
-  SessionMiloDto
+  InstanceSessionMiloDto
 } from '../../../../src/infrastructure/repositories/dto/milo.dto'
 import { MiloRendezVousHttpRepository } from '../../../../src/infrastructure/repositories/rendez-vous/rendez-vous-milo-http.repository'
-import { RendezVousMilo } from '../../../../src/domain/rendez-vous/rendez-vous.milo'
+import { RendezVousMilo } from '../../../../src/domain/milo/rendez-vous.milo'
 import { RateLimiterService } from '../../../../src/utils/rate-limiter.service'
 
 describe('MiloEvenementsHttpRepository', () => {
@@ -195,9 +195,10 @@ describe('MiloEvenementsHttpRepository', () => {
       describe('quand elle existe', () => {
         it('renvoie la session milo', async () => {
           // Given
-          const sessionJson: SessionMiloDto = {
+          const sessionJson: InstanceSessionMiloDto = {
             lieu: 'la',
             nom: 'je suis un titre mais en fait le nom',
+            idSession: '123456',
             id: idObjet.toString(),
             dateHeureDebut: '2020-10-06 10:00:00',
             dateHeureFin: '2020-10-06 12:00:00',
@@ -224,7 +225,7 @@ describe('MiloEvenementsHttpRepository', () => {
 
           // Then
           const expected: RendezVousMilo = unRendezVousMilo({
-            id: idObjet.toString(),
+            id: '123456',
             idPartenaireBeneficiaire: idPartenaireBeneficiaire.toString(),
             titre: sessionJson.nom,
             commentaire: sessionJson.commentaire,

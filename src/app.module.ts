@@ -284,7 +284,7 @@ import { TraiterEvenementMiloJobHandler } from './application/jobs/traiter-evene
 import {
   MiloRendezVousRepositoryToken,
   RendezVousMilo
-} from './domain/rendez-vous/rendez-vous.milo'
+} from './domain/milo/rendez-vous.milo'
 import { MiloJeuneRepositoryToken } from './domain/milo/jeune.milo'
 import { MettreAJourLesJeunesCejPeCommandHandler } from './application/commands/mettre-a-jour-les-jeunes-cej-pe.command.handler'
 import { UpdateAgenceConseillerCommandHandler } from './application/commands/support/update-agence-conseiller.command.handler'
