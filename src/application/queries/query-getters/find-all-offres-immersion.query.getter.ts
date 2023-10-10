@@ -1,10 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { failure, Result, success } from '../../../building-blocks/types/result'
+import {
+  isFailure,
+  Result,
+  success
+} from '../../../building-blocks/types/result'
 import { OffreImmersionQueryModel } from '../query-models/offres-immersion.query-model'
 import { URLSearchParams } from 'url'
-import { PartenaireImmersion } from '../../../infrastructure/repositories/dto/immersion.dto'
 import { toOffreImmersionQueryModel } from '../../../infrastructure/repositories/mappers/offres-immersion.mappers'
-import { RechercheOffreInvalide } from '../../../building-blocks/types/domain-error'
 import { ImmersionClient } from '../../../infrastructure/clients/immersion-client'
 import { GetOffresImmersionQuery } from '../get-offres-immersion.query.handler'
 import { Offre } from '../../../domain/offre/offre'
@@ -21,9 +23,24 @@ export class FindAllOffresImmersionQueryGetter {
   async handle(
     query: GetOffresImmersionQuery
   ): Promise<Result<OffreImmersionQueryModel[]>> {
+    const params = await this.queryConstructor(query)
+
+    const offresImmersion = await this.immersionClient.getOffres(params)
+
+    if (isFailure(offresImmersion)) {
+      return offresImmersion
+    }
+
+    return success(offresImmersion.data.map(toOffreImmersionQueryModel))
+  }
+
+  async queryConstructor(
+    query: GetOffresImmersionQuery
+  ): Promise<URLSearchParams> {
     const distanceAvecDefault = query.distance
       ? query.distance.toString()
       : Offre.Recherche.DISTANCE_PAR_DEFAUT.toString()
+
     const params = new URLSearchParams()
 
     const appellationCodeListe = await this.romeToAppellationCode(query.rome)
@@ -37,21 +54,7 @@ export class FindAllOffresImmersionQueryGetter {
     params.append('sortedBy', 'date')
     params.append('voluntaryToImmersion', 'true')
 
-    try {
-      const response = await this.immersionClient.get<
-        PartenaireImmersion.DtoV2[]
-      >('v2/search', params)
-
-      return success(response.data.map(toOffreImmersionQueryModel))
-    } catch (e) {
-      if (e.response?.status === 400) {
-        const message = e.response.data.errors
-          .map((error: { message: string }) => error.message)
-          .join(' - ')
-        return failure(new RechercheOffreInvalide(message))
-      }
-      throw e
-    }
+    return params
   }
 
   async romeToAppellationCode(codeRome: string): Promise<string[]> {

@@ -1,6 +1,6 @@
 import { PartenaireImmersion } from '../../src/infrastructure/repositories/dto/immersion.dto'
 
-// todo a supprimer si plus utiliser
+// todo a supprimer si n'est plus utiliser
 export const uneOffreImmersionDto = (): PartenaireImmersion.Dto => ({
   romeLabel: 'rome',
   nafLabel: 'naf',

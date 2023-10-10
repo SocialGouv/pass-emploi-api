@@ -64,6 +64,7 @@ describe('', () => {
         ]
 
         await MetierRomeSqlModel.bulkCreate(metiers)
+
         const query = {
           rome: 'D1102',
           location: {
@@ -110,7 +111,7 @@ describe('', () => {
         params.append('sortedBy', 'date')
         params.append('voluntaryToImmersion', 'true')
 
-        immersionClient.get.withArgs('v2/search').resolves(response)
+        immersionClient.getOffres.resolves(success(response.data))
 
         // When
         const offres = await findAllOffresImmersionQueryGetter.handle({
@@ -121,8 +122,7 @@ describe('', () => {
         })
 
         // Then
-        expect(immersionClient.get.getCall(0).args).to.be.deep.equal([
-          'v2/search',
+        expect(immersionClient.getOffres.getCall(0).args).to.be.deep.equal([
           params
         ])
         expect(offres).to.deep.equal(
@@ -151,22 +151,25 @@ describe('', () => {
           distance_km: 30
         }
 
-        const badResponse: AxiosResponse = {
-          data: {
-            errors: [
-              {
-                message: 'Le champs Rome est pas bon'
-              }
-            ]
-          },
-          status: 400,
-          statusText: 'BAD_REQUEST',
-          request: '',
-          headers: '',
-          config: ''
-        }
+        // const badResponse: AxiosResponse = {
+        //   data: {
+        //     errors: [
+        //       {
+        //         message: 'Le champs Rome est pas bon'
+        //       }
+        //     ]
+        //   },
+        //   status: 400,
+        //   statusText: 'BAD_REQUEST',
+        //   request: '',
+        //   headers: '',
+        //   config: ''
+        // }
 
-        immersionClient.get.rejects({ response: badResponse })
+        // immersionClient.get.rejects({ response: badResponse })
+        immersionClient.getOffres.resolves(
+          failure(new RechercheOffreInvalide('Le champs Rome est pas bon'))
+        )
 
         // When
         const offres = await findAllOffresImmersionQueryGetter.handle({
@@ -197,6 +200,7 @@ describe('', () => {
         const error: Error = new Error(TIMEOUT)
 
         immersionClient.get.rejects(error)
+        immersionClient.getOffres.rejects(error)
 
         // When
         const call = findAllOffresImmersionQueryGetter.handle({
