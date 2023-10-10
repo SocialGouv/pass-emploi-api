@@ -38,9 +38,14 @@ export class GetDetailOffreImmersionQueryHandler extends QueryHandler<
     query: GetDetailOffreImmersionQuery
   ): Promise<Result<DetailOffreImmersionQueryModel>> {
     try {
-      const response = await this.immersionClient.get<PartenaireImmersion.Dto>(
-        `/get-immersion-by-id/${query.idOffreImmersion}`
+      const paramsRechercheOffreImmersion = buildParamsRechercheImmersion(
+        query.idOffreImmersion
       )
+
+      const response =
+        await this.immersionClient.get<PartenaireImmersion.DtoV2>(
+          `v2/search/${paramsRechercheOffreImmersion}` // todo pourquoi ici l'url commençait par un / et pas dans le find ?
+        )
       return success(toDetailOffreImmersionQueryModel(response.data))
     } catch (e) {
       if (e.response?.status === 404) {
@@ -68,4 +73,9 @@ export class GetDetailOffreImmersionQueryHandler extends QueryHandler<
       )
     }
   }
+}
+
+function buildParamsRechercheImmersion(idOffreImmersion: string): string {
+  const [siret, appellationCode] = idOffreImmersion.split('-')
+  return siret + '/' + appellationCode
 }

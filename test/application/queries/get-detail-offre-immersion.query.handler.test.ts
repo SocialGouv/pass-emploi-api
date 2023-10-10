@@ -12,7 +12,7 @@ import {
   unUtilisateurConseiller,
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
-import { uneOffreImmersionDto } from '../../fixtures/offre-immersion.dto.fixture'
+import { uneOffreImmersionDtov2 } from '../../fixtures/offre-immersion.dto.fixture'
 import { StubbedClass, stubClass } from '../../utils'
 
 describe('GetDetailOffreImmersionQueryHandler', () => {
@@ -32,7 +32,7 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
       it("renvoie le détail d'une offre", async () => {
         // Given
         const query = {
-          idOffreImmersion: 'id'
+          idOffreImmersion: 'siret-appellationCode'
         }
 
         const response: AxiosResponse = {
@@ -41,7 +41,7 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
           request: undefined,
           status: 200,
           statusText: '',
-          data: uneOffreImmersionDto()
+          data: uneOffreImmersionDtov2()
         }
 
         immersionClient.get.resolves(response)
@@ -53,13 +53,12 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
 
         // Then
         expect(immersionClient.get).to.have.been.calledWith(
-          `/get-immersion-by-id/${query.idOffreImmersion}`
+          `v2/search/siret/appellationCode`
         )
         expect(detailOffre).to.deep.equal(
           success({
-            adresse: 'addresse',
             estVolontaire: true,
-            id: 'id',
+            id: '123456-D1102',
             localisation: {
               latitude: 42,
               longitude: 2
@@ -67,8 +66,9 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
             metier: 'rome',
             nomEtablissement: 'name',
             secteurActivite: 'naf',
-            ville: 'Paris',
-            codeRome: 'D112',
+            ville: 'city',
+            adresse: 'street post code city',
+            codeRome: 'D1102',
             siret: '123456',
             contact: {
               modeDeContact: 'PRESENTIEL'
