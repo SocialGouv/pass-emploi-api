@@ -10,10 +10,9 @@ import {
 } from 'sequelize-typescript'
 import { Core } from '../../../domain/core'
 import { AsSql } from '../types'
-import { JeuneSqlModel } from './jeune.sql-model'
 import { AgenceSqlModel } from './agence.sql-model'
+import { JeuneSqlModel } from './jeune.sql-model'
 import { StructureMiloSqlModel } from './structure-milo.sql-model'
-import { DateTime } from 'luxon'
 
 export class ConseillerDto extends Model {
   @PrimaryKey
@@ -88,7 +87,7 @@ export class ConseillerDto extends Model {
     field: 'date_signature_cgu',
     type: DataType.DATE
   })
-  dateSignatureCGU: DateTime | null
+  dateSignatureCGU: Date | null
 
   @Column({
     field: 'nom_manuel_agence',

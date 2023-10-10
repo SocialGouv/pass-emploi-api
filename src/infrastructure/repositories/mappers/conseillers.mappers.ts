@@ -12,7 +12,7 @@ export function fromSqlToDetailConseillerQueryModel(
     firstName: conseillerSqlModel.prenom,
     lastName: conseillerSqlModel.nom,
     email: conseillerSqlModel.email ?? undefined,
-    dateSignatureCGU: conseillerSqlModel.dateSignatureCGU?.toISO(),
+    dateSignatureCGU: conseillerSqlModel.dateSignatureCGU?.toISOString(),
     agence: undefined,
     notificationsSonores: conseillerSqlModel.notificationsSonores,
     aDesBeneficiairesARecuperer: aDesBeneficiairesARecuperer

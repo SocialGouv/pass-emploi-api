@@ -157,8 +157,6 @@ export class GetRendezVousConseillerV2QueryParams {
 }
 
 export class DetailConseillerPayload {
-  id?: string
-
   @ApiPropertyOptional()
   @IsOptional()
   @IsNotEmptyObject()

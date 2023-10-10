@@ -91,7 +91,8 @@ export namespace Conseiller {
     return success({
       ...conseiller,
       agence: infosDeMiseAJour.agence,
-      notificationsSonores: Boolean(infosDeMiseAJour.notificationsSonores)
+      notificationsSonores: Boolean(infosDeMiseAJour.notificationsSonores),
+      dateSignatureCGU: infosDeMiseAJour.dateSignatureCGU
     })
   }
 

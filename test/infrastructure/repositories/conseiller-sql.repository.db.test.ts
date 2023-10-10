@@ -56,8 +56,7 @@ describe('ConseillerSqlRepository', () => {
           id: 'id',
           nom: 'nom'
         },
-        notificationsSonores: false,
-        dateSignatureCGU: undefined
+        notificationsSonores: false
       }
       expect(result).to.deep.equal(expected)
     })
@@ -109,8 +108,7 @@ describe('ConseillerSqlRepository', () => {
           id: 'id',
           nom: 'nom'
         },
-        notificationsSonores: false,
-        dateSignatureCGU: undefined
+        notificationsSonores: false
       }
       expect(result).to.deep.equal(expected)
     })

@@ -137,7 +137,6 @@ export function fromSqlConseillerToAggregate(
     lastName: conseillerSqlModel.nom,
     structure: conseillerSqlModel.structure,
     email: conseillerSqlModel.email || undefined,
-    dateSignatureCGU: conseillerSqlModel.dateSignatureCGU ?? undefined,
     agence: conseillerSqlModel.agence,
     notificationsSonores: conseillerSqlModel.notificationsSonores
   }
@@ -152,5 +151,12 @@ export function fromSqlConseillerToAggregate(
       nom: conseillerSqlModel.nomManuelAgence
     }
   }
+
+  if (conseillerSqlModel.dateSignatureCGU) {
+    conseiller.dateSignatureCGU = DateTime.fromJSDate(
+      conseillerSqlModel.dateSignatureCGU
+    )
+  }
+
   return conseiller
 }
