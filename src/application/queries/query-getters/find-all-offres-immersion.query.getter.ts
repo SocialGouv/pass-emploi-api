@@ -42,8 +42,6 @@ export class FindAllOffresImmersionQueryGetter {
         PartenaireImmersion.DtoV2[]
       >('v2/search', params)
 
-      // todo dans le mapper remplacer l'ID 'siret-rome' par 'siret/appellationCode'
-      // !!!! faire gaff car un metier peut avoir plusieurs appellationCode => voir lequelle remonter
       return success(response.data.map(toOffreImmersionQueryModel))
     } catch (e) {
       if (e.response?.status === 400) {

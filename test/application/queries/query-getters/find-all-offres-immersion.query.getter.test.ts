@@ -77,14 +77,19 @@ describe('', () => {
         const response: AxiosResponse = {
           data: [
             {
-              id: 'id',
               rome: 'mon-rome',
-              siret: 'mon-siret',
+              siret: 'siret',
               romeLabel: 'romeLabel',
               name: 'name',
               nafLabel: 'nafLabel',
               address: { city: 'city' },
-              voluntaryToImmersion: true
+              voluntaryToImmersion: true,
+              appellations: [
+                {
+                  appellationCode: 'appellationCode',
+                  appellationLabel: 'appellationCodeLabel'
+                }
+              ]
             }
           ],
           status: 200,
@@ -123,7 +128,7 @@ describe('', () => {
         expect(offres).to.deep.equal(
           success([
             {
-              id: 'mon-siret-mon-rome',
+              id: 'siret-appellationCode',
               metier: 'romeLabel',
               nomEtablissement: 'name',
               secteurActivite: 'nafLabel',
