@@ -198,6 +198,7 @@ describe('MiloEvenementsHttpRepository', () => {
           const sessionJson: InstanceSessionMiloDto = {
             lieu: 'la',
             nom: 'je suis un titre mais en fait le nom',
+            idSession: '123456',
             id: idObjet.toString(),
             dateHeureDebut: '2020-10-06 10:00:00',
             dateHeureFin: '2020-10-06 12:00:00',
@@ -224,7 +225,7 @@ describe('MiloEvenementsHttpRepository', () => {
 
           // Then
           const expected: RendezVousMilo = unRendezVousMilo({
-            id: idObjet.toString(),
+            id: '123456',
             idPartenaireBeneficiaire: idPartenaireBeneficiaire.toString(),
             titre: sessionJson.nom,
             commentaire: sessionJson.commentaire,

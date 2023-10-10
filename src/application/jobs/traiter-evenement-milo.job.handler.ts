@@ -122,13 +122,13 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
       this.isDateRecuperable(rendezVousMILO, jeune) &&
       this.isStatutRecuperable(rendezVousMILO)
     ) {
-      const newRendezVousCEJ = this.rendezVousMiloFactory.createRendezVousCEJ(
-        rendezVousMILO,
-        jeune
-      )
-
       switch (rendezVousMILO.type) {
         case RendezVousMilo.Type.RENDEZ_VOUS: {
+          const newRendezVousCEJ =
+            this.rendezVousMiloFactory.createRendezVousCEJ(
+              rendezVousMILO,
+              jeune
+            )
           await this.rendezVousRepository.save(newRendezVousCEJ)
 
           this.planifierLesRappelsDeRendezVous(newRendezVousCEJ)
@@ -150,7 +150,6 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
         case RendezVousMilo.Type.SESSION: {
           this.notifierSession(
             rendezVousMILO,
-            newRendezVousCEJ,
             maintenant,
             jeune,
             Notification.Type.DETAIL_SESSION_MILO,
@@ -159,7 +158,8 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
           return this.buildSuiviJob(
             maintenant,
             Traitement.NOTIFICATION_SESSION_AJOUT,
-            jeune.id
+            jeune.id,
+            rendezVousMILO.id
           )
         }
       }
@@ -178,10 +178,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
     rendezVousCEJExistant?: RendezVous,
     FT_NOTIFIER_EVENEMENTS_MILO?: boolean
   ): Promise<SuiviJob> {
-    if (
-      rendezVousMILO &&
-      rendezVousMILO.type === RendezVousMilo.Type.RENDEZ_VOUS
-    ) {
+    if (rendezVousMILO?.type === RendezVousMilo.Type.RENDEZ_VOUS) {
       if (rendezVousCEJExistant) {
         if (
           !this.isStatutRecuperable(rendezVousMILO) ||
@@ -245,49 +242,48 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
     rendezVousCEJExistant?: RendezVous,
     FT_NOTIFIER_EVENEMENTS_MILO?: boolean
   ): Promise<SuiviJob> {
-    if (rendezVousCEJExistant) {
-      switch (rendezVousCEJExistant.type) {
-        case CodeTypeRendezVous.RENDEZ_VOUS_MILO: {
-          await this.rendezVousRepository.delete(rendezVousCEJExistant.id)
+    if (
+      rendezVousCEJExistant &&
+      (rendezVousCEJExistant?.type === CodeTypeRendezVous.RENDEZ_VOUS_MILO ||
+        rendezVousMILO?.type === RendezVousMilo.Type.RENDEZ_VOUS)
+    ) {
+      await this.rendezVousRepository.delete(rendezVousCEJExistant.id)
 
-          this.supprimerLesRappelsDeRendezVous(rendezVousCEJExistant)
+      this.supprimerLesRappelsDeRendezVous(rendezVousCEJExistant)
 
-          if (rendezVousMILO) {
-            this.notifierRDV(
-              rendezVousMILO,
-              rendezVousCEJExistant,
-              maintenant,
-              Notification.Type.DELETED_RENDEZVOUS,
-              FT_NOTIFIER_EVENEMENTS_MILO
-            )
-          }
-
-          return this.buildSuiviJob(
-            maintenant,
-            Traitement.RENDEZ_VOUS_SUPPRIME,
-            jeune.id,
-            rendezVousCEJExistant.id
-          )
-        }
-        case CodeTypeRendezVous.SESSION_MILO: {
-          if (rendezVousMILO) {
-            this.notifierSession(
-              rendezVousMILO,
-              rendezVousCEJExistant,
-              maintenant,
-              jeune,
-              Notification.Type.DELETED_SESSION_MILO,
-              FT_NOTIFIER_EVENEMENTS_MILO
-            )
-            return this.buildSuiviJob(
-              maintenant,
-              Traitement.NOTIFICATION_SESSION_SUPPRESSION,
-              jeune.id
-            )
-          }
-        }
+      if (rendezVousMILO) {
+        this.notifierRDV(
+          rendezVousMILO,
+          rendezVousCEJExistant,
+          maintenant,
+          Notification.Type.DELETED_RENDEZVOUS,
+          FT_NOTIFIER_EVENEMENTS_MILO
+        )
       }
+
+      return this.buildSuiviJob(
+        maintenant,
+        Traitement.RENDEZ_VOUS_SUPPRIME,
+        jeune.id,
+        rendezVousCEJExistant.id
+      )
     }
+    if (rendezVousMILO?.type === RendezVousMilo.Type.SESSION) {
+      this.notifierSession(
+        rendezVousMILO,
+        maintenant,
+        jeune,
+        Notification.Type.DELETED_SESSION_MILO,
+        FT_NOTIFIER_EVENEMENTS_MILO
+      )
+      return this.buildSuiviJob(
+        maintenant,
+        Traitement.NOTIFICATION_SESSION_SUPPRESSION,
+        jeune.id,
+        rendezVousMILO.id
+      )
+    }
+
     return this.buildSuiviJob(
       maintenant,
       Traitement.TRAITEMENT_DELETE_INCONNU,
@@ -319,17 +315,17 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
 
   private notifierSession(
     sessionMilo: RendezVousMilo,
-    rendezVousCEJ: RendezVous,
     maintenant: DateTime,
     jeune: JeuneMilo,
     typeNotification: Notification.TypeSession,
     FT_NOTIFIER_EVENEMENTS_MILO?: boolean
   ): void {
     if (FT_NOTIFIER_EVENEMENTS_MILO) {
-      const dateTimeSession = DateService.fromJSDateToDateTime(
-        rendezVousCEJ.date
-      )!
-      const dansLeFutur = DateService.isGreater(dateTimeSession, maintenant)
+      const dateSession = RendezVousMilo.timezonerDateMilo(
+        sessionMilo.dateHeureDebut,
+        jeune
+      )
+      const dansLeFutur = DateService.isGreater(dateSession, maintenant)
 
       if (dansLeFutur && this.isStatutNotifiable(sessionMilo)) {
         switch (typeNotification) {
@@ -342,7 +338,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
           case Notification.Type.DELETED_SESSION_MILO:
             this.notificationService.notifierDesinscriptionSession(
               sessionMilo.id,
-              dateTimeSession,
+              dateSession,
               [jeune]
             )
             break
@@ -471,7 +467,6 @@ export enum Traitement {
   RENDEZ_VOUS_MODIFIE = 'RENDEZ_VOUS_MODIFIE',
   NOTIFICATION_SESSION_SUPPRESSION = 'NOTIFICATION_SESSION_SUPPRESSION',
   NOTIFICATION_SESSION_AJOUT = 'NOTIFICATION_SESSION_AJOUT',
-  NOTIFICATION_SESSION_MODIFICATION = 'NOTIFICATION_SESSION_MODIFICATION',
   RENDEZ_VOUS_INEXISTANT = 'RENDEZ_VOUS_INEXISTANT',
   JEUNE_INEXISTANT = 'JEUNE_INEXISTANT',
   TYPE_NON_TRAITABLE = 'TYPE_NON_TRAITABLE',
