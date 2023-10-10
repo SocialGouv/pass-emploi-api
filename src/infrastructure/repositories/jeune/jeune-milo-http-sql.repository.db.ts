@@ -186,17 +186,17 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
 
   async save(
     jeune: JeuneMilo,
-    dateFinCEJ?: DateTime,
-    codeStructureMilo?: string
+    codeStructureMilo?: string | null,
+    dateFinCEJ?: DateTime | null
   ): Promise<void> {
-    let nouveauCodeStructure: string | null = codeStructureMilo ?? null
+    let nouveauCodeStructure = codeStructureMilo
 
     if (
       nouveauCodeStructure &&
       nouveauCodeStructure !== jeune.idStructureMilo
     ) {
       const structureSql = await StructureMiloSqlModel.findByPk(
-        codeStructureMilo
+        nouveauCodeStructure
       )
       if (!structureSql) {
         nouveauCodeStructure = null
@@ -205,7 +205,7 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
 
     await JeuneSqlModel.update(
       {
-        dateFinCEJ: dateFinCEJ?.toJSDate() ?? null,
+        dateFinCEJ: dateFinCEJ === null ? dateFinCEJ : dateFinCEJ?.toJSDate(),
         idStructureMilo: nouveauCodeStructure
       },
       { where: { id: jeune.id } }

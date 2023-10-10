@@ -8,10 +8,10 @@ import {
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
 import {
+  Result,
   failure,
   isFailure,
   isSuccess,
-  Result,
   success
 } from '../../building-blocks/types/result'
 import {
@@ -112,6 +112,7 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
       id: nouveauJeune.id,
       idAuthentification: result.data.idAuthentification
     }
+    this.setStructure(nouveauJeune)
     await this.authentificationRepository.updateJeune(utilisateur)
     await this.chatRepository.initializeChatIfNotExists(
       nouveauJeune.id,
@@ -156,5 +157,19 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     const nouveauJeune = this.jeuneFactory.creer(jeuneACreer)
     await this.jeuneRepository.save(nouveauJeune)
     return nouveauJeune
+  }
+
+  private async setStructure(jeune: Jeune): Promise<void> {
+    try {
+      const resultDossier = await this.miloJeuneRepository.getDossier(
+        jeune.idPartenaire!
+      )
+      if (isSuccess(resultDossier)) {
+        const codeStructure = resultDossier.data.codeStructure
+        await this.miloJeuneRepository.save(jeune, codeStructure)
+      }
+    } catch (e) {
+      this.logger.warn(e)
+    }
   }
 }

@@ -55,8 +55,8 @@ export namespace JeuneMilo {
     saveSituationsJeune(situations: Situations): Promise<void>
     save(
       jeune: JeuneMilo,
-      dateFinCEJ?: DateTime,
-      codeStructureMilo?: string
+      codeStructureMilo?: string | null,
+      dateFinCEJ?: DateTime | null
     ): Promise<void>
     getJeunesMiloAvecIdDossier(
       offset: number,

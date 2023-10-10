@@ -31,6 +31,7 @@ import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { StubbedClass, createSandbox, expect, stubClass } from '../../utils'
+import { unDossierMilo } from '../../fixtures/milo.fixture'
 const idPartenaire = 'idDossier'
 
 describe('CreerJeuneMiloCommandHandler', () => {
@@ -130,6 +131,8 @@ describe('CreerJeuneMiloCommandHandler', () => {
         miloRepository.creerJeune
           .withArgs(command.idPartenaire)
           .resolves(success({ idAuthentification: 'mon-sub' }))
+        const dossier = unDossierMilo()
+        miloRepository.getDossier.resolves(success(dossier))
 
         // When
         const result = await creerJeuneMiloCommandHandler.handle(command)
@@ -169,6 +172,13 @@ describe('CreerJeuneMiloCommandHandler', () => {
         ).to.have.been.calledWith(idNouveauJeune, conseiller.id)
         expect(result).to.deep.equal(
           success({ id: 'DFKAL', prenom: 'prenom', nom: 'nom' })
+        )
+        expect(miloRepository.getDossier).to.have.been.calledOnceWithExactly(
+          idPartenaire
+        )
+        expect(miloRepository.save).to.have.been.calledOnceWithExactly(
+          expectedJeune,
+          dossier.codeStructure
         )
       })
 
@@ -274,14 +284,6 @@ describe('CreerJeuneMiloCommandHandler', () => {
 
         // Then
         expect(result).to.deep.equal(echec)
-      })
-    })
-
-    describe('quand il existe chez Milo ou bien que ça casse', () => {
-      it('renvoie une erreur', () => {
-        // Given
-        // When
-        // Then
       })
     })
   })

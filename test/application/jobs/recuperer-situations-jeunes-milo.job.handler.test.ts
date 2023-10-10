@@ -87,8 +87,8 @@ describe('RecupererSituationsJeunesMiloJobHandler', () => {
       // Then
       expect(miloRepository.save).to.have.been.calledOnceWithExactly(
         jeune1,
-        undefined,
-        '9222000'
+        '9222000',
+        null
       )
       expect(miloRepository.saveSituationsJeune).to.have.callCount(1)
       expect(
@@ -159,8 +159,8 @@ describe('RecupererSituationsJeunesMiloJobHandler', () => {
       expect(result.succes).to.equal(true)
       expect(miloRepository.save).to.have.calledOnceWithExactly(
         jeune1,
-        uneDatetime(),
-        '9222000'
+        '9222000',
+        uneDatetime()
       )
     })
   })
@@ -186,7 +186,6 @@ describe('RecupererSituationsJeunesMiloJobHandler', () => {
       const result = await recupererSituationsJeunesMiloJobHandler.handle()
 
       // Then
-      expect(miloRepository.saveSituationsJeune).to.have.callCount(1)
       expect(
         miloRepository.saveSituationsJeune
       ).to.have.been.calledOnceWithExactly({

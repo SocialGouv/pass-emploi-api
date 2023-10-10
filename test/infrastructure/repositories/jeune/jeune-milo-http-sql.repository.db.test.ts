@@ -442,7 +442,7 @@ describe('MiloHttpRepository', () => {
       })
 
       // When
-      await miloHttpSqlRepository.save(jeune, undefined, codeStructure)
+      await miloHttpSqlRepository.save(jeune, codeStructure)
 
       // Then
       const jeuneTrouve = await JeuneSqlModel.findByPk(jeune.id)
@@ -468,8 +468,8 @@ describe('MiloHttpRepository', () => {
       // When
       await miloHttpSqlRepository.save(
         { ...jeune, dateFinCEJ: uneDatetime(), idStructureMilo: codeStructure },
-        undefined,
-        undefined
+        null,
+        null
       )
 
       // Then
@@ -477,6 +477,35 @@ describe('MiloHttpRepository', () => {
 
       expect(jeuneTrouve?.dateFinCEJ).to.equal(null)
       expect(jeuneTrouve?.idStructureMilo).to.equal(null)
+    })
+    it('ne modifie aucune donnée du Jeune Milo', async () => {
+      // Given
+      const codeStructure = 'structure-du-jeune'
+      await StructureMiloSqlModel.create({
+        id: codeStructure,
+        nomOfficiel: 'test',
+        timezone: 'Europe/Paris'
+      })
+      await JeuneSqlModel.update(
+        {
+          dateFinCEJ: uneDatetime().toJSDate(),
+          idStructureMilo: codeStructure
+        },
+        { where: { id: jeune.id } }
+      )
+
+      // When
+      await miloHttpSqlRepository.save(
+        { ...jeune, dateFinCEJ: uneDatetime(), idStructureMilo: codeStructure },
+        undefined,
+        undefined
+      )
+
+      // Then
+      const jeuneTrouve = await JeuneSqlModel.findByPk(jeune.id)
+
+      expect(jeuneTrouve?.dateFinCEJ).to.deep.equal(uneDatetime().toJSDate())
+      expect(jeuneTrouve?.idStructureMilo).to.equal(codeStructure)
     })
     it('ne sauvegarde pas la structure du jeune quand non trouvée', async () => {
       // Given
@@ -488,7 +517,7 @@ describe('MiloHttpRepository', () => {
       })
 
       // When
-      await miloHttpSqlRepository.save(jeune, undefined, codeStructure)
+      await miloHttpSqlRepository.save(jeune, codeStructure)
 
       // Then
       const jeuneTrouve = await JeuneSqlModel.findByPk(jeune.id)

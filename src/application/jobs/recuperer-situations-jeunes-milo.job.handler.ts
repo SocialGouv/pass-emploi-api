@@ -66,13 +66,13 @@ export class RecupererSituationsJeunesMiloJobHandler extends JobHandler<Job> {
             return
           }
 
-          const nouvelleDateFinCEJ = dossier.data.dateFinCEJ
-          const nouveauCodeStructure = dossier.data.codeStructure
+          const nouveauCodeStructureOuNull = dossier.data.codeStructure ?? null
+          const nouvelleDateFinCEJOuNull = dossier.data.dateFinCEJ ?? null
 
           await this.miloRepository.save(
             jeune,
-            nouvelleDateFinCEJ,
-            nouveauCodeStructure
+            nouveauCodeStructureOuNull,
+            nouvelleDateFinCEJOuNull
           )
 
           const situationsTriees = JeuneMilo.trierSituations(
