@@ -287,7 +287,7 @@ export namespace Notification {
       return Promise.all(
         jeunes.map(async jeune => {
           if (jeune.configuration?.pushNotificationToken) {
-            const notification = this.creerNotificationInscriptionSession(
+            const notification = creerNotificationInscriptionSession(
               jeune.configuration?.pushNotificationToken,
               idSsession
             )
@@ -309,7 +309,7 @@ export namespace Notification {
       return Promise.all(
         jeunes.map(async jeune => {
           if (jeune.configuration?.pushNotificationToken) {
-            const notification = this.creerNotificationDesinscriptionSession(
+            const notification = creerNotificationDesinscriptionSession(
               jeune.configuration?.pushNotificationToken,
               idSsession,
               dateSession
@@ -377,7 +377,6 @@ export namespace Notification {
       }
     }
 
-    // TODO: Envoyer un type de notification UPDATE et gérer les versions de l'app
     private creerNotificationRendezVousMisAJour(
       token: string,
       idRdv: string,
@@ -460,40 +459,40 @@ export namespace Notification {
         }
       }
     }
+  }
 
-    private creerNotificationInscriptionSession(
-      token: string,
-      idSession: string
-    ): Notification.Message {
-      return {
-        token,
-        notification: {
-          title: 'Nouveau rendez-vous',
-          body: 'Votre conseiller a programmé un nouveau rendez-vous'
-        },
-        data: {
-          type: Type.DETAIL_SESSION_MILO,
-          id: idSession
-        }
+  function creerNotificationInscriptionSession(
+    token: string,
+    idSession: string
+  ): Notification.Message {
+    return {
+      token,
+      notification: {
+        title: 'Nouveau rendez-vous',
+        body: 'Votre conseiller a programmé un nouveau rendez-vous'
+      },
+      data: {
+        type: Type.DETAIL_SESSION_MILO,
+        id: idSession
       }
     }
+  }
 
-    private creerNotificationDesinscriptionSession(
-      token: string,
-      idSession: string,
-      date: DateTime
-    ): Notification.Message {
-      const formattedDate = date.toFormat('dd/MM')
-      return {
-        token,
-        notification: {
-          title: 'Rendez-vous supprimé',
-          body: `Votre rendez-vous du ${formattedDate} est supprimé`
-        },
-        data: {
-          type: Type.DELETED_SESSION_MILO,
-          id: idSession
-        }
+  function creerNotificationDesinscriptionSession(
+    token: string,
+    idSession: string,
+    date: DateTime
+  ): Notification.Message {
+    const formattedDate = date.toFormat('dd/MM')
+    return {
+      token,
+      notification: {
+        title: 'Rendez-vous supprimé',
+        body: `Votre rendez-vous du ${formattedDate} est supprimé`
+      },
+      data: {
+        type: Type.DELETED_SESSION_MILO,
+        id: idSession
       }
     }
   }

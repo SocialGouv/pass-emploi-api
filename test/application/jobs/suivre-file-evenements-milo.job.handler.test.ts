@@ -10,7 +10,7 @@ import { SuiviJob } from '../../../src/domain/suivi-job'
 import { DateService } from '../../../src/utils/date-service'
 import { unEvenementMilo } from '../../fixtures/partenaire.fixture'
 import { uneDatetime } from '../../fixtures/date.fixture'
-import { RendezVousMilo } from '../../../src/domain/rendez-vous/rendez-vous.milo'
+import { RendezVousMilo } from '../../../src/domain/milo/rendez-vous.milo'
 
 describe('SuivreEvenementsMiloCronJobHandler', () => {
   let suivreEvenementsMiloHandler: SuivreEvenementsMiloCronJobHandler

@@ -15,17 +15,17 @@ import {
   ProcessJobType
 } from '../../domain/planificateur'
 import {
+  CodeTypeRendezVous,
   RendezVous,
   RendezVousRepositoryToken
 } from '../../domain/rendez-vous/rendez-vous'
 import {
   MiloRendezVousRepositoryToken,
   RendezVousMilo
-} from '../../domain/rendez-vous/rendez-vous.milo'
+} from '../../domain/milo/rendez-vous.milo'
 import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
 import { DateService } from '../../utils/date-service'
 import { buildError } from '../../utils/logger.module'
-import { estUnEarlyAdopter } from 'src/utils/feature-flip-session-helper'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.TRAITER_EVENEMENT_MILO)
@@ -86,14 +86,14 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
 
     switch (evenement.type) {
       case RendezVousMilo.TypeEvenement.CREATE:
-        return this.createRendezVousMILO(
+        return this.handleCreate(
           resultJeune.data,
           maintenant,
           rendezVousMILO,
           FT_NOTIFIER_RDV_MILO
         )
       case RendezVousMilo.TypeEvenement.UPDATE:
-        return this.updateRendezVousMILO(
+        return this.handleUpdate(
           resultJeune.data,
           maintenant,
           rendezVousMILO,
@@ -101,7 +101,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
           FT_NOTIFIER_RDV_MILO
         )
       case RendezVousMilo.TypeEvenement.DELETE:
-        return this.deleteRendezVousMILO(
+        return this.handleDelete(
           resultJeune.data,
           maintenant,
           rendezVousMILO,
@@ -111,7 +111,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
     }
   }
 
-  private async createRendezVousMILO(
+  private async handleCreate(
     jeune: JeuneMilo,
     maintenant: DateTime,
     rendezVousMILO?: RendezVousMilo,
@@ -127,14 +127,10 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
         jeune
       )
 
-      // TODO(7 septembre 2023): supprimer ce comportement pour tout le monde quand les sessions seront déployées à tous
-      if (
-        !estUnEarlyAdopter(this.configuration, jeune.idStructureMilo) ||
-        rendezVousMILO?.type !== RendezVousMilo.Type.SESSION
-      ) {
+      if (rendezVousMILO.type === RendezVousMilo.Type.RENDEZ_VOUS) {
         await this.rendezVousRepository.save(newRendezVousCEJ)
-        this.planifierLesRappelsDeRendezVous(newRendezVousCEJ)
       }
+      this.planifierLesRappelsDeRendezVous(newRendezVousCEJ)
 
       this.notifier(
         rendezVousMILO,
@@ -157,7 +153,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
     )
   }
 
-  private async updateRendezVousMILO(
+  private async handleUpdate(
     jeune: JeuneMilo,
     maintenant: DateTime,
     rendezVousMILO?: RendezVousMilo,
@@ -170,7 +166,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
           !this.isStatutRecuperable(rendezVousMILO) ||
           !this.isDateRecuperable(rendezVousMILO, jeune)
         ) {
-          return this.deleteRendezVousMILO(
+          return this.handleDelete(
             jeune,
             maintenant,
             rendezVousMILO,
@@ -185,17 +181,13 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
             rendezVousMILO
           )
 
-        // TODO(7 septembre 2023): supprimer ce comportement pour tout le monde quand les sessions seront déployées à tous
-        if (
-          !estUnEarlyAdopter(this.configuration, jeune.idStructureMilo) ||
-          rendezVousMILO?.type !== RendezVousMilo.Type.SESSION
-        ) {
+        if (rendezVousMILO.type === RendezVousMilo.Type.RENDEZ_VOUS) {
           await this.rendezVousRepository.save(rendezVousCEJUpdated)
-          this.replanifierLesRappelsDeRendezVous(
-            rendezVousCEJUpdated,
-            rendezVousCEJExistant
-          )
         }
+        this.replanifierLesRappelsDeRendezVous(
+          rendezVousCEJUpdated,
+          rendezVousCEJExistant
+        )
 
         this.notifier(
           rendezVousMILO,
@@ -211,7 +203,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
           rendezVousCEJExistant.id
         )
       } else {
-        return this.createRendezVousMILO(
+        return this.handleCreate(
           jeune,
           maintenant,
           rendezVousMILO,
@@ -226,7 +218,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
     )
   }
 
-  private async deleteRendezVousMILO(
+  private async handleDelete(
     jeune: JeuneMilo,
     maintenant: DateTime,
     rendezVousMILO?: RendezVousMilo,
@@ -234,14 +226,13 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
     FT_NOTIFIER_RDV_MILO?: boolean
   ): Promise<SuiviJob> {
     if (rendezVousCEJExistant) {
-      // TODO(7 septembre 2023): supprimer ce comportement pour tout le monde quand les sessions seront déployées à tous
       if (
-        !estUnEarlyAdopter(this.configuration, jeune.idStructureMilo) ||
-        rendezVousMILO?.type !== RendezVousMilo.Type.SESSION
+        rendezVousMILO?.type === RendezVousMilo.Type.RENDEZ_VOUS ||
+        rendezVousCEJExistant.type === CodeTypeRendezVous.RENDEZ_VOUS_MILO
       ) {
         await this.rendezVousRepository.delete(rendezVousCEJExistant.id)
-        this.supprimerLesRappelsDeRendezVous(rendezVousCEJExistant)
       }
+      this.supprimerLesRappelsDeRendezVous(rendezVousCEJExistant)
 
       if (rendezVousMILO) {
         this.notifier(

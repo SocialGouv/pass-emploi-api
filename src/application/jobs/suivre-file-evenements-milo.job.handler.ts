@@ -12,7 +12,7 @@ import { DateService } from '../../utils/date-service'
 import {
   RendezVousMilo,
   MiloRendezVousRepositoryToken
-} from '../../domain/rendez-vous/rendez-vous.milo'
+} from '../../domain/milo/rendez-vous.milo'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.SUIVRE_FILE_EVENEMENTS_MILO)

@@ -10,8 +10,11 @@ import {
   Planificateur,
   PlanificateurService
 } from '../../../src/domain/planificateur'
-import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
-import { RendezVousMilo } from '../../../src/domain/rendez-vous/rendez-vous.milo'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from '../../../src/domain/rendez-vous/rendez-vous'
+import { RendezVousMilo } from '../../../src/domain/milo/rendez-vous.milo'
 import { SuiviJob } from '../../../src/domain/suivi-job'
 import { DateService } from '../../../src/utils/date-service'
 import { uneDate, uneDatetime } from '../../fixtures/date.fixture'
@@ -603,7 +606,9 @@ describe('TraiterEvenementMiloJobHandler', () => {
             )
           })
           it('supprime le rdv CEJ sans notifier quand rdv MILO inexistant', async () => {
-            const rendezVous = unRendezVous()
+            const rendezVous = unRendezVous({
+              type: CodeTypeRendezVous.RENDEZ_VOUS_MILO
+            })
             rendezVousRepository.getByIdPartenaire
               .withArgs(evenement.idObjet, evenement.objet)
               .returns(rendezVous)

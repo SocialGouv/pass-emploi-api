@@ -8,7 +8,7 @@ import {
   failure,
   Result
 } from '../../../building-blocks/types/result'
-import { RendezVousMilo } from '../../../domain/rendez-vous/rendez-vous.milo'
+import { RendezVousMilo } from '../../../domain/milo/rendez-vous.milo'
 import { RateLimiterService } from '../../../utils/rate-limiter.service'
 import {
   EvenementMiloDto,

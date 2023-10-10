@@ -5,7 +5,7 @@ import {
   JeuneDuRendezVous,
   RendezVous,
   RendezVous as RendezVousPassEmploi
-} from './rendez-vous'
+} from '../rendez-vous/rendez-vous'
 import { IdService } from '../../utils/id-service'
 import { DateTime } from 'luxon'
 import Source = RendezVous.Source

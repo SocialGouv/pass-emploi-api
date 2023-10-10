@@ -17,7 +17,7 @@ import {
   SessionMiloDto
 } from '../../../../src/infrastructure/repositories/dto/milo.dto'
 import { MiloRendezVousHttpRepository } from '../../../../src/infrastructure/repositories/rendez-vous/rendez-vous-milo-http.repository'
-import { RendezVousMilo } from '../../../../src/domain/rendez-vous/rendez-vous.milo'
+import { RendezVousMilo } from '../../../../src/domain/milo/rendez-vous.milo'
 import { RateLimiterService } from '../../../../src/utils/rate-limiter.service'
 
 describe('MiloEvenementsHttpRepository', () => {
