@@ -19,6 +19,9 @@ export class MetierRomeDto extends Model {
 
   @Column({ field: 'libelle_sanitized', type: DataType.STRING })
   libelleSanitized!: string
+
+  @Column({ field: 'appellation_code', type: DataType.STRING })
+  appellationCode!: string
 }
 
 @Table({ timestamps: false, tableName: 'referentiel_metier_rome' })
