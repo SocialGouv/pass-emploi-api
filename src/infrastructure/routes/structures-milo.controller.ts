@@ -9,8 +9,10 @@ import { JeuneQueryModel } from '../../application/queries/query-models/jeunes.q
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure, handleResult } from './result.handler'
-import { GetJeunesStructureMiloQueryParams } from './validation/structures-milo.inputs'
-import { ClotureAnimationCollectivePayload } from './validation/etablissements.inputs'
+import {
+  ClotureAnimationCollectivePayload,
+  GetJeunesStructureMiloQueryParams
+} from './validation/structures-milo.inputs'
 import { CloturerAnimationCollectiveCommandHandler } from '../../application/commands/cloturer-animation-collective.command.handler'
 
 @Controller('structures-milo')
@@ -55,9 +57,9 @@ export class StructuresMiloController {
   }
 
   @ApiOperation({
-    summary: 'clore animation-collectives de structure-milo',
+    summary: 'Clot une animation collective et inscrit les jeunes',
     description:
-      "Autorisé pour un conseiller appartenant à le structure MILO de l'animation collective"
+      "Autorisé pour un conseiller appartenant à la structure MILO de l'animation collective"
   })
   @Post('animations-collectives/:idAnimationCollective/cloturer')
   async postCloture(

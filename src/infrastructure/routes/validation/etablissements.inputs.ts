@@ -1,13 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { Transform, Type } from 'class-transformer'
 import {
-  IsArray,
-  IsDateString,
-  IsNotEmpty,
-  IsOptional,
-  IsNumber,
   IsBoolean,
+  IsDateString,
   IsIn,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
   IsString
 } from 'class-validator'
 import { transformStringToBoolean } from './utils/transformers'
@@ -61,10 +60,4 @@ export class GetJeunesEtablissementV2QueryParams {
   @ApiProperty({ required: true })
   @IsString()
   q: string
-}
-
-export class ClotureAnimationCollectivePayload {
-  @ApiProperty()
-  @IsArray()
-  idsJeunes: string[]
 }
