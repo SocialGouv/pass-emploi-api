@@ -601,24 +601,56 @@ describe('TraiterEvenementMiloJobHandler', () => {
               type: Planificateur.JobType.TRAITER_EVENEMENT_MILO,
               contenu: evenement
             }
-          it('ne fait rien', async () => {
-            const rendezVousMilo: RendezVousMilo = unRendezVousMilo({
+          it('notification modification quand le statut est récupérable', async () => {
+            const sessionMilo = unRendezVousMilo({
               statut: 'Absent',
               type: RendezVousMilo.Type.SESSION
             })
             miloRendezVousRepository.findRendezVousByEvenement
               .withArgs(evenement)
-              .resolves(rendezVousMilo)
+              .resolves(sessionMilo)
 
             // When
             const result = await handler.handle(job)
 
             // Then
             expect(result.resultat).to.be.deep.equal({
-              traitement: Traitement.TRAITEMENT_UPDATE_INCONNU,
+              traitement: Traitement.NOTIFICATION_SESSION_MODIFICATION,
               idJeune: jeune.id,
-              idRendezVous: undefined
+              idRendezVous: sessionMilo.id
             })
+            expect(
+              notificationService.notifierModificationSession
+            ).to.have.been.calledOnceWithExactly(sessionMilo.id, [jeune])
+          })
+          it('notification suppression quand le statut est non récupérable', async () => {
+            const sessionMilo = unRendezVousMilo({
+              statut: 'Refus jeune',
+              type: RendezVousMilo.Type.SESSION
+            })
+            miloRendezVousRepository.findRendezVousByEvenement
+              .withArgs(evenement)
+              .resolves(sessionMilo)
+
+            // When
+            const result = await handler.handle(job)
+
+            // Then
+            expect(result.resultat).to.be.deep.equal({
+              traitement: Traitement.NOTIFICATION_SESSION_SUPPRESSION,
+              idJeune: jeune.id,
+              idRendezVous: sessionMilo.id
+            })
+            expect(
+              notificationService.notifierDesinscriptionSession
+            ).to.have.been.calledOnceWithExactly(
+              sessionMilo.id,
+              RendezVousMilo.timezonerDateMilo(
+                sessionMilo.dateHeureDebut,
+                jeune
+              ),
+              [jeune]
+            )
           })
         })
       })

@@ -284,6 +284,34 @@ describe('Notification', () => {
         )
       })
     })
+    describe('notifierModificationSession', () => {
+      it('notifie les jeunes avec pushNotificationToken', async () => {
+        // Given
+        const jeune: Jeune = unJeune()
+        const idSession = 'session-id'
+        const expectedNotification = uneNotification({
+          token: jeune.configuration?.pushNotificationToken,
+          notification: {
+            title: 'Rendez-vous modifié',
+            body: 'Votre rendez-vous a été modifié'
+          },
+          data: {
+            type: Notification.Type.DETAIL_SESSION_MILO,
+            id: idSession
+          }
+        })
+
+        // When
+        await notificationService.notifierModificationSession(idSession, [
+          jeune
+        ])
+
+        // Then
+        expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
+          expectedNotification
+        )
+      })
+    })
     describe('notifierDesinscriptionSession', () => {
       it('notifie les jeunes avec pushNotificationToken', async () => {
         // Given
