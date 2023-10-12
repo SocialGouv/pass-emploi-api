@@ -1,6 +1,13 @@
 /* eslint-disable no-process-env */
 import { HttpModule } from '@nestjs/axios'
-import { Module, ModuleMetadata, Provider } from '@nestjs/common'
+import {
+  MiddlewareConsumer,
+  Module,
+  ModuleMetadata,
+  NestModule,
+  Provider,
+  RequestMethod
+} from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { APP_GUARD } from '@nestjs/core'
 import { TerminusModule } from '@nestjs/terminus'
@@ -348,6 +355,7 @@ import { GetJeunesByStructureMiloQueryHandler } from './application/queries/milo
 import { StructuresMiloController } from './infrastructure/routes/structures-milo.controller'
 import { GetJeunesEtablissementV2QueryHandler } from './application/queries/get-jeunes-etablissement-v2.query.handler.db'
 import { GetJeunesByEtablissementQueryHandler } from './application/queries/get-jeunes-by-etablissement.query.handler.db'
+import { AppMobileCacheControlMiddleware } from 'src/infrastructure/middlewares/app-mobile-cache-control.middleware'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -801,4 +809,10 @@ export const JobHandlerProviders = [
 ]
 
 @Module(buildModuleMetadata())
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer
+      .apply(AppMobileCacheControlMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.GET })
+  }
+}

@@ -163,5 +163,8 @@ export const configurationSchema = Joi.object({
   }),
   values: Joi.object({
     maxRechercheConseillers: Joi.number()
+  }),
+  headers: Joi.object({
+    maxAge: Joi.number().required()
   })
 })
