@@ -303,6 +303,27 @@ export namespace Notification {
       )
     }
 
+    async notifierModificationSession(
+      idSsession: string,
+      jeunes: Jeune[]
+    ): Promise<void[]> {
+      return Promise.all(
+        jeunes.map(async jeune => {
+          if (jeune.configuration?.pushNotificationToken) {
+            const notification = creerNotificationModificationSession(
+              jeune.configuration?.pushNotificationToken,
+              idSsession
+            )
+            if (notification) {
+              return this.notificationRepository.send(notification)
+            }
+          } else {
+            this.logMessageEchec(jeune.id)
+          }
+        })
+      )
+    }
+
     async notifierDesinscriptionSession(
       idSsession: string,
       dateSession: DateTime,
@@ -472,6 +493,23 @@ export namespace Notification {
       notification: {
         title: 'Nouveau rendez-vous',
         body: 'Votre conseiller a programmé un nouveau rendez-vous'
+      },
+      data: {
+        type: Type.DETAIL_SESSION_MILO,
+        id: idSession
+      }
+    }
+  }
+
+  function creerNotificationModificationSession(
+    token: string,
+    idSession: string
+  ): Notification.Message {
+    return {
+      token,
+      notification: {
+        title: 'Rendez-vous modifié',
+        body: 'Votre rendez-vous a été modifié'
       },
       data: {
         type: Type.DETAIL_SESSION_MILO,

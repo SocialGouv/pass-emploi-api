@@ -152,7 +152,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
             rendezVousMILO,
             maintenant,
             jeune,
-            Notification.Type.DETAIL_SESSION_MILO,
+            'create',
             FT_NOTIFIER_EVENEMENTS_MILO
           )
           return this.buildSuiviJob(
@@ -227,6 +227,32 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
           FT_NOTIFIER_EVENEMENTS_MILO
         )
       }
+    } else if (rendezVousMILO?.type === RendezVousMilo.Type.SESSION) {
+      if (
+        !this.isStatutRecuperable(rendezVousMILO) ||
+        !this.isDateRecuperable(rendezVousMILO, jeune)
+      ) {
+        return this.handleDelete(
+          jeune,
+          maintenant,
+          rendezVousMILO,
+          rendezVousCEJExistant,
+          FT_NOTIFIER_EVENEMENTS_MILO
+        )
+      }
+      this.notifierSession(
+        rendezVousMILO,
+        maintenant,
+        jeune,
+        'update',
+        FT_NOTIFIER_EVENEMENTS_MILO
+      )
+      return this.buildSuiviJob(
+        maintenant,
+        Traitement.NOTIFICATION_SESSION_MODIFICATION,
+        jeune.id,
+        rendezVousMILO.id
+      )
     }
     return this.buildSuiviJob(
       maintenant,
@@ -273,7 +299,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
         rendezVousMILO,
         maintenant,
         jeune,
-        Notification.Type.DELETED_SESSION_MILO,
+        'delete',
         FT_NOTIFIER_EVENEMENTS_MILO
       )
       return this.buildSuiviJob(
@@ -317,7 +343,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
     sessionMilo: RendezVousMilo,
     maintenant: DateTime,
     jeune: JeuneMilo,
-    typeNotification: Notification.TypeSession,
+    typeNotification: 'create' | 'update' | 'delete',
     FT_NOTIFIER_EVENEMENTS_MILO?: boolean
   ): void {
     if (FT_NOTIFIER_EVENEMENTS_MILO) {
@@ -326,16 +352,24 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
         jeune
       )
       const dansLeFutur = DateService.isGreater(dateSession, maintenant)
+      const statutNotifiable =
+        typeNotification === 'delete' || this.isStatutNotifiable(sessionMilo)
 
-      if (dansLeFutur && this.isStatutNotifiable(sessionMilo)) {
+      if (dansLeFutur && statutNotifiable) {
         switch (typeNotification) {
-          case Notification.Type.DETAIL_SESSION_MILO:
+          case 'create':
             this.notificationService.notifierInscriptionSession(
               sessionMilo.id,
               [jeune]
             )
             break
-          case Notification.Type.DELETED_SESSION_MILO:
+          case 'update':
+            this.notificationService.notifierModificationSession(
+              sessionMilo.id,
+              [jeune]
+            )
+            break
+          case 'delete':
             this.notificationService.notifierDesinscriptionSession(
               sessionMilo.id,
               dateSession,
@@ -467,6 +501,7 @@ export enum Traitement {
   RENDEZ_VOUS_MODIFIE = 'RENDEZ_VOUS_MODIFIE',
   NOTIFICATION_SESSION_SUPPRESSION = 'NOTIFICATION_SESSION_SUPPRESSION',
   NOTIFICATION_SESSION_AJOUT = 'NOTIFICATION_SESSION_AJOUT',
+  NOTIFICATION_SESSION_MODIFICATION = 'NOTIFICATION_SESSION_MODIFICATION',
   RENDEZ_VOUS_INEXISTANT = 'RENDEZ_VOUS_INEXISTANT',
   JEUNE_INEXISTANT = 'JEUNE_INEXISTANT',
   TYPE_NON_TRAITABLE = 'TYPE_NON_TRAITABLE',
