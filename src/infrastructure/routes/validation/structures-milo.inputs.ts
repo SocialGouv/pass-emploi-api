@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator'
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString
+} from 'class-validator'
 
 export class GetJeunesStructureMiloQueryParams {
   @ApiProperty({ description: 'applique une pagination aux résultats' })
@@ -24,4 +30,10 @@ export class GetJeunesStructureMiloQueryParams {
   @IsString()
   @IsNotEmpty()
   q?: string
+}
+
+export class ClotureAnimationCollectivePayload {
+  @ApiProperty()
+  @IsArray()
+  idsJeunes: string[]
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   GetJeunesByStructureMiloQuery,
@@ -8,14 +8,19 @@ import {
 import { JeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
-import { handleResult } from './result.handler'
-import { GetJeunesStructureMiloQueryParams } from './validation/structures-milo.inputs'
+import { handleFailure, handleResult } from './result.handler'
+import {
+  ClotureAnimationCollectivePayload,
+  GetJeunesStructureMiloQueryParams
+} from './validation/structures-milo.inputs'
+import { CloturerAnimationCollectiveCommandHandler } from '../../application/commands/cloturer-animation-collective.command.handler'
 
 @Controller('structures-milo')
 @ApiOAuth2([])
 @ApiTags('Structures Milo')
 export class StructuresMiloController {
   constructor(
+    private readonly cloturerAnimationCollectiveCommandHandler: CloturerAnimationCollectiveCommandHandler,
     private readonly getJeunesByStructureMilo: GetJeunesByStructureMiloQueryHandler
   ) {}
 
@@ -49,5 +54,27 @@ export class StructuresMiloController {
     )
 
     return handleResult<GetJeunesByStructureMiloQueryModel>(result)
+  }
+
+  @ApiOperation({
+    summary: 'Clot une animation collective et inscrit les jeunes',
+    description:
+      "Autorisé pour un conseiller appartenant à la structure MILO de l'animation collective"
+  })
+  @Post('animations-collectives/:idAnimationCollective/cloturer')
+  async postCloture(
+    @Param('idAnimationCollective') idAnimationCollective: string,
+    @Body() payload: ClotureAnimationCollectivePayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result = await this.cloturerAnimationCollectiveCommandHandler.execute(
+      {
+        idAnimationCollective,
+        idsJeunes: payload.idsJeunes
+      },
+      utilisateur
+    )
+
+    handleFailure(result)
   }
 }
