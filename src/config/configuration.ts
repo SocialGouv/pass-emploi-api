@@ -166,6 +166,14 @@ export default () => {
         limit: process.env.RATE_LIMITER_GET_SESSION_MILO_LIMIT ?? '3',
         interval: process.env.RATE_LIMITER_GET_SESSION_MILO_INTERVAL ?? '1000'
       },
+      operateursSessionsConseillerMilo: {
+        limit:
+          process.env.RATE_LIMITER_OPERATEURS_SESSIONS_CONSEILLER_MILO_LIMIT ??
+          '3',
+        interval:
+          process.env
+            .RATE_LIMITER_OPERATEURS_SESSIONS_CONSEILLER_MILO_INTERVAL ?? '1000'
+      },
       getNotificationsPE: {
         limit: process.env.RATE_LIMITER_GET_NOTIFICATIONS_PE_LIMIT ?? '3',
         interval:

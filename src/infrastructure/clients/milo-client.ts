@@ -106,6 +106,7 @@ export class MiloClient {
     idDossier: string,
     periode?: { debut?: DateTime; fin?: DateTime }
   ): Promise<Result<ListeSessionsJeuneMiloDto>> {
+    await this.rateLimiterService.operateursSessionsConseillerMilo.attendreLaProchaineDisponibilite()
     return this.recupererSessionsJeune(
       idpToken,
       idDossier,
@@ -118,6 +119,7 @@ export class MiloClient {
     idpToken: string,
     idSession: string
   ): Promise<Result<SessionConseillerDetailDto>> {
+    await this.rateLimiterService.operateursSessionsConseillerMilo.attendreLaProchaineDisponibilite()
     return this.get<SessionConseillerDetailDto>(`sessions/${idSession}`, {
       apiKey: this.apiKeySessionDetailConseiller,
       idpToken
@@ -138,6 +140,7 @@ export class MiloClient {
     idpToken: string,
     idSession: string
   ): Promise<Result<InscritSessionMiloDto[]>> {
+    await this.rateLimiterService.operateursSessionsConseillerMilo.attendreLaProchaineDisponibilite()
     return this.get<InscritSessionMiloDto[]>(`sessions/${idSession}/inscrits`, {
       apiKey: this.apiKeySessionDetailConseiller,
       idpToken

@@ -125,6 +125,10 @@ export const configurationSchema = Joi.object({
       limit: Joi.number().required(),
       interval: Joi.number().required()
     }),
+    operateursSessionsConseillerMilo: Joi.object({
+      limit: Joi.number().required(),
+      interval: Joi.number().required()
+    }),
     getNotificationsPE: Joi.object({
       limit: Joi.number().required(),
       interval: Joi.number().required()
