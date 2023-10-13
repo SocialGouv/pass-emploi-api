@@ -53,9 +53,10 @@ export function toOffreImmersionQueryModel(
   offreImmersionDto: PartenaireImmersion.DtoV2
 ): OffreImmersionQueryModel {
   const appellationCode = offreImmersionDto.appellations[0].appellationCode
+  const labelMetier = offreImmersionDto.appellations[0].appellationLabel
   return {
     id: `${offreImmersionDto.siret}-${appellationCode}`,
-    metier: offreImmersionDto.romeLabel,
+    metier: labelMetier,
     nomEtablissement: offreImmersionDto.name,
     secteurActivite: offreImmersionDto.nafLabel,
     ville: offreImmersionDto.address.city,
@@ -67,11 +68,12 @@ export function toDetailOffreImmersionQueryModel(
   offreImmersionDto: PartenaireImmersion.DtoV2
 ): DetailOffreImmersionQueryModel {
   const appellationCode = offreImmersionDto.appellations[0].appellationCode
+  const labelMetier = offreImmersionDto.appellations[0].appellationLabel
   return {
     id: `${offreImmersionDto.siret}-${appellationCode}`,
     codeRome: offreImmersionDto.rome,
     siret: offreImmersionDto.siret,
-    metier: offreImmersionDto.romeLabel,
+    metier: labelMetier,
     nomEtablissement: offreImmersionDto.name,
     secteurActivite: offreImmersionDto.nafLabel,
     ville: offreImmersionDto.address.city,

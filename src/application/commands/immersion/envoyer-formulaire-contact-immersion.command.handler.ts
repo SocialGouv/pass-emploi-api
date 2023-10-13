@@ -11,6 +11,7 @@ import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
 import { QueryTypes, Sequelize } from 'sequelize'
 import { RechercheDetailOffreNonTrouve } from '../../../building-blocks/types/domain-error'
+import { PartenaireImmersion } from '../../../infrastructure/repositories/dto/immersion.dto'
 
 export interface EnvoyerFormulaireContactImmersionCommand {
   idJeune: string
@@ -49,7 +50,7 @@ export class EnvoyerFormulaireContactImmersionCommandHandler extends CommandHand
     command: EnvoyerFormulaireContactImmersionCommand
   ): Promise<Result> {
     const defaultMessage =
-      'Bonjour, Je souhaiterais passer quelques jours dans votre entreprise en immersion professionnelle auprès de vos salariés pour découvrir ce métier.Pourriez-vous me proposer un rendez-vous ? Je pourrais alors vous expliquer directement mon projet.'
+      'Bonjour, Je souhaiterais passer quelques jours dans votre entreprise en immersion professionnelle auprès de vos salariés pour découvrir ce métier. Pourriez-vous me proposer un rendez-vous ? Je pourrais alors vous expliquer directement mon projet.'
 
     const appellationCode = await this.getAppellationCodeFromLabel(
       command.labelRome
@@ -71,7 +72,7 @@ export class EnvoyerFormulaireContactImmersionCommandHandler extends CommandHand
       potentialBeneficiaryEmail: command.email,
       potentialBeneficiaryPhone: 'non communiqué',
       immersionObjective: "Découvrir un métier ou un secteur d'activité",
-      contactMode: command.contactMode,
+      contactMode: PartenaireImmersion.ContactMode.EMAIL,
       message: command.message ? command.message : defaultMessage
     }
 
@@ -88,18 +89,17 @@ export class EnvoyerFormulaireContactImmersionCommandHandler extends CommandHand
   async getAppellationCodeFromLabel(label: string): Promise<string> {
     const metiers: Array<{ appellation_code: string }> =
       await this.sequelize.query(
-        `SELECT code, libelle, libelle_sanitized AS "score", appellation_code
+        `SELECT appellation_code
        FROM "referentiel_metier_rome"
-       WHERE libelle = ?
-       ORDER BY "score" DESC LIMIT 20;`,
+       WHERE libelle = ?`,
         {
           replacements: [label],
           type: QueryTypes.SELECT
         }
       )
 
-    const appellationCodeListe: string = metiers.map(m => m.appellation_code)[0]
+    const appellationCode: string = metiers.map(m => m.appellation_code)[0]
 
-    return appellationCodeListe
+    return appellationCode
   }
 }

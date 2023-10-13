@@ -3,20 +3,10 @@ import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import { firstValueFrom } from 'rxjs'
-import {
-  emptySuccess,
-  failure,
-  Result,
-  success
-} from 'src/building-blocks/types/result'
+import { emptySuccess, Result, success } from 'src/building-blocks/types/result'
 import { URLSearchParams } from 'url'
 import { handleAxiosError } from './utils/axios-error-handler'
 import { PartenaireImmersion } from '../repositories/dto/immersion.dto'
-import {
-  RechercheDetailOffreInvalide,
-  RechercheDetailOffreNonTrouve,
-  RechercheOffreInvalide
-} from '../../building-blocks/types/domain-error'
 
 export interface FormulaireImmersionPayload {
   appellationCode: string
@@ -55,14 +45,12 @@ export class ImmersionClient {
       )
 
       return success(response.data)
-    } catch (e) {
-      if (e.response?.status === 400) {
-        const message = e.response.data.errors
-          .map((error: { message: string }) => error.message)
-          .join(' - ')
-        return failure(new RechercheOffreInvalide(message))
-      }
-      throw e
+    } catch (erreur) {
+      return handleAxiosError(
+        erreur,
+        this.logger,
+        'ERROR API getOffres immersion'
+      )
     }
   }
 
@@ -74,17 +62,12 @@ export class ImmersionClient {
         `v2/search/${params}`
       )
       return success(response.data)
-    } catch (e) {
-      if (e.response?.status === 404) {
-        const message = `Offre d'immersion ${params} not found`
-        return failure(new RechercheDetailOffreNonTrouve(message))
-      }
-      if (e.response?.status === 400) {
-        return failure(
-          new RechercheDetailOffreInvalide(e.response.data.errors.message)
-        )
-      }
-      throw e
+    } catch (erreur) {
+      return handleAxiosError(
+        erreur,
+        this.logger,
+        'ERROR API getOffres immersion'
+      )
     }
   }
 

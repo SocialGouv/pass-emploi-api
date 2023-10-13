@@ -27,6 +27,8 @@ import {
   MauvaiseCommandeError,
   MaxInscritsDepasse,
   NonTrouveError,
+  RechercheDetailOffreNonTrouve,
+  RechercheOffreInvalide,
   ReponsesCampagneInvalide,
   RessourceIndisponibleError
 } from '../../building-blocks/types/domain-error'
@@ -59,6 +61,8 @@ export function handleFailure(result: Result): void {
       case JeuneMiloSansIdDossier.CODE:
       case MaxInscritsDepasse.CODE:
       case EmargementIncorrect.CODE:
+      case RechercheOffreInvalide.CODE:
+      case RechercheDetailOffreNonTrouve.CODE:
         throw new BadRequestException(result.error, result.error.message)
       case RessourceIndisponibleError.CODE:
         throw new GoneException(result.error.message)

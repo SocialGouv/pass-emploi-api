@@ -129,7 +129,7 @@ describe('', () => {
           success([
             {
               id: 'siret-appellationCode',
-              metier: 'romeLabel',
+              metier: 'appellationCodeLabel',
               nomEtablissement: 'name',
               secteurActivite: 'nafLabel',
               ville: 'city',
@@ -152,7 +152,7 @@ describe('', () => {
         }
 
         immersionClient.getOffres.resolves(
-          failure(new RechercheOffreInvalide('Le champs Rome est pas bon'))
+          failure(new RechercheOffreInvalide('Le champ Rome est pas bon'))
         )
 
         // When
@@ -165,7 +165,7 @@ describe('', () => {
 
         // Then
         expect(offres).to.deep.equal(
-          failure(new RechercheOffreInvalide('Le champs Rome est pas bon'))
+          failure(new RechercheOffreInvalide('Le champ Rome est pas bon'))
         )
       })
     })

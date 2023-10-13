@@ -43,7 +43,7 @@ export class FindAllOffresImmersionQueryGetter {
 
     const params = new URLSearchParams()
 
-    const appellationCodeListe = await this.romeToAppellationCode(query.rome)
+    const appellationCodeListe = await this.romeToAppellationsCode(query.rome)
 
     params.append('distanceKm', distanceAvecDefault)
     params.append('longitude', query.lon.toString())
@@ -57,13 +57,14 @@ export class FindAllOffresImmersionQueryGetter {
     return params
   }
 
-  async romeToAppellationCode(codeRome: string): Promise<string[]> {
+  async romeToAppellationsCode(codeRome: string): Promise<string[]> {
     const metiers: Array<{ appellation_code: string }> =
       await this.sequelize.query(
-        `SELECT code, libelle, libelle_sanitized AS "score", appellation_code
-       FROM "referentiel_metier_rome"
+        `SELECT appellation_code
+       FROM referentiel_metier_rome
        WHERE code = ?
-       ORDER BY "score" DESC LIMIT 20;`,
+       AND  appellation_code != ''
+       ORDER BY libelle DESC`,
         {
           replacements: [codeRome],
           type: QueryTypes.SELECT

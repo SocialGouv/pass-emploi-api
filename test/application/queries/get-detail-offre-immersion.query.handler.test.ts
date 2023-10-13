@@ -63,7 +63,7 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
               latitude: 42,
               longitude: 2
             },
-            metier: 'rome',
+            metier: 'Boulanger-Traiteur',
             nomEtablissement: 'name',
             secteurActivite: 'naf',
             ville: 'city',
