@@ -2,19 +2,19 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox, createSandbox } from 'sinon'
 import { StubbedClass, expect, stubClass } from 'test/utils'
 import { SuivreEvenementsMiloCronJobHandler } from '../../../src/application/jobs/suivre-file-evenements-milo.job.handler'
+import { EvenementMilo } from '../../../src/domain/milo/evenement.milo'
 import {
   Planificateur,
   PlanificateurService
 } from '../../../src/domain/planificateur'
 import { SuiviJob } from '../../../src/domain/suivi-job'
 import { DateService } from '../../../src/utils/date-service'
-import { unEvenementMilo } from '../../fixtures/partenaire.fixture'
 import { uneDatetime } from '../../fixtures/date.fixture'
-import { RendezVousMilo } from '../../../src/domain/milo/rendez-vous.milo'
+import { unEvenementMilo } from '../../fixtures/milo.fixture'
 
 describe('SuivreEvenementsMiloCronJobHandler', () => {
   let suivreEvenementsMiloHandler: SuivreEvenementsMiloCronJobHandler
-  let miloRendezVousRepository: StubbedType<RendezVousMilo.Repository>
+  let evenementMiloRepository: StubbedType<EvenementMilo.Repository>
   let suiviJobService: StubbedType<SuiviJob.Service>
   let dateService: StubbedClass<DateService>
   let planificateurService: StubbedClass<PlanificateurService>
@@ -22,7 +22,7 @@ describe('SuivreEvenementsMiloCronJobHandler', () => {
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
-    miloRendezVousRepository = stubInterface(sandbox)
+    evenementMiloRepository = stubInterface(sandbox)
     suiviJobService = stubInterface(sandbox)
     dateService = stubClass(DateService)
     dateService.now.returns(uneDatetime())
@@ -31,7 +31,7 @@ describe('SuivreEvenementsMiloCronJobHandler', () => {
 
     suivreEvenementsMiloHandler = new SuivreEvenementsMiloCronJobHandler(
       suiviJobService,
-      miloRendezVousRepository,
+      evenementMiloRepository,
       dateService,
       planificateurService,
       planificateurRepository
@@ -47,7 +47,7 @@ describe('SuivreEvenementsMiloCronJobHandler', () => {
 
       // Then
       expect(
-        miloRendezVousRepository.findAllEvenements
+        evenementMiloRepository.findAllEvenements
       ).to.not.have.been.called()
     })
   })
@@ -58,14 +58,14 @@ describe('SuivreEvenementsMiloCronJobHandler', () => {
     })
 
     describe('quand il y a au moins un évènement milo', () => {
-      let eventMilo1: RendezVousMilo.Evenement
-      let eventMilo2: RendezVousMilo.Evenement
+      let eventMilo1: EvenementMilo
+      let eventMilo2: EvenementMilo
 
       beforeEach(() => {
         // Given
         eventMilo1 = unEvenementMilo({ id: 'un-evenement' })
         eventMilo2 = unEvenementMilo({ id: 'un-autre-evenement' })
-        miloRendezVousRepository.findAllEvenements
+        evenementMiloRepository.findAllEvenements
           .onFirstCall()
           .resolves([eventMilo1, eventMilo2])
           .onSecondCall()
@@ -89,16 +89,16 @@ describe('SuivreEvenementsMiloCronJobHandler', () => {
 
         // Then
         expect(
-          miloRendezVousRepository.acquitterEvenement
+          evenementMiloRepository.acquitterEvenement
         ).to.have.been.calledWith(eventMilo1)
         expect(
-          miloRendezVousRepository.acquitterEvenement
+          evenementMiloRepository.acquitterEvenement
         ).to.have.been.calledWith(eventMilo2)
       })
 
       it("s'arrête quand milo ne retourne plus d'évènement", async () => {
         // Given
-        miloRendezVousRepository.findAllEvenements
+        evenementMiloRepository.findAllEvenements
           .onFirstCall()
           .resolves([eventMilo1])
           .onSecondCall()
@@ -110,7 +110,7 @@ describe('SuivreEvenementsMiloCronJobHandler', () => {
         await suivreEvenementsMiloHandler.handle()
 
         // Then
-        expect(miloRendezVousRepository.findAllEvenements).to.have.callCount(3)
+        expect(evenementMiloRepository.findAllEvenements).to.have.callCount(3)
         expect(
           planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant
         ).to.have.been.calledWith(eventMilo1)
@@ -118,10 +118,10 @@ describe('SuivreEvenementsMiloCronJobHandler', () => {
           planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant
         ).to.have.been.calledWith(eventMilo2)
         expect(
-          miloRendezVousRepository.acquitterEvenement
+          evenementMiloRepository.acquitterEvenement
         ).to.have.been.calledWith(eventMilo1)
         expect(
-          miloRendezVousRepository.acquitterEvenement
+          evenementMiloRepository.acquitterEvenement
         ).to.have.been.calledWith(eventMilo2)
       })
     })

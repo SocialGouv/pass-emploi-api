@@ -148,7 +148,7 @@ import { FichierSqlS3Repository } from './infrastructure/repositories/fichier-sq
 import { JeuneConfigurationApplicationSqlRepository } from './infrastructure/repositories/jeune/jeune-configuration-application-sql.repository.db'
 import { JeuneSqlRepository } from './infrastructure/repositories/jeune/jeune-sql.repository.db'
 import { MailSqlRepository } from './infrastructure/repositories/mail-sql.repository.db'
-import { MiloJeuneHttpSqlRepository } from './infrastructure/repositories/jeune/jeune-milo-http-sql.repository.db'
+import { MiloJeuneHttpSqlRepository } from './infrastructure/repositories/milo/jeune-milo-http-sql.repository.db'
 import { NotificationFirebaseRepository } from './infrastructure/repositories/notification-firebase.repository'
 import { OffresEmploiHttpSqlRepository } from './infrastructure/repositories/offre/offre-emploi-http-sql.repository.db'
 import { OffreServiceCiviqueHttpSqlRepository } from './infrastructure/repositories/offre/offre-service-civique-http.repository.db'
@@ -286,10 +286,11 @@ import { BigqueryClient } from './infrastructure/clients/bigquery.client'
 import { MessagesController } from './infrastructure/routes/messages.controller'
 import { SupportController } from './infrastructure/routes/support.controller'
 import { RefreshJddCommandHandler } from './application/commands/refresh-jdd.command.handler'
-import { MiloRendezVousHttpRepository } from './infrastructure/repositories/rendez-vous/rendez-vous-milo-http.repository'
+import { RendezVousMiloHttpRepository } from './infrastructure/repositories/milo/rendez-vous-milo-http.repository'
+import { EvenementMiloHttpRepository } from './infrastructure/repositories/milo/evenement-milo-http.repository'
 import { TraiterEvenementMiloJobHandler } from './application/jobs/traiter-evenement-milo.job.handler'
 import {
-  MiloRendezVousRepositoryToken,
+  RendezVousMiloRepositoryToken,
   RendezVousMilo
 } from './domain/milo/rendez-vous.milo'
 import { MiloJeuneRepositoryToken } from './domain/milo/jeune.milo'
@@ -356,6 +357,7 @@ import { StructuresMiloController } from './infrastructure/routes/structures-mil
 import { GetJeunesEtablissementV2QueryHandler } from './application/queries/get-jeunes-etablissement-v2.query.handler.db'
 import { GetJeunesByEtablissementQueryHandler } from './application/queries/get-jeunes-by-etablissement.query.handler.db'
 import { AppMobileCacheControlMiddleware } from 'src/infrastructure/middlewares/app-mobile-cache-control.middleware'
+import { EvenementMiloRepositoryToken } from './domain/milo/evenement.milo'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -595,8 +597,12 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       useClass: ListeDeDiffusionSqlRepository
     },
     {
-      provide: MiloRendezVousRepositoryToken,
-      useClass: MiloRendezVousHttpRepository
+      provide: RendezVousMiloRepositoryToken,
+      useClass: RendezVousMiloHttpRepository
+    },
+    {
+      provide: EvenementMiloRepositoryToken,
+      useClass: EvenementMiloHttpRepository
     },
     {
       provide: PoleEmploiPartenaireClientToken,

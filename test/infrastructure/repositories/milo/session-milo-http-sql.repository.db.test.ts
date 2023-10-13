@@ -1,4 +1,6 @@
+import { HttpService } from '@nestjs/axios'
 import { DateTime } from 'luxon'
+import * as nock from 'nock'
 import {
   emptySuccess,
   Success,
@@ -19,7 +21,6 @@ import {
 import { uneSessionMilo } from 'test/fixtures/sessions.fixture'
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
-import { expect, sinon, StubbedClass, stubClass } from '../../../utils'
 import { getDatabase } from 'test/utils/database-for-testing'
 import {
   MILO_INSCRIT,
@@ -27,6 +28,11 @@ import {
   MILO_REFUS_JEUNE,
   MILO_REFUS_TIERS
 } from '../../../../src/infrastructure/clients/dto/milo.dto'
+import { InstanceSessionMiloDto } from '../../../../src/infrastructure/repositories/dto/milo.dto'
+import { RateLimiterService } from '../../../../src/utils/rate-limiter.service'
+import { uneInstanceSessionMilo } from '../../../fixtures/milo.fixture'
+import { expect, sinon, StubbedClass, stubClass } from '../../../utils'
+import { testConfig } from '../../../utils/module-for-testing'
 const structureConseiller = {
   id: 'structure-milo',
   timezone: 'America/Cayenne'
@@ -34,13 +40,81 @@ const structureConseiller = {
 
 describe('SessionMiloHttpSqlRepository', () => {
   let miloClient: StubbedClass<MiloClient>
-  let sessionMiloHttpSqlRepository: SessionMiloHttpSqlRepository
+  let repository: SessionMiloHttpSqlRepository
+  const configService = testConfig()
+  const rateLimiterService = new RateLimiterService(configService)
 
   beforeEach(async () => {
+    const httpService = new HttpService()
     await getDatabase().cleanPG()
 
     miloClient = stubClass(MiloClient)
-    sessionMiloHttpSqlRepository = new SessionMiloHttpSqlRepository(miloClient)
+    repository = new SessionMiloHttpSqlRepository(
+      miloClient,
+      httpService,
+      configService,
+      rateLimiterService
+    )
+  })
+  describe('findInstanceSession', () => {
+    const idDossier = '1234'
+    const idInstance = '5678'
+
+    describe('quand elle existe', () => {
+      it('renvoie la session milo', async () => {
+        // Given
+        const sessionJson: InstanceSessionMiloDto = {
+          lieu: 'la',
+          nom: 'je suis un titre mais en fait le nom',
+          idSession: '123456',
+          id: idInstance,
+          dateHeureDebut: '2020-10-06 10:00:00',
+          dateHeureFin: '2020-10-06 12:00:00',
+          idDossier: idDossier,
+          commentaire: 'un petit commentaire plus ou moins long',
+          statut: 'Prescrit'
+        }
+        nock('https://milo.com')
+          .get(`/operateurs/dossiers/${idDossier}/sessions/${idInstance}`)
+          .reply(200, JSON.stringify(sessionJson))
+          .isDone()
+
+        // When
+        const resultat = await repository.findInstanceSession(
+          idInstance,
+          idDossier
+        )
+
+        // Then
+        const expected = uneInstanceSessionMilo({
+          id: '5678',
+          idDossier: idDossier,
+          statut: 'Prescrit',
+          dateHeureDebut: '2020-10-06 10:00:00',
+          idSession: '123456'
+        })
+        expect(resultat).to.deep.equal(expected)
+      })
+    })
+
+    describe('quand elle n’existe pas', () => {
+      it('renvoie undefined', async () => {
+        // Given
+        nock('https://milo.com')
+          .get(`/operateurs/dossiers/${idDossier}/sessions/${idInstance}`)
+          .reply(404)
+          .isDone()
+
+        // When
+        const resultat = await repository.findInstanceSession(
+          idInstance,
+          idDossier
+        )
+
+        // Then
+        expect(resultat).to.be.undefined()
+      })
+    })
   })
 
   describe('.getForConseiller', () => {
@@ -99,7 +173,7 @@ describe('SessionMiloHttpSqlRepository', () => {
 
     it('récupère les informations nécessaires', async () => {
       // When
-      await sessionMiloHttpSqlRepository.getForConseiller(
+      await repository.getForConseiller(
         idSession,
         structureConseiller,
         tokenMilo
@@ -116,7 +190,7 @@ describe('SessionMiloHttpSqlRepository', () => {
 
     it('reconstruit la session avec les inscrits et les dates dans la timezone du conseiller', async () => {
       // When
-      const actual = await sessionMiloHttpSqlRepository.getForConseiller(
+      const actual = await repository.getForConseiller(
         idSession,
         structureConseiller,
         tokenMilo
@@ -168,7 +242,7 @@ describe('SessionMiloHttpSqlRepository', () => {
       })
 
       // When
-      const actual = await sessionMiloHttpSqlRepository.getForConseiller(
+      const actual = await repository.getForConseiller(
         idSession,
         structureConseiller,
         tokenMilo
@@ -247,7 +321,7 @@ describe('SessionMiloHttpSqlRepository', () => {
       }
 
       // When
-      await sessionMiloHttpSqlRepository.save(
+      await repository.save(
         session,
         {
           idsJeunesAInscrire: ['id-hermione', 'id-ron'],
@@ -303,7 +377,7 @@ describe('SessionMiloHttpSqlRepository', () => {
         }),
         dateModification: uneDatetime()
       }
-      await sessionMiloHttpSqlRepository.save(
+      await repository.save(
         sessionModifiee,
         {
           idsJeunesAInscrire: [],

@@ -1,5 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { HttpService } from '@nestjs/axios'
+import { HttpStatus, Injectable, Logger } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { DateTime } from 'luxon'
+import { firstValueFrom } from 'rxjs'
 import {
   Result,
   emptySuccess,
@@ -7,7 +10,12 @@ import {
   success
 } from 'src/building-blocks/types/result'
 import { ConseillerMilo } from 'src/domain/milo/conseiller.milo.db'
-import { InscriptionsATraiter, SessionMilo } from 'src/domain/milo/session.milo'
+import {
+  InscriptionsATraiter,
+  InstanceSessionMilo,
+  SessionMilo
+} from 'src/domain/milo/session.milo'
+import { RateLimiterService } from '../../../utils/rate-limiter.service'
 import {
   InscritSessionMiloDto,
   MILO_INSCRIT,
@@ -25,10 +33,56 @@ import {
   SessionMiloSqlModel
 } from '../../sequelize/models/session-milo.sql-model'
 import { AsSql } from '../../sequelize/types'
+import { InstanceSessionMiloDto } from '../dto/milo.dto'
 
 @Injectable()
 export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
-  constructor(private readonly miloClient: MiloClient) {}
+  private readonly apiUrl: string
+  private readonly apiKeyInstanceSession: string
+
+  constructor(
+    private readonly miloClient: MiloClient,
+    private httpService: HttpService,
+    private configService: ConfigService,
+    private rateLimiterService: RateLimiterService
+  ) {
+    this.apiUrl = this.configService.get('milo').url
+    this.apiKeyInstanceSession =
+      this.configService.get('milo').apiKeyDetailRendezVous
+  }
+
+  async findInstanceSession(
+    idInstance: string,
+    idDossier: string
+  ): Promise<InstanceSessionMilo | undefined> {
+    try {
+      await this.rateLimiterService.getInstanceSessionMilo.attendreLaProchaineDisponibilite()
+      const sessionMilo = await firstValueFrom(
+        this.httpService.get<InstanceSessionMiloDto>(
+          `${this.apiUrl}/operateurs/dossiers/${idDossier}/sessions/${idInstance}`,
+          {
+            headers: {
+              'X-Gravitee-Api-Key': `${this.apiKeyInstanceSession}`,
+              operateur: 'applicationcej'
+            }
+          }
+        )
+      )
+
+      return {
+        id: sessionMilo.data.id,
+        dateHeureDebut: sessionMilo.data.dateHeureDebut,
+        idSession: sessionMilo.data.idSession,
+        idDossier: sessionMilo.data.idDossier,
+        statut: sessionMilo.data.statut
+      }
+    } catch (e) {
+      if (e.response?.status === HttpStatus.NOT_FOUND) {
+        return undefined
+      }
+      throw e
+    }
+  }
 
   async getForConseiller(
     idSession: string,

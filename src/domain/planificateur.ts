@@ -1,12 +1,21 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Inject, Injectable, Logger } from '@nestjs/common'
+import * as APM from 'elastic-apm-node'
 import { DateTime } from 'luxon'
 import { DateService } from '../utils/date-service'
+import { buildError } from '../utils/logger.module'
 import { Action } from './action/action'
+import { EvenementMilo } from './milo/evenement.milo'
 import { RendezVous } from './rendez-vous/rendez-vous'
 import { NettoyageJobsStats } from './suivi-job'
-import { RendezVousMilo } from './milo/rendez-vous.milo'
 
 export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
+
+export interface InstanceSessionRappel {
+  idInstance: string
+  idDossier: string
+  idSession?: string
+  dateDebut: DateTime
+}
 
 export namespace Planificateur {
   export interface Repository {
@@ -38,6 +47,7 @@ export namespace Planificateur {
 
   export enum JobType {
     RENDEZVOUS = 'RENDEZVOUS',
+    RAPPEL_SESSION = 'RAPPEL_SESSION',
     RAPPEL_ACTION = 'RAPPEL_ACTION',
     FAKE = 'FAKE',
     NOUVELLES_OFFRES_EMPLOI = 'NOUVELLES_OFFRES_EMPLOI',
@@ -67,6 +77,13 @@ export namespace Planificateur {
     idRendezVous: string
   }
 
+  export interface JobRappelSession {
+    idInstance: string
+    idDossier: string
+    idSession?: string
+    dateDebut?: string
+  }
+
   export interface JobRappelAction {
     idAction: string
   }
@@ -76,13 +93,13 @@ export namespace Planificateur {
     menage: boolean
   }
 
-  export type JobTraiterEvenementMilo = RendezVousMilo.Evenement
+  export type JobTraiterEvenementMilo = EvenementMilo
 
   export interface JobFake {
     message: string
   }
 
-  export type ContenuJob = JobRendezVous | JobFake
+  export type ContenuJob = JobRendezVous | JobRappelSession | JobFake
 
   export interface Job<T = ContenuJob> {
     dateExecution: Date
@@ -209,6 +226,24 @@ export class PlanificateurService {
     }
   }
 
+  async planifierRappelsInstanceSessionMilo(
+    rappel: InstanceSessionRappel
+  ): Promise<void> {
+    const now = this.dateService.now()
+
+    const nombreDeJoursAvantLeRdv: number = rappel.dateDebut
+      .diff(now)
+      .as('days')
+
+    if (nombreDeJoursAvantLeRdv > 7) {
+      await this.creerJobSession(rappel, 7)
+    }
+
+    if (nombreDeJoursAvantLeRdv > 1) {
+      await this.creerJobSession(rappel, 1)
+    }
+  }
+
   async planifierRappelAction(action: Action): Promise<void> {
     await this.creerJobRappelAction(action, 3)
   }
@@ -218,7 +253,7 @@ export class PlanificateurService {
   }
 
   async creerJobEvenementMiloSiIlNaPasEteCreeAvant(
-    evenementMilo: RendezVousMilo.Evenement
+    evenementMilo: EvenementMilo
   ): Promise<void> {
     const jobId = `event-milo:${evenementMilo.id}`
 
@@ -253,6 +288,21 @@ export class PlanificateurService {
     await this.planificateurRepository.creerJob(job, jobId)
   }
 
+  private async creerJobSession(
+    rappel: InstanceSessionRappel,
+    days: number
+  ): Promise<void> {
+    const jobId = `instance-session:${rappel.idInstance}:${days}`
+    const job: Planificateur.Job<Planificateur.JobRappelSession> = {
+      dateExecution: DateTime.fromJSDate(rappel.dateDebut.toJSDate())
+        .minus({ days: days })
+        .toJSDate(),
+      type: Planificateur.JobType.RAPPEL_SESSION,
+      contenu: { ...rappel, dateDebut: rappel.dateDebut.toISO() }
+    }
+    await this.planificateurRepository.creerJob(job, jobId)
+  }
+
   private async creerJobRappelAction(
     action: Action,
     days: number
@@ -271,5 +321,107 @@ export class PlanificateurService {
 export function ProcessJobType(type: Planificateur.JobType): ClassDecorator {
   return function (target) {
     Reflect.defineMetadata('jobType', type, target)
+  }
+}
+
+export async function planifierRappelsInstanceSessionMilo(
+  rappel: InstanceSessionRappel,
+  planificateurService: PlanificateurService,
+  logger: Logger,
+  apmService: APM.Agent
+): Promise<void> {
+  try {
+    await planificateurService.planifierRappelsInstanceSessionMilo(rappel)
+  } catch (e) {
+    logger.error(
+      buildError(
+        `La planification des notifications de l'instance de session Milo ${rappel.idInstance} a échoué`,
+        e
+      )
+    )
+    apmService.captureError(e)
+  }
+}
+export async function supprimerRappelsInstanceSessionMilo(
+  idInstanceSessionMilo: string,
+  planificateurService: PlanificateurService,
+  logger: Logger,
+  apmService: APM.Agent
+): Promise<void> {
+  try {
+    await planificateurService.supprimerRappelsParId(
+      `instance-session:${idInstanceSessionMilo}`
+    )
+  } catch (e) {
+    logger.error(
+      buildError(
+        `La suppression des notifications de l'instance de session ${idInstanceSessionMilo} a échoué`,
+        e
+      )
+    )
+    apmService.captureError(e)
+  }
+}
+
+export async function planifierLesRappelsDeRendezVous(
+  rendezVous: RendezVous,
+  planificateurService: PlanificateurService,
+  logger: Logger,
+  apmService: APM.Agent
+): Promise<void> {
+  try {
+    await planificateurService.planifierRappelsRendezVous(rendezVous)
+  } catch (e) {
+    logger.error(
+      buildError(
+        `La planification des notifications du rendez-vous ${rendezVous.id} a échoué`,
+        e
+      )
+    )
+    apmService.captureError(e)
+  }
+}
+
+export async function supprimerLesRappelsDeRendezVous(
+  idRendezVous: string,
+  planificateurService: PlanificateurService,
+  logger: Logger,
+  apmService: APM.Agent
+): Promise<void> {
+  try {
+    await planificateurService.supprimerRappelsParId(idRendezVous)
+  } catch (e) {
+    logger.error(
+      buildError(
+        `La suppression des notifications du rendez-vous ${idRendezVous} a échoué`,
+        e
+      )
+    )
+    apmService.captureError(e)
+  }
+}
+
+export async function replanifierLesRappelsDeRendezVous(
+  rendezVousUpdated: RendezVous,
+  rendezVous: RendezVous,
+  planificateurService: PlanificateurService,
+  logger: Logger,
+  apmService: APM.Agent
+): Promise<void> {
+  const laDateAEteModifiee =
+    rendezVousUpdated.date.getTime() !== rendezVous.date.getTime()
+  if (laDateAEteModifiee) {
+    try {
+      await planificateurService.supprimerRappelsParId(rendezVousUpdated.id)
+      await planificateurService.planifierRappelsRendezVous(rendezVousUpdated)
+    } catch (e) {
+      logger.error(
+        buildError(
+          `La replanification des notifications du rendez-vous ${rendezVousUpdated.id} a échoué`,
+          e
+        )
+      )
+      apmService.captureError(e)
+    }
   }
 }

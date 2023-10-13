@@ -1,18 +1,17 @@
 import { Injectable } from '@nestjs/common'
-import { Result } from '../../building-blocks/types/result'
+import { DateTime } from 'luxon'
+import { IdService } from '../../utils/id-service'
 import {
   CodeTypeRendezVous,
   JeuneDuRendezVous,
-  RendezVous,
-  RendezVous as RendezVousPassEmploi
+  RendezVous
 } from '../rendez-vous/rendez-vous'
-import { IdService } from '../../utils/id-service'
-import { DateTime } from 'luxon'
 import Source = RendezVous.Source
+import { EvenementMilo } from './evenement.milo'
 
 const MILO_DATE_FORMAT = 'yyyy-MM-dd HH:mm:ss'
 
-export const MiloRendezVousRepositoryToken = 'MiloRendezVousRepositoryToken'
+export const RendezVousMiloRepositoryToken = 'RendezVousMiloRepositoryToken'
 
 export interface RendezVousMilo {
   id: string
@@ -21,7 +20,6 @@ export interface RendezVousMilo {
   titre: string
   idPartenaireBeneficiaire: string
   commentaire?: string
-  type: RendezVousMilo.Type
   modalite?: string
   adresse?: string
   statut: string
@@ -34,47 +32,12 @@ export namespace RendezVousMilo {
     RDV_NON_PRECISE = 'Non précisé',
     RDV_PLANIFIE = 'Planifié',
     RDV_PRESENT = 'Présent',
-    RDV_REPORTE = 'Reporté',
-    SESSION_REALISE = 'Réalisé',
-    SESSION_PRESCRIT = 'Prescrit',
-    SESSION_REFUS_TIERS = 'Refus tiers',
-    SESSION_REFUS_JEUNE = 'Refus jeune'
-  }
-
-  export enum Type {
-    RENDEZ_VOUS = 'RENDEZ_VOUS',
-    SESSION = 'SESSION'
-  }
-
-  export enum ObjetEvenement {
-    RENDEZ_VOUS = 'RENDEZ_VOUS',
-    SESSION = 'SESSION',
-    NON_TRAITABLE = 'NON_TRAITABLE'
-  }
-
-  export enum TypeEvenement {
-    CREATE = 'CREATE',
-    UPDATE = 'UPDATE',
-    DELETE = 'DELETE',
-    NON_TRAITABLE = 'NON_TRAITABLE'
-  }
-
-  export interface Evenement {
-    id: string
-    idPartenaireBeneficiaire: string
-    objet: RendezVousMilo.ObjetEvenement
-    type: RendezVousMilo.TypeEvenement
-    idObjet: string
-    date: string
+    RDV_REPORTE = 'Reporté'
   }
 
   export interface Repository {
-    findAllEvenements(): Promise<Evenement[]>
-
-    acquitterEvenement(evenement: Evenement): Promise<Result>
-
     findRendezVousByEvenement(
-      evenement: Evenement
+      evenement: EvenementMilo
     ): Promise<RendezVousMilo | undefined>
   }
 
@@ -94,7 +57,7 @@ export namespace RendezVousMilo {
     createRendezVousCEJ(
       rendezVousMilo: RendezVousMilo,
       jeune: JeuneDuRendezVous
-    ): RendezVousPassEmploi {
+    ): RendezVous {
       const { dateTimeDebut, duree } = this.getDateEtDuree(
         rendezVousMilo,
         jeune
@@ -116,27 +79,23 @@ export namespace RendezVousMilo {
             conseiller: jeune.conseiller
           }
         ],
-        type:
-          rendezVousMilo.type === RendezVousMilo.Type.RENDEZ_VOUS
-            ? CodeTypeRendezVous.RENDEZ_VOUS_MILO
-            : CodeTypeRendezVous.SESSION_MILO,
-        presenceConseiller:
-          rendezVousMilo.type === RendezVousMilo.Type.RENDEZ_VOUS,
+        type: CodeTypeRendezVous.RENDEZ_VOUS_MILO,
+        presenceConseiller: true,
         commentaire: rendezVousMilo.commentaire,
         adresse: rendezVousMilo.adresse,
         modalite: rendezVousMilo.modalite,
         createur: { id: '', nom: '', prenom: '' },
         informationsPartenaire: {
           id: rendezVousMilo.id,
-          type: rendezVousMilo.type
+          type: EvenementMilo.ObjetEvenement.RENDEZ_VOUS
         }
       }
     }
 
     updateRendezVousCEJ(
-      rendezVousPassEmploi: RendezVousPassEmploi,
+      rendezVousPassEmploi: RendezVous,
       rendezVousMilo: RendezVousMilo
-    ): RendezVousPassEmploi {
+    ): RendezVous {
       const { dateTimeDebut, duree } = this.getDateEtDuree(
         rendezVousMilo,
         rendezVousPassEmploi.jeunes[0]

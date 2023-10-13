@@ -18,18 +18,18 @@ import {
 import { Authentification } from 'src/domain/authentification'
 import { Conseiller } from 'src/domain/conseiller/conseiller'
 import { SessionMilo } from 'src/domain/milo/session.milo'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { DateService } from 'src/utils/date-service'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from 'test/utils'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
-import { DateService } from 'src/utils/date-service'
-import { uneSessionMilo } from '../../../fixtures/sessions.fixture'
-import Utilisateur = Authentification.Utilisateur
-import { Notification } from '../../../../src/domain/notification/notification'
-import { stubClassSandbox } from '../../../utils/types'
+import { StubbedClass, createSandbox, expect, stubClass } from 'test/utils'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
-import { uneConfiguration, unJeune } from '../../../fixtures/jeune.fixture'
+import { Notification } from '../../../../src/domain/notification/notification'
+import { unJeune, uneConfiguration } from '../../../fixtures/jeune.fixture'
+import { uneSessionMilo } from '../../../fixtures/sessions.fixture'
+import { stubClassSandbox } from '../../../utils/types'
+import Utilisateur = Authentification.Utilisateur
 
 describe('UpdateSessionMiloCommandHandler', () => {
   let updateSessionMiloCommandHandler: UpdateSessionMiloCommandHandler
@@ -132,7 +132,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
         sessionMiloRepository.save.resolves(emptySuccess())
       })
 
-      it('la met à jour', async () => {
+      it('la met à jour + planifie rappels', async () => {
         // Given
         const session = uneSessionMilo({
           inscriptions: [],

@@ -18,7 +18,10 @@ import {
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Mail, MailServiceToken } from '../../domain/mail'
 import { Notification } from '../../domain/notification/notification'
-import { PlanificateurService } from '../../domain/planificateur'
+import {
+  PlanificateurService,
+  replanifierLesRappelsDeRendezVous
+} from '../../domain/planificateur'
 import {
   JeuneDuRendezVous,
   RendezVous,
@@ -91,7 +94,13 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     const rendezVousUpdated = result.data
     await this.rendezVousRepository.save(rendezVousUpdated)
 
-    this.replanifierLesRappelsDeRendezVous(rendezVousUpdated, rendezVous)
+    replanifierLesRappelsDeRendezVous(
+      rendezVousUpdated,
+      rendezVous,
+      this.planificateurService,
+      this.logger,
+      this.apmService
+    )
     this.notifierLesJeunes(rendezVous, rendezVousUpdated)
     if (rendezVousUpdated.invitation) {
       this.envoyerLesInvitationsCalendaires(
@@ -193,32 +202,6 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
       rendezVous.duree !== rendezVousUpdated.duree ||
       rendezVous.adresse !== rendezVousUpdated.adresse
     )
-  }
-
-  private async replanifierLesRappelsDeRendezVous(
-    rendezVousUpdated: RendezVous,
-    rendezVous: RendezVous
-  ): Promise<void> {
-    const laDateAEteModifiee =
-      rendezVousUpdated.date.getTime() !== rendezVous.date.getTime()
-    if (laDateAEteModifiee) {
-      try {
-        await this.planificateurService.supprimerRappelsParId(
-          rendezVousUpdated.id
-        )
-        await this.planificateurService.planifierRappelsRendezVous(
-          rendezVousUpdated
-        )
-      } catch (e) {
-        this.logger.error(
-          buildError(
-            `La replanification des notifications du rendez-vous ${rendezVousUpdated.id} a échoué`,
-            e
-          )
-        )
-        this.apmService.captureError(e)
-      }
-    }
   }
 
   async authorize(

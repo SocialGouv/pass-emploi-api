@@ -1,15 +1,16 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DateTime } from 'luxon'
 import {
+  InstanceSessionRappel,
   Planificateur,
   PlanificateurService
 } from '../../src/domain/planificateur'
 import { RendezVous } from '../../src/domain/rendez-vous/rendez-vous'
 import { DateService } from '../../src/utils/date-service'
+import { uneAction } from '../fixtures/action.fixture'
+import { unEvenementMilo } from '../fixtures/milo.fixture'
 import { unRendezVous } from '../fixtures/rendez-vous.fixture'
 import { createSandbox, expect, stubClass } from '../utils'
-import { uneAction } from '../fixtures/action.fixture'
-import { unEvenementMilo } from '../fixtures/partenaire.fixture'
 import JobType = Planificateur.JobType
 
 describe('Planificateur', () => {
@@ -111,6 +112,82 @@ describe('Planificateur', () => {
               contenu: { idRendezVous: rendezVous.id }
             },
             `rdv:${rendezVous.id}:7`
+          )
+        })
+      })
+    })
+    describe('planifierRappelsInstanceSessionMilo', () => {
+      const rappel: InstanceSessionRappel = {
+        idInstance: 'idInstance',
+        idDossier: 'idDossier',
+        idSession: 'idSession',
+        dateDebut: today
+      }
+      describe('quand la session Milo est dans 1 jour', () => {
+        it('ne génère pas de job', async () => {
+          // Given
+          rappel.dateDebut = today.plus({ days: 1 })
+
+          // When
+          await planificateurService.planifierRappelsInstanceSessionMilo(rappel)
+
+          // Then
+          expect(planificateurRepository.creerJob).to.have.callCount(0)
+        })
+      })
+      describe('quand la session Milo est à moins de 7 jours et à plus de 1 jour', () => {
+        it('génère un job pour un rappel un jour avant la session Milo', async () => {
+          // Given
+          rappel.dateDebut = today.plus({ day: 5 })
+
+          // When
+          await planificateurService.planifierRappelsInstanceSessionMilo(rappel)
+
+          // Then
+          expect(
+            planificateurRepository.creerJob
+          ).to.have.been.calledOnceWithExactly(
+            {
+              dateExecution: rappel.dateDebut.minus({ days: 1 }).toJSDate(),
+              type: Planificateur.JobType.RAPPEL_SESSION,
+              contenu: { ...rappel, dateDebut: rappel.dateDebut.toISO() }
+            },
+            `instance-session:${rappel.idInstance}:1`
+          )
+        })
+      })
+      describe('quand la session Milo est à plus de 7 jours', () => {
+        beforeEach(async () => {
+          // Given
+          rappel.dateDebut = today.plus({ day: 8 })
+          // When
+          await planificateurService.planifierRappelsInstanceSessionMilo(rappel)
+        })
+
+        it('génère un job pour un rappel un jour avant la session Milo', async () => {
+          // Then
+          expect(planificateurRepository.creerJob).to.have.been.calledWith(
+            {
+              dateExecution: rappel.dateDebut.minus({ days: 1 }).toJSDate(),
+              type: Planificateur.JobType.RAPPEL_SESSION,
+              contenu: { ...rappel, dateDebut: rappel.dateDebut.toISO() }
+            },
+            `instance-session:${rappel.idInstance}:1`
+          )
+        })
+
+        it('génère un job pour un rappel sept jours avant la session Milo', async () => {
+          // Then
+          expect(planificateurRepository.creerJob).to.have.callCount(2)
+          expect(
+            planificateurRepository.creerJob
+          ).to.have.been.calledWithExactly(
+            {
+              dateExecution: rappel.dateDebut.minus({ days: 7 }).toJSDate(),
+              type: Planificateur.JobType.RAPPEL_SESSION,
+              contenu: { ...rappel, dateDebut: rappel.dateDebut.toISO() }
+            },
+            `instance-session:${rappel.idInstance}:7`
           )
         })
       })

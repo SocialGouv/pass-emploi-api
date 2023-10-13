@@ -4,10 +4,10 @@ import {
   MaxInscritsDepasse
 } from 'src/building-blocks/types/domain-error'
 import {
+  Result,
   emptySuccess,
   failure,
   isFailure,
-  Result,
   success
 } from 'src/building-blocks/types/result'
 import { ConseillerMilo } from './conseiller.milo.db'
@@ -32,6 +32,14 @@ export interface SessionMilo {
   dateCloture?: DateTime
 }
 
+export interface InstanceSessionMilo {
+  id: string
+  idSession: string
+  dateHeureDebut: string
+  idDossier: string
+  statut: string
+}
+
 export type InscriptionsATraiter = {
   idsJeunesAInscrire: string[]
   inscriptionsASupprimer: Array<
@@ -41,6 +49,13 @@ export type InscriptionsATraiter = {
 }
 
 export namespace SessionMilo {
+  export enum StatutInstance {
+    REALISE = 'Réalisé',
+    PRESCRIT = 'Prescrit',
+    REFUS_TIERS = 'Refus tiers',
+    REFUS_JEUNE = 'Refus jeune'
+  }
+
   function supprimerInscriptions(
     session: SessionMilo
   ): Omit<SessionMilo, 'inscriptions'> {
@@ -145,6 +160,11 @@ export namespace SessionMilo {
   }
 
   export interface Repository {
+    findInstanceSession(
+      idInstance: string,
+      idDossier: string
+    ): Promise<InstanceSessionMilo | undefined>
+
     getForConseiller(
       idSession: string,
       structureConseiller: ConseillerMilo.Structure,

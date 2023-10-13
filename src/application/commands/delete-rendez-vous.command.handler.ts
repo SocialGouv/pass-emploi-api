@@ -1,6 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Evenement, EvenementService } from '../../domain/evenement'
-import { PlanificateurService } from '../../domain/planificateur'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
@@ -8,24 +6,28 @@ import {
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
 import {
+  Result,
   emptySuccess,
-  failure,
-  Result
+  failure
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import {
   Conseiller,
   ConseillersRepositoryToken
 } from '../../domain/conseiller/conseiller'
+import { Evenement, EvenementService } from '../../domain/evenement'
 import { Mail, MailServiceToken } from '../../domain/mail'
 import { Notification } from '../../domain/notification/notification'
+import {
+  PlanificateurService,
+  supprimerLesRappelsDeRendezVous
+} from '../../domain/planificateur'
 import {
   RendezVous,
   RendezVousRepositoryToken
 } from '../../domain/rendez-vous/rendez-vous'
-import { buildError } from '../../utils/logger.module'
-import { RendezVousAuthorizer } from '../authorizers/rendezvous-authorizer'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
+import { RendezVousAuthorizer } from '../authorizers/rendezvous-authorizer'
 
 export interface DeleteRendezVousCommand extends Command {
   idRendezVous: string
@@ -70,17 +72,12 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
       Notification.Type.DELETED_RENDEZVOUS
     )
 
-    try {
-      await this.planificateurService.supprimerRappelsParId(rendezVous.id)
-    } catch (e) {
-      this.logger.error(
-        buildError(
-          `La suppression des notifications du rendez-vous ${rendezVous.id} a échoué`,
-          e
-        )
-      )
-      this.apmService.captureError(e)
-    }
+    supprimerLesRappelsDeRendezVous(
+      rendezVous.id,
+      this.planificateurService,
+      this.logger,
+      this.apmService
+    )
 
     if (rendezVous.invitation) {
       const createur = await this.conseillerRepository.get(

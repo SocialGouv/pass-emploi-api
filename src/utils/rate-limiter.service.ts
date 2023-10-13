@@ -7,7 +7,7 @@ const TokenBucket = require('tokenbucket')
 export class RateLimiterService {
   public readonly getDossierMilo: RateLimiter
   public readonly getRendezVousMilo: RateLimiter
-  public readonly getSessionMilo: RateLimiter
+  public readonly getInstanceSessionMilo: RateLimiter
   public readonly getSessionsStructureMilo: RateLimiter
   public readonly operateursSessionsConseillerMilo: RateLimiter
   public readonly getEvenementMilo: RateLimiter
@@ -17,7 +17,7 @@ export class RateLimiterService {
     this.getDossierMilo = this.buildGetDossierMilo()
     this.getEvenementMilo = this.buildGetEvenementMilo()
     this.getRendezVousMilo = this.buildGetRendezVousMilo()
-    this.getSessionMilo = this.buildGetSessionMilo()
+    this.getInstanceSessionMilo = this.buildGetInstanceSessionMilo()
     this.operateursSessionsConseillerMilo =
       this.buildOperateursSessionsConseillerMilo()
     this.getSessionsStructureMilo = this.buildGetSessionsStructureMilo()
@@ -104,7 +104,7 @@ export class RateLimiterService {
     return new RateLimiter(options)
   }
 
-  private buildGetSessionMilo(): RateLimiter {
+  private buildGetInstanceSessionMilo(): RateLimiter {
     const options: RateLimiter.Options = {
       size: parseInt(
         this.configService.get('rateLimiter.getSessionMilo.limit')!
