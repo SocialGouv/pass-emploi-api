@@ -2,7 +2,7 @@ import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios
 import { URLSearchParams } from 'url'
 import { expect } from 'chai'
 import { failure, success } from '../../../../src/building-blocks/types/result'
-import { RechercheOffreInvalide } from '../../../../src/building-blocks/types/domain-error'
+import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
 import { TIMEOUT } from 'dns'
 import { ImmersionClient } from '../../../../src/infrastructure/clients/immersion-client'
 import { FindAllOffresImmersionQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-immersion.query.getter'
@@ -104,10 +104,10 @@ describe('', () => {
         params.append('distanceKm', query.distance_km.toString())
         params.append('longitude', query.location.lon.toString())
         params.append('latitude', query.location.lat.toString())
-        params.append('appellationCodes[]', appellationCodes[0])
-        params.append('appellationCodes[]', appellationCodes[1])
-        params.append('appellationCodes[]', appellationCodes[2])
         params.append('appellationCodes[]', appellationCodes[3])
+        params.append('appellationCodes[]', appellationCodes[2])
+        params.append('appellationCodes[]', appellationCodes[1])
+        params.append('appellationCodes[]', appellationCodes[0])
         params.append('sortedBy', 'date')
         params.append('voluntaryToImmersion', 'true')
 
@@ -152,7 +152,7 @@ describe('', () => {
         }
 
         immersionClient.getOffres.resolves(
-          failure(new RechercheOffreInvalide('Le champ Rome est pas bon'))
+          failure(new ErreurHttp('un message d’erreur', 404))
         )
 
         // When
@@ -165,7 +165,7 @@ describe('', () => {
 
         // Then
         expect(offres).to.deep.equal(
-          failure(new RechercheOffreInvalide('Le champ Rome est pas bon'))
+          failure(new ErreurHttp('un message d’erreur', 404))
         )
       })
     })

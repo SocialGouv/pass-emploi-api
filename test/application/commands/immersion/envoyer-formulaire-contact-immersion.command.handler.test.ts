@@ -14,7 +14,7 @@ import {
 } from '../../../utils/database-for-testing'
 import { unMetierRomeDto } from '../../../fixtures/sql-models/metier-rome.sql-model'
 import { MetierRomeSqlModel } from '../../../../src/infrastructure/sequelize/models/metier-rome.sql-model'
-import { RechercheDetailOffreNonTrouve } from '../../../../src/building-blocks/types/domain-error'
+import { NonTrouveError } from '../../../../src/building-blocks/types/domain-error'
 
 describe('EnvoyerFormulaireContactImmersionCommandHandler', () => {
   let databaseForTesting: DatabaseForTesting
@@ -121,11 +121,7 @@ describe('EnvoyerFormulaireContactImmersionCommandHandler', () => {
 
         // Then
         expect(result).to.deep.equal(
-          failure(
-            new RechercheDetailOffreNonTrouve(
-              `Offre d'immersion Un label rome qui n’existe pas not found`
-            )
-          )
+          failure(new NonTrouveError('Un label rome qui n’existe pas'))
         )
       })
     })

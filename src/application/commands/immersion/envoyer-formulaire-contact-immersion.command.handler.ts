@@ -10,7 +10,7 @@ import {
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
 import { QueryTypes, Sequelize } from 'sequelize'
-import { RechercheDetailOffreNonTrouve } from '../../../building-blocks/types/domain-error'
+import { NonTrouveError } from '../../../building-blocks/types/domain-error'
 import { PartenaireImmersion } from '../../../infrastructure/repositories/dto/immersion.dto'
 
 export interface EnvoyerFormulaireContactImmersionCommand {
@@ -57,11 +57,7 @@ export class EnvoyerFormulaireContactImmersionCommandHandler extends CommandHand
     )
 
     if (!appellationCode) {
-      return failure(
-        new RechercheDetailOffreNonTrouve(
-          `Offre d'immersion ${command.labelRome} not found`
-        )
-      )
+      return failure(new NonTrouveError(command.labelRome))
     }
 
     const params: FormulaireImmersionPayload = {

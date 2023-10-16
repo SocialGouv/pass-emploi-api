@@ -66,7 +66,7 @@ export class ImmersionClient {
       return handleAxiosError(
         erreur,
         this.logger,
-        'ERROR API getOffres immersion'
+        'ERROR API getDetail immersion'
       )
     }
   }

@@ -17,12 +17,7 @@ import {
   DetailOffreImmersionQueryModel,
   OffreImmersionQueryModel
 } from '../../../src/application/queries/query-models/offres-immersion.query-model'
-import {
-  ErreurHttp,
-  RechercheDetailOffreInvalide,
-  RechercheDetailOffreNonTrouve,
-  RechercheOffreInvalide
-} from '../../../src/building-blocks/types/domain-error'
+import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 
 import {
   emptySuccess,
@@ -101,7 +96,7 @@ describe('OffresImmersionController', () => {
         }
 
         getOffresImmersionQueryHandler.execute.resolves(
-          failure(new RechercheOffreInvalide('Les champs sont pas bons'))
+          failure(new ErreurHttp('Les champs sont pas bons', 400))
         )
 
         // When
@@ -152,11 +147,7 @@ describe('OffresImmersionController', () => {
         // Given
         getDetailOffreImmersionQueryHandler.execute
           .withArgs(query)
-          .resolves(
-            failure(
-              new RechercheDetailOffreInvalide("La recherche n'est pas bonne")
-            )
-          )
+          .resolves(failure(new ErreurHttp('un message d’erreur', 400)))
 
         // When
         await request(app.getHttpServer())
@@ -171,9 +162,7 @@ describe('OffresImmersionController', () => {
         // Given
         getDetailOffreImmersionQueryHandler.execute
           .withArgs(query)
-          .resolves(
-            failure(new RechercheDetailOffreNonTrouve('Offre introuvable'))
-          )
+          .resolves(failure(new ErreurHttp('un message d’erreur', 404)))
 
         // When
         await request(app.getHttpServer())

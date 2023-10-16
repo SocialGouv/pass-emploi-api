@@ -1,10 +1,6 @@
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import { expect } from 'chai'
 import { GetDetailOffreImmersionQueryHandler } from '../../../src/application/queries/get-detail-offre-immersion.query.handler'
-import {
-  RechercheDetailOffreInvalide,
-  RechercheDetailOffreNonTrouve
-} from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { ImmersionClient } from '../../../src/infrastructure/clients/immersion-client'
@@ -14,6 +10,7 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { uneOffreImmersionDtov2 } from '../../fixtures/offre-immersion.dto.fixture'
 import { StubbedClass, stubClass } from '../../utils'
+import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 
 describe('GetDetailOffreImmersionQueryHandler', () => {
   let getDetailOffreImmersionQueryHandler: GetDetailOffreImmersionQueryHandler
@@ -78,36 +75,14 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
       })
     })
     describe('quand la requête est mauvaise', () => {
-      it('renvoie une erreur quand la recherche est faite avec un mauvais id', async () => {
-        // Given
-        const query = {
-          idOffreImmersion: 'fauxId'
-        }
-
-        immersionClient.getDetailOffre.resolves(
-          failure(new RechercheDetailOffreInvalide("L'id fauxId n'est pas bon"))
-        )
-
-        // When
-        const offres = await getDetailOffreImmersionQueryHandler.handle({
-          idOffreImmersion: query.idOffreImmersion
-        })
-
-        // Then
-        expect(offres).to.deep.equal(
-          failure(new RechercheDetailOffreInvalide("L'id fauxId n'est pas bon"))
-        )
-      })
-      it('renvoie une erreur quand l"offre recherchée est introuvable', async () => {
+      it('return la failur', async () => {
         // Given
         const query = {
           idOffreImmersion: 'id'
         }
 
         immersionClient.getDetailOffre.resolves(
-          failure(
-            new RechercheDetailOffreNonTrouve("Offre d'immersion id not found")
-          )
+          failure(new ErreurHttp('un message d’erreur', 400))
         )
 
         // When
@@ -117,9 +92,7 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
 
         // Then
         expect(offres).to.deep.equal(
-          failure(
-            new RechercheDetailOffreNonTrouve("Offre d'immersion id not found")
-          )
+          failure(new ErreurHttp('un message d’erreur', 400))
         )
       })
       it('renvoie une erreur quand une erreur inconnue survient', async () => {
