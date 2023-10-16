@@ -182,6 +182,9 @@ export const testConfig = (): ConfigService => {
     oidc: {},
     values: {
       maxRechercheConseillers: '5'
+    },
+    headers: {
+      maxAge: '600'
     }
   })
 }

@@ -1,11 +1,11 @@
 /* eslint-disable */
-import { parse } from 'pg-connection-string'
+import {parse} from 'pg-connection-string'
 import * as Joi from 'joi'
-import { configurationSchema } from './configuration.schema'
+import {configurationSchema} from './configuration.schema'
 
 export default () => {
   const scalingoApp = process.env.APP
-  let baseUrl = ''
+  let baseUrl: string
   if (scalingoApp && scalingoApp.startsWith('pa-back-staging-pr')) {
     baseUrl = `https://${scalingoApp}.osc-fr1.scalingo.io`
   } else {
@@ -220,6 +220,9 @@ export default () => {
     },
     values: {
       maxRechercheConseillers: process.env.MAX_RECHERCHE_CONSEILLERS ?? '10'
+    },
+    headers:{
+      maxAge: process.env.CACHE_CONTROL_MAX_AGE_APP_MOBILE_EN_SECONDES
     }
   }
   return Joi.attempt(configuration, configurationSchema)
