@@ -4,16 +4,11 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { DetailOffreImmersionQueryModel } from './query-models/offres-immersion.query-model'
 import {
   emptySuccess,
-  failure,
+  isFailure,
   Result,
   success
 } from '../../building-blocks/types/result'
-import { PartenaireImmersion } from '../../infrastructure/repositories/dto/immersion.dto'
 import { toDetailOffreImmersionQueryModel } from '../../infrastructure/repositories/mappers/offres-immersion.mappers'
-import {
-  RechercheDetailOffreInvalide,
-  RechercheDetailOffreNonTrouve
-} from '../../building-blocks/types/domain-error'
 import { ImmersionClient } from '../../infrastructure/clients/immersion-client'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { Authentification } from '../../domain/authentification'
@@ -37,23 +32,19 @@ export class GetDetailOffreImmersionQueryHandler extends QueryHandler<
   async handle(
     query: GetDetailOffreImmersionQuery
   ): Promise<Result<DetailOffreImmersionQueryModel>> {
-    try {
-      const response = await this.immersionClient.get<PartenaireImmersion.Dto>(
-        `/get-immersion-by-id/${query.idOffreImmersion}`
-      )
-      return success(toDetailOffreImmersionQueryModel(response.data))
-    } catch (e) {
-      if (e.response?.status === 404) {
-        const message = `Offre d'immersion ${query.idOffreImmersion} not found`
-        return failure(new RechercheDetailOffreNonTrouve(message))
-      }
-      if (e.response?.status === 400) {
-        return failure(
-          new RechercheDetailOffreInvalide(e.response.data.errors.message)
-        )
-      }
-      throw e
+    const paramsRechercheOffreImmersion = buildParamsRechercheImmersion(
+      query.idOffreImmersion
+    )
+
+    const response = await this.immersionClient.getDetailOffre(
+      paramsRechercheOffreImmersion
+    )
+
+    if (isFailure(response)) {
+      return response
     }
+
+    return success(toDetailOffreImmersionQueryModel(response.data))
   }
 
   async authorize(): Promise<Result> {
@@ -68,4 +59,9 @@ export class GetDetailOffreImmersionQueryHandler extends QueryHandler<
       )
     }
   }
+}
+
+function buildParamsRechercheImmersion(idOffreImmersion: string): string {
+  const [siret, appellationCode] = idOffreImmersion.split('-')
+  return siret + '/' + appellationCode
 }

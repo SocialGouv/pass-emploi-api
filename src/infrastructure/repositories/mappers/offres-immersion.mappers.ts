@@ -50,30 +50,34 @@ export function fromSqlToFavorisOffreImmersionQueryModel(
 }
 
 export function toOffreImmersionQueryModel(
-  offreImmersionDto: PartenaireImmersion.DtoV1
+  offreImmersionDto: PartenaireImmersion.DtoV2
 ): OffreImmersionQueryModel {
+  const appellationCode = offreImmersionDto.appellations[0].appellationCode
+  const labelMetier = offreImmersionDto.appellations[0].appellationLabel
   return {
-    id: `${offreImmersionDto.siret}-${offreImmersionDto.rome}`,
-    metier: offreImmersionDto.romeLabel,
+    id: `${offreImmersionDto.siret}-${appellationCode}`,
+    metier: labelMetier,
     nomEtablissement: offreImmersionDto.name,
     secteurActivite: offreImmersionDto.nafLabel,
-    ville: offreImmersionDto.city,
+    ville: offreImmersionDto.address.city,
     estVolontaire: offreImmersionDto.voluntaryToImmersion
   }
 }
 
 export function toDetailOffreImmersionQueryModel(
-  offreImmersionDto: PartenaireImmersion.Dto
+  offreImmersionDto: PartenaireImmersion.DtoV2
 ): DetailOffreImmersionQueryModel {
+  const appellationCode = offreImmersionDto.appellations[0].appellationCode
+  const labelMetier = offreImmersionDto.appellations[0].appellationLabel
   return {
-    id: offreImmersionDto.id,
+    id: `${offreImmersionDto.siret}-${appellationCode}`,
     codeRome: offreImmersionDto.rome,
     siret: offreImmersionDto.siret,
-    metier: offreImmersionDto.romeLabel,
+    metier: labelMetier,
     nomEtablissement: offreImmersionDto.name,
     secteurActivite: offreImmersionDto.nafLabel,
-    ville: offreImmersionDto.city,
-    adresse: offreImmersionDto.address,
+    ville: offreImmersionDto.address.city,
+    adresse: buildAdresse(offreImmersionDto),
     estVolontaire: offreImmersionDto.voluntaryToImmersion,
     localisation: buildLocalisation(offreImmersionDto),
     contact: buildContact(offreImmersionDto)
@@ -81,23 +85,31 @@ export function toDetailOffreImmersionQueryModel(
 }
 
 export function buildLocalisation(
-  offreImmpersionDto: PartenaireImmersion.Dto
+  offreImmpersionDto: PartenaireImmersion.DtoV2
 ): LocalisationQueryModel | undefined {
-  if (!offreImmpersionDto.location) {
+  if (!offreImmpersionDto.position) {
     return undefined
   }
   return {
-    latitude: offreImmpersionDto.location.lat,
-    longitude: offreImmpersionDto.location.lon
+    latitude: offreImmpersionDto.position.lat,
+    longitude: offreImmpersionDto.position.lon
   }
 }
 
 export function buildContact(
-  offreImmpersionDto: PartenaireImmersion.Dto
+  offreImmpersionDto: PartenaireImmersion.DtoV2
 ): ContactImmersionQueryModel | undefined {
   return {
     modeDeContact: offreImmpersionDto.contactMode
       ? fromContactMode[offreImmpersionDto.contactMode]
       : Offre.Immersion.MethodeDeContact.INCONNU
   }
+}
+
+export function buildAdresse(
+  offreImmpersionDto: PartenaireImmersion.DtoV2
+): string {
+  const { streetNumberAndAddress, postcode, city } = offreImmpersionDto.address
+
+  return streetNumberAndAddress + ' ' + postcode + ' ' + city
 }

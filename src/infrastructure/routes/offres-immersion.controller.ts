@@ -1,17 +1,14 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
   HttpCode,
-  NotFoundException,
   Param,
   Post,
   Query,
   SetMetadata,
   UseGuards
 } from '@nestjs/common'
-import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger'
 import { EnvoyerFormulaireContactImmersionCommandHandler } from '../../application/commands/immersion/envoyer-formulaire-contact-immersion.command.handler'
 import { NotifierNouvellesImmersionsCommandHandler } from '../../application/commands/notifier-nouvelles-immersions.command.handler'
@@ -27,17 +24,11 @@ import {
   DetailOffreImmersionQueryModel,
   OffreImmersionQueryModel
 } from '../../application/queries/query-models/offres-immersion.query-model'
-import {
-  RechercheDetailOffreInvalide,
-  RechercheDetailOffreNonTrouve,
-  RechercheOffreInvalide
-} from '../../building-blocks/types/domain-error'
-import { isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { SkipOidcAuth } from '../decorators/skip-oidc-auth.decorator'
-import { handleFailure } from './result.handler'
+import { handleFailure, handleResult } from './result.handler'
 import {
   GetOffresImmersionQueryParams,
   NouvellesOffresImmersions,
@@ -76,15 +67,7 @@ export class OffresImmersionController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-
-    if (result.error.code === RechercheOffreInvalide.CODE) {
-      throw new BadRequestException(result.error.message)
-    }
-
-    throw new RuntimeException(result.error.message)
+    return handleResult(result)
   }
 
   @Get('offres-immersion/:idOffreImmersion')
@@ -102,17 +85,8 @@ export class OffresImmersionController {
       query,
       utilisateur
     )
-    if (isSuccess(result)) {
-      return result.data
-    }
 
-    if (result.error.code === RechercheDetailOffreNonTrouve.CODE) {
-      throw new NotFoundException(result.error.message)
-    } else if (result.error.code === RechercheDetailOffreInvalide.CODE) {
-      throw new BadRequestException(result.error.message)
-    }
-
-    throw new RuntimeException(result.error.message)
+    return handleResult(result)
   }
 
   @SkipOidcAuth()

@@ -3,22 +3,20 @@ import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import { firstValueFrom } from 'rxjs'
-import { emptySuccess, Result } from 'src/building-blocks/types/result'
+import { emptySuccess, Result, success } from 'src/building-blocks/types/result'
 import { URLSearchParams } from 'url'
 import { handleAxiosError } from './utils/axios-error-handler'
-
-type Offer = {
-  romeCode: string
-  romeLabel: string
-}
+import { PartenaireImmersion } from '../repositories/dto/immersion.dto'
 
 export interface FormulaireImmersionPayload {
-  offer: Offer
+  appellationCode: string
   siret: string
   potentialBeneficiaryFirstName: string
   potentialBeneficiaryLastName: string
   potentialBeneficiaryEmail: string
   contactMode: string
+  potentialBeneficiaryPhone: string
+  immersionObjective: string
   message?: string
 }
 
@@ -37,11 +35,47 @@ export class ImmersionClient {
     this.logger = new Logger('ImmersionClient')
   }
 
-  async postFormulaireImmersion(
+  async getOffres(
+    params: URLSearchParams
+  ): Promise<Result<PartenaireImmersion.DtoV2[]>> {
+    try {
+      const response = await this.get<PartenaireImmersion.DtoV2[]>(
+        'v2/search',
+        params
+      )
+
+      return success(response.data)
+    } catch (erreur) {
+      return handleAxiosError(
+        erreur,
+        this.logger,
+        'ERROR API getOffres immersion'
+      )
+    }
+  }
+
+  async getDetailOffre(
+    params: string
+  ): Promise<Result<PartenaireImmersion.DtoV2>> {
+    try {
+      const response = await this.get<PartenaireImmersion.DtoV2>(
+        `v2/search/${params}`
+      )
+      return success(response.data)
+    } catch (erreur) {
+      return handleAxiosError(
+        erreur,
+        this.logger,
+        'ERROR API getDetail immersion'
+      )
+    }
+  }
+
+  async envoyerFormulaireImmersion(
     params: FormulaireImmersionPayload
   ): Promise<Result> {
     try {
-      await this.post('v1/contact-establishment', params)
+      await this.post('v2/contact-establishment', params)
       return emptySuccess()
     } catch (erreur) {
       return handleAxiosError(

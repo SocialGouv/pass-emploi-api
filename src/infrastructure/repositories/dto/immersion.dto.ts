@@ -1,57 +1,27 @@
 export namespace PartenaireImmersion {
-  export interface DtoV1 {
+  export interface DtoV2 {
     rome: string
     romeLabel: string
-    appellationLabels: string[]
     naf: string
     nafLabel: string
     siret: string
     name: string
+    customizedName?: string
     voluntaryToImmersion: boolean
     position: { lat: number; lon: number }
-    address: string
-    city: string
-    customizedName?: string
-    distance_m?: number
+    address: {
+      streetNumberAndAddress: string
+      postcode: string
+      departmentCode: string
+      city: string
+    }
     contactMode?: ContactMode
-    contactDetails:
-      | {
-          id: string
-          lastName: string
-          firstName: string
-          role: string
-          email?: string
-          phone?: string
-        }
-      | undefined
+    distance_m?: number
     numberOfEmployeeRange?: string
-  }
-
-  export interface Dto {
-    id: string
-    rome: string
-    romeLabel: string
-    naf: string
-    nafLabel: string
-    siret: string
-    name: string
-    voluntaryToImmersion: boolean
-    location?: { lat: number; lon: number }
-    address: string
-    city: string
-    distance_m?: number
-    contactId?: string
-    contactMode?: ContactMode
-    contactDetails:
-      | {
-          id?: string
-          lastName?: string
-          firstName?: string
-          role?: string
-          email?: string
-          phone?: string
-        }
-      | undefined
+    appellations: Array<{
+      appellationLabel: string
+      appellationCode: string
+    }>
   }
 
   export enum ContactMode {

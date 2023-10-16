@@ -193,36 +193,6 @@ export class ConseillerNonValide implements DomainError {
   }
 }
 
-export class RechercheOffreInvalide implements DomainError {
-  static CODE = 'RECHERCHE_OFFRE_INVALIDE'
-  readonly code: string = RechercheOffreInvalide.CODE
-  readonly message: string
-
-  constructor(message: string) {
-    this.message = message
-  }
-}
-
-export class RechercheDetailOffreNonTrouve implements DomainError {
-  static CODE = 'RECHERCHE_DETAIL_OFFRE_NON_TROUVE'
-  readonly code: string = RechercheDetailOffreNonTrouve.CODE
-  readonly message: string
-
-  constructor(message: string) {
-    this.message = message
-  }
-}
-
-export class RechercheDetailOffreInvalide implements DomainError {
-  static CODE = 'RECHERCHE_DETAIL_OFFRE_INVALIDE'
-  readonly code: string = RechercheDetailOffreInvalide.CODE
-  readonly message: string
-
-  constructor(message: string) {
-    this.message = message
-  }
-}
-
 export class DroitsInsuffisants implements DomainError {
   static CODE = 'DROITS_INSUFFISANTS'
   readonly code: string = DroitsInsuffisants.CODE

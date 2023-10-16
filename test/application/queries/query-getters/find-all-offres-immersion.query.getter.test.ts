@@ -2,20 +2,33 @@ import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios
 import { URLSearchParams } from 'url'
 import { expect } from 'chai'
 import { failure, success } from '../../../../src/building-blocks/types/result'
-import { RechercheOffreInvalide } from '../../../../src/building-blocks/types/domain-error'
+import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
 import { TIMEOUT } from 'dns'
 import { ImmersionClient } from '../../../../src/infrastructure/clients/immersion-client'
 import { FindAllOffresImmersionQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-immersion.query.getter'
 import { StubbedClass, stubClass } from '../../../utils'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../../utils/database-for-testing'
+import { unMetierRomeDto } from '../../../fixtures/sql-models/metier-rome.sql-model'
+import { MetierRomeSqlModel } from '../../../../src/infrastructure/sequelize/models/metier-rome.sql-model'
 
 describe('', () => {
+  let databaseForTesting: DatabaseForTesting
   let immersionClient: StubbedClass<ImmersionClient>
   let findAllOffresImmersionQueryGetter: FindAllOffresImmersionQueryGetter
 
-  beforeEach(() => {
+  before(() => {
+    databaseForTesting = getDatabase()
+  })
+
+  beforeEach(async () => {
+    await databaseForTesting.cleanPG()
     immersionClient = stubClass(ImmersionClient)
     findAllOffresImmersionQueryGetter = new FindAllOffresImmersionQueryGetter(
-      immersionClient
+      immersionClient,
+      databaseForTesting.sequelize
     )
   })
 
@@ -23,6 +36,35 @@ describe('', () => {
     describe('quand la requête est correcte', () => {
       it('renvoie les offres', async () => {
         // Given
+        const metiers = [
+          unMetierRomeDto({
+            id: 1,
+            code: 'D1102',
+            libelle: 'Aide-Boulanger',
+            appellationCode: '10868'
+          }),
+          unMetierRomeDto({
+            id: 2,
+            code: 'D1102',
+            libelle: 'Boulanger',
+            appellationCode: '11573'
+          }),
+          unMetierRomeDto({
+            id: 3,
+            code: 'D1102',
+            libelle: 'Boulanger-Patissier',
+            appellationCode: '11574'
+          }),
+          unMetierRomeDto({
+            id: 4,
+            code: 'D1102',
+            libelle: 'Boulanger-Traiteur',
+            appellationCode: '11576'
+          })
+        ]
+
+        await MetierRomeSqlModel.bulkCreate(metiers)
+
         const query = {
           rome: 'D1102',
           location: {
@@ -31,18 +73,24 @@ describe('', () => {
           },
           distance_km: 30
         }
+        const appellationCodes = ['10868', '11573', '11574', '11576']
 
         const response: AxiosResponse = {
           data: [
             {
-              id: 'id',
               rome: 'mon-rome',
-              siret: 'mon-siret',
+              siret: 'siret',
               romeLabel: 'romeLabel',
               name: 'name',
               nafLabel: 'nafLabel',
-              city: 'city',
-              voluntaryToImmersion: true
+              address: { city: 'city' },
+              voluntaryToImmersion: true,
+              appellations: [
+                {
+                  appellationCode: 'appellationCode',
+                  appellationLabel: 'appellationCodeLabel'
+                }
+              ]
             }
           ],
           status: 200,
@@ -53,14 +101,17 @@ describe('', () => {
         }
 
         const params = new URLSearchParams()
-        params.append('rome', query.rome)
+        params.append('distanceKm', query.distance_km.toString())
         params.append('longitude', query.location.lon.toString())
         params.append('latitude', query.location.lat.toString())
-        params.append('distance_km', query.distance_km.toString())
+        params.append('appellationCodes[]', appellationCodes[3])
+        params.append('appellationCodes[]', appellationCodes[2])
+        params.append('appellationCodes[]', appellationCodes[1])
+        params.append('appellationCodes[]', appellationCodes[0])
         params.append('sortedBy', 'date')
         params.append('voluntaryToImmersion', 'true')
 
-        immersionClient.get.withArgs('v1/immersion-offers').resolves(response)
+        immersionClient.getOffres.resolves(success(response.data))
 
         // When
         const offres = await findAllOffresImmersionQueryGetter.handle({
@@ -71,15 +122,14 @@ describe('', () => {
         })
 
         // Then
-        expect(immersionClient.get.getCall(0).args).to.be.deep.equal([
-          'v1/immersion-offers',
+        expect(immersionClient.getOffres.getCall(0).args).to.be.deep.equal([
           params
         ])
         expect(offres).to.deep.equal(
           success([
             {
-              id: 'mon-siret-mon-rome',
-              metier: 'romeLabel',
+              id: 'siret-appellationCode',
+              metier: 'appellationCodeLabel',
               nomEtablissement: 'name',
               secteurActivite: 'nafLabel',
               ville: 'city',
@@ -89,7 +139,6 @@ describe('', () => {
         )
       })
     })
-
     describe('quand la requête est mauvaise', () => {
       it('renvoie une erreur', async () => {
         // Given
@@ -102,22 +151,9 @@ describe('', () => {
           distance_km: 30
         }
 
-        const badResponse: AxiosResponse = {
-          data: {
-            errors: [
-              {
-                message: 'Le champs Rome est pas bon'
-              }
-            ]
-          },
-          status: 400,
-          statusText: 'BAD_REQUEST',
-          request: '',
-          headers: '',
-          config: ''
-        }
-
-        immersionClient.get.rejects({ response: badResponse })
+        immersionClient.getOffres.resolves(
+          failure(new ErreurHttp('un message d’erreur', 404))
+        )
 
         // When
         const offres = await findAllOffresImmersionQueryGetter.handle({
@@ -129,7 +165,7 @@ describe('', () => {
 
         // Then
         expect(offres).to.deep.equal(
-          failure(new RechercheOffreInvalide('Le champs Rome est pas bon'))
+          failure(new ErreurHttp('un message d’erreur', 404))
         )
       })
     })
@@ -147,7 +183,7 @@ describe('', () => {
 
         const error: Error = new Error(TIMEOUT)
 
-        immersionClient.get.rejects(error)
+        immersionClient.getOffres.rejects(error)
 
         // When
         const call = findAllOffresImmersionQueryGetter.handle({

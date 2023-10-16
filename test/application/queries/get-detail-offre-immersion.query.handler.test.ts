@@ -1,10 +1,6 @@
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import { expect } from 'chai'
 import { GetDetailOffreImmersionQueryHandler } from '../../../src/application/queries/get-detail-offre-immersion.query.handler'
-import {
-  RechercheDetailOffreInvalide,
-  RechercheDetailOffreNonTrouve
-} from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { ImmersionClient } from '../../../src/infrastructure/clients/immersion-client'
@@ -12,8 +8,9 @@ import {
   unUtilisateurConseiller,
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
-import { uneOffreImmersionDto } from '../../fixtures/offre-immersion.dto.fixture'
+import { uneOffreImmersionDtov2 } from '../../fixtures/offre-immersion.dto.fixture'
 import { StubbedClass, stubClass } from '../../utils'
+import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 
 describe('GetDetailOffreImmersionQueryHandler', () => {
   let getDetailOffreImmersionQueryHandler: GetDetailOffreImmersionQueryHandler
@@ -32,7 +29,7 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
       it("renvoie le détail d'une offre", async () => {
         // Given
         const query = {
-          idOffreImmersion: 'id'
+          idOffreImmersion: 'siret-appellationCode'
         }
 
         const response: AxiosResponse = {
@@ -41,10 +38,10 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
           request: undefined,
           status: 200,
           statusText: '',
-          data: uneOffreImmersionDto()
+          data: uneOffreImmersionDtov2()
         }
 
-        immersionClient.get.resolves(response)
+        immersionClient.getDetailOffre.resolves(success(response.data))
 
         // When
         const detailOffre = await getDetailOffreImmersionQueryHandler.handle({
@@ -52,23 +49,23 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
         })
 
         // Then
-        expect(immersionClient.get).to.have.been.calledWith(
-          `/get-immersion-by-id/${query.idOffreImmersion}`
+        expect(immersionClient.getDetailOffre).to.have.been.calledWith(
+          `siret/appellationCode`
         )
         expect(detailOffre).to.deep.equal(
           success({
-            adresse: 'addresse',
             estVolontaire: true,
-            id: 'id',
+            id: '123456-D1102',
             localisation: {
               latitude: 42,
               longitude: 2
             },
-            metier: 'rome',
+            metier: 'Boulanger-Traiteur',
             nomEtablissement: 'name',
             secteurActivite: 'naf',
-            ville: 'Paris',
-            codeRome: 'D112',
+            ville: 'city',
+            adresse: 'street post code city',
+            codeRome: 'D1102',
             siret: '123456',
             contact: {
               modeDeContact: 'PRESENTIEL'
@@ -78,57 +75,15 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
       })
     })
     describe('quand la requête est mauvaise', () => {
-      it('renvoie une erreur quand la recherche est faite avec un mauvais id', async () => {
-        // Given
-        const query = {
-          idOffreImmersion: 'fauxId'
-        }
-
-        const badResponse: AxiosResponse = {
-          data: {
-            errors: {
-              message: "L'id fauxId n'est pas bon"
-            }
-          },
-          status: 400,
-          statusText: 'BAD_REQUEST',
-          request: '',
-          headers: '',
-          config: ''
-        }
-
-        immersionClient.get.rejects({ response: badResponse })
-
-        // When
-        const offres = await getDetailOffreImmersionQueryHandler.handle({
-          idOffreImmersion: query.idOffreImmersion
-        })
-
-        // Then
-        expect(offres).to.deep.equal(
-          failure(new RechercheDetailOffreInvalide("L'id fauxId n'est pas bon"))
-        )
-      })
-      it('renvoie une erreur quand l"offre recherchée est introuvable', async () => {
+      it('return la failur', async () => {
         // Given
         const query = {
           idOffreImmersion: 'id'
         }
 
-        const badResponse: AxiosResponse = {
-          data: {
-            errors: {
-              message: "Offre d'immersion id not found"
-            }
-          },
-          status: 404,
-          statusText: 'NOT_FOUND',
-          request: '',
-          headers: '',
-          config: ''
-        }
-
-        immersionClient.get.rejects({ response: badResponse })
+        immersionClient.getDetailOffre.resolves(
+          failure(new ErreurHttp('un message d’erreur', 400))
+        )
 
         // When
         const offres = await getDetailOffreImmersionQueryHandler.handle({
@@ -137,9 +92,7 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
 
         // Then
         expect(offres).to.deep.equal(
-          failure(
-            new RechercheDetailOffreNonTrouve("Offre d'immersion id not found")
-          )
+          failure(new ErreurHttp('un message d’erreur', 400))
         )
       })
       it('renvoie une erreur quand une erreur inconnue survient', async () => {
@@ -148,7 +101,7 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
           idOffreImmersion: 'id'
         }
         const error = new Error('Erreur inconnue')
-        immersionClient.get.rejects(error)
+        immersionClient.getDetailOffre.rejects(error)
 
         // When
         const offres = getDetailOffreImmersionQueryHandler.handle({
