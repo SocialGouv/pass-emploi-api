@@ -81,7 +81,7 @@ describe('EnvoyerFormulaireContactImmersionCommandHandler', () => {
           potentialBeneficiaryFirstName: command.prenom,
           potentialBeneficiaryLastName: command.nom,
           potentialBeneficiaryEmail: command.email,
-          potentialBeneficiaryPhone: 'non communiqué',
+          potentialBeneficiaryPhone: '0600000000',
           immersionObjective: "Découvrir un métier ou un secteur d'activité",
           contactMode: command.contactMode,
           message: command.message

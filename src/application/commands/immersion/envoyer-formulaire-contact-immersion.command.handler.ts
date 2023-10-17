@@ -66,7 +66,7 @@ export class EnvoyerFormulaireContactImmersionCommandHandler extends CommandHand
       potentialBeneficiaryFirstName: command.prenom,
       potentialBeneficiaryLastName: command.nom,
       potentialBeneficiaryEmail: command.email,
-      potentialBeneficiaryPhone: 'non communiqué',
+      potentialBeneficiaryPhone: '0600000000',
       immersionObjective: "Découvrir un métier ou un secteur d'activité",
       contactMode: PartenaireImmersion.ContactMode.EMAIL,
       message: command.message ? command.message : defaultMessage
