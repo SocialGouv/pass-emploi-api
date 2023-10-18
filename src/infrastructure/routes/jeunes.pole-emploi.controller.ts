@@ -13,6 +13,8 @@ import {
   CVPoleEmploiQueryModel
 } from '../../application/queries/query-models/jeunes.pole-emploi.query-model'
 import { GetCVPoleEmploiQueryHandler } from '../../application/queries/get-cv-pole-emploi.query.handler'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { Core } from 'src/domain/core'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -20,7 +22,8 @@ import { GetCVPoleEmploiQueryHandler } from '../../application/queries/get-cv-po
 export class JeunesPoleEmploiController {
   constructor(
     private readonly getAccueilJeunePoleEmploiQueryHandler: GetAccueilJeunePoleEmploiQueryHandler,
-    private readonly getCVPoleEmploiQueryHandler: GetCVPoleEmploiQueryHandler
+    private readonly getCVPoleEmploiQueryHandler: GetCVPoleEmploiQueryHandler,
+    private readonly keycloakClient: KeycloakClient
   ) {}
 
   @Get(':idJeune/pole-emploi/accueil')
@@ -72,5 +75,19 @@ export class JeunesPoleEmploiController {
       return result.data
     }
     throw handleFailure(result)
+  }
+
+  @Get('/pole-emploi/token-cvm')
+  @ApiOperation({
+    summary: 'Récupère un token CVM pour un jeune Pôle Emploi CEJ'
+  })
+  @ApiResponse({
+    type: String
+  })
+  async getTokenCVM(@AccessToken() accessToken: string): Promise<string> {
+    return await this.keycloakClient.exchangeTokenJeune(
+      accessToken,
+      Core.Structure.POLE_EMPLOI
+    )
   }
 }
