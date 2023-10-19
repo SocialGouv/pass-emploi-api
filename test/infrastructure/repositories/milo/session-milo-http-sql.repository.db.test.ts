@@ -33,6 +33,7 @@ import { RateLimiterService } from '../../../../src/utils/rate-limiter.service'
 import { uneInstanceSessionMilo } from '../../../fixtures/milo.fixture'
 import { expect, sinon, StubbedClass, stubClass } from '../../../utils'
 import { testConfig } from '../../../utils/module-for-testing'
+import { PlanificateurService } from '../../../../src/domain/planificateur'
 const structureConseiller = {
   id: 'structure-milo',
   timezone: 'America/Cayenne'
@@ -41,11 +42,13 @@ const structureConseiller = {
 describe('SessionMiloHttpSqlRepository', () => {
   let miloClient: StubbedClass<MiloClient>
   let repository: SessionMiloHttpSqlRepository
+  let planificateurService: StubbedClass<PlanificateurService>
   const configService = testConfig()
   const rateLimiterService = new RateLimiterService(configService)
 
   beforeEach(async () => {
     const httpService = new HttpService()
+    planificateurService = stubClass(PlanificateurService)
     await getDatabase().cleanPG()
 
     miloClient = stubClass(MiloClient)
@@ -53,7 +56,8 @@ describe('SessionMiloHttpSqlRepository', () => {
       miloClient,
       httpService,
       configService,
-      rateLimiterService
+      rateLimiterService,
+      planificateurService
     )
   })
   describe('findInstanceSession', () => {
@@ -262,7 +266,16 @@ describe('SessionMiloHttpSqlRepository', () => {
     let session: SessionMilo & { dateModification: DateTime }
     beforeEach(async () => {
       // Given
-      miloClient.inscrireJeunesSession.resolves(emptySuccess())
+      miloClient.inscrireJeunesSession.resolves(
+        success([
+          {
+            id: 12,
+            idDossier: 34,
+            idSession: 56,
+            statut: 'test'
+          }
+        ])
+      )
       miloClient.desinscrireJeunesSession.resolves(emptySuccess())
       miloClient.modifierInscriptionJeunesSession.resolves(emptySuccess())
       await StructureMiloSqlModel.create({
@@ -411,6 +424,19 @@ describe('SessionMiloHttpSqlRepository', () => {
           idInstanceSession: 'id-inscription-harry'
         }
       ])
+      expect(
+        planificateurService.supprimerRappelsParId
+      ).to.have.been.calledOnceWithExactly(
+        `instance-session:id-inscription-harry`
+      )
+      expect(
+        planificateurService.planifierRappelsInstanceSessionMilo
+      ).to.have.been.calledOnceWithExactly({
+        idInstance: '12',
+        idDossier: '34',
+        idSession: '56',
+        dateDebut: session.debut
+      })
       expect(
         miloClient.modifierInscriptionJeunesSession
       ).to.have.been.calledOnceWithExactly(tokenMilo, [

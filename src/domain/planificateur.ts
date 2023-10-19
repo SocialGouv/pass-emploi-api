@@ -81,7 +81,6 @@ export namespace Planificateur {
     idInstance: string
     idDossier: string
     idSession: string
-    dateDebut?: string
   }
 
   export interface JobRappelAction {
@@ -298,7 +297,7 @@ export class PlanificateurService {
         .minus({ days: days })
         .toJSDate(),
       type: Planificateur.JobType.RAPPEL_SESSION,
-      contenu: { ...rappel, dateDebut: rappel.dateDebut.toISO() }
+      contenu: rappel
     }
     await this.planificateurRepository.creerJob(job, jobId)
   }

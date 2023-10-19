@@ -150,7 +150,7 @@ describe('Planificateur', () => {
             {
               dateExecution: rappel.dateDebut.minus({ days: 1 }).toJSDate(),
               type: Planificateur.JobType.RAPPEL_SESSION,
-              contenu: { ...rappel, dateDebut: rappel.dateDebut.toISO() }
+              contenu: rappel
             },
             `instance-session:${rappel.idInstance}:1`
           )
@@ -170,7 +170,7 @@ describe('Planificateur', () => {
             {
               dateExecution: rappel.dateDebut.minus({ days: 1 }).toJSDate(),
               type: Planificateur.JobType.RAPPEL_SESSION,
-              contenu: { ...rappel, dateDebut: rappel.dateDebut.toISO() }
+              contenu: rappel
             },
             `instance-session:${rappel.idInstance}:1`
           )
@@ -185,7 +185,7 @@ describe('Planificateur', () => {
             {
               dateExecution: rappel.dateDebut.minus({ days: 7 }).toJSDate(),
               type: Planificateur.JobType.RAPPEL_SESSION,
-              contenu: { ...rappel, dateDebut: rappel.dateDebut.toISO() }
+              contenu: rappel
             },
             `instance-session:${rappel.idInstance}:7`
           )

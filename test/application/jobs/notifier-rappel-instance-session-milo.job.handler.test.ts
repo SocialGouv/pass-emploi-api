@@ -183,11 +183,35 @@ describe('handler', () => {
       expect(notificationRepository.send).not.to.have.been.called()
     })
   })
-  describe("quand l'instance de session est passé", () => {
+  describe("quand l'instance de session est passée", () => {
     it("n'envoie pas de notification", async () => {
       // Given
       const instance = uneInstanceSessionMilo({
         dateHeureDebut: today.minus({ day: 1 }).toFormat(MILO_DATE_FORMAT)
+      })
+      sessionRepository.findInstanceSession
+        .withArgs(job.contenu.idInstance)
+        .resolves(instance)
+      const jeuneAvecToken: JeuneMilo = {
+        ...unJeune(),
+        idStructureMilo: '1241'
+      }
+      jeuneRepository.getByIdDossier
+        .withArgs(job.contenu.idDossier)
+        .resolves(success(jeuneAvecToken))
+
+      // When
+      await handler.handle(job)
+
+      // Then
+      expect(notificationRepository.send).not.to.have.been.called()
+    })
+  })
+  describe("quand l'instance de session est dans plus de 7 jours", () => {
+    it("n'envoie pas de notification", async () => {
+      // Given
+      const instance = uneInstanceSessionMilo({
+        dateHeureDebut: today.plus({ day: 8 }).toFormat(MILO_DATE_FORMAT)
       })
       sessionRepository.findInstanceSession
         .withArgs(job.contenu.idInstance)

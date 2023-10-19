@@ -1,19 +1,18 @@
 import { Inject, Injectable, Logger, Type } from '@nestjs/common'
+import { ModuleRef } from '@nestjs/core'
 import * as apm from 'elastic-apm-node'
+import { JobHandlerProviders } from '../app.module'
+import { JobHandler } from '../building-blocks/types/job-handler'
 import {
   Planificateur,
-  PlanificateurRepositoryToken,
-  PlanificateurService
+  PlanificateurRepositoryToken
 } from '../domain/planificateur'
+import { SuiviJob } from '../domain/suivi-job'
 import { getAPMInstance } from '../infrastructure/monitoring/apm.init'
 import {
-  getWorkerTrackingServiceInstance,
-  WorkerTrackingService
+  WorkerTrackingService,
+  getWorkerTrackingServiceInstance
 } from '../infrastructure/monitoring/worker.tracking.service'
-import { SuiviJob } from '../domain/suivi-job'
-import { ModuleRef } from '@nestjs/core'
-import { JobHandler } from '../building-blocks/types/job-handler'
-import { JobHandlerProviders } from '../app.module'
 
 @Injectable()
 export class WorkerService {
@@ -24,7 +23,6 @@ export class WorkerService {
   constructor(
     @Inject(PlanificateurRepositoryToken)
     private planificateurRepository: Planificateur.Repository,
-    private planificateurService: PlanificateurService,
     private moduleRef: ModuleRef
   ) {
     this.apmService = getAPMInstance()

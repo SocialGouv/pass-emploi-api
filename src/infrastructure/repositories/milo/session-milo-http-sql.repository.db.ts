@@ -34,18 +34,30 @@ import {
 } from '../../sequelize/models/session-milo.sql-model'
 import { AsSql } from '../../sequelize/types'
 import { InstanceSessionMiloDto } from '../dto/milo.dto'
+import {
+  PlanificateurService,
+  planifierRappelsInstanceSessionMilo,
+  supprimerRappelsInstanceSessionMilo
+} from '../../../domain/planificateur'
+import { getAPMInstance } from '../../monitoring/apm.init'
+import * as APM from 'elastic-apm-node'
 
 @Injectable()
 export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
   private readonly apiUrl: string
   private readonly apiKeyInstanceSession: string
+  private readonly logger: Logger
+  private readonly apmService: APM.Agent
 
   constructor(
     private readonly miloClient: MiloClient,
     private httpService: HttpService,
     private configService: ConfigService,
-    private rateLimiterService: RateLimiterService
+    private rateLimiterService: RateLimiterService,
+    private planificateurService: PlanificateurService
   ) {
+    this.logger = new Logger('SessionMiloHttpSqlRepository')
+    this.apmService = getAPMInstance()
     this.apiUrl = this.configService.get('milo').url
     this.apiKeyInstanceSession =
       this.configService.get('milo').apiKeyDetailRendezVous
@@ -159,6 +171,7 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
 
     const resultInscriptions = await this.inscrire(
       sessionSansInscription.id,
+      sessionSansInscription.debut,
       idsJeunesAInscrire,
       idsDossier,
       tokenMilo
@@ -180,6 +193,7 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
 
   private async inscrire(
     idSession: string,
+    dateDebutSession: DateTime,
     idsJeunesAInscrire: string[],
     idsDossier: Map<string, string>,
     tokenMilo: string
@@ -187,11 +201,28 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     const idsDossierNouveauxInscrits = idsJeunesAInscrire.map(
       idJeune => idsDossier.get(idJeune)!
     )
-    return this.miloClient.inscrireJeunesSession(
+    const resultInscriptions = await this.miloClient.inscrireJeunesSession(
       tokenMilo,
       idSession,
       idsDossierNouveauxInscrits
     )
+    if (isFailure(resultInscriptions)) {
+      return resultInscriptions
+    }
+    resultInscriptions.data.forEach(inscription => {
+      planifierRappelsInstanceSessionMilo(
+        {
+          idInstance: inscription.id.toString(),
+          idDossier: inscription.idDossier.toString(),
+          idSession: inscription.idSession.toString(),
+          dateDebut: dateDebutSession
+        },
+        this.planificateurService,
+        this.logger,
+        this.apmService
+      )
+    })
+    return emptySuccess()
   }
 
   private async modifierInscriptions(
@@ -221,10 +252,19 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     idsDossier: Map<string, string>,
     tokenMilo: string
   ): Promise<Result> {
-    const desinscriptions = inscriptionsASupprimer.map(desinscription => ({
-      idDossier: idsDossier.get(desinscription.idJeune)!,
-      idInstanceSession: desinscription.idInscription
-    }))
+    const desinscriptions = inscriptionsASupprimer.map(desinscription => {
+      supprimerRappelsInstanceSessionMilo(
+        desinscription.idInscription,
+        this.planificateurService,
+        this.logger,
+        this.apmService
+      )
+      return {
+        idDossier: idsDossier.get(desinscription.idJeune)!,
+        idInstanceSession: desinscription.idInscription
+      }
+    })
+
     return this.miloClient.desinscrireJeunesSession(tokenMilo, desinscriptions)
   }
 }

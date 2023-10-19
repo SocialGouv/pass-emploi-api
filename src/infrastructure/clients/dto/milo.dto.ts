@@ -71,3 +71,10 @@ export interface InscritSessionMiloDto {
   prenom: string
   statut: string
 }
+
+export interface InscrireJeuneSessionDto {
+  id: number
+  idDossier: number
+  idSession: number
+  statut: string
+}

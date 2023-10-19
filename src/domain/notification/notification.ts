@@ -97,19 +97,21 @@ export namespace Notification {
     const maintenant = dateService.now()
     const joursAvantRdv = date.diff(maintenant).as('day')
 
-    const rdvPasse = joursAvantRdv < 0
-    const rdvDansPlusDUnJour = joursAvantRdv > 2
-    const rdvDansMoinsDUneSemaine = joursAvantRdv < 6
+    const sessionPassee = joursAvantRdv < 0
+    const sessionDansPlusDUneSemaine = joursAvantRdv > 7
 
-    if (rdvPasse) {
+    const sessionDansPlusDUnJour = joursAvantRdv > 2
+    const sessionDansMoinsDUneSemaine = joursAvantRdv < 6
+
+    if (sessionPassee || sessionDansPlusDUneSemaine) {
       return
     }
 
     let body = 'Vous avez une session demain'
 
-    if (rdvDansPlusDUnJour) {
+    if (sessionDansPlusDUnJour) {
       body = 'Vous avez une session dans une semaine'
-      if (rdvDansMoinsDUneSemaine) {
+      if (sessionDansMoinsDUneSemaine) {
         return
       }
     }

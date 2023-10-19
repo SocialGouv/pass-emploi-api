@@ -12,6 +12,7 @@ import {
   success
 } from 'src/building-blocks/types/result'
 import {
+  InscrireJeuneSessionDto,
   InscritSessionMiloDto,
   ListeSessionsConseillerMiloDto,
   ListeSessionsJeuneMiloDto,
@@ -176,9 +177,10 @@ export class MiloClient {
     idpToken: string,
     idSession: string,
     idsDossier: string[]
-  ): Promise<Result> {
+  ): Promise<Result<InscrireJeuneSessionDto[]>> {
+    const dto: InscrireJeuneSessionDto[] = []
     for (const idDossier of idsDossier) {
-      const result = await this.post(
+      const result = await this.post<InscrireJeuneSessionDto>(
         `dossiers/${idDossier}/instances-session`,
         idSession,
         this.apiKeyInstanceSessionEcritureConseiller,
@@ -187,9 +189,12 @@ export class MiloClient {
       if (isFailure(result)) {
         return result
       }
+      if (result.data) {
+        dto.push(result.data)
+      }
     }
 
-    return emptySuccess()
+    return success(dto)
   }
 
   async desinscrireJeunesSession(
@@ -322,15 +327,15 @@ export class MiloClient {
     }
   }
 
-  private async post(
+  private async post<T>(
     suffixUrl: string,
     payload: { [p: string]: string } | string,
     apiKey: string,
     idpToken: string
-  ): Promise<Result> {
+  ): Promise<Result<T | void>> {
     try {
-      await firstValueFrom(
-        this.httpService.post(
+      const response = await firstValueFrom(
+        this.httpService.post<T>(
           `${this.apiUrl}/operateurs/${suffixUrl}`,
           payload,
           {
@@ -343,7 +348,7 @@ export class MiloClient {
           }
         )
       )
-      return emptySuccess()
+      return response.data ? success(response.data) : emptySuccess()
     } catch (e) {
       this.apmService.captureError(e)
       return handleAxiosError(e, this.logger, 'Erreur POST Milo')

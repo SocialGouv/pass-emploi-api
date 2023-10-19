@@ -358,6 +358,7 @@ import { GetJeunesEtablissementV2QueryHandler } from './application/queries/get-
 import { GetJeunesByEtablissementQueryHandler } from './application/queries/get-jeunes-by-etablissement.query.handler.db'
 import { AppMobileCacheControlMiddleware } from 'src/infrastructure/middlewares/app-mobile-cache-control.middleware'
 import { EvenementMiloRepositoryToken } from './domain/milo/evenement.milo'
+import { NotifierRappelInstanceSessionMiloJobHandler } from './application/jobs/notifier-rappel-instance-session-milo.job.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -797,6 +798,7 @@ export const JobHandlerProviders = [
   RecupererSituationsJeunesMiloJobHandler,
   MajAgenceAnimationCollectiveJobHandler,
   MajCodesEvenementsJobHandler,
+  NotifierRappelInstanceSessionMiloJobHandler,
   NotifierRendezVousPEJobHandler,
   NettoyerPiecesJointesJobHandler,
   MajMailingListConseillerJobHandler,
