@@ -13,7 +13,7 @@ export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
 export interface InstanceSessionRappel {
   idInstance: string
   idDossier: string
-  idSession?: string
+  idSession: string
   dateDebut: DateTime
 }
 
@@ -80,7 +80,7 @@ export namespace Planificateur {
   export interface JobRappelSession {
     idInstance: string
     idDossier: string
-    idSession?: string
+    idSession: string
     dateDebut?: string
   }
 

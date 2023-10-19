@@ -88,6 +88,45 @@ export namespace Notification {
     }
   }
 
+  export function creerNotificationRappelSessionMilo(
+    token: string,
+    idSession: string,
+    date: DateTime,
+    dateService: DateService
+  ): Notification.Message | undefined {
+    const maintenant = dateService.now()
+    const joursAvantRdv = date.diff(maintenant).as('day')
+
+    const rdvPasse = joursAvantRdv < 0
+    const rdvDansPlusDUnJour = joursAvantRdv > 2
+    const rdvDansMoinsDUneSemaine = joursAvantRdv < 6
+
+    if (rdvPasse) {
+      return
+    }
+
+    let body = 'Vous avez une session demain'
+
+    if (rdvDansPlusDUnJour) {
+      body = 'Vous avez une session dans une semaine'
+      if (rdvDansMoinsDUneSemaine) {
+        return
+      }
+    }
+
+    return {
+      token,
+      notification: {
+        title: 'Rappel session',
+        body
+      },
+      data: {
+        type: Type.DETAIL_SESSION_MILO,
+        id: idSession
+      }
+    }
+  }
+
   export function creerNotificationRappelAction(
     token: string,
     idAction: string
