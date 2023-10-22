@@ -87,7 +87,7 @@ describe('TraiterEvenementMiloJobHandler', () => {
         const evenement = unEvenementMilo({
           idPartenaireBeneficiaire,
           objet: EvenementMilo.ObjetEvenement.RENDEZ_VOUS,
-          type: EvenementMilo.TypeEvenement.NON_TRAITABLE
+          action: EvenementMilo.ActionEvenement.NON_TRAITABLE
         })
         const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> = {
           dateExecution: uneDate(),
@@ -113,7 +113,7 @@ describe('TraiterEvenementMiloJobHandler', () => {
         const evenement = unEvenementMilo({
           idPartenaireBeneficiaire,
           objet: EvenementMilo.ObjetEvenement.NON_TRAITABLE,
-          type: EvenementMilo.TypeEvenement.CREATE
+          action: EvenementMilo.ActionEvenement.CREATE
         })
         const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> = {
           dateExecution: uneDate(),
@@ -139,7 +139,7 @@ describe('TraiterEvenementMiloJobHandler', () => {
         const evenement = unEvenementMilo({
           idPartenaireBeneficiaire,
           objet: EvenementMilo.ObjetEvenement.RENDEZ_VOUS,
-          type: EvenementMilo.TypeEvenement.CREATE
+          action: EvenementMilo.ActionEvenement.CREATE
         })
         const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> = {
           dateExecution: uneDate(),
@@ -175,7 +175,7 @@ describe('TraiterEvenementMiloJobHandler', () => {
           const evenement = unEvenementMilo({
             idPartenaireBeneficiaire,
             objet: EvenementMilo.ObjetEvenement.RENDEZ_VOUS,
-            type: EvenementMilo.TypeEvenement.CREATE
+            action: EvenementMilo.ActionEvenement.CREATE
           })
           const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> =
             {
@@ -356,7 +356,7 @@ describe('TraiterEvenementMiloJobHandler', () => {
           const evenement = unEvenementMilo({
             idPartenaireBeneficiaire,
             objet: EvenementMilo.ObjetEvenement.RENDEZ_VOUS,
-            type: EvenementMilo.TypeEvenement.UPDATE
+            action: EvenementMilo.ActionEvenement.UPDATE
           })
           const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> =
             {
@@ -553,7 +553,7 @@ describe('TraiterEvenementMiloJobHandler', () => {
           const evenement = unEvenementMilo({
             idPartenaireBeneficiaire,
             objet: EvenementMilo.ObjetEvenement.RENDEZ_VOUS,
-            type: EvenementMilo.TypeEvenement.DELETE
+            action: EvenementMilo.ActionEvenement.DELETE
           })
           const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> =
             {
@@ -656,7 +656,7 @@ describe('TraiterEvenementMiloJobHandler', () => {
           const evenement = unEvenementMilo({
             idPartenaireBeneficiaire,
             objet: EvenementMilo.ObjetEvenement.SESSION,
-            type: EvenementMilo.TypeEvenement.CREATE
+            action: EvenementMilo.ActionEvenement.CREATE
           })
           const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> =
             {
@@ -666,7 +666,7 @@ describe('TraiterEvenementMiloJobHandler', () => {
             }
 
           describe('quand Session MILO existante et statut recuperable', () => {
-            it('notifie et planifie rappel sans créer quand Session futur et statut notifiable', async () => {
+            it('notifie et planifie rappel sans créer quand date futur et statut notifiable', async () => {
               // Given
               const instance = uneInstanceSessionMilo({
                 statut: 'Prescrit'
@@ -709,7 +709,7 @@ describe('TraiterEvenementMiloJobHandler', () => {
           const evenement = unEvenementMilo({
             idPartenaireBeneficiaire,
             objet: EvenementMilo.ObjetEvenement.SESSION,
-            type: EvenementMilo.TypeEvenement.UPDATE
+            action: EvenementMilo.ActionEvenement.UPDATE
           })
           const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> =
             {
@@ -785,7 +785,7 @@ describe('TraiterEvenementMiloJobHandler', () => {
           const evenement = unEvenementMilo({
             idPartenaireBeneficiaire,
             objet: EvenementMilo.ObjetEvenement.SESSION,
-            type: EvenementMilo.TypeEvenement.DELETE
+            action: EvenementMilo.ActionEvenement.DELETE
           })
           const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> =
             {

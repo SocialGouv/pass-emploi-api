@@ -425,18 +425,40 @@ describe('SessionMiloHttpSqlRepository', () => {
         }
       ])
       expect(
-        planificateurService.supprimerRappelsParId
-      ).to.have.been.calledOnceWithExactly(
-        `instance-session:id-inscription-harry`
-      )
+        planificateurService.supprimerRappelsParId.getCall(0).args
+      ).to.deep.equal([`instance-session:id-inscription-harry`])
       expect(
-        planificateurService.planifierRappelsInstanceSessionMilo
-      ).to.have.been.calledOnceWithExactly({
-        idInstance: '12',
-        idDossier: '34',
-        idSession: '56',
-        dateDebut: session.debut
-      })
+        planificateurService.supprimerRappelsParId.getCall(1).args
+      ).to.deep.equal([`instance-session:id-inscription-rogue`])
+      expect(
+        planificateurService.supprimerRappelsParId.getCall(2).args
+      ).to.deep.equal([`instance-session:id-inscription-fred`])
+      expect(
+        planificateurService.supprimerRappelsParId.getCall(3).args
+      ).to.deep.equal([`instance-session:id-inscription-luna`])
+      expect(
+        planificateurService.supprimerRappelsParId.getCall(4).args
+      ).to.deep.equal([`instance-session:id-inscription-ginny`])
+      expect(
+        planificateurService.planifierRappelsInstanceSessionMilo.getCall(0).args
+      ).to.deep.equal([
+        {
+          idInstance: 'id-inscription-ginny',
+          idDossier: 'id-dossier-ginny',
+          idSession: 'session-1',
+          dateDebut: session.debut
+        }
+      ])
+      expect(
+        planificateurService.planifierRappelsInstanceSessionMilo.getCall(1).args
+      ).to.deep.equal([
+        {
+          idInstance: '12',
+          idDossier: '34',
+          idSession: '56',
+          dateDebut: session.debut
+        }
+      ])
       expect(
         miloClient.modifierInscriptionJeunesSession
       ).to.have.been.calledOnceWithExactly(tokenMilo, [

@@ -5,8 +5,8 @@ export const EvenementMiloRepositoryToken = 'EvenementMiloRepositoryToken'
 export interface EvenementMilo {
   id: string
   idPartenaireBeneficiaire: string
+  action: EvenementMilo.ActionEvenement
   objet: EvenementMilo.ObjetEvenement
-  type: EvenementMilo.TypeEvenement
   idObjet: string
   date: string
 }
@@ -18,7 +18,7 @@ export namespace EvenementMilo {
     NON_TRAITABLE = 'NON_TRAITABLE'
   }
 
-  export enum TypeEvenement {
+  export enum ActionEvenement {
     CREATE = 'CREATE',
     UPDATE = 'UPDATE',
     DELETE = 'DELETE',

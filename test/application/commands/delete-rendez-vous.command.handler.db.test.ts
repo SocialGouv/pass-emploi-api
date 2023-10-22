@@ -18,7 +18,7 @@ import { Notification } from '../../../src/domain/notification/notification'
 import {
   DeleteRendezVousCommand,
   DeleteRendezVousCommandHandler
-} from '../../../src/application/commands/delete-rendez-vous.command.handler'
+} from '../../../src/application/commands/delete-rendez-vous.command.handler.db'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import {
   unConseillerDuJeune,

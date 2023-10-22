@@ -46,47 +46,53 @@ export class NotifierRappelInstanceSessionMiloJobHandler extends JobHandler<
     job: Planificateur.Job<Planificateur.JobRappelSession>
   ): Promise<SuiviJob> {
     const debut = this.dateService.now()
-
-    const instance = await this.sessionMiloRepository.findInstanceSession(
-      job.contenu.idInstance,
-      job.contenu.idDossier
-    )
-
     const stats: Stats = {
       idDossier: job.contenu.idDossier,
       notificationEnvoyee: false
     }
+    let nbErreurs = 0
 
-    if (instance) {
-      const resultJeune = await this.jeuneRepository.getByIdDossier(
+    try {
+      const instance = await this.sessionMiloRepository.findInstanceSession(
+        job.contenu.idInstance,
         job.contenu.idDossier
       )
-      if (isSuccess(resultJeune)) {
-        if (resultJeune.data.configuration?.pushNotificationToken) {
-          const dateTimezonee = RendezVousMilo.timezonerDateMilo(
-            instance.dateHeureDebut,
-            resultJeune.data
-          )
 
-          const notification = Notification.creerNotificationRappelSessionMilo(
-            resultJeune.data.configuration.pushNotificationToken,
-            job.contenu.idSession,
-            dateTimezonee,
-            this.dateService
-          )
-          if (notification) {
-            await this.notificationRepository.send(notification)
+      if (instance && instance.statut === SessionMilo.StatutInstance.PRESCRIT) {
+        const resultJeune = await this.jeuneRepository.getByIdDossier(
+          job.contenu.idDossier
+        )
+        if (isSuccess(resultJeune)) {
+          if (resultJeune.data.configuration?.pushNotificationToken) {
+            const dateTimezonee = RendezVousMilo.timezonerDateMilo(
+              instance.dateHeureDebut,
+              resultJeune.data
+            )
+
+            const notification =
+              Notification.creerNotificationRappelSessionMilo(
+                resultJeune.data.configuration.pushNotificationToken,
+                job.contenu.idSession,
+                dateTimezonee,
+                this.dateService
+              )
+            if (notification) {
+              await this.notificationRepository.send(notification)
+              stats.notificationEnvoyee = true
+            }
           }
-          stats.notificationEnvoyee = true
         }
       }
+    } catch (e) {
+      this.logger.error(e)
+      nbErreurs = 1
     }
     return {
       jobType: this.jobType,
       dateExecution: debut,
       resultat: stats,
       succes: true,
-      nbErreurs: 0,
+      nbErreurs,
       tempsExecution: DateService.calculerTempsExecution(debut)
     }
   }

@@ -43,8 +43,8 @@ export class EvenementMiloHttpRepository implements EvenementMilo.Repository {
       return {
         id: evenement.identifiant,
         date: evenement.date,
-        type: actionToType(evenement.action),
-        objet: typeToObjet(evenement.type),
+        action: toActionEvenement(evenement.action),
+        objet: toObjetEvenement(evenement.type),
         idObjet: evenement.idType.toString(),
         idPartenaireBeneficiaire: evenement.idDossier.toString()
       }
@@ -74,10 +74,10 @@ export class EvenementMiloHttpRepository implements EvenementMilo.Repository {
   }
 }
 
-function typeToObjet(
-  type: 'RDV' | 'SESSION' | string
+function toObjetEvenement(
+  typeMilo: 'RDV' | 'SESSION' | string
 ): EvenementMilo.ObjetEvenement {
-  switch (type) {
+  switch (typeMilo) {
     case 'RDV':
       return EvenementMilo.ObjetEvenement.RENDEZ_VOUS
     case 'SESSION':
@@ -87,17 +87,17 @@ function typeToObjet(
   }
 }
 
-function actionToType(
-  action: 'CREATE' | 'UPDATE' | 'DELETE' | string
-): EvenementMilo.TypeEvenement {
-  switch (action) {
+function toActionEvenement(
+  actionMilo: 'CREATE' | 'UPDATE' | 'DELETE' | string
+): EvenementMilo.ActionEvenement {
+  switch (actionMilo) {
     case 'CREATE':
-      return EvenementMilo.TypeEvenement.CREATE
+      return EvenementMilo.ActionEvenement.CREATE
     case 'UPDATE':
-      return EvenementMilo.TypeEvenement.UPDATE
+      return EvenementMilo.ActionEvenement.UPDATE
     case 'DELETE':
-      return EvenementMilo.TypeEvenement.DELETE
+      return EvenementMilo.ActionEvenement.DELETE
     default:
-      return EvenementMilo.TypeEvenement.NON_TRAITABLE
+      return EvenementMilo.ActionEvenement.NON_TRAITABLE
   }
 }

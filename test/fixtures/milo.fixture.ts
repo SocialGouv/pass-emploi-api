@@ -71,7 +71,7 @@ export const unEvenementMilo = (
   const defaults = {
     id: '63569521bdd5161673153f9f',
     idPartenaireBeneficiaire: '1234567',
-    type: EvenementMilo.TypeEvenement.CREATE,
+    action: EvenementMilo.ActionEvenement.CREATE,
     objet: EvenementMilo.ObjetEvenement.RENDEZ_VOUS,
     idObjet: '34',
     date: '2022-10-24T08:00:34Z'

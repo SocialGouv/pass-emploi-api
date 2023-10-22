@@ -12,7 +12,7 @@ import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   DeleteRendezVousCommand,
   DeleteRendezVousCommandHandler
-} from '../../application/commands/delete-rendez-vous.command.handler'
+} from '../../application/commands/delete-rendez-vous.command.handler.db'
 import {
   UpdateRendezVousCommand,
   UpdateRendezVousCommandHandler

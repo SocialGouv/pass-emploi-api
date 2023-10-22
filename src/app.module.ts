@@ -37,7 +37,7 @@ import { DeleteFavoriOffreImmersionCommandHandler } from './application/commands
 import { DeleteJeuneInactifCommandHandler } from './application/commands/delete-jeune-inactif.command.handler'
 import { DeleteListeDeDiffusionCommandHandler } from './application/commands/delete-liste-de-diffusion.command.handler'
 import { DeleteRechercheCommandHandler } from './application/commands/delete-recherche.command.handler'
-import { DeleteRendezVousCommandHandler } from './application/commands/delete-rendez-vous.command.handler'
+import { DeleteRendezVousCommandHandler } from './application/commands/delete-rendez-vous.command.handler.db'
 import { DeleteSuperviseursCommandHandler } from './application/commands/delete-superviseurs.command.handler'
 import { EnvoyerMessageGroupeCommandHandler } from './application/commands/envoyer-message-groupe.command.handler'
 import { NotifierNouvellesImmersionsCommandHandler } from './application/commands/notifier-nouvelles-immersions.command.handler'

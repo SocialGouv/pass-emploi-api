@@ -71,7 +71,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
 
     const evenement: EvenementMilo = job.contenu
 
-    if (evenement.type === EvenementMilo.TypeEvenement.NON_TRAITABLE) {
+    if (evenement.action === EvenementMilo.ActionEvenement.NON_TRAITABLE) {
       return this.buildSuiviJob(
         maintenant,
         Traitement.TYPE_EVENEMENT_NON_TRAITABLE
@@ -103,15 +103,15 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
             evenement.objet
           )
 
-        switch (evenement.type) {
-          case EvenementMilo.TypeEvenement.CREATE:
+        switch (evenement.action) {
+          case EvenementMilo.ActionEvenement.CREATE:
             return this.handleCreateRDV(
               resultJeune.data,
               maintenant,
               rendezVousMILO,
               FT_NOTIFIER_EVENEMENTS_MILO
             )
-          case EvenementMilo.TypeEvenement.UPDATE:
+          case EvenementMilo.ActionEvenement.UPDATE:
             return this.handleUpdateRDV(
               resultJeune.data,
               maintenant,
@@ -119,7 +119,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
               rendezVousCEJExistant,
               FT_NOTIFIER_EVENEMENTS_MILO
             )
-          case EvenementMilo.TypeEvenement.DELETE:
+          case EvenementMilo.ActionEvenement.DELETE:
             return this.handleDeleteRDV(
               resultJeune.data,
               maintenant,
@@ -135,22 +135,22 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
             evenement.idObjet,
             evenement.idPartenaireBeneficiaire
           )
-        switch (evenement.type) {
-          case EvenementMilo.TypeEvenement.CREATE:
+        switch (evenement.action) {
+          case EvenementMilo.ActionEvenement.CREATE:
             return this.handleCreateInstanceSession(
               resultJeune.data,
               maintenant,
               instanceSessionMilo,
               FT_NOTIFIER_EVENEMENTS_MILO
             )
-          case EvenementMilo.TypeEvenement.UPDATE:
+          case EvenementMilo.ActionEvenement.UPDATE:
             return this.handleUpdateInstanceSession(
               resultJeune.data,
               maintenant,
               instanceSessionMilo,
               FT_NOTIFIER_EVENEMENTS_MILO
             )
-          case EvenementMilo.TypeEvenement.DELETE:
+          case EvenementMilo.ActionEvenement.DELETE:
             return this.handleDeleteInstanceSession(
               resultJeune.data,
               maintenant,
