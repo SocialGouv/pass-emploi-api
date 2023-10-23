@@ -17,5 +17,3 @@ connect -u redis://username:password@localhost:10000 JobQueue
 delayed -q '[.root[] | select(.data.type | contains("MAJ_CODES_EVENEMENTS"))]'-e 6000
 delayed -q '[.root[] | select(.data.type | contains("RENDEZVOUS") | not)]'-e 6000
 ```
-
-connect -u redis://pa-back-staging-3929:6wegk35B1ota0pPZhAGa@localhost:10000 JobQueue
