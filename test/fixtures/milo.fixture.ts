@@ -1,6 +1,10 @@
 import { SituationsMiloDto } from 'src/infrastructure/sequelize/models/situations-milo.sql-model'
 import { AsSql } from 'src/infrastructure/sequelize/types'
 import { JeuneMilo } from '../../src/domain/milo/jeune.milo'
+import { EvenementMiloDto } from 'src/infrastructure/repositories/dto/milo.dto'
+import { RendezVousMilo } from '../../src/domain/milo/rendez-vous.milo'
+import { EvenementMilo } from '../../src/domain/milo/evenement.milo'
+import { InstanceSessionMilo } from '../../src/domain/milo/session.milo'
 
 export const unDossierMilo = (
   args: Partial<JeuneMilo.Dossier> = {}
@@ -57,6 +61,65 @@ export const uneSituationsMiloDto = (
         dateFin: ''
       }
     ]
+  }
+  return { ...defaults, ...args }
+}
+
+export const unEvenementMilo = (
+  args: Partial<EvenementMilo> = {}
+): EvenementMilo => {
+  const defaults = {
+    id: '63569521bdd5161673153f9f',
+    idPartenaireBeneficiaire: '1234567',
+    action: EvenementMilo.ActionEvenement.CREATE,
+    objet: EvenementMilo.ObjetEvenement.RENDEZ_VOUS,
+    idObjet: '34',
+    date: '2022-10-24T08:00:34Z'
+  }
+  return {
+    ...defaults,
+    ...args
+  }
+}
+
+export const unEvenementMiloDto = (
+  args: Partial<EvenementMiloDto> = {}
+): EvenementMiloDto => {
+  const defaults: EvenementMiloDto = {
+    identifiant: '63569521bdd5161673153f9f',
+    idDossier: 1234567,
+    type: 'RDV',
+    action: 'CREATE',
+    idType: 34,
+    date: '2022-10-24T08:00:34Z'
+  }
+  return { ...defaults, ...args }
+}
+
+export const unRendezVousMilo = (
+  args: Partial<RendezVousMilo> = {}
+): RendezVousMilo => {
+  const defaults: RendezVousMilo = {
+    id: '34',
+    dateHeureDebut: '2020-10-06 10:00:00',
+    dateHeureFin: '2020-10-06 12:00:00',
+    titre: 'Test RDV',
+    idPartenaireBeneficiaire: '5045180',
+    commentaire: '',
+    statut: 'Planifié'
+  }
+  return { ...defaults, ...args }
+}
+
+export const uneInstanceSessionMilo = (
+  args: Partial<InstanceSessionMilo> = {}
+): InstanceSessionMilo => {
+  const defaults: InstanceSessionMilo = {
+    id: '34',
+    dateHeureDebut: '2020-10-06 10:00:00',
+    idSession: '12345',
+    idDossier: '5045180',
+    statut: 'Prescrit'
   }
   return { ...defaults, ...args }
 }

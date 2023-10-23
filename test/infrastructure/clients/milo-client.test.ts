@@ -246,19 +246,34 @@ describe('MiloClient', () => {
           `/operateurs/dossiers/${idsDossier[0]}/instances-session`,
           JSON.stringify(idSession)
         )
-        .reply(201)
+        .reply(201, {
+          id: 'inst1',
+          idDossier: idsDossier[0],
+          idSession,
+          statut: 'test'
+        })
       const scope2 = nock(MILO_BASE_URL)
         .post(
           `/operateurs/dossiers/${idsDossier[1]}/instances-session`,
           JSON.stringify(idSession)
         )
-        .reply(201)
+        .reply(201, {
+          id: 'inst2',
+          idDossier: idsDossier[1],
+          idSession,
+          statut: 'test'
+        })
       const scope3 = nock(MILO_BASE_URL)
         .post(
           `/operateurs/dossiers/${idsDossier[2]}/instances-session`,
           JSON.stringify(idSession)
         )
-        .reply(201)
+        .reply(201, {
+          id: 'inst3',
+          idDossier: idsDossier[2],
+          idSession,
+          statut: 'test'
+        })
 
       // When
       const result = await miloClient.inscrireJeunesSession(
@@ -271,7 +286,28 @@ describe('MiloClient', () => {
       expect(scope1.isDone()).to.equal(true)
       expect(scope2.isDone()).to.equal(true)
       expect(scope3.isDone()).to.equal(true)
-      expect(result).to.deep.equal(emptySuccess())
+      expect(result).to.deep.equal(
+        success([
+          {
+            id: 'inst1',
+            idDossier: 'id-dossier-1',
+            idSession: 'id-session',
+            statut: 'test'
+          },
+          {
+            id: 'inst2',
+            idDossier: 'id-dossier-2',
+            idSession: 'id-session',
+            statut: 'test'
+          },
+          {
+            id: 'inst3',
+            idDossier: 'id-dossier-3',
+            idSession: 'id-session',
+            statut: 'test'
+          }
+        ])
+      )
     })
   })
 

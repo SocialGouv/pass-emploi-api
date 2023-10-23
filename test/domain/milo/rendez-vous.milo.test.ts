@@ -1,17 +1,17 @@
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { unRendezVousMilo } from '../../fixtures/partenaire.fixture'
+import { Jeune } from '../../../src/domain/jeune/jeune'
+import { RendezVousMilo } from '../../../src/domain/milo/rendez-vous.milo'
 import {
   CodeTypeRendezVous,
   RendezVous
 } from '../../../src/domain/rendez-vous/rendez-vous'
 import { IdService } from '../../../src/utils/id-service'
-import { Jeune } from '../../../src/domain/jeune/jeune'
+import { uneConfiguration, unJeune } from '../../fixtures/jeune.fixture'
+import { unRendezVousMilo } from '../../fixtures/milo.fixture'
 import {
   unJeuneDuRendezVous,
   unRendezVous
 } from '../../fixtures/rendez-vous.fixture'
-import { uneConfiguration, unJeune } from '../../fixtures/jeune.fixture'
-import { RendezVousMilo } from '../../../src/domain/milo/rendez-vous.milo'
+import { expect, StubbedClass, stubClass } from '../../utils'
 
 describe('MiloRendezVous', () => {
   describe('Factory', () => {
@@ -138,7 +138,7 @@ describe('MiloRendezVous', () => {
             modalite: rdvMilo.modalite,
             commentaire: rdvMilo.commentaire,
             informationsPartenaire: {
-              type: rdvMilo.type,
+              type: 'RENDEZ_VOUS',
               id: rdvMilo.id
             },
             createur: { id: '', nom: '', prenom: '' },
@@ -153,7 +153,6 @@ describe('MiloRendezVous', () => {
           rdvMilo = unRendezVousMilo({
             dateHeureDebut: dateStringRendezVousDebut,
             dateHeureFin: dateStringRendezVousFin,
-            type: RendezVousMilo.Type.SESSION,
             adresse: 'Route de la plage, 97122 Baie-Mahault'
           })
 
@@ -178,12 +177,12 @@ describe('MiloRendezVous', () => {
                 configuration
               })
             ],
-            type: CodeTypeRendezVous.SESSION_MILO,
-            presenceConseiller: false,
+            type: CodeTypeRendezVous.RENDEZ_VOUS_MILO,
+            presenceConseiller: true,
             adresse: rdvMilo.adresse,
             commentaire: rdvMilo.commentaire,
             informationsPartenaire: {
-              type: rdvMilo.type,
+              type: 'RENDEZ_VOUS',
               id: rdvMilo.id
             },
             createur: { id: '', nom: '', prenom: '' },

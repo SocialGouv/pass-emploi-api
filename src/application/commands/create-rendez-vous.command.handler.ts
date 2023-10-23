@@ -17,7 +17,10 @@ import {
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Mail, MailServiceToken } from '../../domain/mail'
 import { Notification } from '../../domain/notification/notification'
-import { PlanificateurService } from '../../domain/planificateur'
+import {
+  PlanificateurService,
+  planifierLesRappelsDeRendezVous
+} from '../../domain/planificateur'
 import {
   RendezVous,
   RendezVousRepositoryToken
@@ -91,7 +94,12 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
       rendezVous,
       Notification.Type.NEW_RENDEZVOUS
     )
-    this.planifierLesRappelsDeRendezVous(rendezVous)
+    planifierLesRappelsDeRendezVous(
+      rendezVous,
+      this.planificateurService,
+      this.logger,
+      this.apmService
+    )
     if (rendezVous.invitation) {
       this.envoyerLesInvitationsCalendaires(
         conseiller,
@@ -126,22 +134,6 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
       this.logger.warn(
         `Impossible d'envoyer un e-mail au conseiller ${conseiller?.id}, l'adresse n'existe pas`
       )
-    }
-  }
-
-  private async planifierLesRappelsDeRendezVous(
-    rendezVous: RendezVous
-  ): Promise<void> {
-    try {
-      await this.planificateurService.planifierRappelsRendezVous(rendezVous)
-    } catch (e) {
-      this.logger.error(
-        buildError(
-          `La planification des notifications du rendez-vous ${rendezVous.id} a échoué`,
-          e
-        )
-      )
-      this.apmService.captureError(e)
     }
   }
 

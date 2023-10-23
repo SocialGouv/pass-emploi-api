@@ -32,8 +32,7 @@ export enum CodeTypeRendezVous {
   VISITE = 'VISITE',
   PRESTATION = 'PRESTATION',
   AUTRE = 'AUTRE',
-  RENDEZ_VOUS_MILO = 'RENDEZ_VOUS_MILO',
-  SESSION_MILO = 'SESSION_MILO'
+  RENDEZ_VOUS_MILO = 'RENDEZ_VOUS_MILO'
 }
 
 export const TYPES_ANIMATIONS_COLLECTIVES = [
@@ -59,8 +58,7 @@ export const mapCodeCategorieTypeRendezVous: Record<
   VISITE: CategorieRendezVous.CEJ_RDV,
   PRESTATION: CategorieRendezVous.CEJ_RDV,
   AUTRE: CategorieRendezVous.CEJ_RDV,
-  RENDEZ_VOUS_MILO: CategorieRendezVous.MILO,
-  SESSION_MILO: CategorieRendezVous.MILO
+  RENDEZ_VOUS_MILO: CategorieRendezVous.MILO
 }
 
 export const mapCodeLabelTypeRendezVous: Record<CodeTypeRendezVous, string> = {
@@ -72,8 +70,7 @@ export const mapCodeLabelTypeRendezVous: Record<CodeTypeRendezVous, string> = {
   VISITE: 'Visite',
   PRESTATION: 'Prestation',
   AUTRE: 'Autre',
-  RENDEZ_VOUS_MILO: 'Rendez-vous i-milo',
-  SESSION_MILO: 'Inscription à une session i-milo'
+  RENDEZ_VOUS_MILO: 'Rendez-vous i-milo'
 }
 
 export const mapCodeLabelTypeRendezVousJeune: Record<
@@ -88,8 +85,7 @@ export const mapCodeLabelTypeRendezVousJeune: Record<
   VISITE: 'Visite',
   PRESTATION: 'Prestation',
   AUTRE: 'Autre',
-  RENDEZ_VOUS_MILO: 'Rendez-vous',
-  SESSION_MILO: 'Animation collective'
+  RENDEZ_VOUS_MILO: 'Rendez-vous'
 }
 
 export interface TypeRendezVous {

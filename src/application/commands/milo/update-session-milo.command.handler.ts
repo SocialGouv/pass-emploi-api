@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Command } from 'src/building-blocks/types/command'
 import { CommandHandler } from 'src/building-blocks/types/command-handler'
 import {
+  Result,
   emptySuccess,
-  isFailure,
-  Result
+  isFailure
 } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Conseiller } from 'src/domain/conseiller/conseiller'
@@ -15,10 +15,10 @@ import {
   SessionMiloRepositoryToken
 } from 'src/domain/milo/session.milo'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
+import { Notification } from '../../../domain/notification/notification'
 import { DateService } from '../../../utils/date-service'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
-import { Notification } from '../../../domain/notification/notification'
-import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
 import Inscription = SessionMilo.Inscription
 
 export interface UpdateSessionMiloCommand extends Command {
