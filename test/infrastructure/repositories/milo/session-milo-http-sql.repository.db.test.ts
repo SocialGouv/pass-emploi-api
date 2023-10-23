@@ -437,8 +437,8 @@ describe('SessionMiloHttpSqlRepository', () => {
         planificateurService.supprimerRappelsParId.getCall(3).args
       ).to.deep.equal([`instance-session:id-inscription-luna`])
       expect(
-        planificateurService.supprimerRappelsParId.getCall(4).args
-      ).to.deep.equal([`instance-session:id-inscription-ginny`])
+        planificateurService.supprimerRappelsParId
+      ).not.to.have.been.calledWith(`instance-session:id-inscription-ginny`)
       expect(
         planificateurService.planifierRappelsInstanceSessionMilo.getCall(0).args
       ).to.deep.equal([

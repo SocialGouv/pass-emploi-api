@@ -235,38 +235,37 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     idsDossier: Map<string, string>,
     tokenMilo: string
   ): Promise<Result> {
-    const modifications = inscriptionsAModifier.map(modification => {
-      supprimerRappelsInstanceSessionMilo(
-        modification.idInscription,
-        this.planificateurService,
-        this.logger,
-        this.apmService
-      )
-      const inscription = inscriptionToStatutWithCommentaireAndDateDto(
+    const modifications = inscriptionsAModifier.map(modification => ({
+      idDossier: idsDossier.get(modification.idJeune)!,
+      idInstanceSession: modification.idInscription,
+      ...inscriptionToStatutWithCommentaireAndDateDto(
         modification,
         dateDebutSession
       )
-      const idDossier = idsDossier.get(modification.idJeune)!
-
-      if (inscription.statut === MILO_INSCRIT) {
+    }))
+    for (const modification of modifications) {
+      if (modification.statut === MILO_INSCRIT) {
         planifierRappelsInstanceSessionMilo(
           {
-            idDossier,
+            idInstance: modification.idInstanceSession,
+            idDossier: modification.idDossier,
             idSession,
-            idInstance: modification.idInscription,
             dateDebut: dateDebutSession
           },
           this.planificateurService,
           this.logger,
           this.apmService
         )
+      } else {
+        supprimerRappelsInstanceSessionMilo(
+          modification.idInstanceSession,
+          this.planificateurService,
+          this.logger,
+          this.apmService
+        )
       }
-      return {
-        idDossier,
-        idInstanceSession: modification.idInscription,
-        ...inscription
-      }
-    })
+    }
+
     return this.miloClient.modifierInscriptionJeunesSession(
       tokenMilo,
       modifications
