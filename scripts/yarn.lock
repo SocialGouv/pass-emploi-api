@@ -136,17 +136,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*":
-  version: 20.4.9
-  resolution: "@types/node@npm:20.4.9"
-  checksum: 504e3da96274f3865c1251830f4750bb0a8f6ef6f8648902cd3bba33370c5f219235471bfbf55cce726b25c8eacfcc8e2aad0ec3b13e27ea6708b00d4a9a46c8
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^18.7.19":
-  version: 18.17.4
-  resolution: "@types/node@npm:18.17.4"
-  checksum: d4c458202d82c999f38d85ca9ae8a2d3e521645c7f1b908cd6a0303d0e13c7d5eb3f888c41f584ba029ecf802d0a0005b7816c149400371a3c035abc4bd9a4c5
+"@types/node@npm:*, @types/node@npm:^20.0.0":
+  version: 20.8.7
+  resolution: "@types/node@npm:20.8.7"
+  dependencies:
+    undici-types: ~5.25.1
+  checksum: 2173c0c03daefcb60c03a61b1371b28c8fe412e7a40dc6646458b809d14a85fbc7aeb369d957d57f0aaaafd99964e77436f29b3b579232d8f2b20c58abbd1d25
   languageName: node
   linkType: hard
 
@@ -1136,6 +1131,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"undici-types@npm:~5.25.1":
+  version: 5.25.3
+  resolution: "undici-types@npm:5.25.3"
+  checksum: ec9d2cc36520cbd9fbe3b3b6c682a87fe5be214699e1f57d1e3d9a2cb5be422e62735f06e0067dc325fd3dd7404c697e4d479f9147dc8a804e049e29f357f2ff
+  languageName: node
+  linkType: hard
+
 "util-deprecate@npm:^1.0.1":
   version: 1.0.2
   resolution: "util-deprecate@npm:1.0.2"
@@ -1158,7 +1160,7 @@ __metadata:
   dependencies:
     "@google-cloud/bigquery": ^7.0.0
     "@types/json2csv": ^5
-    "@types/node": ^18.7.19
+    "@types/node": ^20.0.0
     dotenv: ^16.0.2
     dotvault: ^0.0.9
     json2csv: ^5.0.7
