@@ -68,7 +68,9 @@ export namespace Conseiller {
     infosDeMiseAJour: InfosDeMiseAJour
   ): Result<Conseiller> {
     const conseilleMiloARenseigneUneAgenceManuelle =
-      conseiller.structure === Structure.MILO && !infosDeMiseAJour.agence?.id
+      conseiller.structure === Structure.MILO &&
+      infosDeMiseAJour.agence &&
+      !infosDeMiseAJour.agence.id
 
     if (conseilleMiloARenseigneUneAgenceManuelle) {
       return failure(
