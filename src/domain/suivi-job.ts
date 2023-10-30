@@ -39,6 +39,7 @@ export function estJobSuivi(jobType: Planificateur.JobType): boolean {
   return ![
     Planificateur.JobType.MONITORER_JOBS,
     Planificateur.JobType.RENDEZVOUS,
+    Planificateur.JobType.RAPPEL_SESSION,
     Planificateur.JobType.RAPPEL_ACTION,
     Planificateur.JobType.TRAITER_EVENEMENT_MILO
   ].includes(jobType)
