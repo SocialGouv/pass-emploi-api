@@ -25,9 +25,7 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
     suiviJobService: SuiviJob.Service,
     private dateService: DateService,
     @Inject(PlanificateurRepositoryToken)
-    private planificateurRepository: Planificateur.Repository,
-    @Inject(SequelizeInjectionToken)
-    private readonly sequelizeSource: Sequelize
+    private planificateurRepository: Planificateur.Repository
   ) {
     super(Planificateur.JobType.CHARGER_EVENEMENTS_ANALYTICS, suiviJobService)
   }
