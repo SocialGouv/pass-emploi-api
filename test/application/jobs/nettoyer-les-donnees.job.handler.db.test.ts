@@ -8,8 +8,6 @@ import { NettoyerLesDonneesJobHandler } from '../../../src/application/jobs/nett
 import { ArchiveJeuneSqlModel } from '../../../src/infrastructure/sequelize/models/archive-jeune.sql-model'
 import { LogApiPartenaireSqlModel } from '../../../src/infrastructure/sequelize/models/log-api-partenaire.sql-model'
 import { getDatabase } from '../../utils/database-for-testing'
-import { EvenementEngagementHebdoSqlModel } from '../../../src/infrastructure/sequelize/models/evenement-engagement-hebdo.sql-model'
-import { Core } from '../../../src/domain/core'
 import { SuiviJobSqlModel } from '../../../src/infrastructure/sequelize/models/suivi-job.sql-model'
 import { Planificateur } from '../../../src/domain/planificateur'
 import {
@@ -93,33 +91,6 @@ describe('NettoyerLesDonneesJobHandler', () => {
       transactionId: 'transactionId'
     })
 
-    // Given - Evenement Engagement Hebdo
-    await EvenementEngagementHebdoSqlModel.create({
-      id: 1,
-      dateEvenement: uneDatetime().minus({ week: 1, day: 1 }).toJSDate(),
-      idUtilisateur: 'idUtilisateur',
-      typeUtilisateur: 'typeUtilisateur',
-      structure: Core.Structure.POLE_EMPLOI,
-      categorie: 'aa',
-      action: 'aa',
-      nom: 'aa',
-      code: 'aa'
-    })
-    await EvenementEngagementHebdoSqlModel.create({
-      id: 2,
-      dateEvenement: uneDatetime()
-        .minus({ week: 1 })
-        .plus({ day: 1 })
-        .toJSDate(),
-      idUtilisateur: 'idUtilisateur',
-      typeUtilisateur: 'typeUtilisateur',
-      structure: Core.Structure.POLE_EMPLOI,
-      categorie: 'aa',
-      action: 'aa',
-      nom: 'aa',
-      code: 'aa'
-    })
-
     // Given - Suivi Job
     await SuiviJobSqlModel.create({
       id: 1,
@@ -201,15 +172,6 @@ describe('NettoyerLesDonneesJobHandler', () => {
       const logs = await LogApiPartenaireSqlModel.findAll()
       expect(logs).to.have.length(1)
       expect(logs[0].pathPartenaire).to.equal('pathAGarder')
-    })
-  })
-
-  describe("evenements d'engagement hebdo", () => {
-    it("supprime les données de plus d'une semaine", async () => {
-      // Then
-      const events = await EvenementEngagementHebdoSqlModel.findAll()
-      expect(events).to.have.length(1)
-      expect(events[0].id).to.equal(2)
     })
   })
 

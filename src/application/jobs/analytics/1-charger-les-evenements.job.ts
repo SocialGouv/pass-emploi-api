@@ -11,8 +11,6 @@ import {
   getConnexionToDBSource,
   getConnexionToDBTarget
 } from '../../../infrastructure/sequelize/connector-analytics'
-import { Sequelize } from 'sequelize-typescript'
-import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
 import { PoolClient } from 'pg'
 import { from as copyFrom, to as copyTo } from 'pg-copy-streams'
 import { pipeline } from 'node:stream/promises'
@@ -32,8 +30,9 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
 
   async handle(): Promise<SuiviJob> {
     let erreur
-    let nombreDevemementsCharges
-    let stats
+    let nombreDevemementsACharger
+    let nombreDevenementsTargetBefore
+    let nombreDevenementsTargetAfter
     const maintenant = this.dateService.now()
     const connexionSource = await getConnexionToDBSource()
     const connexionTarget = await getConnexionToDBTarget()
@@ -41,21 +40,29 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
     try {
       await this.mettreAJourLeSchema(connexionTarget.client)
       await this.indexerLesColonnes(connexionTarget.client)
-      nombreDevemementsCharges = await this.ajouterLesNouveauxEvenements(
+      nombreDevenementsTargetBefore =
+        await this.recupererLeNombreDEvenementsTarget(connexionTarget.client)
+      nombreDevemementsACharger = await this.ajouterLesNouveauxEvenements(
         connexionSource.client,
         connexionTarget.client
       )
-      stats = await this.recupererLeCompteDesEvenementsSurLesDeuxBases(
-        connexionSource.client,
-        connexionTarget.client
-      )
+      nombreDevenementsTargetAfter =
+        await this.recupererLeNombreDEvenementsTarget(connexionTarget.client)
 
       const jobEnrichirLesEvenements: Planificateur.Job<void> = {
         dateExecution: this.dateService.nowJs(),
         type: Planificateur.JobType.ENRICHIR_EVENEMENTS_ANALYTICS,
         contenu: undefined
       }
-      await this.planificateurRepository.creerJob(jobEnrichirLesEvenements)
+      const jobNettoyerLesEvenements: Planificateur.Job<void> = {
+        dateExecution: this.dateService.nowJs(),
+        type: Planificateur.JobType.NETTOYER_EVENEMENTS_CHARGES_ANALYTICS,
+        contenu: undefined
+      }
+      await Promise.all([
+        this.planificateurRepository.creerJob(jobEnrichirLesEvenements),
+        this.planificateurRepository.creerJob(jobNettoyerLesEvenements)
+      ])
     } catch (e) {
       erreur = e
       throw e
@@ -70,8 +77,9 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
       dateExecution: maintenant,
       tempsExecution: DateService.calculerTempsExecution(maintenant),
       resultat: {
-        nombreDevemementsCharges,
-        stats
+        nombreDevemementsACharger,
+        nombreDevenementsTargetBefore,
+        nombreDevenementsTargetAfter
       }
     }
   }
@@ -131,13 +139,13 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
       )
     }
 
-    const streamCopyTo = await clientSource.query(
+    const streamCopyToStdout = clientSource.query(
       copyTo(
-        `COPY (SELECT * FROM evenement_engagement WHERE date_evenement>'${dateDernierEvenementCharge}') TO STDOUT WITH NULL '\\LA_VALEUR_NULL'`
+        `COPY (SELECT * FROM evenement_engagement_hebdo WHERE date_evenement>'${dateDernierEvenementCharge}') TO STDOUT WITH NULL '\\LA_VALEUR_NULL'`
       )
     )
 
-    const streamCopyFrom = clientTarget.query(
+    const streamCopyFromStdin = clientTarget.query(
       copyFrom(
         `COPY evenement_engagement (id,
                            date_evenement,
@@ -150,7 +158,7 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
                            code) FROM STDIN WITH NULL AS '\\LA_VALEUR_NULL'`
       )
     )
-    await pipeline(streamCopyTo, streamCopyFrom)
+    await pipeline(streamCopyToStdout, streamCopyFromStdin)
     return nombreDEvenementACharger
   }
 
@@ -159,7 +167,7 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
   ): Promise<string> {
     this.logger.log('Récupération du dernier événement chargé')
     const result = await clientTarget.query(
-      `SELECT to_char(MAX(date_evenement), 'YYYY-MM-DD"T"HH24:MI:SSOF') as max
+      `SELECT to_char(MAX(date_evenement), 'YYYY-MM-DD"T"HH24:MI:SS.MS OF') as max
        from evenement_engagement;`
     )
 
@@ -177,40 +185,21 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
     this.logger.log("Récupération du nombre d'événements à charger")
     const result = await clientSource.query(
       `SELECT count(*) as compte
-       from evenement_engagement
+       from evenement_engagement_hebdo
        where date_evenement > '${dateDernierEvenementCharge}';`
     )
     return Number(result.rows[0].compte ?? '0')
   }
 
-  private async recupererLeCompteDesEvenementsSurLesDeuxBases(
-    clientSource: PoolClient,
+  private async recupererLeNombreDEvenementsTarget(
     clientTarget: PoolClient
-  ): Promise<Stats> {
-    this.logger.log("Récupération du nombre d'événements sur les deux bases")
-    const resultSource = await clientSource.query(
-      `SELECT count(*) as comptesource
-       from evenement_engagement;`
-    )
-    const nombreEvenementsSource = Number(
-      resultSource.rows[0].comptesource ?? '0'
-    )
+  ): Promise<number> {
+    this.logger.log("Récupération du nombre d'événements sur la base cible")
 
     const { rows } = await clientTarget.query(
       `SELECT count(*) as comptetarget
        from evenement_engagement;`
     )
-    const nombreEvenementsTarget = Number(rows[0].comptetarget ?? '0')
-    return {
-      nombreEvenementsSource,
-      nombreEvenementsTarget,
-      difference: nombreEvenementsSource - nombreEvenementsTarget
-    }
+    return Number(rows[0].comptetarget ?? '0')
   }
-}
-
-interface Stats {
-  nombreEvenementsSource: number | undefined
-  nombreEvenementsTarget: number | undefined
-  difference: number
 }
