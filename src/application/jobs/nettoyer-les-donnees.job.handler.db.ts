@@ -13,6 +13,7 @@ import { SuiviJobSqlModel } from '../../infrastructure/sequelize/models/suivi-jo
 import { DateService } from '../../utils/date-service'
 import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
 import Source = RendezVous.Source
+import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.NETTOYER_LES_DONNEES)
@@ -34,6 +35,7 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
     let nombreSuiviJobsSupprimes = -1
     let nombreRdvSupprimes = -1
     let nombreRdvMiloSupprimes = -1
+    let nombreJeunesPasConnectesDepuis60Jours = -1
 
     try {
       nombreArchivesSupprimees = await ArchiveJeuneSqlModel.destroy({
@@ -84,6 +86,21 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
       nbErreurs++
     }
 
+    try {
+      nombreJeunesPasConnectesDepuis60Jours = (
+        await JeuneSqlModel.update(
+          {
+            pushNotificationToken: null
+          },
+          {
+            where: dateConnexionSuperieureA60Jours(maintenant)
+          }
+        )
+      )[0]
+    } catch (_e) {
+      nbErreurs++
+    }
+
     return {
       jobType: this.jobType,
       nbErreurs,
@@ -96,7 +113,8 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
         nombreEvenementsEngagementHebdoSupprimes,
         nombreSuiviJobsSupprimes,
         nombreRdvSupprimes,
-        nombreRdvMiloSupprimes
+        nombreRdvMiloSupprimes,
+        nombreJeunesPasConnectesDepuis60Jours
       }
     }
   }
@@ -140,5 +158,13 @@ function dateSuperieureATroisMoisEtVenantDeMilo(
 function dateSuppressionSuperieureASixMois(maintenant: DateTime): WhereOptions {
   return {
     dateSuppression: { [Op.lt]: maintenant.minus({ months: 6 }).toJSDate() }
+  }
+}
+
+function dateConnexionSuperieureA60Jours(maintenant: DateTime): WhereOptions {
+  return {
+    dateDerniereConnexion: {
+      [Op.lt]: maintenant.minus({ days: 60 }).toJSDate()
+    }
   }
 }

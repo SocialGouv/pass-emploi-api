@@ -20,6 +20,12 @@ import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
 import Source = RendezVous.Source
+import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
+
+const idJeune1 = 'push1'
+const idJeune2 = 'push2'
+const idJeune3 = 'push3'
 
 describe('NettoyerLesDonneesJobHandler', () => {
   let nettoyerLesDonneesJobHandler: NettoyerLesDonneesJobHandler
@@ -161,6 +167,21 @@ describe('NettoyerLesDonneesJobHandler', () => {
       rendezVousDtoMiloASupprimer.id
     )
 
+    // Given - Jeunes
+    await JeuneSqlModel.bulkCreate([
+      unJeuneDto({ id: idJeune1, idConseiller: undefined }),
+      unJeuneDto({
+        id: idJeune2,
+        dateDerniereConnexion: uneDatetime().minus({ days: 59 }).toJSDate(),
+        idConseiller: undefined
+      }),
+      unJeuneDto({
+        id: idJeune3,
+        dateDerniereConnexion: uneDatetime().minus({ days: 62 }).toJSDate(),
+        idConseiller: undefined
+      })
+    ])
+
     // When
     await nettoyerLesDonneesJobHandler.handle()
   })
@@ -224,6 +245,20 @@ describe('NettoyerLesDonneesJobHandler', () => {
       expect(rendezVousAvantNettoyage).not.to.be.null()
       expect(rendezVousSansDateSuppressionApresNettoyage).not.to.be.null()
       expect(rendezVousApresNettoyage).to.be.null()
+    })
+  })
+
+  describe('jeune', () => {
+    it('met à null pushToken pour jeunes connectés la denière fois il y a plus de 60 jours', async () => {
+      // Then
+      const jeunes = await JeuneSqlModel.findAll()
+      expect(jeunes).to.have.length(3)
+      expect(jeunes[0].id).to.equal(idJeune1)
+      expect(jeunes[0].pushNotificationToken).to.equal('token')
+      expect(jeunes[1].id).to.equal(idJeune2)
+      expect(jeunes[1].pushNotificationToken).to.equal('token')
+      expect(jeunes[2].id).to.equal(idJeune3)
+      expect(jeunes[2].pushNotificationToken).to.equal(null)
     })
   })
 })
