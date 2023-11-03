@@ -43,6 +43,7 @@ import { EnvoyerMessageGroupeCommandHandler } from './application/commands/envoy
 import { NotifierNouvellesImmersionsCommandHandler } from './application/commands/notifier-nouvelles-immersions.command.handler'
 import { SendNotificationsNouveauxMessagesExternesCommandHandler } from './application/commands/send-notifications-nouveaux-messages-externes.command.handler'
 import { SendNotificationsNouveauxMessagesCommandHandler } from './application/commands/send-notifications-nouveaux-messages.command.handler'
+import { NettoyerEvenementsChargesAnalyticsJobHandler } from './application/jobs/analytics/1bis-nettoyer-les-evenements-charges.job.handler.db'
 import { PlanifierExecutionCronCommandHandler } from './application/tasks/planifier-execution-cron.command.handler'
 import { InitCronsCommandHandler } from './application/tasks/init-crons.command'
 import { SynchronizeJobsCommandHandler } from './application/tasks/synchronize-jobs.command'
@@ -811,6 +812,7 @@ export const JobHandlerProviders = [
   TraiterEvenementMiloJobHandler,
   DumpForAnalyticsJobHandler,
   ChargerEvenementsJobHandler,
+  NettoyerEvenementsChargesAnalyticsJobHandler,
   EnrichirEvenementsJobHandler,
   ChargerLesVuesJobHandler,
   InitialiserLesVuesJobHandler

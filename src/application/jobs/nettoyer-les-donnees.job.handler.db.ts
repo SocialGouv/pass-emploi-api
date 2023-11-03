@@ -6,7 +6,6 @@ import { JobHandler } from '../../building-blocks/types/job-handler'
 import { Planificateur, ProcessJobType } from '../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
 import { ArchiveJeuneSqlModel } from '../../infrastructure/sequelize/models/archive-jeune.sql-model'
-import { EvenementEngagementHebdoSqlModel } from '../../infrastructure/sequelize/models/evenement-engagement-hebdo.sql-model'
 import { LogApiPartenaireSqlModel } from '../../infrastructure/sequelize/models/log-api-partenaire.sql-model'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { SuiviJobSqlModel } from '../../infrastructure/sequelize/models/suivi-job.sql-model'
@@ -31,7 +30,6 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
     let nbErreurs = 0
     let nombreArchivesSupprimees = -1
     let nombreLogsApiSupprimes = -1
-    let nombreEvenementsEngagementHebdoSupprimes = -1
     let nombreSuiviJobsSupprimes = -1
     let nombreRdvSupprimes = -1
     let nombreRdvMiloSupprimes = -1
@@ -49,15 +47,6 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
       nombreLogsApiSupprimes = await LogApiPartenaireSqlModel.destroy({
         where: dateSuperieureAUnMois(maintenant)
       })
-    } catch (_e) {
-      nbErreurs++
-    }
-
-    try {
-      nombreEvenementsEngagementHebdoSupprimes =
-        await EvenementEngagementHebdoSqlModel.destroy({
-          where: dateEvenementSuperieureAUneSemaine(maintenant)
-        })
     } catch (_e) {
       nbErreurs++
     }
@@ -110,7 +99,6 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
       resultat: {
         nombreArchivesSupprimees,
         nombreLogsApiSupprimees: nombreLogsApiSupprimes,
-        nombreEvenementsEngagementHebdoSupprimes,
         nombreSuiviJobsSupprimes,
         nombreRdvSupprimes,
         nombreRdvMiloSupprimes,
@@ -129,14 +117,6 @@ function dateArchivageSuperieureADeuxAns(maintenant: DateTime): WhereOptions {
 function dateSuperieureAUnMois(maintenant: DateTime): WhereOptions {
   return {
     date: { [Op.lt]: maintenant.minus({ month: 1 }).toJSDate() }
-  }
-}
-
-function dateEvenementSuperieureAUneSemaine(
-  maintenant: DateTime
-): WhereOptions {
-  return {
-    dateEvenement: { [Op.lt]: maintenant.minus({ week: 1 }).toJSDate() }
   }
 }
 
