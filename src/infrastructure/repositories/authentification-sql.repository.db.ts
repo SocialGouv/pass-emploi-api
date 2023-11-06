@@ -20,69 +20,87 @@ export class AuthentificationSqlRepository
     this.logger = new Logger('AuthentificationSqlRepository')
   }
 
-  async get(
+  async getConseillerByStructure(
     idUtilisateurAuth: string,
-    structure: Core.Structure,
-    type: Authentification.Type
+    structure: Core.Structure
   ): Promise<Authentification.Utilisateur | undefined> {
-    if (type === Authentification.Type.CONSEILLER) {
-      const conseillerSqlModel = await ConseillerSqlModel.findOne({
+    const conseillerSqlModel = await ConseillerSqlModel.findOne({
+      where: {
+        idAuthentification: idUtilisateurAuth,
+        structure: structure
+      }
+    })
+
+    if (conseillerSqlModel) {
+      const superviseursParEmail = await SuperviseurSqlModel.findAll({
         where: {
-          idAuthentification: idUtilisateurAuth,
-          structure: structure
+          email: conseillerSqlModel.email
         }
       })
 
-      if (conseillerSqlModel) {
-        const superviseursParEmail = await SuperviseurSqlModel.findAll({
-          where: {
-            email: conseillerSqlModel.email
-          }
-        })
+      const estSuperviseur = estConseillerSuperviseur(
+        superviseursParEmail,
+        structure
+      )
+      const estSuperviseurPEBRSA = estConseillerSuperviseurPEBRSA(
+        superviseursParEmail,
+        structure,
+        estSuperviseur
+      )
+      const roles = []
 
-        const estSuperviseur = estConseillerSuperviseur(
-          superviseursParEmail,
-          structure
-        )
-        const estSuperviseurPEBRSA = estConseillerSuperviseurPEBRSA(
-          superviseursParEmail,
-          structure,
-          estSuperviseur
-        )
-        const roles = []
-
-        if (estSuperviseur) {
-          roles.push(Authentification.Role.SUPERVISEUR)
-        }
-        if (estSuperviseurPEBRSA) {
-          roles.push(Authentification.Role.SUPERVISEUR_PE_BRSA)
-        }
-        return fromConseillerSqlToUtilisateur(conseillerSqlModel, roles)
+      if (estSuperviseur) {
+        roles.push(Authentification.Role.SUPERVISEUR)
       }
-    } else if (Authentification.estJeune(type)) {
-      const jeuneSqlModel = await JeuneSqlModel.findOne({
-        where: {
-          idAuthentification: idUtilisateurAuth,
-          structure: structure
-        }
-      })
-
-      if (jeuneSqlModel) {
-        return fromJeuneSqlToUtilisateur(jeuneSqlModel)
+      if (estSuperviseurPEBRSA) {
+        roles.push(Authentification.Role.SUPERVISEUR_PE_BRSA)
       }
+      return fromConseillerSqlToUtilisateur(conseillerSqlModel, roles)
     }
 
     return undefined
   }
 
-  async getJeuneByEmailEtStructure(
-    email: string,
+  async getJeuneByStructure(
+    idUtilisateurAuth: string,
     structure: Core.Structure
   ): Promise<Authentification.Utilisateur | undefined> {
     const jeuneSqlModel = await JeuneSqlModel.findOne({
       where: {
-        email: email,
+        idAuthentification: idUtilisateurAuth,
         structure
+      }
+    })
+
+    if (jeuneSqlModel) {
+      return fromJeuneSqlToUtilisateur(jeuneSqlModel)
+    }
+
+    return undefined
+  }
+
+  async getJeune(
+    idUtilisateurAuth: string
+  ): Promise<Authentification.Utilisateur | undefined> {
+    const jeuneSqlModel = await JeuneSqlModel.findOne({
+      where: {
+        idAuthentification: idUtilisateurAuth
+      }
+    })
+
+    if (jeuneSqlModel) {
+      return fromJeuneSqlToUtilisateur(jeuneSqlModel)
+    }
+
+    return undefined
+  }
+
+  async getJeuneByEmail(
+    email: string
+  ): Promise<Authentification.Utilisateur | undefined> {
+    const jeuneSqlModel = await JeuneSqlModel.findOne({
+      where: {
+        email: email
       }
     })
 

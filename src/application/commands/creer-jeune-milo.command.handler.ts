@@ -89,11 +89,11 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     }
 
     if (result.data.existeDejaChezMilo && result.data.idAuthentification) {
-      const utilisateurMilo = await this.authentificationRepository.get(
-        result.data.idAuthentification,
-        Core.Structure.MILO,
-        Authentification.Type.JEUNE
-      )
+      const utilisateurMilo =
+        await this.authentificationRepository.getJeuneByStructure(
+          result.data.idAuthentification,
+          Core.Structure.MILO
+        )
       if (utilisateurMilo) {
         return failure(
           new MauvaiseCommandeError(

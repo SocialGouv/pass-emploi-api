@@ -6,6 +6,7 @@ import {
 } from '../../../src/application/commands/update-utilisateur.command.handler'
 import {
   ConseillerNonValide,
+  NonTraitableError,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
@@ -87,6 +88,72 @@ describe('AuthentificationController', () => {
         .set({ 'X-API-KEY': 'api-key-keycloak' })
         .send(body)
         .expect(HttpStatus.NOT_FOUND)
+    })
+
+    it('retourne 422 quand Non Traitable', async () => {
+      // Given
+      const body: UpdateUserPayload = {
+        nom: 'Tavernier',
+        prenom: 'Nils',
+        type: Authentification.Type.CONSEILLER,
+        email: 'nils.tavernier@passemploi.com',
+        structure: Core.Structure.PASS_EMPLOI
+      }
+
+      const command: UpdateUtilisateurCommand = {
+        ...body,
+        idUtilisateurAuth: 'nilstavernier'
+      }
+
+      updateUtilisateurCommandHandler.execute
+        .withArgs(command)
+        .resolves(
+          failure(
+            new NonTraitableError('Utilisateur', command.idUtilisateurAuth)
+          )
+        )
+
+      // When - Then
+      await request(app.getHttpServer())
+        .put(`/auth/users/${command.idUtilisateurAuth}`)
+        .set({ 'X-API-KEY': 'api-key-keycloak' })
+        .send(body)
+        .expect(HttpStatus.UNPROCESSABLE_ENTITY)
+    })
+
+    it('retourne 422 quand Non Traitable MILO', async () => {
+      // Given
+      const body: UpdateUserPayload = {
+        nom: 'Tavernier',
+        prenom: 'Nils',
+        type: Authentification.Type.CONSEILLER,
+        email: 'nils.tavernier@passemploi.com',
+        structure: Core.Structure.PASS_EMPLOI
+      }
+
+      const command: UpdateUtilisateurCommand = {
+        ...body,
+        idUtilisateurAuth: 'nilstavernier'
+      }
+
+      updateUtilisateurCommandHandler.execute
+        .withArgs(command)
+        .resolves(
+          failure(
+            new NonTraitableError(
+              'Utilisateur',
+              command.idUtilisateurAuth,
+              NonTraitableError.CODE_UTILISATEUR_DEJA_MILO
+            )
+          )
+        )
+
+      // When - Then
+      await request(app.getHttpServer())
+        .put(`/auth/users/${command.idUtilisateurAuth}`)
+        .set({ 'X-API-KEY': 'api-key-keycloak' })
+        .send(body)
+        .expect(HttpStatus.UNPROCESSABLE_ENTITY)
     })
 
     it('retourne 400 quand on veut créer un utilisateur Milo avec des champs manquants', async () => {

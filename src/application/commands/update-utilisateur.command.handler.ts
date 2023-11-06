@@ -1,16 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { DateService } from '../../utils/date-service'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
   NonTraitableError,
+  NonTraitableInexistantError,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
 import {
+  Result,
   emptySuccess,
   failure,
   isFailure,
-  Result,
   success
 } from '../../building-blocks/types/result'
 import {
@@ -18,9 +18,10 @@ import {
   AuthentificationRepositoryToken
 } from '../../domain/authentification'
 import { Core } from '../../domain/core'
+import { DateService } from '../../utils/date-service'
 import {
-  queryModelFromUtilisateur,
-  UtilisateurQueryModel
+  UtilisateurQueryModel,
+  queryModelFromUtilisateur
 } from '../queries/query-models/authentification.query-model'
 
 export interface UpdateUtilisateurCommand extends Command {
@@ -94,35 +95,43 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
   private async authentifierJeuneParEmail(
     command: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
-    if (command.email) {
-      const utilisateurInitial =
-        await this.authentificationRepository.getJeuneByEmailEtStructure(
-          command.email,
-          command.structure
-        )
-
-      if (utilisateurInitial) {
-        const maintenant = this.dateService.nowJs()
-        const utilisateurMisAJour: Authentification.Utilisateur = {
-          ...utilisateurInitial,
-          id: utilisateurInitial.id,
-          prenom: command.prenom ?? utilisateurInitial.prenom,
-          nom: command.nom ?? utilisateurInitial.nom,
-          structure: command.structure,
-          type: Authentification.Type.JEUNE,
-          roles: [],
-          email: command.email ?? utilisateurInitial.email,
-          dateDerniereConnexion: maintenant,
-          datePremiereConnexion: maintenant,
-          idAuthentification: command.idUtilisateurAuth
-        }
-        await this.authentificationRepository.update(utilisateurMisAJour)
-        return success(queryModelFromUtilisateur(utilisateurMisAJour))
-      }
+    if (!command.email) {
+      return failure(
+        new NonTraitableError('Utilisateur', command.idUtilisateurAuth)
+      )
     }
-    return failure(
-      new NonTraitableError('Utilisateur', command.idUtilisateurAuth)
+
+    const utilisateurInitialTrouve =
+      await this.authentificationRepository.getJeuneByEmail(command.email)
+
+    if (!utilisateurInitialTrouve) {
+      return failure(new NonTraitableInexistantError(command.idUtilisateurAuth))
+    }
+    const verificationUtilisateur = verifierStructureUtilisteur(
+      utilisateurInitialTrouve,
+      command.idUtilisateurAuth,
+      command.structure
     )
+    if (isFailure(verificationUtilisateur)) {
+      return verificationUtilisateur
+    }
+
+    const maintenant = this.dateService.nowJs()
+    const utilisateurMisAJour: Authentification.Utilisateur = {
+      ...utilisateurInitialTrouve,
+      id: utilisateurInitialTrouve.id,
+      prenom: command.prenom ?? utilisateurInitialTrouve.prenom,
+      nom: command.nom ?? utilisateurInitialTrouve.nom,
+      structure: command.structure,
+      type: Authentification.Type.JEUNE,
+      roles: [],
+      email: command.email ?? utilisateurInitialTrouve.email,
+      dateDerniereConnexion: maintenant,
+      datePremiereConnexion: maintenant,
+      idAuthentification: command.idUtilisateurAuth
+    }
+    await this.authentificationRepository.update(utilisateurMisAJour)
+    return success(queryModelFromUtilisateur(utilisateurMisAJour))
   }
 
   private async creerNouveauConseiller(
@@ -175,15 +184,13 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
   private async authentificationConseillerPassEmploi(
     commandSanitized: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
-    const utilisateurTrouve = await this.authentificationRepository.get(
-      commandSanitized.idUtilisateurAuth,
-      commandSanitized.structure,
-      commandSanitized.type
-    )
-    if (!utilisateurTrouve) {
-      return failure(
-        new NonTrouveError('Utilisateur', commandSanitized.idUtilisateurAuth)
+    const utilisateurTrouve =
+      await this.authentificationRepository.getConseillerByStructure(
+        commandSanitized.idUtilisateurAuth,
+        commandSanitized.structure
       )
+    if (!utilisateurTrouve) {
+      return failure(new NonTrouveError(commandSanitized.idUtilisateurAuth))
     } else {
       const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
         utilisateurTrouve,
@@ -195,56 +202,66 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
   private async authentificationJeuneMilo(
     commandSanitized: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
-    const utilisateurTrouve = await this.authentificationRepository.get(
-      commandSanitized.idUtilisateurAuth,
-      commandSanitized.structure,
-      commandSanitized.type
+    const utilisateurTrouve = await this.authentificationRepository.getJeune(
+      commandSanitized.idUtilisateurAuth
     )
     if (!utilisateurTrouve) {
       return failure(
-        new NonTraitableError('Utilisateur', commandSanitized.idUtilisateurAuth)
+        new NonTraitableInexistantError(commandSanitized.idUtilisateurAuth)
       )
-    } else {
-      const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
-        utilisateurTrouve,
-        commandSanitized
-      )
-      return success(queryModelFromUtilisateur(utilisateurMisAJour))
     }
+    const verificationStructureUtilisateur = verifierStructureUtilisteur(
+      utilisateurTrouve,
+      commandSanitized.idUtilisateurAuth,
+      commandSanitized.structure
+    )
+    if (isFailure(verificationStructureUtilisateur)) {
+      return verificationStructureUtilisateur
+    }
+    const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
+      utilisateurTrouve,
+      commandSanitized
+    )
+    return success(queryModelFromUtilisateur(utilisateurMisAJour))
   }
 
   private async authentificationJeunePoleEmploi(
     commandSanitized: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
-    const utilisateurTrouve = await this.authentificationRepository.get(
-      commandSanitized.idUtilisateurAuth,
-      commandSanitized.structure,
-      commandSanitized.type
+    const utilisateurTrouve = await this.authentificationRepository.getJeune(
+      commandSanitized.idUtilisateurAuth
     )
+
     if (!utilisateurTrouve) {
       return this.authentifierJeuneParEmail(commandSanitized)
-    } else {
-      const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
-        utilisateurTrouve,
-        commandSanitized
-      )
-
-      return success(queryModelFromUtilisateur(utilisateurMisAJour))
     }
+    const verificationUtilisateur = verifierStructureUtilisteur(
+      utilisateurTrouve,
+      commandSanitized.idUtilisateurAuth,
+      commandSanitized.structure
+    )
+    if (isFailure(verificationUtilisateur)) {
+      return verificationUtilisateur
+    }
+
+    const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
+      utilisateurTrouve,
+      commandSanitized
+    )
+
+    return success(queryModelFromUtilisateur(utilisateurMisAJour))
   }
 
   private async authentificationJeunePassEmploi(
     commandSanitized: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
-    const utilisateurTrouve = await this.authentificationRepository.get(
-      commandSanitized.idUtilisateurAuth,
-      commandSanitized.structure,
-      commandSanitized.type
-    )
-    if (!utilisateurTrouve) {
-      return failure(
-        new NonTrouveError('Utilisateur', commandSanitized.idUtilisateurAuth)
+    const utilisateurTrouve =
+      await this.authentificationRepository.getJeuneByStructure(
+        commandSanitized.idUtilisateurAuth,
+        commandSanitized.structure
       )
+    if (!utilisateurTrouve) {
+      return failure(new NonTrouveError(commandSanitized.idUtilisateurAuth))
     } else {
       const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
         utilisateurTrouve,
@@ -257,11 +274,11 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
   private async authentificationConseillerSSO(
     commandSanitized: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
-    const utilisateurTrouve = await this.authentificationRepository.get(
-      commandSanitized.idUtilisateurAuth,
-      commandSanitized.structure,
-      commandSanitized.type
-    )
+    const utilisateurTrouve =
+      await this.authentificationRepository.getConseillerByStructure(
+        commandSanitized.idUtilisateurAuth,
+        commandSanitized.structure
+      )
     if (!utilisateurTrouve) {
       return this.creerNouveauConseiller(commandSanitized)
     } else {
@@ -272,4 +289,38 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       return success(queryModelFromUtilisateur(utilisateurMisAJour))
     }
   }
+}
+
+function verifierStructureUtilisteur(
+  utilisateurTrouve: Authentification.Utilisateur,
+  idUtilisateur: string,
+  structureAttendue: Core.Structure
+): Result {
+  if (utilisateurTrouve.structure !== structureAttendue) {
+    const dejaConnecte = Boolean(utilisateurTrouve.datePremiereConnexion)
+    let codeErreur = undefined
+
+    switch (utilisateurTrouve.structure) {
+      case Core.Structure.MILO:
+        codeErreur = dejaConnecte
+          ? NonTraitableError.CODE_UTILISATEUR_DEJA_MILO
+          : NonTraitableError.CODE_UTILISATEUR_NOUVEAU_MILO
+        break
+      case Core.Structure.POLE_EMPLOI:
+        codeErreur = dejaConnecte
+          ? NonTraitableError.CODE_UTILISATEUR_DEJA_PE
+          : NonTraitableError.CODE_UTILISATEUR_NOUVEAU_PE
+        break
+      case Core.Structure.POLE_EMPLOI_BRSA:
+        codeErreur = dejaConnecte
+          ? NonTraitableError.CODE_UTILISATEUR_DEJA_PE_BRSA
+          : NonTraitableError.CODE_UTILISATEUR_NOUVEAU_PE_BRSA
+        break
+    }
+
+    return failure(
+      new NonTraitableError('Utilisateur', idUtilisateur, codeErreur)
+    )
+  }
+  return emptySuccess()
 }

@@ -52,12 +52,29 @@ export class ReponsesCampagneInvalide implements DomainError {
   }
 }
 
-export class NonTraitableError implements DomainError {
-  static CODE = 'NON_TRAITABLE'
-  readonly code: string = NonTraitableError.CODE
+export class NonTraitableInexistantError implements DomainError {
+  static CODE = 'UTILISATEUR_INEXISTANT'
+  readonly code: string = NonTraitableInexistantError.CODE
   readonly message: string
 
-  constructor(entityType: string, id: string) {
+  constructor(id: string) {
+    this.message = `Utilisateur ${id} non traitable`
+  }
+}
+
+export class NonTraitableError implements DomainError {
+  static CODE = 'NON_TRAITABLE'
+  static CODE_UTILISATEUR_DEJA_MILO = 'UTILISATEUR_DEJA_MILO'
+  static CODE_UTILISATEUR_NOUVEAU_MILO = 'UTILISATEUR_NOUVEAU_MILO'
+  static CODE_UTILISATEUR_DEJA_PE = 'UTILISATEUR_DEJA_PE'
+  static CODE_UTILISATEUR_NOUVEAU_PE = 'UTILISATEUR_NOUVEAU_PE'
+  static CODE_UTILISATEUR_DEJA_PE_BRSA = 'UTILISATEUR_DEJA_PE_BRSA'
+  static CODE_UTILISATEUR_NOUVEAU_PE_BRSA = 'UTILISATEUR_NOUVEAU_PE_BRSA'
+  readonly code: string
+  readonly message: string
+
+  constructor(entityType: string, id: string, code?: string) {
+    this.code = code || NonTraitableError.CODE
     this.message = `${entityType} ${id} non traitable`
   }
 }

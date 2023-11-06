@@ -59,16 +59,19 @@ export namespace Authentification {
   }
 
   export interface Repository {
-    get(
+    getConseillerByStructure(
       id: string,
-      structure: Core.Structure,
-      type: Authentification.Type
-    ): Promise<Utilisateur | undefined>
-
-    getJeuneByEmailEtStructure(
-      email: string,
       structure: Core.Structure
     ): Promise<Utilisateur | undefined>
+
+    getJeuneByStructure(
+      id: string,
+      structure: Core.Structure
+    ): Promise<Utilisateur | undefined>
+
+    getJeune(id: string): Promise<Utilisateur | undefined>
+
+    getJeuneByEmail(email: string): Promise<Utilisateur | undefined>
 
     update(utilisateur: Authentification.Utilisateur): Promise<void>
 
