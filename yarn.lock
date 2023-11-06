@@ -3102,12 +3102,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/sinon@npm:*, @types/sinon@npm:^10.0.15":
-  version: 10.0.16
-  resolution: "@types/sinon@npm:10.0.16"
+"@types/sinon@npm:*, @types/sinon@npm:^17.0.0":
+  version: 17.0.0
+  resolution: "@types/sinon@npm:17.0.0"
   dependencies:
     "@types/sinonjs__fake-timers": "*"
-  checksum: 1216aac584500d6bf845ca76f57e82f8459cf9de4ed80a55e50aa4438360fc418789a42181e211c5d279e97f86a3a994e3c81e43971d540737caca0193242bbf
+  checksum: 19850ffb787bea148e6429fd0d6207de2f38aa22e6ac5e856f304b4f2eb7d612aa04f315bc715b38a8605a8ff12dc40bd633096bb996472b1dff925a0e25e872
   languageName: node
   linkType: hard
 
@@ -9277,7 +9277,7 @@ __metadata:
     "@types/node": ^20.0.0
     "@types/pg-copy-streams": ^1.2.2
     "@types/pino-multi-stream": ^5.1.3
-    "@types/sinon": ^10.0.15
+    "@types/sinon": ^17.0.0
     "@types/sinon-chai": ^3.2.9
     "@types/supertest": ^2.0.12
     "@types/uuid": ^9.0.2
