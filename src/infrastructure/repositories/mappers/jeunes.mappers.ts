@@ -4,9 +4,8 @@ import { Action } from '../../../domain/action/action'
 import { Jeune } from '../../../domain/jeune/jeune'
 import { mapCodeLabelTypeRendezVous } from '../../../domain/rendez-vous/rendez-vous'
 import { ActionSqlModel } from '../../sequelize/models/action.sql-model'
-import { JeuneDto, JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
+import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../sequelize/models/rendez-vous.sql-model'
-import { AsSql } from '../../sequelize/types'
 import { buildEtat } from './actions.mappers'
 
 export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
@@ -42,36 +41,6 @@ export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
     }
   }
   return jeune
-}
-
-export function toSqlJeune(
-  jeune: Jeune
-): Omit<
-  AsSql<JeuneDto>,
-  | 'idAuthentification'
-  | 'datePremiereConnexion'
-  | 'dateDerniereConnexion'
-  | 'appVersion'
-  | 'installationId'
-  | 'instanceId'
-  | 'pushNotificationToken'
-  | 'dateDerniereActualisationToken'
-  | 'timezone'
-> {
-  return {
-    id: jeune.id,
-    nom: jeune.lastName,
-    prenom: jeune.firstName,
-    idConseiller: jeune.conseiller?.id,
-    idConseillerInitial: jeune.conseillerInitial?.id ?? null,
-    dateCreation: jeune.creationDate.toJSDate(),
-    dateFinCEJ: jeune.dateFinCEJ?.toJSDate() ?? null,
-    email: jeune.email ?? null,
-    structure: jeune.structure,
-    idPartenaire: jeune.idPartenaire ?? null,
-    partageFavoris: jeune.preferences.partageFavoris,
-    idStructureMilo: null
-  }
 }
 
 export function fromSqlToJeuneHomeQueryModel(
