@@ -16,7 +16,6 @@ import {
   Result,
   failure,
   isFailure,
-  isSuccess,
   success
 } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
@@ -83,11 +82,15 @@ export class GetDetailSessionJeuneMiloQueryHandler extends QueryHandler<
       jeune.idPartenaire,
       { debut: dateSession, fin: dateSession }
     )
-    const inscription = isSuccess(resultListeSessions)
-      ? resultListeSessions.data.sessions.find(
-          session => session.session.id.toString() === query.idSession
-        )!.sessionInstance
-      : undefined
+
+    if (isFailure(resultListeSessions)) {
+      return resultListeSessions
+    }
+
+    const detailInscription = resultListeSessions.data.sessions.find(
+      session => session.session.id.toString() === query.idSession
+    )
+    const inscription = detailInscription?.sessionInstance
 
     return success(
       mapDetailSessionJeuneDtoToQueryModel(
