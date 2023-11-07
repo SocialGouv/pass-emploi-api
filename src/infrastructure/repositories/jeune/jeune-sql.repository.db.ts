@@ -8,14 +8,14 @@ import { IdService } from '../../../utils/id-service'
 import { FirebaseClient } from '../../clients/firebase-client'
 import { ActionSqlModel } from '../../sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
-import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
+import { JeuneDto, JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../sequelize/models/rendez-vous.sql-model'
 import { TransfertConseillerSqlModel } from '../../sequelize/models/transfert-conseiller.sql-model'
 import { SequelizeInjectionToken } from '../../sequelize/providers'
+import { AsSql } from '../../sequelize/types'
 import {
   fromSqlToJeune,
-  fromSqlToJeuneHomeQueryModel,
-  toSqlJeune
+  fromSqlToJeuneHomeQueryModel
 } from '../mappers/jeunes.mappers'
 
 @Injectable()
@@ -78,7 +78,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
     await this.firebaseClient.transfererChat(idConseillerCible, idsJeunes)
     await Promise.all([
       this.creerTransferts(idConseillerSource, idConseillerCible, idsJeunes),
-      this.saveAll(jeunes)
+      this.saveAllJeuneTransferes(jeunes)
     ])
   }
 
@@ -202,9 +202,34 @@ export class JeuneSqlRepository implements Jeune.Repository {
     return fromSqlToJeuneHomeQueryModel(jeuneSqlModel, rdvJeuneSqlModel)
   }
 
-  private async saveAll(jeunes: Jeune[]): Promise<void> {
+  private async saveAllJeuneTransferes(jeunes: Jeune[]): Promise<void> {
     for (const jeune of jeunes) {
-      await JeuneSqlModel.upsert(toSqlJeune(jeune))
+      const jeuneTransfereSQL: Omit<
+        AsSql<JeuneDto>,
+        | 'idAuthentification'
+        | 'datePremiereConnexion'
+        | 'dateDerniereConnexion'
+        | 'appVersion'
+        | 'installationId'
+        | 'instanceId'
+        | 'pushNotificationToken'
+        | 'dateDerniereActualisationToken'
+        | 'timezone'
+        | 'idStructureMilo'
+      > = {
+        id: jeune.id,
+        nom: jeune.lastName,
+        prenom: jeune.firstName,
+        idConseiller: jeune.conseiller?.id,
+        idConseillerInitial: jeune.conseillerInitial?.id ?? null,
+        dateCreation: jeune.creationDate.toJSDate(),
+        dateFinCEJ: jeune.dateFinCEJ?.toJSDate() ?? null,
+        email: jeune.email ?? null,
+        structure: jeune.structure,
+        idPartenaire: jeune.idPartenaire ?? null,
+        partageFavoris: jeune.preferences.partageFavoris
+      }
+      await JeuneSqlModel.upsert(jeuneTransfereSQL)
     }
   }
 

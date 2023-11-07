@@ -52,6 +52,8 @@ import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
+import { StructureMiloSqlModel } from '../../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
+import { uneStructureMiloDto } from '../../../fixtures/sql-models/structureMilo.sql-model'
 
 describe('JeuneSqlRepository', () => {
   const uuid = '9e1a7d9f-4038-4631-9aa1-856ee90c7ff8'
@@ -616,9 +618,11 @@ describe('JeuneSqlRepository', () => {
       await ConseillerSqlModel.creer(
         unConseillerDto({ id: 'idConseillerSource' })
       )
+      await StructureMiloSqlModel.create(uneStructureMiloDto({ id: 'test' }))
       jeuneATransfererDto = unJeuneDto({
         id: 'unJeuneATransferer',
-        idConseiller: 'idConseillerSource'
+        idConseiller: 'idConseillerSource',
+        idStructureMilo: 'test'
       })
       await JeuneSqlModel.creer(jeuneATransfererDto)
     })
@@ -654,6 +658,8 @@ describe('JeuneSqlRepository', () => {
 
           const jeune = await jeuneSqlRepository.get('unJeuneATransferer')
           expect(jeune).to.be.deep.equal(jeuneATransferer)
+          const jeuneSql = await JeuneSqlModel.findByPk('unJeuneATransferer')
+          expect(jeuneSql?.idStructureMilo).to.equal('test')
           expect(jeune?.conseillerInitial).to.be.undefined()
 
           const transfertsSql = await TransfertConseillerSqlModel.findAll()
