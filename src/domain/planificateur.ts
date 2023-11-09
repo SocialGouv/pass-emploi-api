@@ -127,8 +127,8 @@ export const listeCronJobs: Planificateur.CronJob[] = [
   },
   {
     type: Planificateur.JobType.RECUPERER_SITUATIONS_JEUNES_MILO,
-    expression: '0 0 * * *',
-    description: 'Tous les jours à minuit.'
+    expression: '0 22 * * *',
+    description: 'Tous les jours à 22h.'
   },
   {
     type: Planificateur.JobType.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS,

@@ -145,6 +145,9 @@ function dateConnexionSuperieureA60Jours(maintenant: DateTime): WhereOptions {
   return {
     dateDerniereConnexion: {
       [Op.lt]: maintenant.minus({ days: 60 }).toJSDate()
+    },
+    pushNotificationToken: {
+      [Op.ne]: null
     }
   }
 }
