@@ -4,7 +4,8 @@ import {
   ForbiddenException,
   GoneException,
   HttpException,
-  NotFoundException
+  NotFoundException,
+  UnprocessableEntityException
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import {
@@ -12,6 +13,7 @@ import {
   CampagneNonActive,
   CompteDiagorienteInvalideError,
   ConseillerMiloSansStructure,
+  ConseillerNonValide,
   ConseillerSansAgenceError,
   DateNonAutoriseeError,
   DossierExisteDejaError,
@@ -26,14 +28,16 @@ import {
   JeunePasInactifError,
   MauvaiseCommandeError,
   MaxInscritsDepasse,
+  NonTraitableError,
+  NonTraitableInexistantError,
   NonTrouveError,
   ReponsesCampagneInvalide,
   RessourceIndisponibleError
 } from '../../building-blocks/types/domain-error'
 import {
+  Result,
   isFailure,
-  isSuccess,
-  Result
+  isSuccess
 } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action/action'
 
@@ -45,6 +49,15 @@ export function handleFailure(result: Result): void {
           throw new HttpException(result.error.message, result.error.statusCode)
         }
         throw new RuntimeException(result.error.message)
+      case NonTraitableError.CODE:
+      case NonTraitableError.CODE_UTILISATEUR_DEJA_MILO:
+      case NonTraitableError.CODE_UTILISATEUR_NOUVEAU_MILO:
+      case NonTraitableError.CODE_UTILISATEUR_DEJA_PE:
+      case NonTraitableError.CODE_UTILISATEUR_NOUVEAU_PE:
+      case NonTraitableError.CODE_UTILISATEUR_DEJA_PE_BRSA:
+      case NonTraitableError.CODE_UTILISATEUR_NOUVEAU_PE_BRSA:
+      case NonTraitableInexistantError.CODE:
+        throw new UnprocessableEntityException(result.error)
       case NonTrouveError.CODE:
         throw new NotFoundException(result.error.message)
       case DateNonAutoriseeError.CODE:
@@ -59,6 +72,7 @@ export function handleFailure(result: Result): void {
       case JeuneMiloSansIdDossier.CODE:
       case MaxInscritsDepasse.CODE:
       case EmargementIncorrect.CODE:
+      case ConseillerNonValide.CODE:
         throw new BadRequestException(result.error, result.error.message)
       case RessourceIndisponibleError.CODE:
         throw new GoneException(result.error.message)
