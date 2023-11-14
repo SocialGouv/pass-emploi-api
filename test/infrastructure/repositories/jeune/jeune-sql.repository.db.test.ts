@@ -1,6 +1,5 @@
 import { DateTime } from 'luxon'
 import { before } from 'mocha'
-import { EvenementEngagementSqlModel } from 'src/infrastructure/sequelize/models/evenement-engagement.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { SituationsMiloSqlModel } from 'src/infrastructure/sequelize/models/situations-milo.sql-model'
 import {
@@ -54,6 +53,7 @@ import {
 } from '../../../utils/database-for-testing'
 import { StructureMiloSqlModel } from '../../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { uneStructureMiloDto } from '../../../fixtures/sql-models/structureMilo.sql-model'
+import { EvenementEngagementHebdoSqlModel } from '../../../../src/infrastructure/sequelize/models/evenement-engagement-hebdo.sql-model'
 
 describe('JeuneSqlRepository', () => {
   const uuid = '9e1a7d9f-4038-4631-9aa1-856ee90c7ff8'
@@ -543,7 +543,7 @@ describe('JeuneSqlRepository', () => {
         await FavoriOffreEngagementSqlModel.create(favoriOffreEngagement)
         await FavoriOffreImmersionSqlModel.create(favoriOffreImmersion)
         await TransfertConseillerSqlModel.create(unTransfertDto)
-        await EvenementEngagementSqlModel.create(evenementEngagement)
+        await EvenementEngagementHebdoSqlModel.create(evenementEngagement)
         await SituationsMiloSqlModel.create(situations)
 
         await jeuneSqlRepository.supprimer(jeuneDto.id)
@@ -596,7 +596,9 @@ describe('JeuneSqlRepository', () => {
       })
       it("ne supprime pas les evenements d'engagement du jeune", async () => {
         await expect(
-          await EvenementEngagementSqlModel.findByPk(evenementEngagement.id)
+          await EvenementEngagementHebdoSqlModel.findByPk(
+            evenementEngagement.id
+          )
         ).not.to.be.null
       })
       it('supprime les situations du jeune', async () => {

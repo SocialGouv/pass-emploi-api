@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common'
 import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { Evenement } from '../../domain/evenement'
 import { EvenementEngagementHebdoSqlModel } from '../sequelize/models/evenement-engagement-hebdo.sql-model'
-import { EvenementEngagementSqlModel } from '../sequelize/models/evenement-engagement.sql-model'
 
 @Injectable()
 export class EvenementSqlRepository implements Evenement.Repository {
@@ -17,7 +16,6 @@ export class EvenementSqlRepository implements Evenement.Repository {
       structure: evenement.utilisateur.structure,
       dateEvenement: evenement.date
     }
-    await EvenementEngagementSqlModel.create(dto)
     await EvenementEngagementHebdoSqlModel.create(dto)
     return emptySuccess()
   }

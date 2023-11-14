@@ -1,12 +1,12 @@
 import { Authentification } from 'src/domain/authentification'
 import { Core } from 'src/domain/core'
-import { EvenementEngagementDto } from 'src/infrastructure/sequelize/models/evenement-engagement.sql-model'
 import { AsSql } from 'src/infrastructure/sequelize/types'
+import { EvenementEngagementHebdoDto } from '../../../src/infrastructure/sequelize/models/evenement-engagement-hebdo.sql-model'
 
 export function unEvenementEngagementDto(
-  args: Partial<AsSql<EvenementEngagementDto>> = {}
-): Partial<EvenementEngagementDto> {
-  const defaults: Partial<EvenementEngagementDto> = {
+  args: Partial<AsSql<EvenementEngagementHebdoDto>> = {}
+): Partial<EvenementEngagementHebdoDto> {
+  const defaults: Partial<EvenementEngagementHebdoDto> = {
     code: 'OFFRE_ALTERNANCE_SAUVEGARDEE',
     categorie: 'Offre',
     action: 'Favori',
