@@ -2,7 +2,6 @@ import { ActionSqlModel } from './action.sql-model'
 import { CommuneSqlModel } from './commune.sql-model'
 import { ConseillerSqlModel } from './conseiller.sql-model'
 import { DepartementSqlModel } from './departement.sql-model'
-import { EvenementEngagementSqlModel } from './evenement-engagement.sql-model'
 import { FavoriOffreEmploiSqlModel } from './favori-offre-emploi.sql-model'
 import { FavoriOffreEngagementSqlModel } from './favori-offre-engagement.sql-model'
 import { FavoriOffreImmersionSqlModel } from './favori-offre-immersion.sql-model'
@@ -39,7 +38,6 @@ export const sqlModels = [
   FavoriOffreEmploiSqlModel,
   CommuneSqlModel,
   DepartementSqlModel,
-  EvenementEngagementSqlModel,
   EvenementEngagementHebdoSqlModel,
   RechercheSqlModel,
   FavoriOffreImmersionSqlModel,
