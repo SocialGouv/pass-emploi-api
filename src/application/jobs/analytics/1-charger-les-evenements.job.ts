@@ -18,6 +18,8 @@ import { PoolClient } from 'pg'
 import { from as copyFrom, to as copyTo } from 'pg-copy-streams'
 import { pipeline } from 'node:stream/promises'
 
+const TAILLE_DU_BATCH = 150000
+
 @Injectable()
 @ProcessJobType(Planificateur.JobType.CHARGER_EVENEMENTS_ANALYTICS)
 export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
@@ -45,10 +47,12 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
       await this.indexerLesColonnes(connexionTarget.client)
       nombreDevenementsTargetBefore =
         await this.recupererLeNombreDEvenementsTarget(connexionTarget.client)
+
       nombreDevemementsACharger = await this.ajouterLesNouveauxEvenements(
         connexionSource.client,
         connexionTarget.client
       )
+
       nombreDevenementsTargetAfter =
         await this.recupererLeNombreDEvenementsTarget(connexionTarget.client)
 
@@ -125,33 +129,36 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
     clientTarget: PoolClient
   ): Promise<number> {
     this.logger.log('Ajout des nouveaux événements')
+
     const dateDernierEvenementCharge = await this.getDateDernierEvenementCharge(
       clientTarget
     )
-
     const nombreDEvenementACharger = await this.getNombreDEvenementACharger(
       clientSource,
       dateDernierEvenementCharge
     )
 
-    if (nombreDEvenementACharger > 500000) {
-      this.logger.error(
-        `Trop d'événements à charger (${nombreDEvenementACharger})`
-      )
-      throw new Error(
-        `Trop d'événements à charger (${nombreDEvenementACharger})`
-      )
-    }
-
-    const streamCopyToStdout = clientSource.query(
-      copyTo(
-        `COPY (SELECT * FROM evenement_engagement_hebdo WHERE date_evenement>'${dateDernierEvenementCharge}') TO STDOUT WITH NULL '\\LA_VALEUR_NULL'`
-      )
+    const nombreDeBatches = Math.ceil(
+      nombreDEvenementACharger / TAILLE_DU_BATCH
     )
-
-    const streamCopyFromStdin = clientTarget.query(
-      copyFrom(
-        `COPY evenement_engagement (id,
+    for (
+      let numeroBatchActuel = 0;
+      numeroBatchActuel < nombreDeBatches;
+      numeroBatchActuel++
+    ) {
+      const streamCopyToStdout = clientSource.query(
+        copyTo(
+          `COPY (SELECT * FROM evenement_engagement_hebdo
+                   WHERE date_evenement>'${dateDernierEvenementCharge}'
+                   ORDER BY date_evenement ASC
+                   LIMIT ${TAILLE_DU_BATCH}
+                   OFFSET ${numeroBatchActuel * TAILLE_DU_BATCH})
+             TO STDOUT WITH NULL '\\LA_VALEUR_NULL'`
+        )
+      )
+      const streamCopyFromStdin = clientTarget.query(
+        copyFrom(
+          `COPY evenement_engagement (id,
                            date_evenement,
                            categorie,
                            action,
@@ -160,9 +167,10 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
                            type_utilisateur,
                            structure,
                            code) FROM STDIN WITH NULL AS '\\LA_VALEUR_NULL'`
+        )
       )
-    )
-    await pipeline(streamCopyToStdout, streamCopyFromStdin)
+      await pipeline(streamCopyToStdout, streamCopyFromStdin)
+    }
     return nombreDEvenementACharger
   }
 
