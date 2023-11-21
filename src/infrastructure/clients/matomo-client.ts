@@ -6,6 +6,7 @@ import { firstValueFrom } from 'rxjs'
 import { Notification } from '../../domain/notification/notification'
 import { buildError } from '../../utils/logger.module'
 import { getAPMInstance } from '../monitoring/apm.init'
+import { RateLimiterService } from '../../utils/rate-limiter.service'
 
 @Injectable()
 export class MatomoClient {
@@ -17,7 +18,8 @@ export class MatomoClient {
 
   constructor(
     private httpService: HttpService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private rateLimiterService: RateLimiterService
   ) {
     this.logger = new Logger('MatomoClient')
     this.apmService = getAPMInstance()
@@ -34,6 +36,7 @@ export class MatomoClient {
       const actionEvent = 'Envoi push notification'
       const nomEvent = message.data.type
 
+      await this.rateLimiterService.matomoRateLimiter.attendreLaProchaineDisponibilite()
       try {
         await firstValueFrom(
           this.httpService.post(this.url, null, {

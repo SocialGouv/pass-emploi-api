@@ -5,130 +5,42 @@ const TokenBucket = require('tokenbucket')
 
 @Injectable()
 export class RateLimiterService {
-  public readonly getDossierMilo: RateLimiter
-  public readonly getRendezVousMilo: RateLimiter
-  public readonly getInstanceSessionMilo: RateLimiter
-  public readonly getSessionsStructureMilo: RateLimiter
-  public readonly operateursSessionsConseillerMilo: RateLimiter
-  public readonly getEvenementMilo: RateLimiter
-  public readonly getNotificationsPE: RateLimiter
+  public readonly dossierMiloRateLimiter: RateLimiter
+  public readonly evenementsMiloRateLimiter: RateLimiter
+  public readonly dossierSessionRDVMiloRateLimiter: RateLimiter
+  public readonly sessionsStructureMiloRateLimiter: RateLimiter
+  public readonly sessionsConseillerMiloRateLimiter: RateLimiter
+  public readonly sessionsJeuneMiloRateLimiter: RateLimiter
+  public readonly structuresMiloRateLimiter: RateLimiter
+  public readonly notificationsPERateLimiter: RateLimiter
+  public readonly matomoRateLimiter: RateLimiter
 
   constructor(private configService: ConfigService) {
-    this.getDossierMilo = this.buildGetDossierMilo()
-    this.getEvenementMilo = this.buildGetEvenementMilo()
-    this.getRendezVousMilo = this.buildGetRendezVousMilo()
-    this.getInstanceSessionMilo = this.buildGetInstanceSessionMilo()
-    this.operateursSessionsConseillerMilo =
-      this.buildOperateursSessionsConseillerMilo()
-    this.getSessionsStructureMilo = this.buildGetSessionsStructureMilo()
-    this.getNotificationsPE = this.buildGetNotificationsPE()
+    this.dossierMiloRateLimiter = this.buildRateLimit('dossierMilo')
+    this.evenementsMiloRateLimiter = this.buildRateLimit('evenementsMilo')
+    this.dossierSessionRDVMiloRateLimiter = this.buildRateLimit(
+      'dossierSessionRDVMilo'
+    )
+    this.sessionsStructureMiloRateLimiter = this.buildRateLimit(
+      'sessionsStructureMilo'
+    )
+    this.sessionsConseillerMiloRateLimiter = this.buildRateLimit(
+      'sessionsConseillerMilo'
+    )
+    this.sessionsJeuneMiloRateLimiter = this.buildRateLimit('sessionsJeuneMilo')
+    this.structuresMiloRateLimiter = this.buildRateLimit('structuresMilo')
+    this.notificationsPERateLimiter = this.buildRateLimit('notificationsPE')
+    this.matomoRateLimiter = this.buildRateLimit('matomo')
   }
 
-  private buildGetDossierMilo(): RateLimiter {
+  private buildRateLimit(configKey: string): RateLimiter {
     const options: RateLimiter.Options = {
-      size: parseInt(
-        this.configService.get('rateLimiter.getDossierMilo.limit')!
-      ),
+      size: parseInt(this.configService.get(`rateLimiter.${configKey}.limit`)!),
       interval: parseInt(
-        this.configService.get('rateLimiter.getDossierMilo.interval')!
+        this.configService.get(`rateLimiter.${configKey}.interval`)!
       ),
       tokensToAddPerInterval: parseInt(
-        this.configService.get('rateLimiter.getDossierMilo.limit')!
-      )
-    }
-    return new RateLimiter(options)
-  }
-
-  private buildGetSessionsStructureMilo(): RateLimiter {
-    const options: RateLimiter.Options = {
-      size: parseInt(
-        this.configService.get('rateLimiter.getSessionsStructureMilo.limit')!
-      ),
-      interval: parseInt(
-        this.configService.get('rateLimiter.getSessionsStructureMilo.interval')!
-      ),
-      tokensToAddPerInterval: parseInt(
-        this.configService.get('rateLimiter.getSessionsStructureMilo.limit')!
-      )
-    }
-    return new RateLimiter(options)
-  }
-  private buildOperateursSessionsConseillerMilo(): RateLimiter {
-    const options: RateLimiter.Options = {
-      size: parseInt(
-        this.configService.get(
-          'rateLimiter.operateursSessionsConseillerMilo.limit'
-        )!
-      ),
-      interval: parseInt(
-        this.configService.get(
-          'rateLimiter.operateursSessionsConseillerMilo.interval'
-        )!
-      ),
-      tokensToAddPerInterval: parseInt(
-        this.configService.get(
-          'rateLimiter.operateursSessionsConseillerMilo.limit'
-        )!
-      )
-    }
-    return new RateLimiter(options)
-  }
-
-  private buildGetEvenementMilo(): RateLimiter {
-    const options: RateLimiter.Options = {
-      size: parseInt(
-        this.configService.get('rateLimiter.getAckEvenementMilo.limit')!
-      ),
-      interval: parseInt(
-        this.configService.get('rateLimiter.getAckEvenementMilo.interval')!
-      ),
-      tokensToAddPerInterval: parseInt(
-        this.configService.get('rateLimiter.getAckEvenementMilo.limit')!
-      )
-    }
-    return new RateLimiter(options)
-  }
-
-  private buildGetRendezVousMilo(): RateLimiter {
-    const options: RateLimiter.Options = {
-      size: parseInt(
-        this.configService.get('rateLimiter.getRendezVousMilo.limit')!
-      ),
-      interval: parseInt(
-        this.configService.get('rateLimiter.getRendezVousMilo.interval')!
-      ),
-      tokensToAddPerInterval: parseInt(
-        this.configService.get('rateLimiter.getRendezVousMilo.limit')!
-      )
-    }
-    return new RateLimiter(options)
-  }
-
-  private buildGetInstanceSessionMilo(): RateLimiter {
-    const options: RateLimiter.Options = {
-      size: parseInt(
-        this.configService.get('rateLimiter.getSessionMilo.limit')!
-      ),
-      interval: parseInt(
-        this.configService.get('rateLimiter.getSessionMilo.interval')!
-      ),
-      tokensToAddPerInterval: parseInt(
-        this.configService.get('rateLimiter.getSessionMilo.limit')!
-      )
-    }
-    return new RateLimiter(options)
-  }
-
-  private buildGetNotificationsPE(): RateLimiter {
-    const options: RateLimiter.Options = {
-      size: parseInt(
-        this.configService.get('rateLimiter.getNotificationsPE.limit')!
-      ),
-      interval: parseInt(
-        this.configService.get('rateLimiter.getNotificationsPE.interval')!
-      ),
-      tokensToAddPerInterval: parseInt(
-        this.configService.get('rateLimiter.getNotificationsPE.limit')!
+        this.configService.get(`rateLimiter.${configKey}.limit`)!
       )
     }
     return new RateLimiter(options)
