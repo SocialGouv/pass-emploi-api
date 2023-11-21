@@ -105,31 +105,39 @@ export const configurationSchema = Joi.object({
     bucket_prefix_pieces_jointes: Joi.string().required()
   }),
   rateLimiter: Joi.object({
-    getDossierMilo: Joi.object({
+    dossierMilo: Joi.object({
       limit: Joi.number().required(),
       interval: Joi.number().required()
     }),
-    getSessionsStructureMilo: Joi.object({
+    evenementsMilo: Joi.object({
       limit: Joi.number().required(),
       interval: Joi.number().required()
     }),
-    getAckEvenementMilo: Joi.object({
+    dossierSessionRDVMilo: Joi.object({
       limit: Joi.number().required(),
       interval: Joi.number().required()
     }),
-    getRendezVousMilo: Joi.object({
+    sessionsStructureMilo: Joi.object({
       limit: Joi.number().required(),
       interval: Joi.number().required()
     }),
-    getSessionMilo: Joi.object({
+    sessionsConseillerMilo: Joi.object({
       limit: Joi.number().required(),
       interval: Joi.number().required()
     }),
-    operateursSessionsConseillerMilo: Joi.object({
+    sessionsJeuneMilo: Joi.object({
       limit: Joi.number().required(),
       interval: Joi.number().required()
     }),
-    getNotificationsPE: Joi.object({
+    structuresMilo: Joi.object({
+      limit: Joi.number().required(),
+      interval: Joi.number().required()
+    }),
+    notificationsPE: Joi.object({
+      limit: Joi.number().required(),
+      interval: Joi.number().required()
+    }),
+    matomo: Joi.object({
       limit: Joi.number().required(),
       interval: Joi.number().required()
     })

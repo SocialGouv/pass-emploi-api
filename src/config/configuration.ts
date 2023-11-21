@@ -1,7 +1,7 @@
 /* eslint-disable */
-import {parse} from 'pg-connection-string'
+import { parse } from 'pg-connection-string'
 import * as Joi from 'joi'
-import {configurationSchema} from './configuration.schema'
+import { configurationSchema } from './configuration.schema'
 
 export default () => {
   const scalingoApp = process.env.APP
@@ -141,43 +141,45 @@ export default () => {
       bucket_prefix_pieces_jointes: process.env.S3_BUCKET_PREFIX_PJ ?? 'pj/'
     },
     rateLimiter: {
-      getDossierMilo: {
-        limit: process.env.RATE_LIMITER_GET_DOSSIER_MILO_LIMIT ?? '10',
-        interval: process.env.RATE_LIMITER_GET_DOSSIER_MILO_INTERVAL ?? '1500'
+      dossierMilo: {
+        limit: process.env.RATE_LIMITER_DOSSIER_MILO_LIMIT ?? '3',
+        interval: process.env.RATE_LIMITER_DOSSIER_MILO_INTERVAL ?? '1000'
       },
-      getSessionsStructureMilo: {
-        limit:
-          process.env.RATE_LIMITER_GET_SESSIONS_STRUCTURE_MILO_LIMIT ?? '10',
+      evenementsMilo: {
+        limit: process.env.RATE_LIMITER_EVENEMENTS_MILO_LIMIT ?? '3',
+        interval: process.env.RATE_LIMITER_EVENEMENTS_MILO_INTERVAL ?? '1000'
+      },
+      dossierSessionRDVMilo: {
+        limit: process.env.RATE_LIMITER_DOSSIER_SESSION_RDV_MILO_LIMIT ?? '3',
         interval:
-          process.env.RATE_LIMITER_GET_SESSIONS_STRUCTURE_MILO_INTERVAL ??
-          '1500'
+          process.env.RATE_LIMITER_DOSSIER_SESSION_RDV_MILO_INTERVAL ?? '1000'
       },
-      getAckEvenementMilo: {
-        limit: process.env.RATE_LIMITER_GET_ACK_EVENEMENT_MILO_LIMIT ?? '10',
+      sessionsStructureMilo: {
+        limit: process.env.RATE_LIMITER_SESSIONS_STRUCTURE_MILO_LIMIT ?? '3',
         interval:
-          process.env.RATE_LIMITER_GET_ACK_EVENEMENT_MILO_INTERVAL ?? '1200'
+          process.env.RATE_LIMITER_SESSIONS_STRUCTURE_MILO_INTERVAL ?? '1000'
       },
-      getRendezVousMilo: {
-        limit: process.env.RATE_LIMITER_GET_RENDEZ_VOUS_MILO_LIMIT ?? '3',
+      sessionsConseillerMilo: {
+        limit: process.env.RATE_LIMITER_SESSIONS_CONSEILLER_MILO_LIMIT ?? '3',
         interval:
-          process.env.RATE_LIMITER_GET_RENDEZ_VOUS_MILO_INTERVAL ?? '1000'
+          process.env.RATE_LIMITER_SESSIONS_CONSEILLER_MILO_INTERVAL ?? '1000'
       },
-      getSessionMilo: {
-        limit: process.env.RATE_LIMITER_GET_SESSION_MILO_LIMIT ?? '3',
-        interval: process.env.RATE_LIMITER_GET_SESSION_MILO_INTERVAL ?? '1000'
-      },
-      operateursSessionsConseillerMilo: {
-        limit:
-          process.env.RATE_LIMITER_OPERATEURS_SESSIONS_CONSEILLER_MILO_LIMIT ??
-          '3',
+      sessionsJeuneMilo: {
+        limit: process.env.RATE_LIMITER_SESSIONS_JEUNE_MILO_LIMIT ?? '3',
         interval:
-          process.env
-            .RATE_LIMITER_OPERATEURS_SESSIONS_CONSEILLER_MILO_INTERVAL ?? '1000'
+          process.env.RATE_LIMITER_SESSIONS_JEUNE_MILO_INTERVAL ?? '1000'
       },
-      getNotificationsPE: {
-        limit: process.env.RATE_LIMITER_GET_NOTIFICATIONS_PE_LIMIT ?? '3',
-        interval:
-          process.env.RATE_LIMITER_GET_NOTIFICATIONS_PE_INTERVAL ?? '1100'
+      structuresMilo: {
+        limit: process.env.RATE_LIMITER_STRUCTURES_MILO_LIMIT ?? '3',
+        interval: process.env.RATE_LIMITER_STRUCTURES_MILO_INTERVAL ?? '1000'
+      },
+      notificationsPE: {
+        limit: process.env.RATE_LIMITER_NOTIFICATIONS_PE_LIMIT ?? '3',
+        interval: process.env.RATE_LIMITER_NOTIFICATIONS_PE_INTERVAL ?? '1000'
+      },
+      matomo: {
+        limit: process.env.RATE_LIMITER_MATOMO_LIMIT ?? '3',
+        interval: process.env.RATE_LIMITER_MATOMO_INTERVAL ?? '1000'
       }
     },
     matomo: {
@@ -221,7 +223,7 @@ export default () => {
     values: {
       maxRechercheConseillers: process.env.MAX_RECHERCHE_CONSEILLERS ?? '10'
     },
-    headers:{
+    headers: {
       maxAge: process.env.CACHE_CONTROL_MAX_AGE_APP_MOBILE_EN_SECONDES
     }
   }

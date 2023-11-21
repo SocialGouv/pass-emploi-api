@@ -52,7 +52,7 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
 
   async getDossier(idDossier: string): Promise<Result<JeuneMilo.Dossier>> {
     try {
-      await this.rateLimiterService.getDossierMilo.attendreLaProchaineDisponibilite()
+      await this.rateLimiterService.dossierMiloRateLimiter.attendreLaProchaineDisponibilite()
       const dossierDto = await firstValueFrom(
         this.httpService.get<DossierMiloDto>(
           `${this.apiUrl}/sue/dossiers/${idDossier}`,

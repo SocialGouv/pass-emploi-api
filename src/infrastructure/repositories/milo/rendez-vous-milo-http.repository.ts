@@ -29,7 +29,7 @@ export class RendezVousMiloHttpRepository implements RendezVousMilo.Repository {
       return undefined
     }
     try {
-      await this.rateLimiterService.getRendezVousMilo.attendreLaProchaineDisponibilite()
+      await this.rateLimiterService.dossierSessionRDVMiloRateLimiter.attendreLaProchaineDisponibilite()
       const rendezVousMilo = await firstValueFrom(
         this.httpService.get<RendezVousMiloDto>(
           `${this.apiUrl}/operateurs/dossiers/${evenement.idPartenaireBeneficiaire}/rdv/${evenement.idObjet}`,

@@ -189,7 +189,7 @@ export class PoleEmploiClient {
     dateHierISO: string,
     dateDuJourISO: string
   ): Promise<Notification.PoleEmploi[]> {
-    await this.rateLimiterService.getNotificationsPE.attendreLaProchaineDisponibilite()
+    await this.rateLimiterService.notificationsPERateLimiter.attendreLaProchaineDisponibilite()
     const response = await this.post<NotificationsPartenairesDto>(
       'listernotificationspartenaires/v1/notifications/partenaires',
       {

@@ -29,7 +29,7 @@ export class EvenementMiloHttpRepository implements EvenementMilo.Repository {
   }
 
   async findAllEvenements(): Promise<EvenementMilo[]> {
-    await this.rateLimiterService.getEvenementMilo.attendreLaProchaineDisponibilite()
+    await this.rateLimiterService.evenementsMiloRateLimiter.attendreLaProchaineDisponibilite()
 
     const evenements = await firstValueFrom(
       this.httpService.get<EvenementMiloDto[]>(
@@ -53,7 +53,7 @@ export class EvenementMiloHttpRepository implements EvenementMilo.Repository {
 
   async acquitterEvenement(evenement: EvenementMilo): Promise<Result> {
     try {
-      await this.rateLimiterService.getEvenementMilo.attendreLaProchaineDisponibilite()
+      await this.rateLimiterService.evenementsMiloRateLimiter.attendreLaProchaineDisponibilite()
       await firstValueFrom(
         this.httpService.post(
           `${this.apiUrl}/operateurs/events/${evenement.id}/ack`,

@@ -68,7 +68,7 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     idDossier: string
   ): Promise<InstanceSessionMilo | undefined> {
     try {
-      await this.rateLimiterService.getInstanceSessionMilo.attendreLaProchaineDisponibilite()
+      await this.rateLimiterService.dossierSessionRDVMiloRateLimiter.attendreLaProchaineDisponibilite()
       const sessionMilo = await firstValueFrom(
         this.httpService.get<InstanceSessionMiloDto>(
           `${this.apiUrl}/operateurs/dossiers/${idDossier}/sessions/${idInstance}`,
