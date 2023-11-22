@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Op } from 'sequelize'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
 import { Planificateur, ProcessJobType } from '../../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
@@ -23,20 +22,14 @@ export class NettoyerEvenementsChargesAnalyticsJobHandler extends JobHandler<Pla
   async handle(): Promise<SuiviJob> {
     const maintenant = this.dateService.now()
 
-    let nombreActesEngagementHebdoSupprimes: number = -1
     try {
-      nombreActesEngagementHebdoSupprimes =
-        await EvenementEngagementHebdoSqlModel.destroy({
-          where: {
-            dateEvenement: { [Op.lt]: maintenant.minus({ week: 1 }).toJSDate() }
-          }
-        })
+      await EvenementEngagementHebdoSqlModel.truncate()
     } catch (e) {
       return {
         jobType: this.jobType,
         dateExecution: maintenant,
         succes: false,
-        resultat: { nombreActesEngagementHebdoSupprimes },
+        resultat: null,
         nbErreurs: 1,
         tempsExecution: DateService.calculerTempsExecution(maintenant),
         erreur: e
@@ -47,7 +40,7 @@ export class NettoyerEvenementsChargesAnalyticsJobHandler extends JobHandler<Pla
       jobType: this.jobType,
       dateExecution: maintenant,
       succes: true,
-      resultat: { nombreActesEngagementHebdoSupprimes },
+      resultat: null,
       nbErreurs: 0,
       tempsExecution: DateService.calculerTempsExecution(maintenant)
     }

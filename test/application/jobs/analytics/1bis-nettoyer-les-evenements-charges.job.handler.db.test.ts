@@ -52,18 +52,14 @@ describe('NettoyerEvenementsChargesAnalyticsJobHandler', () => {
 
       // Then
       const actesEngagement = await EvenementEngagementHebdoSqlModel.findAll()
-      expect(actesEngagement).to.have.length(2)
-      expect(actesEngagement[0].id).to.equal(1)
-      expect(actesEngagement[1].id).to.equal(2)
-      expect(actual)
-        .excluding('tempsExecution')
-        .to.deep.equal({
-          jobType: 'NETTOYER_EVENEMENTS_CHARGES_ANALYTICS',
-          dateExecution: maintenant,
-          succes: true,
-          resultat: { nombreActesEngagementHebdoSupprimes: 1 },
-          nbErreurs: 0
-        })
+      expect(actesEngagement).to.have.length(0)
+      expect(actual).excluding('tempsExecution').to.deep.equal({
+        jobType: 'NETTOYER_EVENEMENTS_CHARGES_ANALYTICS',
+        dateExecution: maintenant,
+        succes: true,
+        resultat: null,
+        nbErreurs: 0
+      })
     })
   })
 })
