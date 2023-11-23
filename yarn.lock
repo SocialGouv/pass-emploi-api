@@ -1181,7 +1181,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@google-cloud/firestore@npm:^6.6.0":
+"@google-cloud/firestore@npm:^6.8.0":
   version: 6.8.0
   resolution: "@google-cloud/firestore@npm:6.8.0"
   dependencies:
@@ -6411,14 +6411,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-admin@npm:11.11.0":
-  version: 11.11.0
-  resolution: "firebase-admin@npm:11.11.0"
+"firebase-admin@npm:11.11.1":
+  version: 11.11.1
+  resolution: "firebase-admin@npm:11.11.1"
   dependencies:
     "@fastify/busboy": ^1.2.1
     "@firebase/database-compat": ^0.3.4
     "@firebase/database-types": ^0.10.4
-    "@google-cloud/firestore": ^6.6.0
+    "@google-cloud/firestore": ^6.8.0
     "@google-cloud/storage": ^6.9.5
     "@types/node": ">=12.12.47"
     jsonwebtoken: ^9.0.0
@@ -6430,7 +6430,7 @@ __metadata:
       optional: true
     "@google-cloud/storage":
       optional: true
-  checksum: 0702b6b8367e90b1463df4b132131924488d2c69f9d0c49072465940708967e93cc1688f4ef76ba59920fbd4e9ca916436ae0c8eca9a6a88b1c8d12ab7fd0f5a
+  checksum: d62b76943668edb3be3b8807cf796394d98110a23dc306281aa13de6c8766510dd3cdc6a2a3126ff5292527fc26fc5a53b5214f4c9a8557c6c22a8c177a9405e
   languageName: node
   linkType: hard
 
@@ -9489,7 +9489,7 @@ __metadata:
     eslint-plugin-chai-friendly: ^0.7.2
     eslint-plugin-mocha: ^10.1.0
     eslint-plugin-prettier: ^4.2.1
-    firebase-admin: 11.11.0
+    firebase-admin: 11.11.1
     geojson: ^0.5.0
     helmet: ^7.0.0
     husky: ^8.0.3
