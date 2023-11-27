@@ -14,6 +14,7 @@ export class RateLimiterService {
   public readonly structuresMiloRateLimiter: RateLimiter
   public readonly notificationsPERateLimiter: RateLimiter
   public readonly matomoRateLimiter: RateLimiter
+  public readonly evenementsEngagementRateLimiter: RateLimiter
 
   constructor(private configService: ConfigService) {
     this.dossierMiloRateLimiter = this.buildRateLimit('dossierMilo')
@@ -31,6 +32,9 @@ export class RateLimiterService {
     this.structuresMiloRateLimiter = this.buildRateLimit('structuresMilo')
     this.notificationsPERateLimiter = this.buildRateLimit('notificationsPE')
     this.matomoRateLimiter = this.buildRateLimit('matomo')
+    this.evenementsEngagementRateLimiter = this.buildRateLimit(
+      'evenementsEngagement'
+    )
   }
 
   private buildRateLimit(configKey: string): RateLimiter {

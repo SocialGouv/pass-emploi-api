@@ -180,6 +180,10 @@ export default () => {
       matomo: {
         limit: process.env.RATE_LIMITER_MATOMO_LIMIT ?? '3',
         interval: process.env.RATE_LIMITER_MATOMO_INTERVAL ?? '1000'
+      },
+      evenementsEngagement: {
+        limit: process.env.RATE_LIMITER_AE_LIMIT ?? '10',
+        interval: process.env.RATE_LIMITER_AE_INTERVAL ?? '1200'
       }
     },
     matomo: {

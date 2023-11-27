@@ -7,13 +7,17 @@ import { Evenement } from '../../../src/domain/evenement'
 import { EvenementSqlRepository } from '../../../src/infrastructure/repositories/evenement-sql.repository.db'
 import { getDatabase } from '../../utils/database-for-testing'
 import { EvenementEngagementHebdoSqlModel } from '../../../src/infrastructure/sequelize/models/evenement-engagement-hebdo.sql-model'
+import { RateLimiterService } from '../../../src/utils/rate-limiter.service'
+import { testConfig } from '../../utils/module-for-testing'
 
 describe('EvenementSqlRepository', () => {
   let evenementHttpSqlRepository: EvenementSqlRepository
+  const configService = testConfig()
+  const rateLimiterService = new RateLimiterService(configService)
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
-    evenementHttpSqlRepository = new EvenementSqlRepository()
+    evenementHttpSqlRepository = new EvenementSqlRepository(rateLimiterService)
   })
 
   describe('saveEvenement', () => {
