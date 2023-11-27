@@ -84,10 +84,11 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
     } catch (e) {
       this.logger.error(e)
       if (e.response?.status >= 400 && e.response?.status <= 404) {
-        const erreur = new ErreurHttp(
-          e.response.data?.message,
-          e.response.status
-        )
+        const message =
+          e.response.status === 400
+            ? 'Le numéro de dossier est incorrect. Renseignez un numéro. Exemple : 123456.'
+            : e.response.data?.message
+        const erreur = new ErreurHttp(message, e.response.status)
         return failure(erreur)
       }
       throw new RuntimeException(e.statusText)
