@@ -63,6 +63,12 @@ export class CreateActionPayload {
   @IsNotEmpty()
   @IsDateString()
   dateEcheance?: string
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(Action.Qualification.Code)
+  codeQualification?: Action.Qualification.Code
 }
 
 export class CreateActionParLeJeunePayload extends CreateActionPayload {

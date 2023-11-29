@@ -28,6 +28,7 @@ export interface CreateActionCommand extends Command {
   commentaire?: string
   dateEcheance: DateTime
   rappel?: boolean
+  codeQualification?: Action.Qualification.Code
 }
 
 @Injectable()

@@ -24,8 +24,8 @@ export class QualificationActionQueryModel {
   @ApiProperty()
   libelle: string
 
-  @ApiProperty()
-  heures: number
+  @ApiPropertyOptional()
+  heures?: number
 
   @ApiPropertyOptional()
   commentaireQualification?: string

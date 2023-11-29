@@ -59,7 +59,7 @@ function fromSqlToJeuneQueryModel(
 export function buildEtat(
   actionSqlModel: ActionSqlModel
 ): Action.Qualification.Etat {
-  if (actionSqlModel.codeQualification) {
+  if (actionSqlModel.codeQualification && actionSqlModel.heuresQualifiees) {
     return Action.Qualification.Etat.QUALIFIEE
   }
   if (actionSqlModel.statut === Action.Statut.TERMINEE) {
@@ -73,9 +73,9 @@ export function buildQualification(
 ): Action.Qualification | undefined {
   if (actionSqlModel.codeQualification) {
     return {
-      heures: actionSqlModel.heuresQualifiees!,
       code: actionSqlModel.codeQualification,
-      commentaire: actionSqlModel.commentaireQualification ?? ''
+      heures: actionSqlModel.heuresQualifiees ?? undefined,
+      commentaire: actionSqlModel.commentaireQualification ?? undefined
     }
   } else {
     return undefined
@@ -91,7 +91,7 @@ export function buildQualificationQueryModel(
         actionSqlModel.codeQualification
       ]
     return {
-      heures: type.heures,
+      heures: actionSqlModel.heuresQualifiees ?? undefined,
       code: actionSqlModel.codeQualification,
       libelle: type.label,
       commentaireQualification: actionSqlModel.commentaireQualification ?? ''
