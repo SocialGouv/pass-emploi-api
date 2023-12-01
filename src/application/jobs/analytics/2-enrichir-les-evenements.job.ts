@@ -36,6 +36,8 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     await this.ajouterLesAgencesJeune(connexion)
     await this.determinerLaSemaineEtLeJourALaFinDuTraitement(connexion)
 
+    await this.associerChaqueConseillerASonDernierAE(connexion)
+
     await connexion.close()
 
     if (maintenant.weekday === JOUR_DE_LA_SEMAINE_LUNDI) {
@@ -66,6 +68,10 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
         ADD COLUMN IF NOT EXISTS "agence"      varchar,
         ADD COLUMN IF NOT EXISTS "departement" varchar,
         ADD COLUMN IF NOT EXISTS "region"      varchar;
+    `)
+    await connexion.query(`
+      ALTER TABLE conseiller
+        ADD COLUMN IF NOT EXISTS "date_dernier_ae"     TIMESTAMP;
     `)
   }
 
@@ -133,5 +139,21 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
                            set semaine = date_trunc('week', date_evenement),
                                jour    = date_trunc('day', date_evenement)
                            where semaine is null;`)
+  }
+
+  private async associerChaqueConseillerASonDernierAE(
+    connexion: Sequelize
+  ): Promise<void> {
+    this.logger.log('Associer chaque conseiller à la date de son dernier AE')
+    await connexion.query(`
+        update conseiller
+        set date_dernier_ae = dernier_ae_conseiller.date_dernier_ae
+        from (
+            select id_utilisateur, max(date_evenement) as date_dernier_ae
+            from evenement_engagement
+            where type_utilisateur = 'CONSEILLER'
+            group by id_utilisateur
+        ) as dernier_ae_conseiller
+        where conseiller.id = dernier_ae_conseiller.id_utilisateur;`)
   }
 }
