@@ -244,7 +244,8 @@ export class ConseillersController {
       rappel: createActionPayload.dateEcheance ? true : false,
       dateEcheance: createActionPayload.dateEcheance
         ? DateTime.fromISO(createActionPayload.dateEcheance, { setZone: true })
-        : this.buildDateEcheanceV1()
+        : this.buildDateEcheanceV1(),
+      codeQualification: createActionPayload.codeQualification
     }
 
     const result = await this.createActionCommandHandler.execute(

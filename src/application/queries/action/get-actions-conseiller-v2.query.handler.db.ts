@@ -52,7 +52,7 @@ export class GetActionsConseillerV2QueryHandler extends QueryHandler<
         whereClause = {
           where: {
             statut: Action.Statut.TERMINEE,
-            codeQualification: null
+            heuresQualifiees: null
           }
         }
         order = [['date_fin_reelle', 'ASC']]
@@ -62,7 +62,7 @@ export class GetActionsConseillerV2QueryHandler extends QueryHandler<
           where: {
             [Op.or]: {
               statut: { [Op.ne]: Action.Statut.TERMINEE },
-              codeQualification: { [Op.ne]: null }
+              heuresQualifiees: { [Op.ne]: null }
             }
           }
         }

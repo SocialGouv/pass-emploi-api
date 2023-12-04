@@ -59,9 +59,11 @@ import { unJeune } from '../../fixtures/jeune.fixture'
 import { unDossierMilo } from '../../fixtures/milo.fixture'
 import { detailConseillerQueryModel } from '../../fixtures/query-models/conseiller.query-model.fixtures'
 import { unJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
-import { StubbedClass, expect } from '../../utils'
+import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
+import { Qualification } from 'src/domain/action/qualification'
+import Code = Qualification.Code
 
 describe('ConseillersController', () => {
   let getDetailConseillerQueryHandler: StubbedClass<GetDetailConseillerQueryHandler>
@@ -397,7 +399,8 @@ describe('ConseillersController', () => {
       // Given
       const actionPayload: CreateActionPayload = {
         content: "Ceci est un contenu d'action",
-        comment: 'Ceci est un commentaire'
+        comment: 'Ceci est un commentaire',
+        codeQualification: Code.PROJET_PROFESSIONNEL
       }
       const idAction = '15916d7e-f13a-4158-b7eb-3936aa937a0a'
       createActionCommandHandler.execute.resolves(success(idAction))
@@ -418,7 +421,8 @@ describe('ConseillersController', () => {
           typeCreateur: Action.TypeCreateur.CONSEILLER,
           commentaire: 'Ceci est un commentaire',
           dateEcheance: nowJsPlus3Mois,
-          rappel: false
+          rappel: false,
+          codeQualification: Code.PROJET_PROFESSIONNEL
         },
         unUtilisateurDecode()
       )
@@ -428,6 +432,7 @@ describe('ConseillersController', () => {
       const actionPayload: CreateActionPayload = {
         content: "Ceci est un contenu d'action",
         comment: 'Ceci est un commentaire',
+        codeQualification: Code.CITOYENNETE,
         dateEcheance: uneDatetimeAvecOffset().toISO()
       }
       const idAction = '15916d7e-f13a-4158-b7eb-3936aa937a0a'
@@ -449,7 +454,8 @@ describe('ConseillersController', () => {
           typeCreateur: Action.TypeCreateur.CONSEILLER,
           commentaire: 'Ceci est un commentaire',
           dateEcheance: uneDatetimeAvecOffset(),
-          rappel: true
+          rappel: true,
+          codeQualification: Code.CITOYENNETE
         },
         unUtilisateurDecode()
       )

@@ -108,13 +108,15 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
         idJeune,
         statut: Action.Statut.TERMINEE,
         dateCreation: datetimeDeBase.plus({ days: 3 }).toJSDate(),
-        dateFinReelle: datetimeDeBase.plus({ days: 1 }).toJSDate()
+        dateFinReelle: datetimeDeBase.plus({ days: 1 }).toJSDate(),
+        codeQualification: Code.SANTE
       })
       actionQualifieeDto = uneActionDto({
         idJeune,
         statut: Action.Statut.TERMINEE,
         dateCreation: datetimeDeBase.plus({ days: 4 }).toJSDate(),
-        codeQualification: Code.SANTE
+        codeQualification: Code.SANTE,
+        heuresQualifiees: 5
       })
 
       autreConseillerDto = unConseillerDto({ id: idAutreConseiller })

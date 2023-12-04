@@ -121,7 +121,7 @@ export namespace Action {
   }
 
   export function estQualifiee(action: Action): boolean {
-    return Boolean(action.qualification?.code)
+    return Boolean(action.qualification?.heures)
   }
 
   export function estTerminee(action: Action): boolean {
@@ -189,6 +189,7 @@ export namespace Action {
         typeCreateur: Action.TypeCreateur
         dateEcheance: DateTime
         rappel?: boolean
+        codeQualification?: Action.Qualification.Code
       },
       jeune: Jeune
     ): Result<Action> {
@@ -233,7 +234,9 @@ export namespace Action {
             ? dateEcheanceA9Heures30
             : undefined,
         dateDebut: undefined,
-        qualification: undefined
+        qualification: data.codeQualification
+          ? { code: data.codeQualification }
+          : undefined
       }
       return success(action)
     }

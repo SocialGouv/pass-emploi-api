@@ -71,10 +71,12 @@ import { uneDemarche } from 'test/fixtures/demarche.fixture'
 import { uneActionQueryModelSansJeune } from 'test/fixtures/query-models/action.query-model.fixtures'
 import { uneDemarcheQueryModel } from 'test/fixtures/query-models/demarche.query-model.fixtures'
 import { unRendezVousJeuneDetailQueryModel } from 'test/fixtures/query-models/rendez-vous.query-model.fixtures'
-import { StubbedClass, enleverLesUndefined, expect } from 'test/utils'
+import { enleverLesUndefined, expect, StubbedClass } from 'test/utils'
 import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
 import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
+import { Qualification } from 'src/domain/action/qualification'
+import Code = Qualification.Code
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
@@ -244,7 +246,8 @@ describe('JeunesController', () => {
     const actionPayload: CreateActionParLeJeunePayload = {
       content: "Ceci est un contenu d'action",
       comment: 'Ceci est un commentaire',
-      status: Action.Statut.EN_COURS
+      status: Action.Statut.EN_COURS,
+      codeQualification: Code.CITOYENNETE
     }
     it("renvoie l'id de l'action créée avec echeance par defaut", async () => {
       // Given
@@ -269,7 +272,8 @@ describe('JeunesController', () => {
           statut: Action.Statut.EN_COURS,
           commentaire: 'Ceci est un commentaire',
           dateEcheance: nowJsPlus3Mois,
-          rappel: false
+          rappel: false,
+          codeQualification: Code.CITOYENNETE
         },
         unUtilisateurDecode()
       )
@@ -285,7 +289,8 @@ describe('JeunesController', () => {
         .set('authorization', unHeaderAuthorization())
         .send({
           content: "Ceci est un contenu d'action",
-          comment: 'Ceci est un commentaire'
+          comment: 'Ceci est un commentaire',
+          codeQualification: Code.CITOYENNETE
         })
 
         // Then
@@ -300,7 +305,8 @@ describe('JeunesController', () => {
           statut: undefined,
           commentaire: 'Ceci est un commentaire',
           dateEcheance: nowJsPlus3Mois,
-          rappel: false
+          rappel: false,
+          codeQualification: Code.CITOYENNETE
         },
         unUtilisateurDecode()
       )
@@ -317,7 +323,8 @@ describe('JeunesController', () => {
         .send({
           content: "Ceci est un contenu d'action",
           comment: 'Ceci est un commentaire',
-          status: Action.Statut.TERMINEE
+          status: Action.Statut.TERMINEE,
+          codeQualification: Code.CITOYENNETE
         })
 
         // Then
@@ -332,7 +339,8 @@ describe('JeunesController', () => {
           statut: Action.Statut.TERMINEE,
           commentaire: 'Ceci est un commentaire',
           dateEcheance: now,
-          rappel: false
+          rappel: false,
+          codeQualification: Code.CITOYENNETE
         },
         unUtilisateurDecode()
       )
@@ -365,7 +373,8 @@ describe('JeunesController', () => {
           statut: Action.Statut.EN_COURS,
           commentaire: 'Ceci est un commentaire',
           dateEcheance: uneDatetimeAvecOffset(),
-          rappel: false
+          rappel: false,
+          codeQualification: Code.CITOYENNETE
         },
         unUtilisateurDecode()
       )

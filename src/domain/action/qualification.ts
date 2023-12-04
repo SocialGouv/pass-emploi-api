@@ -2,7 +2,7 @@ import { Action } from './action'
 
 export interface Qualification {
   code: Qualification.Code
-  heures: number
+  heures?: number
   commentaire?: string
 }
 
