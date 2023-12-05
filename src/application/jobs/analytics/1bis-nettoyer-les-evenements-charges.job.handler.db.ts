@@ -29,7 +29,7 @@ export class NettoyerEvenementsChargesAnalyticsJobHandler extends JobHandler<Pla
         jobType: this.jobType,
         dateExecution: maintenant,
         succes: false,
-        resultat: null,
+        resultat: {},
         nbErreurs: 1,
         tempsExecution: DateService.calculerTempsExecution(maintenant),
         erreur: e
@@ -40,7 +40,7 @@ export class NettoyerEvenementsChargesAnalyticsJobHandler extends JobHandler<Pla
       jobType: this.jobType,
       dateExecution: maintenant,
       succes: true,
-      resultat: null,
+      resultat: {},
       nbErreurs: 0,
       tempsExecution: DateService.calculerTempsExecution(maintenant)
     }

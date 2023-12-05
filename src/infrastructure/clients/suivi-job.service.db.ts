@@ -71,14 +71,18 @@ function construireMessage(suiviJob: SuiviJob): string {
     dateExecution: suiviJob.dateExecution.setZone('Europe/Paris').toISO()
   }
   delete suiviJobStringified.erreur
+
   const data = [
     ...Object.entries(suiviJobStringified).filter(
       entry => !isArrayOrObject(entry[1])
-    ),
-    ...Object.entries(suiviJob.resultat as ArrayLike<unknown>).filter(
-      entry => !isArrayOrObject(entry[1])
     )
   ]
+  try {
+    const resultat = Object.entries(
+      suiviJob.resultat as ArrayLike<unknown>
+    ).filter(entry => !isArrayOrObject(entry[1]))
+    data.push(...resultat)
+  } catch (_e) {}
   const statutIcon = suiviJob.succes ? ':white_check_mark:' : ':x:'
 
   const tableau = `| Statut | ${statutIcon} |

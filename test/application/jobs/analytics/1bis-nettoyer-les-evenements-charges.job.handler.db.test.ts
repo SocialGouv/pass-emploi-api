@@ -57,7 +57,7 @@ describe('NettoyerEvenementsChargesAnalyticsJobHandler', () => {
         jobType: 'NETTOYER_EVENEMENTS_CHARGES_ANALYTICS',
         dateExecution: maintenant,
         succes: true,
-        resultat: null,
+        resultat: {},
         nbErreurs: 0
       })
     })
