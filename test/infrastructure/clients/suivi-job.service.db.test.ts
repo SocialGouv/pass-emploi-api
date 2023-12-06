@@ -50,7 +50,7 @@ describe('SuiviJobService', () => {
     it('envoie une notif de succès quand le result est success', async () => {
       // Given
       const suivi: SuiviJob = {
-        jobType: Planificateur.JobType.MAJ_AGENCE_AC,
+        jobType: Planificateur.JobType.NETTOYER_LES_DONNEES,
         succes: true,
         dateExecution: uneDatetime(),
         tempsExecution: 0,
@@ -58,7 +58,7 @@ describe('SuiviJobService', () => {
         resultat: { unChamp: 'present', unTableau: [], unObjet: {} }
       }
       const stringBody =
-        '{"username":"CEJ Lama","text":"### Résultat du job _MAJ_AGENCE_AC_\\n| Statut | :white_check_mark: |\\n    |:------------------------|:------------|\\n    | jobType | MAJ_AGENCE_AC |\\n| succes | true |\\n| dateExecution | 2020-04-06T14:00:00.000+02:00 |\\n| tempsExecution | 0 |\\n| nbErreurs | 0 |\\n| unChamp | present |"}'
+        '{"username":"CEJ Lama","text":"### Résultat du job _NETTOYER_LES_DONNEES_\\n| Statut | :white_check_mark: |\\n    |:------------------------|:------------|\\n    | jobType | NETTOYER_LES_DONNEES |\\n| succes | true |\\n| dateExecution | 2020-04-06T14:00:00.000+02:00 |\\n| tempsExecution | 0 |\\n| nbErreurs | 0 |\\n| unChamp | present |"}'
 
       const scope = nock(configService.get('mattermost').jobWebhookUrl)
         .post('', stringBody)
@@ -73,7 +73,7 @@ describe('SuiviJobService', () => {
     it("envoie une notif d'erreur quand le result est error", async () => {
       // Given
       const suivi: SuiviJob = {
-        jobType: Planificateur.JobType.MAJ_AGENCE_AC,
+        jobType: Planificateur.JobType.NETTOYER_LES_DONNEES,
         succes: false,
         dateExecution: uneDatetime(),
         tempsExecution: 0,
@@ -82,7 +82,7 @@ describe('SuiviJobService', () => {
         erreur: { message: "erreur d'e quoi" }
       }
       const heureParis = uneDatetime().setZone('Europe/Paris').toISO()
-      const stringBody = `{"username":"CEJ Lama","text":"### Résultat du job _MAJ_AGENCE_AC_\\n| Statut | :x: |\\n    |:------------------------|:------------|\\n    | jobType | MAJ_AGENCE_AC |\\n| succes | false |\\n| dateExecution | ${heureParis} |\\n| tempsExecution | 0 |\\n| nbErreurs | 0 |\\n| code | NON_TROUVE |\\n| message | test 1 non trouvé(e) |"}`
+      const stringBody = `{"username":"CEJ Lama","text":"### Résultat du job _NETTOYER_LES_DONNEES_\\n| Statut | :x: |\\n    |:------------------------|:------------|\\n    | jobType | NETTOYER_LES_DONNEES |\\n| succes | false |\\n| dateExecution | ${heureParis} |\\n| tempsExecution | 0 |\\n| nbErreurs | 0 |\\n| code | NON_TROUVE |\\n| message | test 1 non trouvé(e) |"}`
 
       const scope = nock(configService.get('mattermost').jobWebhookUrl)
         .post('', stringBody)
