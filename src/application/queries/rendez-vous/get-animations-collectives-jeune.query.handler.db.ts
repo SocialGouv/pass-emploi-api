@@ -23,7 +23,7 @@ export class GetAnimationsCollectivesJeuneQueryHandler extends QueryHandler<
   Result<RendezVousJeuneDetailQueryModel[]>
 > {
   constructor(private jeuneAuthorizer: JeuneAuthorizer) {
-    super('GetAnimationsCollectivesJeuneQueryHandlerQueryHandler')
+    super('GetAnimationsCollectivesJeuneQueryHandler')
   }
 
   async authorize(
