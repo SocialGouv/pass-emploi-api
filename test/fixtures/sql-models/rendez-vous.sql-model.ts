@@ -29,6 +29,7 @@ export function unRendezVousDto(
     icsSequence: null,
     dateCloture: null,
     idAgence: null,
+    idStructureMilo: null,
     createur: { id: '1', nom: 'Tavernier', prenom: 'Nils' },
     source: RendezVous.Source.PASS_EMPLOI,
     typePartenaire: null,

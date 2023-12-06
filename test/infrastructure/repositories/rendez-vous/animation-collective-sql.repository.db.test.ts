@@ -174,6 +174,7 @@ describe('AnimationsCollectivesSqlRepository', () => {
         createur: uneACAVenir.createur,
         dateCloture: DateService.fromJSDateToDateTime(uneACAVenir.dateCloture),
         idAgence: uneACAVenir.idAgence!,
+        idStructureMilo: undefined,
         source: RendezVous.Source.PASS_EMPLOI,
         informationsPartenaire: undefined,
         nombreMaxParticipants: undefined
@@ -279,6 +280,7 @@ describe('AnimationsCollectivesSqlRepository', () => {
         createur: uneACAVenir.createur,
         dateCloture: DateService.fromJSDateToDateTime(uneACAVenir.dateCloture),
         idAgence: uneACAVenir.idAgence!,
+        idStructureMilo: undefined,
         source: RendezVous.Source.PASS_EMPLOI,
         informationsPartenaire: undefined,
         nombreMaxParticipants: undefined
@@ -337,6 +339,7 @@ describe('AnimationsCollectivesSqlRepository', () => {
           const animationCollectiveAvecUnJeuneDePlus: RendezVous.AnimationCollective =
             {
               ...uneAnimationCollectiveTest,
+              idStructureMilo: undefined,
               informationsPartenaire: undefined,
               jeunes: uneAnimationCollectiveTest.jeunes.concat(nouveauJeune)
             }
@@ -353,11 +356,12 @@ describe('AnimationsCollectivesSqlRepository', () => {
       })
 
       describe('quand on enlève un jeune du rendez-vous', () => {
-        it('met à jour les informations du animationCollective en supprimant une association quand on supprime un jeune', async () => {
+        it("met à jour les informations de l'animation collective en supprimant une association quand on supprime un jeune", async () => {
           // Given
           const rendezVousAvecUnJeuneDeMoins: RendezVous.AnimationCollective = {
             ...uneAnimationCollectiveTest,
             informationsPartenaire: undefined,
+            idStructureMilo: undefined,
             jeunes: uneAnimationCollectiveTest.jeunes.filter(
               jeune => jeune.id !== unAutreJeune.id
             )
@@ -375,7 +379,7 @@ describe('AnimationsCollectivesSqlRepository', () => {
       })
 
       describe('quand on ne change pas le nombre de jeunes', () => {
-        it('met à jour les informations du animationCollective en ne rajoutant pas une association supplémentaire et en mettant à jour les informations de presence des jeunes', async () => {
+        it("met à jour les informations de l'animation collective en ne rajoutant pas une association supplémentaire et en mettant à jour les informations de presence des jeunes", async () => {
           // Given
           const uneAnimationCollectiveModifiee: RendezVous.AnimationCollective =
             {
@@ -405,6 +409,7 @@ describe('AnimationsCollectivesSqlRepository', () => {
           expect(actual).to.deep.equal({
             ...uneAnimationCollectiveModifiee,
             informationsPartenaire: undefined,
+            idStructureMilo: undefined,
             jeunes: [jeune, unAutreJeune]
           })
         })

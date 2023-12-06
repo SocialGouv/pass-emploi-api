@@ -16,6 +16,7 @@ import { AgenceSqlModel } from './agence.sql-model'
 import { JeuneSqlModel } from './jeune.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from './rendez-vous-jeune-association.sql-model'
 import { LogModificationRendezVousSqlModel } from './log-modification-rendez-vous-sql.model'
+import { StructureMiloSqlModel } from './structure-milo.sql-model'
 
 export class RendezVousDto extends Model {
   @PrimaryKey
@@ -83,6 +84,13 @@ export class RendezVousDto extends Model {
     type: DataType.STRING
   })
   idAgence: string | null
+
+  @ForeignKey(() => StructureMiloSqlModel)
+  @Column({
+    field: 'id_structure_milo',
+    type: DataType.STRING
+  })
+  idStructureMilo: string | null
 
   @Column({
     field: 'type_partenaire',

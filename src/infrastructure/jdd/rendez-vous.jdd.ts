@@ -29,6 +29,7 @@ export function unRendezVousJDD(
     icsSequence: null,
     dateCloture: null,
     idAgence: null,
+    idStructureMilo: null,
     createur: { id: '1', nom: 'Tavernier', prenom: 'Nils' },
     typePartenaire: null,
     idPartenaire: null,

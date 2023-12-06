@@ -123,6 +123,7 @@ export interface RendezVous {
   icsSequence?: number
   createur: Createur
   idAgence?: string
+  idStructureMilo?: string
   dateCloture?: DateTime
   informationsPartenaire?: RendezVous.InformationsPartenaire
   nombreMaxParticipants?: number
