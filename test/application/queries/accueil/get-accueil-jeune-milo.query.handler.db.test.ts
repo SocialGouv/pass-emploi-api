@@ -48,11 +48,15 @@ import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from 'test/fixtures/sql-models/rendez-vous.sql-model'
 import { expect, StubbedClass, stubClass } from 'test/utils'
-import { getDatabase } from '../../../utils/database-for-testing'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../../utils/database-for-testing'
 import { testConfig } from 'test/utils/module-for-testing'
 
 describe('GetAccueilJeuneMiloQueryHandler', () => {
   let handler: GetAccueilJeuneMiloQueryHandler
+  let databaseForTesting: DatabaseForTesting
   let sessionsQueryGetter: StubbedClass<GetSessionsJeuneMiloQueryGetter>
   let alertesQueryGetter: StubbedClass<GetRecherchesSauvegardeesQueryGetter>
   let favorisAccueilQueryGetter: StubbedClass<GetFavorisAccueilQueryGetter>
@@ -60,6 +64,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
 
   before(async () => {
+    databaseForTesting = getDatabase()
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     sessionsQueryGetter = stubClass(GetSessionsJeuneMiloQueryGetter)
     alertesQueryGetter = stubClass(GetRecherchesSauvegardeesQueryGetter)
@@ -72,7 +77,8 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       alertesQueryGetter,
       favorisAccueilQueryGetter,
       getCampagneQueryGetter,
-      testConfig()
+      testConfig(),
+      databaseForTesting.sequelize
     )
   })
 
@@ -367,12 +373,13 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       })
     })
 
-    describe('retourne les 3 prochains événements à venir', () => {
+    describe('retourne les 3 prochains événements où le bénéficiaire n’est pas inscrit', () => {
       let evenementAVenir1: AsSql<RendezVousDto>
       let evenementAVenir2: AsSql<RendezVousDto>
       let evenementAVenir3: AsSql<RendezVousDto>
       let evenementPasse: AsSql<RendezVousDto>
       let evenementAVenirAutreAgence: AsSql<RendezVousDto>
+      let evenementAVenirBeneficiaireDejaInscrit: AsSql<RendezVousDto>
       let evenementAVenir4HorsPage: AsSql<RendezVousDto>
 
       beforeEach(async () => {
@@ -402,25 +409,42 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
           type: CodeTypeRendezVous.ATELIER,
           idAgence: 'fake-agence-id'
         })
+        evenementAVenirBeneficiaireDejaInscrit = unRendezVousDto({
+          date: maintenant.plus({ day: 2 }).toJSDate(),
+          type: CodeTypeRendezVous.ATELIER,
+          idAgence: 'bonne-agence-id'
+        })
+        evenementAVenir2 = unRendezVousDto({
+          date: maintenant.plus({ day: 3 }).toJSDate(),
+          type: CodeTypeRendezVous.ATELIER,
+          idAgence: 'bonne-agence-id'
+        })
         evenementAVenir4HorsPage = unRendezVousDto({
           date: maintenant.plus({ day: 5 }).toJSDate(),
           type: CodeTypeRendezVous.ATELIER,
           idAgence: 'bonne-agence-id'
         })
+
         await RendezVousSqlModel.bulkCreate([
           evenementPasse,
           evenementAVenir1,
           evenementAVenirAutreAgence,
+          evenementAVenirBeneficiaireDejaInscrit,
           evenementAVenir2,
           evenementAVenir3,
           evenementAVenir4HorsPage
         ])
+        await RendezVousJeuneAssociationSqlModel.create({
+          id: 1,
+          idRendezVous: evenementAVenirBeneficiaireDejaInscrit.id,
+          idJeune: accueilQuery.idJeune
+        })
       })
       after(() => {
         RendezVousSqlModel.destroy({ truncate: true, cascade: true })
       })
 
-      it('retourne les 3 prochains événements à venir', async () => {
+      it('retourne les 3 prochains événements à venir où le bénéficiaire n’est pas inscrit', async () => {
         // When
         result = await handler.handle(accueilQuery)
 
