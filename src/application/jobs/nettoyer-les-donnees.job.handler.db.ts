@@ -45,7 +45,7 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
 
     try {
       nombreLogsApiSupprimes = await LogApiPartenaireSqlModel.destroy({
-        where: dateSuperieureAUnMois(maintenant)
+        where: dateSuperieureAUneSemaine(maintenant)
       })
     } catch (_e) {
       nbErreurs++
@@ -69,7 +69,7 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
 
     try {
       nombreRdvSupprimes = await RendezVousSqlModel.destroy({
-        where: dateSuppressionSuperieureASixMois(maintenant)
+        where: dateSuppressionSuperieureATroisMois(maintenant)
       })
     } catch (_e) {
       nbErreurs++
@@ -114,9 +114,9 @@ function dateArchivageSuperieureADeuxAns(maintenant: DateTime): WhereOptions {
   }
 }
 
-function dateSuperieureAUnMois(maintenant: DateTime): WhereOptions {
+function dateSuperieureAUneSemaine(maintenant: DateTime): WhereOptions {
   return {
-    date: { [Op.lt]: maintenant.minus({ month: 1 }).toJSDate() }
+    date: { [Op.lt]: maintenant.minus({ week: 1 }).toJSDate() }
   }
 }
 
@@ -135,9 +135,11 @@ function dateSuperieureATroisMoisEtVenantDeMilo(
   }
 }
 
-function dateSuppressionSuperieureASixMois(maintenant: DateTime): WhereOptions {
+function dateSuppressionSuperieureATroisMois(
+  maintenant: DateTime
+): WhereOptions {
   return {
-    dateSuppression: { [Op.lt]: maintenant.minus({ months: 6 }).toJSDate() }
+    dateSuppression: { [Op.lt]: maintenant.minus({ months: 3 }).toJSDate() }
   }
 }
 

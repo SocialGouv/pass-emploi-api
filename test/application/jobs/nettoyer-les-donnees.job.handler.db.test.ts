@@ -72,7 +72,7 @@ describe('NettoyerLesDonneesJobHandler', () => {
     // Given - Log Api Partenaire
     await LogApiPartenaireSqlModel.create({
       id: 'a282ae5e-b1f0-4a03-86a3-1870d913da93',
-      date: uneDatetime().minus({ months: 1, day: 1 }).toJSDate(),
+      date: uneDatetime().minus({ week: 1, day: 1 }).toJSDate(),
       idUtilisateur: 'idUtilisateur',
       typeUtilisateur: 'typeUtilisateur',
       pathPartenaire: 'pathASupprimer',
@@ -82,7 +82,7 @@ describe('NettoyerLesDonneesJobHandler', () => {
     })
     await LogApiPartenaireSqlModel.create({
       id: '826553e8-7581-44ab-9d76-f04be13f8971',
-      date: uneDatetime().minus({ months: 1 }).plus({ day: 1 }).toJSDate(),
+      date: uneDatetime().minus({ week: 1 }).plus({ day: 1 }).toJSDate(),
       idUtilisateur: 'idUtilisateur',
       typeUtilisateur: 'typeUtilisateur',
       pathPartenaire: 'pathAGarder',
@@ -113,7 +113,7 @@ describe('NettoyerLesDonneesJobHandler', () => {
 
     // Given - Rendez-vous
     rendezVousDto = unRendezVousDto({
-      dateSuppression: uneDatetime().minus({ months: 7 }).toJSDate()
+      dateSuppression: uneDatetime().minus({ months: 4 }).toJSDate()
     })
     rendezVousDtoSansDateSuppression = unRendezVousDto({
       dateSuppression: null
@@ -167,7 +167,7 @@ describe('NettoyerLesDonneesJobHandler', () => {
   })
 
   describe('logs api partenaires', () => {
-    it("supprime les logs de plus d'un mois", async () => {
+    it("supprime les logs de plus d'une semaine", async () => {
       // Then
       const logs = await LogApiPartenaireSqlModel.findAll()
       expect(logs).to.have.length(1)
