@@ -69,9 +69,11 @@ describe('DeleteConseillerCommandHandler', () => {
       const command: DeleteConseillerCommand = {
         idConseiller: 'idConseiller'
       }
-      conseillerRepository.get
-        .withArgs(command.idConseiller)
-        .resolves(unConseiller())
+      beforeEach(async () => {
+        conseillerRepository.get
+          .withArgs(command.idConseiller)
+          .resolves(unConseiller())
+      })
 
       it('echec quand son portefeuille est non vide', async () => {
         jeuneRepository.findAllJeunesByConseiller
