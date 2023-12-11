@@ -10,7 +10,7 @@ import {
   UseGuards
 } from '@nestjs/common'
 import { ApiOAuth2, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger'
-import { EnvoyerFormulaireContactImmersionCommandHandler } from '../../application/commands/immersion/envoyer-formulaire-contact-immersion.command.handler'
+import { EnvoyerFormulaireContactImmersionCommandHandler } from '../../application/commands/immersion/envoyer-formulaire-contact-immersion.command.handler.db'
 import { NotifierNouvellesImmersionsCommandHandler } from '../../application/commands/notifier-nouvelles-immersions.command.handler'
 import {
   GetDetailOffreImmersionQuery,

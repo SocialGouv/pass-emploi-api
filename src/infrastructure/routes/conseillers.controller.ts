@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpException,
   HttpStatus,
   Param,
   Post,
@@ -33,10 +32,6 @@ import {
   CreateRendezVousCommand,
   CreateRendezVousCommandHandler
 } from '../../application/commands/create-rendez-vous.command.handler'
-import {
-  CreerJeuneMiloCommand,
-  CreerJeuneMiloCommandHandler
-} from '../../application/commands/creer-jeune-milo.command.handler'
 import { ModifierConseillerCommandHandler } from '../../application/commands/modifier-conseiller.command.handler'
 import { ModifierJeuneDuConseillerCommandHandler } from '../../application/commands/modifier-jeune-du-conseiller.command.handler'
 import { RecupererJeunesDuConseillerCommandHandler } from '../../application/commands/recuperer-jeunes-du-conseiller.command.handler'
@@ -47,12 +42,10 @@ import {
 import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from '../../application/queries/action/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
 import { GetConseillersQueryHandler } from '../../application/queries/get-conseillers.query.handler.db'
 import { GetDetailConseillerQueryHandler } from '../../application/queries/get-detail-conseiller.query.handler.db'
-import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
 import {
   GetIndicateursPourConseillerExclusionQuery,
   GetIndicateursPourConseillerQueryHandler
 } from '../../application/queries/get-indicateurs-pour-conseiller.query.handler.db'
-import { GetJeuneMiloByDossierQueryHandler } from '../../application/queries/get-jeune-milo-by-dossier.query.handler.db'
 import { GetJeunesByConseillerQueryHandler } from '../../application/queries/get-jeunes-by-conseiller.query.handler.db'
 import { GetJeunesIdentitesQueryHandler } from '../../application/queries/get-jeunes-identites.query.handler.db'
 import {
@@ -63,17 +56,14 @@ import { IndicateursPourConseillerQueryModel } from '../../application/queries/q
 import {
   DetailJeuneConseillerQueryModel,
   IdentiteJeuneQueryModel,
-  JeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from '../../application/queries/query-models/jeunes.query-model'
-import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
 import { RendezVousConseillerFutursEtPassesQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
 import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
-import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import {
+  Result,
   isFailure,
-  isSuccess,
-  Result
+  isSuccess
 } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
@@ -84,7 +74,6 @@ import { handleFailure } from './result.handler'
 import { CreateActionPayload } from './validation/actions.inputs'
 import {
   CreateListeDeDiffusionPayload,
-  CreerJeuneMiloPayload,
   DetailConseillerPayload,
   EnvoyerNotificationsPayload,
   GetConseillersQueryParams,
@@ -109,9 +98,6 @@ export class ConseillersController {
     private readonly sendNotificationsNouveauxMessages: SendNotificationsNouveauxMessagesCommandHandler,
     private readonly getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler,
     private readonly createRendezVousCommandHandler: CreateRendezVousCommandHandler,
-    private readonly getDossierMiloJeuneQueryHandler: GetDossierMiloJeuneQueryHandler,
-    private readonly getJeuneMiloByDossierQueryHandler: GetJeuneMiloByDossierQueryHandler,
-    private readonly creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler,
     private readonly modifierConseillerCommandHandler: ModifierConseillerCommandHandler,
     private readonly recupererJeunesDuConseillerCommandHandler: RecupererJeunesDuConseillerCommandHandler,
     private readonly modifierJeuneDuConseillerCommandHandler: ModifierJeuneDuConseillerCommandHandler,
@@ -356,85 +342,6 @@ export class ConseillersController {
 
     if (isSuccess(result)) {
       return { id: result.data }
-    }
-    throw handleFailure(result)
-  }
-
-  @ApiOperation({
-    summary: "Récupère le dossier Milo d'un jeune",
-    description: 'Autorisé pour un conseiller du jeune'
-  })
-  @Get('/milo/dossiers/:idDossier')
-  @ApiResponse({
-    type: DossierJeuneMiloQueryModel
-  })
-  async getDossierMilo(
-    @Param('idDossier') idDossier: string,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<DossierJeuneMiloQueryModel> {
-    const result = await this.getDossierMiloJeuneQueryHandler.execute(
-      { idDossier },
-      utilisateur
-    )
-
-    if (isFailure(result)) {
-      if (result.error.code === ErreurHttp.CODE) {
-        throw new HttpException(
-          result.error.message,
-          (result.error as ErreurHttp).statusCode
-        )
-      }
-      throw new RuntimeException(result.error.message)
-    }
-
-    return result.data
-  }
-
-  @ApiOperation({
-    summary: 'Récupère un jeune par son idDossier Milo',
-    description: 'Autorisé pour un conseiller du jeune'
-  })
-  @Get('milo/jeunes/:idDossier')
-  @ApiResponse({
-    type: JeuneQueryModel
-  })
-  async getJeuneMiloByDossier(
-    @Param('idDossier') idDossier: string,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<JeuneQueryModel> {
-    const result = await this.getJeuneMiloByDossierQueryHandler.execute(
-      { idDossier },
-      utilisateur
-    )
-
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
-  }
-
-  @ApiOperation({
-    summary: 'Crée un jeune Milo',
-    description: 'Autorisé pour un conseiller Milo'
-  })
-  @Post('milo/jeunes')
-  async postJeuneMilo(
-    @Body() creerJeuneMiloPayload: CreerJeuneMiloPayload,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<IdentiteJeuneQueryModel> {
-    const command: CreerJeuneMiloCommand = {
-      idConseiller: creerJeuneMiloPayload.idConseiller,
-      email: creerJeuneMiloPayload.email,
-      nom: creerJeuneMiloPayload.nom,
-      prenom: creerJeuneMiloPayload.prenom,
-      idPartenaire: creerJeuneMiloPayload.idDossier
-    }
-    const result = await this.creerJeuneMiloCommandHandler.execute(
-      command,
-      utilisateur
-    )
-    if (isSuccess(result)) {
-      return result.data
     }
     throw handleFailure(result)
   }

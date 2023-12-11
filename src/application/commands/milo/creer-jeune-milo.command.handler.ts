@@ -1,36 +1,36 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Command } from '../../building-blocks/types/command'
-import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { Command } from '../../../building-blocks/types/command'
+import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {
   DossierExisteDejaError,
   EmailExisteDejaError,
   MauvaiseCommandeError,
   NonTrouveError
-} from '../../building-blocks/types/domain-error'
+} from '../../../building-blocks/types/domain-error'
 import {
   Result,
   failure,
   isFailure,
   isSuccess,
   success
-} from '../../building-blocks/types/result'
+} from '../../../building-blocks/types/result'
 import {
   Authentification,
   AuthentificationRepositoryToken
-} from '../../domain/authentification'
-import { Chat, ChatRepositoryToken } from '../../domain/chat'
+} from '../../../domain/authentification'
+import { Chat, ChatRepositoryToken } from '../../../domain/chat'
 import {
   Conseiller,
   ConseillersRepositoryToken
-} from '../../domain/conseiller/conseiller'
-import { Core, estMilo } from '../../domain/core'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+} from '../../../domain/conseiller/conseiller'
+import { Core, estMilo } from '../../../domain/core'
+import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
 import {
   JeuneMilo,
   MiloJeuneRepositoryToken
-} from '../../domain/milo/jeune.milo'
-import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
-import { IdentiteJeuneQueryModel } from '../queries/query-models/jeunes.query-model'
+} from '../../../domain/milo/jeune.milo'
+import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
+import { IdentiteJeuneQueryModel } from '../../queries/query-models/jeunes.query-model'
 
 export interface CreerJeuneMiloCommand extends Command {
   idPartenaire: string

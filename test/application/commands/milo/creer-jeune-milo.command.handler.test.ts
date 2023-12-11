@@ -1,37 +1,37 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DateTime } from 'luxon'
 import { SinonSandbox } from 'sinon'
-import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
+import { ConseillerAuthorizer } from '../../../../src/application/authorizers/conseiller-authorizer'
 
 import {
   CreerJeuneMiloCommand,
   CreerJeuneMiloCommandHandler
-} from '../../../src/application/commands/creer-jeune-milo.command.handler'
+} from '../../../../src/application/commands/milo/creer-jeune-milo.command.handler'
 import {
   DossierExisteDejaError,
   EmailExisteDejaError,
   ErreurHttp,
   MauvaiseCommandeError,
   NonTrouveError
-} from '../../../src/building-blocks/types/domain-error'
+} from '../../../../src/building-blocks/types/domain-error'
 import {
   failure,
   isSuccess,
   success
-} from '../../../src/building-blocks/types/result'
-import { Authentification } from '../../../src/domain/authentification'
-import { Chat } from '../../../src/domain/chat'
-import { Conseiller } from '../../../src/domain/conseiller/conseiller'
-import { Core, estMilo } from '../../../src/domain/core'
-import { Jeune } from '../../../src/domain/jeune/jeune'
-import { JeuneMilo } from '../../../src/domain/milo/jeune.milo'
-import { DateService } from '../../../src/utils/date-service'
-import { IdService } from '../../../src/utils/id-service'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { StubbedClass, createSandbox, expect, stubClass } from '../../utils'
-import { unDossierMilo } from '../../fixtures/milo.fixture'
+} from '../../../../src/building-blocks/types/result'
+import { Authentification } from '../../../../src/domain/authentification'
+import { Chat } from '../../../../src/domain/chat'
+import { Conseiller } from '../../../../src/domain/conseiller/conseiller'
+import { Core, estMilo } from '../../../../src/domain/core'
+import { Jeune } from '../../../../src/domain/jeune/jeune'
+import { JeuneMilo } from '../../../../src/domain/milo/jeune.milo'
+import { DateService } from '../../../../src/utils/date-service'
+import { IdService } from '../../../../src/utils/id-service'
+import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
+import { unConseiller } from '../../../fixtures/conseiller.fixture'
+import { unJeune } from '../../../fixtures/jeune.fixture'
+import { StubbedClass, createSandbox, expect, stubClass } from '../../../utils'
+import { unDossierMilo } from '../../../fixtures/milo.fixture'
 const idPartenaire = 'idDossier'
 
 describe('CreerJeuneMiloCommandHandler', () => {

@@ -1,6 +1,6 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
-import { EnvoyerFormulaireContactImmersionCommandHandler } from '../../../src/application/commands/immersion/envoyer-formulaire-contact-immersion.command.handler'
+import { EnvoyerFormulaireContactImmersionCommandHandler } from '../../../src/application/commands/immersion/envoyer-formulaire-contact-immersion.command.handler.db'
 import {
   NotifierNouvellesImmersionsCommand,
   NotifierNouvellesImmersionsCommandHandler

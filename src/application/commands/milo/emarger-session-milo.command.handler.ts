@@ -18,7 +18,7 @@ import { Conseiller } from '../../../domain/conseiller/conseiller'
 import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client'
 import { DateService } from 'src/utils/date-service'
 
-export interface EmargementSessionMiloCommand extends Command {
+export interface EmargerSessionMiloCommand extends Command {
   idSession: string
   idConseiller: string
   accessToken: string
@@ -26,8 +26,8 @@ export interface EmargementSessionMiloCommand extends Command {
 }
 
 @Injectable()
-export class EmargementSessionMiloCommandHandler extends CommandHandler<
-  EmargementSessionMiloCommand,
+export class EmargerSessionMiloCommandHandler extends CommandHandler<
+  EmargerSessionMiloCommand,
   void
 > {
   constructor(
@@ -42,7 +42,7 @@ export class EmargementSessionMiloCommandHandler extends CommandHandler<
     super('UpdateSessionMiloCommandHandler')
   }
 
-  async handle(command: EmargementSessionMiloCommand): Promise<Result> {
+  async handle(command: EmargerSessionMiloCommand): Promise<Result> {
     const conseillerMiloResult = await this.conseillerMiloRepository.get(
       command.idConseiller
     )
@@ -84,7 +84,7 @@ export class EmargementSessionMiloCommandHandler extends CommandHandler<
   }
 
   async authorize(
-    command: EmargementSessionMiloCommand,
+    command: EmargerSessionMiloCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     return this.conseillerAuthorizer.autoriserLeConseiller(

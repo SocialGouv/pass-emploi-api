@@ -1,7 +1,7 @@
 import {
   EnvoyerFormulaireContactImmersionCommand,
   EnvoyerFormulaireContactImmersionCommandHandler
-} from 'src/application/commands/immersion/envoyer-formulaire-contact-immersion.command.handler'
+} from 'src/application/commands/immersion/envoyer-formulaire-contact-immersion.command.handler.db'
 import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { ImmersionClient } from 'src/infrastructure/clients/immersion-client'

@@ -20,7 +20,7 @@ import { DateService } from '../../utils/date-service'
 
 @Controller('jeunes')
 @ApiOAuth2([])
-@ApiTags('Jeunes')
+@ApiTags('Jeunes Milo')
 export class JeunesMiloController {
   constructor(
     private readonly getAccueilQueryHandler: GetAccueilJeuneMiloQueryHandler,

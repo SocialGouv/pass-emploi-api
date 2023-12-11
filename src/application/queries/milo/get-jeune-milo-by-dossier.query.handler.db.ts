@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
-import { Query } from '../../building-blocks/types/query'
-import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Result, failure, success } from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
-import { estMilo } from '../../domain/core'
-import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
-import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
-import { JeuneQueryModel } from './query-models/jeunes.query-model'
+import { NonTrouveError } from '../../../building-blocks/types/domain-error'
+import { Query } from '../../../building-blocks/types/query'
+import { QueryHandler } from '../../../building-blocks/types/query-handler'
+import { Result, failure, success } from '../../../building-blocks/types/result'
+import { Authentification } from '../../../domain/authentification'
+import { estMilo } from '../../../domain/core'
+import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
+import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
+import { JeuneQueryModel } from '../query-models/jeunes.query-model'
 
 export interface GetJeuneMiloByDossierQuery extends Query {
   idDossier: string

@@ -27,7 +27,7 @@ import { CreateActionCommandHandler } from './application/commands/action/create
 import { CreateEvenementCommandHandler } from './application/commands/create-evenement.command.handler'
 import { CreateRechercheCommandHandler } from './application/commands/create-recherche.command.handler'
 import { CreateRendezVousCommandHandler } from './application/commands/create-rendez-vous.command.handler'
-import { CreerJeuneMiloCommandHandler } from './application/commands/creer-jeune-milo.command.handler'
+import { CreerJeuneMiloCommandHandler } from './application/commands/milo/creer-jeune-milo.command.handler'
 import { CreerJeunePoleEmploiCommandHandler } from './application/commands/creer-jeune-pole-emploi.command.handler'
 import { CreerSuperviseursCommandHandler } from './application/commands/creer-superviseurs.command.handler'
 import { DeleteActionCommandHandler } from './application/commands/action/delete-action.command.handler'
@@ -67,7 +67,7 @@ import { GetDetailOffreEmploiQueryHandler } from './application/queries/get-deta
 import { GetDetailOffreImmersionQueryHandler } from './application/queries/get-detail-offre-immersion.query.handler'
 import { GetDetailRendezVousQueryHandler } from './application/queries/rendez-vous/get-detail-rendez-vous.query.handler.db'
 import { GetDetailOffreServiceCiviqueQueryHandler } from './application/queries/get-detail-offre-service-civique.query.handler'
-import { GetDossierMiloJeuneQueryHandler } from './application/queries/get-dossier-milo-jeune.query.handler'
+import { GetDossierMiloJeuneQueryHandler } from './application/queries/milo/get-dossier-milo-jeune.query.handler'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from './application/queries/get-favoris-offres-emploi-jeune.query.handler.db'
 import { GetFavorisOffresImmersionJeuneQueryHandler } from './application/queries/get-favoris-offres-immersion-jeune.query.handler.db'
 import { GetHomeJeuneHandler } from './application/queries/get-home-jeune.query.handler'
@@ -187,7 +187,7 @@ import {
 } from './infrastructure/clients/pole-emploi-partenaire-client'
 import { GetDemarchesQueryHandler } from './application/queries/get-demarches.query.handler'
 import { GetCatalogueDemarchesQueryHandler } from './application/queries/get-catalogue-demarches.query.handler'
-import { GetJeuneMiloByDossierQueryHandler } from './application/queries/get-jeune-milo-by-dossier.query.handler.db'
+import { GetJeuneMiloByDossierQueryHandler } from './application/queries/milo/get-jeune-milo-by-dossier.query.handler.db'
 import { UpdateRendezVousCommandHandler } from './application/commands/update-rendez-vous.command.handler'
 import { InvitationIcsClient } from './infrastructure/clients/invitation-ics.client'
 import { Mail, MailRepositoryToken, MailServiceToken } from './domain/mail'
@@ -237,7 +237,7 @@ import { GetCommentairesActionQueryHandler } from './application/queries/action/
 import { GetJeuneHomeAgendaQueryHandler } from './application/queries/get-jeune-home-agenda.query.handler.db'
 import { JeunePoleEmploiSqlRepository } from './infrastructure/repositories/jeune/jeune-pole-emploi-sql.repository.db'
 import { GetTypesQualificationsQueryHandler } from './application/queries/action/get-types-qualifications.query.handler'
-import { ActionMiloHttpRepository } from './infrastructure/repositories/action/action-milo-http-sql.repository'
+import { ActionMiloHttpRepository } from './infrastructure/repositories/milo/action.milo.repository'
 import { QualifierActionCommandHandler } from './application/commands/action/qualifier-action.command.handler'
 import { GetSuiviSemainePoleEmploiQueryHandler } from './application/queries/get-suivi-semaine-pole-emploi.query.handler'
 import { GetDemarchesQueryGetter } from './application/queries/query-getters/pole-emploi/get-demarches.query.getter'
@@ -301,7 +301,7 @@ import { DiagorienteController } from './infrastructure/routes/diagoriente.contr
 import { GetDiagorienteUrlsQueryHandler } from './application/queries/get-diagoriente-urls.query.handler'
 import { ArchiverJeuneSupportCommandHandler } from './application/commands/support/archiver-jeune-support.command.handler'
 import { GetDiagorienteMetiersFavorisQueryHandler } from './application/queries/get-diagoriente-metiers-favoris.query.handler'
-import { EnvoyerFormulaireContactImmersionCommandHandler } from './application/commands/immersion/envoyer-formulaire-contact-immersion.command.handler'
+import { EnvoyerFormulaireContactImmersionCommandHandler } from './application/commands/immersion/envoyer-formulaire-contact-immersion.command.handler.db'
 import { GetAccueilJeuneMiloQueryHandler } from './application/queries/accueil/get-accueil-jeune-milo.query.handler.db'
 import { GetAccueilJeunePoleEmploiQueryHandler } from './application/queries/accueil/get-accueil-jeune-pole-emploi.query.handler.db'
 import { JeunesPoleEmploiController } from './infrastructure/routes/jeunes.pole-emploi.controller'
@@ -344,7 +344,7 @@ import { HandleJobGenererJDDCommandHandler } from './application/jobs/generer-jd
 import { MajSegmentsJobHandler } from './application/jobs/maj-segments.job.handler.db'
 import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
 import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
-import { EmargementSessionMiloCommandHandler } from 'src/application/commands/milo/emargement-session-milo.command.handler'
+import { EmargerSessionMiloCommandHandler } from 'src/application/commands/milo/emarger-session-milo.command.handler'
 import { GetSessionsConseillerMiloQueryGetter } from './application/queries/query-getters/milo/get-sessions-conseiller.milo.query.getter.db'
 import { ConseillerInterStructureMiloAuthorizer } from './application/authorizers/conseiller-inter-structure-milo-authorizer'
 import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
@@ -377,9 +377,9 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     // De base
     ActionsController,
     JeunesController,
+    JeunesControllerV2,
     JeunesMiloController,
     JeunesPoleEmploiController,
-    JeunesControllerV2,
     ConseillersController,
     ConseillersControllerV2,
     ConseillersMiloController,
@@ -778,7 +778,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetDetailSessionConseillerMiloQueryHandler,
     GetDetailSessionJeuneMiloQueryHandler,
     UpdateSessionMiloCommandHandler,
-    EmargementSessionMiloCommandHandler,
+    EmargerSessionMiloCommandHandler,
     EvenementEmploiCodePostalQueryGetter,
     GetCatalogueDemarchesQueryHandler
   ]

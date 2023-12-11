@@ -1,15 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Query } from '../../building-blocks/types/query'
-import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Result } from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
-import { estMilo } from '../../domain/core'
+import { Query } from '../../../building-blocks/types/query'
+import { QueryHandler } from '../../../building-blocks/types/query-handler'
+import { Result } from '../../../building-blocks/types/result'
+import { Authentification } from '../../../domain/authentification'
+import { estMilo } from '../../../domain/core'
 import {
   JeuneMilo,
   MiloJeuneRepositoryToken
-} from '../../domain/milo/jeune.milo'
-import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
-import { DossierJeuneMiloQueryModel } from './query-models/milo.query-model'
+} from '../../../domain/milo/jeune.milo'
+import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
+import { DossierJeuneMiloQueryModel } from '../query-models/milo.query-model'
 
 export interface GetDossierMiloJeuneQuery extends Query {
   idDossier: string

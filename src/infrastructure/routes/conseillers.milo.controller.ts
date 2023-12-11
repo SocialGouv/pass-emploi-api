@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
   Param,
   Patch,
   Post,
@@ -19,23 +20,37 @@ import {
   DetailSessionConseillerMiloQueryModel,
   SessionConseillerMiloQueryModel
 } from 'src/application/queries/query-models/sessions.milo.query.model'
-import { isSuccess } from 'src/building-blocks/types/result'
+import { isFailure, isSuccess } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { DateService } from 'src/utils/date-service'
 import {
-  EmargementSessionMiloCommand,
-  EmargementSessionMiloCommandHandler
-} from '../../application/commands/milo/emargement-session-milo.command.handler'
+  EmargerSessionMiloCommand,
+  EmargerSessionMiloCommandHandler
+} from '../../application/commands/milo/emarger-session-milo.command.handler'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './result.handler'
 import {
-  EmargementsSessionMiloPayload,
+  EmargementsSessionMiloPayload as EmargerSessionMiloPayload,
   GetAgendaSessionsQueryParams,
   GetSessionsQueryParams,
   UpdateSessionMiloPayload
 } from './validation/conseiller-milo.inputs'
 import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
 import { DateTime } from 'luxon'
+import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
+import {
+  CreerJeuneMiloCommandHandler,
+  CreerJeuneMiloCommand
+} from '../../application/commands/milo/creer-jeune-milo.command.handler'
+import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/milo/get-dossier-milo-jeune.query.handler'
+import { GetJeuneMiloByDossierQueryHandler } from '../../application/queries/milo/get-jeune-milo-by-dossier.query.handler.db'
+import {
+  JeuneQueryModel,
+  IdentiteJeuneQueryModel
+} from '../../application/queries/query-models/jeunes.query-model'
+import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
+import { ErreurHttp } from '../../building-blocks/types/domain-error'
+import { CreerJeuneMiloPayload } from './validation/conseillers.inputs'
 
 @Controller('conseillers/milo')
 @ApiOAuth2([])
@@ -46,8 +61,89 @@ export class ConseillersMiloController {
     private readonly getDetailSessionQueryHandler: GetDetailSessionConseillerMiloQueryHandler,
     private readonly getAgendaSessionsQueryHandler: GetAgendaSessionsConseillerMiloQueryHandler,
     private readonly updateSessionCommandHandler: UpdateSessionMiloCommandHandler,
-    private readonly emargementSessionCommandHandler: EmargementSessionMiloCommandHandler
+    private readonly emargerSessionCommandHandler: EmargerSessionMiloCommandHandler,
+    private readonly getDossierMiloJeuneQueryHandler: GetDossierMiloJeuneQueryHandler,
+    private readonly getJeuneMiloByDossierQueryHandler: GetJeuneMiloByDossierQueryHandler,
+    private readonly creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler
   ) {}
+  @ApiOperation({
+    summary: "Récupère le dossier Milo d'un jeune",
+    description: 'Autorisé pour un conseiller du jeune'
+  })
+  @Get('/dossiers/:idDossier')
+  @ApiResponse({
+    type: DossierJeuneMiloQueryModel
+  })
+  async getDossierMilo(
+    @Param('idDossier') idDossier: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<DossierJeuneMiloQueryModel> {
+    const result = await this.getDossierMiloJeuneQueryHandler.execute(
+      { idDossier },
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      if (result.error.code === ErreurHttp.CODE) {
+        throw new HttpException(
+          result.error.message,
+          (result.error as ErreurHttp).statusCode
+        )
+      }
+      throw new RuntimeException(result.error.message)
+    }
+
+    return result.data
+  }
+
+  @ApiOperation({
+    summary: 'Récupère un jeune par son idDossier Milo',
+    description: 'Autorisé pour un conseiller du jeune'
+  })
+  @Get('/jeunes/:idDossier')
+  @ApiResponse({
+    type: JeuneQueryModel
+  })
+  async getJeuneMiloByDossier(
+    @Param('idDossier') idDossier: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<JeuneQueryModel> {
+    const result = await this.getJeuneMiloByDossierQueryHandler.execute(
+      { idDossier },
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
+  }
+
+  @ApiOperation({
+    summary: 'Crée un jeune Milo',
+    description: 'Autorisé pour un conseiller Milo'
+  })
+  @Post('/jeunes')
+  async postJeuneMilo(
+    @Body() creerJeuneMiloPayload: CreerJeuneMiloPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<IdentiteJeuneQueryModel> {
+    const command: CreerJeuneMiloCommand = {
+      idConseiller: creerJeuneMiloPayload.idConseiller,
+      email: creerJeuneMiloPayload.email,
+      nom: creerJeuneMiloPayload.nom,
+      prenom: creerJeuneMiloPayload.prenom,
+      idPartenaire: creerJeuneMiloPayload.idDossier
+    }
+    const result = await this.creerJeuneMiloCommandHandler.execute(
+      command,
+      utilisateur
+    )
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
+  }
 
   @ApiOperation({
     summary: 'Récupère la liste des sessions de sa structure MILO',
@@ -152,18 +248,18 @@ export class ConseillersMiloController {
   async emargerSession(
     @Param('idConseiller') idConseiller: string,
     @Param('idSession') idSession: string,
-    @Body() emargementSessionMiloPayload: EmargementsSessionMiloPayload,
+    @Body() emargerSessionMiloPayload: EmargerSessionMiloPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @AccessToken() accessToken: string
   ): Promise<void> {
-    const command: EmargementSessionMiloCommand = {
+    const command: EmargerSessionMiloCommand = {
       idSession,
       idConseiller,
       accessToken: accessToken,
-      emargements: emargementSessionMiloPayload.emargements
+      emargements: emargerSessionMiloPayload.emargements
     }
 
-    const result = await this.emargementSessionCommandHandler.execute(
+    const result = await this.emargerSessionCommandHandler.execute(
       command,
       utilisateur
     )
