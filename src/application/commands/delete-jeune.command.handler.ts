@@ -16,7 +16,7 @@ import { Mail, MailServiceToken } from '../../domain/mail'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { Core } from '../../domain/core'
 
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { SupportAuthorizer } from '../authorizers/support-authorizer'
 
@@ -37,7 +37,7 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
   void
 > {
   constructor(
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private readonly jeuneRepository: Jeune.Repository,
     @Inject(ChatRepositoryToken)
     private readonly chatRepository: Chat.Repository,

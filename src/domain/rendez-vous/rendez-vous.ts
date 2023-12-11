@@ -1,25 +1,26 @@
 import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import {
-  ConseillerSansAgenceError,
+  ConseillerMiloSansStructure,
   DateNonAutoriseeError,
-  JeuneNonLieALAgenceError,
+  JeuneNonLieALaStructureMiloError,
   JeuneNonLieAuConseillerError,
   MauvaiseCommandeError
 } from '../../building-blocks/types/domain-error'
 import {
+  Result,
   emptySuccess,
   failure,
   isFailure,
-  Result,
   success
 } from '../../building-blocks/types/result'
+import { DateService } from '../../utils/date-service'
 import { IdService } from '../../utils/id-service'
 import { Conseiller } from '../conseiller/conseiller'
 import { Jeune } from '../jeune/jeune'
 import * as _AnimationCollective from './animation-collective'
 import * as _Historique from './historique'
-import { DateService } from '../../utils/date-service'
+import { JeuneMilo } from '../milo/jeune.milo'
 
 export const RendezVousRepositoryToken = 'RendezVous.Repository'
 
@@ -102,6 +103,17 @@ export interface Createur {
 export type JeuneDuRendezVous = Pick<
   Jeune,
   'id' | 'firstName' | 'lastName' | 'conseiller' | 'email' | 'configuration'
+>
+
+export type JeuneMiloDuRendezVous = Pick<
+  JeuneMilo,
+  | 'id'
+  | 'firstName'
+  | 'lastName'
+  | 'conseiller'
+  | 'email'
+  | 'configuration'
+  | 'idStructureMilo'
 >
 
 export interface RendezVous {
@@ -209,13 +221,15 @@ export namespace RendezVous {
     )
   }
 
-  function verifierAgenceJeunes(
-    jeunes: JeuneDuRendezVous[],
-    idAgence: string
+  function verifierStructureMiloJeunes(
+    jeunes: JeuneMiloDuRendezVous[],
+    idStructureMilo: string
   ): Result {
     for (const jeune of jeunes) {
-      if (jeune.conseiller?.idAgence !== idAgence) {
-        return failure(new JeuneNonLieALAgenceError(jeune.id, idAgence))
+      if (!jeune.idStructureMilo || jeune.idStructureMilo !== idStructureMilo) {
+        return failure(
+          new JeuneNonLieALaStructureMiloError(jeune.id, idStructureMilo)
+        )
       }
     }
     return emptySuccess()
@@ -238,14 +252,14 @@ export namespace RendezVous {
 
     creer(
       infosRendezVousACreer: InfosRendezVousACreer,
-      jeunes: Jeune[],
-      conseiller: Conseiller
+      jeunes: Jeune[] | JeuneMilo[],
+      conseiller: Conseiller | Conseiller.Milo
     ): Result<RendezVous> {
       const type = infosRendezVousACreer.type
         ? (infosRendezVousACreer.type as CodeTypeRendezVous)
         : CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
       const categorie = mapCodeCategorieTypeRendezVous[type]
-      let idAgence = undefined
+      let idStructureMilo = undefined
 
       switch (categorie) {
         case CategorieRendezVous.MILO:
@@ -253,6 +267,10 @@ export namespace RendezVous {
             new MauvaiseCommandeError('Le type de rendez-vous est invalide')
           )
         case CategorieRendezVous.CEJ_AC:
+          idStructureMilo = (conseiller as Conseiller.Milo).structureMilo?.id
+          if (!idStructureMilo) {
+            return failure(new ConseillerMiloSansStructure(conseiller.id))
+          }
           if (
             infosRendezVousACreer.nombreMaxParticipants &&
             infosRendezVousACreer.nombreMaxParticipants < jeunes.length
@@ -263,16 +281,13 @@ export namespace RendezVous {
               )
             )
           }
-          idAgence = conseiller.agence?.id
-          if (!idAgence) {
-            return failure(new ConseillerSansAgenceError(conseiller.id))
-          }
-          const resultVerificationAgence = verifierAgenceJeunes(
+
+          const resultVerificationStructureMilo = verifierStructureMiloJeunes(
             jeunes,
-            idAgence
+            idStructureMilo
           )
-          if (isFailure(resultVerificationAgence)) {
-            return resultVerificationAgence
+          if (isFailure(resultVerificationStructureMilo)) {
+            return resultVerificationStructureMilo
           }
           break
         case CategorieRendezVous.CEJ_RDV:
@@ -320,7 +335,7 @@ export namespace RendezVous {
           nom: conseiller.lastName,
           prenom: conseiller.firstName
         },
-        idAgence,
+        idStructureMilo,
         nombreMaxParticipants: infosRendezVousACreer.nombreMaxParticipants
       })
     }
@@ -351,13 +366,13 @@ export namespace RendezVous {
               )
             )
           }
-          if (rendezVousInitial.idAgence) {
-            const resultVerificationAgence = verifierAgenceJeunes(
+          if (rendezVousInitial.idStructureMilo) {
+            const resultVerificationStrucutreMilo = verifierStructureMiloJeunes(
               infosRendezVousAMettreAJour.jeunes,
-              rendezVousInitial.idAgence
+              rendezVousInitial.idStructureMilo
             )
-            if (isFailure(resultVerificationAgence)) {
-              return resultVerificationAgence
+            if (isFailure(resultVerificationStrucutreMilo)) {
+              return resultVerificationStrucutreMilo
             }
           }
           break

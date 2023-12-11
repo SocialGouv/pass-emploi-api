@@ -104,7 +104,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
       sessionMiloRepository.getForConseiller
         .withArgs(
           commandSansInscription.idSession,
-          conseiller.structure,
+          conseiller.structureMilo,
           idpToken
         )
         .resolves(failure(erreurHttp))

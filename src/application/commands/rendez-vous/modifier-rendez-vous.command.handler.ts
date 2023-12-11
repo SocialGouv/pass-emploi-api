@@ -1,37 +1,41 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Core } from '../../domain/core'
-import { Evenement, EvenementService } from '../../domain/evenement'
-import { Command } from '../../building-blocks/types/command'
-import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import { Core } from '../../../domain/core'
+import { Evenement, EvenementService } from '../../../domain/evenement'
+import { Command } from '../../../building-blocks/types/command'
+import { CommandHandler } from '../../../building-blocks/types/command-handler'
+import { NonTrouveError } from '../../../building-blocks/types/domain-error'
 import {
   failure,
   isFailure,
   Result,
   success
-} from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
+} from '../../../building-blocks/types/result'
+import { Authentification } from '../../../domain/authentification'
 import {
   Conseiller,
-  ConseillersRepositoryToken
-} from '../../domain/conseiller/conseiller'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
-import { Mail, MailServiceToken } from '../../domain/mail'
-import { Notification } from '../../domain/notification/notification'
+  ConseillerRepositoryToken
+} from '../../../domain/conseiller/conseiller'
+import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
+import { Mail, MailServiceToken } from '../../../domain/mail'
+import { Notification } from '../../../domain/notification/notification'
 import {
   PlanificateurService,
   replanifierLesRappelsDeRendezVous
-} from '../../domain/planificateur'
+} from '../../../domain/planificateur'
 import {
   JeuneDuRendezVous,
   RendezVous,
   RendezVousRepositoryToken
-} from '../../domain/rendez-vous/rendez-vous'
-import { buildError } from '../../utils/logger.module'
-import { RendezVousAuthorizer } from '../authorizers/rendezvous-authorizer'
-import { HistoriqueRendezVousRepositoryToken } from '../../domain/rendez-vous/historique'
+} from '../../../domain/rendez-vous/rendez-vous'
+import { buildError } from '../../../utils/logger.module'
+import { RendezVousAuthorizer } from '../../authorizers/rendezvous-authorizer'
+import { HistoriqueRendezVousRepositoryToken } from '../../../domain/rendez-vous/historique'
+import {
+  JeuneMilo,
+  MiloJeuneRepositoryToken
+} from '../../../domain/milo/jeune.milo'
 
-export interface UpdateRendezVousCommand extends Command {
+export interface ModifierRendezVousCommand extends Command {
   idRendezVous: string
   idsJeunes: string[]
   titre?: string
@@ -46,20 +50,22 @@ export interface UpdateRendezVousCommand extends Command {
 }
 
 @Injectable()
-export class UpdateRendezVousCommandHandler extends CommandHandler<
-  UpdateRendezVousCommand,
+export class ModifierRendezVousCommandHandler extends CommandHandler<
+  ModifierRendezVousCommand,
   Core.Id
 > {
   constructor(
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
+    @Inject(MiloJeuneRepositoryToken)
+    private jeuneMiloRepository: JeuneMilo.Repository,
     private rendezVousFactory: RendezVous.Factory,
     private notificationService: Notification.Service,
     @Inject(MailServiceToken)
     private mailClient: Mail.Service,
-    @Inject(ConseillersRepositoryToken)
+    @Inject(ConseillerRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     private rendezVousAuthorizer: RendezVousAuthorizer,
     private planificateurService: PlanificateurService,
@@ -68,16 +74,22 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     @Inject(HistoriqueRendezVousRepositoryToken)
     private historiqueRendezVousRepository: RendezVous.Historique.Repository
   ) {
-    super('UpdateRendezVousCommandHandler')
+    super('ModifierRendezVousCommandHandler')
   }
 
-  async handle(command: UpdateRendezVousCommand): Promise<Result<Core.Id>> {
+  async handle(command: ModifierRendezVousCommand): Promise<Result<Core.Id>> {
     const rendezVous = await this.rendezVousRepository.get(command.idRendezVous)
     if (!rendezVous) {
       return failure(new NonTrouveError('RendezVous', command.idRendezVous))
     }
 
-    const jeunes = await this.jeuneRepository.findAll(command.idsJeunes)
+    let jeunes
+
+    if (RendezVous.estUnTypeAnimationCollective(rendezVous.type)) {
+      jeunes = await this.jeuneMiloRepository.findAll(command.idsJeunes)
+    } else {
+      jeunes = await this.jeuneRepository.findAll(command.idsJeunes)
+    }
 
     if (jeunes.length !== command.idsJeunes?.length) {
       return failure(new NonTrouveError('Jeune'))
@@ -205,7 +217,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
   }
 
   async authorize(
-    command: UpdateRendezVousCommand,
+    command: ModifierRendezVousCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     return this.rendezVousAuthorizer.autoriserConseillerPourUnRendezVousAvecAuMoinsUnJeune(
@@ -216,7 +228,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
 
   async monitor(
     utilisateur: Authentification.Utilisateur,
-    command: UpdateRendezVousCommand
+    command: ModifierRendezVousCommand
   ): Promise<void> {
     const log = this.historiqueRendezVousFactory.creerLogModification(
       command.idRendezVous,

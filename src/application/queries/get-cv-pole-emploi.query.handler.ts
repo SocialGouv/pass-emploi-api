@@ -10,7 +10,7 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { estPoleEmploiBRSA } from '../../domain/core'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { DocumentPoleEmploiDto } from '../../infrastructure/clients/dto/pole-emploi.dto'
 import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
 import {
@@ -31,7 +31,7 @@ export class GetCVPoleEmploiQueryHandler extends QueryHandler<
   Result<CVPoleEmploiQueryModel[]>
 > {
   constructor(
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     @Inject(PoleEmploiPartenaireClientToken)
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,

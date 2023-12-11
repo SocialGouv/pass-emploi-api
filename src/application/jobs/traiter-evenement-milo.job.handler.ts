@@ -174,7 +174,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
       this.isDateRecuperable(rendezVousMILO, jeune) &&
       this.isStatutRDVRecuperable(rendezVousMILO)
     ) {
-      const newRendezVousCEJ = this.rendezVousMiloFactory.createRendezVousCEJ(
+      const newRendezVousCEJ = this.rendezVousMiloFactory.creerRendezVousCEJ(
         rendezVousMILO,
         jeune
       )

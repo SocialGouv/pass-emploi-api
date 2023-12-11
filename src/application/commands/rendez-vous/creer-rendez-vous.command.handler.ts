@@ -1,34 +1,40 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Evenement, EvenementService } from '../../domain/evenement'
-import { Command } from '../../building-blocks/types/command'
-import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import { Evenement, EvenementService } from '../../../domain/evenement'
+import { Command } from '../../../building-blocks/types/command'
+import { CommandHandler } from '../../../building-blocks/types/command-handler'
+import { NonTrouveError } from '../../../building-blocks/types/domain-error'
 import {
   failure,
   isFailure,
   Result,
   success
-} from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
+} from '../../../building-blocks/types/result'
+import { Authentification } from '../../../domain/authentification'
 import {
   Conseiller,
-  ConseillersRepositoryToken
-} from '../../domain/conseiller/conseiller'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
-import { Mail, MailServiceToken } from '../../domain/mail'
-import { Notification } from '../../domain/notification/notification'
+  ConseillerRepositoryToken
+} from '../../../domain/conseiller/conseiller'
+import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
+import { Mail, MailServiceToken } from '../../../domain/mail'
+import { Notification } from '../../../domain/notification/notification'
 import {
   PlanificateurService,
   planifierLesRappelsDeRendezVous
-} from '../../domain/planificateur'
+} from '../../../domain/planificateur'
 import {
+  CodeTypeRendezVous,
   RendezVous,
   RendezVousRepositoryToken
-} from '../../domain/rendez-vous/rendez-vous'
-import { buildError } from '../../utils/logger.module'
-import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
+} from '../../../domain/rendez-vous/rendez-vous'
+import { buildError } from '../../../utils/logger.module'
+import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
+import { ConseillerMiloRepositoryToken } from '../../../domain/milo/conseiller.milo.db'
+import {
+  JeuneMilo,
+  MiloJeuneRepositoryToken
+} from '../../../domain/milo/jeune.milo'
 
-export interface CreateRendezVousCommand extends Command {
+export interface CreerRendezVousCommand extends Command {
   idsJeunes: string[]
   idConseiller: string
   commentaire?: string
@@ -36,7 +42,7 @@ export interface CreateRendezVousCommand extends Command {
   duree: number
   modalite?: string
   titre?: string
-  type?: string
+  type?: CodeTypeRendezVous
   precision?: string
   adresse?: string
   organisme?: string
@@ -46,16 +52,20 @@ export interface CreateRendezVousCommand extends Command {
 }
 
 @Injectable()
-export class CreateRendezVousCommandHandler extends CommandHandler<
-  CreateRendezVousCommand,
+export class CreerRendezVousCommandHandler extends CommandHandler<
+  CreerRendezVousCommand,
   string
 > {
   constructor(
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
-    @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
-    @Inject(ConseillersRepositoryToken)
+    @Inject(JeuneRepositoryToken) private jeuneRepository: Jeune.Repository,
+    @Inject(MiloJeuneRepositoryToken)
+    private jeuneMiloRepository: JeuneMilo.Repository,
+    @Inject(ConseillerRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
+    @Inject(ConseillerMiloRepositoryToken)
+    private conseillerMiloRepository: Conseiller.Milo.Repository,
     private rendezVousFactory: RendezVous.Factory,
     private notificationService: Notification.Service,
     @Inject(MailServiceToken)
@@ -64,17 +74,29 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
     private planificateurService: PlanificateurService,
     private evenementService: EvenementService
   ) {
-    super('CreateRendezVousCommandHandler')
+    super('CreerRendezVousCommandHandler')
   }
 
-  async handle(command: CreateRendezVousCommand): Promise<Result<string>> {
-    const conseiller = await this.conseillerRepository.get(command.idConseiller)
+  async handle(command: CreerRendezVousCommand): Promise<Result<string>> {
+    let conseiller
+    let jeunes
 
-    if (!conseiller) {
-      return failure(new NonTrouveError('Conseiller'))
+    if (RendezVous.estUnTypeAnimationCollective(command.type)) {
+      const conseillerResult = await this.conseillerMiloRepository.get(
+        command.idConseiller
+      )
+      if (isFailure(conseillerResult)) {
+        return conseillerResult
+      }
+      conseiller = conseillerResult.data
+      jeunes = await this.jeuneMiloRepository.findAll(command.idsJeunes)
+    } else {
+      conseiller = await this.conseillerRepository.get(command.idConseiller)
+      if (!conseiller) {
+        return failure(new NonTrouveError('Conseiller'))
+      }
+      jeunes = await this.jeuneRepository.findAll(command.idsJeunes)
     }
-
-    const jeunes = await this.jeuneRepository.findAll(command.idsJeunes)
 
     if (jeunes.length !== command.idsJeunes.length) {
       return failure(new NonTrouveError('Jeune'))
@@ -138,7 +160,7 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
   }
 
   async authorize(
-    command: CreateRendezVousCommand,
+    command: CreerRendezVousCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     return this.conseillerAuthorizer.autoriserLeConseiller(
@@ -149,7 +171,7 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
 
   async monitor(
     utilisateur: Authentification.Utilisateur,
-    command: CreateRendezVousCommand
+    command: CreerRendezVousCommand
   ): Promise<void> {
     const codeEvenement = RendezVous.estUnTypeAnimationCollective(command.type)
       ? Evenement.Code.ANIMATION_COLLECTIVE_CREEE

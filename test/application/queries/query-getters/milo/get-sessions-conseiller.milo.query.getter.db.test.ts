@@ -75,7 +75,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
       }
       const idpToken = 'idpToken'
       const conseiller = unConseillerMilo({
-        structure: {
+        structureMilo: {
           id: query.idStructureMilo,
           timezone: query.timezoneStructure
         }
@@ -83,14 +83,14 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
 
       beforeEach(async () => {
         await StructureMiloSqlModel.create({
-          id: conseiller.structure.id,
+          id: conseiller.structureMilo.id,
           nomOfficiel: 'Structure Milo',
-          timezone: conseiller.structure.timezone
+          timezone: conseiller.structureMilo.timezone
         })
         await SessionMiloSqlModel.create({
           id: unDetailSessionConseillerDto.session.id,
           estVisible: true,
-          idStructureMilo: conseiller.structure.id,
+          idStructureMilo: conseiller.structureMilo.id,
           dateModification: DateTime.now().toJSDate()
         })
         keycloakClient.exchangeTokenConseillerMilo
@@ -103,8 +103,8 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
         miloClient.getSessionsConseiller
           .withArgs(
             idpToken,
-            conseiller.structure.id,
-            conseiller.structure.timezone,
+            conseiller.structureMilo.id,
+            conseiller.structureMilo.timezone,
             {
               periode: {
                 dateDebut: query.options.periode.debut,
@@ -170,8 +170,8 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
         miloClient.getSessionsConseiller
           .withArgs(
             idpToken,
-            conseiller.structure.id,
-            conseiller.structure.timezone,
+            conseiller.structureMilo.id,
+            conseiller.structureMilo.timezone,
             {
               periode: {
                 dateDebut: DateTime.fromISO(DATE_DEBUT_SESSIONS_A_CLORE),
@@ -201,8 +201,8 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
         )
         expect(miloClient.getSessionsConseiller).to.have.been.calledWith(
           idpToken,
-          conseiller.structure.id,
-          conseiller.structure.timezone,
+          conseiller.structureMilo.id,
+          conseiller.structureMilo.timezone,
           {
             periode: {
               dateDebut: DateTime.fromISO(DATE_DEBUT_SESSIONS_A_CLORE),
@@ -309,8 +309,8 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
         miloClient.getSessionsConseiller
           .withArgs(
             idpToken,
-            conseiller.structure.id,
-            conseiller.structure.timezone,
+            conseiller.structureMilo.id,
+            conseiller.structureMilo.timezone,
             {
               periode: {
                 dateDebut: query.options.periode.debut,

@@ -19,6 +19,7 @@ import { DossierMiloDto } from '../dto/milo.dto'
 import { fromSqlToJeune } from '../mappers/jeunes.mappers'
 import { StructureMiloSqlModel } from '../../sequelize/models/structure-milo.sql-model'
 import { DateTime } from 'luxon'
+import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
 
 @Injectable()
 export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
@@ -48,6 +49,21 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
       idStructureMilo: jeuneSqlModel.idStructureMilo ?? undefined
     }
     return success(jeuneMilo)
+  }
+
+  async findAll(ids: string[]): Promise<JeuneMilo[]> {
+    const jeunesSqlModels = await JeuneSqlModel.findAll({
+      where: {
+        id: {
+          [Op.in]: ids
+        }
+      },
+      include: [ConseillerSqlModel]
+    })
+    return jeunesSqlModels.map(jeuneSql => ({
+      ...fromSqlToJeune(jeuneSql),
+      idStructureMilo: jeuneSql.idStructureMilo || undefined
+    }))
   }
 
   async getDossier(idDossier: string): Promise<Result<JeuneMilo.Dossier>> {

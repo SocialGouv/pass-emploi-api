@@ -1,45 +1,48 @@
-import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
-import { PlanificateurService } from '../../../src/domain/planificateur'
-import {
-  unUtilisateurConseiller,
-  unUtilisateurJeune
-} from '../../fixtures/authentification.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { failure, success } from '../../../src/building-blocks/types/result'
+import { Conseiller } from 'src/domain/conseiller/conseiller'
+import { Evenement, EvenementService } from 'src/domain/evenement'
+import { stubClassSandbox } from 'test/utils/types'
+import { ConseillerAuthorizer } from '../../../../src/application/authorizers/conseiller-authorizer'
+import {
+  CreerRendezVousCommand,
+  CreerRendezVousCommandHandler
+} from '../../../../src/application/commands/rendez-vous/creer-rendez-vous.command.handler'
+import {
+  ConseillerMiloSansStructure,
+  DateNonAutoriseeError,
+  NonTrouveError
+} from '../../../../src/building-blocks/types/domain-error'
+import { failure, success } from '../../../../src/building-blocks/types/result'
+import { Jeune } from '../../../../src/domain/jeune/jeune'
+import { Mail } from '../../../../src/domain/mail'
+import { JeuneMilo } from '../../../../src/domain/milo/jeune.milo'
+import { Notification } from '../../../../src/domain/notification/notification'
+import { PlanificateurService } from '../../../../src/domain/planificateur'
 import {
   CodeTypeRendezVous,
   RendezVous
-} from '../../../src/domain/rendez-vous/rendez-vous'
-import { Notification } from '../../../src/domain/notification/notification'
-import { uneConfiguration, unJeune } from '../../fixtures/jeune.fixture'
+} from '../../../../src/domain/rendez-vous/rendez-vous'
 import {
-  ConseillerSansAgenceError,
-  DateNonAutoriseeError,
-  NonTrouveError
-} from '../../../src/building-blocks/types/domain-error'
-import { Jeune } from '../../../src/domain/jeune/jeune'
-import {
-  CreateRendezVousCommand,
-  CreateRendezVousCommandHandler
-} from '../../../src/application/commands/create-rendez-vous.command.handler'
-import { Evenement, EvenementService } from 'src/domain/evenement'
-import { Mail } from '../../../src/domain/mail'
-import { Conseiller } from 'src/domain/conseiller/conseiller'
-import { stubClassSandbox } from 'test/utils/types'
-import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
-import { unConseiller } from '../../fixtures/conseiller.fixture'
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../../fixtures/authentification.fixture'
+import { unConseiller } from '../../../fixtures/conseiller.fixture'
+import { unJeune, uneConfiguration } from '../../../fixtures/jeune.fixture'
+import { unRendezVous } from '../../../fixtures/rendez-vous.fixture'
+import { StubbedClass, createSandbox, expect, stubClass } from '../../../utils'
 
-describe('CreateRendezVousCommandHandler', () => {
+describe('CreerRendezVousCommandHandler', () => {
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let notificationService: StubbedClass<Notification.Service>
   let rendezVousFactory: StubbedClass<RendezVous.Factory>
   let jeuneRepository: StubbedType<Jeune.Repository>
+  let jeuneMiloRepository: StubbedType<JeuneMilo.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
+  let conseillerMiloRepository: StubbedType<Conseiller.Milo.Repository>
   let planificateurService: StubbedClass<PlanificateurService>
   const conseillerAuthorizer = stubClass(ConseillerAuthorizer)
-  let createRendezVousCommandHandler: CreateRendezVousCommandHandler
+  let creerRendezVousCommandHandler: CreerRendezVousCommandHandler
   let evenementService: StubbedClass<EvenementService>
   let mailClient: StubbedType<Mail.Service>
   const conseiller = unConseiller()
@@ -60,18 +63,22 @@ describe('CreateRendezVousCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     rendezVousRepository = stubInterface(sandbox)
     conseillerRepository = stubInterface(sandbox)
+    conseillerMiloRepository = stubInterface(sandbox)
     notificationService = stubClassSandbox(Notification.Service, sandbox)
     notificationService.notifierLesJeunesDuRdv.resolves()
     jeuneRepository = stubInterface(sandbox)
+    jeuneMiloRepository = stubInterface(sandbox)
     planificateurService = stubClass(PlanificateurService)
     rendezVousFactory = stubClass(RendezVous.Factory)
     evenementService = stubClass(EvenementService)
     mailClient = stubInterface(sandbox)
 
-    createRendezVousCommandHandler = new CreateRendezVousCommandHandler(
+    creerRendezVousCommandHandler = new CreerRendezVousCommandHandler(
       rendezVousRepository,
       jeuneRepository,
+      jeuneMiloRepository,
       conseillerRepository,
+      conseillerMiloRepository,
       rendezVousFactory,
       notificationService,
       mailClient,
@@ -85,7 +92,7 @@ describe('CreateRendezVousCommandHandler', () => {
     describe("quand le conseiller n'existe pas", () => {
       it('renvoie une failure', async () => {
         // Given
-        const command: CreateRendezVousCommand = {
+        const command: CreerRendezVousCommand = {
           idsJeunes: [jeune1.id, jeune2.id],
           idConseiller: conseiller.id,
           commentaire: rendezVous.commentaire,
@@ -98,7 +105,7 @@ describe('CreateRendezVousCommandHandler', () => {
           .resolves(undefined)
 
         // When
-        const result = await createRendezVousCommandHandler.handle(command)
+        const result = await creerRendezVousCommandHandler.handle(command)
 
         // Then
         expect(rendezVousRepository.save).not.to.have.been.calledWith(
@@ -112,7 +119,7 @@ describe('CreateRendezVousCommandHandler', () => {
     describe("quand au moins un des jeunes n'existe pas", () => {
       it('renvoie une failure', async () => {
         // Given
-        const command: CreateRendezVousCommand = {
+        const command: CreerRendezVousCommand = {
           idsJeunes: [jeune1.id, jeune2.id],
           idConseiller: conseiller.id,
           commentaire: rendezVous.commentaire,
@@ -126,7 +133,7 @@ describe('CreateRendezVousCommandHandler', () => {
         jeuneRepository.findAll.withArgs(command.idsJeunes).resolves([jeune1])
 
         // When
-        const result = await createRendezVousCommandHandler.handle(command)
+        const result = await creerRendezVousCommandHandler.handle(command)
 
         // Then
         expect(rendezVousRepository.save).not.to.have.been.calledWith(
@@ -140,7 +147,7 @@ describe('CreateRendezVousCommandHandler', () => {
     describe("quand la création n'est pas possible", () => {
       it('renvoie une failure', async () => {
         // Given
-        const command: CreateRendezVousCommand = {
+        const command: CreerRendezVousCommand = {
           idsJeunes: [jeune1.id, jeune2.id],
           idConseiller: conseiller.id,
           commentaire: rendezVous.commentaire,
@@ -157,10 +164,10 @@ describe('CreateRendezVousCommandHandler', () => {
 
         rendezVousFactory.creer
           .withArgs(command, [jeune1, jeune2], conseiller)
-          .returns(failure(new ConseillerSansAgenceError(conseiller.id)))
+          .returns(failure(new ConseillerMiloSansStructure(conseiller.id)))
 
         // When
-        const result = await createRendezVousCommandHandler.handle(command)
+        const result = await creerRendezVousCommandHandler.handle(command)
 
         // Then
         expect(rendezVousRepository.save).not.to.have.been.calledWith(
@@ -169,7 +176,7 @@ describe('CreateRendezVousCommandHandler', () => {
         expect(notificationService.notifierLesJeunesDuRdv).to.have.callCount(0)
         expect(mailClient.envoyerMailRendezVous).callCount(0)
         expect(result).to.deep.equal(
-          failure(new ConseillerSansAgenceError(conseiller.id))
+          failure(new ConseillerMiloSansStructure(conseiller.id))
         )
       })
     })
@@ -177,7 +184,7 @@ describe('CreateRendezVousCommandHandler', () => {
     describe("quand la date du rendez-vous n'est pas valide", () => {
       it('renvoie une failure', async () => {
         // Given
-        const command: CreateRendezVousCommand = {
+        const command: CreerRendezVousCommand = {
           idsJeunes: [jeune1.id, jeune2.id],
           idConseiller: conseiller.id,
           commentaire: rendezVous.commentaire,
@@ -196,7 +203,7 @@ describe('CreateRendezVousCommandHandler', () => {
           .returns(failure(new DateNonAutoriseeError()))
 
         // When
-        const result = await createRendezVousCommandHandler.handle(command)
+        const result = await creerRendezVousCommandHandler.handle(command)
 
         // Then
         expect(rendezVousRepository.save).not.to.have.been.calledWith(
@@ -221,7 +228,7 @@ describe('CreateRendezVousCommandHandler', () => {
         it('crée un rendez-vous, envoie une notification au jeune, envoie un mail au conseiller et planifie', async () => {
           // Given
           const rendezVousAvecInvitation = { ...rendezVous, invitation: true }
-          const command: CreateRendezVousCommand = {
+          const command: CreerRendezVousCommand = {
             idsJeunes: [jeune1.id, jeune2.id],
             idConseiller: conseiller.id,
             commentaire: rendezVousAvecInvitation.commentaire,
@@ -235,7 +242,7 @@ describe('CreateRendezVousCommandHandler', () => {
             .returns(success(rendezVousAvecInvitation))
 
           // When
-          const result = await createRendezVousCommandHandler.handle(command)
+          const result = await creerRendezVousCommandHandler.handle(command)
 
           // Then
           expect(result).to.deep.equal(success(rendezVousAvecInvitation.id))
@@ -268,7 +275,7 @@ describe('CreateRendezVousCommandHandler', () => {
               pushNotificationToken: undefined
             }
           })
-          const command: CreateRendezVousCommand = {
+          const command: CreerRendezVousCommand = {
             idsJeunes: [jeuneSansPushToken.id],
             idConseiller: conseiller.id,
             commentaire: rendezVousAvecInvitation.commentaire,
@@ -289,7 +296,7 @@ describe('CreateRendezVousCommandHandler', () => {
             .returns(success(rendezVousAvecInvitation))
 
           // When
-          const result = await createRendezVousCommandHandler.handle(command)
+          const result = await creerRendezVousCommandHandler.handle(command)
           // Then
           expect(result).to.deep.equal(success(rendezVousAvecInvitation.id))
           expect(rendezVousRepository.save).to.have.been.calledWith(
@@ -314,7 +321,7 @@ describe('CreateRendezVousCommandHandler', () => {
             ...unConseiller(),
             email: undefined
           }
-          const command: CreateRendezVousCommand = {
+          const command: CreerRendezVousCommand = {
             idsJeunes: [jeune1.id],
             idConseiller: conseillerSansEmail.id,
             commentaire: rendezVous.commentaire,
@@ -334,7 +341,7 @@ describe('CreateRendezVousCommandHandler', () => {
             .returns(success(rendezVous))
 
           // When
-          const result = await createRendezVousCommandHandler.handle(command)
+          const result = await creerRendezVousCommandHandler.handle(command)
 
           // Then
           expect(result).to.deep.equal(success(rendezVous.id))
@@ -351,7 +358,7 @@ describe('CreateRendezVousCommandHandler', () => {
       describe("quand le conseiller a choisi de ne pas recevoir d'invitation par email", () => {
         it('crée un rendez-vous sans envoyer un mail au conseiller', async () => {
           // Given
-          const command: CreateRendezVousCommand = {
+          const command: CreerRendezVousCommand = {
             idsJeunes: [jeune1.id],
             idConseiller: conseiller.id,
             commentaire: rendezVous.commentaire,
@@ -365,7 +372,7 @@ describe('CreateRendezVousCommandHandler', () => {
             .returns(success(rendezVous))
 
           // When
-          const result = await createRendezVousCommandHandler.handle(command)
+          const result = await creerRendezVousCommandHandler.handle(command)
           // Then
           expect(result).to.deep.equal(success(rendezVous.id))
           expect(rendezVousRepository.save).to.have.been.calledWith(rendezVous)
@@ -384,7 +391,7 @@ describe('CreateRendezVousCommandHandler', () => {
   describe('authorize', () => {
     it('authorise un conseiller', async () => {
       // Given
-      const command: CreateRendezVousCommand = {
+      const command: CreerRendezVousCommand = {
         idsJeunes: [jeune1.id],
         idConseiller: conseiller.id,
         commentaire: rendezVous.commentaire,
@@ -395,7 +402,7 @@ describe('CreateRendezVousCommandHandler', () => {
       const utilisateur = unUtilisateurConseiller()
 
       // When
-      await createRendezVousCommandHandler.authorize(command, utilisateur)
+      await creerRendezVousCommandHandler.authorize(command, utilisateur)
 
       // Then
       expect(
@@ -419,7 +426,7 @@ describe('CreateRendezVousCommandHandler', () => {
       }
 
       // When
-      createRendezVousCommandHandler.monitor(utilisateur, command)
+      creerRendezVousCommandHandler.monitor(utilisateur, command)
 
       // Then
       expect(evenementService.creer).to.have.been.calledWithExactly(
@@ -441,7 +448,7 @@ describe('CreateRendezVousCommandHandler', () => {
       }
 
       // When
-      await createRendezVousCommandHandler.monitor(utilisateur, command)
+      await creerRendezVousCommandHandler.monitor(utilisateur, command)
 
       // Then
       expect(evenementService.creer).to.have.been.calledWithExactly(

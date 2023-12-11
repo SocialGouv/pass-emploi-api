@@ -9,10 +9,10 @@ import { Action, ActionsRepositoryToken } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
 import {
   Conseiller,
-  ConseillersRepositoryToken
+  ConseillerRepositoryToken
 } from '../../domain/conseiller/conseiller'
 import { Core, estMiloPassEmploi } from '../../domain/core'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import {
   RendezVous,
   RendezVousRepositoryToken
@@ -21,9 +21,9 @@ import {
 @Injectable()
 export class ConseillerInterAgenceAuthorizer {
   constructor(
-    @Inject(ConseillersRepositoryToken)
+    @Inject(ConseillerRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     @Inject(ActionsRepositoryToken)
     private actionRepository: Action.Repository,

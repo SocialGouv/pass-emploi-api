@@ -1,20 +1,20 @@
-import { Conseiller } from '../../../../src/domain/conseiller/conseiller'
-import { ListeDeDiffusionJeuneAssociationSqlModel } from '../../../../src/infrastructure/sequelize/models/liste-de-diffusion-jeune-association.sql-model'
-import { ListeDeDiffusionSqlRepository } from '../../../../src/infrastructure/repositories/conseiller/liste-de-diffusion-sql.repository.db'
-import { unConseillerDuJeune, unJeune } from '../../../fixtures/jeune.fixture'
-import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
-import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
-import { Jeune } from '../../../../src/domain/jeune/jeune'
-import { uneListeDeDiffusion } from '../../../fixtures/liste-de-diffusion.fixture'
-import { expect } from '../../../utils'
-import { ListeDeDiffusion } from '../../../../src/domain/conseiller/liste-de-diffusion'
-import { uneAutreDatetime, uneDatetime } from '../../../fixtures/date.fixture'
+import { Conseiller } from '../../../src/domain/conseiller/conseiller'
+import { ListeDeDiffusionJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/liste-de-diffusion-jeune-association.sql-model'
+import { ListeDeDiffusionSqlRepository } from '../../../src/infrastructure/repositories/liste-de-diffusion-sql.repository.db'
+import { unConseillerDuJeune, unJeune } from '../../fixtures/jeune.fixture'
+import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
+import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
+import { Jeune } from '../../../src/domain/jeune/jeune'
+import { uneListeDeDiffusion } from '../../fixtures/liste-de-diffusion.fixture'
+import { expect } from '../../utils'
+import { ListeDeDiffusion } from '../../../src/domain/conseiller/liste-de-diffusion'
+import { uneAutreDatetime, uneDatetime } from '../../fixtures/date.fixture'
 import {
   DatabaseForTesting,
   getDatabase
-} from '../../../utils/database-for-testing'
+} from '../../utils/database-for-testing'
 
 describe(' ListeDeDiffusionSqlRepository', () => {
   let database: DatabaseForTesting

@@ -10,10 +10,10 @@ import { Authentification } from '../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import {
   Conseiller,
-  ConseillersRepositoryToken
+  ConseillerRepositoryToken
 } from '../../domain/conseiller/conseiller'
 import { estPoleEmploiBRSA } from '../../domain/core'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 
 export interface CreateJeuneCommand extends Command {
@@ -29,9 +29,9 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
   Jeune
 > {
   constructor(
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
-    @Inject(ConseillersRepositoryToken)
+    @Inject(ConseillerRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     @Inject(ChatRepositoryToken)
     private chatRepository: Chat.Repository,

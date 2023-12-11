@@ -73,7 +73,7 @@ export class GetAgendaSessionsConseillerMiloQueryHandler extends QueryHandler<
     )
 
     const { id: idStructureMilo, timezone: timezoneStructure } =
-      conseiller.structure
+      conseiller.structureMilo
     const resultSessionMiloClient = await this.miloClient.getSessionsConseiller(
       idpToken,
       idStructureMilo,

@@ -3,7 +3,7 @@ import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { Notification } from '../../domain/notification/notification'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 
@@ -18,7 +18,7 @@ export class SendNotificationsNouveauxMessagesCommandHandler extends CommandHand
   void
 > {
   constructor(
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     private notificationService: Notification.Service,
     private conseillerAuthorizer: ConseillerAuthorizer

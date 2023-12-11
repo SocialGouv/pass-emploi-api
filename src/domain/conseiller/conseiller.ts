@@ -19,7 +19,7 @@ export interface Conseiller {
   notificationsSonores: boolean
 }
 
-export const ConseillersRepositoryToken = 'Conseiller.Repository'
+export const ConseillerRepositoryToken = 'Conseiller.Repository'
 
 export namespace Conseiller {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

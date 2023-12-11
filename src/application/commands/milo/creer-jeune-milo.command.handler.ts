@@ -21,10 +21,10 @@ import {
 import { Chat, ChatRepositoryToken } from '../../../domain/chat'
 import {
   Conseiller,
-  ConseillersRepositoryToken
+  ConseillerRepositoryToken
 } from '../../../domain/conseiller/conseiller'
 import { Core, estMilo } from '../../../domain/core'
-import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import {
   JeuneMilo,
   MiloJeuneRepositoryToken
@@ -49,10 +49,10 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     private conseillerAuthorizer: ConseillerAuthorizer,
     @Inject(MiloJeuneRepositoryToken)
     private miloJeuneRepository: JeuneMilo.Repository,
-    @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
+    @Inject(JeuneRepositoryToken) private jeuneRepository: Jeune.Repository,
     @Inject(AuthentificationRepositoryToken)
     private authentificationRepository: Authentification.Repository,
-    @Inject(ConseillersRepositoryToken)
+    @Inject(ConseillerRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     @Inject(ChatRepositoryToken) private chatRepository: Chat.Repository,
     private jeuneFactory: Jeune.Factory

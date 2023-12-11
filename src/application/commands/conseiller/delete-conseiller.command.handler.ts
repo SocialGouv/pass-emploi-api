@@ -17,10 +17,10 @@ import { Evenement, EvenementService } from '../../../domain/evenement'
 
 import {
   Conseiller,
-  ConseillersRepositoryToken
+  ConseillerRepositoryToken
 } from '../../../domain/conseiller/conseiller'
 import { estPoleEmploiBRSA } from '../../../domain/core'
-import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 
 export interface DeleteConseillerCommand {
@@ -33,9 +33,9 @@ export class DeleteConseillerCommandHandler extends CommandHandler<
   void
 > {
   constructor(
-    @Inject(ConseillersRepositoryToken)
+    @Inject(ConseillerRepositoryToken)
     private readonly conseillerRepository: Conseiller.Repository,
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private readonly jeuneRepository: Jeune.Repository,
     @Inject(AuthentificationRepositoryToken)
     private readonly authentificationRepository: Authentification.Repository,

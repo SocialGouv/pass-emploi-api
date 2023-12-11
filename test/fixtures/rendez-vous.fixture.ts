@@ -5,6 +5,7 @@ import {
 import {
   CodeTypeRendezVous,
   JeuneDuRendezVous,
+  JeuneMiloDuRendezVous,
   mapCodeLabelTypeRendezVous,
   RendezVous
 } from '../../src/domain/rendez-vous/rendez-vous'
@@ -83,6 +84,17 @@ export const unJeuneDuRendezVous = (
     conseiller: unConseillerDuJeune(),
     configuration: uneConfiguration(),
     email: 'john.doe@plop.io'
+  }
+
+  return { ...defaults, ...args }
+}
+
+export const unJeuneMiloDuRendezVous = (
+  args: Partial<JeuneMiloDuRendezVous> = {}
+): JeuneMiloDuRendezVous => {
+  const defaults: JeuneMiloDuRendezVous = {
+    ...unJeuneDuRendezVous(),
+    idStructureMilo: '1'
   }
 
   return { ...defaults, ...args }

@@ -1,5 +1,6 @@
 import { Core } from '../../src/domain/core'
 import { Jeune } from '../../src/domain/jeune/jeune'
+import { JeuneMilo } from '../../src/domain/milo/jeune.milo'
 import { unConseiller } from './conseiller.fixture'
 import { uneDate, uneDatetime } from './date.fixture'
 
@@ -21,6 +22,19 @@ export const unJeune = (
     preferences: {
       partageFavoris: true
     }
+  }
+
+  return { ...defaults, ...args }
+}
+
+export const unJeuneMilo = (
+  args: Partial<JeuneMilo> = {}
+): Required<Omit<JeuneMilo, 'conseillerInitial' | 'dateFinCEJ'>> => {
+  const defaults: Required<
+    Omit<JeuneMilo, 'conseillerInitial' | 'dateFinCEJ'>
+  > = {
+    ...unJeune(),
+    idStructureMilo: '1'
   }
 
   return { ...defaults, ...args }

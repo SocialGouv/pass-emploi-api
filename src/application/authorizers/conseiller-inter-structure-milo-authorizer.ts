@@ -32,7 +32,7 @@ export class ConseillerInterStructureMiloAuthorizer {
 
       if (
         isSuccess(conseiller) &&
-        conseiller.data.structure.id === idStructureMilo
+        conseiller.data.structureMilo.id === idStructureMilo
       ) {
         return emptySuccess()
       }
@@ -55,7 +55,8 @@ export class ConseillerInterStructureMiloAuthorizer {
         if (
           isSuccess(jeuneMilo) &&
           jeuneMilo.data.idStructureMilo &&
-          jeuneMilo.data.idStructureMilo === conseillerMilo.data.structure.id
+          jeuneMilo.data.idStructureMilo ===
+            conseillerMilo.data.structureMilo.id
         ) {
           return emptySuccess()
         }

@@ -3,6 +3,7 @@ import {
   NonTrouveError
 } from '../../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../../src/building-blocks/types/result'
+import { Core } from '../../../../src/domain/core'
 import { ConseillerMiloSqlRepository } from '../../../../src/infrastructure/repositories/milo/conseiller.milo.repository.db'
 import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { StructureMiloSqlModel } from '../../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
@@ -61,7 +62,13 @@ describe('ConseillerMiloSqlRepository', () => {
       expect(conseiller).to.deep.equal(
         success({
           id: idConseiller,
-          structure: { id: idStructureMilo, timezone: 'Europe/Paris' }
+          lastName: 'Tavernier',
+          firstName: 'Nils',
+          structure: Core.Structure.PASS_EMPLOI,
+          email: 'nils.tavernier@passemploi.com',
+          agence: undefined,
+          notificationsSonores: false,
+          structureMilo: { id: idStructureMilo, timezone: 'Europe/Paris' }
         })
       )
     })

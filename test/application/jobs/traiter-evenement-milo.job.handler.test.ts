@@ -260,7 +260,7 @@ describe('TraiterEvenementMiloJobHandler', () => {
               const rendezVous = unRendezVous({
                 date: maintenant.minus({ days: 1 }).toJSDate()
               })
-              rendezVousMiloFactory.createRendezVousCEJ
+              rendezVousMiloFactory.creerRendezVousCEJ
                 .withArgs(rendezVousMilo, jeune)
                 .returns(rendezVous)
 
@@ -292,7 +292,7 @@ describe('TraiterEvenementMiloJobHandler', () => {
                 .withArgs(evenement)
                 .resolves(rendezVousMilo)
               const rendezVous = unRendezVous()
-              rendezVousMiloFactory.createRendezVousCEJ
+              rendezVousMiloFactory.creerRendezVousCEJ
                 .withArgs(rendezVousMilo, jeune)
                 .returns(rendezVous)
 
@@ -324,7 +324,7 @@ describe('TraiterEvenementMiloJobHandler', () => {
                 .withArgs(evenement)
                 .resolves(rendezVousMilo)
               const rendezVous = unRendezVous()
-              rendezVousMiloFactory.createRendezVousCEJ
+              rendezVousMiloFactory.creerRendezVousCEJ
                 .withArgs(rendezVousMilo, jeune)
                 .returns(rendezVous)
 
@@ -395,7 +395,7 @@ describe('TraiterEvenementMiloJobHandler', () => {
                   .withArgs(evenement)
                   .resolves(rendezVousMilo)
                 const rendezVous = unRendezVous()
-                rendezVousMiloFactory.createRendezVousCEJ
+                rendezVousMiloFactory.creerRendezVousCEJ
                   .withArgs(rendezVousMilo, jeune)
                   .returns(rendezVous)
 

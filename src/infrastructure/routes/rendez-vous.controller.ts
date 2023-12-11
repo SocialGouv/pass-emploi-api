@@ -14,9 +14,9 @@ import {
   DeleteRendezVousCommandHandler
 } from '../../application/commands/delete-rendez-vous.command.handler.db'
 import {
-  UpdateRendezVousCommand,
-  UpdateRendezVousCommandHandler
-} from '../../application/commands/update-rendez-vous.command.handler'
+  ModifierRendezVousCommand,
+  ModifierRendezVousCommandHandler
+} from '../../application/commands/rendez-vous/modifier-rendez-vous.command.handler'
 import { GetDetailRendezVousQueryHandler } from '../../application/queries/rendez-vous/get-detail-rendez-vous.query.handler.db'
 import {
   RendezVousConseillerDetailQueryModel,
@@ -36,7 +36,7 @@ export class RendezVousController {
   constructor(
     private readonly getDetailRendezVousQueryHandler: GetDetailRendezVousQueryHandler,
     private readonly deleteRendezVousCommandHandler: DeleteRendezVousCommandHandler,
-    private readonly updateRendezVousCommandHandler: UpdateRendezVousCommandHandler
+    private readonly modifierRendezVousCommandHandler: ModifierRendezVousCommandHandler
   ) {}
 
   @Get(':idRendezVous')
@@ -83,7 +83,7 @@ export class RendezVousController {
     @Body() updateRendezVousPayload: UpdateRendezVousPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<Core.Id> {
-    const command: UpdateRendezVousCommand = {
+    const command: ModifierRendezVousCommand = {
       idRendezVous: idRendezVous,
       idsJeunes: updateRendezVousPayload.jeunesIds,
       titre: updateRendezVousPayload.titre,
@@ -97,7 +97,7 @@ export class RendezVousController {
       nombreMaxParticipants: updateRendezVousPayload.nombreMaxParticipants
     }
 
-    const result = await this.updateRendezVousCommandHandler.execute(
+    const result = await this.modifierRendezVousCommandHandler.execute(
       command,
       utilisateur
     )

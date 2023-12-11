@@ -14,7 +14,10 @@ export function sessionsMiloSontActiveesPourLeConseiller(
   configuration: ConfigService,
   conseillerMilo: ConseillerMilo
 ): boolean {
-  return sessionsMiloSontActivees(configuration, conseillerMilo.structure.id)
+  return sessionsMiloSontActivees(
+    configuration,
+    conseillerMilo.structureMilo.id
+  )
 }
 
 export function estUnEarlyAdopter(

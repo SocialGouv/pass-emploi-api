@@ -14,7 +14,6 @@ import {
   CompteDiagorienteInvalideError,
   ConseillerMiloSansStructure,
   ConseillerNonValide,
-  ConseillerSansAgenceError,
   DateNonAutoriseeError,
   DossierExisteDejaError,
   DroitsInsuffisants,
@@ -23,7 +22,7 @@ import {
   ErreurHttp,
   JeuneMiloSansIdDossier,
   JeuneMiloSansStructure,
-  JeuneNonLieALAgenceError,
+  JeuneNonLieALaStructureMiloError,
   JeuneNonLieAuConseillerError,
   JeunePasInactifError,
   MauvaiseCommandeError,
@@ -65,8 +64,7 @@ export function handleFailure(result: Result): void {
       case ReponsesCampagneInvalide.CODE:
       case CampagneNonActive.CODE:
       case CampagneExisteDejaError.CODE:
-      case JeuneNonLieALAgenceError.CODE:
-      case ConseillerSansAgenceError.CODE:
+      case JeuneNonLieALaStructureMiloError.CODE:
       case ConseillerMiloSansStructure.CODE:
       case JeuneMiloSansStructure.CODE:
       case JeuneMiloSansIdDossier.CODE:

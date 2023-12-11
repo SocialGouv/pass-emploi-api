@@ -101,19 +101,19 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
         dateFin: DateTime.fromISO('2023-04-13T00:00:00Z')
       }
       const conseiller = unConseillerMilo({
-        structure: { id: '1', timezone: 'America/Cayenne' }
+        structureMilo: { id: '1', timezone: 'America/Cayenne' }
       })
 
       beforeEach(async () => {
         await StructureMiloSqlModel.create({
-          id: conseiller.structure.id,
+          id: conseiller.structureMilo.id,
           nomOfficiel: 'Structure Milo',
-          timezone: conseiller.structure.timezone
+          timezone: conseiller.structureMilo.timezone
         })
         await SessionMiloSqlModel.create({
           id: unDetailSessionConseillerDto.session.id,
           estVisible: true,
-          idStructureMilo: conseiller.structure.id,
+          idStructureMilo: conseiller.structureMilo.id,
           dateModification: DateTime.now().toJSDate()
         })
         conseillerRepository.get

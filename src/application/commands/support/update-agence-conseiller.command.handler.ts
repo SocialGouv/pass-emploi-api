@@ -10,7 +10,7 @@ import { Agence, AgenceRepositoryToken } from '../../../domain/agence'
 import { Authentification } from '../../../domain/authentification'
 import {
   Conseiller,
-  ConseillersRepositoryToken
+  ConseillerRepositoryToken
 } from '../../../domain/conseiller/conseiller'
 import {
   AnimationCollective,
@@ -73,7 +73,7 @@ export class UpdateAgenceConseillerCommandHandler extends CommandHandler<
   ChangementAgenceQueryModel
 > {
   constructor(
-    @Inject(ConseillersRepositoryToken)
+    @Inject(ConseillerRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     @Inject(AgenceRepositoryToken)
     private agencesRepository: Agence.Repository,

@@ -1,12 +1,12 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
-import { CreateRendezVousCommandHandler } from 'src/application/commands/create-rendez-vous.command.handler'
+import { CreerRendezVousCommandHandler } from 'src/application/commands/rendez-vous/creer-rendez-vous.command.handler'
 import { RecupererJeunesDuConseillerCommandHandler } from 'src/application/commands/recuperer-jeunes-du-conseiller.command.handler'
 import { GetAllRendezVousConseillerQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
 import { Action } from 'src/domain/action/action'
 import { Qualification } from 'src/domain/action/qualification'
 import { CodeTypeRendezVous } from 'src/domain/rendez-vous/rendez-vous'
 import { CreateActionPayload } from 'src/infrastructure/routes/validation/actions.inputs'
-import { CreateRendezVousPayload } from 'src/infrastructure/routes/validation/rendez-vous.inputs'
+import { CreerRendezVousPayload } from 'src/infrastructure/routes/validation/rendez-vous.inputs'
 import * as request from 'supertest'
 import { uneDatetime, uneDatetimeAvecOffset } from 'test/fixtures/date.fixture'
 import { unRendezVousConseillerFutursEtPassesQueryModel } from 'test/fixtures/rendez-vous.fixture'
@@ -58,7 +58,7 @@ describe('ConseillersController', () => {
   let getJeunesByConseillerQueryHandler: StubbedClass<GetJeunesByConseillerQueryHandler>
   let sendNotificationsNouveauxMessages: StubbedClass<SendNotificationsNouveauxMessagesCommandHandler>
   let getAllRendezVousConseillerQueryHandler: StubbedClass<GetAllRendezVousConseillerQueryHandler>
-  let createRendezVousCommandHandler: StubbedClass<CreateRendezVousCommandHandler>
+  let creerRendezVousCommandHandler: StubbedClass<CreerRendezVousCommandHandler>
   let deleteConseillerCommandHandler: StubbedClass<DeleteConseillerCommandHandler>
   let modifierConseillerCommandHandler: StubbedClass<ModifierConseillerCommandHandler>
   let recupererJeunesDuConseillerCommandHandler: StubbedClass<RecupererJeunesDuConseillerCommandHandler>
@@ -84,7 +84,7 @@ describe('ConseillersController', () => {
     getAllRendezVousConseillerQueryHandler = app.get(
       GetAllRendezVousConseillerQueryHandler
     )
-    createRendezVousCommandHandler = app.get(CreateRendezVousCommandHandler)
+    creerRendezVousCommandHandler = app.get(CreerRendezVousCommandHandler)
     deleteConseillerCommandHandler = app.get(DeleteConseillerCommandHandler)
     modifierConseillerCommandHandler = app.get(ModifierConseillerCommandHandler)
     recupererJeunesDuConseillerCommandHandler = app.get(
@@ -512,12 +512,12 @@ describe('ConseillersController', () => {
     describe('quand le payload est bon', () => {
       describe('quand la commande est en succes', () => {
         beforeEach(() => {
-          createRendezVousCommandHandler.execute.resolves(success('id-rdv'))
+          creerRendezVousCommandHandler.execute.resolves(success('id-rdv'))
         })
         it('crée le rendezvous avec jeunesIds', async () => {
           // Given
           const idConseiller = '41'
-          const payload: CreateRendezVousPayload = {
+          const payload: CreerRendezVousPayload = {
             jeunesIds: ['1'],
             comment: '',
             date: uneDatetime().toJSDate().toISOString(),
@@ -534,9 +534,7 @@ describe('ConseillersController', () => {
             .expect(HttpStatus.CREATED)
             .expect({ id: 'id-rdv' })
 
-          expect(
-            createRendezVousCommandHandler.execute
-          ).to.have.been.calledWith(
+          expect(creerRendezVousCommandHandler.execute).to.have.been.calledWith(
             {
               idsJeunes: payload.jeunesIds,
               commentaire: payload.comment,
@@ -559,7 +557,7 @@ describe('ConseillersController', () => {
         it("crée le rendezvous sans jeunesIds quand c'est une animation collective", async () => {
           // Given
           const idConseiller = '41'
-          const payload: CreateRendezVousPayload = {
+          const payload: CreerRendezVousPayload = {
             jeunesIds: [],
             comment: '',
             titre: 'aa',
@@ -581,7 +579,7 @@ describe('ConseillersController', () => {
         it("crée le rendezvous avec jeunesIds quand c'est une animation collective", async () => {
           // Given
           const idConseiller = '41'
-          const payload: CreateRendezVousPayload = {
+          const payload: CreerRendezVousPayload = {
             jeunesIds: ['1'],
             comment: '',
             titre: 'aa',
@@ -603,14 +601,14 @@ describe('ConseillersController', () => {
         it('retourne une 200 quand presenceConseiller est undefined pour le type ENTRETIEN_CONSEILLER', async () => {
           // Given
           const idConseiller = '41'
-          const payload: CreateRendezVousPayload = {
+          const payload: CreerRendezVousPayload = {
             jeunesIds: ['1'],
             comment: '',
             date: uneDatetime().toJSDate().toISOString(),
             duration: 30,
             type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
           }
-          createRendezVousCommandHandler.execute.resolves(success('id-rdv'))
+          creerRendezVousCommandHandler.execute.resolves(success('id-rdv'))
 
           // When - Then
           await request(app.getHttpServer())
@@ -622,13 +620,13 @@ describe('ConseillersController', () => {
         it('retourne une 200 quand presenceConseiller est undefined pour le type par defaut', async () => {
           // Given
           const idConseiller = '41'
-          const payload: CreateRendezVousPayload = {
+          const payload: CreerRendezVousPayload = {
             jeunesIds: ['1'],
             comment: '',
             date: uneDatetime().toJSDate().toISOString(),
             duration: 30
           }
-          createRendezVousCommandHandler.execute.resolves(success('id-rdv'))
+          creerRendezVousCommandHandler.execute.resolves(success('id-rdv'))
 
           // When - Then
           await request(app.getHttpServer())
@@ -640,7 +638,7 @@ describe('ConseillersController', () => {
         it('retourne une 200 quand presenceConseiller est true pour le type ENTRETIEN_CONSEILLER', async () => {
           // Given
           const idConseiller = '41'
-          const payload: CreateRendezVousPayload = {
+          const payload: CreerRendezVousPayload = {
             jeunesIds: ['1'],
             comment: '',
             date: uneDatetime().toJSDate().toISOString(),
@@ -648,7 +646,7 @@ describe('ConseillersController', () => {
             type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
             presenceConseiller: true
           }
-          createRendezVousCommandHandler.execute.resolves(success('id-rdv'))
+          creerRendezVousCommandHandler.execute.resolves(success('id-rdv'))
 
           // When - Then
           await request(app.getHttpServer())
@@ -660,14 +658,14 @@ describe('ConseillersController', () => {
         it('retourne une 200 quand presenceConseiller est true pour le type par defaut', async () => {
           // Given
           const idConseiller = '41'
-          const payload: CreateRendezVousPayload = {
+          const payload: CreerRendezVousPayload = {
             jeunesIds: ['1'],
             comment: '',
             date: uneDatetime().toJSDate().toISOString(),
             duration: 30,
             presenceConseiller: true
           }
-          createRendezVousCommandHandler.execute.resolves(success('id-rdv'))
+          creerRendezVousCommandHandler.execute.resolves(success('id-rdv'))
 
           // When - Then
           await request(app.getHttpServer())
@@ -679,7 +677,7 @@ describe('ConseillersController', () => {
         it('retourne une 201 quand le champ precision est rempli', async () => {
           // Given
           const idConseiller = '41'
-          const payload: CreateRendezVousPayload = {
+          const payload: CreerRendezVousPayload = {
             jeunesIds: ['1'],
             comment: '',
             date: uneDatetime().toJSDate().toISOString(),
@@ -687,7 +685,7 @@ describe('ConseillersController', () => {
             type: CodeTypeRendezVous.AUTRE,
             precision: 'aa'
           }
-          createRendezVousCommandHandler.execute.resolves(success('id-rdv'))
+          creerRendezVousCommandHandler.execute.resolves(success('id-rdv'))
 
           // When - Then
           await request(app.getHttpServer())
@@ -702,7 +700,7 @@ describe('ConseillersController', () => {
         it('retourne une 403 quand une failure JeuneNonLieAuConseiller est renvoyée', async () => {
           // Given
           const idConseiller = '41'
-          const payload: CreateRendezVousPayload = {
+          const payload: CreerRendezVousPayload = {
             jeunesIds: ['1'],
             comment: '',
             date: uneDatetime().toJSDate().toISOString(),
@@ -710,7 +708,7 @@ describe('ConseillersController', () => {
             modality: 'rdv',
             invitation: true
           }
-          createRendezVousCommandHandler.execute.resolves(
+          creerRendezVousCommandHandler.execute.resolves(
             failure(new JeuneNonLieAuConseillerError('41', '1'))
           )
 
@@ -727,7 +725,7 @@ describe('ConseillersController', () => {
       it('retourne une 400 les jeunes sont vide pour une rdv autre que animation collective', async () => {
         // Given
         const idConseiller = '41'
-        const payload: CreateRendezVousPayload = {
+        const payload: CreerRendezVousPayload = {
           jeunesIds: [],
           comment: '',
           titre: 'aa',
@@ -747,7 +745,7 @@ describe('ConseillersController', () => {
       it("retourne une 400 quand la date n'est pas une dateString", async () => {
         // Given
         const idConseiller = '41'
-        const payload: CreateRendezVousPayload = {
+        const payload: CreerRendezVousPayload = {
           jeunesIds: ['1'],
           comment: '',
           date: '',
@@ -764,7 +762,7 @@ describe('ConseillersController', () => {
       it("retourne une 400 quand le type n'est pas bon", async () => {
         // Given
         const idConseiller = '41'
-        const payload: CreateRendezVousPayload = {
+        const payload = {
           jeunesIds: ['1'],
           comment: '',
           date: uneDatetime().toJSDate().toISOString(),
@@ -782,7 +780,7 @@ describe('ConseillersController', () => {
       it('retourne une 400 quand presenceConseiller est false pour le type ENTRETIEN_CONSEILLER', async () => {
         // Given
         const idConseiller = '41'
-        const payload: CreateRendezVousPayload = {
+        const payload: CreerRendezVousPayload = {
           jeunesIds: ['1'],
           comment: '',
           date: uneDatetime().toJSDate().toISOString(),
@@ -801,7 +799,7 @@ describe('ConseillersController', () => {
       it('retourne une 400 quand presenceConseiller est false pour le type par defaut', async () => {
         // Given
         const idConseiller = '41'
-        const payload: CreateRendezVousPayload = {
+        const payload: CreerRendezVousPayload = {
           jeunesIds: ['1'],
           comment: '',
           date: uneDatetime().toJSDate().toISOString(),
@@ -819,7 +817,7 @@ describe('ConseillersController', () => {
       it("retourne une 400 quand le champ precision n'est pas rempli", async () => {
         // Given
         const idConseiller = '41'
-        const payload: CreateRendezVousPayload = {
+        const payload: CreerRendezVousPayload = {
           jeunesIds: ['1'],
           comment: '',
           date: uneDatetime().toJSDate().toISOString(),

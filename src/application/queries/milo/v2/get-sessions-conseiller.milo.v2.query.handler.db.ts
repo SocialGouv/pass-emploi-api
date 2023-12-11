@@ -66,7 +66,7 @@ export class GetSessionsConseillerMiloV2QueryHandler extends QueryHandler<
     }
 
     const { id: idStructureMilo, timezone: timezoneStructure } =
-      resultConseiller.data.structure
+      resultConseiller.data.structureMilo
 
     const resultSessionsMiloFromQueryGetter: Result<
       SessionConseillerMiloQueryModel[]

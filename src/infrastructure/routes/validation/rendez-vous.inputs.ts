@@ -18,7 +18,7 @@ import {
   RendezVous
 } from '../../../domain/rendez-vous/rendez-vous'
 
-export class CreateRendezVousPayload {
+export class CreerRendezVousPayload {
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
@@ -45,7 +45,7 @@ export class CreateRendezVousPayload {
   @IsOptional()
   @IsString()
   @IsEnum(CodeTypeRendezVous)
-  type?: string
+  type?: CodeTypeRendezVous
 
   @ApiProperty()
   @IsArray()

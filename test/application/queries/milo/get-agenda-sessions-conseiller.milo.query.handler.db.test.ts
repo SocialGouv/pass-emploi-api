@@ -117,7 +117,7 @@ describe('GetAgendaSessionsConseillerMiloQueryHandler', () => {
       }
       const conseiller = unConseillerMilo({
         id: '1',
-        structure: { id: '1', timezone: 'America/Cayenne' }
+        structureMilo: { id: '1', timezone: 'America/Cayenne' }
       })
 
       beforeEach(async () => {
@@ -181,8 +181,8 @@ function givenSessionsDuConseiller(
   miloClient.getSessionsConseiller
     .withArgs(
       'idpToken',
-      conseiller.structure.id,
-      conseiller.structure.timezone,
+      conseiller.structureMilo.id,
+      conseiller.structureMilo.timezone,
       {
         periode: {
           dateDebut: query.dateDebut,

@@ -91,7 +91,7 @@ describe('EmargerSessionMiloCommandHandler', () => {
       sessionMiloRepository.getForConseiller
         .withArgs(
           commandSansEmargement.idSession,
-          conseiller.structure,
+          conseiller.structureMilo,
           idpToken
         )
         .resolves(failure(erreurHttp))
@@ -139,7 +139,7 @@ describe('EmargerSessionMiloCommandHandler', () => {
         sessionMiloRepository.getForConseiller
           .withArgs(
             commandSansEmargement.idSession,
-            conseiller.structure,
+            conseiller.structureMilo,
             idpToken
           )
           .resolves(success(uneSessionMilo()))

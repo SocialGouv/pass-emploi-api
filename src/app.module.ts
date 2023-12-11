@@ -26,7 +26,7 @@ import { AddFavoriOffreImmersionCommandHandler } from './application/commands/ad
 import { CreateActionCommandHandler } from './application/commands/action/create-action.command.handler'
 import { CreateEvenementCommandHandler } from './application/commands/create-evenement.command.handler'
 import { CreateRechercheCommandHandler } from './application/commands/create-recherche.command.handler'
-import { CreateRendezVousCommandHandler } from './application/commands/create-rendez-vous.command.handler'
+import { CreerRendezVousCommandHandler } from './application/commands/rendez-vous/creer-rendez-vous.command.handler'
 import { CreerJeuneMiloCommandHandler } from './application/commands/milo/creer-jeune-milo.command.handler'
 import { CreerJeunePoleEmploiCommandHandler } from './application/commands/creer-jeune-pole-emploi.command.handler'
 import { CreerSuperviseursCommandHandler } from './application/commands/creer-superviseurs.command.handler'
@@ -97,7 +97,7 @@ import {
 import { ChatRepositoryToken } from './domain/chat'
 import {
   Conseiller,
-  ConseillersRepositoryToken
+  ConseillerRepositoryToken
 } from './domain/conseiller/conseiller'
 import { EvenementService, EvenementsRepositoryToken } from './domain/evenement'
 import { Fichier, FichierRepositoryToken } from './domain/fichier'
@@ -105,7 +105,7 @@ import {
   Jeune,
   JeuneConfigurationApplicationRepositoryToken,
   JeunePoleEmploiRepositoryToken,
-  JeunesRepositoryToken
+  JeuneRepositoryToken
 } from './domain/jeune/jeune'
 import {
   Notification,
@@ -188,7 +188,7 @@ import {
 import { GetDemarchesQueryHandler } from './application/queries/get-demarches.query.handler'
 import { GetCatalogueDemarchesQueryHandler } from './application/queries/get-catalogue-demarches.query.handler'
 import { GetJeuneMiloByDossierQueryHandler } from './application/queries/milo/get-jeune-milo-by-dossier.query.handler.db'
-import { UpdateRendezVousCommandHandler } from './application/commands/update-rendez-vous.command.handler'
+import { ModifierRendezVousCommandHandler } from './application/commands/rendez-vous/modifier-rendez-vous.command.handler'
 import { InvitationIcsClient } from './infrastructure/clients/invitation-ics.client'
 import { Mail, MailRepositoryToken, MailServiceToken } from './domain/mail'
 import { ChatCryptoService } from './utils/chat-crypto-service'
@@ -275,7 +275,7 @@ import { HistoriqueRendezVousRepositoryToken } from './domain/rendez-vous/histor
 import { GetAnimationsCollectivesJeuneQueryHandler } from './application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
 import { GetUnRendezVousJeuneQueryHandler } from './application/queries/rendez-vous/get-un-rendez-vous-jeune.query.handler.db'
 import { CreateListeDeDiffusionCommandHandler } from './application/commands/create-liste-de-diffusion.command.handler'
-import { ListeDeDiffusionSqlRepository } from './infrastructure/repositories/conseiller/liste-de-diffusion-sql.repository.db'
+import { ListeDeDiffusionSqlRepository } from './infrastructure/repositories/liste-de-diffusion-sql.repository.db'
 import { ListeDeDiffusionRepositoryToken } from './domain/conseiller/liste-de-diffusion'
 import { GetListesDeDiffusionDuConseillerQueryHandler } from './application/queries/get-listes-de-diffusion-du-conseiller.query.handler.db'
 import { ListesDeDiffusionController } from './infrastructure/routes/listes-de-diffusion.controller'
@@ -466,11 +466,11 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       useClass: ActionSqlRepository
     },
     {
-      provide: JeunesRepositoryToken,
+      provide: JeuneRepositoryToken,
       useClass: JeuneSqlRepository
     },
     {
-      provide: ConseillersRepositoryToken,
+      provide: ConseillerRepositoryToken,
       useClass: ConseillerSqlRepository
     },
     {
@@ -656,7 +656,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetResumeActionsDesJeunesDuConseillerQueryHandlerDb,
     UpdateJeuneConfigurationApplicationCommandHandler,
     UpdateStatutActionCommandHandler,
-    CreateRendezVousCommandHandler,
+    CreerRendezVousCommandHandler,
     DeleteRendezVousCommandHandler,
     GetAllRendezVousConseillerQueryHandler,
     GetRendezVousJeuneQueryHandler,
@@ -693,7 +693,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetDetailRendezVousQueryHandler,
     GetDemarchesQueryHandler,
     GetJeuneMiloByDossierQueryHandler,
-    UpdateRendezVousCommandHandler,
+    ModifierRendezVousCommandHandler,
     GetConseillersJeuneQueryHandler,
     GetAgencesQueryHandler,
     ModifierConseillerCommandHandler,

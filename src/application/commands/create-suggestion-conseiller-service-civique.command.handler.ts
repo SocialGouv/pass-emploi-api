@@ -10,7 +10,7 @@ import {
 import { Authentification } from '../../domain/authentification'
 import { estNonBRSA } from '../../domain/core'
 import { Evenement, EvenementService } from '../../domain/evenement'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { Recherche } from '../../domain/offre/recherche/recherche'
 import {
   Suggestion,
@@ -37,7 +37,7 @@ export class CreateSuggestionConseillerServiceCiviqueCommandHandler extends Comm
     @Inject(SuggestionsRepositoryToken)
     private suggestionRepository: Suggestion.Repository,
     private suggestionFactory: Suggestion.Factory,
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     private evenementService: EvenementService
   ) {

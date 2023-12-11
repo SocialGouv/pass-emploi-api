@@ -22,9 +22,9 @@ import {
 } from '../../../src/application/commands/delete-rendez-vous.command.handler.db'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import {
-  UpdateRendezVousCommand,
-  UpdateRendezVousCommandHandler
-} from 'src/application/commands/update-rendez-vous.command.handler'
+  ModifierRendezVousCommand,
+  ModifierRendezVousCommandHandler
+} from 'src/application/commands/rendez-vous/modifier-rendez-vous.command.handler'
 import { UpdateRendezVousPayload } from 'src/infrastructure/routes/validation/rendez-vous.inputs'
 import { GetDetailRendezVousQueryHandler } from '../../../src/application/queries/rendez-vous/get-detail-rendez-vous.query.handler.db'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
@@ -32,14 +32,14 @@ import { getApplicationWithStubbedDependencies } from '../../utils/module-for-te
 describe('RendezvousController', () => {
   let getDetailRendezVousQueryHandler: StubbedClass<GetDetailRendezVousQueryHandler>
   let deleteRendezVousCommandHandler: StubbedClass<DeleteRendezVousCommandHandler>
-  let updateRendezVousCommandHandler: StubbedClass<UpdateRendezVousCommandHandler>
+  let modifierRendezVousCommandHandler: StubbedClass<ModifierRendezVousCommandHandler>
   let app: INestApplication
 
   before(async () => {
     app = await getApplicationWithStubbedDependencies()
     getDetailRendezVousQueryHandler = app.get(GetDetailRendezVousQueryHandler)
     deleteRendezVousCommandHandler = app.get(DeleteRendezVousCommandHandler)
-    updateRendezVousCommandHandler = app.get(UpdateRendezVousCommandHandler)
+    modifierRendezVousCommandHandler = app.get(ModifierRendezVousCommandHandler)
   })
 
   describe('GET rendezvous/:idRendezVous', () => {
@@ -160,7 +160,7 @@ describe('RendezvousController', () => {
       presenceConseiller: true,
       nombreMaxParticipants: undefined
     }
-    const expectedCommand: UpdateRendezVousCommand = {
+    const expectedCommand: ModifierRendezVousCommand = {
       idsJeunes: ['1'],
       idRendezVous: rendezvous.id,
       titre: undefined,
@@ -175,7 +175,7 @@ describe('RendezvousController', () => {
     }
     it('met à jour le rendez-vous', async () => {
       // Given
-      updateRendezVousCommandHandler.execute.resolves(
+      modifierRendezVousCommandHandler.execute.resolves(
         success({ id: rendezvous.id })
       )
       // When - Then
@@ -186,12 +186,12 @@ describe('RendezvousController', () => {
         .expect(HttpStatus.OK)
 
       expect(
-        updateRendezVousCommandHandler.execute
+        modifierRendezVousCommandHandler.execute
       ).to.have.be.calledWithExactly(expectedCommand, unUtilisateurDecode())
     })
     it("renvoie une 404 quand le rendez-vous n'existe pas", async () => {
       // Given
-      updateRendezVousCommandHandler.execute
+      modifierRendezVousCommandHandler.execute
         .withArgs(expectedCommand)
         .resolves(
           failure(
@@ -207,7 +207,7 @@ describe('RendezvousController', () => {
         .expect(HttpStatus.NOT_FOUND)
     })
     it('renvoie une 400 (BAD REQUEST) pour une mauvaise commande', async () => {
-      updateRendezVousCommandHandler.execute
+      modifierRendezVousCommandHandler.execute
         .withArgs(expectedCommand)
         .resolves(failure(new MauvaiseCommandeError('Rendez-vous')))
 

@@ -447,7 +447,9 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             const conseillerSource = unConseiller({
               structure: Structure.MILO
             })
-            const conseillerCible = unConseiller({ structure: Structure.MILO })
+            const conseillerCible = unConseiller({
+              structure: Structure.MILO
+            })
 
             const command: TransfererJeunesConseillerCommand = {
               idConseillerSource: conseillerSource.id,

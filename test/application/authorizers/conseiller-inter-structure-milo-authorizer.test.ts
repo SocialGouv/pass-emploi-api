@@ -41,7 +41,7 @@ describe('ConseillerInterStructureMiloAuthorizer', () => {
 
         // When
         const result = await authorizer.autoriserConseillerPourUneStructureMilo(
-          conseiller.structure.id,
+          conseiller.structureMilo.id,
           utilisateur
         )
 
@@ -82,7 +82,7 @@ describe('ConseillerInterStructureMiloAuthorizer', () => {
 
         const jeune: JeuneMilo = {
           ...unJeune({}),
-          idStructureMilo: conseiller.structure.id
+          idStructureMilo: conseiller.structureMilo.id
         }
         jeuneRepository.get.withArgs(jeune.id).resolves(success(jeune))
 

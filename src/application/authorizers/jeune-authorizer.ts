@@ -6,12 +6,12 @@ import {
   failure
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 
 @Injectable()
 export class JeuneAuthorizer {
   constructor(
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository
   ) {}
 

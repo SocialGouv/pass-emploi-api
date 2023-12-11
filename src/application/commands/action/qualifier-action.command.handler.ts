@@ -17,7 +17,7 @@ import {
 } from '../../../domain/action/action'
 import { Authentification } from '../../../domain/authentification'
 import { ActionAuthorizer } from '../../authorizers/action-authorizer'
-import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import { QualificationActionQueryModel } from '../../queries/query-models/actions.query-model'
 import { Evenement, EvenementService } from '../../../domain/evenement'
 import { Command } from '../../../building-blocks/types/command'
@@ -45,7 +45,7 @@ export class QualifierActionCommandHandler extends CommandHandler<
     @Inject(ActionMiloRepositoryToken)
     private readonly actionMiloRepository: ActionMilo.Repository,
     private readonly actionAuthorizer: ActionAuthorizer,
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private readonly jeuneRepository: Jeune.Repository,
     private readonly evenementService: EvenementService
   ) {

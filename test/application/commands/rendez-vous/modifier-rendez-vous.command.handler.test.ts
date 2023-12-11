@@ -2,28 +2,30 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { RendezVousAuthorizer } from 'src/application/authorizers/rendezvous-authorizer'
 import {
-  UpdateRendezVousCommand,
-  UpdateRendezVousCommandHandler
-} from 'src/application/commands/update-rendez-vous.command.handler'
+  ModifierRendezVousCommand,
+  ModifierRendezVousCommandHandler
+} from 'src/application/commands/rendez-vous/modifier-rendez-vous.command.handler'
 import { Evenement, EvenementService } from 'src/domain/evenement'
-import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
-import { failure, success } from '../../../src/building-blocks/types/result'
-import { Notification } from '../../../src/domain/notification/notification'
-import { PlanificateurService } from '../../../src/domain/planificateur'
-import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { Conseiller } from '../../../src/domain/conseiller/conseiller'
-import { Mail } from '../../../src/domain/mail'
-import { Jeune } from '../../../src/domain/jeune/jeune'
-import { uneDate } from '../../fixtures/date.fixture'
-import { Authentification } from '../../../src/domain/authentification'
+import { NonTrouveError } from '../../../../src/building-blocks/types/domain-error'
+import { failure, success } from '../../../../src/building-blocks/types/result'
+import { Notification } from '../../../../src/domain/notification/notification'
+import { PlanificateurService } from '../../../../src/domain/planificateur'
+import { RendezVous } from '../../../../src/domain/rendez-vous/rendez-vous'
+import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
+import { unJeune } from '../../../fixtures/jeune.fixture'
+import { unRendezVous } from '../../../fixtures/rendez-vous.fixture'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
+import { Conseiller } from '../../../../src/domain/conseiller/conseiller'
+import { Mail } from '../../../../src/domain/mail'
+import { Jeune } from '../../../../src/domain/jeune/jeune'
+import { uneDate } from '../../../fixtures/date.fixture'
+import { Authentification } from '../../../../src/domain/authentification'
+import { JeuneMilo } from '../../../../src/domain/milo/jeune.milo'
 
-describe('UpdateRendezVousCommandHandler', () => {
+describe('ModifierRendezVousCommandHandler', () => {
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
+  let jeuneMiloRepository: StubbedType<JeuneMilo.Repository>
   let rendezVousFactory: StubbedClass<RendezVous.Factory>
   let notificationService: StubbedClass<Notification.Service>
   let conseillerRepository: StubbedType<Conseiller.Repository>
@@ -33,7 +35,7 @@ describe('UpdateRendezVousCommandHandler', () => {
   let evenementService: StubbedClass<EvenementService>
   let historiqueRendezVousFactory: StubbedClass<RendezVous.Historique.Factory>
   let historiqueRendezVousRepository: StubbedType<RendezVous.Historique.Repository>
-  let updateRendezVousCommandHandler: UpdateRendezVousCommandHandler
+  let modifierRendezVousCommandHandler: ModifierRendezVousCommandHandler
   const jeune = unJeune()
   const rendezVous = unRendezVous({ jeunes: [jeune] })
 
@@ -41,6 +43,7 @@ describe('UpdateRendezVousCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     rendezVousRepository = stubInterface(sandbox)
     jeuneRepository = stubInterface(sandbox)
+    jeuneMiloRepository = stubInterface(sandbox)
     rendezVousFactory = stubClass(RendezVous.Factory)
     notificationService = stubClass(Notification.Service)
     conseillerRepository = stubInterface(sandbox)
@@ -51,9 +54,10 @@ describe('UpdateRendezVousCommandHandler', () => {
     historiqueRendezVousFactory = stubClass(RendezVous.Historique.Factory)
     historiqueRendezVousRepository = stubInterface(sandbox)
 
-    updateRendezVousCommandHandler = new UpdateRendezVousCommandHandler(
+    modifierRendezVousCommandHandler = new ModifierRendezVousCommandHandler(
       rendezVousRepository,
       jeuneRepository,
+      jeuneMiloRepository,
       rendezVousFactory,
       notificationService,
       mailService,
@@ -70,7 +74,7 @@ describe('UpdateRendezVousCommandHandler', () => {
     describe('erreurs', () => {
       it('échoue si rendez-vous inexistant', async () => {
         // Given
-        const command: UpdateRendezVousCommand = {
+        const command: ModifierRendezVousCommand = {
           idsJeunes: ['x'],
           idRendezVous: rendezVous.id,
           date: '2021-11-11T08:03:30.000Z',
@@ -81,7 +85,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           .withArgs(command.idRendezVous)
           .resolves(undefined)
         // When
-        const result = await updateRendezVousCommandHandler.handle(command)
+        const result = await modifierRendezVousCommandHandler.handle(command)
         // Then
         expect(rendezVousRepository.save).to.have.callCount(0)
         expect(notificationService.notifierLesJeunesDuRdv).to.have.callCount(0)
@@ -92,7 +96,7 @@ describe('UpdateRendezVousCommandHandler', () => {
       it("échoue si un jeune de la liste n'est pas trouvé", async () => {
         // Given
         const idJeuneNonTrouve = 'x'
-        const command: UpdateRendezVousCommand = {
+        const command: ModifierRendezVousCommand = {
           idsJeunes: [idJeuneNonTrouve],
           idRendezVous: rendezVous.id,
           date: '2021-11-11T08:03:30.000Z',
@@ -105,7 +109,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         jeuneRepository.findAll.withArgs([idJeuneNonTrouve]).resolves([])
 
         // When
-        const result = await updateRendezVousCommandHandler.handle(command)
+        const result = await modifierRendezVousCommandHandler.handle(command)
         // Then
         expect(rendezVousRepository.save).to.have.callCount(0)
         expect(notificationService.notifierLesJeunesDuRdv).to.have.callCount(0)
@@ -113,7 +117,7 @@ describe('UpdateRendezVousCommandHandler', () => {
       })
     })
     describe('save : quand tous les jeunes de la liste sont trouvés', () => {
-      const command: UpdateRendezVousCommand = {
+      const command: ModifierRendezVousCommand = {
         idsJeunes: [jeune.id],
         idRendezVous: rendezVous.id,
         date: rendezVous.date.toISOString(),
@@ -141,7 +145,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           .returns(success(rendezVousUpdated))
 
         // When
-        const result = await updateRendezVousCommandHandler.handle(command)
+        const result = await modifierRendezVousCommandHandler.handle(command)
 
         // Then
         expect(result).to.deep.equal(success({ id: rendezVousUpdated.id }))
@@ -152,7 +156,7 @@ describe('UpdateRendezVousCommandHandler', () => {
     })
 
     describe('notifications', () => {
-      const command: UpdateRendezVousCommand = {
+      const command: ModifierRendezVousCommand = {
         idsJeunes: [jeune.id],
         idRendezVous: rendezVous.id,
         date: rendezVous.date.toISOString(),
@@ -180,7 +184,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           .returns(success(rendezVousSansInvitation))
 
         // When
-        await updateRendezVousCommandHandler.handle(command)
+        await modifierRendezVousCommandHandler.handle(command)
 
         // Then
         expect(mailService.envoyerMailRendezVous).not.to.have.been.called()
@@ -209,7 +213,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           .returns(success(rendezVousUpdated))
 
         // When
-        await updateRendezVousCommandHandler.handle(command)
+        await modifierRendezVousCommandHandler.handle(command)
 
         // Then
         expect(
@@ -235,7 +239,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           .returns(success(rendezVousUpdated))
 
         // When
-        await updateRendezVousCommandHandler.handle(command)
+        await modifierRendezVousCommandHandler.handle(command)
 
         // Then
         expect(
@@ -267,7 +271,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           .returns(success(rendezVousUpdated))
 
         // When
-        await updateRendezVousCommandHandler.handle(command)
+        await modifierRendezVousCommandHandler.handle(command)
 
         // Then
         expect(
@@ -286,7 +290,7 @@ describe('UpdateRendezVousCommandHandler', () => {
       it('notifie les jeunes ajoutés de la création du rendez-vous pour leur ajout dans la liste des bénéficiaires', async () => {
         // Given
         const jeuneAjoute = unJeune({ id: 'jeuneAjoute' })
-        const commandAvecUnJeuneEnPlus: UpdateRendezVousCommand = {
+        const commandAvecUnJeuneEnPlus: ModifierRendezVousCommand = {
           ...command,
           idsJeunes: [jeune.id, jeuneAjoute.id]
         }
@@ -313,7 +317,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           .returns(success(rendezVousUpdated))
 
         // When
-        await updateRendezVousCommandHandler.handle(commandAvecUnJeuneEnPlus)
+        await modifierRendezVousCommandHandler.handle(commandAvecUnJeuneEnPlus)
 
         // Then
         expect(
@@ -326,7 +330,7 @@ describe('UpdateRendezVousCommandHandler', () => {
       it('notifie les jeunes supprimés de la suppression du rendez-vous pour leur retrait de la liste des bénéficiaires', async () => {
         // Given
         const jeuneSupprime = unJeune({ id: 'jeuneSupprime' })
-        const commandAvecUnJeuneEnMoins: UpdateRendezVousCommand = {
+        const commandAvecUnJeuneEnMoins: ModifierRendezVousCommand = {
           ...command,
           idsJeunes: [jeune.id]
         }
@@ -353,7 +357,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           .returns(success(rendezVousUpdated))
 
         // When
-        await updateRendezVousCommandHandler.handle(commandAvecUnJeuneEnMoins)
+        await modifierRendezVousCommandHandler.handle(commandAvecUnJeuneEnMoins)
         // Then
         expect(
           notificationService.notifierLesJeunesDuRdv
@@ -368,7 +372,7 @@ describe('UpdateRendezVousCommandHandler', () => {
   describe('authorize', () => {
     it('autorise un conseiller', async () => {
       // Given
-      const command: UpdateRendezVousCommand = {
+      const command: ModifierRendezVousCommand = {
         idsJeunes: ['x'],
         idRendezVous: rendezVous.id,
         date: '2021-11-11T08:03:30.000Z',
@@ -379,7 +383,7 @@ describe('UpdateRendezVousCommandHandler', () => {
       const utilisateur = unUtilisateurConseiller()
 
       // When
-      await updateRendezVousCommandHandler.authorize(command, utilisateur)
+      await modifierRendezVousCommandHandler.authorize(command, utilisateur)
 
       // Then
       expect(
@@ -390,7 +394,7 @@ describe('UpdateRendezVousCommandHandler', () => {
 
   describe('monitor', () => {
     let utilisateur: Authentification.Utilisateur
-    let updateCommand: UpdateRendezVousCommand
+    let updateCommand: ModifierRendezVousCommand
     let date: Date
 
     // Given
@@ -408,7 +412,7 @@ describe('UpdateRendezVousCommandHandler', () => {
 
     it("créé l'événement idoine", async () => {
       // When
-      await updateRendezVousCommandHandler.monitor(utilisateur, updateCommand)
+      await modifierRendezVousCommandHandler.monitor(utilisateur, updateCommand)
 
       // Then
       expect(evenementService.creer).to.have.been.calledWithExactly(
@@ -434,7 +438,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         .returns(logModification)
 
       // When
-      await updateRendezVousCommandHandler.monitor(utilisateur, updateCommand)
+      await modifierRendezVousCommandHandler.monitor(utilisateur, updateCommand)
 
       // Then
       expect(

@@ -54,7 +54,7 @@ export namespace RendezVousMilo {
   export class Factory {
     constructor(private idService: IdService) {}
 
-    createRendezVousCEJ(
+    creerRendezVousCEJ(
       rendezVousMilo: RendezVousMilo,
       jeune: JeuneDuRendezVous
     ): RendezVous {

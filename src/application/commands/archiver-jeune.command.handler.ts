@@ -19,7 +19,7 @@ import { Evenement, EvenementService } from '../../domain/evenement'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { Mail, MailServiceToken } from '../../domain/mail'
 import { DateService } from '../../utils/date-service'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
@@ -36,7 +36,7 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
   void
 > {
   constructor(
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private readonly jeuneRepository: Jeune.Repository,
     @Inject(ArchiveJeuneRepositoryToken)
     private readonly archiveJeuneRepository: ArchiveJeune.Repository,

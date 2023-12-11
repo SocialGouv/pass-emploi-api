@@ -14,9 +14,9 @@ import { Authentification } from '../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import {
   Conseiller,
-  ConseillersRepositoryToken
+  ConseillerRepositoryToken
 } from '../../domain/conseiller/conseiller'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 
 export interface DeleteJeuneInactifCommand {
@@ -30,9 +30,9 @@ export class DeleteJeuneInactifCommandHandler extends CommandHandler<
   void
 > {
   constructor(
-    @Inject(ConseillersRepositoryToken)
+    @Inject(ConseillerRepositoryToken)
     private readonly conseillerRepository: Conseiller.Repository,
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private readonly jeuneRepository: Jeune.Repository,
     @Inject(ChatRepositoryToken)
     private readonly chatRepository: Chat.Repository,

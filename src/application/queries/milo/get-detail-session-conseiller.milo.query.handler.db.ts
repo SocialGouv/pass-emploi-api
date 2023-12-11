@@ -48,7 +48,7 @@ export class GetDetailSessionConseillerMiloQueryHandler extends QueryHandler<
     if (isFailure(resultConseiller)) {
       return resultConseiller
     }
-    const { structure } = resultConseiller.data
+    const { structureMilo: structure } = resultConseiller.data
 
     const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
       query.accessToken

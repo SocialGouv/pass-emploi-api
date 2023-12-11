@@ -73,7 +73,7 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
 
       const idpToken = 'idpToken'
       const conseiller = unConseillerMilo({
-        structure: {
+        structureMilo: {
           id: query.idStructureMilo,
           timezone: query.timezoneStructure
         }
@@ -81,14 +81,14 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
 
       beforeEach(async () => {
         await StructureMiloSqlModel.create({
-          id: conseiller.structure.id,
+          id: conseiller.structureMilo.id,
           nomOfficiel: 'Structure Milo',
-          timezone: conseiller.structure.timezone
+          timezone: conseiller.structureMilo.timezone
         })
         await SessionMiloSqlModel.create({
           id: unDetailSessionConseillerDto.session.id,
           estVisible: true,
-          idStructureMilo: conseiller.structure.id,
+          idStructureMilo: conseiller.structureMilo.id,
           dateModification: DateTime.now().toJSDate()
         })
         keycloakClient.exchangeTokenConseillerMilo
@@ -101,8 +101,8 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
         miloClient.getSessionsConseiller
           .withArgs(
             idpToken,
-            conseiller.structure.id,
-            conseiller.structure.timezone,
+            conseiller.structureMilo.id,
+            conseiller.structureMilo.timezone,
             {
               periode: {
                 dateDebut: dateDebut
@@ -179,8 +179,8 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
         miloClient.getSessionsConseiller
           .withArgs(
             idpToken,
-            conseiller.structure.id,
-            conseiller.structure.timezone,
+            conseiller.structureMilo.id,
+            conseiller.structureMilo.timezone,
             {
               periode: {
                 dateDebut: dateDebut
@@ -192,8 +192,8 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
         miloClient.getSessionsConseiller
           .withArgs(
             idpToken,
-            conseiller.structure.id,
-            conseiller.structure.timezone,
+            conseiller.structureMilo.id,
+            conseiller.structureMilo.timezone,
             {
               periode: {
                 dateDebut: dateDebut
@@ -206,8 +206,8 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
         miloClient.getSessionsConseiller
           .withArgs(
             idpToken,
-            conseiller.structure.id,
-            conseiller.structure.timezone,
+            conseiller.structureMilo.id,
+            conseiller.structureMilo.timezone,
             {
               periode: {
                 dateDebut: dateDebut
@@ -274,8 +274,8 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
         miloClient.getSessionsConseiller
           .withArgs(
             idpToken,
-            conseiller.structure.id,
-            conseiller.structure.timezone,
+            conseiller.structureMilo.id,
+            conseiller.structureMilo.timezone,
             {
               periode: {
                 dateDebut: dateDebut
@@ -287,8 +287,8 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
         miloClient.getSessionsConseiller
           .withArgs(
             idpToken,
-            conseiller.structure.id,
-            conseiller.structure.timezone,
+            conseiller.structureMilo.id,
+            conseiller.structureMilo.timezone,
             {
               periode: {
                 dateDebut: dateDebut
@@ -347,8 +347,8 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
         miloClient.getSessionsConseiller
           .withArgs(
             idpToken,
-            conseiller.structure.id,
-            conseiller.structure.timezone,
+            conseiller.structureMilo.id,
+            conseiller.structureMilo.timezone,
             {
               periode: {
                 dateDebut: dateDebut
@@ -455,8 +455,8 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
         miloClient.getSessionsConseiller
           .withArgs(
             idpToken,
-            conseiller.structure.id,
-            conseiller.structure.timezone,
+            conseiller.structureMilo.id,
+            conseiller.structureMilo.timezone,
             {
               periode: {
                 dateDebut: dateDebut

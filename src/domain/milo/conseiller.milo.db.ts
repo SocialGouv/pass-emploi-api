@@ -20,9 +20,8 @@ import { AsSql } from '../../infrastructure/sequelize/types'
 
 export const ConseillerMiloRepositoryToken = 'ConseillerMilo.Repository'
 
-export interface ConseillerMilo {
-  id: string
-  structure: ConseillerMilo.Structure
+export interface ConseillerMilo extends Conseiller {
+  structureMilo: ConseillerMilo.Structure
 }
 
 export namespace ConseillerMilo {

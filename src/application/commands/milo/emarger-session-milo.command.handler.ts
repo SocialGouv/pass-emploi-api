@@ -47,7 +47,7 @@ export class EmargerSessionMiloCommandHandler extends CommandHandler<
       command.idConseiller
     )
     if (isFailure(conseillerMiloResult)) return conseillerMiloResult
-    const { structure: structureConseiller } = conseillerMiloResult.data
+    const { structureMilo: structureConseiller } = conseillerMiloResult.data
 
     const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
       command.accessToken

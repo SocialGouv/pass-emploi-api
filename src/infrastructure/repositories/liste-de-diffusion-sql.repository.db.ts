@@ -1,17 +1,17 @@
-import { Conseiller } from '../../../domain/conseiller/conseiller'
+import { Conseiller } from '../../domain/conseiller/conseiller'
 import {
   ListeDeDiffusionDto,
   ListeDeDiffusionSqlModel
-} from '../../sequelize/models/liste-de-diffusion.sql-model'
-import { AsSql } from '../../sequelize/types'
+} from '../sequelize/models/liste-de-diffusion.sql-model'
+import { AsSql } from '../sequelize/types'
 import { Inject } from '@nestjs/common'
-import { SequelizeInjectionToken } from '../../sequelize/providers'
+import { SequelizeInjectionToken } from '../sequelize/providers'
 import { Op, Sequelize } from 'sequelize'
-import { ListeDeDiffusionJeuneAssociationSqlModel } from '../../sequelize/models/liste-de-diffusion-jeune-association.sql-model'
+import { ListeDeDiffusionJeuneAssociationSqlModel } from '../sequelize/models/liste-de-diffusion-jeune-association.sql-model'
 import { DateTime } from 'luxon'
-import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
-import { ListeDeDiffusion } from '../../../domain/conseiller/liste-de-diffusion'
-import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
+import { ListeDeDiffusion } from '../../domain/conseiller/liste-de-diffusion'
+import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 
 export class ListeDeDiffusionSqlRepository
   implements Conseiller.ListeDeDiffusion.Repository

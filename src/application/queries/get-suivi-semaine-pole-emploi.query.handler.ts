@@ -12,7 +12,7 @@ import {
 import { Authentification } from '../../domain/authentification'
 import { estPoleEmploiBRSA } from '../../domain/core'
 import { Demarche } from '../../domain/demarche'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
@@ -32,7 +32,7 @@ export class GetSuiviSemainePoleEmploiQueryHandler extends QueryHandler<
   Result<Cached<SuiviSemainePoleEmploiQueryModel>>
 > {
   constructor(
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     private getDemarchesQueryGetter: GetDemarchesQueryGetter,
     private getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter,

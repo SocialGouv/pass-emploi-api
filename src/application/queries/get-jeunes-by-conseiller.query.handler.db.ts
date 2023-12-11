@@ -13,7 +13,7 @@ import {
 } from '../../building-blocks/types/result'
 import {
   Conseiller,
-  ConseillersRepositoryToken
+  ConseillerRepositoryToken
 } from '../../domain/conseiller/conseiller'
 import { toDetailJeuneConseillerQueryModel } from './query-mappers/jeune.mappers'
 import { DetailJeuneConseillerQueryModel } from './query-models/jeunes.query-model'
@@ -30,7 +30,7 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
 > {
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
-    @Inject(ConseillersRepositoryToken)
+    @Inject(ConseillerRepositoryToken)
     private readonly conseillersRepository: Conseiller.Repository
   ) {
     super('GetJeunesByConseillerQueryHandler')

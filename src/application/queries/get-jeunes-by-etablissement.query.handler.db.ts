@@ -6,7 +6,7 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result, success } from '../../building-blocks/types/result'
 import {
   Conseiller,
-  ConseillersRepositoryToken
+  ConseillerRepositoryToken
 } from '../../domain/conseiller/conseiller'
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
@@ -27,7 +27,7 @@ export class GetJeunesByEtablissementQueryHandler extends QueryHandler<
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
     @Inject(ConseillerInterAgenceAuthorizer)
     private readonly conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer,
-    @Inject(ConseillersRepositoryToken)
+    @Inject(ConseillerRepositoryToken)
     private readonly conseillersRepository: Conseiller.Repository
   ) {
     super('GetJeunesByEtablissementQueryHandler')

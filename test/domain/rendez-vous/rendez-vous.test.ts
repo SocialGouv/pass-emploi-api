@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import {
   CodeTypeRendezVous,
   InfosRendezVousACreer,
@@ -6,20 +7,29 @@ import {
 import { IdService } from 'src/utils/id-service'
 import { unConseiller } from 'test/fixtures/conseiller.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
-import { unConseillerDuJeune, unJeune } from 'test/fixtures/jeune.fixture'
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { failure, isSuccess } from '../../../src/building-blocks/types/result'
 import {
-  ConseillerSansAgenceError,
+  unConseillerDuJeune,
+  unJeune,
+  unJeuneMilo
+} from 'test/fixtures/jeune.fixture'
+import {
+  ConseillerMiloSansStructure,
   DateNonAutoriseeError,
-  JeuneNonLieALAgenceError,
+  JeuneNonLieALaStructureMiloError,
   MauvaiseCommandeError
 } from '../../../src/building-blocks/types/domain-error'
 import {
+  failure,
+  isSuccess,
+  success
+} from '../../../src/building-blocks/types/result'
+import { unConseillerMilo } from '../../fixtures/conseiller-milo.fixture'
+import {
   unJeuneDuRendezVous,
+  unJeuneMiloDuRendezVous,
   unRendezVous
 } from '../../fixtures/rendez-vous.fixture'
-import { DateTime } from 'luxon'
+import { StubbedClass, expect, stubClass } from '../../utils'
 
 describe('Rendez-vous', () => {
   const id = '26279b34-318a-45e4-a8ad-514a1090462c'
@@ -82,35 +92,37 @@ describe('Rendez-vous', () => {
             const result = factory.creer(infosRdv, [unJeune()], conseiller)
 
             // Then
-            expect(isSuccess(result) && result.data).to.deep.equal({
-              adresse: undefined,
-              commentaire: '',
-              createur: {
-                id: '1',
-                nom: 'Tavernier',
-                prenom: 'Nils'
-              },
-              date: dateAujourdhui,
-              duree: 10,
-              id: '26279b34-318a-45e4-a8ad-514a1090462c',
-              source: RendezVous.Source.PASS_EMPLOI,
-              idAgence: undefined,
-              invitation: undefined,
-              jeunes: [unJeune()],
-              modalite: undefined,
-              organisme: undefined,
-              precision: undefined,
-              presenceConseiller: true,
-              sousTitre: 'avec Nils',
-              titre: 'Rendez-vous conseiller',
-              type: 'ENTRETIEN_INDIVIDUEL_CONSEILLER',
-              nombreMaxParticipants: undefined
-            })
+            expect(result).to.deep.equal(
+              success({
+                adresse: undefined,
+                commentaire: '',
+                createur: {
+                  id: '1',
+                  nom: 'Tavernier',
+                  prenom: 'Nils'
+                },
+                date: dateAujourdhui,
+                duree: 10,
+                id: '26279b34-318a-45e4-a8ad-514a1090462c',
+                source: RendezVous.Source.PASS_EMPLOI,
+                idStructureMilo: undefined,
+                invitation: undefined,
+                jeunes: [unJeune()],
+                modalite: undefined,
+                organisme: undefined,
+                precision: undefined,
+                presenceConseiller: true,
+                sousTitre: 'avec Nils',
+                titre: 'Rendez-vous conseiller',
+                type: 'ENTRETIEN_INDIVIDUEL_CONSEILLER',
+                nombreMaxParticipants: undefined
+              })
+            )
           })
         })
       })
       describe('quand le type est animation collective', () => {
-        describe('quand le conseiller a une agence ', () => {
+        describe('quand le conseiller a une structure Milo ', () => {
           describe('quand le nombre de participants est supérieur à la limite', () => {
             it('rejette avec une MauvaiseCommandeError', async () => {
               // Given
@@ -123,9 +135,7 @@ describe('Rendez-vous', () => {
                 type: CodeTypeRendezVous.INFORMATION_COLLECTIVE,
                 nombreMaxParticipants: 1
               }
-              const conseiller = unConseiller({
-                agence: { id: 'test' }
-              })
+              const conseiller = unConseillerMilo()
 
               // When
               const result = factory.creer(
@@ -141,7 +151,7 @@ describe('Rendez-vous', () => {
             })
           })
           describe('quand tout est bon', () => {
-            it('renvoie un rdv avec agence', async () => {
+            it('renvoie un rdv avec structure Milo', async () => {
               // Given
               const dateAujourdhui = new Date()
               const infosRdv: InfosRendezVousACreer = {
@@ -152,14 +162,13 @@ describe('Rendez-vous', () => {
                 duree: 10,
                 type: CodeTypeRendezVous.INFORMATION_COLLECTIVE
               }
-              const conseiller = unConseiller({ agence: { id: 'test' } })
-              const unJeuneDuConseiller = unJeune({
+              const conseiller = unConseillerMilo()
+              const unJeuneDuConseiller = unJeuneMilo({
                 conseiller: {
                   id: conseiller.id,
                   firstName: conseiller.firstName,
                   lastName: conseiller.lastName,
-                  email: conseiller.email,
-                  idAgence: 'test'
+                  email: conseiller.email
                 }
               })
 
@@ -171,11 +180,13 @@ describe('Rendez-vous', () => {
               )
 
               // Then
-              expect(isSuccess(result) && result.data.idAgence).to.equal('test')
+              expect(isSuccess(result) && result.data.idStructureMilo).to.equal(
+                conseiller.structureMilo.id
+              )
             })
           })
         })
-        describe("quand le conseiller n'a pas d'agence", () => {
+        describe("quand le conseiller n'a pas de structure Milo", () => {
           it('renvoie une failure', async () => {
             // Given
             const dateAujourdhui = new Date()
@@ -187,15 +198,15 @@ describe('Rendez-vous', () => {
               duree: 10,
               type: CodeTypeRendezVous.INFORMATION_COLLECTIVE
             }
-            const conseiller = unConseiller({ agence: undefined })
-            const unJeuneDuConseiller = unJeune({
+            const conseiller = unConseiller()
+            const unJeuneDuConseiller = unJeuneMilo({
               conseiller: {
                 id: conseiller.id,
                 firstName: conseiller.firstName,
                 lastName: conseiller.lastName,
-                email: conseiller.email,
-                idAgence: undefined
-              }
+                email: conseiller.email
+              },
+              idStructureMilo: '2'
             })
 
             // When
@@ -207,12 +218,12 @@ describe('Rendez-vous', () => {
 
             // Then
             expect(result).to.deep.equal(
-              failure(new ConseillerSansAgenceError(conseiller.id))
+              failure(new ConseillerMiloSansStructure(conseiller.id))
             )
           })
         })
       })
-      describe("quand un des jeunes n'est pas lié a la bonne agence", () => {
+      describe("quand un des jeunes n'est pas lié a la bonne structure Milo", () => {
         it('rejette', () => {
           // Given
           const infosRdv: InfosRendezVousACreer = {
@@ -223,16 +234,13 @@ describe('Rendez-vous', () => {
             duree: 10,
             type: CodeTypeRendezVous.INFORMATION_COLLECTIVE
           }
-          const conseiller = unConseiller({
-            agence: { id: 'test' }
-          })
+          const conseiller = unConseillerMilo()
           const unJeuneDunAutreConseiller = unJeune({
             conseiller: {
               id: 'un-autre-conseiller',
               firstName: 'un',
               lastName: 'autre',
-              email: 'conseiller',
-              idAgence: 'plop'
+              email: 'conseiller'
             }
           })
 
@@ -246,7 +254,10 @@ describe('Rendez-vous', () => {
           // Then
           expect(result).to.deep.equal(
             failure(
-              new JeuneNonLieALAgenceError(unJeuneDunAutreConseiller.id, 'test')
+              new JeuneNonLieALaStructureMiloError(
+                unJeuneDunAutreConseiller.id,
+                conseiller.structureMilo.id
+              )
             )
           )
         })
@@ -340,12 +351,12 @@ describe('Rendez-vous', () => {
             )
           })
         })
-        describe("quand un des jeunes n'appartient pas à l'agence", () => {
+        describe("quand un des jeunes n'appartient pas à la structure Milo", () => {
           it('rejette', () => {
             // Given
             const unAtelier = unRendezVous({
               type: CodeTypeRendezVous.ATELIER,
-              idAgence: '1'
+              idStructureMilo: '1'
             })
 
             // When
@@ -353,15 +364,16 @@ describe('Rendez-vous', () => {
               ...unAtelier,
               date: '2020-04-06T12:00:00.000Z',
               jeunes: [
-                unJeuneDuRendezVous({
-                  conseiller: unConseillerDuJeune({ idAgence: '2' })
+                unJeuneMiloDuRendezVous({
+                  conseiller: unConseillerDuJeune(),
+                  idStructureMilo: '2'
                 })
               ]
             })
 
             // Then
             expect(!result._isSuccess && result.error).to.be.an.instanceOf(
-              JeuneNonLieALAgenceError
+              JeuneNonLieALaStructureMiloError
             )
           })
         })
@@ -370,7 +382,8 @@ describe('Rendez-vous', () => {
             // Given
             const dateAujourdhui = new Date()
             const rendezVous = unRendezVous({
-              type: CodeTypeRendezVous.ATELIER
+              type: CodeTypeRendezVous.ATELIER,
+              idStructureMilo: '1'
             })
 
             // When
@@ -378,7 +391,7 @@ describe('Rendez-vous', () => {
               ...rendezVous,
               titre: 'Nouveau titre',
               date: dateAujourdhui.toISOString(),
-              jeunes: [unJeuneDuRendezVous()],
+              jeunes: [unJeuneMiloDuRendezVous()],
               modalite: 'nouveau',
               adresse: 'nouvelle',
               organisme: 'nouvel',
@@ -390,7 +403,7 @@ describe('Rendez-vous', () => {
             expect(isSuccess(result) && result.data).to.deep.equal({
               ...rendezVous,
               date: dateAujourdhui,
-              jeunes: [unJeuneDuRendezVous()],
+              jeunes: [unJeuneMiloDuRendezVous()],
               titre: 'Nouveau titre',
               modalite: 'nouveau',
               adresse: 'nouvelle',

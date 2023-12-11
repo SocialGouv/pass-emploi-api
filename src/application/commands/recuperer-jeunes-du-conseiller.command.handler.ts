@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
@@ -11,7 +11,7 @@ import {
 import { Authentification } from '../../domain/authentification'
 import {
   Conseiller,
-  ConseillersRepositoryToken
+  ConseillerRepositoryToken
 } from '../../domain/conseiller/conseiller'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
@@ -26,9 +26,9 @@ export class RecupererJeunesDuConseillerCommandHandler extends CommandHandler<
   void
 > {
   constructor(
-    @Inject(ConseillersRepositoryToken)
+    @Inject(ConseillerRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     @Inject(ChatRepositoryToken)
     private chatRepository: Chat.Repository,

@@ -8,6 +8,7 @@ import { Result, failure, success } from '../../../building-blocks/types/result'
 import { Conseiller } from '../../../domain/conseiller/conseiller'
 import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
 import { StructureMiloSqlModel } from '../../sequelize/models/structure-milo.sql-model'
+import { fromSqlConseillerToAggregate } from '../conseiller-sql.repository.db'
 
 @Injectable()
 export class ConseillerMiloSqlRepository implements Conseiller.Milo.Repository {
@@ -26,8 +27,8 @@ export class ConseillerMiloSqlRepository implements Conseiller.Milo.Repository {
       return failure(new ConseillerMiloSansStructure(id))
     }
     return success({
-      id,
-      structure: {
+      ...fromSqlConseillerToAggregate(conseillerSqlModel),
+      structureMilo: {
         id: conseillerSqlModel.structureMilo.id,
         timezone: conseillerSqlModel.structureMilo.timezone
       }

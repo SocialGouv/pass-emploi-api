@@ -16,7 +16,7 @@ import {
   ListeDeDiffusionRepositoryToken
 } from '../../domain/conseiller/liste-de-diffusion'
 import { Evenement, EvenementService } from '../../domain/evenement'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { Notification } from '../../domain/notification/notification'
 import { ListeDeDiffusionAuthorizer } from '../authorizers/liste-de-diffusion-authorizer'
 import Code = Evenement.Code
@@ -42,7 +42,7 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
   constructor(
     @Inject(ChatRepositoryToken)
     private chatRepository: Chat.Repository,
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     @Inject(ListeDeDiffusionRepositoryToken)
     private listeDeDiffusionRepository: Conseiller.ListeDeDiffusion.Repository,

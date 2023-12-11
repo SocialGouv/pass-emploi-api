@@ -56,7 +56,7 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
     }
 
     const { id: idStructureMilo, timezone: timezoneStructure } =
-      resultConseiller.data.structure
+      resultConseiller.data.structureMilo
 
     let periode
     if (query.dateDebut || query.dateFin)

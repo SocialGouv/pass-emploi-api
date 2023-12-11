@@ -29,9 +29,9 @@ import {
   CreateListeDeDiffusionCommandHandler
 } from '../../application/commands/create-liste-de-diffusion.command.handler'
 import {
-  CreateRendezVousCommand,
-  CreateRendezVousCommandHandler
-} from '../../application/commands/create-rendez-vous.command.handler'
+  CreerRendezVousCommand,
+  CreerRendezVousCommandHandler
+} from '../../application/commands/rendez-vous/creer-rendez-vous.command.handler'
 import { ModifierConseillerCommandHandler } from '../../application/commands/modifier-conseiller.command.handler'
 import { ModifierJeuneDuConseillerCommandHandler } from '../../application/commands/modifier-jeune-du-conseiller.command.handler'
 import { RecupererJeunesDuConseillerCommandHandler } from '../../application/commands/recuperer-jeunes-du-conseiller.command.handler'
@@ -82,7 +82,7 @@ import {
   GetRendezVousConseillerQueryParams,
   PutJeuneDuConseillerPayload
 } from './validation/conseillers.inputs'
-import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
+import { CreerRendezVousPayload } from './validation/rendez-vous.inputs'
 
 @Controller('conseillers')
 @ApiOAuth2([])
@@ -97,7 +97,7 @@ export class ConseillersController {
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly sendNotificationsNouveauxMessages: SendNotificationsNouveauxMessagesCommandHandler,
     private readonly getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler,
-    private readonly createRendezVousCommandHandler: CreateRendezVousCommandHandler,
+    private readonly creerRendezVousCommandHandler: CreerRendezVousCommandHandler,
     private readonly modifierConseillerCommandHandler: ModifierConseillerCommandHandler,
     private readonly recupererJeunesDuConseillerCommandHandler: RecupererJeunesDuConseillerCommandHandler,
     private readonly modifierJeuneDuConseillerCommandHandler: ModifierJeuneDuConseillerCommandHandler,
@@ -311,34 +311,34 @@ export class ConseillersController {
   }
 
   @ApiOperation({
-    summary: 'Crée un rendez-vous pour des jeunes',
+    summary: 'Crée un rendez-vous ou une animation collective pour des jeunes',
     description: 'Autorisé pour un conseiller'
   })
   @Post(':idConseiller/rendezvous')
-  async createRendezVous(
+  async creerRendezVous(
     @Param('idConseiller') idConseiller: string,
-    @Body() createRendezVousPayload: CreateRendezVousPayload,
+    @Body() creerRendezVousPayload: CreerRendezVousPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<Core.Id> {
-    const command: CreateRendezVousCommand = {
-      idsJeunes: createRendezVousPayload.jeunesIds,
-      commentaire: createRendezVousPayload.comment,
-      date: createRendezVousPayload.date,
-      duree: createRendezVousPayload.duration,
+    const command: CreerRendezVousCommand = {
+      idsJeunes: creerRendezVousPayload.jeunesIds,
+      commentaire: creerRendezVousPayload.comment,
+      date: creerRendezVousPayload.date,
+      duree: creerRendezVousPayload.duration,
       idConseiller: idConseiller,
-      modalite: createRendezVousPayload.modality,
-      titre: createRendezVousPayload.titre,
-      type: createRendezVousPayload.type,
-      precision: createRendezVousPayload.precision,
-      adresse: createRendezVousPayload.adresse,
-      organisme: createRendezVousPayload.organisme,
-      presenceConseiller: createRendezVousPayload.presenceConseiller,
-      invitation: createRendezVousPayload.invitation,
-      nombreMaxParticipants: createRendezVousPayload.nombreMaxParticipants
+      modalite: creerRendezVousPayload.modality,
+      titre: creerRendezVousPayload.titre,
+      type: creerRendezVousPayload.type,
+      precision: creerRendezVousPayload.precision,
+      adresse: creerRendezVousPayload.adresse,
+      organisme: creerRendezVousPayload.organisme,
+      presenceConseiller: creerRendezVousPayload.presenceConseiller,
+      invitation: creerRendezVousPayload.invitation,
+      nombreMaxParticipants: creerRendezVousPayload.nombreMaxParticipants
     }
 
     const result: Result<string> =
-      await this.createRendezVousCommandHandler.execute(command, utilisateur)
+      await this.creerRendezVousCommandHandler.execute(command, utilisateur)
 
     if (isSuccess(result)) {
       return { id: result.data }
