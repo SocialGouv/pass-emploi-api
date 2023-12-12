@@ -65,7 +65,7 @@ describe('GetDiagorienteMetiersFavorisQueryHandler', () => {
   })
 
   describe('jeune avec email', () => {
-    describe('register en echec', async () => {
+    it('register en echec', async () => {
       // Given
       const jeune = unJeune()
       const infosJeune = {
@@ -90,6 +90,7 @@ describe('GetDiagorienteMetiersFavorisQueryHandler', () => {
         failure(new CompteDiagorienteInvalideError(jeune.id))
       )
     })
+
     describe('register en succes', async () => {
       describe('quand la recuperation des metiers favoris est en succes', () => {
         it('renvoie les métiers favoris', async () => {

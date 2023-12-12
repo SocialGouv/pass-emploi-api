@@ -297,7 +297,6 @@ describe('RechercheSqlRepository', () => {
 
   describe('trouverLesRecherchesImmersion', () => {
     describe('quand la latlon et le rome correspondent', async () => {
-      // Given
       const rechercheCharpentierANice = uneRecherche({
         id: '80b0a6fd-5c65-470f-8d2c-a2b500824e7a',
         idJeune,
@@ -307,29 +306,31 @@ describe('RechercheSqlRepository', () => {
           rome: 'charpentier'
         }
       })
+      beforeEach(async () => {
+        // Given
+        const rechercheBoulangerANice = uneRecherche({
+          id: 'cda271d8-2d95-42a7-9c3B-47d142b55c39',
+          idJeune,
+          type: Recherche.Type.OFFRES_IMMERSION,
+          criteres: {
+            ...criteresImmersionNice,
+            rome: 'boulanger'
+          }
+        })
 
-      const rechercheBoulangerANice = uneRecherche({
-        id: 'cda271d8-2d95-42a7-9c3B-47d142b55c39',
-        idJeune,
-        type: Recherche.Type.OFFRES_IMMERSION,
-        criteres: {
-          ...criteresImmersionNice,
-          rome: 'boulanger'
-        }
+        const rechercheBoulangerAParis = uneRecherche({
+          id: 'cda271d8-2d95-42a7-9c3B-47d142b55c34',
+          idJeune,
+          type: Recherche.Type.OFFRES_IMMERSION,
+          criteres: {
+            ...criteresImmersionParis,
+            rome: 'boulanger'
+          }
+        })
+        await rechercheSqlRepository.save(rechercheCharpentierANice)
+        await rechercheSqlRepository.save(rechercheBoulangerANice)
+        await rechercheSqlRepository.save(rechercheBoulangerAParis)
       })
-
-      const rechercheBoulangerAParis = uneRecherche({
-        id: 'cda271d8-2d95-42a7-9c3B-47d142b55c34',
-        idJeune,
-        type: Recherche.Type.OFFRES_IMMERSION,
-        criteres: {
-          ...criteresImmersionParis,
-          rome: 'boulanger'
-        }
-      })
-      await rechercheSqlRepository.save(rechercheCharpentierANice)
-      await rechercheSqlRepository.save(rechercheBoulangerANice)
-      await rechercheSqlRepository.save(rechercheBoulangerAParis)
 
       it('retourne la recherche de charpentier', async () => {
         // When
