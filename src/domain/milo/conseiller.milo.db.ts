@@ -17,6 +17,8 @@ import { DateService } from '../../utils/date-service'
 import { buildError } from '../../utils/logger.module'
 import { Conseiller } from '../conseiller/conseiller'
 import { AsSql } from '../../infrastructure/sequelize/types'
+import { AgenceSqlModel } from '../../infrastructure/sequelize/models/agence.sql-model'
+import { Core } from '../core'
 
 export const ConseillerMiloRepositoryToken = 'ConseillerMilo.Repository'
 
@@ -32,6 +34,7 @@ export namespace ConseillerMilo {
     get(idConseiller: string): Promise<Result<ConseillerMilo>>
     save(conseiller: {
       id: string
+      idAgence?: string | null
       idStructure?: string | null
       dateVerificationStructureMilo?: DateTime
     }): Promise<void>
@@ -113,6 +116,7 @@ export namespace ConseillerMilo {
 
               await this.conseillerMiloRepository.save({
                 id: idConseiller,
+                idAgence: codeStructureAjouteeOuNull,
                 idStructure: codeStructureAjouteeOuNull,
                 dateVerificationStructureMilo: maintenant
               })
@@ -122,6 +126,7 @@ export namespace ConseillerMilo {
 
           await this.conseillerMiloRepository.save({
             id: idConseiller,
+            idAgence: codeStructure,
             idStructure: codeStructure,
             dateVerificationStructureMilo: maintenant
           })
@@ -176,8 +181,20 @@ export namespace ConseillerMilo {
           codeDepartement: structureDansLeDepartementSql.codeDepartement,
           timezone: structureDansLeDepartementSql.timezone
         }
+        const agenceACreer: AsSql<AgenceSqlModel> = {
+          id: structureMilo.code,
+          nomAgence: structureMilo.nomOfficiel,
+          nomRegion: structureDansLeDepartementSql.nomRegion ?? 'INCONNU',
+          codeRegion: structureDansLeDepartementSql.codeRegion,
+          nomDepartement: structureDansLeDepartementSql.nomDepartement,
+          codeDepartement:
+            structureDansLeDepartementSql.codeDepartement ?? '99',
+          timezone: structureDansLeDepartementSql.timezone,
+          structure: Core.Structure.MILO
+        }
 
         await StructureMiloSqlModel.create(structureACreer)
+        await AgenceSqlModel.create(agenceACreer)
         return structureMilo.code
       } catch (e) {
         this.logger.warn(e)

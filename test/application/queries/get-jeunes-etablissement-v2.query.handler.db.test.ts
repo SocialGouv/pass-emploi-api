@@ -11,7 +11,7 @@ import {
   AgenceDto,
   AgenceSqlModel
 } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
-import { unEtablissementDto } from '../../fixtures/sql-models/etablissement.sq-model'
+import { uneAgenceDto } from '../../fixtures/sql-models/agence.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
@@ -41,14 +41,14 @@ describe('GetJeuneEtablissementV2QueryHandler', () => {
 
   const datetimeDeBase = uneDatetime()
 
-  let etablissement1Dto: AsSql<AgenceDto>
-  let etablissement2Dto: AsSql<AgenceDto>
+  let agence1Dto: AsSql<AgenceDto>
+  let agence2Dto: AsSql<AgenceDto>
 
-  let conseillerEtablissement1Dto: AsSql<ConseillerDto>
-  let conseillerEtablissement2Dto: AsSql<ConseillerDto>
+  let conseillerAgence1Dto: AsSql<ConseillerDto>
+  let conseillerAgence2Dto: AsSql<ConseillerDto>
 
-  let jeuneEtablissement1Dto: AsSql<JeuneDto>
-  let jeuneEtablissement2Dto: AsSql<JeuneDto>
+  let jeuneAgence1Dto: AsSql<JeuneDto>
+  let jeuneAgence2Dto: AsSql<JeuneDto>
   let jeuneEtablissement3Dto: AsSql<JeuneDto>
 
   let situationJeune1Dto: AsSql<SituationsMiloDto>
@@ -85,7 +85,7 @@ describe('GetJeuneEtablissementV2QueryHandler', () => {
     before(async () => {
       await databaseForTesting.cleanPG()
 
-      etablissement1Dto = unEtablissementDto({
+      agence1Dto = uneAgenceDto({
         id: '1',
         nomAgence: 'Paris',
         nomRegion: 'Île-de-France',
@@ -93,7 +93,7 @@ describe('GetJeuneEtablissementV2QueryHandler', () => {
         structure: Core.Structure.MILO
       })
 
-      etablissement2Dto = unEtablissementDto({
+      agence2Dto = uneAgenceDto({
         id: '2',
         nomAgence: 'Paris',
         nomRegion: 'Île-de-France',
@@ -101,21 +101,21 @@ describe('GetJeuneEtablissementV2QueryHandler', () => {
         structure: Core.Structure.MILO
       })
 
-      conseillerEtablissement1Dto = unConseillerDto({
+      conseillerAgence1Dto = unConseillerDto({
         id: '1',
         nom: 'Nom premier conseiller',
         prenom: 'Prenom premier conseiller',
         idAgence: '1'
       })
 
-      conseillerEtablissement2Dto = unConseillerDto({
+      conseillerAgence2Dto = unConseillerDto({
         id: '2',
         nom: 'Nom deuxième conseiller',
         prenom: 'Prenom deuxième conseiller',
         idAgence: '2'
       })
 
-      jeuneEtablissement1Dto = unJeuneDto({
+      jeuneAgence1Dto = unJeuneDto({
         id: '1',
         nom: 'Jean',
         prenom: 'Dupont',
@@ -123,7 +123,7 @@ describe('GetJeuneEtablissementV2QueryHandler', () => {
         dateDerniereActualisationToken: uneDate()
       })
 
-      jeuneEtablissement2Dto = unJeuneDto({
+      jeuneAgence2Dto = unJeuneDto({
         id: '2',
         nom: 'Jeanne',
         prenom: 'Claude Van Damme',
@@ -141,12 +141,12 @@ describe('GetJeuneEtablissementV2QueryHandler', () => {
 
       situationJeune1Dto = uneSituationsMiloDto({
         id: 1,
-        idJeune: jeuneEtablissement1Dto.id
+        idJeune: jeuneAgence1Dto.id
       })
 
       situationJeune2Dto = uneSituationsMiloDto({
         id: 2,
-        idJeune: jeuneEtablissement2Dto.id
+        idJeune: jeuneAgence2Dto.id
       })
 
       situationJeune3Dto = uneSituationsMiloDto({
@@ -154,16 +154,16 @@ describe('GetJeuneEtablissementV2QueryHandler', () => {
         idJeune: jeuneEtablissement3Dto.id
       })
 
-      await AgenceSqlModel.bulkCreate([etablissement1Dto, etablissement2Dto])
+      await AgenceSqlModel.bulkCreate([agence1Dto, agence2Dto])
 
       await ConseillerSqlModel.bulkCreate([
-        conseillerEtablissement1Dto,
-        conseillerEtablissement2Dto
+        conseillerAgence1Dto,
+        conseillerAgence2Dto
       ])
 
       await JeuneSqlModel.bulkCreate([
-        jeuneEtablissement1Dto,
-        jeuneEtablissement2Dto,
+        jeuneAgence1Dto,
+        jeuneAgence2Dto,
         jeuneEtablissement3Dto
       ])
 
@@ -178,7 +178,7 @@ describe('GetJeuneEtablissementV2QueryHandler', () => {
       it('ne retourne pas de doublon quand le nom et le prénom ont le même préfixe', async () => {
         // Given
         const query = {
-          idEtablissement: etablissement1Dto.id,
+          idEtablissement: agence1Dto.id,
           page: 1,
           limit: 1,
           q: 'Jean'
@@ -196,9 +196,9 @@ describe('GetJeuneEtablissementV2QueryHandler', () => {
           },
           resultats: [
             mapJeuneMiloResume(
-              jeuneEtablissement1Dto,
+              jeuneAgence1Dto,
               situationJeune1Dto,
-              conseillerEtablissement1Dto
+              conseillerAgence1Dto
             )
           ]
         }

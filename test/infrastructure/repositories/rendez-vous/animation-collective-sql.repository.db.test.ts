@@ -20,7 +20,7 @@ import {
   uneConfiguration
 } from '../../../fixtures/jeune.fixture'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
-import { unEtablissementDto } from '../../../fixtures/sql-models/etablissement.sq-model'
+import { uneAgenceDto } from '../../../fixtures/sql-models/agence.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
 import { expect, stubClass } from '../../../utils'
@@ -67,12 +67,12 @@ describe('AnimationsCollectivesSqlRepository', () => {
     await JeuneSqlModel.creer(unJeuneDto({ id: jeune.id }))
     await JeuneSqlModel.creer(unJeuneDto({ id: unAutreJeune.id }))
     await AgenceSqlModel.create(
-      unEtablissementDto({
+      uneAgenceDto({
         id: 'une-agence'
       })
     )
     await AgenceSqlModel.create(
-      unEtablissementDto({
+      uneAgenceDto({
         id: 'une-autre-agence'
       })
     )

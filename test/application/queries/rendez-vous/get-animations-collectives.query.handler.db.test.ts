@@ -4,7 +4,7 @@ import { expect, StubbedClass, stubClass } from '../../../utils'
 import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
 import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
-import { unEtablissementDto } from '../../../fixtures/sql-models/etablissement.sq-model'
+import { uneAgenceDto } from '../../../fixtures/sql-models/agence.sql-model'
 import { AgenceSqlModel } from '../../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
 import { uneDatetime } from '../../../fixtures/date.fixture'
@@ -30,7 +30,7 @@ describe('GetAnimationsCollectivesQueryHandler', () => {
   let dateService: StubbedClass<DateService>
 
   const maintenant = uneDatetime()
-  const agenceDto = unEtablissementDto()
+  const agenceDto = uneAgenceDto()
   const conseillerDto = unConseillerDto({
     idAgence: agenceDto.id
   })

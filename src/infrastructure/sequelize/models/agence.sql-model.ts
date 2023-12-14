@@ -28,6 +28,18 @@ export class AgenceDto extends Model {
   nomRegion: string
 
   @Column({
+    field: 'code_region',
+    type: DataType.STRING
+  })
+  codeRegion: string | null
+
+  @Column({
+    field: 'nom_departement',
+    type: DataType.STRING
+  })
+  nomDepartement: string | null
+
+  @Column({
     field: 'code_departement',
     type: DataType.STRING
   })
@@ -38,6 +50,12 @@ export class AgenceDto extends Model {
     type: DataType.STRING
   })
   structure: Core.Structure
+
+  @Column({
+    field: 'timezone',
+    type: DataType.STRING
+  })
+  timezone: string
 }
 
 @Table({

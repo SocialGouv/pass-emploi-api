@@ -9,9 +9,12 @@ export function uneAgenceMiloDto(
   const defaults: AsSql<AgenceDto> = {
     id: '1',
     nomAgence: 'Mission Locale Aubenas',
-    codeDepartement: '7',
+    nomDepartement: null,
+    codeDepartement: '07',
     structure: Structure.MILO,
-    nomRegion: 'Auvergne-Rhône-Alpes'
+    nomRegion: 'Auvergne-Rhône-Alpes',
+    codeRegion: null,
+    timezone: 'Europe/Paris'
   }
 
   return { ...defaults, ...args }
@@ -23,9 +26,12 @@ export function uneAgenceDto(
   const defaults: AsSql<AgenceDto> = {
     id: '1',
     nomAgence: 'Nice',
+    nomDepartement: null,
     codeDepartement: '6',
     structure: Structure.POLE_EMPLOI,
-    nomRegion: 'PACA'
+    nomRegion: 'PACA',
+    codeRegion: null,
+    timezone: 'Europe/Paris'
   }
 
   return { ...defaults, ...args }

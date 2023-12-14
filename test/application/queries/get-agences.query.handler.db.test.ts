@@ -39,14 +39,16 @@ describe('GetAgencesQueryHandler', () => {
           nomAgence: 'Agence Du CEJ MILO',
           nomRegion: 'Pays de la Loire',
           structure: 'MILO',
-          codeDepartement: 44
+          codeDepartement: 44,
+          timezone: 'Paris'
         },
         {
           id: '1',
           nomAgence: 'Agence normale',
           nomRegion: 'Limousin',
           structure: 'POLE_EMPLOI',
-          codeDepartement: 87
+          codeDepartement: 87,
+          timezone: 'Paris'
         }
       ])
 

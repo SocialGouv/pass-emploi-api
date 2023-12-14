@@ -13,7 +13,7 @@ import {
   CodeTypeRendezVous,
   RendezVous
 } from '../../../../src/domain/rendez-vous/rendez-vous'
-import { unEtablissementDto } from '../../../fixtures/sql-models/etablissement.sq-model'
+import { uneAgenceDto } from '../../../fixtures/sql-models/agence.sql-model'
 import { AgenceSqlModel } from '../../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { RendezVousJeuneDetailQueryModel } from '../../../../src/application/queries/query-models/rendez-vous.query-model'
 import { RendezVousJeuneAssociationSqlModel } from '../../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
@@ -61,10 +61,10 @@ describe('GetAnimationsCollectivesJeuneQueryHandler', () => {
   })
   describe('handle', () => {
     describe('quand le jeune est lié à une agence', () => {
-      const etablissementDuConseillerDto = unEtablissementDto({
+      const agenceDuConseillerDto = uneAgenceDto({
         id: 'agence-du-conseiller'
       })
-      const unAutreEtablissementDto = unEtablissementDto({
+      const uneAutreAgenceDto = uneAgenceDto({
         id: 'une-autre-agence'
       })
       const idConseiller = 'id-conseiller'
@@ -72,26 +72,26 @@ describe('GetAnimationsCollectivesJeuneQueryHandler', () => {
 
       const conseillerDto = unConseillerDto({
         id: idConseiller,
-        idAgence: etablissementDuConseillerDto.id
+        idAgence: agenceDuConseillerDto.id
       })
 
       const acAgenceConseillerDto = unRendezVousDto({
         date: maintenant.plus({ day: 1 }).toJSDate(),
         type: CodeTypeRendezVous.ATELIER,
-        idAgence: etablissementDuConseillerDto.id
+        idAgence: agenceDuConseillerDto.id
       })
 
       const acAutreAgenceDto = unRendezVousDto({
         date: maintenant.plus({ day: 2 }).toJSDate(),
         type: CodeTypeRendezVous.INFORMATION_COLLECTIVE,
-        idAgence: unAutreEtablissementDto.id
+        idAgence: uneAutreAgenceDto.id
       })
 
       beforeEach(async () => {
         // Given
         await AgenceSqlModel.bulkCreate([
-          etablissementDuConseillerDto,
-          unAutreEtablissementDto
+          agenceDuConseillerDto,
+          uneAutreAgenceDto
         ])
 
         await ConseillerSqlModel.creer(conseillerDto)
@@ -203,10 +203,10 @@ describe('GetAnimationsCollectivesJeuneQueryHandler', () => {
     describe("quand le jeune n'est pas lié à une agence", () => {
       it('retourne un tableau vide', async () => {
         // Given
-        const etablissementDto = unEtablissementDto({
+        const agenceDto = uneAgenceDto({
           id: 'une-agence'
         })
-        await AgenceSqlModel.create(etablissementDto)
+        await AgenceSqlModel.create(agenceDto)
 
         const conseillerDto = unConseillerDto({
           idAgence: undefined
@@ -223,12 +223,12 @@ describe('GetAnimationsCollectivesJeuneQueryHandler', () => {
         const animationCollective = unRendezVousDto({
           date: maintenant.plus({ day: 1 }).toJSDate(),
           type: CodeTypeRendezVous.ATELIER,
-          idAgence: etablissementDto.id
+          idAgence: agenceDto.id
         })
         const autreAnimationCollective = unRendezVousDto({
           date: maintenant.plus({ day: 2 }).toJSDate(),
           type: CodeTypeRendezVous.INFORMATION_COLLECTIVE,
-          idAgence: etablissementDto.id
+          idAgence: agenceDto.id
         })
         await RendezVousSqlModel.bulkCreate([
           animationCollective,

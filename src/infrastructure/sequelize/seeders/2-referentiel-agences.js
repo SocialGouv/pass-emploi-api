@@ -6,7 +6,8 @@ const agencePassEmploi = {
   nom_agence: 'Agence Du CEJ MILO',
   nom_region: 'Pays de la Loire',
   structure: 'MILO',
-  code_departement: 44
+  code_departement: 44,
+  timezone: 'Europe/Paris'
 }
 
 module.exports = {

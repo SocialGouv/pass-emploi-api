@@ -20,7 +20,7 @@ import {
 } from '../../../fixtures/authentification.fixture'
 import { uneDatetime } from '../../../fixtures/date.fixture'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
-import { unEtablissementDto } from '../../../fixtures/sql-models/etablissement.sq-model'
+import { uneAgenceDto } from '../../../fixtures/sql-models/agence.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
 import { StubbedClass, expect, stubClass } from '../../../utils'
@@ -83,11 +83,11 @@ describe('GetUnRendezVousJeuneQueryHandler', () => {
     const idRendezVous = 'cbc5f0b4-ce56-4ced-a461-791478ad75a5'
     const idJeune = 'un-id-jeune'
 
-    const etablissementDto = unEtablissementDto({
+    const agenceDto = uneAgenceDto({
       id: 'une-agence'
     })
     const conseillerDto = unConseillerDto({
-      idAgence: etablissementDto.id
+      idAgence: agenceDto.id
     })
     const jeuneDto = unJeuneDto({
       id: idJeune,
@@ -97,7 +97,7 @@ describe('GetUnRendezVousJeuneQueryHandler', () => {
       id: idAnimationCollective,
       date: maintenant.plus({ day: 1 }).toJSDate(),
       type: CodeTypeRendezVous.ATELIER,
-      idAgence: etablissementDto.id
+      idAgence: agenceDto.id
     })
 
     const rendezVous = unRendezVousDto({
@@ -107,7 +107,7 @@ describe('GetUnRendezVousJeuneQueryHandler', () => {
     })
 
     beforeEach(async () => {
-      await AgenceSqlModel.create(etablissementDto)
+      await AgenceSqlModel.create(agenceDto)
       await ConseillerSqlModel.creer(conseillerDto)
       await JeuneSqlModel.creer(jeuneDto)
       await RendezVousSqlModel.bulkCreate([rendezVous, animationCollective])

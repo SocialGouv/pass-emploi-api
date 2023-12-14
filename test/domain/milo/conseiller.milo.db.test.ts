@@ -202,6 +202,7 @@ describe('Conseiller.Milo', () => {
             conseillerMiloRepository.save
           ).to.have.been.calledOnceWithExactly({
             id: idConseiller,
+            idAgence: idStructureMilo,
             idStructure: idStructureMilo,
             dateVerificationStructureMilo: maintenant
           })
@@ -241,6 +242,7 @@ describe('Conseiller.Milo', () => {
 
           const conseillerMiloAvecStructure = {
             id: idConseiller,
+            idAgence: idNouvelleStructure,
             idStructure: idNouvelleStructure,
             dateVerificationStructureMilo: maintenant
           }
@@ -294,6 +296,7 @@ describe('Conseiller.Milo', () => {
             conseillerMiloRepository.save
           ).to.have.been.calledOnceWithExactly({
             id: idConseiller,
+            idAgence: idStructureMilo,
             idStructure: idStructureMilo,
             dateVerificationStructureMilo: maintenant
           })
@@ -340,6 +343,7 @@ describe('Conseiller.Milo', () => {
             conseillerMiloRepository.save
           ).to.have.been.calledOnceWithExactly({
             id: idConseiller,
+            idAgence: idStructureMilo,
             idStructure: idStructureMilo,
             dateVerificationStructureMilo: maintenant
           })
@@ -384,6 +388,7 @@ describe('Conseiller.Milo', () => {
             conseillerMiloRepository.save
           ).to.have.been.calledOnceWithExactly({
             id: idConseiller,
+            idAgence: idStructureMilo,
             idStructure: idStructureMilo,
             dateVerificationStructureMilo: maintenant
           })
@@ -424,6 +429,7 @@ describe('Conseiller.Milo', () => {
 
           const conseillerMiloAvecStructure = {
             id: idConseiller,
+            idAgence: idNouvelleStructure,
             idStructure: idNouvelleStructure,
             dateVerificationStructureMilo: maintenant
           }
@@ -473,6 +479,7 @@ describe('Conseiller.Milo', () => {
 
           const conseillerMiloAvecStructure = {
             id: idConseiller,
+            idAgence: idNouvelleStructure,
             idStructure: idNouvelleStructure,
             dateVerificationStructureMilo: maintenant
           }
@@ -522,6 +529,7 @@ describe('Conseiller.Milo', () => {
 
           const conseillerMiloAvecStructure = {
             id: idConseiller,
+            idAgence: null,
             idStructure: null,
             dateVerificationStructureMilo: maintenant
           }

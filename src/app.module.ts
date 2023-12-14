@@ -282,7 +282,6 @@ import { ListesDeDiffusionController } from './infrastructure/routes/listes-de-d
 import { ListeDeDiffusionAuthorizer } from './application/authorizers/liste-de-diffusion-authorizer'
 import { UpdateListeDeDiffusionCommandHandler } from './application/commands/update-liste-de-diffusion.command.handler'
 import { GetDetailListeDeDiffusionQueryHandler } from './application/queries/get-detail-liste-de-diffusion.query.handler.db'
-import { MajAgenceAnimationCollectiveJobHandler } from './application/jobs/maj-agence-animation-collective.job.handler.db'
 import { BigqueryClient } from './infrastructure/clients/bigquery.client'
 import { MessagesController } from './infrastructure/routes/messages.controller'
 import { SupportController } from './infrastructure/routes/support.controller'
@@ -797,7 +796,6 @@ export const JobHandlerProviders = [
   EnvoyerEmailsMessagesConseillersJobHandler,
   NotifierRecherchesOffreEmploiJobHandler,
   RecupererSituationsJeunesMiloJobHandler,
-  MajAgenceAnimationCollectiveJobHandler,
   MajCodesEvenementsJobHandler,
   NotifierRappelInstanceSessionMiloJobHandler,
   NotifierRendezVousPEJobHandler,

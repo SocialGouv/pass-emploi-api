@@ -38,7 +38,8 @@ describe('ConseillerSqlRepository', () => {
         nomAgence: 'nom',
         nomRegion: 'nomRegion',
         codeDepartement: 'codeDepartement',
-        structure: 'MILO'
+        structure: 'MILO',
+        timezone: 'Paris'
       })
       await conseillerSqlRepository.save(conseiller)
 
@@ -82,7 +83,8 @@ describe('ConseillerSqlRepository', () => {
         nomAgence: 'nom',
         nomRegion: 'nomRegion',
         codeDepartement: 'codeDepartement',
-        structure: 'MILO'
+        structure: 'MILO',
+        timezone: 'Paris'
       })
       await conseillerSqlRepository.save(conseiller)
       await ConseillerSqlModel.update(
