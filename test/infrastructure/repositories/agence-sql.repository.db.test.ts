@@ -15,14 +15,16 @@ describe('AgenceSqlRepository', () => {
     nomAgence: 'Bonjour je suis une agence',
     structure: Structure.MILO,
     codeDepartement: '45',
-    nomRegion: 'yolo'
+    nomRegion: 'yolo',
+    timezone: 'Paris'
   }
   const agencePE: Partial<AgenceDto> = {
     id: 'Bonjour je suis un id pe',
     nomAgence: 'Bonjour je suis une agence',
     structure: Structure.POLE_EMPLOI,
     codeDepartement: '45',
-    nomRegion: 'yolo'
+    nomRegion: 'yolo',
+    timezone: 'Paris'
   }
 
   beforeEach(async () => {

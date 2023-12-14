@@ -56,7 +56,6 @@
     "tasks:nettoyer-les-pieces-jointes": "IS_WEB=false TASK_NAME=NETTOYER_LES_PIECES_JOINTES node dist/main",
     "tasks:nettoyer-les-donnees": "IS_WEB=false TASK_NAME=NETTOYER_LES_DONNEES node dist/main",
     "tasks:notifier-rendez-vous-pe": "IS_WEB=false TASK_NAME=NOTIFIER_RENDEZVOUS_PE node dist/main",
-    "tasks:maj-agences-ac": "IS_WEB=false TASK_NAME=MAJ_AGENCE_AC node dist/main",
     "tasks:maj-segments": "IS_WEB=false TASK_NAME=MAJ_SEGMENTS node dist/main",
     "tasks:monitorer-jobs": "IS_WEB=false TASK_NAME=MONITORER_JOBS node dist/main",
     "tasks:suivre-events-milo": "IS_WEB=false TASK_NAME=SUIVRE_FILE_EVENEMENTS_MILO node dist/main",

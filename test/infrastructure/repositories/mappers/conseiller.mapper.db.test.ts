@@ -77,7 +77,8 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
         nomAgence: 'Bonjour je suis une agence',
         structure: Structure.MILO,
         codeDepartement: '45',
-        nomRegion: 'yolo'
+        nomRegion: 'yolo',
+        timezone: 'test'
       }
       await AgenceSqlModel.create(uneAgence)
       await ConseillerSqlModel.create(

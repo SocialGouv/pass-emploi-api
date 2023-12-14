@@ -61,7 +61,6 @@ export namespace Planificateur {
     NOTIFIER_RENDEZVOUS_PE = 'NOTIFIER_RENDEZVOUS_PE',
     MAJ_CODES_EVENEMENTS = 'MAJ_CODES_EVENEMENTS',
     MAJ_SEGMENTS = 'MAJ_SEGMENTS',
-    MAJ_AGENCE_AC = 'MAJ_AGENCE_AC',
     MONITORER_JOBS = 'MONITORER_JOBS',
     GENERER_JDD = 'GENERER_JDD',
     SUIVRE_FILE_EVENEMENTS_MILO = 'SUIVRE_FILE_EVENEMENTS_MILO',
@@ -171,12 +170,6 @@ export const listeCronJobs: Planificateur.CronJob[] = [
     type: Planificateur.JobType.NOTIFIER_RENDEZVOUS_PE,
     expression: '0 */2 * * *',
     description: 'Toutes les 2 heures.'
-  },
-  {
-    type: Planificateur.JobType.MAJ_AGENCE_AC,
-    expression: '0 3 * * *',
-    description:
-      'Tous les jours à 3h. Cohérence AC avec agence du conseiller créateur.'
   },
   {
     type: Planificateur.JobType.MONITORER_JOBS,

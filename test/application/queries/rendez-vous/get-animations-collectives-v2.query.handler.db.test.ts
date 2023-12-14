@@ -1,7 +1,7 @@
 import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
-import { unEtablissementDto } from '../../../fixtures/sql-models/etablissement.sq-model'
+import { uneAgenceDto } from '../../../fixtures/sql-models/agence.sql-model'
 import {
   AgenceDto,
   AgenceSqlModel
@@ -34,8 +34,8 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
 
   const datetimeDeBase = uneDatetime()
 
-  let etablissement1Dto: AsSql<AgenceDto>
-  let etablissement2Dto: AsSql<AgenceDto>
+  let agence1Dto: AsSql<AgenceDto>
+  let agence2Dto: AsSql<AgenceDto>
   let evenementCollectifAClore1Dto: AsSql<RendezVousDto>
   let evenementCollectifAClore2Dto: AsSql<RendezVousDto>
   let evenementCollectifAClore3Dto: AsSql<RendezVousDto>
@@ -74,7 +74,7 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
     before(async () => {
       await databaseForTesting.cleanPG()
 
-      etablissement1Dto = unEtablissementDto({
+      agence1Dto = uneAgenceDto({
         id: '1',
         nomAgence: 'Paris',
         nomRegion: 'Île-de-France',
@@ -82,7 +82,7 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
         structure: Core.Structure.MILO
       })
 
-      etablissement2Dto = unEtablissementDto({
+      agence2Dto = uneAgenceDto({
         id: '2',
         nomAgence: 'Paris',
         nomRegion: 'Île-de-France',
@@ -159,7 +159,7 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
         idAgence: '2'
       })
 
-      await AgenceSqlModel.bulkCreate([etablissement1Dto, etablissement2Dto])
+      await AgenceSqlModel.bulkCreate([agence1Dto, agence2Dto])
       await RendezVousSqlModel.bulkCreate([
         evenementCollectifAClore1Dto,
         evenementCollectifAClore2Dto,
@@ -174,7 +174,7 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
     describe('handle', () => {
       it('retourne uniquement les évènements à clore du bon établissement sans paramètres', async () => {
         // Given
-        const query = { idEtablissement: etablissement1Dto.id, aClore: true }
+        const query = { idEtablissement: agence1Dto.id, aClore: true }
 
         // When
         const result = await queryHandler.handle(query)
@@ -199,7 +199,7 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
       it('retourne uniquement les évènements à clore du bon établissement avec les paramètres page et limite', async () => {
         // Given
         const query = {
-          idEtablissement: etablissement1Dto.id,
+          idEtablissement: agence1Dto.id,
           aClore: true,
           page: 1,
           limit: 1
@@ -227,7 +227,7 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
       it('retourne uniquement les évènements à clore du bon établissement de la deuxième page avec les paramètres page et limite', async () => {
         // Given
         const query = {
-          idEtablissement: etablissement1Dto.id,
+          idEtablissement: agence1Dto.id,
           aClore: true,
           page: 2,
           limit: 1
@@ -255,7 +255,7 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
       it("retourne toutes les animations collectives d'un établissement", async () => {
         // Given
         const query = {
-          idEtablissement: etablissement1Dto.id
+          idEtablissement: agence1Dto.id
         }
 
         // When
