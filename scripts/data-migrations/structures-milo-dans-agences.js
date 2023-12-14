@@ -97,16 +97,9 @@ sequelize.transaction(async transaction => {
     )
   }
 
-  // Detacher les conseillers MILO de leurs Agence CEJ
-  await sequelize.query(
-    `UPDATE conseiller SET id_agence = NULL WHERE structure = 'MILO'`,
-    {
-      transaction
-    }
-  )
   // Rattacher les conseillers MILO avec des Agences CEJ qui sont maintenant des structures Milo
   await sequelize.query(
-    `UPDATE conseiller SET id_agence = id_structure_milo WHERE structure = 'MILO'`,
+    `UPDATE conseiller SET id_agence = id_structure_milo WHERE structure = 'MILO' AND id_agence != '9999'`,
     {
       transaction
     }
