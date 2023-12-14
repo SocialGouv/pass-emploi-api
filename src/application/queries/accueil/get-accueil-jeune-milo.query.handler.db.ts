@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 
 import { DateTime } from 'luxon'
-import { Op } from 'sequelize'
+import { Op, Sequelize } from 'sequelize'
 import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import {
   JeuneMiloSansIdDossier,
@@ -37,6 +37,7 @@ import { SessionJeuneMiloQueryModel } from '../query-models/sessions.milo.query.
 import { ConfigService } from '@nestjs/config'
 import { sessionsMiloSontActiveesPourLeJeune } from 'src/utils/feature-flip-session-helper'
 import { buildError } from '../../../utils/logger.module'
+import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
 
 export interface GetAccueilJeuneMiloQuery extends Query {
   idJeune: string
@@ -55,7 +56,8 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     private getRecherchesSauvegardeesQueryGetter: GetRecherchesSauvegardeesQueryGetter,
     private getFavorisAccueilQueryGetter: GetFavorisAccueilQueryGetter,
     private getCampagneQueryGetter: GetCampagneQueryGetter,
-    private configService: ConfigService
+    private configService: ConfigService,
+    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
   ) {
     super('GetAccueilJeuneMiloQueryHandler')
   }
@@ -265,6 +267,13 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
         date: { [Op.gte]: maintenant.toJSDate() },
         type: {
           [Op.in]: TYPES_ANIMATIONS_COLLECTIVES
+        },
+        id: {
+          [Op.notIn]: this.sequelize.literal(`(
+              SELECT DISTINCT id_rendez_vous
+              FROM rendez_vous_jeune_association
+              WHERE rendez_vous_jeune_association.id_jeune = '${jeuneSqlModel.id}'
+           )`)
         }
       },
       order: [['date', 'ASC']],
