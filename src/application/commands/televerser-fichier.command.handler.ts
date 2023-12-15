@@ -9,11 +9,11 @@ import {
   success
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Conseiller } from '../../domain/conseiller/conseiller'
+import { Conseiller } from '../../domain/milo/conseiller'
 import {
   ListeDeDiffusion,
   ListeDeDiffusionRepositoryToken
-} from '../../domain/conseiller/liste-de-diffusion'
+} from '../../domain/milo/liste-de-diffusion'
 import { Fichier, FichierRepositoryToken } from '../../domain/fichier'
 import { ListeDeDiffusionAuthorizer } from '../authorizers/liste-de-diffusion-authorizer'
 import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'

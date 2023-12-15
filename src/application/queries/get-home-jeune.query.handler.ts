@@ -3,7 +3,7 @@ import { Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { JeuneHomeQueryModel } from './query-models/home-jeune.query-model'
 
@@ -17,7 +17,7 @@ export class GetHomeJeuneHandler extends QueryHandler<
   JeuneHomeQueryModel
 > {
   constructor(
-    @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
+    @Inject(JeuneRepositoryToken) private jeuneRepository: Jeune.Repository,
     private jeuneAuthorizer: JeuneAuthorizer
   ) {
     super('GetHomeJeuneHandler')

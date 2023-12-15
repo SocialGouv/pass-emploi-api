@@ -10,7 +10,7 @@ import {
   success
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { DiagorienteClient } from '../../infrastructure/clients/diagoriente-client'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 
@@ -40,7 +40,7 @@ export class GetDiagorienteUrlsQueryHandler extends QueryHandler<
 > {
   constructor(
     private readonly jeuneAuthorizer: JeuneAuthorizer,
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private readonly jeunesRepository: Jeune.Repository,
     private readonly diagorienteClient: DiagorienteClient
   ) {

@@ -17,7 +17,7 @@ import {
 import { SuggestionPoleEmploiService } from '../../domain/offre/recherche/suggestion/pole-emploi.service'
 import { Core, estPoleEmploiBRSA } from '../../domain/core'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { DiagorienteClient } from 'src/infrastructure/clients/diagoriente-client'
 import { buildError } from '../../utils/logger.module'
 
@@ -34,7 +34,7 @@ export class RafraichirSuggestionsCommandHandler extends CommandHandler<
   void
 > {
   constructor(
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     private jeuneAuthorizer: JeuneAuthorizer,
     private suggestionFactory: Suggestion.Factory,

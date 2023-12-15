@@ -16,7 +16,7 @@ import {
   success
 } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { Conseiller } from 'src/domain/conseiller/conseiller'
+import { Conseiller } from 'src/domain/milo/conseiller'
 import { SessionMilo } from 'src/domain/milo/session.milo'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import { DateService } from 'src/utils/date-service'

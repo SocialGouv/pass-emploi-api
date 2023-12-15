@@ -10,19 +10,18 @@ import {
   Result,
   success
 } from '../../../building-blocks/types/result'
-import {
-  Action,
-  ActionMiloRepositoryToken,
-  ActionsRepositoryToken
-} from '../../../domain/action/action'
+import { Action, ActionRepositoryToken } from '../../../domain/action/action'
 import { Authentification } from '../../../domain/authentification'
 import { ActionAuthorizer } from '../../authorizers/action-authorizer'
-import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import { QualificationActionQueryModel } from '../../queries/query-models/actions.query-model'
 import { Evenement, EvenementService } from '../../../domain/evenement'
 import { Command } from '../../../building-blocks/types/command'
 import { DateTime } from 'luxon'
-import { ActionMilo } from '../../../domain/action/action.milo'
+import {
+  ActionMilo,
+  ActionMiloRepositoryToken
+} from '../../../domain/milo/action.milo'
 import { Qualification } from '../../../domain/action/qualification'
 
 export interface QualifierActionCommand extends Command {
@@ -40,12 +39,12 @@ export class QualifierActionCommandHandler extends CommandHandler<
   QualificationActionQueryModel
 > {
   constructor(
-    @Inject(ActionsRepositoryToken)
+    @Inject(ActionRepositoryToken)
     private readonly actionRepository: Action.Repository,
     @Inject(ActionMiloRepositoryToken)
     private readonly actionMiloRepository: ActionMilo.Repository,
     private readonly actionAuthorizer: ActionAuthorizer,
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private readonly jeuneRepository: Jeune.Repository,
     private readonly evenementService: EvenementService
   ) {

@@ -7,7 +7,7 @@ import {
   unUtilisateurConseiller,
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
-import { ListeDeDiffusion } from '../../../src/domain/conseiller/liste-de-diffusion'
+import { ListeDeDiffusion } from '../../../src/domain/milo/liste-de-diffusion'
 import { uneListeDeDiffusion } from '../../fixtures/liste-de-diffusion.fixture'
 import { ListeDeDiffusionAuthorizer } from '../../../src/application/authorizers/liste-de-diffusion-authorizer'
 

@@ -7,7 +7,7 @@ import {
   Result,
   success
 } from '../../../../building-blocks/types/result'
-import { Jeune, JeunesRepositoryToken } from '../../../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../../../domain/jeune/jeune'
 import { RendezVous } from '../../../../domain/rendez-vous/rendez-vous'
 import { KeycloakClient } from '../../../../infrastructure/clients/keycloak-client'
 import {
@@ -36,7 +36,7 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
   private logger: Logger
 
   constructor(
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     @Inject(PoleEmploiPartenaireClientToken)
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,

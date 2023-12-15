@@ -1,20 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Command } from '../../building-blocks/types/command'
-import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { Command } from '../../../building-blocks/types/command'
+import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {
   EmailExisteDejaError,
   NonTrouveError
-} from '../../building-blocks/types/domain-error'
-import { Result, failure, success } from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
-import { Chat, ChatRepositoryToken } from '../../domain/chat'
+} from '../../../building-blocks/types/domain-error'
+import { Result, failure, success } from '../../../building-blocks/types/result'
+import { Authentification } from '../../../domain/authentification'
+import { Chat, ChatRepositoryToken } from '../../../domain/chat'
 import {
   Conseiller,
-  ConseillersRepositoryToken
-} from '../../domain/conseiller/conseiller'
-import { estPoleEmploiBRSA } from '../../domain/core'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
-import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
+  ConseillerRepositoryToken
+} from '../../../domain/milo/conseiller'
+import { estPoleEmploiBRSA } from '../../../domain/core'
+import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
+import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 
 export interface CreateJeuneCommand extends Command {
   idConseiller: string
@@ -29,9 +29,9 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
   Jeune
 > {
   constructor(
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
-    @Inject(ConseillersRepositoryToken)
+    @Inject(ConseillerRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     @Inject(ChatRepositoryToken)
     private chatRepository: Chat.Repository,

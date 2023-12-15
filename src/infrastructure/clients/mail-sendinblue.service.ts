@@ -2,7 +2,7 @@ import { HttpService } from '@nestjs/axios'
 import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
-import { Conseiller } from '../../domain/conseiller/conseiller'
+import { Conseiller } from '../../domain/milo/conseiller'
 import { Mail, MailDataDto } from '../../domain/mail'
 import {
   mapCodeLabelTypeRendezVous,

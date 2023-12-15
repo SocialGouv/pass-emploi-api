@@ -11,7 +11,7 @@ import {
   success
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { JeunesRepositoryToken, Jeune } from '../../domain/jeune/jeune'
+import { JeuneRepositoryToken, Jeune } from '../../domain/jeune/jeune'
 import { DiagorienteClient } from '../../infrastructure/clients/diagoriente-client'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 
@@ -46,7 +46,7 @@ export class GetDiagorienteMetiersFavorisQueryHandler extends QueryHandler<
   constructor(
     private readonly jeuneAuthorizer: JeuneAuthorizer,
     private readonly diagorienteClient: DiagorienteClient,
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private readonly jeunesRepository: Jeune.Repository
   ) {
     super('GetDiagorienteMetiersFavorisQueryHandler')

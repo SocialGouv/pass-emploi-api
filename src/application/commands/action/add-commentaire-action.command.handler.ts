@@ -6,7 +6,7 @@ import { ActionAuthorizer } from '../../authorizers/action-authorizer'
 import { Authentification } from '../../../domain/authentification'
 import {
   Action,
-  ActionsRepositoryToken,
+  ActionRepositoryToken,
   CommentaireActionRepositoryToken
 } from '../../../domain/action/action'
 import { Inject } from '@nestjs/common'
@@ -29,7 +29,7 @@ export class AddCommentaireActionCommandHandler extends CommandHandler<
 > {
   constructor(
     private actionAuthorizer: ActionAuthorizer,
-    @Inject(ActionsRepositoryToken)
+    @Inject(ActionRepositoryToken)
     private actionRepository: Action.Repository,
     @Inject(CommentaireActionRepositoryToken)
     private commentaireActionRepository: Action.Commentaire.Repository,

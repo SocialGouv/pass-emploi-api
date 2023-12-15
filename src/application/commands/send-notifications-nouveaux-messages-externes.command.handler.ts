@@ -7,7 +7,7 @@ import {
   failure,
   Result
 } from '../../building-blocks/types/result'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { Notification } from '../../domain/notification/notification'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 
@@ -23,7 +23,7 @@ export class SendNotificationsNouveauxMessagesExternesCommandHandler extends Com
   void
 > {
   constructor(
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     private notificationService: Notification.Service,
     private conseillerAuthorizer: ConseillerAuthorizer

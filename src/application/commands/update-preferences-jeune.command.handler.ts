@@ -8,7 +8,7 @@ import {
 } from '../../building-blocks/types/result'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Authentification } from '../../domain/authentification'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { Evenement, EvenementService } from '../../domain/evenement'
 
@@ -23,7 +23,7 @@ export class UpdateJeunePreferencesCommandHandler extends CommandHandler<
   void
 > {
   constructor(
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private readonly jeuneRepository: Jeune.Repository,
     private readonly jeuneAuthorizer: JeuneAuthorizer,
     private readonly evenementService: EvenementService

@@ -3,7 +3,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { IdService } from '../../utils/id-service'
 import { DateService } from '../../utils/date-service'
 
-export const ListeDeDiffusionRepositoryToken = 'ListeDeDiffusion.Repository'
+export const ListeDeDiffusionRepositoryToken = 'ListeDeDiffusionRepositoryToken'
 
 export interface ListeDeDiffusion {
   id: string

@@ -29,7 +29,7 @@ import { uneDate, uneDatetimeAvecOffset } from '../../fixtures/date.fixture'
 import {
   QualifierActionCommand,
   QualifierActionCommandHandler
-} from '../../../src/application/commands/action/qualifier-action.command.handler'
+} from '../../../src/application/commands/milo/qualifier-action.command.handler'
 import { DateService } from '../../../src/utils/date-service'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 

@@ -12,7 +12,7 @@ import {
   success
 } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { Conseiller } from 'src/domain/conseiller/conseiller'
+import { Conseiller } from 'src/domain/milo/conseiller'
 import { SessionMilo } from 'src/domain/milo/session.milo'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
@@ -22,13 +22,13 @@ import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import { DateService } from 'src/utils/date-service'
 import { uneSessionMilo } from '../../../fixtures/sessions.fixture'
 import {
-  EmargementSessionMiloCommand,
-  EmargementSessionMiloCommandHandler
-} from 'src/application/commands/milo/emargement-session-milo.command.handler'
+  EmargerSessionMiloCommand,
+  EmargerSessionMiloCommandHandler
+} from 'src/application/commands/milo/emarger-session-milo.command.handler'
 import Utilisateur = Authentification.Utilisateur
 
-describe('EmargementSessionMiloCommandHandler', () => {
-  let emargementCommandHandler: EmargementSessionMiloCommandHandler
+describe('EmargerSessionMiloCommandHandler', () => {
+  let emargementCommandHandler: EmargerSessionMiloCommandHandler
   let conseillerMiloRepository: StubbedType<Conseiller.Milo.Repository>
   let sessionMiloRepository: StubbedType<SessionMilo.Repository>
   let keycloakClient: StubbedClass<KeycloakClient>
@@ -43,7 +43,7 @@ describe('EmargementSessionMiloCommandHandler', () => {
     keycloakClient = stubClass(KeycloakClient)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     dateService = stubClass(DateService)
-    emargementCommandHandler = new EmargementSessionMiloCommandHandler(
+    emargementCommandHandler = new EmargerSessionMiloCommandHandler(
       conseillerMiloRepository,
       sessionMiloRepository,
       keycloakClient,
@@ -53,7 +53,7 @@ describe('EmargementSessionMiloCommandHandler', () => {
   })
 
   describe('handle', () => {
-    const commandSansEmargement: EmargementSessionMiloCommand = {
+    const commandSansEmargement: EmargerSessionMiloCommand = {
       idSession: 'idSession',
       idConseiller: conseiller.id,
       accessToken: 'token',
@@ -107,7 +107,7 @@ describe('EmargementSessionMiloCommandHandler', () => {
 
     describe('quand le conseiller a accès à la session', () => {
       const idpToken = 'idpToken'
-      const commandAvecEmargements: EmargementSessionMiloCommand = {
+      const commandAvecEmargements: EmargerSessionMiloCommand = {
         idSession: 'idSession',
         idConseiller: conseiller.id,
         accessToken: 'token',
@@ -214,7 +214,7 @@ describe('EmargementSessionMiloCommandHandler', () => {
   describe('authorize', () => {
     it('authorize le conseiller', async () => {
       // Given
-      const command: EmargementSessionMiloCommand = {
+      const command: EmargerSessionMiloCommand = {
         idSession: 'idSession',
         idConseiller: conseiller.id,
         accessToken: 'token',

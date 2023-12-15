@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { QueryTypes, Sequelize } from 'sequelize'
 import { SequelizeInjectionToken } from '../sequelize/providers'
-import { Conseiller } from '../../domain/conseiller/conseiller'
+import { Conseiller } from '../../domain/milo/conseiller'
 import {
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous,

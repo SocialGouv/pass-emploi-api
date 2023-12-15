@@ -9,7 +9,7 @@ import {
   isFailure,
   Result
 } from '../../../building-blocks/types/result'
-import { Action, ActionsRepositoryToken } from '../../../domain/action/action'
+import { Action, ActionRepositoryToken } from '../../../domain/action/action'
 import { Authentification } from '../../../domain/authentification'
 import { ActionAuthorizer } from '../../authorizers/action-authorizer'
 
@@ -24,7 +24,7 @@ export class UpdateStatutActionCommandHandler extends CommandHandler<
   void
 > {
   constructor(
-    @Inject(ActionsRepositoryToken)
+    @Inject(ActionRepositoryToken)
     private readonly actionRepository: Action.Repository,
     private actionFactory: Action.Factory,
     private actionAuthorizer: ActionAuthorizer,

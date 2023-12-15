@@ -3,10 +3,10 @@ import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { Command } from '../../building-blocks/types/command'
 import { Authentification } from '../../domain/authentification'
 import { Evenement, EvenementService } from '../../domain/evenement'
-import { Conseiller } from '../../domain/conseiller/conseiller'
+import { Conseiller } from '../../domain/milo/conseiller'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { Inject, Injectable } from '@nestjs/common'
-import { ListeDeDiffusionRepositoryToken } from '../../domain/conseiller/liste-de-diffusion'
+import { ListeDeDiffusionRepositoryToken } from '../../domain/milo/liste-de-diffusion'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 
 export interface CreateListeDeDiffusionCommand extends Command {

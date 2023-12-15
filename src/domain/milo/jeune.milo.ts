@@ -2,7 +2,7 @@ import { DateTime } from 'luxon'
 import { Result } from '../../building-blocks/types/result'
 import { Jeune } from '../jeune/jeune'
 
-export const MiloJeuneRepositoryToken = 'MiloJeuneRepository'
+export const JeuneMiloRepositoryToken = 'JeuneMiloRepositoryToken'
 
 export interface JeuneMilo extends Jeune {
   idStructureMilo?: string

@@ -8,10 +8,10 @@ import { Core } from '../core'
 import * as _ConfigurationApplication from './configuration-application'
 import * as _PoleEmploi from './jeune.pole-emploi'
 
-export const JeunesRepositoryToken = 'Jeune.Repository'
+export const JeuneRepositoryToken = 'JeuneRepositoryToken'
 export const JeuneConfigurationApplicationRepositoryToken =
-  'Jeune.ConfigurationApplication.Repository'
-export const JeunePoleEmploiRepositoryToken = 'Jeune.PoleEmploi.Repository'
+  'JeuneConfigurationApplicationRepositoryToken'
+export const JeunePoleEmploiRepositoryToken = 'JeunePoleEmploiRepositoryToken'
 
 export interface Jeune {
   id: string

@@ -44,7 +44,7 @@ import { GetCommentairesActionQueryHandler } from '../../application/queries/act
 import {
   QualifierActionCommand,
   QualifierActionCommandHandler
-} from '../../application/commands/action/qualifier-action.command.handler'
+} from '../../application/commands/milo/qualifier-action.command.handler'
 import { DateTime } from 'luxon'
 import { toCommentaireQueryModel } from '../../application/queries/query-mappers/commentaire.mapper'
 

@@ -7,7 +7,7 @@ import {
   success
 } from '../../../../building-blocks/types/result'
 import { Demarche } from '../../../../domain/demarche'
-import { Jeune, JeunesRepositoryToken } from '../../../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../../../domain/jeune/jeune'
 import { KeycloakClient } from '../../../../infrastructure/clients/keycloak-client'
 import {
   PoleEmploiPartenaireClient,
@@ -31,7 +31,7 @@ export class GetDemarchesQueryGetter {
   private logger: Logger
 
   constructor(
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     @Inject(PoleEmploiPartenaireClientToken)
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,

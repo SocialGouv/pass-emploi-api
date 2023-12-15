@@ -8,7 +8,7 @@ import {
 import { MauvaiseCommandeError } from '../../../../src/building-blocks/types/domain-error'
 import { failure } from '../../../../src/building-blocks/types/result'
 import { Authentification } from '../../../../src/domain/authentification'
-import { Conseiller } from '../../../../src/domain/conseiller/conseiller'
+import { Conseiller } from '../../../../src/domain/milo/conseiller'
 import { Core, estPoleEmploiBRSA } from '../../../../src/domain/core'
 import { Evenement, EvenementService } from '../../../../src/domain/evenement'
 import { Jeune } from '../../../../src/domain/jeune/jeune'

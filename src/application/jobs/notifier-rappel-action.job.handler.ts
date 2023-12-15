@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { isSuccess } from '../../building-blocks/types/result'
-import { Action, ActionsRepositoryToken } from '../../domain/action/action'
+import { Action, ActionRepositoryToken } from '../../domain/action/action'
 import {
   Jeune,
   JeuneConfigurationApplicationRepositoryToken
@@ -27,7 +27,7 @@ export class NotifierRappelActionJobHandler extends JobHandler<
   Planificateur.Job<Planificateur.JobRappelAction>
 > {
   constructor(
-    @Inject(ActionsRepositoryToken)
+    @Inject(ActionRepositoryToken)
     private actionRepository: Action.Repository,
     @Inject(JeuneConfigurationApplicationRepositoryToken)
     private jeuneConfigurationApplicationRepository: Jeune.ConfigurationApplication.Repository,

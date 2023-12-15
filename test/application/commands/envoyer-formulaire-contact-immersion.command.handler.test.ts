@@ -1,20 +1,20 @@
 import {
   EnvoyerFormulaireContactImmersionCommand,
   EnvoyerFormulaireContactImmersionCommandHandler
-} from 'src/application/commands/immersion/envoyer-formulaire-contact-immersion.command.handler'
+} from 'src/application/commands/envoyer-formulaire-contact-immersion.command.handler.db'
 import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { ImmersionClient } from 'src/infrastructure/clients/immersion-client'
 import { unUtilisateurJeune } from 'test/fixtures/authentification.fixture'
 import { expect, StubbedClass, stubClass } from 'test/utils'
-import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import {
   DatabaseForTesting,
   getDatabase
-} from '../../../utils/database-for-testing'
-import { unMetierRomeDto } from '../../../fixtures/sql-models/metier-rome.sql-model'
-import { MetierRomeSqlModel } from '../../../../src/infrastructure/sequelize/models/metier-rome.sql-model'
-import { NonTrouveError } from '../../../../src/building-blocks/types/domain-error'
+} from '../../utils/database-for-testing'
+import { unMetierRomeDto } from '../../fixtures/sql-models/metier-rome.sql-model'
+import { MetierRomeSqlModel } from '../../../src/infrastructure/sequelize/models/metier-rome.sql-model'
+import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 
 describe('EnvoyerFormulaireContactImmersionCommandHandler', () => {
   let databaseForTesting: DatabaseForTesting

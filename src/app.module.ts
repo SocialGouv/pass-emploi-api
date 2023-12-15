@@ -27,8 +27,8 @@ import { CreateActionCommandHandler } from './application/commands/action/create
 import { CreateEvenementCommandHandler } from './application/commands/create-evenement.command.handler'
 import { CreateRechercheCommandHandler } from './application/commands/create-recherche.command.handler'
 import { CreateRendezVousCommandHandler } from './application/commands/create-rendez-vous.command.handler'
-import { CreerJeuneMiloCommandHandler } from './application/commands/creer-jeune-milo.command.handler'
-import { CreerJeunePoleEmploiCommandHandler } from './application/commands/creer-jeune-pole-emploi.command.handler'
+import { CreerJeuneMiloCommandHandler } from './application/commands/milo/creer-jeune-milo.command.handler'
+import { CreerJeunePoleEmploiCommandHandler } from './application/commands/pole-emploi/creer-jeune-pole-emploi.command.handler'
 import { CreerSuperviseursCommandHandler } from './application/commands/creer-superviseurs.command.handler'
 import { DeleteActionCommandHandler } from './application/commands/action/delete-action.command.handler'
 import { DeleteFavoriOffreEmploiCommandHandler } from './application/commands/delete-favori-offre-emploi.command.handler'
@@ -86,8 +86,7 @@ import { WorkerService } from './application/worker.service.db'
 import configuration from './config/configuration'
 import {
   Action,
-  ActionMiloRepositoryToken,
-  ActionsRepositoryToken,
+  ActionRepositoryToken,
   CommentaireActionRepositoryToken
 } from './domain/action/action'
 import {
@@ -95,17 +94,14 @@ import {
   AuthentificationRepositoryToken
 } from './domain/authentification'
 import { ChatRepositoryToken } from './domain/chat'
-import {
-  Conseiller,
-  ConseillersRepositoryToken
-} from './domain/conseiller/conseiller'
+import { Conseiller, ConseillerRepositoryToken } from './domain/milo/conseiller'
 import { EvenementService, EvenementsRepositoryToken } from './domain/evenement'
 import { Fichier, FichierRepositoryToken } from './domain/fichier'
 import {
   Jeune,
   JeuneConfigurationApplicationRepositoryToken,
   JeunePoleEmploiRepositoryToken,
-  JeunesRepositoryToken
+  JeuneRepositoryToken
 } from './domain/jeune/jeune'
 import {
   Notification,
@@ -209,8 +205,8 @@ import { GetCampagneQueryGetter } from './application/queries/query-getters/get-
 import { CreateEvaluationCommandHandler } from './application/commands/campagne/create-evaluation.command'
 import { DemarcheHttpRepository } from './infrastructure/repositories/demarche-http.repository'
 import { Demarche, DemarcheRepositoryToken } from './domain/demarche'
-import { UpdateStatutDemarcheCommandHandler } from './application/commands/demarche/update-demarche.command.handler'
-import { CreateDemarcheCommandHandler } from './application/commands/demarche/create-demarche.command.handler'
+import { UpdateStatutDemarcheCommandHandler } from './application/commands/pole-emploi/update-demarche.command.handler'
+import { CreateDemarcheCommandHandler } from './application/commands/pole-emploi/create-demarche.command.handler'
 import { RechercherTypesDemarcheQueryHandler } from './application/queries/rechercher-types-demarche.query.handler'
 import { FilesController } from './infrastructure/routes/fichiers.controller'
 import { TelechargerFichierQueryHandler } from './application/queries/telecharger-fichier.query.handler'
@@ -237,8 +233,8 @@ import { GetCommentairesActionQueryHandler } from './application/queries/action/
 import { GetJeuneHomeAgendaQueryHandler } from './application/queries/get-jeune-home-agenda.query.handler.db'
 import { JeunePoleEmploiSqlRepository } from './infrastructure/repositories/jeune/jeune-pole-emploi-sql.repository.db'
 import { GetTypesQualificationsQueryHandler } from './application/queries/action/get-types-qualifications.query.handler'
-import { ActionMiloHttpRepository } from './infrastructure/repositories/action/action-milo-http-sql.repository'
-import { QualifierActionCommandHandler } from './application/commands/action/qualifier-action.command.handler'
+import { ActionMiloHttpRepository } from './infrastructure/repositories/milo/action.milo.repository'
+import { QualifierActionCommandHandler } from './application/commands/milo/qualifier-action.command.handler'
 import { GetSuiviSemainePoleEmploiQueryHandler } from './application/queries/get-suivi-semaine-pole-emploi.query.handler'
 import { GetDemarchesQueryGetter } from './application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRecherchesSauvegardeesQueryGetter } from './application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
@@ -276,7 +272,7 @@ import { GetAnimationsCollectivesJeuneQueryHandler } from './application/queries
 import { GetUnRendezVousJeuneQueryHandler } from './application/queries/rendez-vous/get-un-rendez-vous-jeune.query.handler.db'
 import { CreateListeDeDiffusionCommandHandler } from './application/commands/create-liste-de-diffusion.command.handler'
 import { ListeDeDiffusionSqlRepository } from './infrastructure/repositories/conseiller/liste-de-diffusion-sql.repository.db'
-import { ListeDeDiffusionRepositoryToken } from './domain/conseiller/liste-de-diffusion'
+import { ListeDeDiffusionRepositoryToken } from './domain/milo/liste-de-diffusion'
 import { GetListesDeDiffusionDuConseillerQueryHandler } from './application/queries/get-listes-de-diffusion-du-conseiller.query.handler.db'
 import { ListesDeDiffusionController } from './infrastructure/routes/listes-de-diffusion.controller'
 import { ListeDeDiffusionAuthorizer } from './application/authorizers/liste-de-diffusion-authorizer'
@@ -293,7 +289,7 @@ import {
   RendezVousMiloRepositoryToken,
   RendezVousMilo
 } from './domain/milo/rendez-vous.milo'
-import { MiloJeuneRepositoryToken } from './domain/milo/jeune.milo'
+import { JeuneMiloRepositoryToken } from './domain/milo/jeune.milo'
 import { MettreAJourLesJeunesCejPeCommandHandler } from './application/commands/mettre-a-jour-les-jeunes-cej-pe.command.handler'
 import { UpdateAgenceConseillerCommandHandler } from './application/commands/support/update-agence-conseiller.command.handler'
 import { GetActionsConseillerV2QueryHandler } from './application/queries/action/get-actions-conseiller-v2.query.handler.db'
@@ -301,7 +297,7 @@ import { DiagorienteController } from './infrastructure/routes/diagoriente.contr
 import { GetDiagorienteUrlsQueryHandler } from './application/queries/get-diagoriente-urls.query.handler'
 import { ArchiverJeuneSupportCommandHandler } from './application/commands/support/archiver-jeune-support.command.handler'
 import { GetDiagorienteMetiersFavorisQueryHandler } from './application/queries/get-diagoriente-metiers-favoris.query.handler'
-import { EnvoyerFormulaireContactImmersionCommandHandler } from './application/commands/immersion/envoyer-formulaire-contact-immersion.command.handler'
+import { EnvoyerFormulaireContactImmersionCommandHandler } from './application/commands/envoyer-formulaire-contact-immersion.command.handler.db'
 import { GetAccueilJeuneMiloQueryHandler } from './application/queries/accueil/get-accueil-jeune-milo.query.handler.db'
 import { GetAccueilJeunePoleEmploiQueryHandler } from './application/queries/accueil/get-accueil-jeune-pole-emploi.query.handler.db'
 import { JeunesPoleEmploiController } from './infrastructure/routes/jeunes.pole-emploi.controller'
@@ -344,7 +340,7 @@ import { HandleJobGenererJDDCommandHandler } from './application/jobs/generer-jd
 import { MajSegmentsJobHandler } from './application/jobs/maj-segments.job.handler.db'
 import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
 import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
-import { EmargementSessionMiloCommandHandler } from 'src/application/commands/milo/emargement-session-milo.command.handler'
+import { EmargerSessionMiloCommandHandler } from 'src/application/commands/milo/emarger-session-milo.command.handler'
 import { GetSessionsConseillerMiloQueryGetter } from './application/queries/query-getters/milo/get-sessions-conseiller.milo.query.getter.db'
 import { ConseillerInterStructureMiloAuthorizer } from './application/authorizers/conseiller-inter-structure-milo-authorizer'
 import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
@@ -359,6 +355,7 @@ import { GetJeunesByEtablissementQueryHandler } from './application/queries/get-
 import { AppMobileCacheControlMiddleware } from 'src/infrastructure/middlewares/app-mobile-cache-control.middleware'
 import { EvenementMiloRepositoryToken } from './domain/milo/evenement.milo'
 import { NotifierRappelInstanceSessionMiloJobHandler } from './application/jobs/notifier-rappel-instance-session-milo.job.handler'
+import { ActionMiloRepositoryToken } from './domain/milo/action.milo'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -377,9 +374,9 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     // De base
     ActionsController,
     JeunesController,
+    JeunesControllerV2,
     JeunesMiloController,
     JeunesPoleEmploiController,
-    JeunesControllerV2,
     ConseillersController,
     ConseillersControllerV2,
     ConseillersMiloController,
@@ -462,15 +459,15 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       useClass: OidcAuthGuard
     },
     {
-      provide: ActionsRepositoryToken,
+      provide: ActionRepositoryToken,
       useClass: ActionSqlRepository
     },
     {
-      provide: JeunesRepositoryToken,
+      provide: JeuneRepositoryToken,
       useClass: JeuneSqlRepository
     },
     {
-      provide: ConseillersRepositoryToken,
+      provide: ConseillerRepositoryToken,
       useClass: ConseillerSqlRepository
     },
     {
@@ -506,7 +503,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       useClass: AuthentificationSqlRepository
     },
     {
-      provide: MiloJeuneRepositoryToken,
+      provide: JeuneMiloRepositoryToken,
       useClass: MiloJeuneHttpSqlRepository
     },
     {
@@ -778,7 +775,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetDetailSessionConseillerMiloQueryHandler,
     GetDetailSessionJeuneMiloQueryHandler,
     UpdateSessionMiloCommandHandler,
-    EmargementSessionMiloCommandHandler,
+    EmargerSessionMiloCommandHandler,
     EvenementEmploiCodePostalQueryGetter,
     GetCatalogueDemarchesQueryHandler
   ]

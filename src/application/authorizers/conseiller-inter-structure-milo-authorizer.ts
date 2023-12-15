@@ -7,11 +7,11 @@ import {
   isSuccess
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Conseiller } from '../../domain/conseiller/conseiller'
+import { Conseiller } from '../../domain/milo/conseiller'
 import { ConseillerMiloRepositoryToken } from '../../domain/milo/conseiller.milo.db'
 import {
   JeuneMilo,
-  MiloJeuneRepositoryToken
+  JeuneMiloRepositoryToken
 } from '../../domain/milo/jeune.milo'
 
 @Injectable()
@@ -19,7 +19,7 @@ export class ConseillerInterStructureMiloAuthorizer {
   constructor(
     @Inject(ConseillerMiloRepositoryToken)
     private conseillerMiloRepository: Conseiller.Milo.Repository,
-    @Inject(MiloJeuneRepositoryToken)
+    @Inject(JeuneMiloRepositoryToken)
     private jeuneRepository: JeuneMilo.Repository
   ) {}
 

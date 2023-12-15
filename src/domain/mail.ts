@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { ArchiveJeune } from './archive-jeune'
-import { Conseiller } from './conseiller/conseiller'
+import { Conseiller } from './milo/conseiller'
 import { Core, estPoleEmploiBRSA } from './core'
 import { Jeune } from './jeune/jeune'
 import { RendezVous } from './rendez-vous/rendez-vous'

@@ -16,7 +16,7 @@ import { GetCVPoleEmploiQueryHandler } from '../../application/queries/get-cv-po
 
 @Controller('jeunes')
 @ApiOAuth2([])
-@ApiTags('Jeunes')
+@ApiTags('Jeunes Pole Emploi')
 export class JeunesPoleEmploiController {
   constructor(
     private readonly getAccueilJeunePoleEmploiQueryHandler: GetAccueilJeunePoleEmploiQueryHandler,

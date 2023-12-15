@@ -5,7 +5,7 @@ import {
   NonTrouveError
 } from '../../../building-blocks/types/domain-error'
 import { Result, failure, success } from '../../../building-blocks/types/result'
-import { Conseiller } from '../../../domain/conseiller/conseiller'
+import { Conseiller } from '../../../domain/milo/conseiller'
 import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
 import { StructureMiloSqlModel } from '../../sequelize/models/structure-milo.sql-model'
 

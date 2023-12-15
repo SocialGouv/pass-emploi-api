@@ -6,7 +6,7 @@ import {
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
 import { Authentification } from '../../../src/domain/authentification'
-import { Conseiller } from '../../../src/domain/conseiller/conseiller'
+import { Conseiller } from '../../../src/domain/milo/conseiller'
 import { Core } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import {

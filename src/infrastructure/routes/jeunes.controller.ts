@@ -24,7 +24,7 @@ import { ArchiverJeuneCommandHandler } from 'src/application/commands/archiver-j
 import {
   CreateDemarcheCommand,
   CreateDemarcheCommandHandler
-} from 'src/application/commands/demarche/create-demarche.command.handler'
+} from 'src/application/commands/pole-emploi/create-demarche.command.handler'
 import { DeleteJeuneCommandHandler } from 'src/application/commands/delete-jeune.command.handler'
 import {
   TransfererJeunesConseillerCommand,
@@ -55,7 +55,7 @@ import { DeleteJeuneInactifCommandHandler } from 'src/application/commands/delet
 import {
   UpdateStatutDemarcheCommand,
   UpdateStatutDemarcheCommandHandler
-} from 'src/application/commands/demarche/update-demarche.command.handler'
+} from 'src/application/commands/pole-emploi/update-demarche.command.handler'
 import { UpdateJeuneConfigurationApplicationCommandHandler } from 'src/application/commands/update-jeune-configuration-application.command.handler'
 import { UpdateJeunePreferencesCommandHandler } from 'src/application/commands/update-preferences-jeune.command.handler'
 import { GetConseillersJeuneQueryHandler } from 'src/application/queries/get-conseillers-jeune.query.handler.db'

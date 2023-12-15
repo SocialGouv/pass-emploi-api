@@ -1,4 +1,4 @@
-import { Conseiller } from '../../../../src/domain/conseiller/conseiller'
+import { Conseiller } from '../../../../src/domain/milo/conseiller'
 import { ListeDeDiffusionJeuneAssociationSqlModel } from '../../../../src/infrastructure/sequelize/models/liste-de-diffusion-jeune-association.sql-model'
 import { ListeDeDiffusionSqlRepository } from '../../../../src/infrastructure/repositories/conseiller/liste-de-diffusion-sql.repository.db'
 import { unConseillerDuJeune, unJeune } from '../../../fixtures/jeune.fixture'
@@ -9,7 +9,7 @@ import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
 import { uneListeDeDiffusion } from '../../../fixtures/liste-de-diffusion.fixture'
 import { expect } from '../../../utils'
-import { ListeDeDiffusion } from '../../../../src/domain/conseiller/liste-de-diffusion'
+import { ListeDeDiffusion } from '../../../../src/domain/milo/liste-de-diffusion'
 import { uneAutreDatetime, uneDatetime } from '../../../fixtures/date.fixture'
 import {
   DatabaseForTesting,

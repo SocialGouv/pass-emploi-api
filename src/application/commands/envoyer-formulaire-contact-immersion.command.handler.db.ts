@@ -7,11 +7,11 @@ import {
   FormulaireImmersionPayload,
   ImmersionClient
 } from 'src/infrastructure/clients/immersion-client'
-import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
-import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
+import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
 import { QueryTypes, Sequelize } from 'sequelize'
-import { NonTrouveError } from '../../../building-blocks/types/domain-error'
-import { PartenaireImmersion } from '../../../infrastructure/repositories/dto/immersion.dto'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import { PartenaireImmersion } from '../../infrastructure/repositories/dto/immersion.dto'
 
 export interface EnvoyerFormulaireContactImmersionCommand {
   idJeune: string

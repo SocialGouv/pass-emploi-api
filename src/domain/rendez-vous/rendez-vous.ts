@@ -15,7 +15,7 @@ import {
   success
 } from '../../building-blocks/types/result'
 import { IdService } from '../../utils/id-service'
-import { Conseiller } from '../conseiller/conseiller'
+import { Conseiller } from '../milo/conseiller'
 import { Jeune } from '../jeune/jeune'
 import * as _AnimationCollective from './animation-collective'
 import * as _Historique from './historique'

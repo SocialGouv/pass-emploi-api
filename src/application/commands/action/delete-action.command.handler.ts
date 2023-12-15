@@ -11,7 +11,7 @@ import {
   failure,
   Result
 } from '../../../building-blocks/types/result'
-import { Action, ActionsRepositoryToken } from '../../../domain/action/action'
+import { Action, ActionRepositoryToken } from '../../../domain/action/action'
 import { Authentification } from '../../../domain/authentification'
 import { ActionAuthorizer } from '../../authorizers/action-authorizer'
 
@@ -25,7 +25,7 @@ export class DeleteActionCommandHandler extends CommandHandler<
   void
 > {
   constructor(
-    @Inject(ActionsRepositoryToken)
+    @Inject(ActionRepositoryToken)
     private readonly actionRepository: Action.Repository,
     private actionAuthorizer: ActionAuthorizer,
     private evenementService: EvenementService

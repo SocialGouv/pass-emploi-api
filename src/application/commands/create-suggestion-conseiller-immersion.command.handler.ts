@@ -8,7 +8,7 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { Recherche } from '../../domain/offre/recherche/recherche'
 import {
   SuggestionsRepositoryToken,
@@ -35,7 +35,7 @@ export class CreateSuggestionConseillerImmersionCommandHandler extends CommandHa
     @Inject(SuggestionsRepositoryToken)
     private suggestionRepository: Suggestion.Repository,
     private suggestionFactory: Suggestion.Factory,
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     private evenementService: EvenementService
   ) {

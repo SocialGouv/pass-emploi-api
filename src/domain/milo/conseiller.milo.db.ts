@@ -15,12 +15,12 @@ import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/consei
 import { StructureMiloSqlModel } from '../../infrastructure/sequelize/models/structure-milo.sql-model'
 import { DateService } from '../../utils/date-service'
 import { buildError } from '../../utils/logger.module'
-import { Conseiller } from '../conseiller/conseiller'
+import { Conseiller } from './conseiller'
 import { AsSql } from '../../infrastructure/sequelize/types'
 import { AgenceSqlModel } from '../../infrastructure/sequelize/models/agence.sql-model'
 import { Core } from '../core'
 
-export const ConseillerMiloRepositoryToken = 'ConseillerMilo.Repository'
+export const ConseillerMiloRepositoryToken = 'ConseillerMiloRepositoryToken'
 
 export interface ConseillerMilo {
   id: string

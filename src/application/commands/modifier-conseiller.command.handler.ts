@@ -12,8 +12,8 @@ import { Agence, AgenceRepositoryToken } from '../../domain/agence'
 import { Authentification } from '../../domain/authentification'
 import {
   Conseiller,
-  ConseillersRepositoryToken
-} from '../../domain/conseiller/conseiller'
+  ConseillerRepositoryToken
+} from '../../domain/milo/conseiller'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { DateTime } from 'luxon'
 
@@ -30,7 +30,7 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
   void
 > {
   constructor(
-    @Inject(ConseillersRepositoryToken)
+    @Inject(ConseillerRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     @Inject(AgenceRepositoryToken)
     private agencesRepository: Agence.Repository,

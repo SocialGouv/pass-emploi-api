@@ -4,7 +4,7 @@ import { ActionAuthorizer } from '../../../../src/application/authorizers/action
 import {
   QualifierActionCommand,
   QualifierActionCommandHandler
-} from '../../../../src/application/commands/action/qualifier-action.command.handler'
+} from '../../../../src/application/commands/milo/qualifier-action.command.handler'
 import {
   ErreurHttp,
   NonTrouveError
@@ -26,7 +26,7 @@ import { Jeune } from '../../../../src/domain/jeune/jeune'
 import { unJeune } from '../../../fixtures/jeune.fixture'
 import { Evenement, EvenementService } from '../../../../src/domain/evenement'
 import { uneDatetime } from '../../../fixtures/date.fixture'
-import { ActionMilo } from '../../../../src/domain/action/action.milo'
+import { ActionMilo } from '../../../../src/domain/milo/action.milo'
 
 describe('QualifierActionCommandHandler', () => {
   let actionRepository: StubbedType<Action.Repository>
