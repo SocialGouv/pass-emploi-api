@@ -11,7 +11,10 @@ import {
   Result,
   success
 } from 'src/building-blocks/types/result'
-import { generateSourceRendezVousCondition } from 'src/config/feature-flipping'
+import {
+  generateSourceRendezVousCondition,
+  sessionsMiloActives
+} from 'src/config/feature-flipping'
 import { Action } from 'src/domain/action/action'
 import { Authentification } from 'src/domain/authentification'
 import { fromSqlToActionQueryModel } from 'src/infrastructure/repositories/mappers/actions.mappers'
@@ -23,16 +26,15 @@ import {
   JeuneMiloSansIdDossier,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
+import { estMilo } from '../../domain/core'
+import { buildError } from '../../utils/logger.module'
 import { ConseillerInterAgenceAuthorizer } from '../authorizers/conseiller-inter-agence-authorizer'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { fromSqlToRendezVousJeuneQueryModel } from './query-mappers/rendez-vous-milo.mappers'
 import { ActionQueryModel } from './query-models/actions.query-model'
 import { JeuneHomeAgendaQueryModel } from './query-models/home-jeune-suivi.query-model'
 import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
-import { estMilo } from '../../domain/core'
 import { SessionJeuneMiloQueryModel } from './query-models/sessions.milo.query.model'
-import { sessionsMiloSontActiveesPourLeJeune } from 'src/utils/feature-flip-session-helper'
-import { buildError } from '../../utils/logger.module'
 
 export interface GetJeuneHomeAgendaQuery extends Query {
   idJeune: string
@@ -83,7 +85,7 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
     let sessionsMilo: SessionJeuneMiloQueryModel[] = []
     if (
       estMilo(utilisateur.structure) &&
-      sessionsMiloSontActiveesPourLeJeune(this.configuration, jeuneSqlModel)
+      sessionsMiloActives(this.configuration)
     ) {
       if (!jeuneSqlModel.idPartenaire) {
         return failure(new JeuneMiloSansIdDossier(query.idJeune))

@@ -3,12 +3,11 @@ import { ConfigService } from '@nestjs/config'
 import { DateTime } from 'luxon'
 import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
-import { isFailure, Result, success } from 'src/building-blocks/types/result'
+import { Result, isFailure, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { Conseiller } from 'src/domain/milo/conseiller'
 import { estMilo } from 'src/domain/core'
+import { Conseiller } from 'src/domain/milo/conseiller'
 import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo.db'
-import { sessionsMiloSontActiveesPourLeConseiller } from 'src/utils/feature-flip-session-helper'
 import {
   InscritSessionMiloDto,
   MILO_INSCRIT,
@@ -27,6 +26,7 @@ import {
   AgendaConseillerMiloSessionListItemQueryModel,
   InscritSessionMiloQueryModel
 } from '../query-models/sessions.milo.query.model'
+import { sessionsMiloActives } from '../../../config/feature-flipping'
 
 export interface GetAgendaSessionsConseillerMiloQuery extends Query {
   idConseiller: string
@@ -62,9 +62,7 @@ export class GetAgendaSessionsConseillerMiloQueryHandler extends QueryHandler<
     }
     const conseiller = resultConseiller.data
 
-    if (
-      !sessionsMiloSontActiveesPourLeConseiller(this.configService, conseiller)
-    ) {
+    if (!sessionsMiloActives(this.configService)) {
       return success([])
     }
 

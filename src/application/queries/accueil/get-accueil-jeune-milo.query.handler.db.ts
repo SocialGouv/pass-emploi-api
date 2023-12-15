@@ -10,34 +10,34 @@ import {
 import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
 import {
+  Result,
   failure,
   isSuccess,
-  Result,
   success
 } from 'src/building-blocks/types/result'
 import { Action } from 'src/domain/action/action'
 import { Authentification } from 'src/domain/authentification'
 import { estMilo, estMiloPassEmploi } from 'src/domain/core'
 
+import { ConfigService } from '@nestjs/config'
+import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
+import { GetFavorisAccueilQueryGetter } from 'src/application/queries/query-getters/accueil/get-favoris.query.getter.db'
+import { GetRecherchesSauvegardeesQueryGetter } from 'src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
+import { GetCampagneQueryGetter } from 'src/application/queries/query-getters/get-campagne.query.getter'
 import { TYPES_ANIMATIONS_COLLECTIVES } from 'src/domain/rendez-vous/rendez-vous'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { GetFavorisAccueilQueryGetter } from 'src/application/queries/query-getters/accueil/get-favoris.query.getter.db'
-import { GetRecherchesSauvegardeesQueryGetter } from 'src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
-import { GetCampagneQueryGetter } from 'src/application/queries/query-getters/get-campagne.query.getter'
+import { sessionsMiloActives } from '../../../config/feature-flipping'
+import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
+import { buildError } from '../../../utils/logger.module'
 import {
   fromSqlToRendezVousDetailJeuneQueryModel,
   fromSqlToRendezVousJeuneQueryModel
 } from '../query-mappers/rendez-vous-milo.mappers'
 import { AccueilJeuneMiloQueryModel } from '../query-models/jeunes.milo.query-model'
-import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
 import { SessionJeuneMiloQueryModel } from '../query-models/sessions.milo.query.model'
-import { ConfigService } from '@nestjs/config'
-import { sessionsMiloSontActiveesPourLeJeune } from 'src/utils/feature-flip-session-helper'
-import { buildError } from '../../../utils/logger.module'
-import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
 
 export interface GetAccueilJeuneMiloQuery extends Query {
   idJeune: string
@@ -107,7 +107,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     let sessions: SessionJeuneMiloQueryModel[] = []
 
     if (
-      sessionsMiloSontActiveesPourLeJeune(this.configService, jeuneSqlModel) &&
+      sessionsMiloActives(this.configService) &&
       estMilo(jeuneSqlModel.structure)
     ) {
       if (!jeuneSqlModel.idPartenaire) {

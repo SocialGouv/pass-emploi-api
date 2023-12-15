@@ -21,3 +21,7 @@ export function generateSourceRendezVousCondition(
   }
   return sourceCondition
 }
+
+export function sessionsMiloActives(configuration: ConfigService): boolean {
+  return configuration.get('features.recupererSessionsMilo') ?? false
+}

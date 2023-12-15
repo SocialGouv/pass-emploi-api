@@ -13,7 +13,7 @@ import { QueryHandler } from 'src/building-blocks/types/query-handler'
 import { Result, failure, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { estMilo } from 'src/domain/core'
-import { sessionsMiloSontActiveesPourLeJeune } from 'src/utils/feature-flip-session-helper'
+import { sessionsMiloActives } from '../../../config/feature-flipping'
 import { ConseillerSqlModel } from '../../../infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { ConseillerInterStructureMiloAuthorizer } from '../../authorizers/conseiller-inter-structure-milo-authorizer'
@@ -51,9 +51,7 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
 
-    if (
-      !sessionsMiloSontActiveesPourLeJeune(this.configService, jeuneSqlModel)
-    ) {
+    if (!sessionsMiloActives(this.configService)) {
       return success([])
     }
 
