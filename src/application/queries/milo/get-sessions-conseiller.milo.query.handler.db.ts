@@ -1,17 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { DateTime } from 'luxon'
 import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
-import { isFailure, Result, success } from 'src/building-blocks/types/result'
+import { Result, isFailure, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { Conseiller } from 'src/domain/milo/conseiller'
 import { estMilo } from 'src/domain/core'
+import { Conseiller } from 'src/domain/milo/conseiller'
 import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo.db'
+import { sessionsMiloActives } from '../../../config/feature-flipping'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
-import { SessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
-import { ConfigService } from '@nestjs/config'
 import { GetSessionsConseillerMiloQueryGetter } from '../query-getters/milo/get-sessions-conseiller.milo.query.getter.db'
-import { sessionsMiloSontActiveesPourLeConseiller } from 'src/utils/feature-flip-session-helper'
+import { SessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
 
 export interface GetSessionsConseillerMiloQuery extends Query {
   idConseiller: string
@@ -46,12 +46,7 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
       return resultConseiller
     }
 
-    if (
-      !sessionsMiloSontActiveesPourLeConseiller(
-        this.configService,
-        resultConseiller.data
-      )
-    ) {
+    if (!sessionsMiloActives(this.configService)) {
       return success([])
     }
 

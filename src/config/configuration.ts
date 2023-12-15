@@ -218,11 +218,7 @@ export default () => {
       recupererStructureMilo:
         process.env.FEATURE_RECUPERER_STRUCTURE_MILO === 'true',
       recupererSessionsMilo:
-        process.env.FEATURE_RECUPERER_SESSIONS_MILO === 'true',
-      idsStructuresEarlyAdoptersSession:
-        process.env.FEATURE_SESSIONS_MILO_IDS_STRUCTURES_EARLY_ADOPTERS?.split(
-          '|'
-        ) ?? []
+        process.env.FEATURE_RECUPERER_SESSIONS_MILO === 'true'
     },
     values: {
       maxRechercheConseillers: process.env.MAX_RECHERCHE_CONSEILLERS ?? '10'
