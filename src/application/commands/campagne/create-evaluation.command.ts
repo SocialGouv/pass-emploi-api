@@ -9,7 +9,7 @@ import {
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { Campagne, CampagneRepositoryToken } from '../../../domain/campagne'
 import { Inject } from '@nestjs/common'
-import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 
 export interface CreateEvaluationCommand extends Command {
   idCampagne: string
@@ -29,7 +29,7 @@ export class CreateEvaluationCommandHandler extends CommandHandler<
     private campagneFactory: Campagne.Factory,
     @Inject(CampagneRepositoryToken)
     private campagneRepository: Campagne.Repository,
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     private jeuneAuthorizer: JeuneAuthorizer
   ) {

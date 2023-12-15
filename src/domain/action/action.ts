@@ -19,10 +19,9 @@ import * as _Commentaire from './commentaire'
 import * as _Qualification from './qualification'
 import _ACTIONS_PREDEFINIES from './actions-predefinies'
 
-export const ActionsRepositoryToken = 'ActionsRepositoryToken'
+export const ActionRepositoryToken = 'ActionRepositoryToken'
 export const CommentaireActionRepositoryToken =
   'CommentaireActionRepositoryToken'
-export const ActionMiloRepositoryToken = 'ActionMiloRepositoryToken'
 
 export interface Action {
   id: Action.Id

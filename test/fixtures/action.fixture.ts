@@ -1,7 +1,7 @@
 import { Action } from '../../src/domain/action/action'
 import { uneDate, uneDatetime } from './date.fixture'
 import { DateTime } from 'luxon'
-import { ActionMilo } from '../../src/domain/action/action.milo'
+import { ActionMilo } from '../../src/domain/milo/action.milo'
 
 export const uneAction = (args: Partial<Action> = {}): Action => {
   const now = uneDatetime()

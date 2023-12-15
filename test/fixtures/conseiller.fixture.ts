@@ -1,4 +1,4 @@
-import { Conseiller } from '../../src/domain/conseiller/conseiller'
+import { Conseiller } from '../../src/domain/milo/conseiller'
 import { Core } from '../../src/domain/core'
 import { DateTime } from 'luxon'
 

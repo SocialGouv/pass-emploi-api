@@ -14,6 +14,8 @@ import {
 } from 'src/building-blocks/types/result'
 import * as request from 'supertest'
 import {
+  DossierExisteDejaError,
+  EmailExisteDejaError,
   ErreurHttp,
   NonTrouveError
 } from 'src/building-blocks/types/domain-error'
@@ -30,8 +32,20 @@ import {
 import { SessionMilo } from 'src/domain/milo/session.milo'
 import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
 import { DateTime } from 'luxon'
+import {
+  CreerJeuneMiloCommandHandler,
+  CreerJeuneMiloCommand
+} from '../../../src/application/commands/milo/creer-jeune-milo.command.handler'
+import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
+import { GetJeuneMiloByDossierQueryHandler } from '../../../src/application/queries/get-jeune-milo-by-dossier.query.handler.db'
+import { CreerJeuneMiloPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
+import { unDossierMilo } from '../../fixtures/milo.fixture'
+import { unJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 
 describe('ConseillersMiloController', () => {
+  let getDossierMiloJeuneQueryHandler: StubbedClass<GetDossierMiloJeuneQueryHandler>
+  let getJeuneMiloByDossierQueryHandler: StubbedClass<GetJeuneMiloByDossierQueryHandler>
+  let creerJeuneMiloCommandHandler: StubbedClass<CreerJeuneMiloCommandHandler>
   let getSessionsQueryHandler: StubbedClass<GetSessionsConseillerMiloQueryHandler>
   let getDetailSessionQueryHandler: StubbedClass<GetDetailSessionConseillerMiloQueryHandler>
   let getAgendaSessionsQueryHandler: StubbedClass<GetAgendaSessionsConseillerMiloQueryHandler>
@@ -42,6 +56,11 @@ describe('ConseillersMiloController', () => {
   before(async () => {
     app = await getApplicationWithStubbedDependencies()
 
+    getDossierMiloJeuneQueryHandler = app.get(GetDossierMiloJeuneQueryHandler)
+    getJeuneMiloByDossierQueryHandler = app.get(
+      GetJeuneMiloByDossierQueryHandler
+    )
+    creerJeuneMiloCommandHandler = app.get(CreerJeuneMiloCommandHandler)
     getSessionsQueryHandler = app.get(GetSessionsConseillerMiloQueryHandler)
     getDetailSessionQueryHandler = app.get(
       GetDetailSessionConseillerMiloQueryHandler
@@ -50,6 +69,195 @@ describe('ConseillersMiloController', () => {
       GetAgendaSessionsConseillerMiloQueryHandler
     )
     updateSessionCommandHandler = app.get(UpdateSessionMiloCommandHandler)
+  })
+
+  describe('GET /conseillers/milo/dossiers/:idDossier', () => {
+    describe('quand le dossier existe', () => {
+      it('renvoie le dossier', async () => {
+        // Given
+        getDossierMiloJeuneQueryHandler.execute
+          .withArgs({ idDossier: '1' }, unUtilisateurDecode())
+          .resolves(success(unDossierMilo()))
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get('/conseillers/milo/dossiers/1')
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+          .expect(JSON.stringify(unDossierMilo()))
+      })
+    })
+
+    describe("quand le dossier n'existe pas", () => {
+      it('renvoie 404', async () => {
+        // Given
+        // Given
+        getDossierMiloJeuneQueryHandler.execute
+          .withArgs({ idDossier: '2' }, unUtilisateurDecode())
+          .resolves(failure(new ErreurHttp('Pas trouvé', 404)))
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get('/conseillers/milo/dossiers/2')
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.NOT_FOUND)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/conseillers/milo/dossiers/2'
+    )
+  })
+
+  describe('GET /conseillers/milo/jeunes/:idDossier', () => {
+    describe('quand le dossier existe', () => {
+      it('renvoie le jeune', async () => {
+        // Given
+        getJeuneMiloByDossierQueryHandler.execute
+          .withArgs({ idDossier: '1' }, unUtilisateurDecode())
+          .resolves(success(unJeuneQueryModel()))
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get('/conseillers/milo/jeunes/1')
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+          .expect(JSON.stringify(unJeuneQueryModel()))
+      })
+    })
+
+    describe("quand le dossier n'existe pas", () => {
+      it('renvoie 404', async () => {
+        // Given
+        // Given
+        getJeuneMiloByDossierQueryHandler.execute
+          .withArgs({ idDossier: '2' }, unUtilisateurDecode())
+          .resolves(failure(new ErreurHttp('Pas trouvé', 404)))
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get('/conseillers/milo/jeunes/2')
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.NOT_FOUND)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/conseillers/milo/dossiers/2'
+    )
+  })
+
+  describe('POST /conseillers/milo/jeunes', () => {
+    describe('quand le jeune est nouveau', () => {
+      it('renvoie 201', async () => {
+        // Given
+        const command: CreerJeuneMiloCommand = {
+          idPartenaire: 'idDossier',
+          nom: 'nom',
+          prenom: 'prenom',
+          email: 'email',
+          idConseiller: 'idConseiller'
+        }
+
+        const payload: CreerJeuneMiloPayload = {
+          idDossier: 'idDossier',
+          nom: 'nom',
+          prenom: 'prenom',
+          email: 'email',
+          idConseiller: 'idConseiller'
+        }
+
+        creerJeuneMiloCommandHandler.execute
+          .withArgs(command, unUtilisateurDecode())
+          .resolves(success({ id: 'idJeune', prenom: 'prenom', nom: 'nom' }))
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/conseillers/milo/jeunes')
+          .send(payload)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.CREATED)
+          .expect({ id: 'idJeune', prenom: 'prenom', nom: 'nom' })
+      })
+    })
+
+    describe('quand le jeune est déjà chez nous', () => {
+      it('renvoie 400', async () => {
+        // Given
+        const command: CreerJeuneMiloCommand = {
+          idPartenaire: 'ID400',
+          nom: 'nom',
+          prenom: 'prenom',
+          email: 'email',
+          idConseiller: 'idConseiller'
+        }
+        creerJeuneMiloCommandHandler.execute.resolves(
+          failure(new ErreurHttp('email pas bon', 400))
+        )
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/conseillers/milo/jeunes')
+          .send({ ...command, idDossier: command.idPartenaire })
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+
+    describe('quand le mail existe déja', () => {
+      it('renvoie 409', async () => {
+        // Given
+        const command: CreerJeuneMiloCommand = {
+          idPartenaire: 'ID409',
+          nom: 'nom',
+          prenom: 'prenom',
+          email: 'email',
+          idConseiller: 'idConseiller'
+        }
+
+        creerJeuneMiloCommandHandler.execute.resolves(
+          failure(new EmailExisteDejaError('test@test.fr'))
+        )
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/conseillers/milo/jeunes')
+          .send({ ...command, idDossier: command.idPartenaire })
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.CONFLICT)
+      })
+    })
+
+    describe("quand l'id dossier existe déja", () => {
+      it('renvoie 409', async () => {
+        // Given
+        const command: CreerJeuneMiloCommand = {
+          idPartenaire: 'ID409',
+          nom: 'nom',
+          prenom: 'prenom',
+          email: 'email',
+          idConseiller: 'idConseiller'
+        }
+
+        creerJeuneMiloCommandHandler.execute.resolves(
+          failure(new DossierExisteDejaError('ID409'))
+        )
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/conseillers/milo/jeunes')
+          .send({ ...command, idDossier: command.idPartenaire })
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.CONFLICT)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/conseillers/milo/dossiers/2'
+    )
   })
 
   describe('GET /conseillers/milo/:idConseiller/sessions', () => {

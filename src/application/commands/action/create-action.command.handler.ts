@@ -9,10 +9,10 @@ import {
   Result,
   success
 } from '../../../building-blocks/types/result'
-import { Action, ActionsRepositoryToken } from '../../../domain/action/action'
+import { Action, ActionRepositoryToken } from '../../../domain/action/action'
 import { Authentification } from '../../../domain/authentification'
 import { Evenement, EvenementService } from '../../../domain/evenement'
-import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import { Notification } from '../../../domain/notification/notification'
 import { PlanificateurService } from '../../../domain/planificateur'
 import { buildError } from '../../../utils/logger.module'
@@ -37,9 +37,9 @@ export class CreateActionCommandHandler extends CommandHandler<
   string
 > {
   constructor(
-    @Inject(ActionsRepositoryToken)
+    @Inject(ActionRepositoryToken)
     private readonly actionRepository: Action.Repository,
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private readonly jeuneRepository: Jeune.Repository,
     private readonly notificationService: Notification.Service,
     private readonly actionFactory: Action.Factory,

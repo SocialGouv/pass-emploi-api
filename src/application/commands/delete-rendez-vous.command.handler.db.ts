@@ -13,8 +13,8 @@ import {
 import { Authentification } from '../../domain/authentification'
 import {
   Conseiller,
-  ConseillersRepositoryToken
-} from '../../domain/conseiller/conseiller'
+  ConseillerRepositoryToken
+} from '../../domain/milo/conseiller'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { Mail, MailServiceToken } from '../../domain/mail'
 import { Notification } from '../../domain/notification/notification'
@@ -41,7 +41,7 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
   constructor(
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
-    @Inject(ConseillersRepositoryToken)
+    @Inject(ConseillerRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     private notificationService: Notification.Service,
     private rendezVousAuthorizer: RendezVousAuthorizer,

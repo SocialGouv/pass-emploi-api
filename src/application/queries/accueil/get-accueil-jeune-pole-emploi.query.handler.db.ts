@@ -12,7 +12,7 @@ import {
 import { Authentification } from '../../../domain/authentification'
 import { estBRSA, estPoleEmploiBRSA } from '../../../domain/core'
 import { Demarche } from '../../../domain/demarche'
-import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client'
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { GetFavorisAccueilQueryGetter } from '../query-getters/accueil/get-favoris.query.getter.db'
@@ -34,7 +34,7 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
   Result<AccueilJeunePoleEmploiQueryModel>
 > {
   constructor(
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     private jeuneAuthorizer: JeuneAuthorizer,
     private keycloakClient: KeycloakClient,

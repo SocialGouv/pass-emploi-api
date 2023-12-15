@@ -5,8 +5,8 @@ import { JobHandler } from '../../building-blocks/types/job-handler'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import {
   Conseiller,
-  ConseillersRepositoryToken
-} from '../../domain/conseiller/conseiller'
+  ConseillerRepositoryToken
+} from '../../domain/milo/conseiller'
 import { Mail, MailServiceToken } from '../../domain/mail'
 import { Planificateur, ProcessJobType } from '../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
@@ -19,7 +19,7 @@ export class EnvoyerEmailsMessagesConseillersJobHandler extends JobHandler<Job> 
   constructor(
     @Inject(ChatRepositoryToken)
     private chatRepository: Chat.Repository,
-    @Inject(ConseillersRepositoryToken)
+    @Inject(ConseillerRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     @Inject(MailServiceToken)
     private mailService: Mail.Service,

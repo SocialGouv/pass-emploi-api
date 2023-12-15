@@ -5,7 +5,7 @@ import { isFailure } from '../../building-blocks/types/result'
 import { Jeune } from '../../domain/jeune/jeune'
 import {
   JeuneMilo,
-  MiloJeuneRepositoryToken
+  JeuneMiloRepositoryToken
 } from '../../domain/milo/jeune.milo'
 import { Planificateur, ProcessJobType } from '../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
@@ -17,7 +17,7 @@ const PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM = 100
 @ProcessJobType(Planificateur.JobType.RECUPERER_SITUATIONS_JEUNES_MILO)
 export class RecupererSituationsJeunesMiloJobHandler extends JobHandler<Job> {
   constructor(
-    @Inject(MiloJeuneRepositoryToken)
+    @Inject(JeuneMiloRepositoryToken)
     private miloRepository: JeuneMilo.Repository,
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service,

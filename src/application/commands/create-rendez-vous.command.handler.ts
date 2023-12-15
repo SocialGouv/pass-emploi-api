@@ -12,9 +12,9 @@ import {
 import { Authentification } from '../../domain/authentification'
 import {
   Conseiller,
-  ConseillersRepositoryToken
-} from '../../domain/conseiller/conseiller'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+  ConseillerRepositoryToken
+} from '../../domain/milo/conseiller'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { Mail, MailServiceToken } from '../../domain/mail'
 import { Notification } from '../../domain/notification/notification'
 import {
@@ -53,8 +53,8 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
   constructor(
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
-    @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
-    @Inject(ConseillersRepositoryToken)
+    @Inject(JeuneRepositoryToken) private jeuneRepository: Jeune.Repository,
+    @Inject(ConseillerRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     private rendezVousFactory: RendezVous.Factory,
     private notificationService: Notification.Service,

@@ -9,8 +9,8 @@ import {
   isFailure
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Conseiller } from '../../domain/conseiller/conseiller'
-import { ListeDeDiffusionRepositoryToken } from '../../domain/conseiller/liste-de-diffusion'
+import { Conseiller } from '../../domain/milo/conseiller'
+import { ListeDeDiffusionRepositoryToken } from '../../domain/milo/liste-de-diffusion'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { ListeDeDiffusionAuthorizer } from '../authorizers/liste-de-diffusion-authorizer'

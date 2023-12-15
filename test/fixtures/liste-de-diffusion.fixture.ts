@@ -1,4 +1,4 @@
-import { ListeDeDiffusion } from '../../src/domain/conseiller/liste-de-diffusion'
+import { ListeDeDiffusion } from '../../src/domain/milo/liste-de-diffusion'
 import { uneDatetime } from './date.fixture'
 import { unJeune } from './jeune.fixture'
 import { unConseiller } from './conseiller.fixture'

@@ -8,7 +8,7 @@ import { HttpService } from '@nestjs/axios'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
 import { ErreurHttp } from '../../../building-blocks/types/domain-error'
-import { ActionMilo } from '../../../domain/action/action.milo'
+import { ActionMilo } from '../../../domain/milo/action.milo'
 
 @Injectable()
 export class ActionMiloHttpRepository implements ActionMilo.Repository {

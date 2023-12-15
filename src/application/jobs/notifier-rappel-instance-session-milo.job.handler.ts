@@ -3,7 +3,7 @@ import { JobHandler } from '../../building-blocks/types/job-handler'
 import { isSuccess } from '../../building-blocks/types/result'
 import {
   JeuneMilo,
-  MiloJeuneRepositoryToken
+  JeuneMiloRepositoryToken
 } from '../../domain/milo/jeune.milo'
 import { RendezVousMilo } from '../../domain/milo/rendez-vous.milo'
 import {
@@ -33,7 +33,7 @@ export class NotifierRappelInstanceSessionMiloJobHandler extends JobHandler<
     suiviJobService: SuiviJob.Service,
     @Inject(SessionMiloRepositoryToken)
     private sessionMiloRepository: SessionMilo.Repository,
-    @Inject(MiloJeuneRepositoryToken)
+    @Inject(JeuneMiloRepositoryToken)
     private jeuneRepository: JeuneMilo.Repository,
     @Inject(NotificationRepositoryToken)
     private notificationRepository: Notification.Repository,

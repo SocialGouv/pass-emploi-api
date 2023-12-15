@@ -6,7 +6,7 @@ import { Authentification } from '../../domain/authentification'
 import { estMilo } from '../../domain/core'
 import {
   JeuneMilo,
-  MiloJeuneRepositoryToken
+  JeuneMiloRepositoryToken
 } from '../../domain/milo/jeune.milo'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { DossierJeuneMiloQueryModel } from './query-models/milo.query-model'
@@ -21,7 +21,7 @@ export class GetDossierMiloJeuneQueryHandler extends QueryHandler<
   Result<DossierJeuneMiloQueryModel>
 > {
   constructor(
-    @Inject(MiloJeuneRepositoryToken)
+    @Inject(JeuneMiloRepositoryToken)
     private miloRepository: JeuneMilo.Repository,
     private readonly conseillerAuthorizer: ConseillerAuthorizer
   ) {

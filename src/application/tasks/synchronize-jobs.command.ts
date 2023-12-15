@@ -15,7 +15,7 @@ import {
   RendezVous,
   RendezVousRepositoryToken
 } from '../../domain/rendez-vous/rendez-vous'
-import { Action, ActionsRepositoryToken } from '../../domain/action/action'
+import { Action, ActionRepositoryToken } from '../../domain/action/action'
 
 @Injectable()
 export class SynchronizeJobsCommandHandler extends CommandHandler<
@@ -25,7 +25,7 @@ export class SynchronizeJobsCommandHandler extends CommandHandler<
   constructor(
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
-    @Inject(ActionsRepositoryToken)
+    @Inject(ActionRepositoryToken)
     private actionRepository: Action.Repository,
     private planificateurService: PlanificateurService,
     @Inject(PlanificateurRepositoryToken)

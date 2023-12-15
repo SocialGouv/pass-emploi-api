@@ -4,7 +4,7 @@ import { failure, Result, success } from '../../building-blocks/types/result'
 import { Agence } from '../agence'
 import { Core } from '../core'
 import * as _ListeDeDiffusion from './liste-de-diffusion'
-import * as _Conseiller from '../milo/conseiller.milo.db'
+import * as _Conseiller from './conseiller.milo.db'
 import Structure = Core.Structure
 
 export interface Conseiller {
@@ -19,7 +19,7 @@ export interface Conseiller {
   notificationsSonores: boolean
 }
 
-export const ConseillersRepositoryToken = 'Conseiller.Repository'
+export const ConseillerRepositoryToken = 'ConseillerRepositoryToken'
 
 export namespace Conseiller {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

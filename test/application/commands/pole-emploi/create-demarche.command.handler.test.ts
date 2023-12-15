@@ -4,7 +4,7 @@ import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-a
 import {
   CreateDemarcheCommand,
   CreateDemarcheCommandHandler
-} from '../../../../src/application/commands/demarche/create-demarche.command.handler'
+} from '../../../../src/application/commands/pole-emploi/create-demarche.command.handler'
 import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,

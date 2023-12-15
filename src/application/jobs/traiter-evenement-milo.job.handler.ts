@@ -7,7 +7,7 @@ import { Jeune } from '../../domain/jeune/jeune'
 import { EvenementMilo } from '../../domain/milo/evenement.milo'
 import {
   JeuneMilo,
-  MiloJeuneRepositoryToken
+  JeuneMiloRepositoryToken
 } from '../../domain/milo/jeune.milo'
 import {
   RendezVousMilo,
@@ -45,7 +45,7 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service,
     private dateService: DateService,
-    @Inject(MiloJeuneRepositoryToken)
+    @Inject(JeuneMiloRepositoryToken)
     private jeuneRepository: JeuneMilo.Repository,
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,

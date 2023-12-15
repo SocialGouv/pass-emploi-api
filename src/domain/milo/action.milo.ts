@@ -1,8 +1,10 @@
-import { Action } from './action'
+import { Action } from '../action/action'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Jeune } from '../jeune/jeune'
 import { Authentification } from '../authentification'
 import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
+
+export const ActionMiloRepositoryToken = 'ActionMiloRepositoryToken'
 
 export interface ActionMilo extends Action.Qualifiee {
   idDossier: string

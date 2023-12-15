@@ -15,7 +15,7 @@ import {
   ApiTags
 } from '@nestjs/swagger'
 import { isSuccess } from 'src/building-blocks/types/result'
-import { CreerJeunePoleEmploiCommandHandler } from '../../application/commands/creer-jeune-pole-emploi.command.handler'
+import { CreerJeunePoleEmploiCommandHandler } from '../../application/commands/pole-emploi/creer-jeune-pole-emploi.command.handler'
 import {
   SendNotificationsNouveauxMessagesExternesCommand,
   SendNotificationsNouveauxMessagesExternesCommandHandler

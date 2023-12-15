@@ -6,9 +6,9 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Conseiller } from '../../domain/conseiller/conseiller'
+import { Conseiller } from '../../domain/milo/conseiller'
 import ListeDeDiffusion = Conseiller.ListeDeDiffusion
-import { ListeDeDiffusionRepositoryToken } from '../../domain/conseiller/liste-de-diffusion'
+import { ListeDeDiffusionRepositoryToken } from '../../domain/milo/liste-de-diffusion'
 
 @Injectable()
 export class ListeDeDiffusionAuthorizer {

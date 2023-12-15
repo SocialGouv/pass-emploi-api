@@ -7,7 +7,7 @@ import {
   isFailure
 } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { Conseiller } from 'src/domain/conseiller/conseiller'
+import { Conseiller } from 'src/domain/milo/conseiller'
 import { estMilo } from 'src/domain/core'
 import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo.db'
 import {
@@ -15,7 +15,7 @@ import {
   SessionMiloRepositoryToken
 } from 'src/domain/milo/session.milo'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
-import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import { Notification } from '../../../domain/notification/notification'
 import { DateService } from '../../../utils/date-service'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
@@ -39,7 +39,7 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
     private conseillerMiloRepository: Conseiller.Milo.Repository,
     @Inject(SessionMiloRepositoryToken)
     private sessionMiloRepository: SessionMilo.Repository,
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     private keycloakClient: KeycloakClient,
     private dateService: DateService,

@@ -1,4 +1,4 @@
-import { Conseiller } from '../../../domain/conseiller/conseiller'
+import { Conseiller } from '../../../domain/milo/conseiller'
 import {
   ListeDeDiffusionDto,
   ListeDeDiffusionSqlModel
@@ -10,7 +10,7 @@ import { Op, Sequelize } from 'sequelize'
 import { ListeDeDiffusionJeuneAssociationSqlModel } from '../../sequelize/models/liste-de-diffusion-jeune-association.sql-model'
 import { DateTime } from 'luxon'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
-import { ListeDeDiffusion } from '../../../domain/conseiller/liste-de-diffusion'
+import { ListeDeDiffusion } from '../../../domain/milo/liste-de-diffusion'
 import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
 
 export class ListeDeDiffusionSqlRepository

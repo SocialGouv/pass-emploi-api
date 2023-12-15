@@ -11,7 +11,7 @@ import { Authentification } from '../../domain/authentification'
 import {
   Jeune,
   JeuneConfigurationApplicationRepositoryToken,
-  JeunesRepositoryToken
+  JeuneRepositoryToken
 } from '../../domain/jeune/jeune'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { ConfigurationApplication } from '../../domain/jeune/configuration-application'
@@ -31,7 +31,7 @@ export class UpdateJeuneConfigurationApplicationCommandHandler extends CommandHa
   void
 > {
   constructor(
-    @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
+    @Inject(JeuneRepositoryToken) private jeuneRepository: Jeune.Repository,
     @Inject(JeuneConfigurationApplicationRepositoryToken)
     private jeuneConfigurationApplicationRepository: Jeune.ConfigurationApplication.Repository,
     private jeuneAuthorizer: JeuneAuthorizer,

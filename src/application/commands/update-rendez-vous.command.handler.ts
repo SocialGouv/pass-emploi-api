@@ -13,9 +13,9 @@ import {
 import { Authentification } from '../../domain/authentification'
 import {
   Conseiller,
-  ConseillersRepositoryToken
-} from '../../domain/conseiller/conseiller'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+  ConseillerRepositoryToken
+} from '../../domain/milo/conseiller'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { Mail, MailServiceToken } from '../../domain/mail'
 import { Notification } from '../../domain/notification/notification'
 import {
@@ -53,13 +53,13 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
   constructor(
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
-    @Inject(JeunesRepositoryToken)
+    @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     private rendezVousFactory: RendezVous.Factory,
     private notificationService: Notification.Service,
     @Inject(MailServiceToken)
     private mailClient: Mail.Service,
-    @Inject(ConseillersRepositoryToken)
+    @Inject(ConseillerRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     private rendezVousAuthorizer: RendezVousAuthorizer,
     private planificateurService: PlanificateurService,

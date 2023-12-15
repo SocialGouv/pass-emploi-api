@@ -13,8 +13,8 @@ import {
 } from '../../building-blocks/types/result'
 import {
   Conseiller,
-  ConseillersRepositoryToken
-} from '../../domain/conseiller/conseiller'
+  ConseillerRepositoryToken
+} from '../../domain/milo/conseiller'
 import { toDetailJeuneConseillerQueryModel } from './query-mappers/jeune.mappers'
 import { DetailJeuneConseillerQueryModel } from './query-models/jeunes.query-model'
 import { estPoleEmploiBRSA } from '../../domain/core'
@@ -30,7 +30,7 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
 > {
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
-    @Inject(ConseillersRepositoryToken)
+    @Inject(ConseillerRepositoryToken)
     private readonly conseillersRepository: Conseiller.Repository
   ) {
     super('GetJeunesByConseillerQueryHandler')

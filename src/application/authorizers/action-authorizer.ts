@@ -5,13 +5,13 @@ import {
   failure,
   Result
 } from '../../building-blocks/types/result'
-import { Action, ActionsRepositoryToken } from '../../domain/action/action'
+import { Action, ActionRepositoryToken } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
 
 @Injectable()
 export class ActionAuthorizer {
   constructor(
-    @Inject(ActionsRepositoryToken)
+    @Inject(ActionRepositoryToken)
     private actionRepository: Action.Repository
   ) {}
 
