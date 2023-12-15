@@ -1,47 +1,21 @@
 const structuresReferentielUnml = require('./referentiel_unml.json').Sheet1
-const idsStructuresReferentielUnml = structuresReferentielUnml.map(
-  structure => structure['Code structure'] + 'S00'
-)
-
-const structuresAvecAuMoinsUnConseillerUtilisateur = require('./structures_cej_avec_conseillers_utilisateurs.json')
-const idsStructuresAvecAuMoinsUnConseillerUtilisateur =
-  structuresAvecAuMoinsUnConseillerUtilisateur.map(
-    structure => structure.structure_id
-  )
+const structuresAvecAuMoinsUnConseillerUtilisateurCej = require('./structures_cej_avec_conseillers_utilisateurs.json')
 
 const fs = require('fs')
 
 async function exportStructuresPourTauxPenetration() {
   const result = []
 
-  for (let i = 0; i < idsStructuresReferentielUnml.length; i++) {
-    let structureAvecAuMoinsUnConseillerUtilisateur =
-      idsStructuresAvecAuMoinsUnConseillerUtilisateur.includes(
-        idsStructuresReferentielUnml[i]
-      )
-
-    if (structureAvecAuMoinsUnConseillerUtilisateur) {
-      result.push(
-        structuresAvecAuMoinsUnConseillerUtilisateur.find(
-          structure =>
-            structure.structure_id === idsStructuresReferentielUnml[i]
-        )
-      )
-    } else {
-      result.push({
-        structure_id: structuresReferentielUnml[i]['Code structure'] + 'S00',
-        nom_region: 'Structure régionale -',
-        nom_departement: 'Structure départementale -',
-        code_departement: structuresReferentielUnml[i]['Code département'],
-        nom_officiel: structuresReferentielUnml[i]['Nom officiel structure'],
-        nom_usuel: structuresReferentielUnml[i]['Nom usuel structure'],
-        count: 0
-      })
-    }
+  for (const structureUnml of structuresReferentielUnml) {
+    let structureTmp = {}
+    enrichirAvecLesInformationsDeStructure(structureTmp, structureUnml)
+    enrichirAvecLeNombreDeConseillersUtilisateursDuCEJ(structureTmp)
+    enrichirAvecLesInformationsGeographiques(structureTmp, structureUnml)
+    result.push(structureTmp)
   }
 
   result.sort((structure1, structure2) => {
-    return structure1.code_departement < structure2.code_departement ? -1 : 1
+    return structure1.structure_id < structure2.structure_id ? -1 : 1
   })
 
   fs.writeFile(
@@ -51,6 +25,44 @@ async function exportStructuresPourTauxPenetration() {
       console.log(err)
     }
   )
+}
+
+function enrichirAvecLesInformationsDeStructure(structureTmp, structureUnml) {
+  structureTmp.structure_id = structureUnml['Code structure'] + 'S00'
+  structureTmp.nom_officiel = structureUnml['Nom officiel structure']
+  structureTmp.nom_usuel = structureUnml['Nom usuel structure']
+}
+
+function enrichirAvecLeNombreDeConseillersUtilisateursDuCEJ(structureTmp) {
+  const structureAvecConseillerCej =
+    structuresAvecAuMoinsUnConseillerUtilisateurCej.find(
+      structureCej => structureTmp.structure_id === structureCej.structure_id
+    )
+  if (structureAvecConseillerCej) {
+    structureTmp.nb_conseillers_cej = structureAvecConseillerCej.count
+  } else {
+    structureTmp.nb_conseillers_cej = 0
+  }
+}
+
+function enrichirAvecLesInformationsGeographiques(structureTmp, structureUnml) {
+  const structureAvecConseillerCej =
+    structuresAvecAuMoinsUnConseillerUtilisateurCej.find(
+      structureCej => structureTmp.structure_id === structureCej.structure_id
+    )
+
+  structureTmp.code_departement = structureUnml['Code département']
+
+  if (structureAvecConseillerCej) {
+    structureTmp.nom_departement =
+      structureAvecConseillerCej.nom_departement
+    structureTmp.code_region = structureAvecConseillerCej.code_region
+    structureTmp.nom_region = structureAvecConseillerCej.nom_region
+  } else {
+    structureTmp.nom_departement = 'Structure départementale -'
+    structureTmp.code_region = '-'
+    structureTmp.nom_region = 'Structure régionale -'
+  }
 }
 
 exportStructuresPourTauxPenetration()
