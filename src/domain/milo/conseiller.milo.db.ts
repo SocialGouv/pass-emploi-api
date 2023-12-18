@@ -27,17 +27,19 @@ export interface ConseillerMilo {
   structure: ConseillerMilo.Structure
 }
 
+export interface ConseillerMiloModifie {
+  id: string
+  idAgence?: string | null
+  idStructure?: string | null
+  dateVerificationStructureMilo?: DateTime
+}
+
 export namespace ConseillerMilo {
   export type Structure = { id: string; timezone: string }
 
   export interface Repository {
     get(idConseiller: string): Promise<Result<ConseillerMilo>>
-    save(conseiller: {
-      id: string
-      idAgence?: string | null
-      idStructure?: string | null
-      dateVerificationStructureMilo?: DateTime
-    }): Promise<void>
+    save(conseiller: ConseillerMiloModifie): Promise<void>
     structureExiste(idStructure: string): Promise<boolean>
   }
 
@@ -62,6 +64,11 @@ export namespace ConseillerMilo {
       accessToken: string
     ): Promise<void> {
       const maintenant = this.dateService.now()
+      const conseillerModifie: ConseillerMiloModifie = {
+        id: idConseiller,
+        dateVerificationStructureMilo: maintenant
+      }
+
       try {
         const conseillerSql = await ConseillerSqlModel.findByPk(idConseiller)
 
@@ -93,14 +100,17 @@ export namespace ConseillerMilo {
             await this.miloClient.getStructureConseiller(idpToken)
 
           if (isFailure(resultStructureMiloConseiller)) {
-            await this.conseillerMiloRepository.save({
-              id: idConseiller,
-              dateVerificationStructureMilo: maintenant
-            })
+            await this.conseillerMiloRepository.save(conseillerModifie)
             return
           }
 
           const codeStructure = resultStructureMiloConseiller.data.code
+          const conseillerSansAgence = !Boolean(conseillerSql.idAgence)
+
+          if (conseillerSansAgence) {
+            conseillerModifie.idAgence = codeStructure
+          }
+          conseillerModifie.idStructure = codeStructure
 
           const structureModifiee =
             conseillerSql.idStructureMilo !== codeStructure
@@ -114,22 +124,14 @@ export namespace ConseillerMilo {
                   resultStructureMiloConseiller.data
                 )
 
-              await this.conseillerMiloRepository.save({
-                id: idConseiller,
-                idAgence: codeStructureAjouteeOuNull,
-                idStructure: codeStructureAjouteeOuNull,
-                dateVerificationStructureMilo: maintenant
-              })
-              return
+              if (conseillerSansAgence) {
+                conseillerModifie.idAgence = codeStructureAjouteeOuNull
+              }
+              conseillerModifie.idStructure = codeStructureAjouteeOuNull
             }
           }
 
-          await this.conseillerMiloRepository.save({
-            id: idConseiller,
-            idAgence: codeStructure,
-            idStructure: codeStructure,
-            dateVerificationStructureMilo: maintenant
-          })
+          await this.conseillerMiloRepository.save(conseillerModifie)
         }
       } catch (e) {
         this.logger.error(
@@ -140,10 +142,7 @@ export namespace ConseillerMilo {
         )
         this.apmService.captureError(e)
 
-        await this.conseillerMiloRepository.save({
-          id: idConseiller,
-          dateVerificationStructureMilo: maintenant
-        })
+        await this.conseillerMiloRepository.save(conseillerModifie)
 
         if (e instanceof UnauthorizedException) {
           throw e
