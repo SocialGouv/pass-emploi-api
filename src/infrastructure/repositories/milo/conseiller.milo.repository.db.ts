@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common'
-import { DateTime } from 'luxon'
 import {
   ConseillerMiloSansStructure,
   NonTrouveError
 } from '../../../building-blocks/types/domain-error'
 import { Result, failure, success } from '../../../building-blocks/types/result'
 import { Conseiller } from '../../../domain/milo/conseiller'
+import { ConseillerMiloModifie } from '../../../domain/milo/conseiller.milo.db'
 import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
 import { StructureMiloSqlModel } from '../../sequelize/models/structure-milo.sql-model'
 
@@ -34,12 +34,7 @@ export class ConseillerMiloSqlRepository implements Conseiller.Milo.Repository {
     })
   }
 
-  async save(conseiller: {
-    id: string
-    idAgence?: string | null
-    idStructure?: string | null
-    dateVerificationStructureMilo: DateTime
-  }): Promise<void> {
+  async save(conseiller: ConseillerMiloModifie): Promise<void> {
     await ConseillerSqlModel.update(
       {
         idAgence: conseiller.idAgence,
