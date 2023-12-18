@@ -1,55 +1,54 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
+import { CreateActionCommandHandler } from 'src/application/commands/action/create-action.command.handler'
+import { DeleteConseillerCommandHandler } from 'src/application/commands/conseiller/delete-conseiller.command.handler'
 import { CreateRendezVousCommandHandler } from 'src/application/commands/create-rendez-vous.command.handler'
-import { RecupererJeunesDuConseillerCommandHandler } from 'src/application/commands/recuperer-jeunes-du-conseiller.command.handler'
-import { GetAllRendezVousConseillerQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
-import { Action } from 'src/domain/action/action'
-import { Qualification } from 'src/domain/action/qualification'
-import { CodeTypeRendezVous } from 'src/domain/rendez-vous/rendez-vous'
-import { CreateActionPayload } from 'src/infrastructure/routes/validation/actions.inputs'
-import { CreateRendezVousPayload } from 'src/infrastructure/routes/validation/rendez-vous.inputs'
-import * as request from 'supertest'
-import { uneDatetime, uneDatetimeAvecOffset } from 'test/fixtures/date.fixture'
-import { unRendezVousConseillerFutursEtPassesQueryModel } from 'test/fixtures/rendez-vous.fixture'
-import { CreateActionCommandHandler } from '../../../src/application/commands/action/create-action.command.handler'
-import { DeleteConseillerCommandHandler } from '../../../src/application/commands/conseiller/delete-conseiller.command.handler'
 import {
   ModifierConseillerCommand,
   ModifierConseillerCommandHandler
-} from '../../../src/application/commands/modifier-conseiller.command.handler'
+} from 'src/application/commands/modifier-conseiller.command.handler'
 import {
   ModifierJeuneDuConseillerCommand,
   ModifierJeuneDuConseillerCommandHandler
-} from '../../../src/application/commands/modifier-jeune-du-conseiller.command.handler'
-import { SendNotificationsNouveauxMessagesCommandHandler } from '../../../src/application/commands/send-notifications-nouveaux-messages.command.handler'
-import { GetConseillersQueryHandler } from '../../../src/application/queries/get-conseillers.query.handler.db'
-import { GetDetailConseillerQueryHandler } from '../../../src/application/queries/get-detail-conseiller.query.handler.db'
-import { GetIndicateursPourConseillerQueryHandler } from '../../../src/application/queries/get-indicateurs-pour-conseiller.query.handler.db'
-import { GetJeunesByConseillerQueryHandler } from '../../../src/application/queries/get-jeunes-by-conseiller.query.handler.db'
-import { GetJeunesIdentitesQueryHandler } from '../../../src/application/queries/get-jeunes-identites.query.handler.db'
+} from 'src/application/commands/modifier-jeune-du-conseiller.command.handler'
+import { RecupererJeunesDuConseillerCommandHandler } from 'src/application/commands/recuperer-jeunes-du-conseiller.command.handler'
+import { SendNotificationsNouveauxMessagesCommandHandler } from 'src/application/commands/send-notifications-nouveaux-messages.command.handler'
+import { GetConseillersQueryHandler } from 'src/application/queries/get-conseillers.query.handler.db'
+import { GetDetailConseillerQueryHandler } from 'src/application/queries/get-detail-conseiller.query.handler.db'
+import { GetIndicateursPourConseillerQueryHandler } from 'src/application/queries/get-indicateurs-pour-conseiller.query.handler.db'
+import { GetJeunesByConseillerQueryHandler } from 'src/application/queries/get-jeunes-by-conseiller.query.handler.db'
+import { GetJeunesIdentitesQueryHandler } from 'src/application/queries/get-jeunes-identites.query.handler.db'
+import { GetAllRendezVousConseillerQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
 import {
   DroitsInsuffisants,
   JeuneNonLieAuConseillerError,
   NonTrouveError
-} from '../../../src/building-blocks/types/domain-error'
+} from 'src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
   success
-} from '../../../src/building-blocks/types/result'
-import { Core } from '../../../src/domain/core'
-import { EnvoyerNotificationsPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
-import { uneAgence } from '../../fixtures/agence.fixture'
+} from 'src/building-blocks/types/result'
+import { Action } from 'src/domain/action/action'
+import { Qualification } from 'src/domain/action/qualification'
+import { Core } from 'src/domain/core'
+import { CodeTypeRendezVous } from 'src/domain/rendez-vous/rendez-vous'
+import { CreateActionPayload } from 'src/infrastructure/routes/validation/actions.inputs'
+import { EnvoyerNotificationsPayload } from 'src/infrastructure/routes/validation/conseillers.inputs'
+import { CreateRendezVousPayload } from 'src/infrastructure/routes/validation/rendez-vous.inputs'
+import * as request from 'supertest'
+import { uneAgence } from 'test/fixtures/agence.fixture'
 import {
   unHeaderAuthorization,
   unUtilisateurDecode
-} from '../../fixtures/authentification.fixture'
-import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { detailConseillerQueryModel } from '../../fixtures/query-models/conseiller.query-model.fixtures'
-import { StubbedClass, expect } from '../../utils'
-import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
-import Code = Qualification.Code
+} from 'test/fixtures/authentification.fixture'
+import { unConseiller } from 'test/fixtures/conseiller.fixture'
+import { uneDatetime, uneDatetimeAvecOffset } from 'test/fixtures/date.fixture'
+import { unJeune } from 'test/fixtures/jeune.fixture'
+import { detailConseillerQueryModel } from 'test/fixtures/query-models/conseiller.query-model.fixtures'
+import { unRendezVousConseillerFutursEtPassesQueryModel } from 'test/fixtures/rendez-vous.fixture'
+import { expect, StubbedClass } from 'test/utils'
+import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
+import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
 
 describe('ConseillersController', () => {
   let getDetailConseillerQueryHandler: StubbedClass<GetDetailConseillerQueryHandler>
@@ -378,7 +377,8 @@ describe('ConseillersController', () => {
       const actionPayload: CreateActionPayload = {
         content: "Ceci est un contenu d'action",
         comment: 'Ceci est un commentaire',
-        codeQualification: Code.PROJET_PROFESSIONNEL
+        codeQualification: Qualification.Code.PROJET_PROFESSIONNEL,
+        status: Action.Statut.TERMINEE
       }
       const idAction = '15916d7e-f13a-4158-b7eb-3936aa937a0a'
       createActionCommandHandler.execute.resolves(success(idAction))
@@ -400,18 +400,21 @@ describe('ConseillersController', () => {
           commentaire: 'Ceci est un commentaire',
           dateEcheance: nowJsPlus3Mois,
           rappel: false,
-          codeQualification: Code.PROJET_PROFESSIONNEL
+          codeQualification: Qualification.Code.PROJET_PROFESSIONNEL,
+          statut: Action.Statut.TERMINEE
         },
         unUtilisateurDecode()
       )
     })
+
     it("renvoie l'id de l'action créée avec dateEcheance", async () => {
       // Given
       const actionPayload: CreateActionPayload = {
         content: "Ceci est un contenu d'action",
         comment: 'Ceci est un commentaire',
-        codeQualification: Code.CITOYENNETE,
-        dateEcheance: uneDatetimeAvecOffset().toISO()
+        codeQualification: Qualification.Code.CITOYENNETE,
+        dateEcheance: uneDatetimeAvecOffset().toISO(),
+        status: Action.Statut.EN_COURS
       }
       const idAction = '15916d7e-f13a-4158-b7eb-3936aa937a0a'
       createActionCommandHandler.execute.resolves(success(idAction))
@@ -433,7 +436,8 @@ describe('ConseillersController', () => {
           commentaire: 'Ceci est un commentaire',
           dateEcheance: uneDatetimeAvecOffset(),
           rappel: true,
-          codeQualification: Code.CITOYENNETE
+          codeQualification: Qualification.Code.CITOYENNETE,
+          statut: Action.Statut.EN_COURS
         },
         unUtilisateurDecode()
       )

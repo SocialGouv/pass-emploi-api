@@ -69,16 +69,15 @@ export class CreateActionPayload {
   @IsNotEmpty()
   @IsEnum(Action.Qualification.Code)
   codeQualification?: Action.Qualification.Code
-}
 
-export class CreateActionParLeJeunePayload extends CreateActionPayload {
-  @ApiProperty({ enum: Action.Statut })
+  @IsOptional()
   @IsString()
   @IsEnum(Action.Statut)
   @IsNotIn([Action.Statut.ANNULEE])
-  @IsOptional()
   status?: Action.Statut
+}
 
+export class CreateActionParLeJeunePayload extends CreateActionPayload {
   @IsOptional()
   @IsBoolean()
   rappel?: boolean
