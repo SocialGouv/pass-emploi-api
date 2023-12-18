@@ -231,6 +231,7 @@ export class ConseillersController {
       dateEcheance: createActionPayload.dateEcheance
         ? DateTime.fromISO(createActionPayload.dateEcheance, { setZone: true })
         : this.buildDateEcheanceV1(),
+      statut: createActionPayload.status,
       codeQualification: createActionPayload.codeQualification
     }
 
