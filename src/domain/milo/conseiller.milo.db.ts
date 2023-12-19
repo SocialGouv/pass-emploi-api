@@ -183,6 +183,7 @@ export namespace ConseillerMilo {
         const agenceACreer: AsSql<AgenceSqlModel> = {
           id: structureMilo.code,
           nomAgence: structureMilo.nomOfficiel,
+          nomUsuel: structureMilo.nomUsuel,
           nomRegion: structureDansLeDepartementSql.nomRegion ?? 'INCONNU',
           codeRegion: structureDansLeDepartementSql.codeRegion,
           nomDepartement: structureDansLeDepartementSql.nomDepartement,
