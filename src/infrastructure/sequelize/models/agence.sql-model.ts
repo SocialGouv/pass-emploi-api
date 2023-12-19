@@ -22,6 +22,12 @@ export class AgenceDto extends Model {
   nomAgence: string
 
   @Column({
+    field: 'nom_usuel',
+    type: DataType.STRING
+  })
+  nomUsuel: string | null
+
+  @Column({
     field: 'nom_region',
     type: DataType.STRING
   })
