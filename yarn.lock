@@ -2940,6 +2940,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/methods@npm:*":
+  version: 1.1.4
+  resolution: "@types/methods@npm:1.1.4"
+  checksum: ad2a7178486f2fd167750f3eb920ab032a947ff2e26f55c86670a6038632d790b46f52e5b6ead5823f1e53fc68028f1e9ddd15cfead7903e04517c88debd72b1
+  languageName: node
+  linkType: hard
+
 "@types/mime@npm:*":
   version: 3.0.4
   resolution: "@types/mime@npm:3.0.4"
@@ -3153,12 +3160,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/supertest@npm:^2.0.12":
-  version: 2.0.16
-  resolution: "@types/supertest@npm:2.0.16"
+"@types/supertest@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "@types/supertest@npm:6.0.0"
   dependencies:
+    "@types/cookiejar": "*"
+    "@types/methods": "*"
     "@types/superagent": "*"
-  checksum: 2fc998ea698e0467cdbe3bea0ebce2027ea3a45a13e51a6cecb0435f44b486faecf99c34d8702d2d7fe033e6e09fdd2b374af52ecc8d0c69a1deec66b8c0dd52
+  checksum: 696419d6d1fbb4638e063471d0ce8c2e6c68c2e09fce40713933fcdf8bfc5c0d803b287c7c5e8ec5ab58b6078e498ec34099ae6461dfd70b481832086dc0a1d8
   languageName: node
   linkType: hard
 
@@ -9165,7 +9174,7 @@ __metadata:
     "@types/pino-multi-stream": ^5.1.3
     "@types/sinon": ^17.0.0
     "@types/sinon-chai": ^3.2.9
-    "@types/supertest": ^2.0.12
+    "@types/supertest": ^6.0.0
     "@types/uuid": ^9.0.2
     "@types/yargs": ^17.0.24
     "@typescript-eslint/eslint-plugin": ^6.0.0
