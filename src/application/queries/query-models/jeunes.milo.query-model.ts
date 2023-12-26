@@ -35,9 +35,7 @@ export class AccueilJeuneMiloQueryModel {
   })
   evenementsAVenir: RendezVousJeuneDetailQueryModel[]
 
-  @ApiProperty({
-    required: false //TODO: required ? vu que retourne toujours un tableau (vide ou pas)
-  })
+  @ApiProperty()
   sessionsMiloAVenir: SessionJeuneMiloQueryModel[]
 
   @ApiProperty()

@@ -38,6 +38,7 @@ import {
 } from '../query-mappers/rendez-vous-milo.mappers'
 import { AccueilJeuneMiloQueryModel } from '../query-models/jeunes.milo.query-model'
 import { SessionJeuneMiloQueryModel } from '../query-models/sessions.milo.query.model'
+import { SessionMilo } from 'src/domain/milo/session.milo'
 
 export interface GetAccueilJeuneMiloQuery extends Query {
   idJeune: string
@@ -69,6 +70,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     })
 
     const dateFinDeSemaine = maintenant.endOf('week')
+    const datePlus30Jours = maintenant.plus({ days: 30 }).endOf('day')
     const { idJeune } = query
 
     const jeuneSqlModel = await JeuneSqlModel.findByPk(query.idJeune, {
@@ -104,7 +106,8 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       this.getCampagneQueryGetter.handle({ idJeune })
     ])
 
-    let sessions: SessionJeuneMiloQueryModel[] = []
+    let sessionsInscrit: SessionJeuneMiloQueryModel[] = []
+    let sessionsInscritCetteSemaine: SessionJeuneMiloQueryModel[] = []
     let sessionsNonInscrit: SessionJeuneMiloQueryModel[] = []
 
     if (
@@ -120,38 +123,31 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
           jeuneSqlModel.idPartenaire,
           query.accessToken,
           {
-            periode: { debut: maintenant, fin: dateFinDeSemaine },
-            filtrerEstInscrit: true
+            periode: { debut: maintenant, fin: datePlus30Jours }
           }
         )
         if (isSuccess(sessionsQueryModels)) {
-          sessions = sessionsQueryModels.data
+          sessionsInscrit = sessionsQueryModels.data.filter(session => {
+            return (
+              session.inscription === SessionMilo.Inscription.Statut.INSCRIT ||
+              session.inscription === SessionMilo.Inscription.Statut.PRESENT
+            )
+          })
+          sessionsInscritCetteSemaine = sessionsInscrit.filter(session => {
+            const dateDebutSession = DateTime.fromISO(session.dateHeureDebut)
+            return dateDebutSession < dateFinDeSemaine
+          })
+          sessionsNonInscrit = sessionsQueryModels.data.filter(session => {
+            return (
+              session.inscription !== SessionMilo.Inscription.Statut.INSCRIT &&
+              session.inscription !== SessionMilo.Inscription.Statut.PRESENT
+            )
+          })
         }
       } catch (e) {
         this.logger.error(
           buildError(
-            `La récupération des sessions (est inscrit) de l'accueil du jeune ${query.idJeune} a échoué`,
-            e
-          )
-        )
-      }
-      try {
-        const sessionsQueryModels = await this.getSessionsQueryGetter.handle(
-          query.idJeune,
-          jeuneSqlModel.idPartenaire,
-          query.accessToken,
-          {
-            periode: { debut: maintenant, fin: dateFinDeSemaine }, //TODO: plus loin que une semaine
-            filtrerEstInscrit: false
-          }
-        )
-        if (isSuccess(sessionsQueryModels)) {
-          sessionsNonInscrit = sessionsQueryModels.data
-        }
-      } catch (e) {
-        this.logger.error(
-          buildError(
-            `La récupération des sessions (n'est pas inscrit) de l'accueil du jeune ${query.idJeune} a échoué`,
+            `La récupération des sessions de l'accueil du jeune ${query.idJeune} a échoué`,
             e
           )
         )
@@ -160,7 +156,8 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
 
     return success({
       cetteSemaine: {
-        nombreRendezVous: rendezVousSqlModelsCount + sessions.length,
+        nombreRendezVous:
+          rendezVousSqlModelsCount + sessionsInscritCetteSemaine.length,
         nombreActionsDemarchesEnRetard: actionSqlModelsEnRetard,
         nombreActionsDemarchesARealiser: actionSqlModelsARealiser
       },
@@ -171,7 +168,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
             idJeune
           )
         : undefined,
-      prochaineSessionMilo: sessions[0],
+      prochaineSessionMilo: sessionsInscrit[0],
       evenementsAVenir: evenementSqlModelAVenir.map(acSql =>
         fromSqlToRendezVousDetailJeuneQueryModel(
           acSql,
