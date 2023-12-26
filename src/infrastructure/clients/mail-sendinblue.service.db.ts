@@ -11,21 +11,23 @@ import {
 import { InvitationIcsClient } from './invitation-ics.client'
 import { Jeune } from '../../domain/jeune/jeune'
 import { ArchiveJeune } from '../../domain/archive-jeune'
+import { Authentification } from '../../domain/authentification'
 
 export type ICS = string
 
 @Injectable()
 export class MailSendinblueService implements Mail.Service {
-  private sendinblueUrl: string
-  private apiKey: string
+  private readonly sendinblueUrl: string
+  private readonly apiKey: string
   private templates: {
     conversationsNonLues: string
     nouveauRendezvous: string
     rappelRendezvous: string
     rendezVousSupprime: string
     compteJeuneArchive: string
+    creationConseillerMilo: string
   }
-  private frontendUrl: string
+  private readonly frontendUrl: string
   private logger: Logger
 
   constructor(
@@ -73,6 +75,24 @@ export class MailSendinblueService implements Mail.Service {
         conversationsNonLues: nombreDeConversationNonLues,
         nom: conseiller.lastName,
         lien: this.frontendUrl
+      }
+    }
+    await this.envoyer(mailDataDto)
+  }
+
+  async envoyerEmailCreationConseillerMilo(
+    utilisateurConseiller: Authentification.Utilisateur
+  ): Promise<void> {
+    const mailDataDto: MailDataDto = {
+      to: [
+        {
+          email: utilisateurConseiller.email!,
+          name: `${utilisateurConseiller.prenom} ${utilisateurConseiller.nom}`
+        }
+      ],
+      templateId: parseInt(this.templates.creationConseillerMilo),
+      params: {
+        prenom: utilisateurConseiller.prenom
       }
     }
     await this.envoyer(mailDataDto)

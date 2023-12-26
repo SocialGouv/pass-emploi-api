@@ -1,4 +1,4 @@
-import { MailSendinblueService } from '../../../src/infrastructure/clients/mail-sendinblue.service'
+import { MailSendinblueService } from '../../../src/infrastructure/clients/mail-sendinblue.service.db'
 import { HttpService } from '@nestjs/axios'
 import { testConfig } from '../../utils/module-for-testing'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
@@ -16,6 +16,7 @@ import {
   DatabaseForTesting,
   getDatabase
 } from '../../utils/database-for-testing'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 
 describe('MailSendinblueService', () => {
   let databaseForTesting: DatabaseForTesting
@@ -76,6 +77,37 @@ describe('MailSendinblueService', () => {
         // Then
         expect(scope.isDone()).to.equal(true)
       })
+    })
+  })
+  describe('envoyerEmailCreationConseillerMilo', () => {
+    it('envoie un email', async () => {
+      // Given
+      const utilisateurConseiller = unUtilisateurConseiller()
+      const expectedBody = {
+        to: [
+          {
+            email: utilisateurConseiller.email,
+            name: utilisateurConseiller.prenom + ' ' + utilisateurConseiller.nom
+          }
+        ],
+        templateId: parseInt(
+          config.get('sendinblue').templates.creationConseillerMilo
+        ),
+        params: {
+          prenom: utilisateurConseiller.prenom
+        }
+      }
+      const scope = nock(config.get('sendinblue').url)
+        .post('/v3/smtp/email', JSON.stringify(expectedBody))
+        .reply(200)
+
+      // When
+      await mailSendinblueService.envoyerEmailCreationConseillerMilo(
+        utilisateurConseiller
+      )
+
+      // Then
+      expect(scope.isDone()).to.equal(true)
     })
   })
   describe('envoyerEmailJeuneArchive', () => {
