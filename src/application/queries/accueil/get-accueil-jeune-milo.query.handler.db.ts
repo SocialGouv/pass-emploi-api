@@ -105,6 +105,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     ])
 
     let sessions: SessionJeuneMiloQueryModel[] = []
+    let sessionsNonInscrit: SessionJeuneMiloQueryModel[] = []
 
     if (
       sessionsMiloActives(this.configService) &&
@@ -129,7 +130,28 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       } catch (e) {
         this.logger.error(
           buildError(
-            `La récupération des sessions de l'accueil du jeune ${query.idJeune} a échoué`,
+            `La récupération des sessions (est inscrit) de l'accueil du jeune ${query.idJeune} a échoué`,
+            e
+          )
+        )
+      }
+      try {
+        const sessionsQueryModels = await this.getSessionsQueryGetter.handle(
+          query.idJeune,
+          jeuneSqlModel.idPartenaire,
+          query.accessToken,
+          {
+            periode: { debut: maintenant, fin: dateFinDeSemaine }, //TODO: plus loin que une semaine
+            filtrerEstInscrit: false
+          }
+        )
+        if (isSuccess(sessionsQueryModels)) {
+          sessionsNonInscrit = sessionsQueryModels.data
+        }
+      } catch (e) {
+        this.logger.error(
+          buildError(
+            `La récupération des sessions (n'est pas inscrit) de l'accueil du jeune ${query.idJeune} a échoué`,
             e
           )
         )
@@ -157,6 +179,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
           Authentification.Type.JEUNE
         )
       ),
+      sessionsMiloAVenir: sessionsNonInscrit.slice(0, 3),
       mesAlertes: recherchesQueryModels,
       mesFavoris: favorisQueryModels,
       campagne: campagneQueryModel
