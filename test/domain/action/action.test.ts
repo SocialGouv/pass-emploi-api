@@ -103,6 +103,128 @@ describe('Action', () => {
         })
       })
     })
+
+    describe('updateAction', () => {
+      describe('Quand on peut modifier l’action', () => {
+        it('met à jour les attributs', () => {
+          // Given
+          const action = uneAction({
+            statut: Action.Statut.EN_COURS
+          })
+
+          const infosActionAMettreAJour = {
+            idAction: 'id-action',
+            statut: Action.Statut.TERMINEE,
+            description: 'une nouvelle description',
+            contenu: 'un nouveau contenu'
+          }
+
+          // When
+          const resultAction = actionFactory.updateAction(
+            action,
+            infosActionAMettreAJour
+          )
+
+          // Then
+          expect(isSuccess(resultAction)).to.equal(true)
+          if (isSuccess(resultAction)) {
+            expect(resultAction.data.statut).to.equal(Action.Statut.TERMINEE)
+            expect(resultAction.data.description).to.equal(
+              'une nouvelle description'
+            )
+            expect(resultAction.data.contenu).to.equal('un nouveau contenu')
+          }
+        })
+
+        describe('quand le statut passe en Terminée', () => {
+          it('met à jour la dateDeFinReelle', () => {
+            // Given
+            const action = uneAction({
+              statut: Action.Statut.EN_COURS
+            })
+
+            const infosActionAMettreAJour = {
+              idAction: 'id-action',
+              statut: Action.Statut.TERMINEE
+            }
+
+            // When
+            const resultAction = actionFactory.updateAction(
+              action,
+              infosActionAMettreAJour
+            )
+
+            // Then
+            expect(isSuccess(resultAction)).to.equal(true)
+            if (isSuccess(resultAction)) {
+              expect(resultAction.data.statut).to.equal(Action.Statut.TERMINEE)
+              expect(resultAction.data.dateFinReelle).to.deep.equal(now)
+            }
+          })
+        })
+
+        it('met à jour la dateActualisation', () => {
+          // Given
+          const action = uneAction({
+            statut: Action.Statut.EN_COURS
+          })
+
+          const infosActionAMettreAJour = {
+            idAction: 'id-action',
+            description: 'nouvelle description'
+          }
+
+          // When
+          const resultAction = actionFactory.updateAction(
+            action,
+            infosActionAMettreAJour
+          )
+
+          // Then
+          expect(isSuccess(resultAction)).to.equal(true)
+          if (isSuccess(resultAction)) {
+            expect(resultAction.data.dateDerniereActualisation).to.deep.equal(
+              now
+            )
+          }
+        })
+      })
+
+      describe('Quand le statut de l’action est Qualifiée', () => {
+        it('rejette', () => {
+          // Given
+          const action = uneAction({
+            statut: Action.Statut.TERMINEE,
+            qualification: {
+              code: Action.Qualification.Code.EMPLOI,
+              heures: 3,
+              commentaire: 'Un commentaire'
+            }
+          })
+
+          const infosActionAMettreAJour = {
+            idAction: 'id-action',
+            statut: Action.Statut.EN_COURS
+          }
+
+          // When
+          const result = actionFactory.updateAction(
+            action,
+            infosActionAMettreAJour
+          )
+
+          // Then
+          expect(result).to.deep.equal(
+            failure(
+              new MauvaiseCommandeError(
+                'Vous ne pouvez pas modifier une action qualifée'
+              )
+            )
+          )
+        })
+      })
+    })
+
     describe('buildAction', () => {
       const dateEcheance = DateTime.fromISO('2020-02-02T00:00:00.000')
       const dateEcheanceA9h30 = DateTime.fromISO('2020-02-02T09:30:00.000')

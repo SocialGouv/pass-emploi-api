@@ -15,10 +15,6 @@ import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Authentification } from '../../domain/authentification'
 import { DeleteActionCommandHandler } from '../../application/commands/action/delete-action.command.handler'
 import {
-  UpdateStatutActionCommand,
-  UpdateStatutActionCommandHandler
-} from '../../application/commands/action/update-statut-action.command.handler'
-import {
   GetDetailActionQuery,
   GetDetailActionQueryHandler
 } from '../../application/queries/action/get-detail-action.query.handler.db'
@@ -33,7 +29,7 @@ import { Utilisateur } from '../decorators/authenticated.decorator'
 import {
   AddCommentaireActionPayload,
   QualifierActionPayload,
-  UpdateStatutActionPayload
+  UpdateActionPayload
 } from './validation/actions.inputs'
 import {
   AddCommentaireActionCommand,
@@ -47,6 +43,10 @@ import {
 } from '../../application/commands/milo/qualifier-action.command.handler'
 import { DateTime } from 'luxon'
 import { toCommentaireQueryModel } from '../../application/queries/query-mappers/commentaire.mapper'
+import {
+  UpdateActionCommand,
+  UpdateActionCommandHandler
+} from 'src/application/commands/action/update-action.command.handler'
 
 @Controller('actions')
 @ApiOAuth2([])
@@ -54,7 +54,7 @@ import { toCommentaireQueryModel } from '../../application/queries/query-mappers
 export class ActionsController {
   constructor(
     private readonly getDetailActionQueryHandler: GetDetailActionQueryHandler,
-    private readonly updateStatutActionCommandHandler: UpdateStatutActionCommandHandler,
+    private readonly updateActionCommandHandler: UpdateActionCommandHandler,
     private readonly deleteActionCommandHandler: DeleteActionCommandHandler,
     private readonly addCommentaireActionCommandHandler: AddCommentaireActionCommandHandler,
     private readonly getCommentairesActionQueryHandler: GetCommentairesActionQueryHandler,
@@ -89,20 +89,25 @@ export class ActionsController {
   }
 
   @ApiOperation({
-    summary: "Modifie le statut d'une action",
+    summary: 'Modifie une action',
     description: 'Autorisé pour un jeune et son conseiller'
   })
   @Put(':idAction')
-  async updateStatutAction(
+  async updateAction(
     @Param('idAction', new ParseUUIDPipe()) idAction: string,
-    @Body() updateStatutActionPayload: UpdateStatutActionPayload,
+    @Body() updateActionPayload: UpdateActionPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    const command: UpdateStatutActionCommand = {
+    const command: UpdateActionCommand = {
       idAction,
-      statut: updateStatutActionPayload.status
+      statut: updateActionPayload.status,
+      contenu: updateActionPayload.contenu,
+      description: updateActionPayload.description,
+      dateEcheance: updateActionPayload.dateEcheance
+        ? DateTime.fromISO(updateActionPayload.dateEcheance, { setZone: true })
+        : undefined
     }
-    const result = await this.updateStatutActionCommandHandler.execute(
+    const result = await this.updateActionCommandHandler.execute(
       command,
       utilisateur
     )
