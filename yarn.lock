@@ -9207,7 +9207,7 @@ __metadata:
     pg: 8.11.2
     pg-connection-string: 2.6.2
     pg-copy-streams: ^6.0.5
-    pino-http: 8.6.0
+    pino-http: 8.6.1
     prettier: ^2.8.8
     redis: ^4.6.7
     reflect-metadata: ^0.2.0
@@ -10155,15 +10155,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pino-http@npm:8.6.0":
-  version: 8.6.0
-  resolution: "pino-http@npm:8.6.0"
+"pino-http@npm:8.6.1":
+  version: 8.6.1
+  resolution: "pino-http@npm:8.6.1"
   dependencies:
     get-caller-file: ^2.0.5
-    pino: ^8.17.0
-    pino-std-serializers: ^6.0.0
-    process-warning: ^2.0.0
-  checksum: ebcde8cfa86be7030b719a6d6c55d3e92e2c6c3a21e6e21e68e7bb910223272e2c206d356dd311082e2d2d133d4a5586fd40758efe43ca0469061d887c68a7a2
+    pino: ^8.17.1
+    pino-std-serializers: ^6.2.2
+    process-warning: ^3.0.0
+  checksum: 988e3e838a5a68b062e07da96d2c990ea6f60d5d17cee00e97bd7af6cb7a60fc7f15e6aaa682340b63e848796b178a925f625ea54e429e3fa019a9edded25787
   languageName: node
   linkType: hard
 
@@ -10174,7 +10174,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pino-std-serializers@npm:^6.0.0":
+"pino-std-serializers@npm:^6.0.0, pino-std-serializers@npm:^6.2.2":
   version: 6.2.2
   resolution: "pino-std-serializers@npm:6.2.2"
   checksum: aeb0662edc46ec926de9961ed4780a4f0586bb7c37d212cd469c069639e7816887a62c5093bc93f260a4e0900322f44fc8ab1343b5a9fa2864a888acccdb22a4
@@ -10198,16 +10198,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pino@npm:^8.17.0":
-  version: 8.17.1
-  resolution: "pino@npm:8.17.1"
+"pino@npm:^8.17.1":
+  version: 8.17.2
+  resolution: "pino@npm:8.17.2"
   dependencies:
     atomic-sleep: ^1.0.0
     fast-redact: ^3.1.1
     on-exit-leak-free: ^2.1.0
     pino-abstract-transport: v1.1.0
     pino-std-serializers: ^6.0.0
-    process-warning: ^2.0.0
+    process-warning: ^3.0.0
     quick-format-unescaped: ^4.0.3
     real-require: ^0.2.0
     safe-stable-stringify: ^2.3.1
@@ -10215,7 +10215,7 @@ __metadata:
     thread-stream: ^2.0.0
   bin:
     pino: bin.js
-  checksum: 12fda9f8942ff299dcab6aace9396c90f650db88b82c5954fc91ab7e05765a15dc655072749342b539916406bbe13a8983c13498a95cd7e126218f4b830126a2
+  checksum: fc769d3d7b1333de94d51815fbe2abc4a1cc07cb0252a399313e54e26c13da2c0a69b227c296bd95ed52660d7eaa993662a9bf270b7370d0f7553fdd38716b63
   languageName: node
   linkType: hard
 
@@ -10364,10 +10364,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"process-warning@npm:^2.0.0":
-  version: 2.3.2
-  resolution: "process-warning@npm:2.3.2"
-  checksum: cbeddc85d3963eccd6578b1eea5ba981383d1ec688d6e4ba5bf0ca6662d094c024b44dfcb1c530662c7694b68fe09fd95fa0269a1309090d793008f4553e7784
+"process-warning@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "process-warning@npm:3.0.0"
+  checksum: 1fc2eb4524041de3c18423334cc8b4e36bec5ad5472640ca1a936122c6e01da0864c1a4025858ef89aea93eabe7e77db93ccea225b10858617821cb6a8719efe
   languageName: node
   linkType: hard
 
