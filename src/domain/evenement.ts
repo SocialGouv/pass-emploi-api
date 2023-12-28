@@ -33,6 +33,8 @@ export namespace Evenement {
     ACTION_CREEE_REFERENTIEL = 'ACTION_CREEE_REFERENTIEL',
     ACTION_DETAIL = 'ACTION_DETAIL',
     ACTION_LISTE = 'ACTION_LISTE',
+    ACTION_CATEGORIE_MODIFIEE = 'ACTION_CATEGORIE_MODIFIEE',
+    ACTION_TEXTE_MODIFIE = 'ACTION_TEXTE_MODIFIE',
     ACTION_STATUT_MODIFIE = 'ACTION_STATUT_MODIFIE',
     ACTION_SUPPRIMEE = 'ACTION_SUPPRIMEE',
     ACTION_COMMENTEE = 'ACTION_COMMENTEE',
@@ -173,6 +175,16 @@ const evenements: {
     categorie: 'Action',
     action: 'Consultation',
     nom: 'Liste'
+  },
+  [Evenement.Code.ACTION_CATEGORIE_MODIFIEE]: {
+    categorie: 'Action',
+    action: 'Modification',
+    nom: 'Catégorie'
+  },
+  [Evenement.Code.ACTION_TEXTE_MODIFIE]: {
+    categorie: 'Action',
+    action: 'Modification',
+    nom: 'Texte'
   },
   [Evenement.Code.ACTION_STATUT_MODIFIE]: {
     categorie: 'Action',

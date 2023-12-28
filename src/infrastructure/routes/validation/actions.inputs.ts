@@ -18,6 +18,30 @@ export class UpdateStatutActionPayload {
   status: Action.Statut
 }
 
+export class UpdateActionPayload {
+  @ApiPropertyOptional({ enum: Action.Statut })
+  @IsString()
+  @IsEnum(Action.Statut)
+  status?: Action.Statut
+
+  @ApiPropertyOptional()
+  @IsString()
+  contenu?: string
+
+  @ApiPropertyOptional()
+  @IsString()
+  description?: string
+
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
+  @IsDateString()
+  dateEcheance?: string
+
+  @ApiPropertyOptional({ enum: Action.Qualification })
+  @IsString()
+  @IsEnum(Action.Qualification)
+  qualification?: Action.Qualification
+}
+
 export class AddCommentaireActionPayload {
   @ApiProperty()
   @IsString()
