@@ -1,4 +1,4 @@
-import { MailSendinblueService } from '../../../src/infrastructure/clients/mail-sendinblue.service'
+import { MailBrevoService } from '../../../src/infrastructure/clients/mail-brevo.service.db'
 import { HttpService } from '@nestjs/axios'
 import { testConfig } from '../../utils/module-for-testing'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
@@ -16,10 +16,11 @@ import {
   DatabaseForTesting,
   getDatabase
 } from '../../utils/database-for-testing'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 
-describe('MailSendinblueService', () => {
+describe('MailBrevoService', () => {
   let databaseForTesting: DatabaseForTesting
-  let mailSendinblueService: MailSendinblueService
+  let mailBrevoService: MailBrevoService
   let invitationIcsClient: InvitationIcsClient
   const config = testConfig()
 
@@ -34,7 +35,7 @@ describe('MailSendinblueService', () => {
       databaseForTesting.sequelize,
       config
     )
-    mailSendinblueService = new MailSendinblueService(
+    mailBrevoService = new MailBrevoService(
       invitationIcsClient,
       httpService,
       config
@@ -54,7 +55,7 @@ describe('MailSendinblueService', () => {
             }
           ],
           templateId: parseInt(
-            config.get('sendinblue').templates.conversationsNonLues
+            config.get('brevo').templates.conversationsNonLues
           ),
           params: {
             prenom: conseiller.firstName,
@@ -63,19 +64,47 @@ describe('MailSendinblueService', () => {
             lien: config.get('frontEndUrl')
           }
         }
-        const scope = nock(config.get('sendinblue').url)
+        const scope = nock(config.get('brevo').url)
           .post('/v3/smtp/email', JSON.stringify(expectedBody))
           .reply(200)
 
         // When
-        await mailSendinblueService.envoyerMailConversationsNonLues(
-          conseiller,
-          22
-        )
+        await mailBrevoService.envoyerMailConversationsNonLues(conseiller, 22)
 
         // Then
         expect(scope.isDone()).to.equal(true)
       })
+    })
+  })
+  describe('envoyerEmailCreationConseillerMilo', () => {
+    it('envoie un email', async () => {
+      // Given
+      const utilisateurConseiller = unUtilisateurConseiller()
+      const expectedBody = {
+        to: [
+          {
+            email: utilisateurConseiller.email,
+            name: utilisateurConseiller.prenom + ' ' + utilisateurConseiller.nom
+          }
+        ],
+        templateId: parseInt(
+          config.get('brevo').templates.creationConseillerMilo
+        ),
+        params: {
+          prenom: utilisateurConseiller.prenom
+        }
+      }
+      const scope = nock(config.get('brevo').url)
+        .post('/v3/smtp/email', JSON.stringify(expectedBody))
+        .reply(200)
+
+      // When
+      await mailBrevoService.envoyerEmailCreationConseillerMilo(
+        utilisateurConseiller
+      )
+
+      // Then
+      expect(scope.isDone()).to.equal(true)
     })
   })
   describe('envoyerEmailJeuneArchive', () => {
@@ -94,9 +123,7 @@ describe('MailSendinblueService', () => {
             name: `${jeune.firstName} ${jeune.lastName}`
           }
         ],
-        templateId: parseInt(
-          config.get('sendinblue').templates.compteJeuneArchive
-        ),
+        templateId: parseInt(config.get('brevo').templates.compteJeuneArchive),
         params: {
           prenom: jeune.firstName,
           nom: jeune.lastName,
@@ -104,12 +131,12 @@ describe('MailSendinblueService', () => {
           commentaireMotif: 'test'
         }
       }
-      const scope = nock(config.get('sendinblue').url)
+      const scope = nock(config.get('brevo').url)
         .post('/v3/smtp/email', JSON.stringify(mailDataDtoAttendu))
         .reply(200)
 
       // When
-      await mailSendinblueService.envoyerEmailJeuneArchive(
+      await mailBrevoService.envoyerEmailJeuneArchive(
         jeune,
         command.motif,
         command.commentaireMotif
@@ -131,7 +158,7 @@ describe('MailSendinblueService', () => {
       const invitationBase64 = Buffer.from(fichierInvitation).toString('base64')
 
       // When
-      const result = mailSendinblueService.creerContenuMailRendezVous(
+      const result = mailBrevoService.creerContenuMailRendezVous(
         conseiller,
         rendezVous,
         fichierInvitation,
@@ -172,7 +199,7 @@ describe('MailSendinblueService', () => {
       const invitationBase64 = Buffer.from(fichierInvitation).toString('base64')
 
       // When
-      const result = mailSendinblueService.creerContenuMailRendezVous(
+      const result = mailBrevoService.creerContenuMailRendezVous(
         conseiller,
         rendezVous,
         fichierInvitation,
@@ -216,7 +243,7 @@ describe('MailSendinblueService', () => {
       const invitationBase64 = Buffer.from(fichierInvitation).toString('base64')
 
       // When
-      const result = mailSendinblueService.creerContenuMailRendezVous(
+      const result = mailBrevoService.creerContenuMailRendezVous(
         conseiller,
         rendezVous,
         fichierInvitation,
@@ -237,9 +264,7 @@ describe('MailSendinblueService', () => {
           lienPortail: 'http://frontend.com',
           typeRdv: 'Entretien individuel conseiller'
         },
-        templateId: parseInt(
-          config.get('sendinblue').templates.rendezVousSupprime
-        ),
+        templateId: parseInt(config.get('brevo').templates.rendezVousSupprime),
         to: [
           {
             email: 'nils.tavernier@passemploi.com',
@@ -267,7 +292,7 @@ describe('MailSendinblueService', () => {
             }
           ],
           templateId: parseInt(
-            config.get('sendinblue').templates.conversationsNonLues
+            config.get('brevo').templates.conversationsNonLues
           ),
           params: {
             prenom: 'Nils',
@@ -282,12 +307,12 @@ describe('MailSendinblueService', () => {
             }
           ]
         }
-        const scope = nock(config.get('sendinblue').url)
+        const scope = nock(config.get('brevo').url)
           .post('/v3/smtp/email', JSON.stringify(mailDataDto))
           .reply(200)
 
         // When
-        await mailSendinblueService.envoyer(mailDataDto)
+        await mailBrevoService.envoyer(mailDataDto)
 
         // Then
         expect(scope.isDone()).to.equal(true)

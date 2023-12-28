@@ -133,7 +133,7 @@ import { FirebaseClient } from './infrastructure/clients/firebase-client'
 import { ImmersionClient } from './infrastructure/clients/immersion-client'
 import { DiagorienteClient } from './infrastructure/clients/diagoriente-client'
 import { KeycloakClient } from './infrastructure/clients/keycloak-client'
-import { MailSendinblueService } from './infrastructure/clients/mail-sendinblue.service'
+import { MailBrevoService } from './infrastructure/clients/mail-brevo.service.db'
 import { ObjectStorageClient } from './infrastructure/clients/object-storage.client'
 import { PoleEmploiClient } from './infrastructure/clients/pole-emploi-client'
 import { SuiviJobService } from './infrastructure/clients/suivi-job.service.db'
@@ -493,7 +493,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     },
     {
       provide: MailServiceToken,
-      useClass: MailSendinblueService
+      useClass: MailBrevoService
     },
     {
       provide: RendezVousRepositoryToken,

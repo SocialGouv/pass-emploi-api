@@ -12,7 +12,7 @@ import {
   formaterDateRendezVous,
   formaterHeureRendezVous,
   ICS
-} from './mail-sendinblue.service'
+} from './mail-brevo.service.db'
 import { Attendee, EventAttributes } from 'ics'
 import { ConfigService } from '@nestjs/config'
 
