@@ -40,6 +40,15 @@ export interface Action {
   commentaires?: Action.Commentaire[]
 }
 
+export interface InfosActionAMettreAJour {
+  idAction: Action.Id
+  statut?: Action.Statut
+  contenu?: string
+  description?: string
+  dateEcheance?: DateTime
+  codeQualification?: Action.Qualification.Code
+}
+
 export namespace Action {
   export const ACTIONS_PREDEFINIES: Action.ActionPredefinie[] =
     _ACTIONS_PREDEFINIES
@@ -259,6 +268,38 @@ export namespace Action {
           maintenant
         ),
         dateDerniereActualisation: maintenant
+      })
+    }
+
+    updateAction(
+      action: Action,
+      infosActionAMettreAJour: InfosActionAMettreAJour
+    ): Result<Action> {
+      if (Action.estQualifiee(action)) {
+        return failure(
+          new MauvaiseCommandeError(
+            'Vous ne pouvez pas modifier une action qualifée'
+          )
+        )
+      }
+
+      const maintenant = this.dateService.now()
+      const statut = infosActionAMettreAJour.statut ?? action.statut
+
+      return success({
+        ...action,
+        statut,
+        contenu: infosActionAMettreAJour.contenu ?? action.contenu,
+        description: infosActionAMettreAJour.description ?? action.description,
+        dateFinReelle: this.mettreAJourLaDateDeFinReelle(
+          action,
+          statut,
+          maintenant
+        ),
+        dateDerniereActualisation: maintenant,
+        qualification: infosActionAMettreAJour.codeQualification
+          ? { code: infosActionAMettreAJour.codeQualification }
+          : undefined
       })
     }
 

@@ -50,6 +50,7 @@ import { SynchronizeJobsCommandHandler } from './application/tasks/synchronize-j
 import { TransfererJeunesConseillerCommandHandler } from './application/commands/transferer-jeunes-conseiller.command.handler'
 import { UpdateJeuneConfigurationApplicationCommandHandler } from './application/commands/update-jeune-configuration-application.command.handler'
 import { UpdateStatutActionCommandHandler } from './application/commands/action/update-statut-action.command.handler'
+import { UpdateActionCommandHandler } from './application/commands/action/update-action.command.handler'
 import { UpdateUtilisateurCommandHandler } from './application/commands/update-utilisateur.command.handler'
 import { TeleverserFichierCommandHandler } from './application/commands/televerser-fichier.command.handler'
 import { GetActionsPredefiniesQueryHandler } from './application/queries/action/get-actions-predefinies.query.handler'
@@ -653,6 +654,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetResumeActionsDesJeunesDuConseillerQueryHandlerDb,
     UpdateJeuneConfigurationApplicationCommandHandler,
     UpdateStatutActionCommandHandler,
+    UpdateActionCommandHandler,
     CreateRendezVousCommandHandler,
     DeleteRendezVousCommandHandler,
     GetAllRendezVousConseillerQueryHandler,
