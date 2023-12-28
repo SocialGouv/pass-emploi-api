@@ -36,6 +36,9 @@ export class AccueilJeuneMiloQueryModel {
   evenementsAVenir: RendezVousJeuneDetailQueryModel[]
 
   @ApiProperty()
+  sessionsMiloAVenir: SessionJeuneMiloQueryModel[]
+
+  @ApiProperty()
   mesAlertes: RechercheQueryModel[]
 
   @ApiPropertyOptional()
