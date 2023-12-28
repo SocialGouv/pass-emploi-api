@@ -79,7 +79,7 @@ export const configurationSchema = Joi.object({
   redis: Joi.object({
     url: Joi.string().uri()
   }),
-  sendinblue: Joi.object({
+  brevo: Joi.object({
     url: Joi.string().uri().required(),
     apiKey: Joi.string().required(),
     templates: Joi.object({

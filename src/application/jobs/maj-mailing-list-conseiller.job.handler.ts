@@ -27,7 +27,7 @@ export class MajMailingListConseillerJobHandler extends JobHandler<Job> {
       Planificateur.JobType.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS,
       suiviJobService
     )
-    this.mailingLists = this.configuration.get('sendinblue').mailingLists
+    this.mailingLists = this.configuration.get('brevo').mailingLists
   }
 
   async handle(): Promise<SuiviJob> {

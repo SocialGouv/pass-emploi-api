@@ -120,9 +120,9 @@ export const testConfig = (): ConfigService => {
     planificateur: {
       url: 'https://planification.com'
     },
-    sendinblue: {
-      url: 'https://sendinblue.com',
-      apiKey: 'sendinblueapiKey',
+    brevo: {
+      url: 'https://brevo.com',
+      apiKey: 'brevoApiKey',
       templates: {
         conversationsNonLues: '200',
         nouveauRendezvous: '300',

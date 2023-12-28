@@ -32,26 +32,31 @@ import {
   success
 } from '../../../src/building-blocks/types/result'
 import { Core } from '../../../src/domain/core'
-import { expect, stubClass } from '../../utils'
+import { expect, StubbedClass, stubClass } from '../../utils'
+import { MailBrevoService } from '../../../src/infrastructure/clients/mail-brevo.service.db'
 
 describe('UpdateUtilisateurCommandHandler', () => {
   let authentificationRepository: StubbedType<Authentification.Repository>
   let updateUtilisateurCommandHandler: UpdateUtilisateurCommandHandler
   const dateService = stubClass(DateService)
   dateService.nowJs.returns(uneDate())
+  let mailBrevoService: StubbedClass<MailBrevoService>
   const uuidGenere = '1'
   const idService: IdService = {
     uuid: () => uuidGenere
   }
   const authentificationFactory: Authentification.Factory =
     new Authentification.Factory(idService)
+
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     authentificationRepository = stubInterface(sandbox)
+    mailBrevoService = stubClass(MailBrevoService)
     updateUtilisateurCommandHandler = new UpdateUtilisateurCommandHandler(
       authentificationRepository,
       authentificationFactory,
-      dateService
+      dateService,
+      mailBrevoService
     )
   })
 
@@ -219,17 +224,17 @@ describe('UpdateUtilisateurCommandHandler', () => {
         describe('conseiller inconnu', async () => {
           describe('quand il est valide', () => {
             let result: Result<UtilisateurQueryModel>
-            beforeEach(async () => {
-              // Given
-              const command: UpdateUtilisateurCommand = {
-                nom: 'Tavernier',
-                prenom: 'Nils',
-                type: Authentification.Type.CONSEILLER,
-                email: 'Nils.Tavernier@Passemploi.com',
-                idUtilisateurAuth: 'nilstavernier',
-                structure: Core.Structure.MILO
-              }
+            const command: UpdateUtilisateurCommand = {
+              nom: 'Tavernier',
+              prenom: 'Nils',
+              type: Authentification.Type.CONSEILLER,
+              email: 'Nils.Tavernier@Passemploi.com',
+              idUtilisateurAuth: 'nilstavernier',
+              structure: Core.Structure.MILO
+            }
 
+            beforeEach(() => {
+              // Given
               authentificationRepository.getConseillerByStructure
                 .withArgs(command.idUtilisateurAuth, command.structure)
                 .resolves(undefined)
@@ -246,16 +251,50 @@ describe('UpdateUtilisateurCommandHandler', () => {
               authentificationRepository.save
                 .withArgs(utilisateur, command.idUtilisateurAuth)
                 .resolves()
-
+            })
+            it('crée et retourne le conseiller avec un email minusculisé', async () => {
               // When
               result = await updateUtilisateurCommandHandler.execute(command)
-            })
-            it('crée et retourne le conseiller avec un mail minusculisé', async () => {
+
               // Then
               expect(isSuccess(result)).equal(true)
               if (isSuccess(result)) {
                 expect(result.data).to.deep.equal(unUtilisateurQueryModel())
               }
+            })
+            describe('Pôle Emploi', () => {
+              it('n’envoie pas d’email de bienvenue', async () => {
+                // Given
+                const command: UpdateUtilisateurCommand = {
+                  nom: 'Tavernier',
+                  prenom: 'Nils',
+                  type: Authentification.Type.CONSEILLER,
+                  email: 'Nils.Tavernier@Passemploi.com',
+                  idUtilisateurAuth: 'nilstavernier',
+                  structure: Core.Structure.POLE_EMPLOI
+                }
+                // When
+                result = await updateUtilisateurCommandHandler.execute(command)
+                // Then
+                expect(
+                  mailBrevoService.envoyerEmailCreationConseillerMilo
+                ).to.have.callCount(0)
+              })
+            })
+            describe('Mission Locale', () => {
+              it('envoie un email de bienvenue', async () => {
+                // When
+                result = await updateUtilisateurCommandHandler.execute(command)
+                // Then
+                expect(
+                  mailBrevoService.envoyerEmailCreationConseillerMilo
+                ).to.have.calledWithExactly(
+                  unUtilisateurConseiller({
+                    idAuthentification: 'nilstavernier',
+                    dateDerniereConnexion: uneDate()
+                  })
+                )
+              })
             })
           })
           describe("quand il est valide mais il manque l' email", () => {

@@ -108,7 +108,7 @@ export default () => {
     redis: {
       url: process.env.REDIS_URL
     },
-    sendinblue: {
+    brevo: {
       url: process.env.SENDINBLUE_API_URL ?? 'https://api.sendinblue.com',
       apiKey: process.env.SENDINBLUE_API_KEY ?? '',
       templates: {
@@ -125,7 +125,9 @@ export default () => {
         suppressionJeunePE:
           process.env.SENDINBLUE_SUPPRESSION_JEUNE_PE_ID ?? '17',
         compteJeuneArchive:
-          process.env.SENDINBLUE_COMPTE_JEUNE_ARCHIVE_ID ?? '51'
+          process.env.SENDINBLUE_COMPTE_JEUNE_ARCHIVE_ID ?? '51',
+        creationConseillerMilo:
+          process.env.SENDINBLUE_COMPTE_JEUNE_ARCHIVE_ID ?? '264'
       },
       mailingLists: {
         poleEmploi: process.env.SENDINBLUE_POLE_EMPLOI_MAILING_LIST_ID ?? 7,

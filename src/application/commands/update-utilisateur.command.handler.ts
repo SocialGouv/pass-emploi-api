@@ -23,6 +23,8 @@ import {
   UtilisateurQueryModel,
   queryModelFromUtilisateur
 } from '../queries/query-models/authentification.query-model'
+import { MailBrevoService } from '../../infrastructure/clients/mail-brevo.service.db'
+import { MailServiceToken } from '../../domain/mail'
 
 export interface UpdateUtilisateurCommand extends Command {
   idUtilisateurAuth: string
@@ -43,7 +45,9 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     @Inject(AuthentificationRepositoryToken)
     private readonly authentificationRepository: Authentification.Repository,
     private authentificationFactory: Authentification.Factory,
-    private dateService: DateService
+    private dateService: DateService,
+    @Inject(MailServiceToken)
+    private mailBrevoService: MailBrevoService
   ) {
     super('UpdateUtilisateurCommandHandler')
   }
@@ -157,7 +161,14 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       utilisateurConseiller,
       this.dateService.nowJs()
     )
-
+    if (
+      utilisateurConseiller.structure === Core.Structure.MILO &&
+      utilisateurConseiller.email
+    ) {
+      await this.mailBrevoService.envoyerEmailCreationConseillerMilo(
+        utilisateurConseiller
+      )
+    }
     return success(queryModelFromUtilisateur(utilisateurConseiller))
   }
 
