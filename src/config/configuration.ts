@@ -108,7 +108,7 @@ export default () => {
     redis: {
       url: process.env.REDIS_URL
     },
-    sendinblue: {
+    brevo: {
       url: process.env.SENDINBLUE_API_URL ?? 'https://api.sendinblue.com',
       apiKey: process.env.SENDINBLUE_API_KEY ?? '',
       templates: {

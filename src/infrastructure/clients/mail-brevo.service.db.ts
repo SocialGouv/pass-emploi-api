@@ -16,8 +16,8 @@ import { Authentification } from '../../domain/authentification'
 export type ICS = string
 
 @Injectable()
-export class MailSendinblueService implements Mail.Service {
-  private readonly sendinblueUrl: string
+export class MailBrevoService implements Mail.Service {
+  private readonly brevoUrl: string
   private readonly apiKey: string
   private templates: {
     conversationsNonLues: string
@@ -35,17 +35,17 @@ export class MailSendinblueService implements Mail.Service {
     private httpService: HttpService,
     private configService: ConfigService
   ) {
-    this.sendinblueUrl = this.configService.get('sendinblue').url
-    this.apiKey = this.configService.get('sendinblue').apiKey
-    this.templates = this.configService.get('sendinblue').templates
+    this.brevoUrl = this.configService.get('brevo').url
+    this.apiKey = this.configService.get('brevo').apiKey
+    this.templates = this.configService.get('brevo').templates
     this.frontendUrl = this.configService.get('frontEndUrl') ?? ''
-    this.logger = new Logger('MailSendinblueService')
+    this.logger = new Logger('MailBrevoService')
   }
 
   async envoyer(data: MailDataDto): Promise<void> {
     try {
       await firstValueFrom(
-        this.httpService.post(`${this.sendinblueUrl}/v3/smtp/email`, data, {
+        this.httpService.post(`${this.brevoUrl}/v3/smtp/email`, data, {
           headers: {
             'api-key': `${this.apiKey}`,
             accept: 'application/json',
@@ -150,7 +150,7 @@ export class MailSendinblueService implements Mail.Service {
     contacts: Mail.Contact[],
     mailingListId: number
   ): Promise<void> {
-    const contactsDTO: Sendinblue.Contact[] = contacts.map(contact => ({
+    const contactsDTO: Brevo.Contact[] = contacts.map(contact => ({
       email: contact.email,
       attributes: {
         nom: contact.nom,
@@ -167,17 +167,13 @@ export class MailSendinblueService implements Mail.Service {
     }
     try {
       await firstValueFrom(
-        this.httpService.post(
-          `${this.sendinblueUrl}/v3/contacts/import`,
-          payload,
-          {
-            headers: {
-              'api-key': `${this.apiKey}`,
-              accept: 'application/json',
-              'content-type': 'application/json'
-            }
+        this.httpService.post(`${this.brevoUrl}/v3/contacts/import`, payload, {
+          headers: {
+            'api-key': `${this.apiKey}`,
+            accept: 'application/json',
+            'content-type': 'application/json'
           }
-        )
+        })
       )
     } catch (e) {
       if (e.name === 'AxiosError') {
@@ -234,7 +230,7 @@ export class MailSendinblueService implements Mail.Service {
   }
 }
 
-export namespace Sendinblue {
+export namespace Brevo {
   export interface Contact {
     email: string
     attributes: AttributesContact

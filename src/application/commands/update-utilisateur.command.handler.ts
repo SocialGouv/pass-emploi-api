@@ -23,7 +23,7 @@ import {
   UtilisateurQueryModel,
   queryModelFromUtilisateur
 } from '../queries/query-models/authentification.query-model'
-import { MailSendinblueService } from '../../infrastructure/clients/mail-sendinblue.service.db'
+import { MailBrevoService } from '../../infrastructure/clients/mail-brevo.service.db'
 import { MailServiceToken } from '../../domain/mail'
 
 export interface UpdateUtilisateurCommand extends Command {
@@ -47,7 +47,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     private authentificationFactory: Authentification.Factory,
     private dateService: DateService,
     @Inject(MailServiceToken)
-    private mailBrevoService: MailSendinblueService
+    private mailBrevoService: MailBrevoService
   ) {
     super('UpdateUtilisateurCommandHandler')
   }

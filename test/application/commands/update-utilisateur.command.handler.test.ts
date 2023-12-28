@@ -33,14 +33,14 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { Core } from '../../../src/domain/core'
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { MailSendinblueService } from '../../../src/infrastructure/clients/mail-sendinblue.service.db'
+import { MailBrevoService } from '../../../src/infrastructure/clients/mail-brevo.service.db'
 
 describe('UpdateUtilisateurCommandHandler', () => {
   let authentificationRepository: StubbedType<Authentification.Repository>
   let updateUtilisateurCommandHandler: UpdateUtilisateurCommandHandler
   const dateService = stubClass(DateService)
   dateService.nowJs.returns(uneDate())
-  let mailBrevoService: StubbedClass<MailSendinblueService>
+  let mailBrevoService: StubbedClass<MailBrevoService>
   const uuidGenere = '1'
   const idService: IdService = {
     uuid: () => uuidGenere
@@ -51,7 +51,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     authentificationRepository = stubInterface(sandbox)
-    mailBrevoService = stubClass(MailSendinblueService)
+    mailBrevoService = stubClass(MailBrevoService)
     updateUtilisateurCommandHandler = new UpdateUtilisateurCommandHandler(
       authentificationRepository,
       authentificationFactory,

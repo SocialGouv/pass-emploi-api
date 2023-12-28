@@ -81,7 +81,7 @@ export namespace Mail {
     }
 
     constructor(private configService: ConfigService) {
-      this.templates = this.configService.get('sendinblue').templates
+      this.templates = this.configService.get('brevo').templates
     }
 
     creerMailSuppressionJeune(jeune: Jeune): MailDataDto {
