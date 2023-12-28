@@ -144,7 +144,7 @@
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "bull-repl": "^0.29.0",
-    "chai": "^4.3.7",
+    "chai": "^5.0.0",
     "chai-as-promised": "^7.1.1",
     "chai-exclude": "^2.1.0",
     "dirty-chai": "^2.0.1",
