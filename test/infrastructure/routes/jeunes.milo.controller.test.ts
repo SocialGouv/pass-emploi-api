@@ -62,6 +62,7 @@ describe('JeunesMiloController', () => {
       },
       prochainRendezVous: undefined,
       evenementsAVenir: [],
+      sessionsMiloAVenir: [],
       mesAlertes: [],
       mesFavoris: []
     }

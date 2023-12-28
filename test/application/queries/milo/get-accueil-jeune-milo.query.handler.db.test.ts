@@ -88,7 +88,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
 
     const token = 'token'
     const maintenantString = '2023-03-27T03:24:00'
-    const dateFinDeSemaineString = '2023-04-02T23:59:59.999'
+    const datePlus30Jours = '2023-04-26T23:59:59.999'
     const maintenant = DateTime.fromISO(maintenantString)
     const campagneQueryModel = uneCampagneQueryModel()
 
@@ -120,9 +120,8 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
         .withArgs(accueilQuery.idJeune, 'idDossier', token, {
           periode: {
             debut: maintenant,
-            fin: DateTime.fromISO(dateFinDeSemaineString)
-          },
-          filtrerEstInscrit: true
+            fin: DateTime.fromISO(datePlus30Jours)
+          }
         })
         .resolves(success([]))
     })
@@ -198,9 +197,8 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
             .withArgs(accueilQuery.idJeune, 'idDossier', token, {
               periode: {
                 debut: maintenant,
-                fin: DateTime.fromISO(dateFinDeSemaineString)
-              },
-              filtrerEstInscrit: true
+                fin: DateTime.fromISO(datePlus30Jours)
+              }
             })
             .resolves(
               failure(new NonTrouveError('Jeune', accueilQuery.idJeune))
@@ -221,9 +219,8 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
             .withArgs(accueilQuery.idJeune, 'idDossier', token, {
               periode: {
                 debut: maintenant,
-                fin: DateTime.fromISO(dateFinDeSemaineString)
-              },
-              filtrerEstInscrit: true
+                fin: DateTime.fromISO(datePlus30Jours)
+              }
             })
             .resolves(success([]))
 
@@ -242,15 +239,30 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
               dateHeureDebut: maintenant.plus({ days: 1 }).toISODate(),
               inscription: SessionMilo.Inscription.Statut.INSCRIT
             })
+          const sessionSansInscriptionCetteSemaine =
+            uneSessionJeuneMiloQueryModel({
+              dateHeureDebut: maintenant.plus({ days: 2 }).toISODate()
+            })
+          const sessionAvecInscriptionSemaineSuivant =
+            uneSessionJeuneMiloQueryModel({
+              dateHeureDebut: maintenant.plus({ days: 8 }).toISODate(),
+              inscription: SessionMilo.Inscription.Statut.INSCRIT
+            })
+
           sessionsQueryGetter.handle
             .withArgs(accueilQuery.idJeune, 'idDossier', token, {
               periode: {
                 debut: maintenant,
-                fin: DateTime.fromISO(dateFinDeSemaineString)
-              },
-              filtrerEstInscrit: true
+                fin: DateTime.fromISO(datePlus30Jours)
+              }
             })
-            .resolves(success([sessionAvecInscriptionCetteSemaine]))
+            .resolves(
+              success([
+                sessionAvecInscriptionCetteSemaine,
+                sessionSansInscriptionCetteSemaine,
+                sessionAvecInscriptionSemaineSuivant
+              ])
+            )
 
           // When
           result = await handler.handle(accueilQuery)
@@ -319,26 +331,29 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
 
     describe('retourne une prochaine session Milo', () => {
       it('renseignée s’il y en a une', async () => {
-        const sessionAvecInscriptionAJPlus2 = uneSessionJeuneMiloQueryModel({
-          dateHeureDebut: maintenant.plus({ days: 2 }).toISODate(),
+        const sessionSansInscriptionAJPlus1 = uneSessionJeuneMiloQueryModel({
+          dateHeureDebut: maintenant.plus({ days: 1 }).toISODate()
+        })
+        const sessionAvecInscriptionAJPlus12 = uneSessionJeuneMiloQueryModel({
+          dateHeureDebut: maintenant.plus({ days: 12 }).toISODate(),
           inscription: SessionMilo.Inscription.Statut.INSCRIT
         })
-        const sessionAvecInscriptionAJPlus3 = uneSessionJeuneMiloQueryModel({
-          dateHeureDebut: maintenant.plus({ days: 3 }).toISODate(),
+        const sessionAvecInscriptionAJPlus23 = uneSessionJeuneMiloQueryModel({
+          dateHeureDebut: maintenant.plus({ days: 23 }).toISODate(),
           inscription: SessionMilo.Inscription.Statut.INSCRIT
         })
         sessionsQueryGetter.handle
           .withArgs(accueilQuery.idJeune, 'idDossier', token, {
             periode: {
               debut: maintenant,
-              fin: DateTime.fromISO(dateFinDeSemaineString)
-            },
-            filtrerEstInscrit: true
+              fin: DateTime.fromISO(datePlus30Jours)
+            }
           })
           .resolves(
             success([
-              sessionAvecInscriptionAJPlus2,
-              sessionAvecInscriptionAJPlus3
+              sessionSansInscriptionAJPlus1,
+              sessionAvecInscriptionAJPlus12,
+              sessionAvecInscriptionAJPlus23
             ])
           )
 
@@ -348,7 +363,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
         // Then
         expect(
           isSuccess(result) && result.data.prochaineSessionMilo
-        ).to.deep.equal(sessionAvecInscriptionAJPlus2)
+        ).to.deep.equal(sessionAvecInscriptionAJPlus12)
       })
 
       it('à undefined s’il n’y en a pas', async () => {
@@ -357,9 +372,8 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
           .withArgs(accueilQuery.idJeune, 'idDossier', token, {
             periode: {
               debut: maintenant,
-              fin: DateTime.fromISO(dateFinDeSemaineString)
-            },
-            filtrerEstInscrit: true
+              fin: DateTime.fromISO(datePlus30Jours)
+            }
           })
           .resolves(success([]))
 
@@ -483,6 +497,75 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
             })
           ]
         )
+      })
+    })
+
+    describe("retourne les 3 prochaines sessions Milo où le bénéficiaire n'est pas inscrit", () => {
+      it('renseignée s’il y en a', async () => {
+        const sessionAvecInscriptionAJPlus1 = uneSessionJeuneMiloQueryModel({
+          dateHeureDebut: maintenant.plus({ days: 1 }).toISODate(),
+          inscription: SessionMilo.Inscription.Statut.INSCRIT
+        })
+        const sessionSansInscriptionAJPlus2 = uneSessionJeuneMiloQueryModel({
+          dateHeureDebut: maintenant.plus({ days: 2 }).toISODate()
+        })
+        const sessionSansInscriptionAJPlus3 = uneSessionJeuneMiloQueryModel({
+          dateHeureDebut: maintenant.plus({ days: 3 }).toISODate()
+        })
+        const sessionSansInscriptionAJPlus4 = uneSessionJeuneMiloQueryModel({
+          dateHeureDebut: maintenant.plus({ days: 4 }).toISODate()
+        })
+        const sessionSansInscriptionAJPlus5 = uneSessionJeuneMiloQueryModel({
+          dateHeureDebut: maintenant.plus({ days: 5 }).toISODate()
+        })
+        sessionsQueryGetter.handle
+          .withArgs(accueilQuery.idJeune, 'idDossier', token, {
+            periode: {
+              debut: maintenant,
+              fin: DateTime.fromISO(datePlus30Jours)
+            }
+          })
+          .resolves(
+            success([
+              sessionAvecInscriptionAJPlus1,
+              sessionSansInscriptionAJPlus2,
+              sessionSansInscriptionAJPlus3,
+              sessionSansInscriptionAJPlus4,
+              sessionSansInscriptionAJPlus5
+            ])
+          )
+
+        // When
+        result = await handler.handle(accueilQuery)
+
+        // Then
+        expect(
+          isSuccess(result) && result.data.sessionsMiloAVenir
+        ).to.deep.equal([
+          sessionSansInscriptionAJPlus2,
+          sessionSansInscriptionAJPlus3,
+          sessionSansInscriptionAJPlus4
+        ])
+      })
+
+      it('vide s’il n’y en a pas', async () => {
+        // Given
+        sessionsQueryGetter.handle
+          .withArgs(accueilQuery.idJeune, 'idDossier', token, {
+            periode: {
+              debut: maintenant,
+              fin: DateTime.fromISO(datePlus30Jours)
+            }
+          })
+          .resolves(success([]))
+
+        // When
+        result = await handler.handle(accueilQuery)
+
+        // Then
+        expect(
+          isSuccess(result) && result.data.sessionsMiloAVenir
+        ).to.deep.equal([])
       })
     })
 
