@@ -75,5 +75,10 @@ export class UpdateActionCommandHandler extends CommandHandler<
         Evenement.Code.ACTION_TEXTE_MODIFIE,
         utilisateur
       )
+    if (command.statut)
+      await this.evenementService.creer(
+        Evenement.Code.ACTION_STATUT_MODIFIE,
+        utilisateur
+      )
   }
 }
