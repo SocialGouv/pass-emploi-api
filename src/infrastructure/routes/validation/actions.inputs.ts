@@ -20,23 +20,28 @@ export class UpdateStatutActionPayload {
 
 export class UpdateActionPayload {
   @ApiPropertyOptional({ enum: Action.Statut })
+  @IsOptional()
   @IsString()
   @IsEnum(Action.Statut)
   status?: Action.Statut
 
   @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
   contenu?: string
 
   @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
   description?: string
 
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
+  @IsOptional()
   @IsDateString()
   dateEcheance?: string
 
   @ApiPropertyOptional({ enum: Action.Qualification })
+  @IsOptional()
   @IsString()
   @IsEnum(Action.Qualification)
   qualification?: Action.Qualification
