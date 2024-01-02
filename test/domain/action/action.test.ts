@@ -112,11 +112,16 @@ describe('Action', () => {
             statut: Action.Statut.EN_COURS
           })
 
+          const nouvelleDate = DateTime.fromISO('2024-01-01')
+          const nouveauCodeQualification = Action.Qualification.Code.CITOYENNETE
+
           const infosActionAMettreAJour = {
             idAction: 'id-action',
             statut: Action.Statut.TERMINEE,
             description: 'une nouvelle description',
-            contenu: 'un nouveau contenu'
+            contenu: 'un nouveau contenu',
+            dateEcheance: nouvelleDate,
+            codeQualification: nouveauCodeQualification
           }
 
           // When
@@ -133,6 +138,10 @@ describe('Action', () => {
               'une nouvelle description'
             )
             expect(resultAction.data.contenu).to.equal('un nouveau contenu')
+            expect(resultAction.data.dateEcheance).to.equal(nouvelleDate)
+            expect(resultAction.data.qualification?.code).to.equal(
+              nouveauCodeQualification
+            )
           }
         })
 

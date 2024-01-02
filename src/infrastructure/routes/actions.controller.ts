@@ -105,7 +105,8 @@ export class ActionsController {
       description: updateActionPayload.description,
       dateEcheance: updateActionPayload.dateEcheance
         ? DateTime.fromISO(updateActionPayload.dateEcheance, { setZone: true })
-        : undefined
+        : undefined,
+      codeQualification: updateActionPayload.codeQualification ?? undefined
     }
     const result = await this.updateActionCommandHandler.execute(
       command,
