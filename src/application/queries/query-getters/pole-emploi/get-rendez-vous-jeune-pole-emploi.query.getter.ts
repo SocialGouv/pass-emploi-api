@@ -91,10 +91,6 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
       return responsePrestations
     }
 
-    if (isFailure(responseRendezVous)) {
-      return responseRendezVous
-    }
-
     let rendezVousPrestations = await Promise.all(
       responsePrestations.data
         .filter(prestation => !prestation.annule)
@@ -140,9 +136,14 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
         })
     )
 
-    const rendezVousPoleEmploi = responseRendezVous.data.map(rendezVous => {
-      return fromRendezVousDtoToRendezVousQueryModel(rendezVous, this.idService)
-    })
+    const rendezVousPoleEmploi = isFailure(responseRendezVous)
+      ? []
+      : responseRendezVous.data.map(rendezVous => {
+          return fromRendezVousDtoToRendezVousQueryModel(
+            rendezVous,
+            this.idService
+          )
+        })
 
     if (query.periode === RendezVous.Periode.PASSES) {
       rendezVousPrestations = rendezVousPrestations.filter(prestations =>
@@ -161,7 +162,7 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
       queryModel: rendezVousDuJeune,
       dateDuCache: recupererLaDateLaPlusAncienne(
         responsePrestations.dateCache,
-        responseRendezVous.dateCache
+        isFailure(responseRendezVous) ? undefined : responseRendezVous.dateCache
       )
     }
     return success(data)

@@ -540,6 +540,24 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
         })
       })
       describe('quand une erreur se produit', () => {
+        it('renvoie un succes quand une erreur rendezVous Agenda se produit', async () => {
+          // Given
+          jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
+          dateService.now.returns(maintenant)
+
+          poleEmploiPartenaireClient.getPrestations
+            .withArgs(idpToken, maintenant)
+            .resolves(success([]))
+          poleEmploiPartenaireClient.getRendezVous
+            .withArgs(idpToken)
+            .resolves(failureApi(new ErreurHttp('Erreur', 500)))
+
+          // When
+          const result = await queryGetter.handle(query)
+
+          // Then
+          expect(result._isSuccess).to.equal(true)
+        })
         it('renvoie une failure quand une erreur client se produit', async () => {
           // Given
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)

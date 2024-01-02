@@ -4,7 +4,7 @@ import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
 import {
   GetAccueilJeuneMiloQuery,
   GetAccueilJeuneMiloQueryHandler
-} from 'src/application/queries/accueil/get-accueil-jeune-milo.query.handler.db'
+} from 'src/application/queries/milo/get-accueil-jeune-milo.query.handler.db'
 import { GetFavorisAccueilQueryGetter } from 'src/application/queries/query-getters/accueil/get-favoris.query.getter.db'
 import { GetRecherchesSauvegardeesQueryGetter } from 'src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
 import { GetCampagneQueryGetter } from 'src/application/queries/query-getters/get-campagne.query.getter'

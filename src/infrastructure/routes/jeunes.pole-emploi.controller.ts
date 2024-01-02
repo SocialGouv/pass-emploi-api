@@ -7,7 +7,7 @@ import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './result.handler'
 
 import { MaintenantQueryParams } from './validation/jeunes.inputs'
-import { GetAccueilJeunePoleEmploiQueryHandler } from '../../application/queries/accueil/get-accueil-jeune-pole-emploi.query.handler.db'
+import { GetAccueilJeunePoleEmploiQueryHandler } from '../../application/queries/pole-emploi/get-accueil-jeune-pole-emploi.query.handler.db'
 import {
   AccueilJeunePoleEmploiQueryModel,
   CVPoleEmploiQueryModel

@@ -2,7 +2,7 @@ import { StubbedClass } from '../../utils'
 import { JwtService } from '../../../src/infrastructure/auth/jwt.service'
 import { HttpStatus, INestApplication } from '@nestjs/common'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
-import { GetAccueilJeunePoleEmploiQueryHandler } from '../../../src/application/queries/accueil/get-accueil-jeune-pole-emploi.query.handler.db'
+import { GetAccueilJeunePoleEmploiQueryHandler } from '../../../src/application/queries/pole-emploi/get-accueil-jeune-pole-emploi.query.handler.db'
 import {
   unHeaderAuthorization,
   unJwtPayloadValide,
