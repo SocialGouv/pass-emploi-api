@@ -9207,7 +9207,7 @@ __metadata:
     pg: 8.11.2
     pg-connection-string: 2.6.2
     pg-copy-streams: ^6.0.5
-    pino-http: 8.6.1
+    pino-http: 9.0.0
     prettier: ^2.8.8
     redis: ^4.6.7
     reflect-metadata: ^0.2.0
@@ -10155,15 +10155,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pino-http@npm:8.6.1":
-  version: 8.6.1
-  resolution: "pino-http@npm:8.6.1"
+"pino-http@npm:9.0.0":
+  version: 9.0.0
+  resolution: "pino-http@npm:9.0.0"
   dependencies:
     get-caller-file: ^2.0.5
     pino: ^8.17.1
     pino-std-serializers: ^6.2.2
     process-warning: ^3.0.0
-  checksum: 988e3e838a5a68b062e07da96d2c990ea6f60d5d17cee00e97bd7af6cb7a60fc7f15e6aaa682340b63e848796b178a925f625ea54e429e3fa019a9edded25787
+  checksum: 61be08f23f07f4429cab1b78bdc2d048b4bbbd1c2a20e87b2ae01d5b2bc7fce2d1cfe06396e2694fc321ba4aeb7426da9bc50f74af958e7adef92504dc66c7fb
   languageName: node
   linkType: hard
 
