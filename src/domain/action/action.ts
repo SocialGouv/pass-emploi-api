@@ -291,6 +291,8 @@ export namespace Action {
         statut,
         contenu: infosActionAMettreAJour.contenu ?? action.contenu,
         description: infosActionAMettreAJour.description ?? action.description,
+        dateEcheance:
+          infosActionAMettreAJour.dateEcheance ?? action.dateEcheance,
         dateFinReelle: this.mettreAJourLaDateDeFinReelle(
           action,
           statut,

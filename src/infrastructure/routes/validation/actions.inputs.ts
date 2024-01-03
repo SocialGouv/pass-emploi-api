@@ -40,11 +40,10 @@ export class UpdateActionPayload {
   @IsDateString()
   dateEcheance?: string
 
-  @ApiPropertyOptional({ enum: Action.Qualification })
+  @ApiPropertyOptional({ enum: Action.Qualification.Code })
   @IsOptional()
-  @IsString()
-  @IsEnum(Action.Qualification)
-  qualification?: Action.Qualification
+  @IsEnum(Action.Qualification.Code)
+  codeQualification?: Action.Qualification.Code
 }
 
 export class AddCommentaireActionPayload {
