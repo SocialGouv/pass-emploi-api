@@ -66,25 +66,21 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
     let responseRendezVous
 
     if (query.periode === RendezVous.Periode.PASSES) {
-      responsePrestations =
-        await this.poleEmploiPartenaireClient.getPrestations(
+      ;[responsePrestations, responseRendezVous] = await Promise.all([
+        this.poleEmploiPartenaireClient.getPrestations(
           idpToken,
           jeune.creationDate
-        )
-      responseRendezVous =
-        await this.poleEmploiPartenaireClient.getRendezVousPasses(
+        ),
+        this.poleEmploiPartenaireClient.getRendezVousPasses(
           idpToken,
           jeune.creationDate.toUTC()
         )
+      ])
     } else {
-      responsePrestations =
-        await this.poleEmploiPartenaireClient.getPrestations(
-          idpToken,
-          maintenant
-        )
-      responseRendezVous = await this.poleEmploiPartenaireClient.getRendezVous(
-        idpToken
-      )
+      ;[responsePrestations, responseRendezVous] = await Promise.all([
+        this.poleEmploiPartenaireClient.getPrestations(idpToken, maintenant),
+        this.poleEmploiPartenaireClient.getRendezVous(idpToken)
+      ])
     }
 
     if (isFailure(responsePrestations)) {
