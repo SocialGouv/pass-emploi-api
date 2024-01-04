@@ -505,6 +505,63 @@ describe('Conseiller.Milo', () => {
             conseillerMiloRepository.save
           ).to.have.been.calledOnceWithExactly(conseillerMiloAvecStructure)
         })
+        it('crée et met à jour la structure Milo du Conseiller dont la région comporte un prefixe', async () => {
+          // Given
+          const idStructureMilo = '92073S00'
+          await StructureMiloSqlModel.create({
+            id: idStructureMilo,
+            codeDepartement: '92',
+            nomOfficiel: 'test',
+            nomRegion: 'Structure régionale Auvergne-Rhône-Alpes',
+            timezone: 'Europe/Paris'
+          })
+          await ConseillerSqlModel.create(
+            unConseillerDto({
+              id: idConseiller,
+              structure: Core.Structure.MILO,
+              idStructureMilo
+            })
+          )
+          keycloakClient.exchangeTokenConseillerMilo
+            .withArgs(token)
+            .resolves(idpToken)
+
+          const idNouvelleStructure = '92063S00'
+          miloClient.getStructureConseiller
+            .withArgs(idpToken)
+            .resolves(
+              success(
+                uneStructureConseillerMiloDto({ code: idNouvelleStructure })
+              )
+            )
+          conseillerMiloRepository.structureExiste
+            .withArgs(idNouvelleStructure)
+            .resolves(false)
+
+          const conseillerMiloAvecStructure = {
+            id: idConseiller,
+            idAgence: idNouvelleStructure,
+            idStructure: idNouvelleStructure,
+            dateVerificationStructureMilo: maintenant
+          }
+
+          const agenceAvant = await AgenceSqlModel.findByPk(idNouvelleStructure)
+
+          // When
+          await conseillerMiloService.recupererEtMettreAJourStructure(
+            idConseiller,
+            token
+          )
+
+          // Then
+          expect(
+            conseillerMiloRepository.save
+          ).to.have.been.calledOnceWithExactly(conseillerMiloAvecStructure)
+
+          const agenceApres = await AgenceSqlModel.findByPk(idNouvelleStructure)
+          expect(agenceAvant).to.be.null()
+          expect(agenceApres?.nomRegion).to.deep.equal('Auvergne-Rhône-Alpes')
+        })
         it('crée et met à jour la structure Milo du Conseiller sans mettre à jour agence', async () => {
           // Given
           const idStructureMilo = '10'

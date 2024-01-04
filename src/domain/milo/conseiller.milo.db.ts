@@ -180,13 +180,36 @@ export namespace ConseillerMilo {
           codeDepartement: structureDansLeDepartementSql.codeDepartement,
           timezone: structureDansLeDepartementSql.timezone
         }
+
+        const TAILLE_PREFIX_REGION = 20
+        const nomRegionSansPrefixe =
+          structureDansLeDepartementSql.nomRegion?.substring(
+            0,
+            TAILLE_PREFIX_REGION
+          ) === 'Structure régionale '
+            ? structureDansLeDepartementSql.nomRegion?.substring(
+                TAILLE_PREFIX_REGION
+              )
+            : structureDansLeDepartementSql.nomRegion
+
+        const TAILLE_PREFIX_DEPARTEMENT = 25
+        const nomDepartementSansPrefixe =
+          structureDansLeDepartementSql.nomDepartement?.substring(
+            0,
+            TAILLE_PREFIX_DEPARTEMENT
+          ) === 'Structure départementale '
+            ? structureDansLeDepartementSql.nomDepartement?.substring(
+                TAILLE_PREFIX_DEPARTEMENT
+              )
+            : structureDansLeDepartementSql.nomDepartement
+
         const agenceACreer: AsSql<AgenceSqlModel> = {
           id: structureMilo.code,
           nomAgence: structureMilo.nomOfficiel,
           nomUsuel: structureMilo.nomUsuel,
-          nomRegion: structureDansLeDepartementSql.nomRegion ?? 'INCONNU',
+          nomRegion: nomRegionSansPrefixe ?? 'INCONNU',
           codeRegion: structureDansLeDepartementSql.codeRegion,
-          nomDepartement: structureDansLeDepartementSql.nomDepartement,
+          nomDepartement: nomDepartementSansPrefixe,
           codeDepartement:
             structureDansLeDepartementSql.codeDepartement ?? '99',
           timezone: structureDansLeDepartementSql.timezone,
