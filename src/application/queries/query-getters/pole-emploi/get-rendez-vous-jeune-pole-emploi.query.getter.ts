@@ -66,33 +66,25 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
     let responseRendezVous
 
     if (query.periode === RendezVous.Periode.PASSES) {
-      responsePrestations =
-        await this.poleEmploiPartenaireClient.getPrestations(
+      ;[responsePrestations, responseRendezVous] = await Promise.all([
+        this.poleEmploiPartenaireClient.getPrestations(
           idpToken,
           jeune.creationDate
-        )
-      responseRendezVous =
-        await this.poleEmploiPartenaireClient.getRendezVousPasses(
+        ),
+        this.poleEmploiPartenaireClient.getRendezVousPasses(
           idpToken,
           jeune.creationDate.toUTC()
         )
+      ])
     } else {
-      responsePrestations =
-        await this.poleEmploiPartenaireClient.getPrestations(
-          idpToken,
-          maintenant
-        )
-      responseRendezVous = await this.poleEmploiPartenaireClient.getRendezVous(
-        idpToken
-      )
+      ;[responsePrestations, responseRendezVous] = await Promise.all([
+        this.poleEmploiPartenaireClient.getPrestations(idpToken, maintenant),
+        this.poleEmploiPartenaireClient.getRendezVous(idpToken)
+      ])
     }
 
     if (isFailure(responsePrestations)) {
       return responsePrestations
-    }
-
-    if (isFailure(responseRendezVous)) {
-      return responseRendezVous
     }
 
     let rendezVousPrestations = await Promise.all(
@@ -140,9 +132,14 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
         })
     )
 
-    const rendezVousPoleEmploi = responseRendezVous.data.map(rendezVous => {
-      return fromRendezVousDtoToRendezVousQueryModel(rendezVous, this.idService)
-    })
+    const rendezVousPoleEmploi = isFailure(responseRendezVous)
+      ? []
+      : responseRendezVous.data.map(rendezVous => {
+          return fromRendezVousDtoToRendezVousQueryModel(
+            rendezVous,
+            this.idService
+          )
+        })
 
     if (query.periode === RendezVous.Periode.PASSES) {
       rendezVousPrestations = rendezVousPrestations.filter(prestations =>
@@ -161,7 +158,7 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
       queryModel: rendezVousDuJeune,
       dateDuCache: recupererLaDateLaPlusAncienne(
         responsePrestations.dateCache,
-        responseRendezVous.dateCache
+        isFailure(responseRendezVous) ? undefined : responseRendezVous.dateCache
       )
     }
     return success(data)

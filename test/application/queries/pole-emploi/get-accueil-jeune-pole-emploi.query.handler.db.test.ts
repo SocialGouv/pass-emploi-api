@@ -12,7 +12,7 @@ import {
 import {
   GetAccueilJeunePoleEmploiQuery,
   GetAccueilJeunePoleEmploiQueryHandler
-} from '../../../../src/application/queries/accueil/get-accueil-jeune-pole-emploi.query.handler.db'
+} from '../../../../src/application/queries/pole-emploi/get-accueil-jeune-pole-emploi.query.handler.db'
 import { Demarche } from '../../../../src/domain/demarche'
 import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
 import { unRendezVousQueryModel } from '../../../fixtures/query-models/rendez-vous.query-model.fixtures'
