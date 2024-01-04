@@ -1,7 +1,7 @@
 # -- stackhawk configuration for Pass emploi API --
 app:
   # -- An applicationId obtained from the StackHawk platform. --
-  applicationId: 37182e21-4b33-40cf-a571-2a7e6b6fc978 # (required)
+  applicationId: 940254ab-d427-46dd-894b-e9ecc03eae6f # (required)
   # -- The environment for the applicationId defined in the StackHawk platform. --
   env: Development # (required)
   # -- The url of your application to scan --

@@ -127,7 +127,7 @@ export default () => {
         compteJeuneArchive:
           process.env.SENDINBLUE_COMPTE_JEUNE_ARCHIVE_ID ?? '51',
         creationConseillerMilo:
-          process.env.SENDINBLUE_COMPTE_JEUNE_ARCHIVE_ID ?? '264'
+          process.env.BREVO_CREATION_CONSEILLER_MILO_ID ?? '264'
       },
       mailingLists: {
         poleEmploi: process.env.SENDINBLUE_POLE_EMPLOI_MAILING_LIST_ID ?? 7,
