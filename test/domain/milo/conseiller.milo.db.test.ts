@@ -512,7 +512,7 @@ describe('Conseiller.Milo', () => {
             id: idStructureMilo,
             codeDepartement: '92',
             nomOfficiel: 'test',
-            nomRegion: 'Structure régionale Auvergne-Rhône-Alpes',
+            nomRegion: "Structure régionale Provence-Alpes-Côte-d'Azur",
             timezone: 'Europe/Paris'
           })
           await ConseillerSqlModel.create(
@@ -560,7 +560,9 @@ describe('Conseiller.Milo', () => {
 
           const agenceApres = await AgenceSqlModel.findByPk(idNouvelleStructure)
           expect(agenceAvant).to.be.null()
-          expect(agenceApres?.nomRegion).to.deep.equal('Auvergne-Rhône-Alpes')
+          expect(agenceApres?.nomRegion).to.deep.equal(
+            "Provence-Alpes-Côte d'Azur"
+          )
         })
         it('crée et met à jour la structure Milo du Conseiller sans mettre à jour agence', async () => {
           // Given

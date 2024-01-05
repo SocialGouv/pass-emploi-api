@@ -182,7 +182,7 @@ export namespace ConseillerMilo {
         }
 
         const TAILLE_PREFIX_REGION = 20
-        const nomRegionSansPrefixe =
+        let nomRegionSansPrefixe =
           structureDansLeDepartementSql.nomRegion?.substring(
             0,
             TAILLE_PREFIX_REGION
@@ -191,6 +191,12 @@ export namespace ConseillerMilo {
                 TAILLE_PREFIX_REGION
               )
             : structureDansLeDepartementSql.nomRegion
+
+        if (nomRegionSansPrefixe === 'Grand-Est') {
+          nomRegionSansPrefixe = 'Grand Est'
+        } else if (nomRegionSansPrefixe === "Provence-Alpes-Côte-d'Azur") {
+          nomRegionSansPrefixe = "Provence-Alpes-Côte d'Azur"
+        }
 
         const TAILLE_PREFIX_DEPARTEMENT = 25
         const nomDepartementSansPrefixe =
