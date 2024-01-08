@@ -65,20 +65,17 @@ export class UpdateActionCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur,
     command: UpdateActionCommand
   ): Promise<void> {
-    if (command.codeQualification)
-      await this.evenementService.creer(
-        Evenement.Code.ACTION_CATEGORIE_MODIFIEE,
-        utilisateur
-      )
-    if (command.contenu || command.description)
-      await this.evenementService.creer(
-        Evenement.Code.ACTION_TEXTE_MODIFIE,
-        utilisateur
-      )
-    if (command.statut)
+    if (command.statut) {
       await this.evenementService.creer(
         Evenement.Code.ACTION_STATUT_MODIFIE,
         utilisateur
       )
+    }
+    if (command.contenu || command.description || command.codeQualification) {
+      await this.evenementService.creer(
+        Evenement.Code.ACTION_TEXTE_MODIFIE,
+        utilisateur
+      )
+    }
   }
 }

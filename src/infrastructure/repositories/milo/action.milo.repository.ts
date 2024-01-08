@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
 import { ErreurHttp } from '../../../building-blocks/types/domain-error'
 import { ActionMilo } from '../../../domain/milo/action.milo'
+import { RateLimiterService } from '../../../utils/rate-limiter.service'
 
 @Injectable()
 export class ActionMiloHttpRepository implements ActionMilo.Repository {
@@ -18,7 +19,8 @@ export class ActionMiloHttpRepository implements ActionMilo.Repository {
 
   constructor(
     private httpService: HttpService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private rateLimiterService: RateLimiterService
   ) {
     this.logger = new Logger('ActionMiloHttpSqlRepository')
     this.apiUrl = this.configService.get('milo').url
@@ -27,6 +29,8 @@ export class ActionMiloHttpRepository implements ActionMilo.Repository {
 
   async save(action: ActionMilo): Promise<Result> {
     try {
+      await this.rateLimiterService.dossierMiloRateLimiter.attendreLaProchaineDisponibilite()
+
       const body = {
         dateDebut: action.dateDebut.toFormat('yyyy-MM-dd'),
         dateFinReelle: action.dateFinReelle.toFormat('yyyy-MM-dd'),

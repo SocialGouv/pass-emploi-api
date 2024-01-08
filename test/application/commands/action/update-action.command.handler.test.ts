@@ -127,6 +127,28 @@ describe('UpdateActionCommandHandler', () => {
   })
 
   describe('monitor', () => {
+    it('monitore la modification du statut et texte', async () => {
+      // Given
+      const utilisateur = unUtilisateurDecode()
+
+      // When
+      await updateActionCommandHandler.monitor(utilisateur, {
+        idAction: 'id-action',
+        statut: Action.Statut.ANNULEE,
+        codeQualification: Qualification.Code.SANTE
+      })
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledTwice()
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.ACTION_STATUT_MODIFIE,
+        utilisateur
+      )
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.ACTION_TEXTE_MODIFIE,
+        utilisateur
+      )
+    })
     it('monitore la modification de la catégorie', async () => {
       // Given
       const utilisateur = unUtilisateurDecode()
@@ -138,8 +160,9 @@ describe('UpdateActionCommandHandler', () => {
       })
 
       // Then
+      expect(evenementService.creer).to.have.been.calledOnce()
       expect(evenementService.creer).to.have.been.calledWithExactly(
-        Evenement.Code.ACTION_CATEGORIE_MODIFIEE,
+        Evenement.Code.ACTION_TEXTE_MODIFIE,
         utilisateur
       )
     })
@@ -156,6 +179,7 @@ describe('UpdateActionCommandHandler', () => {
       })
 
       // Then
+      expect(evenementService.creer).to.have.been.calledOnce()
       expect(evenementService.creer).to.have.been.calledWithExactly(
         Evenement.Code.ACTION_TEXTE_MODIFIE,
         utilisateur
