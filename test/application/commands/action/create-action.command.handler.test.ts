@@ -21,9 +21,7 @@ import {
   unUtilisateurJeune
 } from '../../../fixtures/authentification.fixture'
 import { unJeune } from '../../../fixtures/jeune.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
-import { Core } from '../../../../src/domain/core'
-import Structure = Core.Structure
+import { StubbedClass, createSandbox, expect, stubClass } from '../../../utils'
 
 describe('CreateActionCommandHandler', () => {
   let action: Action
@@ -254,7 +252,7 @@ describe('CreateActionCommandHandler', () => {
   describe('monitor', () => {
     it("créé l'événement idoine", () => {
       // Given
-      const utilisateur = unUtilisateurConseiller({ structure: Structure.MILO })
+      const utilisateur = unUtilisateurConseiller()
       const command: CreateActionCommand = {
         idJeune: action.idJeune,
         contenu: 'whatever',
@@ -274,11 +272,9 @@ describe('CreateActionCommandHandler', () => {
         utilisateur
       )
     })
-    it("créé l'événement idoine si Pôle emploi et l'action provient du referentiel d'actions prédéfinies", () => {
+    it("créé l'événement idoine si l'action provient du referentiel d'actions prédéfinies Conseiller", () => {
       // Given
-      const utilisateur = unUtilisateurConseiller({
-        structure: Structure.POLE_EMPLOI
-      })
+      const utilisateur = unUtilisateurConseiller()
       const command: CreateActionCommand = {
         idJeune: action.idJeune,
         contenu: Action.ACTIONS_PREDEFINIES[5].titre,
@@ -295,6 +291,51 @@ describe('CreateActionCommandHandler', () => {
       // Then
       expect(evenementService.creer).to.have.been.calledWithExactly(
         Evenement.Code.ACTION_CREEE_REFERENTIEL,
+        utilisateur
+      )
+    })
+    it("créé l'événement idoine si l'action provient d'une suggestion Jeune'", () => {
+      // Given
+      const utilisateur = unUtilisateurJeune()
+      const command: CreateActionCommand = {
+        idJeune: action.idJeune,
+        contenu: 'test',
+        idCreateur: utilisateur.id,
+        typeCreateur: Action.TypeCreateur.JEUNE,
+        statut: action.statut,
+        commentaire: action.description,
+        dateEcheance: action.dateEcheance,
+        codeQualification: Action.Qualification.Code.CITOYENNETE
+      }
+
+      // When
+      createActionCommandHandler.monitor(utilisateur, command)
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.ACTION_CREEE_SUGGESTION,
+        utilisateur
+      )
+    })
+    it("créé l'événement idoine si l'action provient d'un Jeune'", () => {
+      // Given
+      const utilisateur = unUtilisateurJeune()
+      const command: CreateActionCommand = {
+        idJeune: action.idJeune,
+        contenu: 'test',
+        idCreateur: utilisateur.id,
+        typeCreateur: Action.TypeCreateur.JEUNE,
+        statut: action.statut,
+        commentaire: action.description,
+        dateEcheance: action.dateEcheance
+      }
+
+      // When
+      createActionCommandHandler.monitor(utilisateur, command)
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.ACTION_CREEE_HORS_SUGGESTION,
         utilisateur
       )
     })

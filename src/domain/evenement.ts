@@ -31,6 +31,8 @@ export namespace Evenement {
     ACTION_CREEE = 'ACTION_CREEE',
     ACTION_CREEE_HORS_REFERENTIEL = 'ACTION_CREEE_HORS_REFERENTIEL',
     ACTION_CREEE_REFERENTIEL = 'ACTION_CREEE_REFERENTIEL',
+    ACTION_CREEE_HORS_SUGGESTION = 'ACTION_CREEE_HORS_SUGGESTION',
+    ACTION_CREEE_SUGGESTION = 'ACTION_CREEE_SUGGESTION',
     ACTION_DETAIL = 'ACTION_DETAIL',
     ACTION_LISTE = 'ACTION_LISTE',
     ACTION_CATEGORIE_MODIFIEE = 'ACTION_CATEGORIE_MODIFIEE',
@@ -165,6 +167,16 @@ const evenements: {
     categorie: 'Action',
     action: 'Création',
     nom: 'Référentiel'
+  },
+  [Evenement.Code.ACTION_CREEE_HORS_SUGGESTION]: {
+    categorie: 'Action',
+    action: 'Création',
+    nom: 'Hors suggestion'
+  },
+  [Evenement.Code.ACTION_CREEE_SUGGESTION]: {
+    categorie: 'Action',
+    action: 'Création',
+    nom: 'Suggestion'
   },
   [Evenement.Code.ACTION_DETAIL]: {
     categorie: 'Action',

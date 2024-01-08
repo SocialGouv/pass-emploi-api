@@ -95,15 +95,24 @@ export class CreateActionCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur,
     command: CreateActionCommand
   ): Promise<void> {
-    const vientDuReferentiel = Action.ACTIONS_PREDEFINIES.some(
-      ({ titre }) => titre === command.contenu
-    )
-    await this.evenementService.creer(
-      vientDuReferentiel
-        ? Evenement.Code.ACTION_CREEE_REFERENTIEL
-        : Evenement.Code.ACTION_CREEE_HORS_REFERENTIEL,
-      utilisateur
-    )
+    if (Authentification.estJeune(utilisateur.type)) {
+      await this.evenementService.creer(
+        command.codeQualification
+          ? Evenement.Code.ACTION_CREEE_SUGGESTION
+          : Evenement.Code.ACTION_CREEE_HORS_SUGGESTION,
+        utilisateur
+      )
+    } else {
+      const vientDuReferentiel = Action.ACTIONS_PREDEFINIES.some(
+        ({ titre }) => titre === command.contenu
+      )
+      await this.evenementService.creer(
+        vientDuReferentiel
+          ? Evenement.Code.ACTION_CREEE_REFERENTIEL
+          : Evenement.Code.ACTION_CREEE_HORS_REFERENTIEL,
+        utilisateur
+      )
+    }
   }
 
   private async planifierRappelAction(action: Action): Promise<void> {
