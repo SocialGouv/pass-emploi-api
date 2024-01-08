@@ -9,15 +9,21 @@ import {
 } from '../../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
 import * as nock from 'nock'
+import { RateLimiterService } from '../../../../src/utils/rate-limiter.service'
 
 describe('MiloHttpSqlRepository', () => {
   const configService = testConfig()
+  const rateLimiterService = new RateLimiterService(configService)
 
   let repository: ActionMiloHttpRepository
 
   beforeEach(() => {
     const httpService = new HttpService()
-    repository = new ActionMiloHttpRepository(httpService, configService)
+    repository = new ActionMiloHttpRepository(
+      httpService,
+      configService,
+      rateLimiterService
+    )
   })
 
   describe('save', () => {
