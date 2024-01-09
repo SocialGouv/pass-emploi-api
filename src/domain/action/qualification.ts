@@ -25,19 +25,19 @@ export namespace Qualification {
   }
 
   export const mapCodeTypeQualification: Record<Code, TypeQualification> = {
-    SANTE: {
-      code: Code.SANTE,
-      label: 'Santé',
-      heures: 2
+    EMPLOI: {
+      code: Code.EMPLOI,
+      label: 'Emploi',
+      heures: 3
     },
     PROJET_PROFESSIONNEL: {
       code: Code.PROJET_PROFESSIONNEL,
       label: 'Projet Professionnel',
       heures: 2
     },
-    LOGEMENT: {
-      code: Code.LOGEMENT,
-      label: 'Logement',
+    CULTURE_SPORT_LOISIRS: {
+      code: Code.CULTURE_SPORT_LOISIRS,
+      label: 'Loisir, sport, culture',
       heures: 2
     },
     CITOYENNETE: {
@@ -45,20 +45,20 @@ export namespace Qualification {
       label: 'Citoyenneté',
       heures: 2
     },
-    EMPLOI: {
-      code: Code.EMPLOI,
-      label: 'Emploi',
-      heures: 3
-    },
-    CULTURE_SPORT_LOISIRS: {
-      code: Code.CULTURE_SPORT_LOISIRS,
-      label: 'Loisir, sport, culture',
-      heures: 2
-    },
     FORMATION: {
       code: Code.FORMATION,
       label: 'Formation',
       heures: 3
+    },
+    LOGEMENT: {
+      code: Code.LOGEMENT,
+      label: 'Logement',
+      heures: 2
+    },
+    SANTE: {
+      code: Code.SANTE,
+      label: 'Santé',
+      heures: 2
     },
     NON_SNP: {
       code: Code.NON_SNP,
