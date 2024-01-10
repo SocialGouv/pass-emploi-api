@@ -85,12 +85,12 @@ describe('ArchiverJeuneCommandHandler', () => {
         // Given
         archivageJeuneRepository.archiver.resolves(emptySuccess())
         jeuneRepository.get.withArgs('idJeune').resolves(jeune)
-
-        // When
-        await archiverJeuneCommandHandler.handle(command)
       })
 
-      it('archive le jeune', () => {
+      it('archive le jeune', async () => {
+        // When
+        await archiverJeuneCommandHandler.handle(command)
+
         // Then
         const metadonneesArchive: ArchiveJeune.Metadonnees = {
           idJeune: command.idJeune,
@@ -109,30 +109,61 @@ describe('ArchiverJeuneCommandHandler', () => {
         ).to.have.been.calledWithExactly(metadonneesArchive)
       })
 
-      it('supprime son compte keycloak', () => {
-        expect(
-          authentificationRepository.deleteUtilisateurIdp
-        ).to.have.been.calledWithExactly('idJeune')
-      })
+      describe('supprime les données', () => {
+        it('supprime son compte keycloak', async () => {
+          // When
+          await archiverJeuneCommandHandler.handle(command)
 
-      it('supprime ses données en base', () => {
-        expect(jeuneRepository.supprimer).to.have.been.calledWithExactly(
-          'idJeune'
-        )
-      })
+          // Then
+          expect(
+            authentificationRepository.deleteUtilisateurIdp
+          ).to.have.been.calledWithExactly('idJeune')
+        })
 
-      it('supprime ses messages', () => {
-        expect(chatRepository.supprimerChat).to.have.been.calledWithExactly(
-          'idJeune'
-        )
-      })
+        it('supprime ses données en base', async () => {
+          // When
+          await archiverJeuneCommandHandler.handle(command)
 
-      it('envoie un email au jeune', () => {
-        expect(mailService.envoyerEmailJeuneArchive).to.have.been.calledWith(
-          jeune,
-          command.motif,
-          command.commentaire
-        )
+          // Then
+          expect(jeuneRepository.supprimer).to.have.been.calledWithExactly(
+            'idJeune'
+          )
+        })
+
+        it('supprime ses messages', async () => {
+          // When
+          await archiverJeuneCommandHandler.handle(command)
+
+          // Then
+          expect(chatRepository.supprimerChat).to.have.been.calledWithExactly(
+            'idJeune'
+          )
+        })
+      })
+      describe('notifie le jeune', () => {
+        it('envoie un email après la suppression des données', async () => {
+          // When
+          await archiverJeuneCommandHandler.handle(command)
+
+          // Then
+          expect(mailService.envoyerEmailJeuneArchive).to.have.been.calledWith(
+            jeune,
+            command.motif,
+            command.commentaire
+          )
+        })
+        it('n’envoie pas d’email quand la suppression des données a échoué', async () => {
+          // Given
+          // When
+          await archiverJeuneCommandHandler.handle(command)
+
+          // Then
+          expect(mailService.envoyerEmailJeuneArchive).to.have.been.calledWith(
+            jeune,
+            command.motif,
+            command.commentaire
+          )
+        })
       })
     })
   })
