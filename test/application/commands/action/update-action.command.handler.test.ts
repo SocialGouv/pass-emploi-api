@@ -43,6 +43,40 @@ describe('UpdateActionCommandHandler', () => {
     )
   })
 
+  describe('getEntity', () => {
+    it("renvoie l'action quand elle existe", async () => {
+      // Given
+      const idAction = '35399853-f224-4910-8d02-44fb1ac85606'
+      const actionOrigine = uneAction({
+        id: idAction,
+        statut: Action.Statut.PAS_COMMENCEE
+      })
+      const command: UpdateActionCommand = {
+        idAction: idAction,
+        statut: Action.Statut.EN_COURS,
+        contenu: "Nouveau contenu de l'action",
+        description: "Nouvelle description de l'action",
+        dateEcheance: DateTime.fromISO('2023-12-27')
+      }
+      actionRepository.get.withArgs(idAction).resolves(actionOrigine)
+      const entity = await updateActionCommandHandler.getAggregate(command)
+      expect(entity).to.deep.equal(actionOrigine)
+    })
+    it("renvoie undefined quand l'action n'existe pas", async () => {
+      // Given
+      const idAction = '35399853-f224-4910-8d02-44fb1ac85606'
+      const command: UpdateActionCommand = {
+        idAction: idAction,
+        statut: Action.Statut.EN_COURS,
+        contenu: "Nouveau contenu de l'action",
+        description: "Nouvelle description de l'action",
+        dateEcheance: DateTime.fromISO('2023-12-27')
+      }
+      actionRepository.get.withArgs(idAction).resolves(undefined)
+      const entity = await updateActionCommandHandler.getAggregate(command)
+      expect(entity).to.deep.equal(undefined)
+    })
+  })
   describe('handle', () => {
     describe('Quand l’action existe', () => {
       it("modifie l'action", async () => {
@@ -70,7 +104,11 @@ describe('UpdateActionCommandHandler', () => {
           description: "Nouvelle description de l'action",
           dateEcheance: DateTime.fromISO('2023-12-27')
         }
-        const result = await updateActionCommandHandler.handle(command)
+        const result = await updateActionCommandHandler.handle(
+          command,
+          undefined,
+          actionOrigine
+        )
 
         // Then
         expect(actionRepository.save).to.have.been.calledWithExactly(
@@ -84,7 +122,6 @@ describe('UpdateActionCommandHandler', () => {
       it('renvoie une failure', async () => {
         // Given
         const idAction = 'id-action-inexistante'
-        actionRepository.get.withArgs(idAction).resolves(undefined)
 
         // When
         const result = await updateActionCommandHandler.handle({

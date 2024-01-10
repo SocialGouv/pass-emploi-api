@@ -19,7 +19,7 @@ import {
  * @see https://martinfowler.com/bliki/CommandQuerySeparation.html
  * @see https://udidahan.com/2009/12/09/clarified-cqrs/
  */
-export abstract class CommandHandler<C, T> {
+export abstract class CommandHandler<C, R, A = void> {
   protected logger: Logger
   protected apmService: APM.Agent
   private commandName: string
@@ -33,17 +33,23 @@ export abstract class CommandHandler<C, T> {
   async execute(
     command?: C,
     utilisateur?: Authentification.Utilisateur
-  ): Promise<Result<T>> {
+  ): Promise<Result<R>> {
     try {
-      const authorizedResult = await this.authorize(command, utilisateur)
-      if (isFailure(authorizedResult)) {
-        return authorizedResult
+      const aggregate = await this.getAggregate(command, utilisateur)
+
+      const authorizerResult = await this.authorize(
+        command,
+        utilisateur,
+        aggregate
+      )
+      if (isFailure(authorizerResult)) {
+        return authorizerResult
       }
 
-      const result = await this.handle(command, utilisateur)
+      const result = await this.handle(command, utilisateur, aggregate)
 
       if (isSuccess(result)) {
-        this.monitor(utilisateur, command).catch(error => {
+        this.monitor(utilisateur, command, aggregate).catch(error => {
           this.apmService.captureError(error)
           this.logger.error(error)
         })
@@ -57,23 +63,33 @@ export abstract class CommandHandler<C, T> {
     }
   }
 
-  abstract handle(
-    command?: C,
-    utilisateur?: Authentification.Utilisateur
-  ): Promise<Result<T>>
+  async getAggregate(
+    _command?: C,
+    _utilisateur?: Authentification.Utilisateur
+  ): Promise<A | undefined> {
+    return undefined
+  }
 
   abstract authorize(
     command?: C,
-    utilisateur?: Authentification.Utilisateur
+    utilisateur?: Authentification.Utilisateur,
+    aggregate?: A
   ): Promise<Result>
+
+  abstract handle(
+    command?: C,
+    utilisateur?: Authentification.Utilisateur,
+    aggregate?: A
+  ): Promise<Result<R>>
 
   abstract monitor(
     utilisateur?: Authentification.Utilisateur,
-    command?: C
+    command?: C,
+    aggregate?: A
   ): Promise<void>
 
   protected logAfter(
-    result: Result<T>,
+    result: Result<R>,
     command?: C,
     utilisateur?: Authentification.Utilisateur
   ): void {

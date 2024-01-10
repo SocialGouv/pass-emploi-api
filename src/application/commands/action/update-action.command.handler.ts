@@ -26,7 +26,8 @@ export interface UpdateActionCommand extends Command {
 @Injectable()
 export class UpdateActionCommandHandler extends CommandHandler<
   UpdateActionCommand,
-  void
+  void,
+  Action
 > {
   constructor(
     @Inject(ActionRepositoryToken)
@@ -38,8 +39,17 @@ export class UpdateActionCommandHandler extends CommandHandler<
     super('UpdateActionCommandHandler')
   }
 
-  async handle(command: UpdateActionCommand): Promise<Result<void>> {
-    const action = await this.actionRepository.get(command.idAction)
+  async getAggregate(
+    command: UpdateActionCommand
+  ): Promise<Action | undefined> {
+    return this.actionRepository.get(command.idAction)
+  }
+
+  async handle(
+    command: UpdateActionCommand,
+    _utilisateur?: Authentification.Utilisateur,
+    action?: Action
+  ): Promise<Result<void>> {
     if (!action) {
       return failure(new NonTrouveError('Action', command.idAction))
     }
@@ -63,15 +73,20 @@ export class UpdateActionCommandHandler extends CommandHandler<
 
   async monitor(
     utilisateur: Authentification.Utilisateur,
-    command: UpdateActionCommand
+    command: UpdateActionCommand,
+    action?: Action
   ): Promise<void> {
-    if (command.statut) {
+    if (command.statut !== action?.statut) {
       await this.evenementService.creer(
         Evenement.Code.ACTION_STATUT_MODIFIE,
         utilisateur
       )
     }
-    if (command.contenu || command.description || command.codeQualification) {
+    if (
+      command.contenu !== action?.contenu ||
+      command.description !== action?.description ||
+      command.codeQualification !== action?.qualification?.code
+    ) {
       await this.evenementService.creer(
         Evenement.Code.ACTION_TEXTE_MODIFIE,
         utilisateur
