@@ -89,9 +89,11 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
       return resultArchiver
     }
 
-    await this.authentificationRepository.deleteUtilisateurIdp(command.idJeune)
-    await this.jeuneRepository.supprimer(command.idJeune)
-    await this.chatRepository.supprimerChat(command.idJeune)
+    await Promise.all([
+      this.authentificationRepository.deleteUtilisateurIdp(command.idJeune),
+      this.jeuneRepository.supprimer(command.idJeune),
+      this.chatRepository.supprimerChat(command.idJeune)
+    ])
 
     await this.mailService.envoyerEmailJeuneArchive(
       jeune,
