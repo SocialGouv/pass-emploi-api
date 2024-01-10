@@ -73,6 +73,10 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
       ALTER TABLE conseiller
         ADD COLUMN IF NOT EXISTS "date_dernier_ae"     TIMESTAMP;
     `)
+    await connexion.query(`
+      ALTER TABLE archive_jeune
+        DROP COLUMN donnees;
+    `)
   }
 
   private async indexerLesColonnes(connexion: Sequelize): Promise<void> {
