@@ -1,22 +1,26 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { Transform, Type } from 'class-transformer'
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsArray,
   IsBoolean,
   IsDateString,
-  IsNotEmpty,
-  IsOptional,
-  ValidateNested,
-  IsArray,
-  IsString,
-  IsEnum,
-  ValidateIf,
   IsDefined,
+  IsEnum,
+  IsIn,
+  IsNotEmpty,
   IsNumber,
-  IsIn
+  IsOptional,
+  IsString,
+  MaxLength,
+  ValidateIf,
+  ValidateNested
 } from 'class-validator'
-import { Transform, Type } from 'class-transformer'
+import { Action } from '../../../domain/action/action'
 import { SessionMilo } from '../../../domain/milo/session.milo'
-import Inscription = SessionMilo.Inscription
 import { transformStringToBoolean } from './utils/transformers'
+import Inscription = SessionMilo.Inscription
 
 export class GetSessionsQueryParams {
   @IsOptional()
@@ -116,4 +120,33 @@ export class EmargementsSessionMiloPayload {
   @IsNotEmpty()
   @Type(() => EmargementJeuneSessionMiloPayload)
   emargements: EmargementJeuneSessionMiloPayload[]
+}
+
+export class QualifierActionsMiloPayload {
+  @ApiProperty()
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(10)
+  idsActions: string[]
+
+  @ApiProperty({ enum: Action.Qualification.Code })
+  @IsString()
+  @IsEnum(Action.Qualification.Code)
+  codeQualification: Action.Qualification.Code
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  commentaireQualification?: string
+
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
+  @IsDateString()
+  @IsOptional()
+  dateDebut?: string
+
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
+  @IsDateString()
+  @IsOptional()
+  dateFinReelle?: string
 }

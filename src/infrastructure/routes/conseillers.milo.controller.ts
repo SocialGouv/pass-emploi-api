@@ -8,11 +8,14 @@ import {
   Post,
   Query
 } from '@nestjs/common'
+import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { DateTime } from 'luxon'
 import {
   UpdateSessionMiloCommand,
   UpdateSessionMiloCommandHandler
 } from 'src/application/commands/milo/update-session-milo.command.handler'
+import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
 import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-conseiller.milo.query.handler.db'
 import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-sessions-conseiller.milo.query.handler.db'
 import {
@@ -24,32 +27,35 @@ import { isFailure, isSuccess } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { DateService } from 'src/utils/date-service'
 import {
+  CreerJeuneMiloCommand,
+  CreerJeuneMiloCommandHandler
+} from '../../application/commands/milo/creer-jeune-milo.command.handler'
+import {
   EmargerSessionMiloCommand,
   EmargerSessionMiloCommandHandler
 } from '../../application/commands/milo/emarger-session-milo.command.handler'
+import {
+  QualificationActionsMiloQueryModel,
+  QualifierActionsMiloCommand,
+  QualifierActionsMiloCommandHandler
+} from '../../application/commands/milo/qualifier-actions-milo.command.handler'
+import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
+import { GetJeuneMiloByDossierQueryHandler } from '../../application/queries/get-jeune-milo-by-dossier.query.handler.db'
+import {
+  IdentiteJeuneQueryModel,
+  JeuneQueryModel
+} from '../../application/queries/query-models/jeunes.query-model'
+import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
+import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './result.handler'
+import { handleFailure, handleResult } from './result.handler'
 import {
   EmargementsSessionMiloPayload,
   GetAgendaSessionsQueryParams,
   GetSessionsQueryParams,
+  QualifierActionsMiloPayload,
   UpdateSessionMiloPayload
 } from './validation/conseiller-milo.inputs'
-import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
-import { DateTime } from 'luxon'
-import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
-import {
-  CreerJeuneMiloCommandHandler,
-  CreerJeuneMiloCommand
-} from '../../application/commands/milo/creer-jeune-milo.command.handler'
-import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
-import { GetJeuneMiloByDossierQueryHandler } from '../../application/queries/get-jeune-milo-by-dossier.query.handler.db'
-import {
-  JeuneQueryModel,
-  IdentiteJeuneQueryModel
-} from '../../application/queries/query-models/jeunes.query-model'
-import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
-import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import { CreerJeuneMiloPayload } from './validation/conseillers.inputs'
 
 @Controller('conseillers/milo')
@@ -64,7 +70,8 @@ export class ConseillersMiloController {
     private readonly emargementSessionCommandHandler: EmargerSessionMiloCommandHandler,
     private readonly getDossierMiloJeuneQueryHandler: GetDossierMiloJeuneQueryHandler,
     private readonly getJeuneMiloByDossierQueryHandler: GetJeuneMiloByDossierQueryHandler,
-    private readonly creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler
+    private readonly creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler,
+    private readonly qualifierActionsMiloCommandHandler: QualifierActionsMiloCommandHandler
   ) {}
   @ApiOperation({
     summary: "Récupère le dossier Milo d'un jeune",
@@ -300,5 +307,42 @@ export class ConseillersMiloController {
       return result.data
     }
     throw handleFailure(result)
+  }
+
+  @ApiOperation({
+    summary: 'Qualifie des actions en SNP / non-SNP',
+    description: 'Autorisé pour un conseiller Milo'
+  })
+  @Post('actions/qualifier')
+  async qualifierActions(
+    @Body() qualifierActionsMiloPayload: QualifierActionsMiloPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<QualificationActionsMiloQueryModel> {
+    const dateDebut = qualifierActionsMiloPayload.dateDebut
+      ? DateTime.fromISO(qualifierActionsMiloPayload.dateDebut, {
+          setZone: true
+        })
+      : undefined
+    const dateFinReelle = qualifierActionsMiloPayload.dateFinReelle
+      ? DateTime.fromISO(qualifierActionsMiloPayload.dateFinReelle, {
+          setZone: true
+        })
+      : undefined
+
+    const command: QualifierActionsMiloCommand = {
+      idsActions: qualifierActionsMiloPayload.idsActions,
+      codeQualification: qualifierActionsMiloPayload.codeQualification,
+      commentaireQualification:
+        qualifierActionsMiloPayload.commentaireQualification,
+      dateDebut,
+      dateFinReelle
+    }
+
+    const result = await this.qualifierActionsMiloCommandHandler.execute(
+      command,
+      utilisateur
+    )
+
+    return handleResult(result)
   }
 }

@@ -194,6 +194,7 @@ export class ActionsController {
   }
 
   @ApiOperation({
+    deprecated: true,
     summary: 'Qualifie une action en SNP / non-SNP',
     description: 'Autorisé pour un conseiller'
   })
