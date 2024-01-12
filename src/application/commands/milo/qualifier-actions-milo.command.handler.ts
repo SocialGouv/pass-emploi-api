@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { ApiProperty } from '@nestjs/swagger'
-import { DateTime } from 'luxon'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {
   DroitsInsuffisants,
+  MauvaiseCommandeError,
   NonTrouveError
 } from '../../../building-blocks/types/domain-error'
 import {
@@ -32,12 +32,10 @@ export class QualificationActionsMiloQueryModel {
 }
 
 export interface QualifierActionsMiloCommand extends Command {
+  estSNP: boolean
   qualifications: Array<{
     idAction: string
     codeQualification: Qualification.Code
-    commentaireQualification?: string
-    dateDebut?: DateTime
-    dateFinReelle?: DateTime
   }>
 }
 
@@ -74,6 +72,11 @@ export class QualifierActionsMiloCommandHandler extends CommandHandler<
   ): Promise<Result<QualificationActionsMiloQueryModel>> {
     const idsActionsEnErreur: string[] = []
 
+    const resultValidationCategories = validaterCategories(command)
+    if (isFailure(resultValidationCategories)) {
+      return resultValidationCategories
+    }
+
     for (const qualification of command.qualifications) {
       const action = actions.find(
         actionTrouvee => qualification.idAction === actionTrouvee.id
@@ -85,10 +88,7 @@ export class QualifierActionsMiloCommandHandler extends CommandHandler<
       }
       const qualifierResult = Action.qualifier(
         action,
-        qualification.codeQualification,
-        qualification.commentaireQualification,
-        qualification.dateDebut,
-        qualification.dateFinReelle
+        qualification.codeQualification
       )
 
       if (isFailure(qualifierResult)) {
@@ -143,26 +143,18 @@ export class QualifierActionsMiloCommandHandler extends CommandHandler<
 
   async monitor(
     utilisateur: Authentification.Utilisateur,
-    command: QualifierActionsMiloCommand,
-    actions: Action[]
+    command: QualifierActionsMiloCommand
   ): Promise<void> {
-    for (const action of actions) {
-      const qualification = command.qualifications.find(
-        qualification => qualification.idAction === action.id
+    if (command.estSNP) {
+      await this.evenementService.creer(
+        Evenement.Code.ACTION_QUALIFIEE_MULTIPLE_SNP,
+        utilisateur
       )
-      if (qualification) {
-        if (qualification.codeQualification === Qualification.Code.NON_SNP) {
-          await this.evenementService.creer(
-            Evenement.Code.ACTION_QUALIFIEE_MULTIPLE_NON_SNP,
-            utilisateur
-          )
-        } else {
-          await this.evenementService.creer(
-            Evenement.Code.ACTION_QUALIFIEE_MULTIPLE_SNP,
-            utilisateur
-          )
-        }
-      }
+    } else {
+      await this.evenementService.creer(
+        Evenement.Code.ACTION_QUALIFIEE_MULTIPLE_NON_SNP,
+        utilisateur
+      )
     }
   }
 }
@@ -190,6 +182,36 @@ async function qualifierEnSNP(
 
   if (isFailure(qualificationResult)) {
     return qualificationResult
+  }
+
+  return emptySuccess()
+}
+
+function validaterCategories(command: QualifierActionsMiloCommand): Result {
+  if (command.estSNP) {
+    if (
+      command.qualifications.some(
+        qualification =>
+          qualification.codeQualification === Qualification.Code.NON_SNP
+      )
+    )
+      return failure(
+        new MauvaiseCommandeError(
+          'Toutes les actions doivent être qualifiées SNP'
+        )
+      )
+  } else {
+    if (
+      command.qualifications.some(
+        qualification =>
+          qualification.codeQualification !== Qualification.Code.NON_SNP
+      )
+    )
+      return failure(
+        new MauvaiseCommandeError(
+          'Toutes les actions doivent être qualifiées non SNP'
+        )
+      )
   }
 
   return emptySuccess()

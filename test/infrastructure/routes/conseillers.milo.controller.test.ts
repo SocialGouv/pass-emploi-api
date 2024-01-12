@@ -46,7 +46,6 @@ import { GetJeuneMiloByDossierQueryHandler } from '../../../src/application/quer
 import { Action } from '../../../src/domain/action/action'
 import { QualifierActionsMiloPayload } from '../../../src/infrastructure/routes/validation/conseiller-milo.inputs'
 import { CreerJeuneMiloPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
-import { uneDatetimeAvecOffset } from '../../fixtures/date.fixture'
 import { unDossierMilo } from '../../fixtures/milo.fixture'
 import { unJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 
@@ -496,12 +495,10 @@ describe('ConseillersMiloController', () => {
       const utilisateur = unUtilisateurDecode()
 
       const command: QualifierActionsMiloCommand = {
+        estSNP: true,
         qualifications: [
           {
             idAction: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
-            dateDebut: uneDatetimeAvecOffset(),
-            dateFinReelle: uneDatetimeAvecOffset(),
-            commentaireQualification: 'Un commentaire valide',
             codeQualification: Action.Qualification.Code.EMPLOI
           }
         ]
@@ -518,12 +515,10 @@ describe('ConseillersMiloController', () => {
         )
 
       const payload: QualifierActionsMiloPayload = {
+        estSNP: true,
         qualifications: [
           {
             idAction: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
-            dateDebut: uneDatetimeAvecOffset().toISO(),
-            dateFinReelle: uneDatetimeAvecOffset().toISO(),
-            commentaireQualification: 'Un commentaire valide',
             codeQualification: Action.Qualification.Code.EMPLOI
           }
         ]
@@ -546,24 +541,20 @@ describe('ConseillersMiloController', () => {
       const utilisateur = unUtilisateurDecode()
 
       const command: QualifierActionsMiloCommand = {
+        estSNP: false,
         qualifications: [
           {
             idAction: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
-            dateDebut: uneDatetimeAvecOffset(),
-            dateFinReelle: uneDatetimeAvecOffset(),
-            commentaireQualification: 'Un commentaire valide',
             codeQualification: Action.Qualification.Code.EMPLOI
           }
         ]
       }
 
       const payload: QualifierActionsMiloPayload = {
+        estSNP: false,
         qualifications: [
           {
             idAction: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
-            dateDebut: uneDatetimeAvecOffset().toISO(),
-            dateFinReelle: uneDatetimeAvecOffset().toISO(),
-            commentaireQualification: 'Un commentaire valide',
             codeQualification: Action.Qualification.Code.EMPLOI
           }
         ]
@@ -581,32 +572,10 @@ describe('ConseillersMiloController', () => {
         // Then
         .expect(HttpStatus.FORBIDDEN)
     })
-    it('retourne une BAD_REQUEST lorsque le commentaire dépasse les 255 caractères.', async () => {
-      // Given
-      const payload: QualifierActionsMiloPayload = {
-        qualifications: [
-          {
-            idAction: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
-            dateDebut: uneDatetimeAvecOffset().toISO(),
-            dateFinReelle: uneDatetimeAvecOffset().toISO(),
-            commentaireQualification:
-              "Un commentaire invalide car il dépasse la limite fixée à deux cent cinquante-cinq caractères par l'API-Application Programming Interface- développée par i-milo. Ce commentaire est invalide puisjjjjjjjjjjjjjjjjjjjjjjjqu'il est d'une longueur de deux cent cinquante-six caractères",
-            codeQualification: Action.Qualification.Code.EMPLOI
-          }
-        ]
-      }
-
-      // When
-      await request(app.getHttpServer())
-        .post(`/conseillers/milo/actions/qualifier`)
-        .send(payload)
-        .set('authorization', unHeaderAuthorization())
-        // Then
-        .expect(HttpStatus.BAD_REQUEST)
-    })
     it('retourne une BAD_REQUEST lorsque le tableau est vide', async () => {
       // Given
       const payload: QualifierActionsMiloPayload = {
+        estSNP: true,
         qualifications: []
       }
 

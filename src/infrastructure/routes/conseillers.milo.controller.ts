@@ -319,26 +319,12 @@ export class ConseillersMiloController {
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<QualificationActionsMiloQueryModel> {
     const command: QualifierActionsMiloCommand = {
+      estSNP: qualifierActionsMiloPayload.estSNP,
       qualifications: qualifierActionsMiloPayload.qualifications.map(
         qualifierActionPayload => {
-          const dateDebut = qualifierActionPayload.dateDebut
-            ? DateTime.fromISO(qualifierActionPayload.dateDebut, {
-                setZone: true
-              })
-            : undefined
-          const dateFinReelle = qualifierActionPayload.dateFinReelle
-            ? DateTime.fromISO(qualifierActionPayload.dateFinReelle, {
-                setZone: true
-              })
-            : undefined
-
           return {
             idAction: qualifierActionPayload.idAction,
-            codeQualification: qualifierActionPayload.codeQualification,
-            commentaireQualification:
-              qualifierActionPayload.commentaireQualification,
-            dateDebut,
-            dateFinReelle
+            codeQualification: qualifierActionPayload.codeQualification
           }
         }
       )

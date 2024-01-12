@@ -13,7 +13,6 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  MaxLength,
   ValidateIf,
   ValidateNested
 } from 'class-validator'
@@ -132,25 +131,14 @@ class QualificationActionMiloPayload {
   @IsString()
   @IsEnum(Action.Qualification.Code)
   codeQualification: Action.Qualification.Code
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
-  @MaxLength(255)
-  commentaireQualification?: string
-
-  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
-  @IsDateString()
-  @IsOptional()
-  dateDebut?: string
-
-  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
-  @IsDateString()
-  @IsOptional()
-  dateFinReelle?: string
 }
 
 export class QualifierActionsMiloPayload {
+  @ApiProperty()
+  @IsBoolean()
+  @IsIn([true, false])
+  estSNP: boolean
+
   @ApiProperty()
   @IsArray()
   @ArrayMinSize(1)

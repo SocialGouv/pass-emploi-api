@@ -7,7 +7,8 @@ import {
 } from '../../../../src/application/commands/milo/qualifier-actions-milo.command.handler'
 import {
   DroitsInsuffisants,
-  ErreurHttp
+  ErreurHttp,
+  MauvaiseCommandeError
 } from '../../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
@@ -67,6 +68,7 @@ describe('QualifierActionsMiloCommandHandler', () => {
 
     it('retourne uniquement les actions existantes', async () => {
       const command: QualifierActionsMiloCommand = {
+        estSNP: true,
         qualifications: [
           {
             idAction: idActionInexistante,
@@ -98,14 +100,13 @@ describe('QualifierActionsMiloCommandHandler', () => {
           const actionTerminee: Action.Terminee = uneActionTerminee({
             id: idAction
           })
-          const commentaireQualification = 'Un commentaire'
           const actionQualifiee: Action.Qualifiee = {
             ...actionTerminee,
             dateDebut: actionTerminee.dateCreation,
             qualification: {
               code: Action.Qualification.Code.SANTE,
               heures: 2,
-              commentaire: commentaireQualification
+              commentaire: "Contenu de l'action - Commentaire de l'action"
             }
           }
           jeuneRepository.get
@@ -116,17 +117,18 @@ describe('QualifierActionsMiloCommandHandler', () => {
             idDossier: '1234',
             loginConseiller: 'j.doe'
           }
+
           actionMiloRepository.save
             .withArgs(actionMilo)
             .resolves(emptySuccess())
 
           // When
           const command: QualifierActionsMiloCommand = {
+            estSNP: true,
             qualifications: [
               {
                 idAction,
-                codeQualification: Action.Qualification.Code.SANTE,
-                commentaireQualification: commentaireQualification
+                codeQualification: Action.Qualification.Code.SANTE
               }
             ]
           }
@@ -174,6 +176,7 @@ describe('QualifierActionsMiloCommandHandler', () => {
 
           // When
           const command: QualifierActionsMiloCommand = {
+            estSNP: true,
             qualifications: [
               {
                 idAction: idActionQuiEchoue,
@@ -226,11 +229,11 @@ describe('QualifierActionsMiloCommandHandler', () => {
 
           // When
           const command: QualifierActionsMiloCommand = {
+            estSNP: false,
             qualifications: [
               {
                 idAction,
-                codeQualification: Action.Qualification.Code.NON_SNP,
-                commentaireQualification: 'Un commentaire'
+                codeQualification: Action.Qualification.Code.NON_SNP
               }
             ]
           }
@@ -262,11 +265,11 @@ describe('QualifierActionsMiloCommandHandler', () => {
 
         // When
         const command: QualifierActionsMiloCommand = {
+          estSNP: true,
           qualifications: [
             {
               idAction,
-              codeQualification: Action.Qualification.Code.SANTE,
-              commentaireQualification: 'Un commentaire'
+              codeQualification: Action.Qualification.Code.SANTE
             }
           ]
         }
@@ -290,11 +293,11 @@ describe('QualifierActionsMiloCommandHandler', () => {
       it('renvoie des données vides', async () => {
         // Given
         const command: QualifierActionsMiloCommand = {
+          estSNP: true,
           qualifications: [
             {
               idAction: 'inconnu',
-              codeQualification: Action.Qualification.Code.EMPLOI,
-              commentaireQualification: 'Un commentaire'
+              codeQualification: Action.Qualification.Code.EMPLOI
             }
           ]
         }
@@ -314,6 +317,40 @@ describe('QualifierActionsMiloCommandHandler', () => {
         )
       })
     })
+    describe('Quand catégories ne correspondent pas à la qualification', () => {
+      it('renvoie une failure', async () => {
+        // Given
+        const command: QualifierActionsMiloCommand = {
+          estSNP: true,
+          qualifications: [
+            {
+              idAction: 'inconnu',
+              codeQualification: Action.Qualification.Code.EMPLOI
+            },
+            {
+              idAction: 'inconnu',
+              codeQualification: Action.Qualification.Code.NON_SNP
+            }
+          ]
+        }
+
+        // When
+        const result = await qualifierActionsMiloCommandHandler.handle(
+          command,
+          utilisateur,
+          []
+        )
+
+        // Then
+        expect(result).to.deep.equal(
+          failure(
+            new MauvaiseCommandeError(
+              'Toutes les actions doivent être qualifiées SNP'
+            )
+          )
+        )
+      })
+    })
   })
 
   describe('authorize', () => {
@@ -324,11 +361,11 @@ describe('QualifierActionsMiloCommandHandler', () => {
     it('authorise un conseiller à qualifier les actions de ses jeunes', async () => {
       // Given
       const command: QualifierActionsMiloCommand = {
+        estSNP: true,
         qualifications: [
           {
             idAction: 'inconnu',
-            codeQualification: Action.Qualification.Code.EMPLOI,
-            commentaireQualification: 'Un commentaire'
+            codeQualification: Action.Qualification.Code.EMPLOI
           }
         ]
       }
@@ -350,11 +387,11 @@ describe('QualifierActionsMiloCommandHandler', () => {
       // Given
 
       const command: QualifierActionsMiloCommand = {
+        estSNP: true,
         qualifications: [
           {
             idAction: 'inconnu',
-            codeQualification: Action.Qualification.Code.EMPLOI,
-            commentaireQualification: 'Un commentaire'
+            codeQualification: Action.Qualification.Code.EMPLOI
           }
         ]
       }
@@ -372,43 +409,34 @@ describe('QualifierActionsMiloCommandHandler', () => {
   })
 
   describe('monitor', () => {
-    const actions = [uneAction({ id: 'Action1' }), uneAction({ id: 'Action2' })]
-    it("monitore la qualification de l'action en SNP et NON SNP", async () => {
+    it("monitore la qualification de l'action en SNP", async () => {
       // Given
       const utilisateur = unUtilisateurDecode()
       const command: QualifierActionsMiloCommand = {
-        qualifications: [
-          {
-            idAction: 'Action1',
-            codeQualification: Action.Qualification.Code.SANTE,
-            commentaireQualification: 'Un commentaire'
-          },
-          {
-            idAction: 'Action2',
-            codeQualification: Action.Qualification.Code.NON_SNP,
-            commentaireQualification: 'Un commentaire'
-          },
-          {
-            idAction: 'Action3',
-            codeQualification: Action.Qualification.Code.NON_SNP,
-            commentaireQualification: 'Un commentaire'
-          }
-        ]
+        estSNP: true,
+        qualifications: []
       }
       // When
-      await qualifierActionsMiloCommandHandler.monitor(
-        utilisateur,
-        command,
-        actions
-      )
+      await qualifierActionsMiloCommandHandler.monitor(utilisateur, command)
 
       // Then
-      expect(evenementService.creer).to.have.been.calledTwice()
-      expect(evenementService.creer).to.have.been.calledWithExactly(
+      expect(evenementService.creer).to.have.been.calledOnceWithExactly(
         Evenement.Code.ACTION_QUALIFIEE_MULTIPLE_SNP,
         utilisateur
       )
-      expect(evenementService.creer).to.have.been.calledWithExactly(
+    })
+    it("monitore la qualification de l'action en NON SNP", async () => {
+      // Given
+      const utilisateur = unUtilisateurDecode()
+      const command: QualifierActionsMiloCommand = {
+        estSNP: false,
+        qualifications: []
+      }
+      // When
+      await qualifierActionsMiloCommandHandler.monitor(utilisateur, command)
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledOnceWithExactly(
         Evenement.Code.ACTION_QUALIFIEE_MULTIPLE_NON_SNP,
         utilisateur
       )
