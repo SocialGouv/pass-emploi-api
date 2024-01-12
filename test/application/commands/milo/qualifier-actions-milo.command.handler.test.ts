@@ -70,8 +70,9 @@ describe('QualifierActionsMiloCommandHandler', () => {
         idsActions: [idActionInexistante, idActionExistante],
         codeQualification: Action.Qualification.Code.EMPLOI
       }
-      actionRepository.get.withArgs(idActionExistante).resolves(actionTerminee)
-      actionRepository.get.withArgs(idActionInexistante).resolves(undefined)
+      actionRepository.findAll
+        .withArgs(command.idsActions)
+        .resolves([actionTerminee])
 
       const aggregate = await qualifierActionsMiloCommandHandler.getAggregate(
         command
@@ -138,6 +139,7 @@ describe('QualifierActionsMiloCommandHandler', () => {
               libelle: 'Santé',
               commentaireQualification,
               idsActionsQualifiees: [idAction],
+              idsActionsNonTrouvees: [],
               idsActionsEnErreur: []
             })
           )
@@ -185,7 +187,8 @@ describe('QualifierActionsMiloCommandHandler', () => {
               heures: undefined,
               libelle: undefined,
               idsActionsQualifiees: [],
-              idsActionsEnErreur: [idActionQuiEchoue, 'actionSansQualif']
+              idsActionsNonTrouvees: ['actionSansQualif'],
+              idsActionsEnErreur: [idActionQuiEchoue]
             })
           )
         })
@@ -237,6 +240,7 @@ describe('QualifierActionsMiloCommandHandler', () => {
               libelle: 'Action non qualifiée en Situation Non Professionnelle',
               commentaireQualification: undefined,
               idsActionsQualifiees: [idAction],
+              idsActionsNonTrouvees: [],
               idsActionsEnErreur: []
             })
           )
@@ -271,6 +275,7 @@ describe('QualifierActionsMiloCommandHandler', () => {
             heures: undefined,
             libelle: undefined,
             idsActionsQualifiees: [],
+            idsActionsNonTrouvees: [],
             idsActionsEnErreur: [idAction]
           })
         )
@@ -300,7 +305,8 @@ describe('QualifierActionsMiloCommandHandler', () => {
             heures: undefined,
             libelle: undefined,
             idsActionsQualifiees: [],
-            idsActionsEnErreur: ['inexistante']
+            idsActionsEnErreur: [],
+            idsActionsNonTrouvees: ['inexistante']
           })
         )
       })
@@ -366,7 +372,7 @@ describe('QualifierActionsMiloCommandHandler', () => {
 
       // Then
       expect(evenementService.creer).to.have.been.calledOnceWithExactly(
-        Evenement.Code.ACTION_QUALIFIEE_SNP,
+        Evenement.Code.ACTION_QUALIFIEE_MULTIPLE_SNP,
         utilisateur
       )
     })
@@ -383,7 +389,7 @@ describe('QualifierActionsMiloCommandHandler', () => {
 
       // Then
       expect(evenementService.creer).to.have.been.calledOnceWithExactly(
-        Evenement.Code.ACTION_QUALIFIEE_NON_SNP,
+        Evenement.Code.ACTION_QUALIFIEE_MULTIPLE_NON_SNP,
         utilisateur
       )
     })

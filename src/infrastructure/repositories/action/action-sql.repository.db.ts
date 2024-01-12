@@ -34,6 +34,16 @@ export class ActionSqlRepository implements Action.Repository {
     return ActionSqlRepository.actionFromSqlModel(sqlModel)
   }
 
+  async findAll(idsActions: Action.Id[]): Promise<Action[]> {
+    const sqlModels = await ActionSqlModel.findAll({
+      where: { id: idsActions }
+    })
+
+    return sqlModels.map(sqlModel =>
+      ActionSqlRepository.actionFromSqlModel(sqlModel)
+    )
+  }
+
   async getConseillerEtJeune(
     id: Action.Id
   ): Promise<{ idConseiller: string; idJeune: string } | undefined> {

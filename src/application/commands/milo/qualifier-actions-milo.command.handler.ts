@@ -43,6 +43,9 @@ export class QualificationActionsMiloQueryModel {
   idsActionsQualifiees: string[]
 
   @ApiProperty({ isArray: true, type: String })
+  idsActionsNonTrouvees: string[]
+
+  @ApiProperty({ isArray: true, type: String })
   idsActionsEnErreur: string[]
 }
 
@@ -74,10 +77,7 @@ export class QualifierActionsMiloCommandHandler extends CommandHandler<
   }
 
   async getAggregate(command: QualifierActionsMiloCommand): Promise<Action[]> {
-    const actions = await Promise.all(
-      command.idsActions.map(idAction => this.actionRepository.get(idAction))
-    )
-    return actions.filter((action): action is Action => action !== undefined)
+    return this.actionRepository.findAll(command.idsActions)
   }
 
   async handle(
@@ -86,6 +86,7 @@ export class QualifierActionsMiloCommandHandler extends CommandHandler<
     actions: Action[]
   ): Promise<Result<QualificationActionsMiloQueryModel>> {
     const idsActionsQualifiees: string[] = []
+    const idsActionsNonTrouvees: string[] = []
     const idsActionsEnErreur: string[] = []
     let code, commentaireQualification, libelle, heures
 
@@ -95,7 +96,7 @@ export class QualifierActionsMiloCommandHandler extends CommandHandler<
       )
 
       if (!action) {
-        idsActionsEnErreur.push(idAction)
+        idsActionsNonTrouvees.push(idAction)
         continue
       }
       const qualifierResult = Action.qualifier(
@@ -108,6 +109,7 @@ export class QualifierActionsMiloCommandHandler extends CommandHandler<
 
       if (isFailure(qualifierResult)) {
         idsActionsEnErreur.push(action.id)
+        this.logger.warn(qualifierResult.error.message)
         continue
       }
       const actionQualifiee: Action.Qualifiee = qualifierResult.data
@@ -120,6 +122,7 @@ export class QualifierActionsMiloCommandHandler extends CommandHandler<
       )
       if (isFailure(resultQualificationEnSNP)) {
         idsActionsEnErreur.push(idAction)
+        this.logger.warn(resultQualificationEnSNP.error.message)
         continue
       }
       await this.actionRepository.save(actionQualifiee)
@@ -137,6 +140,7 @@ export class QualifierActionsMiloCommandHandler extends CommandHandler<
 
     return success({
       idsActionsQualifiees,
+      idsActionsNonTrouvees,
       idsActionsEnErreur,
       code: code ?? command.codeQualification,
       commentaireQualification,
@@ -169,12 +173,12 @@ export class QualifierActionsMiloCommandHandler extends CommandHandler<
   ): Promise<void> {
     if (command.codeQualification === Qualification.Code.NON_SNP) {
       await this.evenementService.creer(
-        Evenement.Code.ACTION_QUALIFIEE_NON_SNP,
+        Evenement.Code.ACTION_QUALIFIEE_MULTIPLE_NON_SNP,
         utilisateur
       )
     } else {
       await this.evenementService.creer(
-        Evenement.Code.ACTION_QUALIFIEE_SNP,
+        Evenement.Code.ACTION_QUALIFIEE_MULTIPLE_SNP,
         utilisateur
       )
     }

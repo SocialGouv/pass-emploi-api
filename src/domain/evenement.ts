@@ -42,6 +42,8 @@ export namespace Evenement {
     ACTION_COMMENTEE = 'ACTION_COMMENTEE',
     ACTION_QUALIFIEE_SNP = 'ACTION_QUALIFIEE_SNP',
     ACTION_QUALIFIEE_NON_SNP = 'ACTION_QUALIFIEE_NON_SNP',
+    ACTION_QUALIFIEE_MULTIPLE_SNP = 'ACTION_QUALIFIEE_MULTIPLE_SNP',
+    ACTION_QUALIFIEE_MULTIPLE_NON_SNP = 'ACTION_QUALIFIEE_MULTIPLE_NON_SNP',
     ANIMATION_COLLECTIVE_CREEE = 'ANIMATION_COLLECTIVE_CREEE',
     ANIMATION_COLLECTIVE_SUPPRIMEE = 'ANIMATION_COLLECTIVE_SUPPRIMEE',
     ANIMATION_COLLECTIVE_AFFICHEE = 'ANIMATION_COLLECTIVE_AFFICHEE',
@@ -221,6 +223,16 @@ const evenements: {
     categorie: 'Action',
     action: 'Qualifier',
     nom: 'Non SNP'
+  },
+  [Evenement.Code.ACTION_QUALIFIEE_MULTIPLE_SNP]: {
+    categorie: 'Action',
+    action: 'Qualifier',
+    nom: 'Multiple SNP'
+  },
+  [Evenement.Code.ACTION_QUALIFIEE_MULTIPLE_NON_SNP]: {
+    categorie: 'Action',
+    action: 'Qualifier',
+    nom: 'Multiple Non SNP'
   },
   [Evenement.Code.ANIMATION_COLLECTIVE_CREEE]: {
     categorie: 'Rendez-vous',

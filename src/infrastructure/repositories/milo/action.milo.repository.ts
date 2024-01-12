@@ -10,12 +10,15 @@ import { firstValueFrom } from 'rxjs'
 import { ErreurHttp } from '../../../building-blocks/types/domain-error'
 import { ActionMilo } from '../../../domain/milo/action.milo'
 import { RateLimiterService } from '../../../utils/rate-limiter.service'
+import * as APM from 'elastic-apm-node'
+import { getAPMInstance } from '../../monitoring/apm.init'
 
 @Injectable()
 export class ActionMiloHttpRepository implements ActionMilo.Repository {
   private logger: Logger
   private readonly apiUrl: string
   private readonly apiKey: string
+  private readonly apmService: APM.Agent
 
   constructor(
     private httpService: HttpService,
@@ -23,6 +26,7 @@ export class ActionMiloHttpRepository implements ActionMilo.Repository {
     private rateLimiterService: RateLimiterService
   ) {
     this.logger = new Logger('ActionMiloHttpSqlRepository')
+    this.apmService = getAPMInstance()
     this.apiUrl = this.configService.get('milo').url
     this.apiKey = this.configService.get('milo').apiKeyDossier
   }
@@ -54,6 +58,7 @@ export class ActionMiloHttpRepository implements ActionMilo.Repository {
 
       return emptySuccess()
     } catch (e) {
+      this.apmService.captureError(e)
       this.logger.error(e)
 
       // requete aboutie mais le serveur répond avec statut hors 2XX
