@@ -122,12 +122,11 @@ export class EmargementsSessionMiloPayload {
   emargements: EmargementJeuneSessionMiloPayload[]
 }
 
-export class QualifierActionsMiloPayload {
+class QualificationActionMiloPayload {
   @ApiProperty()
-  @IsArray()
-  @ArrayMinSize(1)
-  @ArrayMaxSize(10)
-  idsActions: string[]
+  @IsString()
+  @IsNotEmpty()
+  idAction: string
 
   @ApiProperty({ enum: Action.Qualification.Code })
   @IsString()
@@ -149,4 +148,14 @@ export class QualifierActionsMiloPayload {
   @IsDateString()
   @IsOptional()
   dateFinReelle?: string
+}
+
+export class QualifierActionsMiloPayload {
+  @ApiProperty()
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(10)
+  @ValidateNested({ each: true })
+  @Type(() => QualificationActionMiloPayload)
+  qualifications: QualificationActionMiloPayload[]
 }

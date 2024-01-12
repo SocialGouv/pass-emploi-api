@@ -67,11 +67,19 @@ describe('QualifierActionsMiloCommandHandler', () => {
 
     it('retourne uniquement les actions existantes', async () => {
       const command: QualifierActionsMiloCommand = {
-        idsActions: [idActionInexistante, idActionExistante],
-        codeQualification: Action.Qualification.Code.EMPLOI
+        qualifications: [
+          {
+            idAction: idActionInexistante,
+            codeQualification: Action.Qualification.Code.EMPLOI
+          },
+          {
+            idAction: idActionExistante,
+            codeQualification: Action.Qualification.Code.EMPLOI
+          }
+        ]
       }
       actionRepository.findAll
-        .withArgs(command.idsActions)
+        .withArgs([idActionInexistante, idActionExistante])
         .resolves([actionTerminee])
 
       const aggregate = await qualifierActionsMiloCommandHandler.getAggregate(
@@ -114,9 +122,13 @@ describe('QualifierActionsMiloCommandHandler', () => {
 
           // When
           const command: QualifierActionsMiloCommand = {
-            idsActions: [idAction],
-            codeQualification: Action.Qualification.Code.SANTE,
-            commentaireQualification: commentaireQualification
+            qualifications: [
+              {
+                idAction,
+                codeQualification: Action.Qualification.Code.SANTE,
+                commentaireQualification: commentaireQualification
+              }
+            ]
           }
 
           const result = await qualifierActionsMiloCommandHandler.handle(
@@ -134,12 +146,6 @@ describe('QualifierActionsMiloCommandHandler', () => {
           )
           expect(result).to.deep.equal(
             success({
-              code: 'SANTE',
-              heures: 2,
-              libelle: 'Santé',
-              commentaireQualification,
-              idsActionsQualifiees: [idAction],
-              idsActionsNonTrouvees: [],
               idsActionsEnErreur: []
             })
           )
@@ -168,8 +174,16 @@ describe('QualifierActionsMiloCommandHandler', () => {
 
           // When
           const command: QualifierActionsMiloCommand = {
-            idsActions: [idActionQuiEchoue, 'actionSansQualif'],
-            codeQualification: Action.Qualification.Code.EMPLOI
+            qualifications: [
+              {
+                idAction: idActionQuiEchoue,
+                codeQualification: Action.Qualification.Code.EMPLOI
+              },
+              {
+                idAction: 'qualifSansAction',
+                codeQualification: Action.Qualification.Code.EMPLOI
+              }
+            ]
           }
 
           const result = await qualifierActionsMiloCommandHandler.handle(
@@ -182,13 +196,7 @@ describe('QualifierActionsMiloCommandHandler', () => {
           expect(actionRepository.save).not.to.have.been.called()
           expect(result).to.deep.equal(
             success({
-              code: 'EMPLOI',
-              commentaireQualification: undefined,
-              heures: undefined,
-              libelle: undefined,
-              idsActionsQualifiees: [],
-              idsActionsNonTrouvees: ['actionSansQualif'],
-              idsActionsEnErreur: [idActionQuiEchoue]
+              idsActionsEnErreur: [idActionQuiEchoue, 'qualifSansAction']
             })
           )
         })
@@ -218,9 +226,13 @@ describe('QualifierActionsMiloCommandHandler', () => {
 
           // When
           const command: QualifierActionsMiloCommand = {
-            idsActions: [idAction],
-            codeQualification: Action.Qualification.Code.NON_SNP,
-            commentaireQualification: 'Un commentaire'
+            qualifications: [
+              {
+                idAction,
+                codeQualification: Action.Qualification.Code.NON_SNP,
+                commentaireQualification: 'Un commentaire'
+              }
+            ]
           }
           const result = await qualifierActionsMiloCommandHandler.handle(
             command,
@@ -235,12 +247,6 @@ describe('QualifierActionsMiloCommandHandler', () => {
           expect(actionMiloRepository.save).not.to.have.been.called()
           expect(result).to.deep.equal(
             success({
-              code: 'NON_SNP',
-              heures: 0,
-              libelle: 'Action non qualifiée en Situation Non Professionnelle',
-              commentaireQualification: undefined,
-              idsActionsQualifiees: [idAction],
-              idsActionsNonTrouvees: [],
               idsActionsEnErreur: []
             })
           )
@@ -256,9 +262,13 @@ describe('QualifierActionsMiloCommandHandler', () => {
 
         // When
         const command: QualifierActionsMiloCommand = {
-          idsActions: [idAction],
-          codeQualification: Action.Qualification.Code.SANTE,
-          commentaireQualification: 'Un commentaire'
+          qualifications: [
+            {
+              idAction,
+              codeQualification: Action.Qualification.Code.SANTE,
+              commentaireQualification: 'Un commentaire'
+            }
+          ]
         }
         const result = await qualifierActionsMiloCommandHandler.handle(
           command,
@@ -270,12 +280,6 @@ describe('QualifierActionsMiloCommandHandler', () => {
         expect(actionRepository.save).not.to.have.been.called()
         expect(result).to.deep.equal(
           success({
-            code: 'SANTE',
-            commentaireQualification: undefined,
-            heures: undefined,
-            libelle: undefined,
-            idsActionsQualifiees: [],
-            idsActionsNonTrouvees: [],
             idsActionsEnErreur: [idAction]
           })
         )
@@ -286,8 +290,13 @@ describe('QualifierActionsMiloCommandHandler', () => {
       it('renvoie des données vides', async () => {
         // Given
         const command: QualifierActionsMiloCommand = {
-          idsActions: ['inexistante'],
-          codeQualification: Action.Qualification.Code.EMPLOI
+          qualifications: [
+            {
+              idAction: 'inconnu',
+              codeQualification: Action.Qualification.Code.EMPLOI,
+              commentaireQualification: 'Un commentaire'
+            }
+          ]
         }
 
         // When
@@ -300,13 +309,7 @@ describe('QualifierActionsMiloCommandHandler', () => {
         // Then
         expect(result).to.deep.equal(
           success({
-            code: 'EMPLOI',
-            commentaireQualification: undefined,
-            heures: undefined,
-            libelle: undefined,
-            idsActionsQualifiees: [],
-            idsActionsEnErreur: [],
-            idsActionsNonTrouvees: ['inexistante']
+            idsActionsEnErreur: ['inconnu']
           })
         )
       })
@@ -321,8 +324,13 @@ describe('QualifierActionsMiloCommandHandler', () => {
     it('authorise un conseiller à qualifier les actions de ses jeunes', async () => {
       // Given
       const command: QualifierActionsMiloCommand = {
-        idsActions: [],
-        codeQualification: Action.Qualification.Code.SANTE
+        qualifications: [
+          {
+            idAction: 'inconnu',
+            codeQualification: Action.Qualification.Code.EMPLOI,
+            commentaireQualification: 'Un commentaire'
+          }
+        ]
       }
       conseillerAuthorizer.autoriserConseillerPourSesJeunes.resolves(
         emptySuccess()
@@ -338,12 +346,17 @@ describe('QualifierActionsMiloCommandHandler', () => {
       // Then
       expect(result).to.deep.equal(emptySuccess())
     })
-    it("rejette si une des actions n'est pas autorisée", async () => {
+    it('rejette si jeune', async () => {
       // Given
 
       const command: QualifierActionsMiloCommand = {
-        idsActions: [],
-        codeQualification: Action.Qualification.Code.SANTE
+        qualifications: [
+          {
+            idAction: 'inconnu',
+            codeQualification: Action.Qualification.Code.EMPLOI,
+            commentaireQualification: 'Un commentaire'
+          }
+        ]
       }
 
       // When
@@ -359,36 +372,43 @@ describe('QualifierActionsMiloCommandHandler', () => {
   })
 
   describe('monitor', () => {
+    const actions = [uneAction({ id: 'Action1' }), uneAction({ id: 'Action2' })]
     it("monitore la qualification de l'action en SNP et NON SNP", async () => {
       // Given
       const utilisateur = unUtilisateurDecode()
       const command: QualifierActionsMiloCommand = {
-        idsActions: ['Action1', 'Action2', 'Action3'],
-        codeQualification: Action.Qualification.Code.SANTE,
-        commentaireQualification: 'Un commentaire'
+        qualifications: [
+          {
+            idAction: 'Action1',
+            codeQualification: Action.Qualification.Code.SANTE,
+            commentaireQualification: 'Un commentaire'
+          },
+          {
+            idAction: 'Action2',
+            codeQualification: Action.Qualification.Code.NON_SNP,
+            commentaireQualification: 'Un commentaire'
+          },
+          {
+            idAction: 'Action3',
+            codeQualification: Action.Qualification.Code.NON_SNP,
+            commentaireQualification: 'Un commentaire'
+          }
+        ]
       }
       // When
-      await qualifierActionsMiloCommandHandler.monitor(utilisateur, command)
+      await qualifierActionsMiloCommandHandler.monitor(
+        utilisateur,
+        command,
+        actions
+      )
 
       // Then
-      expect(evenementService.creer).to.have.been.calledOnceWithExactly(
+      expect(evenementService.creer).to.have.been.calledTwice()
+      expect(evenementService.creer).to.have.been.calledWithExactly(
         Evenement.Code.ACTION_QUALIFIEE_MULTIPLE_SNP,
         utilisateur
       )
-    })
-    it("monitore la qualification de l'action en NON SNP", async () => {
-      // Given
-      const utilisateur = unUtilisateurDecode()
-      const command: QualifierActionsMiloCommand = {
-        idsActions: ['Action1', 'Action2', 'Action3'],
-        codeQualification: Action.Qualification.Code.NON_SNP,
-        commentaireQualification: 'Un commentaire'
-      }
-      // When
-      await qualifierActionsMiloCommandHandler.monitor(utilisateur, command)
-
-      // Then
-      expect(evenementService.creer).to.have.been.calledOnceWithExactly(
+      expect(evenementService.creer).to.have.been.calledWithExactly(
         Evenement.Code.ACTION_QUALIFIEE_MULTIPLE_NON_SNP,
         utilisateur
       )

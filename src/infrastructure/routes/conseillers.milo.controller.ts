@@ -318,24 +318,30 @@ export class ConseillersMiloController {
     @Body() qualifierActionsMiloPayload: QualifierActionsMiloPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<QualificationActionsMiloQueryModel> {
-    const dateDebut = qualifierActionsMiloPayload.dateDebut
-      ? DateTime.fromISO(qualifierActionsMiloPayload.dateDebut, {
-          setZone: true
-        })
-      : undefined
-    const dateFinReelle = qualifierActionsMiloPayload.dateFinReelle
-      ? DateTime.fromISO(qualifierActionsMiloPayload.dateFinReelle, {
-          setZone: true
-        })
-      : undefined
-
     const command: QualifierActionsMiloCommand = {
-      idsActions: qualifierActionsMiloPayload.idsActions,
-      codeQualification: qualifierActionsMiloPayload.codeQualification,
-      commentaireQualification:
-        qualifierActionsMiloPayload.commentaireQualification,
-      dateDebut,
-      dateFinReelle
+      qualifications: qualifierActionsMiloPayload.qualifications.map(
+        qualifierActionPayload => {
+          const dateDebut = qualifierActionPayload.dateDebut
+            ? DateTime.fromISO(qualifierActionPayload.dateDebut, {
+                setZone: true
+              })
+            : undefined
+          const dateFinReelle = qualifierActionPayload.dateFinReelle
+            ? DateTime.fromISO(qualifierActionPayload.dateFinReelle, {
+                setZone: true
+              })
+            : undefined
+
+          return {
+            idAction: qualifierActionPayload.idAction,
+            codeQualification: qualifierActionPayload.codeQualification,
+            commentaireQualification:
+              qualifierActionPayload.commentaireQualification,
+            dateDebut,
+            dateFinReelle
+          }
+        }
+      )
     }
 
     const result = await this.qualifierActionsMiloCommandHandler.execute(

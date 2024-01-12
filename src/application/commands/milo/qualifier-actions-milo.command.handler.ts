@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import { DateTime } from 'luxon'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
@@ -27,34 +27,18 @@ import {
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 
 export class QualificationActionsMiloQueryModel {
-  @ApiProperty()
-  code: Action.Qualification.Code
-
-  @ApiProperty()
-  libelle?: string
-
-  @ApiPropertyOptional()
-  heures?: number
-
-  @ApiPropertyOptional()
-  commentaireQualification?: string
-
-  @ApiProperty({ isArray: true, type: String })
-  idsActionsQualifiees: string[]
-
-  @ApiProperty({ isArray: true, type: String })
-  idsActionsNonTrouvees: string[]
-
   @ApiProperty({ isArray: true, type: String })
   idsActionsEnErreur: string[]
 }
 
 export interface QualifierActionsMiloCommand extends Command {
-  idsActions: string[]
-  codeQualification: Qualification.Code
-  commentaireQualification?: string
-  dateDebut?: DateTime
-  dateFinReelle?: DateTime
+  qualifications: Array<{
+    idAction: string
+    codeQualification: Qualification.Code
+    commentaireQualification?: string
+    dateDebut?: DateTime
+    dateFinReelle?: DateTime
+  }>
 }
 
 @Injectable()
@@ -77,7 +61,10 @@ export class QualifierActionsMiloCommandHandler extends CommandHandler<
   }
 
   async getAggregate(command: QualifierActionsMiloCommand): Promise<Action[]> {
-    return this.actionRepository.findAll(command.idsActions)
+    const idsActions = command.qualifications.map(
+      qualification => qualification.idAction
+    )
+    return this.actionRepository.findAll(idsActions)
   }
 
   async handle(
@@ -85,26 +72,23 @@ export class QualifierActionsMiloCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur,
     actions: Action[]
   ): Promise<Result<QualificationActionsMiloQueryModel>> {
-    const idsActionsQualifiees: string[] = []
-    const idsActionsNonTrouvees: string[] = []
     const idsActionsEnErreur: string[] = []
-    let code, commentaireQualification, libelle, heures
 
-    for (const idAction of command.idsActions) {
+    for (const qualification of command.qualifications) {
       const action = actions.find(
-        actionTrouvee => idAction === actionTrouvee.id
+        actionTrouvee => qualification.idAction === actionTrouvee.id
       )
 
       if (!action) {
-        idsActionsNonTrouvees.push(idAction)
+        idsActionsEnErreur.push(qualification.idAction)
         continue
       }
       const qualifierResult = Action.qualifier(
         action,
-        command.codeQualification,
-        command.commentaireQualification,
-        command.dateDebut,
-        command.dateFinReelle
+        qualification.codeQualification,
+        qualification.commentaireQualification,
+        qualification.dateDebut,
+        qualification.dateFinReelle
       )
 
       if (isFailure(qualifierResult)) {
@@ -114,38 +98,28 @@ export class QualifierActionsMiloCommandHandler extends CommandHandler<
       }
       const actionQualifiee: Action.Qualifiee = qualifierResult.data
 
-      const resultQualificationEnSNP = await qualifierEnSNP(
-        actionQualifiee,
-        utilisateur,
-        this.actionMiloRepository,
-        this.jeuneRepository
-      )
-      if (isFailure(resultQualificationEnSNP)) {
-        idsActionsEnErreur.push(idAction)
-        this.logger.warn(resultQualificationEnSNP.error.message)
-        continue
-      }
-      await this.actionRepository.save(actionQualifiee)
+      const estSNP =
+        actionQualifiee.qualification.code !== Qualification.Code.NON_SNP
 
-      const typeQualification =
-        Qualification.mapCodeTypeQualification[
-          actionQualifiee.qualification.code
-        ]
-      code = actionQualifiee.qualification.code
-      commentaireQualification = actionQualifiee.qualification.commentaire
-      libelle = typeQualification.label
-      heures = typeQualification.heures
-      idsActionsQualifiees.push(actionQualifiee.id)
+      if (estSNP) {
+        const resultQualificationEnSNP = await qualifierEnSNP(
+          actionQualifiee,
+          utilisateur,
+          this.actionMiloRepository,
+          this.jeuneRepository
+        )
+        if (isFailure(resultQualificationEnSNP)) {
+          idsActionsEnErreur.push(qualification.idAction)
+          this.logger.warn(resultQualificationEnSNP.error.message)
+          continue
+        }
+      }
+
+      await this.actionRepository.save(actionQualifiee)
     }
 
     return success({
-      idsActionsQualifiees,
-      idsActionsNonTrouvees,
-      idsActionsEnErreur,
-      code: code ?? command.codeQualification,
-      commentaireQualification,
-      libelle,
-      heures
+      idsActionsEnErreur
     })
   }
 
@@ -169,18 +143,26 @@ export class QualifierActionsMiloCommandHandler extends CommandHandler<
 
   async monitor(
     utilisateur: Authentification.Utilisateur,
-    command: QualifierActionsMiloCommand
+    command: QualifierActionsMiloCommand,
+    actions: Action[]
   ): Promise<void> {
-    if (command.codeQualification === Qualification.Code.NON_SNP) {
-      await this.evenementService.creer(
-        Evenement.Code.ACTION_QUALIFIEE_MULTIPLE_NON_SNP,
-        utilisateur
+    for (const action of actions) {
+      const qualification = command.qualifications.find(
+        qualification => qualification.idAction === action.id
       )
-    } else {
-      await this.evenementService.creer(
-        Evenement.Code.ACTION_QUALIFIEE_MULTIPLE_SNP,
-        utilisateur
-      )
+      if (qualification) {
+        if (qualification.codeQualification === Qualification.Code.NON_SNP) {
+          await this.evenementService.creer(
+            Evenement.Code.ACTION_QUALIFIEE_MULTIPLE_NON_SNP,
+            utilisateur
+          )
+        } else {
+          await this.evenementService.creer(
+            Evenement.Code.ACTION_QUALIFIEE_MULTIPLE_SNP,
+            utilisateur
+          )
+        }
+      }
     }
   }
 }
@@ -191,32 +173,24 @@ async function qualifierEnSNP(
   actionMiloRepository: ActionMilo.Repository,
   jeuneRepository: Jeune.Repository
 ): Promise<Result> {
-  const estSNP =
-    actionQualifiee.qualification.code !== Qualification.Code.NON_SNP
-
-  if (estSNP) {
-    const jeune = await jeuneRepository.get(actionQualifiee.idJeune)
-    if (!jeune) {
-      return failure(new NonTrouveError('Jeune non trouvé'))
-    }
-
-    const actionMiloResult = ActionMilo.creer(
-      actionQualifiee,
-      jeune,
-      utilisateur
-    )
-
-    if (isFailure(actionMiloResult)) {
-      return actionMiloResult
-    }
-
-    const qualificationResult = await actionMiloRepository.save(
-      actionMiloResult.data
-    )
-
-    if (isFailure(qualificationResult)) {
-      return qualificationResult
-    }
+  const jeune = await jeuneRepository.get(actionQualifiee.idJeune)
+  if (!jeune) {
+    return failure(new NonTrouveError('Jeune non trouvé'))
   }
+
+  const actionMiloResult = ActionMilo.creer(actionQualifiee, jeune, utilisateur)
+
+  if (isFailure(actionMiloResult)) {
+    return actionMiloResult
+  }
+
+  const qualificationResult = await actionMiloRepository.save(
+    actionMiloResult.data
+  )
+
+  if (isFailure(qualificationResult)) {
+    return qualificationResult
+  }
+
   return emptySuccess()
 }

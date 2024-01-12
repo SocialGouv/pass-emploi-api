@@ -496,11 +496,15 @@ describe('ConseillersMiloController', () => {
       const utilisateur = unUtilisateurDecode()
 
       const command: QualifierActionsMiloCommand = {
-        idsActions: ['13c11b33-751c-4e1b-a49d-1b5a473ba159'],
-        dateDebut: uneDatetimeAvecOffset(),
-        dateFinReelle: uneDatetimeAvecOffset(),
-        commentaireQualification: 'Un commentaire valide',
-        codeQualification: Action.Qualification.Code.EMPLOI
+        qualifications: [
+          {
+            idAction: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
+            dateDebut: uneDatetimeAvecOffset(),
+            dateFinReelle: uneDatetimeAvecOffset(),
+            commentaireQualification: 'Un commentaire valide',
+            codeQualification: Action.Qualification.Code.EMPLOI
+          }
+        ]
       }
 
       qualifierActionsMiloCommandHandler.execute
@@ -514,11 +518,15 @@ describe('ConseillersMiloController', () => {
         )
 
       const payload: QualifierActionsMiloPayload = {
-        idsActions: ['13c11b33-751c-4e1b-a49d-1b5a473ba159'],
-        dateDebut: uneDatetimeAvecOffset().toISO(),
-        dateFinReelle: uneDatetimeAvecOffset().toISO(),
-        commentaireQualification: 'Un commentaire valide',
-        codeQualification: Action.Qualification.Code.EMPLOI
+        qualifications: [
+          {
+            idAction: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
+            dateDebut: uneDatetimeAvecOffset().toISO(),
+            dateFinReelle: uneDatetimeAvecOffset().toISO(),
+            commentaireQualification: 'Un commentaire valide',
+            codeQualification: Action.Qualification.Code.EMPLOI
+          }
+        ]
       }
 
       // When
@@ -538,19 +546,27 @@ describe('ConseillersMiloController', () => {
       const utilisateur = unUtilisateurDecode()
 
       const command: QualifierActionsMiloCommand = {
-        idsActions: ['13c11b33-751c-4e1b-a49d-1b5a473ba159'],
-        dateDebut: uneDatetimeAvecOffset(),
-        dateFinReelle: uneDatetimeAvecOffset(),
-        commentaireQualification: 'Un commentaire valide',
-        codeQualification: Action.Qualification.Code.EMPLOI
+        qualifications: [
+          {
+            idAction: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
+            dateDebut: uneDatetimeAvecOffset(),
+            dateFinReelle: uneDatetimeAvecOffset(),
+            commentaireQualification: 'Un commentaire valide',
+            codeQualification: Action.Qualification.Code.EMPLOI
+          }
+        ]
       }
 
       const payload: QualifierActionsMiloPayload = {
-        idsActions: ['13c11b33-751c-4e1b-a49d-1b5a473ba159'],
-        dateDebut: uneDatetimeAvecOffset().toISO(),
-        dateFinReelle: uneDatetimeAvecOffset().toISO(),
-        commentaireQualification: 'Un commentaire valide',
-        codeQualification: Action.Qualification.Code.EMPLOI
+        qualifications: [
+          {
+            idAction: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
+            dateDebut: uneDatetimeAvecOffset().toISO(),
+            dateFinReelle: uneDatetimeAvecOffset().toISO(),
+            commentaireQualification: 'Un commentaire valide',
+            codeQualification: Action.Qualification.Code.EMPLOI
+          }
+        ]
       }
 
       qualifierActionsMiloCommandHandler.execute
@@ -568,12 +584,16 @@ describe('ConseillersMiloController', () => {
     it('retourne une BAD_REQUEST lorsque le commentaire dépasse les 255 caractères.', async () => {
       // Given
       const payload: QualifierActionsMiloPayload = {
-        idsActions: ['13c11b33-751c-4e1b-a49d-1b5a473ba159'],
-        dateDebut: uneDatetimeAvecOffset().toISO(),
-        dateFinReelle: uneDatetimeAvecOffset().toISO(),
-        commentaireQualification:
-          "Un commentaire invalide car il dépasse la limite fixée à deux cent cinquante-cinq caractères par l'API-Application Programming Interface- développée par i-milo. Ce commentaire est invalide puisjjjjjjjjjjjjjjjjjjjjjjjqu'il est d'une longueur de deux cent cinquante-six caractères",
-        codeQualification: Action.Qualification.Code.EMPLOI
+        qualifications: [
+          {
+            idAction: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
+            dateDebut: uneDatetimeAvecOffset().toISO(),
+            dateFinReelle: uneDatetimeAvecOffset().toISO(),
+            commentaireQualification:
+              "Un commentaire invalide car il dépasse la limite fixée à deux cent cinquante-cinq caractères par l'API-Application Programming Interface- développée par i-milo. Ce commentaire est invalide puisjjjjjjjjjjjjjjjjjjjjjjjqu'il est d'une longueur de deux cent cinquante-six caractères",
+            codeQualification: Action.Qualification.Code.EMPLOI
+          }
+        ]
       }
 
       // When
@@ -587,8 +607,7 @@ describe('ConseillersMiloController', () => {
     it('retourne une BAD_REQUEST lorsque le tableau est vide', async () => {
       // Given
       const payload: QualifierActionsMiloPayload = {
-        idsActions: [],
-        codeQualification: Action.Qualification.Code.EMPLOI
+        qualifications: []
       }
 
       // When
