@@ -1,22 +1,25 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { Transform, Type } from 'class-transformer'
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsArray,
   IsBoolean,
   IsDateString,
-  IsNotEmpty,
-  IsOptional,
-  ValidateNested,
-  IsArray,
-  IsString,
-  IsEnum,
-  ValidateIf,
   IsDefined,
+  IsEnum,
+  IsIn,
+  IsNotEmpty,
   IsNumber,
-  IsIn
+  IsOptional,
+  IsString,
+  ValidateIf,
+  ValidateNested
 } from 'class-validator'
-import { Transform, Type } from 'class-transformer'
+import { Action } from '../../../domain/action/action'
 import { SessionMilo } from '../../../domain/milo/session.milo'
-import Inscription = SessionMilo.Inscription
 import { transformStringToBoolean } from './utils/transformers'
+import Inscription = SessionMilo.Inscription
 
 export class GetSessionsQueryParams {
   @IsOptional()
@@ -116,4 +119,31 @@ export class EmargementsSessionMiloPayload {
   @IsNotEmpty()
   @Type(() => EmargementJeuneSessionMiloPayload)
   emargements: EmargementJeuneSessionMiloPayload[]
+}
+
+class QualificationActionMiloPayload {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  idAction: string
+
+  @ApiProperty({ enum: Action.Qualification.Code })
+  @IsString()
+  @IsEnum(Action.Qualification.Code)
+  codeQualification: Action.Qualification.Code
+}
+
+export class QualifierActionsMiloPayload {
+  @ApiProperty()
+  @IsBoolean()
+  @IsIn([true, false])
+  estSNP: boolean
+
+  @ApiProperty()
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(10)
+  @ValidateNested({ each: true })
+  @Type(() => QualificationActionMiloPayload)
+  qualifications: QualificationActionMiloPayload[]
 }

@@ -356,6 +356,7 @@ import { AppMobileCacheControlMiddleware } from 'src/infrastructure/middlewares/
 import { EvenementMiloRepositoryToken } from './domain/milo/evenement.milo'
 import { NotifierRappelInstanceSessionMiloJobHandler } from './application/jobs/notifier-rappel-instance-session-milo.job.handler'
 import { ActionMiloRepositoryToken } from './domain/milo/action.milo'
+import { QualifierActionsMiloCommandHandler } from './application/commands/milo/qualifier-actions-milo.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -703,6 +704,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateDemarcheCommandHandler,
     RechercherTypesDemarcheQueryHandler,
     TeleverserFichierCommandHandler,
+    QualifierActionsMiloCommandHandler,
     TelechargerFichierQueryHandler,
     SupprimerFichierCommandHandler,
     FichierAuthorizer,

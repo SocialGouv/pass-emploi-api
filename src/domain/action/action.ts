@@ -77,6 +77,8 @@ export namespace Action {
       options?: { avecCommentaires: boolean }
     ): Promise<Action | undefined>
 
+    findAll(idsActions: Action.Id[]): Promise<Action[]>
+
     getConseillerEtJeune(
       id: Action.Id
     ): Promise<{ idConseiller: string; idJeune: string } | undefined>

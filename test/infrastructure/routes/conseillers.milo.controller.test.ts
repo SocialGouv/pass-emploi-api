@@ -1,43 +1,50 @@
-import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
 import { HttpStatus, INestApplication } from '@nestjs/common'
-import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
+import { DateTime } from 'luxon'
+import {
+  UpdateSessionMiloCommand,
+  UpdateSessionMiloCommandHandler
+} from 'src/application/commands/milo/update-session-milo.command.handler'
+import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
+import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-conseiller.milo.query.handler.db'
 import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-sessions-conseiller.milo.query.handler.db'
-import { expect, StubbedClass } from 'test/utils'
-import {
-  unHeaderAuthorization,
-  unUtilisateurDecode
-} from 'test/fixtures/authentification.fixture'
-import {
-  emptySuccess,
-  failure,
-  success
-} from 'src/building-blocks/types/result'
-import * as request from 'supertest'
 import {
   DossierExisteDejaError,
+  DroitsInsuffisants,
   EmailExisteDejaError,
   ErreurHttp,
   NonTrouveError
 } from 'src/building-blocks/types/domain-error'
 import {
+  emptySuccess,
+  failure,
+  success
+} from 'src/building-blocks/types/result'
+import { SessionMilo } from 'src/domain/milo/session.milo'
+import * as request from 'supertest'
+import {
+  unHeaderAuthorization,
+  unUtilisateurDecode
+} from 'test/fixtures/authentification.fixture'
+import {
   unAgendaConseillerMiloSessionListItemQueryModel,
   unDetailSessionConseillerMiloQueryModel,
   uneSessionConseillerMiloQueryModel
 } from 'test/fixtures/sessions.fixture'
-import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-conseiller.milo.query.handler.db'
+import { StubbedClass, expect } from 'test/utils'
+import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
+import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
 import {
-  UpdateSessionMiloCommand,
-  UpdateSessionMiloCommandHandler
-} from 'src/application/commands/milo/update-session-milo.command.handler'
-import { SessionMilo } from 'src/domain/milo/session.milo'
-import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
-import { DateTime } from 'luxon'
-import {
-  CreerJeuneMiloCommandHandler,
-  CreerJeuneMiloCommand
+  CreerJeuneMiloCommand,
+  CreerJeuneMiloCommandHandler
 } from '../../../src/application/commands/milo/creer-jeune-milo.command.handler'
+import {
+  QualifierActionsMiloCommand,
+  QualifierActionsMiloCommandHandler
+} from '../../../src/application/commands/milo/qualifier-actions-milo.command.handler'
 import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
 import { GetJeuneMiloByDossierQueryHandler } from '../../../src/application/queries/get-jeune-milo-by-dossier.query.handler.db'
+import { Action } from '../../../src/domain/action/action'
+import { QualifierActionsMiloPayload } from '../../../src/infrastructure/routes/validation/conseiller-milo.inputs'
 import { CreerJeuneMiloPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
 import { unDossierMilo } from '../../fixtures/milo.fixture'
 import { unJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
@@ -50,6 +57,7 @@ describe('ConseillersMiloController', () => {
   let getDetailSessionQueryHandler: StubbedClass<GetDetailSessionConseillerMiloQueryHandler>
   let getAgendaSessionsQueryHandler: StubbedClass<GetAgendaSessionsConseillerMiloQueryHandler>
   let updateSessionCommandHandler: StubbedClass<UpdateSessionMiloCommandHandler>
+  let qualifierActionsMiloCommandHandler: StubbedClass<QualifierActionsMiloCommandHandler>
 
   let app: INestApplication
 
@@ -69,6 +77,9 @@ describe('ConseillersMiloController', () => {
       GetAgendaSessionsConseillerMiloQueryHandler
     )
     updateSessionCommandHandler = app.get(UpdateSessionMiloCommandHandler)
+    qualifierActionsMiloCommandHandler = app.get(
+      QualifierActionsMiloCommandHandler
+    )
   })
 
   describe('GET /conseillers/milo/dossiers/:idDossier', () => {
@@ -475,6 +486,110 @@ describe('ConseillersMiloController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'patch',
       '/conseillers/milo/1/sessions/id-session'
+    )
+  })
+
+  describe('POST /conseillers/milo/actions/qualifier', () => {
+    it('qualifie les actions', async () => {
+      // Given
+      const utilisateur = unUtilisateurDecode()
+
+      const command: QualifierActionsMiloCommand = {
+        estSNP: true,
+        qualifications: [
+          {
+            idAction: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
+            codeQualification: Action.Qualification.Code.EMPLOI
+          }
+        ]
+      }
+
+      qualifierActionsMiloCommandHandler.execute
+        .withArgs(command, utilisateur)
+        .resolves(
+          success({
+            code: Action.Qualification.Code.EMPLOI,
+            idsActionsQualifiees: [],
+            idsActionsEnErreur: []
+          })
+        )
+
+      const payload: QualifierActionsMiloPayload = {
+        estSNP: true,
+        qualifications: [
+          {
+            idAction: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
+            codeQualification: Action.Qualification.Code.EMPLOI
+          }
+        ]
+      }
+
+      // When
+      await request(app.getHttpServer())
+        .post(`/conseillers/milo/actions/qualifier`)
+        .send(payload)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.CREATED)
+
+      expect(
+        qualifierActionsMiloCommandHandler.execute
+      ).to.have.been.calledWithExactly(command, utilisateur)
+    })
+    it("retourne une erreur non autorisée pour un utilisateur n'ayant pas les droits", async () => {
+      // Given
+      const utilisateur = unUtilisateurDecode()
+
+      const command: QualifierActionsMiloCommand = {
+        estSNP: false,
+        qualifications: [
+          {
+            idAction: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
+            codeQualification: Action.Qualification.Code.EMPLOI
+          }
+        ]
+      }
+
+      const payload: QualifierActionsMiloPayload = {
+        estSNP: false,
+        qualifications: [
+          {
+            idAction: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
+            codeQualification: Action.Qualification.Code.EMPLOI
+          }
+        ]
+      }
+
+      qualifierActionsMiloCommandHandler.execute
+        .withArgs(command, utilisateur)
+        .resolves(failure(new DroitsInsuffisants()))
+
+      // When
+      await request(app.getHttpServer())
+        .post(`/conseillers/milo/actions/qualifier`)
+        .send(payload)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.FORBIDDEN)
+    })
+    it('retourne une BAD_REQUEST lorsque le tableau est vide', async () => {
+      // Given
+      const payload: QualifierActionsMiloPayload = {
+        estSNP: true,
+        qualifications: []
+      }
+
+      // When
+      await request(app.getHttpServer())
+        .post(`/conseillers/milo/actions/qualifier`)
+        .send(payload)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+    ensureUserAuthenticationFailsIfInvalid(
+      'post',
+      '/conseillers/milo/actions/qualifier'
     )
   })
 })

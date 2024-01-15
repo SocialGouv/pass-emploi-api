@@ -217,6 +217,60 @@ describe('ActionSqlRepository', () => {
     })
   })
 
+  describe('findAll', () => {
+    it('récupère les actions trouvees uniquement', async () => {
+      // Given
+      const idAction = 'c723bfa8-0ac4-4d29-b0b6-68bdb3dec21c'
+      const actionDto = uneActionDto({
+        id: idAction,
+        statut: Action.Statut.EN_COURS,
+        idJeune: jeune.id,
+        dateFinReelle: new Date('2021-11-10T08:03:30.000Z'),
+        codeQualification: Action.Qualification.Code.SANTE,
+        heuresQualifiees: 2,
+        commentaireQualification: 'Un commentaire'
+      })
+      await ActionSqlModel.creer(actionDto)
+
+      // When
+      const actual = await actionSqlRepository.findAll([
+        idAction,
+        'c723bfa8-0ac4-4d29-b0b6-68bdb3dec21e'
+      ])
+
+      // Then
+      const attendu: Action[] = [
+        {
+          id: 'c723bfa8-0ac4-4d29-b0b6-68bdb3dec21c',
+          statut: Action.Statut.EN_COURS,
+          idJeune: 'ABCDE',
+          description: "Description de l'action",
+          contenu: "Contenu de l'action",
+          dateCreation: DateTime.fromISO('2021-11-11T08:03:30.000Z'),
+          dateDerniereActualisation: DateTime.fromISO(
+            '2021-11-11T08:03:30.000Z'
+          ),
+          createur: {
+            id: '1',
+            nom: 'Tavernier',
+            prenom: 'Nils',
+            type: Action.TypeCreateur.CONSEILLER
+          },
+          dateDebut: undefined,
+          dateEcheance: DateTime.fromISO('2021-11-11T08:03:30.000Z'),
+          dateFinReelle: DateTime.fromISO('2021-11-10T08:03:30.000Z'),
+          rappel: true,
+          qualification: {
+            code: Action.Qualification.Code.SANTE,
+            heures: 2,
+            commentaire: 'Un commentaire'
+          }
+        }
+      ]
+      expect(actual).to.deep.equal(attendu)
+    })
+  })
+
   describe('.findAllActionsARappeler()', () => {
     it('récupère les actions qui arrivent à échance dans + 3 jours avec un rappel et pas de statut terminé ou annulé', async () => {
       // Given

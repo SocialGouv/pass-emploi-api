@@ -22,7 +22,9 @@ export namespace ActionMilo {
     utilisateur: Authentification.Utilisateur
   ): Result<ActionMilo> {
     if (!jeune.idPartenaire) {
-      return failure(new MauvaiseCommandeError("Le jeune n'a pas d'id dossier"))
+      return failure(
+        new MauvaiseCommandeError(`Le jeune ${jeune.id} n'a pas d'id dossier`)
+      )
     }
 
     if (!utilisateur.username) {
