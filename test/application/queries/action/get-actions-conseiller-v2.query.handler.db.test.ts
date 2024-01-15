@@ -94,7 +94,8 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
         idJeune,
         statut: Action.Statut.TERMINEE,
         dateCreation: datetimeDeBase.plus({ days: 1 }).toJSDate(),
-        dateFinReelle: datetimeDeBase.toJSDate()
+        dateFinReelle: datetimeDeBase.toJSDate(),
+        codeQualification: Action.Qualification.Code.CITOYENNETE
       })
       actionAQualifier3Dto = uneActionDto({
         id: '8c84a1ab-96e2-4841-935a-16d69fe2e7ee',
@@ -163,7 +164,8 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionNonTermineeDto.dateFinReelle?.toISOString()
+              dateFinReelle: actionNonTermineeDto.dateFinReelle?.toISOString(),
+              categorie: undefined
             },
             {
               id: actionAQualifier1Dto.id,
@@ -173,7 +175,8 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionAQualifier1Dto.dateFinReelle?.toISOString()
+              dateFinReelle: actionAQualifier1Dto.dateFinReelle?.toISOString(),
+              categorie: Action.Qualification.Code.CITOYENNETE
             },
             {
               id: actionAQualifier3Dto.id,
@@ -183,7 +186,8 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionAQualifier3Dto.dateFinReelle?.toISOString()
+              dateFinReelle: actionAQualifier3Dto.dateFinReelle?.toISOString(),
+              categorie: undefined
             }
           ]
         }
@@ -210,7 +214,8 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionAQualifier2Dto.dateFinReelle?.toISOString()
+              dateFinReelle: actionAQualifier2Dto.dateFinReelle?.toISOString(),
+              categorie: Action.Qualification.Code.SANTE
             },
             {
               id: actionQualifieeDto.id,
@@ -220,7 +225,8 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionQualifieeDto.dateFinReelle?.toISOString()
+              dateFinReelle: actionQualifieeDto.dateFinReelle?.toISOString(),
+              categorie: Action.Qualification.Code.SANTE
             }
           ]
         }
@@ -250,7 +256,8 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionAQualifier1Dto.dateFinReelle?.toISOString()
+              dateFinReelle: actionAQualifier1Dto.dateFinReelle?.toISOString(),
+              categorie: Action.Qualification.Code.CITOYENNETE
             },
             {
               id: actionAQualifier2Dto.id,
@@ -260,7 +267,8 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionAQualifier2Dto.dateFinReelle?.toISOString()
+              dateFinReelle: actionAQualifier2Dto.dateFinReelle?.toISOString(),
+              categorie: Action.Qualification.Code.SANTE
             }
           ]
         }
@@ -287,7 +295,8 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionAQualifier3Dto.dateFinReelle?.toISOString()
+              dateFinReelle: actionAQualifier3Dto.dateFinReelle?.toISOString(),
+              categorie: undefined
             }
           ]
         }

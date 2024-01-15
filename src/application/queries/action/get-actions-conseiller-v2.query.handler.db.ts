@@ -77,7 +77,13 @@ export class GetActionsConseillerV2QueryHandler extends QueryHandler<
         },
         required: true
       },
-      attributes: ['id', 'contenu', 'idJeune', 'dateFinReelle'],
+      attributes: [
+        'id',
+        'contenu',
+        'idJeune',
+        'dateFinReelle',
+        'codeQualification'
+      ],
       ...whereClause,
       limit,
       offset: (page - 1) * limit,
@@ -98,7 +104,8 @@ export class GetActionsConseillerV2QueryHandler extends QueryHandler<
           nom: actionSql.jeune.nom,
           prenom: actionSql.jeune.prenom
         },
-        dateFinReelle: actionSql.dateFinReelle?.toISOString()
+        dateFinReelle: actionSql.dateFinReelle?.toISOString(),
+        categorie: actionSql.codeQualification ?? undefined
       }))
     })
   }
