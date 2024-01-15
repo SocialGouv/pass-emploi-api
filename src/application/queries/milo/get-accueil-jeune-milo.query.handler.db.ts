@@ -175,7 +175,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     return ActionSqlModel.count({
       where: {
         id_jeune: idJeune,
-        dateEcheance: { [Op.lte]: maintenant.toJSDate() },
+        dateEcheance: { [Op.lt]: maintenant.startOf('day').toJSDate() },
         statut: {
           [Op.in]: [Action.Statut.EN_COURS, Action.Statut.PAS_COMMENCEE]
         }

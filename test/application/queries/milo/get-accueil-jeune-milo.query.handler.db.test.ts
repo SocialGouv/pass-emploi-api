@@ -87,7 +87,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
     let accueilQuery: GetAccueilJeuneMiloQuery
 
     const token = 'token'
-    const maintenantString = '2023-03-27T03:24:00'
+    const maintenantString = '2023-03-27T09:30:00'
     const datePlus30Jours = '2023-04-26T23:59:59.999'
     const maintenant = DateTime.fromISO(maintenantString)
     const campagneQueryModel = uneCampagneQueryModel()
@@ -171,12 +171,21 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
           dateEcheance: maintenant.plus({ days: 2 }).toJSDate(),
           statut: Action.Statut.EN_COURS
         })
-        const actionEnRetardDto = uneActionDto({
+        const actionEnRetard1Dto = uneActionDto({
           idJeune: accueilQuery.idJeune,
           dateEcheance: maintenant.minus({ days: 1 }).toJSDate(),
           statut: Action.Statut.EN_COURS
         })
-        await ActionSqlModel.bulkCreate([actionARealiserDto, actionEnRetardDto])
+        const actionEnRetard2Dto = uneActionDto({
+          idJeune: accueilQuery.idJeune,
+          dateEcheance: maintenant.minus({ hours: 1 }).toJSDate(),
+          statut: Action.Statut.EN_COURS
+        })
+        await ActionSqlModel.bulkCreate([
+          actionARealiserDto,
+          actionEnRetard1Dto,
+          actionEnRetard2Dto
+        ])
 
         rendezVousCetteSemaine = await RendezVousSqlModel.create(
           unRendezVousDto({
