@@ -16,7 +16,7 @@ import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
 import {
   PoleEmploiPartenaireClient,
   PoleEmploiPartenaireClientToken
-} from '../../infrastructure/clients/pole-emploi-partenaire-client'
+} from '../../infrastructure/clients/pole-emploi-partenaire-client.db'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { CVPoleEmploiQueryModel } from './query-models/jeunes.pole-emploi.query-model'
 

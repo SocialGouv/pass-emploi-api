@@ -21,7 +21,7 @@ import { KeycloakClient } from '../../src/infrastructure/clients/keycloak-client
 import { createSandbox } from 'sinon'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { Jeune } from '../../src/domain/jeune/jeune'
-import { PoleEmploiPartenaireClient } from '../../src/infrastructure/clients/pole-emploi-partenaire-client'
+import { PoleEmploiPartenaireClient } from '../../src/infrastructure/clients/pole-emploi-partenaire-client.db'
 import { IdService } from '../../src/utils/id-service'
 import { emptySuccess, success } from '../../src/building-blocks/types/result'
 import {

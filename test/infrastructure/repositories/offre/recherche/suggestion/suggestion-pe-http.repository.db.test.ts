@@ -1,6 +1,6 @@
 import { success } from '../../../../../../src/building-blocks/types/result'
 import { Suggestion } from '../../../../../../src/domain/offre/recherche/suggestion/suggestion'
-import { PoleEmploiPartenaireClient } from '../../../../../../src/infrastructure/clients/pole-emploi-partenaire-client'
+import { PoleEmploiPartenaireClient } from '../../../../../../src/infrastructure/clients/pole-emploi-partenaire-client.db'
 import { SuggestionPeHttpRepository } from '../../../../../../src/infrastructure/repositories/offre/recherche/suggestion/suggestion-pe-http.repository.db'
 import { CommuneSqlModel } from '../../../../../../src/infrastructure/sequelize/models/commune.sql-model'
 import {

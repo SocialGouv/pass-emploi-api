@@ -7,7 +7,7 @@ import {
 import { OffreImmersionQueryModel } from '../../../src/application/queries/query-models/offres-immersion.query-model'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import { FindAllOffresImmersionQueryGetter } from '../../../src/application/queries/query-getters/find-all-offres-immersion.query.getter'
+import { FindAllOffresImmersionQueryGetter } from '../../../src/application/queries/query-getters/find-all-offres-immersion.query.getter.db'
 import { success } from '../../../src/building-blocks/types/result'
 import { Offre } from '../../../src/domain/offre/offre'
 

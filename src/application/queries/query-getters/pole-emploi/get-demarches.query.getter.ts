@@ -12,7 +12,7 @@ import { KeycloakClient } from '../../../../infrastructure/clients/keycloak-clie
 import {
   PoleEmploiPartenaireClient,
   PoleEmploiPartenaireClientToken
-} from '../../../../infrastructure/clients/pole-emploi-partenaire-client'
+} from '../../../../infrastructure/clients/pole-emploi-partenaire-client.db'
 import { DateService } from '../../../../utils/date-service'
 import { fromDemarcheDtoToDemarche } from '../../query-mappers/actions-pole-emploi.mappers'
 import { DemarcheQueryModel } from '../../query-models/actions.query-model'

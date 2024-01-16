@@ -7,7 +7,7 @@ import { KeycloakClient } from '../clients/keycloak-client'
 import {
   PoleEmploiPartenaireClient,
   PoleEmploiPartenaireClientToken
-} from '../clients/pole-emploi-partenaire-client'
+} from '../clients/pole-emploi-partenaire-client.db'
 import { Core } from '../../domain/core'
 
 @Injectable()

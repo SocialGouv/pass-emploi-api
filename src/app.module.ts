@@ -180,7 +180,7 @@ import {
   PoleEmploiPartenaireClient,
   PoleEmploiPartenaireClientToken,
   PoleEmploiPartenaireInMemoryClient
-} from './infrastructure/clients/pole-emploi-partenaire-client'
+} from './infrastructure/clients/pole-emploi-partenaire-client.db'
 import { GetDemarchesQueryHandler } from './application/queries/get-demarches.query.handler'
 import { GetCatalogueDemarchesQueryHandler } from './application/queries/get-catalogue-demarches.query.handler'
 import { GetJeuneMiloByDossierQueryHandler } from './application/queries/get-jeune-milo-by-dossier.query.handler.db'
@@ -213,7 +213,7 @@ import { TelechargerFichierQueryHandler } from './application/queries/telecharge
 import { SupprimerFichierCommandHandler } from './application/commands/supprimer-fichier.command.handler'
 import { FichierAuthorizer } from './application/authorizers/fichier-authorizer'
 import { FindAllOffresEmploiQueryGetter } from './application/queries/query-getters/find-all-offres-emploi.query.getter'
-import { FindAllOffresImmersionQueryGetter } from './application/queries/query-getters/find-all-offres-immersion.query.getter'
+import { FindAllOffresImmersionQueryGetter } from './application/queries/query-getters/find-all-offres-immersion.query.getter.db'
 import { FindAllOffresServicesCiviqueQueryGetter } from './application/queries/query-getters/find-all-offres-services-civique.query.getter'
 import { RecupererJeunesDuConseillerCommandHandler } from './application/commands/recuperer-jeunes-du-conseiller.command.handler'
 import { ArchiverJeuneCommandHandler } from './application/commands/archiver-jeune.command.handler'

@@ -2,7 +2,7 @@ import { HttpService } from '@nestjs/axios'
 import * as nock from 'nock'
 import { testConfig } from '../../utils/module-for-testing'
 import { uneDatetime } from '../../fixtures/date.fixture'
-import { PoleEmploiPartenaireClient } from '../../../src/infrastructure/clients/pole-emploi-partenaire-client'
+import { PoleEmploiPartenaireClient } from '../../../src/infrastructure/clients/pole-emploi-partenaire-client.db'
 import { uneDemarcheDto } from '../../fixtures/demarches-dto.fixtures'
 import { Demarche } from '../../../src/domain/demarche'
 import {
