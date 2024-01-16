@@ -67,10 +67,11 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
 
+    const maintenant = DateTime.fromISO(query.maintenant, {
+      setZone: true
+    })
     const { lundiDernier, dimancheEnHuit } =
-      this.recupererLesDatesEntreLundiDernierEtDeuxSemainesPlusTard(
-        query.maintenant
-      )
+      this.recupererLesDatesEntreLundiDernierEtDeuxSemainesPlusTard(maintenant)
     const [actions, rendezVous, actionsEnRetard] = await Promise.all([
       this.recupererLesActions(query, lundiDernier, dimancheEnHuit),
       this.recupererLesRendezVous(
@@ -79,7 +80,7 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
         dimancheEnHuit,
         utilisateur.type
       ),
-      this.recupererLeNombreDactionsEnRetard(query)
+      this.recupererLeNombreDactionsEnRetard(query, maintenant)
     ])
 
     let sessionsMilo: SessionJeuneMiloQueryModel[] = []
@@ -149,14 +150,12 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
   }
 
   private recupererLesDatesEntreLundiDernierEtDeuxSemainesPlusTard(
-    maintenant: string
+    maintenant: DateTime
   ): {
     lundiDernier: DateTime
     dimancheEnHuit: DateTime
   } {
-    const dateDebut = DateTime.fromISO(maintenant, {
-      setZone: true
-    }).startOf('week')
+    const dateDebut = maintenant.startOf('week')
     const dimancheEnHuit = dateDebut.plus({ day: 13 }).endOf('day')
     return { lundiDernier: dateDebut, dimancheEnHuit: dimancheEnHuit }
   }
@@ -210,13 +209,14 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
   }
 
   private async recupererLeNombreDactionsEnRetard(
-    query: GetJeuneHomeAgendaQuery
+    query: GetJeuneHomeAgendaQuery,
+    maintenant: DateTime
   ): Promise<number> {
     return ActionSqlModel.count({
       where: {
         idJeune: query.idJeune,
         dateEcheance: {
-          [Op.lt]: query.maintenant
+          [Op.lt]: maintenant.startOf('day').toJSDate()
         },
         statut: {
           [Op.notIn]: [Action.Statut.ANNULEE, Action.Statut.TERMINEE]
