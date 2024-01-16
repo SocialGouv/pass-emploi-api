@@ -185,5 +185,5 @@
   "lint-staged": {
     "*.ts": "yarn lint:fix"
   },
-  "packageManager": "yarn@3.7.0"
+  "packageManager": "yarn@4.0.2"
 }
