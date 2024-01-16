@@ -2904,7 +2904,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/luxon@npm:^3.3.0":
+"@types/luxon@npm:^3.4.1":
   version: 3.4.1
   resolution: "@types/luxon@npm:3.4.1"
   checksum: dc133d28dee98fd7944e81fbde8df4fcdd7b602139259b5566b556a09da296a6c57e02899b0068470465d5b3798f551edafe0a6c8fb89fcd327d799ff7d37c92
@@ -2955,7 +2955,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=12.12.47, @types/node@npm:>=13.7.0, @types/node@npm:^20.0.0, @types/node@npm:^20.10.3":
+"@types/node@npm:*, @types/node@npm:>=12.12.47, @types/node@npm:>=13.7.0, @types/node@npm:^20.10.3, @types/node@npm:^20.11.4":
   version: 20.11.4
   resolution: "@types/node@npm:20.11.4"
   dependencies:
@@ -3178,7 +3178,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/eslint-plugin@npm:^6.0.0":
+"@typescript-eslint/eslint-plugin@npm:^6.19.0":
   version: 6.19.0
   resolution: "@typescript-eslint/eslint-plugin@npm:6.19.0"
   dependencies:
@@ -3203,7 +3203,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:^6.0.0":
+"@typescript-eslint/parser@npm:^6.19.0":
   version: 6.19.0
   resolution: "@typescript-eslint/parser@npm:6.19.0"
   dependencies:
@@ -4386,7 +4386,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chai@npm:^4.3.7":
+"chai@npm:^4.4.1":
   version: 4.4.1
   resolution: "chai@npm:4.4.1"
   dependencies:
@@ -5227,7 +5227,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv-cli@npm:^7.2.1":
+"dotenv-cli@npm:^7.3.0":
   version: 7.3.0
   resolution: "dotenv-cli@npm:7.3.0"
   dependencies:
@@ -5675,7 +5675,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-prettier@npm:^9.0.0":
+"eslint-config-prettier@npm:^9.1.0":
   version: 9.1.0
   resolution: "eslint-config-prettier@npm:9.1.0"
   peerDependencies:
@@ -5695,7 +5695,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-mocha@npm:^10.1.0":
+"eslint-plugin-mocha@npm:^10.2.0":
   version: 10.2.0
   resolution: "eslint-plugin-mocha@npm:10.2.0"
   dependencies:
@@ -8296,7 +8296,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lint-staged@npm:^15.0.0":
+"lint-staged@npm:^15.2.0":
   version: 15.2.0
   resolution: "lint-staged@npm:15.2.0"
   dependencies:
@@ -9234,10 +9234,10 @@ __metadata:
     "@types/express": "npm:^4.17.21"
     "@types/geojson": "npm:^7946.0.13"
     "@types/lodash.isequal": "npm:^4.5.8"
-    "@types/luxon": "npm:^3.3.0"
+    "@types/luxon": "npm:^3.4.1"
     "@types/mocha": "npm:^10.0.6"
     "@types/multer": "npm:^1.4.11"
-    "@types/node": "npm:^20.0.0"
+    "@types/node": "npm:^20.11.4"
     "@types/pg-copy-streams": "npm:^1.2.5"
     "@types/pino-multi-stream": "npm:^5.1.6"
     "@types/sinon": "npm:^17.0.3"
@@ -9245,11 +9245,11 @@ __metadata:
     "@types/supertest": "npm:^2.0.16"
     "@types/uuid": "npm:^9.0.7"
     "@types/yargs": "npm:^17.0.32"
-    "@typescript-eslint/eslint-plugin": "npm:^6.0.0"
-    "@typescript-eslint/parser": "npm:^6.0.0"
+    "@typescript-eslint/eslint-plugin": "npm:^6.19.0"
+    "@typescript-eslint/parser": "npm:^6.19.0"
     bull: "npm:4.12.1"
     bull-repl: "npm:^0.29.0"
-    chai: "npm:^4.3.7"
+    chai: "npm:^4.4.1"
     chai-as-promised: "npm:^7.1.1"
     chai-exclude: "npm:^2.1.0"
     class-transformer: "npm:0.5.1"
@@ -9258,13 +9258,13 @@ __metadata:
     cron-parser: "npm:4.8.1"
     crypto-js: "npm:4.1.1"
     dirty-chai: "npm:^2.0.1"
-    dotenv-cli: "npm:^7.2.1"
+    dotenv-cli: "npm:^7.3.0"
     dotvault: "npm:^0.0.9"
     elastic-apm-node: "npm:3.51.0"
     eslint: "npm:^8.56.0"
-    eslint-config-prettier: "npm:^9.0.0"
+    eslint-config-prettier: "npm:^9.1.0"
     eslint-plugin-chai-friendly: "npm:^0.7.4"
-    eslint-plugin-mocha: "npm:^10.1.0"
+    eslint-plugin-mocha: "npm:^10.2.0"
     eslint-plugin-prettier: "npm:^4.2.1"
     firebase-admin: "npm:12.0.0"
     geojson: "npm:0.5.0"
@@ -9273,12 +9273,12 @@ __metadata:
     ics: "npm:3.2.0"
     joi: "npm:17.9.2"
     jose: "npm:5.0.0"
-    lint-staged: "npm:^15.0.0"
+    lint-staged: "npm:^15.2.0"
     lodash.isequal: "npm:4.5.0"
     luxon: "npm:3.4.4"
     mocha: "npm:^10.2.0"
     nestjs-pino: "npm:4.0.0"
-    nock: "npm:^13.3.1"
+    nock: "npm:^13.5.0"
     nyc: "npm:^15.1.0"
     openid-client: "npm:5.6.4"
     pg: "npm:8.11.3"
@@ -9300,7 +9300,7 @@ __metadata:
     supertest: "npm:^6.3.4"
     swagger-ui-express: "npm:5.0.0"
     tokenbucket: "npm:0.3.2"
-    ts-loader: "npm:^9.4.3"
+    ts-loader: "npm:^9.5.1"
     ts-node: "npm:^10.9.2"
     tsconfig-paths: "npm:^4.2.0"
     typescript: "npm:^4.9.5"
@@ -9361,7 +9361,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nock@npm:^13.3.1":
+"nock@npm:^13.5.0":
   version: 13.5.0
   resolution: "nock@npm:13.5.0"
   dependencies:
@@ -12266,7 +12266,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-loader@npm:^9.4.3":
+"ts-loader@npm:^9.5.1":
   version: 9.5.1
   resolution: "ts-loader@npm:9.5.1"
   dependencies:
