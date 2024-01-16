@@ -1,6 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { PaginationQueryModel } from './common/pagination.query-model'
-import { Qualification } from 'src/domain/action/qualification'
 
 class AgenceDuConseillerQueryModel {
   @ApiProperty({ required: false })
@@ -89,7 +88,7 @@ class ActionResumeV2QueryModel {
   dateFinReelle?: string
 
   @ApiPropertyOptional()
-  categorie?: Qualification.Code
+  categorie?: string
 }
 
 export class GetActionsConseillerV2QueryModel {

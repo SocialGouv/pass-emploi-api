@@ -368,11 +368,15 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
       let result: Result<JeuneHomeAgendaQueryModel>
 
       beforeEach(async () => {
-        const hier = '2022-08-11T12:00:00Z'
-        const dansUneSemaine = '2022-08-19T12:00:00Z'
+        const hier = '2022-08-13T12:00:00Z'
+        const aujourdhui = '2022-08-14T08:30:00Z'
+        const dansUneSemaine = '2022-08-21T12:00:00Z'
         await createActions([hier], Action.Statut.TERMINEE)
         await createActions([hier], Action.Statut.ANNULEE)
-        await createActions([hier, dansUneSemaine], Action.Statut.PAS_COMMENCEE)
+        await createActions(
+          [hier, aujourdhui, dansUneSemaine],
+          Action.Statut.PAS_COMMENCEE
+        )
 
         // When
         result = await handler.handle(homeQuery, utilisateurJeune)
