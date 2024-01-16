@@ -173,7 +173,8 @@
     "yargs": "^17.7.2"
   },
   "resolutions": {
-    "get-func-name": "2.0.2"
+    "@nestjs/axios/axios": "1.6.0",
+    "download/got": "11.8.5"
   },
   "mocha": {
     "require": [
