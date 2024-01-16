@@ -176,7 +176,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 prenom: jeuneDto.prenom
               },
               dateFinReelle: actionAQualifier1Dto.dateFinReelle?.toISOString(),
-              categorie: Action.Qualification.Code.CITOYENNETE
+              categorie: 'Citoyenneté'
             },
             {
               id: actionAQualifier3Dto.id,
@@ -215,7 +215,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 prenom: jeuneDto.prenom
               },
               dateFinReelle: actionAQualifier2Dto.dateFinReelle?.toISOString(),
-              categorie: Action.Qualification.Code.SANTE
+              categorie: 'Santé'
             },
             {
               id: actionQualifieeDto.id,
@@ -226,7 +226,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 prenom: jeuneDto.prenom
               },
               dateFinReelle: actionQualifieeDto.dateFinReelle?.toISOString(),
-              categorie: Action.Qualification.Code.SANTE
+              categorie: 'Santé'
             }
           ]
         }
@@ -257,7 +257,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 prenom: jeuneDto.prenom
               },
               dateFinReelle: actionAQualifier1Dto.dateFinReelle?.toISOString(),
-              categorie: Action.Qualification.Code.CITOYENNETE
+              categorie: 'Citoyenneté'
             },
             {
               id: actionAQualifier2Dto.id,
@@ -268,7 +268,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 prenom: jeuneDto.prenom
               },
               dateFinReelle: actionAQualifier2Dto.dateFinReelle?.toISOString(),
-              categorie: Action.Qualification.Code.SANTE
+              categorie: 'Santé'
             }
           ]
         }

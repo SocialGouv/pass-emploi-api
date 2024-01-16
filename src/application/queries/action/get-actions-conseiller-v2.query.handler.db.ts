@@ -9,6 +9,7 @@ import { ActionSqlModel } from '../../../infrastructure/sequelize/models/action.
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { GetActionsConseillerV2QueryModel } from '../query-models/conseillers.query-model'
+import { Qualification } from 'src/domain/action/qualification'
 
 const DEFAULT_PAGE = 1
 const DEFAULT_LIMIT = 10
@@ -105,7 +106,10 @@ export class GetActionsConseillerV2QueryHandler extends QueryHandler<
           prenom: actionSql.jeune.prenom
         },
         dateFinReelle: actionSql.dateFinReelle?.toISOString(),
-        categorie: actionSql.codeQualification ?? undefined
+        categorie: actionSql.codeQualification
+          ? Qualification.mapCodeTypeQualification[actionSql.codeQualification]
+              .label
+          : undefined
       }))
     })
   }
