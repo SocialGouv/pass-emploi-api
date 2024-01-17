@@ -111,8 +111,13 @@ export class GetActionsConseillerV2QueryHandler extends QueryHandler<
         },
         dateFinReelle: actionSql.dateFinReelle?.toISOString(),
         categorie: actionSql.codeQualification
-          ? Qualification.mapCodeTypeQualification[actionSql.codeQualification]
-              .label
+          ? {
+              code: actionSql.codeQualification,
+              libelle:
+                Qualification.mapCodeTypeQualification[
+                  actionSql.codeQualification
+                ].label
+            }
           : undefined
       }))
     })
