@@ -10,7 +10,7 @@ import { SuggestionDto } from '../../../../clients/dto/pole-emploi.dto'
 import {
   PoleEmploiPartenaireClient,
   PoleEmploiPartenaireClientToken
-} from '../../../../clients/pole-emploi-partenaire-client'
+} from '../../../../clients/pole-emploi-partenaire-client.db'
 
 const CODE_TYPE_LIEU_DEPARTEMENT = '4'
 const CODE_TYPE_LIEU_COMMUNE = '5'

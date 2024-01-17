@@ -21,7 +21,7 @@ import {
 } from '../../../../../src/building-blocks/types/domain-error'
 import { before } from 'mocha'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { PoleEmploiPartenaireClient } from '../../../../../src/infrastructure/clients/pole-emploi-partenaire-client'
+import { PoleEmploiPartenaireClient } from '../../../../../src/infrastructure/clients/pole-emploi-partenaire-client.db'
 import { DateService } from '../../../../../src/utils/date-service'
 import { DateTime } from 'luxon'
 import { KeycloakClient } from '../../../../../src/infrastructure/clients/keycloak-client'

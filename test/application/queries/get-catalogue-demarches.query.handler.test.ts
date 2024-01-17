@@ -1,4 +1,4 @@
-import { PoleEmploiPartenaireClient } from 'src/infrastructure/clients/pole-emploi-partenaire-client'
+import { PoleEmploiPartenaireClient } from 'src/infrastructure/clients/pole-emploi-partenaire-client.db'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 
 import { Core, estPoleEmploiBRSA } from '../../../src/domain/core'

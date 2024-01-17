@@ -10,7 +10,7 @@ import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import {
   PoleEmploiPartenaireClient,
   PoleEmploiPartenaireClientToken
-} from 'src/infrastructure/clients/pole-emploi-partenaire-client'
+} from 'src/infrastructure/clients/pole-emploi-partenaire-client.db'
 import { buildError } from 'src/utils/logger.module'
 
 import { TypesDemarcheQueryModel } from './query-models/types-demarche.query-model'

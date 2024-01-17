@@ -5,7 +5,7 @@ import { failure, success } from '../../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
 import { TIMEOUT } from 'dns'
 import { ImmersionClient } from '../../../../src/infrastructure/clients/immersion-client'
-import { FindAllOffresImmersionQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-immersion.query.getter'
+import { FindAllOffresImmersionQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-immersion.query.getter.db'
 import { StubbedClass, stubClass } from '../../../utils'
 import {
   DatabaseForTesting,
@@ -14,7 +14,7 @@ import {
 import { unMetierRomeDto } from '../../../fixtures/sql-models/metier-rome.sql-model'
 import { MetierRomeSqlModel } from '../../../../src/infrastructure/sequelize/models/metier-rome.sql-model'
 
-describe('', () => {
+describe('FindAllOffresImmersionQueryGetter', () => {
   let databaseForTesting: DatabaseForTesting
   let immersionClient: StubbedClass<ImmersionClient>
   let findAllOffresImmersionQueryGetter: FindAllOffresImmersionQueryGetter

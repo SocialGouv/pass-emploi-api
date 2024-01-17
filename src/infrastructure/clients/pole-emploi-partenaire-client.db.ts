@@ -407,7 +407,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
   private ajouterLeRetourAuContexteNode<T>(res: AxiosResponse<T>): void {
     let resultatsAppelPartenaire: AppelPartenaireResultat[] = this.context.get<
       AppelPartenaireResultat[]
-    >(ContextKey.RESULTATS_APPEL_PARTENAIRE) as AppelPartenaireResultat[]
+    >(ContextKey.RESULTATS_APPEL_PARTENAIRE)
     if (!resultatsAppelPartenaire) {
       resultatsAppelPartenaire = []
     }

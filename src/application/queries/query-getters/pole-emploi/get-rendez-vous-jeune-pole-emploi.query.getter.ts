@@ -13,7 +13,7 @@ import { KeycloakClient } from '../../../../infrastructure/clients/keycloak-clie
 import {
   PoleEmploiPartenaireClient,
   PoleEmploiPartenaireClientToken
-} from '../../../../infrastructure/clients/pole-emploi-partenaire-client'
+} from '../../../../infrastructure/clients/pole-emploi-partenaire-client.db'
 import { DateService } from '../../../../utils/date-service'
 import { IdService } from '../../../../utils/id-service'
 import { fromRendezVousDtoToRendezVousQueryModel } from '../../query-mappers/rendez-vous-pole-emploi.mappers'

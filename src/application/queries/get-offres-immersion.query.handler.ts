@@ -5,7 +5,7 @@ import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { OffreImmersionQueryModel } from './query-models/offres-immersion.query-model'
-import { FindAllOffresImmersionQueryGetter } from './query-getters/find-all-offres-immersion.query.getter'
+import { FindAllOffresImmersionQueryGetter } from './query-getters/find-all-offres-immersion.query.getter.db'
 
 export interface GetOffresImmersionQuery extends Query {
   rome: string
