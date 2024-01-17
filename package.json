@@ -174,7 +174,7 @@
   },
   "resolutions": {
     "@nestjs/axios/axios": "1.6.0",
-    "download/got": "11.8.5"
+    "download/got": "11.8.6"
   },
   "mocha": {
     "require": [
