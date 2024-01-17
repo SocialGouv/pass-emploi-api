@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common'
 import { Op, Order } from 'sequelize'
-import { Query } from '../../../building-blocks/types/query'
-import { QueryHandler } from '../../../building-blocks/types/query-handler'
-import { Result, success } from '../../../building-blocks/types/result'
-import { Action } from '../../../domain/action/action'
-import { Authentification } from '../../../domain/authentification'
-import { ActionSqlModel } from '../../../infrastructure/sequelize/models/action.sql-model'
-import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
-import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
-import { GetActionsConseillerV2QueryModel } from '../query-models/conseillers.query-model'
+import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
+import { GetActionsConseillerV2QueryModel } from 'src/application/queries/query-models/conseillers.query-model'
+import { Query } from 'src/building-blocks/types/query'
+import { QueryHandler } from 'src/building-blocks/types/query-handler'
+import { Result, success } from 'src/building-blocks/types/result'
+import { Action } from 'src/domain/action/action'
 import { Qualification } from 'src/domain/action/qualification'
+import { Authentification } from 'src/domain/authentification'
+import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
+import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 
 const DEFAULT_PAGE = 1
 const DEFAULT_LIMIT = 10
@@ -18,6 +18,7 @@ export interface GetActionsConseillerV2Query extends Query {
   idConseiller: string
   page?: number
   limit?: number
+  codesCategories?: Action.Qualification.Code[]
   aQualifier?: boolean
 }
 
@@ -45,28 +46,31 @@ export class GetActionsConseillerV2QueryHandler extends QueryHandler<
     const page = query.page ?? DEFAULT_PAGE
     const limit = query.limit ?? DEFAULT_LIMIT
 
-    let whereClause = {}
+    let whereClause
     let order: Order | undefined
 
     switch (query.aQualifier) {
       case true:
         whereClause = {
-          where: {
-            statut: Action.Statut.TERMINEE,
-            heuresQualifiees: null
-          }
+          statut: Action.Statut.TERMINEE,
+          heuresQualifiees: null
         }
         order = [['date_fin_reelle', 'ASC']]
         break
       case false:
         whereClause = {
-          where: {
-            [Op.or]: {
-              statut: { [Op.ne]: Action.Statut.TERMINEE },
-              heuresQualifiees: { [Op.ne]: null }
-            }
+          [Op.or]: {
+            statut: { [Op.ne]: Action.Statut.TERMINEE },
+            heuresQualifiees: { [Op.ne]: null }
           }
         }
+    }
+
+    if (query.codesCategories) {
+      whereClause = {
+        ...(whereClause ?? {}),
+        codeQualification: { [Op.in]: query.codesCategories }
+      }
     }
 
     const actionsSqlModel = await ActionSqlModel.findAndCountAll({
@@ -85,7 +89,7 @@ export class GetActionsConseillerV2QueryHandler extends QueryHandler<
         'dateFinReelle',
         'codeQualification'
       ],
-      ...whereClause,
+      ...(whereClause ? { where: whereClause } : {}),
       limit,
       offset: (page - 1) * limit,
       order: order ?? [['date_creation', 'ASC']]
