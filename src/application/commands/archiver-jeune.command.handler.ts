@@ -23,6 +23,7 @@ import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { Mail, MailServiceToken } from '../../domain/mail'
 import { DateService } from '../../utils/date-service'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
+import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 
 export interface ArchiverJeuneCommand {
   idJeune: Jeune.Id
@@ -89,7 +90,6 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
       return resultArchiver
     }
 
-    await this.authentificationRepository.deleteUtilisateurIdp(command.idJeune)
     await this.jeuneRepository.supprimer(command.idJeune)
     await this.chatRepository.supprimerChat(command.idJeune)
 
@@ -99,7 +99,32 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
       command.commentaire
     )
 
-    return emptySuccess()
+    // TODO mesurer le taux de retry des conseillers sur 1 mois sur la commande
+    await this.authentificationRepository.deleteUtilisateurIdp(command.idJeune)
+    /*
+    const MAX_RETRY = 3
+    for (let i = 0; i < MAX_RETRY; i++) {
+      try {
+        await this.authentificationRepository.deleteUtilisateurIdp(
+          command.idJeune
+        )
+        return emptySuccess()
+      } catch (e) {
+        await new Promise(resolve => setTimeout(resolve, 5000))
+        this.logger.log(
+          `Suppression Keycloak User - Essai ${i + 1} en échec : ${e}`
+        )
+      }
+    }
+    // Si on arrive ici, la suppression Keycloak a échoué
+    // return emptySuccess()
+    */
+    retry(
+      this.authentificationRepository.deleteUtilisateurIdp(command.idJeune)
+    ).catch(e => {
+      this.logger.log('Suppression user keycloak échouée')
+      throw new RuntimeException(e)
+    })
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
@@ -108,4 +133,20 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
       utilisateur
     )
   }
+}
+
+function delay(t): Promise<void> {
+  return new Promise(resolve => {
+    setTimeout(resolve, t)
+  })
+}
+
+async function retry(promise, retries = 3, e = null) {
+  if (!retries) {
+    return Promise.reject(e)
+  }
+  return promise.catch(e => {
+    delay(5000)
+    return retry(promise, retries - 1, e)
+  })
 }
