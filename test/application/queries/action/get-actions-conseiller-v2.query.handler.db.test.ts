@@ -1,7 +1,8 @@
 import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
 import {
   GetActionsConseillerV2Query,
-  GetActionsConseillerV2QueryHandler
+  GetActionsConseillerV2QueryHandler,
+  TriActionsConseillerV2
 } from 'src/application/queries/action/get-actions-conseiller-v2.query.handler.db'
 import { GetActionsConseillerV2QueryModel } from 'src/application/queries/query-models/conseillers.query-model'
 import { Action } from 'src/domain/action/action'
@@ -36,6 +37,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
 
   const idConseiller = 'id-conseiller'
   const idJeune = 'id-jeune'
+  const idJeune2 = 'id-jeune-2'
   const idAutreConseiller = 'id-autre-conseiller'
   const idAutreJeune = 'id-autre-jeune'
   const datetimeDeBase = uneDatetime()
@@ -43,6 +45,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
   let conseillerDto: AsSql<ConseillerDto>
   let autreConseillerDto: AsSql<ConseillerDto>
   let jeuneDto: AsSql<JeuneDto>
+  let jeune2Dto: AsSql<JeuneDto>
   let autreJeuneDto: AsSql<JeuneDto>
   let actionAQualifier1Dto: AsSql<ActionDto>
   let actionAQualifier2Dto: AsSql<ActionDto>
@@ -83,6 +86,12 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
       // Given
       conseillerDto = unConseillerDto({ id: idConseiller })
       jeuneDto = unJeuneDto({ id: idJeune, idConseiller })
+      jeune2Dto = unJeuneDto({
+        id: idJeune2,
+        idConseiller,
+        nom: 'Granger',
+        prenom: 'Hermione'
+      })
 
       // Tri par date creation numérotées par ordre de date d'échéance
       actionNonTermineeDto = uneActionDto({
@@ -91,7 +100,6 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
         dateCreation: datetimeDeBase.toJSDate()
       })
       actionAQualifier1Dto = uneActionDto({
-        id: '9c84a1ab-96e2-4841-935a-16d69fe2e7ff',
         idJeune,
         statut: Action.Statut.TERMINEE,
         dateCreation: datetimeDeBase.plus({ days: 1 }).toJSDate(),
@@ -99,14 +107,12 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
         codeQualification: Action.Qualification.Code.CITOYENNETE
       })
       actionAQualifier3Dto = uneActionDto({
-        id: '8c84a1ab-96e2-4841-935a-16d69fe2e7ee',
-        idJeune,
+        idJeune: idJeune2,
         statut: Action.Statut.TERMINEE,
         dateCreation: datetimeDeBase.plus({ days: 2 }).toJSDate(),
         dateFinReelle: datetimeDeBase.plus({ days: 2 }).toJSDate()
       })
       actionAQualifier2Dto = uneActionDto({
-        id: '7c84a1ab-96e2-4841-935a-16d69fe2e444',
         idJeune,
         statut: Action.Statut.TERMINEE,
         dateCreation: datetimeDeBase.plus({ days: 3 }).toJSDate(),
@@ -114,9 +120,10 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
         codeQualification: Action.Qualification.Code.SANTE
       })
       actionQualifieeDto = uneActionDto({
-        idJeune,
+        idJeune: idJeune2,
         statut: Action.Statut.TERMINEE,
         dateCreation: datetimeDeBase.plus({ days: 4 }).toJSDate(),
+        dateFinReelle: datetimeDeBase.plus({ days: 5 }).toJSDate(),
         codeQualification: Action.Qualification.Code.SANTE,
         heuresQualifiees: 5
       })
@@ -133,7 +140,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
       })
 
       await ConseillerSqlModel.bulkCreate([conseillerDto, autreConseillerDto])
-      await JeuneSqlModel.bulkCreate([jeuneDto, autreJeuneDto])
+      await JeuneSqlModel.bulkCreate([jeuneDto, jeune2Dto, autreJeuneDto])
       await ActionSqlModel.bulkCreate([
         actionAQualifier1Dto,
         actionAQualifier2Dto,
@@ -165,7 +172,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionNonTermineeDto.dateFinReelle?.toISOString(),
+              dateFinReelle: undefined,
               categorie: undefined
             },
             {
@@ -176,7 +183,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionAQualifier1Dto.dateFinReelle?.toISOString(),
+              dateFinReelle: actionAQualifier1Dto.dateFinReelle!.toISOString(),
               categorie: {
                 code: Action.Qualification.Code.CITOYENNETE,
                 libelle: 'Citoyenneté'
@@ -186,11 +193,11 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
               id: actionAQualifier3Dto.id,
               titre: actionAQualifier3Dto.contenu,
               jeune: {
-                id: idJeune,
-                nom: jeuneDto.nom,
-                prenom: jeuneDto.prenom
+                id: idJeune2,
+                nom: jeune2Dto.nom,
+                prenom: jeune2Dto.prenom
               },
-              dateFinReelle: actionAQualifier3Dto.dateFinReelle?.toISOString(),
+              dateFinReelle: actionAQualifier3Dto.dateFinReelle!.toISOString(),
               categorie: undefined
             }
           ]
@@ -199,7 +206,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
           queryModelAttendu
         )
       })
-      it('récupère toutes les actions à qualifier de la deuxième page', async () => {
+      it('récupère toutes les actions de la deuxième page', async () => {
         // Given
         const query = { idConseiller, page: 2, limit }
 
@@ -218,7 +225,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionAQualifier2Dto.dateFinReelle?.toISOString(),
+              dateFinReelle: actionAQualifier2Dto.dateFinReelle!.toISOString(),
               categorie: {
                 code: Action.Qualification.Code.SANTE,
                 libelle: 'Santé'
@@ -228,11 +235,11 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
               id: actionQualifieeDto.id,
               titre: actionQualifieeDto.contenu,
               jeune: {
-                id: idJeune,
-                nom: jeuneDto.nom,
-                prenom: jeuneDto.prenom
+                id: idJeune2,
+                nom: jeune2Dto.nom,
+                prenom: jeune2Dto.prenom
               },
-              dateFinReelle: actionQualifieeDto.dateFinReelle?.toISOString(),
+              dateFinReelle: actionQualifieeDto.dateFinReelle!.toISOString(),
               categorie: {
                 code: Action.Qualification.Code.SANTE,
                 libelle: 'Santé'
@@ -267,7 +274,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionAQualifier1Dto.dateFinReelle?.toISOString(),
+              dateFinReelle: actionAQualifier1Dto.dateFinReelle!.toISOString(),
               categorie: {
                 code: Action.Qualification.Code.CITOYENNETE,
                 libelle: 'Citoyenneté'
@@ -281,7 +288,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionAQualifier2Dto.dateFinReelle?.toISOString(),
+              dateFinReelle: actionAQualifier2Dto.dateFinReelle!.toISOString(),
               categorie: {
                 code: Action.Qualification.Code.SANTE,
                 libelle: 'Santé'
@@ -308,11 +315,11 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
               id: actionAQualifier3Dto.id,
               titre: actionAQualifier3Dto.contenu,
               jeune: {
-                id: idJeune,
-                nom: jeuneDto.nom,
-                prenom: jeuneDto.prenom
+                id: idJeune2,
+                nom: jeune2Dto.nom,
+                prenom: jeune2Dto.prenom
               },
-              dateFinReelle: actionAQualifier3Dto.dateFinReelle?.toISOString(),
+              dateFinReelle: actionAQualifier3Dto.dateFinReelle!.toISOString(),
               categorie: undefined
             }
           ]
@@ -348,7 +355,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionAQualifier2Dto.dateFinReelle?.toISOString(),
+              dateFinReelle: actionAQualifier2Dto.dateFinReelle!.toISOString(),
               categorie: {
                 code: Action.Qualification.Code.SANTE,
                 libelle: 'Santé'
@@ -358,11 +365,11 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
               id: actionQualifieeDto.id,
               titre: actionQualifieeDto.contenu,
               jeune: {
-                id: idJeune,
-                nom: jeuneDto.nom,
-                prenom: jeuneDto.prenom
+                id: idJeune2,
+                nom: jeune2Dto.nom,
+                prenom: jeune2Dto.prenom
               },
-              dateFinReelle: actionQualifieeDto.dateFinReelle?.toISOString(),
+              dateFinReelle: actionQualifieeDto.dateFinReelle!.toISOString(),
               categorie: {
                 code: Action.Qualification.Code.SANTE,
                 libelle: 'Santé'
@@ -402,7 +409,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionAQualifier1Dto.dateFinReelle?.toISOString(),
+              dateFinReelle: actionAQualifier1Dto.dateFinReelle!.toISOString(),
               categorie: {
                 code: Action.Qualification.Code.CITOYENNETE,
                 libelle: 'Citoyenneté'
@@ -416,7 +423,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionAQualifier2Dto.dateFinReelle?.toISOString(),
+              dateFinReelle: actionAQualifier2Dto.dateFinReelle!.toISOString(),
               categorie: {
                 code: Action.Qualification.Code.SANTE,
                 libelle: 'Santé'
@@ -426,11 +433,11 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
               id: actionQualifieeDto.id,
               titre: actionQualifieeDto.contenu,
               jeune: {
-                id: idJeune,
-                nom: jeuneDto.nom,
-                prenom: jeuneDto.prenom
+                id: idJeune2,
+                nom: jeune2Dto.nom,
+                prenom: jeune2Dto.prenom
               },
-              dateFinReelle: actionQualifieeDto.dateFinReelle?.toISOString(),
+              dateFinReelle: actionQualifieeDto.dateFinReelle!.toISOString(),
               categorie: {
                 code: Action.Qualification.Code.SANTE,
                 libelle: 'Santé'
@@ -470,7 +477,108 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionAQualifier2Dto.dateFinReelle?.toISOString(),
+              dateFinReelle: actionAQualifier2Dto.dateFinReelle!.toISOString(),
+              categorie: {
+                code: Action.Qualification.Code.SANTE,
+                libelle: 'Santé'
+              }
+            }
+          ]
+        }
+        expect(result._isSuccess && result.data).to.deep.equal(
+          queryModelAttendu
+        )
+      })
+    })
+
+    describe('quand trié par bénéficiaires', () => {
+      it('récupère toutes les actions triées par bénéficiaire alphabétique', async () => {
+        // Given
+        const query: GetActionsConseillerV2Query = {
+          idConseiller,
+          page: 1,
+          limit: 2,
+          tri: TriActionsConseillerV2.BENEFICIAIRE_ALPHABETIQUE
+        }
+
+        // When
+        const result = await queryHandler.handle(query)
+
+        // Then
+        const queryModelAttendu: GetActionsConseillerV2QueryModel = {
+          pagination: { page: query.page!, limit: query.limit!, total: 5 },
+          resultats: [
+            {
+              id: actionAQualifier2Dto.id,
+              titre: actionAQualifier2Dto.contenu,
+              jeune: {
+                id: idJeune,
+                nom: jeuneDto.nom,
+                prenom: jeuneDto.prenom
+              },
+              dateFinReelle: actionAQualifier2Dto.dateFinReelle!.toISOString(),
+              categorie: {
+                code: Action.Qualification.Code.SANTE,
+                libelle: 'Santé'
+              }
+            },
+            {
+              id: actionAQualifier1Dto.id,
+              titre: actionAQualifier1Dto.contenu,
+              jeune: {
+                id: idJeune,
+                nom: jeuneDto.nom,
+                prenom: jeuneDto.prenom
+              },
+              dateFinReelle: actionAQualifier1Dto.dateFinReelle!.toISOString(),
+              categorie: {
+                code: Action.Qualification.Code.CITOYENNETE,
+                libelle: 'Citoyenneté'
+              }
+            }
+          ]
+        }
+        expect(result._isSuccess && result.data).to.deep.equal(
+          queryModelAttendu
+        )
+      })
+
+      it('récupère toutes les actions triées par bénéficiaire anti-alphabétique', async () => {
+        // Given
+        const query: GetActionsConseillerV2Query = {
+          idConseiller,
+          page: 1,
+          limit: 2,
+          tri: TriActionsConseillerV2.BENEFICIAIRE_INVERSE
+        }
+
+        // When
+        const result = await queryHandler.handle(query)
+
+        // Then
+        const queryModelAttendu: GetActionsConseillerV2QueryModel = {
+          pagination: { page: query.page!, limit: query.limit!, total: 5 },
+          resultats: [
+            {
+              id: actionAQualifier3Dto.id,
+              titre: actionAQualifier3Dto.contenu,
+              jeune: {
+                id: idJeune2,
+                nom: jeune2Dto.nom,
+                prenom: jeune2Dto.prenom
+              },
+              dateFinReelle: actionAQualifier3Dto.dateFinReelle!.toISOString(),
+              categorie: undefined
+            },
+            {
+              id: actionQualifieeDto.id,
+              titre: actionQualifieeDto.contenu,
+              jeune: {
+                id: idJeune2,
+                nom: jeune2Dto.nom,
+                prenom: jeune2Dto.prenom
+              },
+              dateFinReelle: actionQualifieeDto.dateFinReelle!.toISOString(),
               categorie: {
                 code: Action.Qualification.Code.SANTE,
                 libelle: 'Santé'
