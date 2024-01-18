@@ -1,7 +1,8 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
 import {
   GetActionsConseillerV2Query,
-  GetActionsConseillerV2QueryHandler
+  GetActionsConseillerV2QueryHandler,
+  TriActionsConseillerV2
 } from 'src/application/queries/action/get-actions-conseiller-v2.query.handler.db'
 import { GetRendezVousConseillerPaginesQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
 import { success } from 'src/building-blocks/types/result'
@@ -175,7 +176,8 @@ describe('ConseillersControllerV2', () => {
           page: 2,
           limit: undefined,
           codesCategories: undefined,
-          aQualifier: true
+          aQualifier: true,
+          tri: undefined
         }
         const resultat = {
           pagination: {
@@ -206,7 +208,8 @@ describe('ConseillersControllerV2', () => {
           page: 2,
           limit: undefined,
           codesCategories: undefined,
-          aQualifier: false
+          aQualifier: false,
+          tri: undefined
         }
         const resultat = {
           pagination: {
@@ -237,7 +240,8 @@ describe('ConseillersControllerV2', () => {
           page: 2,
           limit: undefined,
           codesCategories: undefined,
-          aQualifier: undefined
+          aQualifier: undefined,
+          tri: undefined
         }
         const resultat = {
           pagination: {
@@ -269,7 +273,8 @@ describe('ConseillersControllerV2', () => {
             Action.Qualification.Code.SANTE,
             Action.Qualification.Code.CITOYENNETE
           ],
-          aQualifier: undefined
+          aQualifier: undefined,
+          tri: undefined
         }
         const resultat = {
           pagination: {
@@ -288,6 +293,38 @@ describe('ConseillersControllerV2', () => {
         await request(app.getHttpServer())
           .get(
             `/v2/conseillers/${query.idConseiller}/actions?page=2&codesCategories=SANTE&codesCategories=CITOYENNETE`
+          )
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+          .expect(JSON.stringify(resultat))
+      })
+      it('retourne les actions triées', async () => {
+        // Given
+        const query: GetActionsConseillerV2Query = {
+          idConseiller: 'un-id-conseiller',
+          page: 2,
+          limit: undefined,
+          codesCategories: undefined,
+          aQualifier: undefined,
+          tri: TriActionsConseillerV2.BENEFICIAIRE_ALPHABETIQUE
+        }
+        const resultat = {
+          pagination: {
+            page: 1,
+            limit: 10,
+            total: 0
+          },
+          resultats: []
+        }
+
+        getActionsConseillerQueryHandler.execute
+          .withArgs(query, unUtilisateurDecode())
+          .resolves(success(resultat))
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get(
+            `/v2/conseillers/${query.idConseiller}/actions?page=2&tri=BENEFICIAIRE_ALPHABETIQUE`
           )
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.OK)

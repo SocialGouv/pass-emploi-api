@@ -18,8 +18,9 @@ import {
   MinLength,
   ValidateNested
 } from 'class-validator'
-import { Action } from 'src/domain/action/action'
+import { TriActionsConseillerV2 } from 'src/application/queries/action/get-actions-conseiller-v2.query.handler.db'
 import { TriRendezVous } from 'src/application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
+import { Action } from 'src/domain/action/action'
 import { Core } from 'src/domain/core'
 import { AgenceInput } from 'src/infrastructure/routes/validation/agences.inputs'
 import {
@@ -252,6 +253,11 @@ export class GetActionsConseillerV2QueryParams {
   @IsIn([true, false])
   @Transform(params => transformStringToBoolean(params, 'aQualifier'))
   aQualifier?: boolean
+
+  @IsOptional()
+  @IsString()
+  @IsEnum(TriActionsConseillerV2)
+  tri?: TriActionsConseillerV2
 }
 
 export class GetIdentitesJeunesQueryParams {

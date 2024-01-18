@@ -91,7 +91,8 @@ export class ConseillersControllerV2 {
           page: getActionsConseillerV2QueryParams.page,
           limit: getActionsConseillerV2QueryParams.limit,
           codesCategories: getActionsConseillerV2QueryParams.codesCategories,
-          aQualifier: getActionsConseillerV2QueryParams.aQualifier
+          aQualifier: getActionsConseillerV2QueryParams.aQualifier,
+          tri: getActionsConseillerV2QueryParams.tri
         },
         utilisateur
       )

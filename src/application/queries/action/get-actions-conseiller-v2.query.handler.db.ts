@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { Op, Order } from 'sequelize'
+import { Op, OrderItem, WhereOptions } from 'sequelize'
 import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
 import { GetActionsConseillerV2QueryModel } from 'src/application/queries/query-models/conseillers.query-model'
 import { Query } from 'src/building-blocks/types/query'
@@ -14,12 +14,17 @@ import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-mod
 const DEFAULT_PAGE = 1
 const DEFAULT_LIMIT = 10
 
+export enum TriActionsConseillerV2 {
+  BENEFICIAIRE_ALPHABETIQUE = 'BENEFICIAIRE_ALPHABETIQUE',
+  BENEFICIAIRE_INVERSE = 'BENEFICIAIRE_INVERSE'
+}
 export interface GetActionsConseillerV2Query extends Query {
   idConseiller: string
   page?: number
   limit?: number
   codesCategories?: Action.Qualification.Code[]
   aQualifier?: boolean
+  tri?: TriActionsConseillerV2
 }
 
 @Injectable()
@@ -46,8 +51,8 @@ export class GetActionsConseillerV2QueryHandler extends QueryHandler<
     const page = query.page ?? DEFAULT_PAGE
     const limit = query.limit ?? DEFAULT_LIMIT
 
-    let whereClause
-    let order: Order | undefined
+    let whereClause: WhereOptions | undefined
+    let order: OrderItem[] | undefined
 
     switch (query.aQualifier) {
       case true:
@@ -64,6 +69,7 @@ export class GetActionsConseillerV2QueryHandler extends QueryHandler<
             heuresQualifiees: { [Op.ne]: null }
           }
         }
+        break
     }
 
     if (query.codesCategories) {
@@ -71,6 +77,23 @@ export class GetActionsConseillerV2QueryHandler extends QueryHandler<
         ...(whereClause ?? {}),
         codeQualification: { [Op.in]: query.codesCategories }
       }
+    }
+
+    switch (query.tri) {
+      case TriActionsConseillerV2.BENEFICIAIRE_ALPHABETIQUE:
+        order = [
+          ['jeune', 'nom', 'ASC'],
+          ['jeune', 'prenom', 'ASC'],
+          ...(order ?? [])
+        ]
+        break
+      case TriActionsConseillerV2.BENEFICIAIRE_INVERSE:
+        order = [
+          ['jeune', 'nom', 'DESC'],
+          ['jeune', 'prenom', 'DESC'],
+          ...(order ?? [])
+        ]
+        break
     }
 
     const actionsSqlModel = await ActionSqlModel.findAndCountAll({
