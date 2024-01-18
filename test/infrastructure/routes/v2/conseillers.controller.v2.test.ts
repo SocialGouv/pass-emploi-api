@@ -1,18 +1,19 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
-import { GetRendezVousConseillerPaginesQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
-import * as request from 'supertest'
 import {
   GetActionsConseillerV2Query,
   GetActionsConseillerV2QueryHandler
-} from '../../../../src/application/queries/action/get-actions-conseiller-v2.query.handler.db'
-import { success } from '../../../../src/building-blocks/types/result'
+} from 'src/application/queries/action/get-actions-conseiller-v2.query.handler.db'
+import { GetRendezVousConseillerPaginesQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
+import { success } from 'src/building-blocks/types/result'
+import { Action } from 'src/domain/action/action'
+import * as request from 'supertest'
 import {
   unHeaderAuthorization,
   unUtilisateurDecode
-} from '../../../fixtures/authentification.fixture'
-import { expect, StubbedClass } from '../../../utils'
-import { ensureUserAuthenticationFailsIfInvalid } from '../../../utils/ensure-user-authentication-fails-if-invalid'
-import { getApplicationWithStubbedDependencies } from '../../../utils/module-for-testing'
+} from 'test/fixtures/authentification.fixture'
+import { expect, StubbedClass } from 'test/utils'
+import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
+import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
 
 describe('ConseillersControllerV2', () => {
   let app: INestApplication
@@ -173,6 +174,7 @@ describe('ConseillersControllerV2', () => {
           idConseiller: 'un-id-conseiller',
           page: 2,
           limit: undefined,
+          codesCategories: undefined,
           aQualifier: true
         }
         const resultat = {
@@ -203,6 +205,7 @@ describe('ConseillersControllerV2', () => {
           idConseiller: 'un-id-conseiller',
           page: 2,
           limit: undefined,
+          codesCategories: undefined,
           aQualifier: false
         }
         const resultat = {
@@ -233,6 +236,7 @@ describe('ConseillersControllerV2', () => {
           idConseiller: 'un-id-conseiller',
           page: 2,
           limit: undefined,
+          codesCategories: undefined,
           aQualifier: undefined
         }
         const resultat = {
@@ -251,6 +255,40 @@ describe('ConseillersControllerV2', () => {
         // When - Then
         await request(app.getHttpServer())
           .get(`/v2/conseillers/${query.idConseiller}/actions?page=2`)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+          .expect(JSON.stringify(resultat))
+      })
+      it('retourne les actions avec les catégories demandées', async () => {
+        // Given
+        const query: GetActionsConseillerV2Query = {
+          idConseiller: 'un-id-conseiller',
+          page: 2,
+          limit: undefined,
+          codesCategories: [
+            Action.Qualification.Code.SANTE,
+            Action.Qualification.Code.CITOYENNETE
+          ],
+          aQualifier: undefined
+        }
+        const resultat = {
+          pagination: {
+            page: 1,
+            limit: 10,
+            total: 0
+          },
+          resultats: []
+        }
+
+        getActionsConseillerQueryHandler.execute
+          .withArgs(query, unUtilisateurDecode())
+          .resolves(success(resultat))
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get(
+            `/v2/conseillers/${query.idConseiller}/actions?page=2&codesCategories=SANTE&codesCategories=CITOYENNETE`
+          )
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.OK)
           .expect(JSON.stringify(resultat))

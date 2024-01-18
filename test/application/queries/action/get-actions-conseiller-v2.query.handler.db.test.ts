@@ -1,32 +1,33 @@
-import { ConseillerAuthorizer } from '../../../../src/application/authorizers/conseiller-authorizer'
-import { GetActionsConseillerV2QueryHandler } from '../../../../src/application/queries/action/get-actions-conseiller-v2.query.handler.db'
-import { GetActionsConseillerV2QueryModel } from '../../../../src/application/queries/query-models/conseillers.query-model'
-import { Action } from '../../../../src/domain/action/action'
-import { Qualification } from '../../../../src/domain/action/qualification'
+import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
+import {
+  GetActionsConseillerV2Query,
+  GetActionsConseillerV2QueryHandler
+} from 'src/application/queries/action/get-actions-conseiller-v2.query.handler.db'
+import { GetActionsConseillerV2QueryModel } from 'src/application/queries/query-models/conseillers.query-model'
+import { Action } from 'src/domain/action/action'
 import {
   ActionDto,
   ActionSqlModel
-} from '../../../../src/infrastructure/sequelize/models/action.sql-model'
+} from 'src/infrastructure/sequelize/models/action.sql-model'
 import {
   ConseillerDto,
   ConseillerSqlModel
-} from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+} from 'src/infrastructure/sequelize/models/conseiller.sql-model'
 import {
   JeuneDto,
   JeuneSqlModel
-} from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { AsSql } from '../../../../src/infrastructure/sequelize/types'
-import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
-import { uneDatetime } from '../../../fixtures/date.fixture'
-import { uneActionDto } from '../../../fixtures/sql-models/action.sql-model'
-import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
-import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
-import { expect, StubbedClass, stubClass } from '../../../utils'
+} from 'src/infrastructure/sequelize/models/jeune.sql-model'
+import { AsSql } from 'src/infrastructure/sequelize/types'
+import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
+import { uneDatetime } from 'test/fixtures/date.fixture'
+import { uneActionDto } from 'test/fixtures/sql-models/action.sql-model'
+import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
+import { expect, StubbedClass, stubClass } from 'test/utils'
 import {
   DatabaseForTesting,
   getDatabase
-} from '../../../utils/database-for-testing'
-import Code = Qualification.Code
+} from 'test/utils/database-for-testing'
 
 describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
@@ -110,13 +111,13 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
         statut: Action.Statut.TERMINEE,
         dateCreation: datetimeDeBase.plus({ days: 3 }).toJSDate(),
         dateFinReelle: datetimeDeBase.plus({ days: 1 }).toJSDate(),
-        codeQualification: Code.SANTE
+        codeQualification: Action.Qualification.Code.SANTE
       })
       actionQualifieeDto = uneActionDto({
         idJeune,
         statut: Action.Statut.TERMINEE,
         dateCreation: datetimeDeBase.plus({ days: 4 }).toJSDate(),
-        codeQualification: Code.SANTE,
+        codeQualification: Action.Qualification.Code.SANTE,
         heuresQualifiees: 5
       })
 
@@ -176,7 +177,10 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 prenom: jeuneDto.prenom
               },
               dateFinReelle: actionAQualifier1Dto.dateFinReelle?.toISOString(),
-              categorie: 'Citoyenneté'
+              categorie: {
+                code: Action.Qualification.Code.CITOYENNETE,
+                libelle: 'Citoyenneté'
+              }
             },
             {
               id: actionAQualifier3Dto.id,
@@ -215,7 +219,10 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 prenom: jeuneDto.prenom
               },
               dateFinReelle: actionAQualifier2Dto.dateFinReelle?.toISOString(),
-              categorie: 'Santé'
+              categorie: {
+                code: Action.Qualification.Code.SANTE,
+                libelle: 'Santé'
+              }
             },
             {
               id: actionQualifieeDto.id,
@@ -226,7 +233,10 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 prenom: jeuneDto.prenom
               },
               dateFinReelle: actionQualifieeDto.dateFinReelle?.toISOString(),
-              categorie: 'Santé'
+              categorie: {
+                code: Action.Qualification.Code.SANTE,
+                libelle: 'Santé'
+              }
             }
           ]
         }
@@ -235,6 +245,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
         )
       })
     })
+
     describe('quand filtre a qualifier', () => {
       const limit = 2
       it('récupère toutes les actions de la première page', async () => {
@@ -257,7 +268,10 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 prenom: jeuneDto.prenom
               },
               dateFinReelle: actionAQualifier1Dto.dateFinReelle?.toISOString(),
-              categorie: 'Citoyenneté'
+              categorie: {
+                code: Action.Qualification.Code.CITOYENNETE,
+                libelle: 'Citoyenneté'
+              }
             },
             {
               id: actionAQualifier2Dto.id,
@@ -268,7 +282,10 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 prenom: jeuneDto.prenom
               },
               dateFinReelle: actionAQualifier2Dto.dateFinReelle?.toISOString(),
-              categorie: 'Santé'
+              categorie: {
+                code: Action.Qualification.Code.SANTE,
+                libelle: 'Santé'
+              }
             }
           ]
         }
@@ -297,6 +314,167 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
               },
               dateFinReelle: actionAQualifier3Dto.dateFinReelle?.toISOString(),
               categorie: undefined
+            }
+          ]
+        }
+        expect(result._isSuccess && result.data).to.deep.equal(
+          queryModelAttendu
+        )
+      })
+    })
+
+    describe('quand filtre catégories', () => {
+      it('récupère toutes les actions avec une catégorie', async () => {
+        // Given
+        const query: GetActionsConseillerV2Query = {
+          idConseiller,
+          page: 1,
+          limit: 2,
+          codesCategories: [Action.Qualification.Code.SANTE]
+        }
+
+        // When
+        const result = await queryHandler.handle(query)
+
+        // Then
+        const queryModelAttendu: GetActionsConseillerV2QueryModel = {
+          pagination: { page: query.page!, limit: query.limit!, total: 2 },
+          resultats: [
+            {
+              id: actionAQualifier2Dto.id,
+              titre: actionAQualifier2Dto.contenu,
+              jeune: {
+                id: idJeune,
+                nom: jeuneDto.nom,
+                prenom: jeuneDto.prenom
+              },
+              dateFinReelle: actionAQualifier2Dto.dateFinReelle?.toISOString(),
+              categorie: {
+                code: Action.Qualification.Code.SANTE,
+                libelle: 'Santé'
+              }
+            },
+            {
+              id: actionQualifieeDto.id,
+              titre: actionQualifieeDto.contenu,
+              jeune: {
+                id: idJeune,
+                nom: jeuneDto.nom,
+                prenom: jeuneDto.prenom
+              },
+              dateFinReelle: actionQualifieeDto.dateFinReelle?.toISOString(),
+              categorie: {
+                code: Action.Qualification.Code.SANTE,
+                libelle: 'Santé'
+              }
+            }
+          ]
+        }
+        expect(result._isSuccess && result.data).to.deep.equal(
+          queryModelAttendu
+        )
+      })
+
+      it('récupère toutes les actions avec plusieurs catégories', async () => {
+        // Given
+        const query: GetActionsConseillerV2Query = {
+          idConseiller,
+          page: 1,
+          limit: 3,
+          codesCategories: [
+            Action.Qualification.Code.SANTE,
+            Action.Qualification.Code.CITOYENNETE
+          ]
+        }
+
+        // When
+        const result = await queryHandler.handle(query)
+
+        // Then
+        const queryModelAttendu: GetActionsConseillerV2QueryModel = {
+          pagination: { page: query.page!, limit: query.limit!, total: 3 },
+          resultats: [
+            {
+              id: actionAQualifier1Dto.id,
+              titre: actionAQualifier1Dto.contenu,
+              jeune: {
+                id: idJeune,
+                nom: jeuneDto.nom,
+                prenom: jeuneDto.prenom
+              },
+              dateFinReelle: actionAQualifier1Dto.dateFinReelle?.toISOString(),
+              categorie: {
+                code: Action.Qualification.Code.CITOYENNETE,
+                libelle: 'Citoyenneté'
+              }
+            },
+            {
+              id: actionAQualifier2Dto.id,
+              titre: actionAQualifier2Dto.contenu,
+              jeune: {
+                id: idJeune,
+                nom: jeuneDto.nom,
+                prenom: jeuneDto.prenom
+              },
+              dateFinReelle: actionAQualifier2Dto.dateFinReelle?.toISOString(),
+              categorie: {
+                code: Action.Qualification.Code.SANTE,
+                libelle: 'Santé'
+              }
+            },
+            {
+              id: actionQualifieeDto.id,
+              titre: actionQualifieeDto.contenu,
+              jeune: {
+                id: idJeune,
+                nom: jeuneDto.nom,
+                prenom: jeuneDto.prenom
+              },
+              dateFinReelle: actionQualifieeDto.dateFinReelle?.toISOString(),
+              categorie: {
+                code: Action.Qualification.Code.SANTE,
+                libelle: 'Santé'
+              }
+            }
+          ]
+        }
+        expect(result._isSuccess && result.data).to.deep.equal(
+          queryModelAttendu
+        )
+      })
+    })
+
+    describe('quand tous les filtres', () => {
+      it('récupère toutes les actions à qualifier avec une catégorie', async () => {
+        // Given
+        const query: GetActionsConseillerV2Query = {
+          idConseiller,
+          page: 1,
+          limit: 2,
+          codesCategories: [Action.Qualification.Code.SANTE],
+          aQualifier: true
+        }
+
+        // When
+        const result = await queryHandler.handle(query)
+
+        // Then
+        const queryModelAttendu: GetActionsConseillerV2QueryModel = {
+          pagination: { page: query.page!, limit: query.limit!, total: 1 },
+          resultats: [
+            {
+              id: actionAQualifier2Dto.id,
+              titre: actionAQualifier2Dto.contenu,
+              jeune: {
+                id: idJeune,
+                nom: jeuneDto.nom,
+                prenom: jeuneDto.prenom
+              },
+              dateFinReelle: actionAQualifier2Dto.dateFinReelle?.toISOString(),
+              categorie: {
+                code: Action.Qualification.Code.SANTE,
+                libelle: 'Santé'
+              }
             }
           ]
         }

@@ -7,25 +7,21 @@ import {
   Query
 } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { GetActionsConseillerV2QueryHandler } from '../../../application/queries/action/get-actions-conseiller-v2.query.handler.db'
-import { GetActionsConseillerV2QueryModel } from '../../../application/queries/query-models/conseillers.query-model'
-import { RendezVousConseillerQueryModel } from '../../../application/queries/query-models/rendez-vous.query-model'
+import { GetActionsConseillerV2QueryHandler } from 'src/application/queries/action/get-actions-conseiller-v2.query.handler.db'
+import { GetActionsConseillerV2QueryModel } from 'src/application/queries/query-models/conseillers.query-model'
+import { RendezVousConseillerQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
 import {
   GetRendezVousConseillerPaginesQuery,
   GetRendezVousConseillerPaginesQueryHandler
-} from '../../../application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
-import {
-  isFailure,
-  isSuccess,
-  Result
-} from '../../../building-blocks/types/result'
-import { Authentification } from '../../../domain/authentification'
-import { Utilisateur } from '../../decorators/authenticated.decorator'
-import { handleFailure } from '../result.handler'
+} from 'src/application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
+import { isFailure, isSuccess, Result } from 'src/building-blocks/types/result'
+import { Authentification } from 'src/domain/authentification'
 import {
   GetActionsConseillerV2QueryParams,
   GetRendezVousConseillerV2QueryParams
-} from '../validation/conseillers.inputs'
+} from 'src/infrastructure/routes/validation/conseillers.inputs'
+import { Utilisateur } from '../../decorators/authenticated.decorator'
+import { handleFailure } from '../result.handler'
 
 @Controller('v2/conseillers')
 @ApiOAuth2([])
@@ -94,6 +90,7 @@ export class ConseillersControllerV2 {
           idConseiller,
           page: getActionsConseillerV2QueryParams.page,
           limit: getActionsConseillerV2QueryParams.limit,
+          codesCategories: getActionsConseillerV2QueryParams.codesCategories,
           aQualifier: getActionsConseillerV2QueryParams.aQualifier
         },
         utilisateur

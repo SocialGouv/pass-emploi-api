@@ -18,9 +18,10 @@ import {
   MinLength,
   ValidateNested
 } from 'class-validator'
-import { TriRendezVous } from '../../../application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
-import { Core } from '../../../domain/core'
-import { AgenceInput } from './agences.inputs'
+import { Action } from 'src/domain/action/action'
+import { TriRendezVous } from 'src/application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
+import { Core } from 'src/domain/core'
+import { AgenceInput } from 'src/infrastructure/routes/validation/agences.inputs'
 import {
   transformStringToArray,
   transformStringToBoolean
@@ -236,6 +237,14 @@ export class GetActionsConseillerV2QueryParams {
   @IsNumber()
   @Type(() => Number)
   limit?: number
+
+  @IsOptional()
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsString({ each: true })
+  @IsEnum(Action.Qualification.Code, { each: true })
+  @Transform(params => transformStringToArray(params, 'codesCategories'))
+  codesCategories?: Action.Qualification.Code[]
 
   @ApiPropertyOptional()
   @IsOptional()
