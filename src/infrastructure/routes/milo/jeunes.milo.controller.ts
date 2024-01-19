@@ -5,18 +5,21 @@ import { AccueilJeuneMiloQueryModel } from 'src/application/queries/query-models
 
 import { isSuccess } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './result.handler'
+import {
+  AccessToken,
+  Utilisateur
+} from '../../decorators/authenticated.decorator'
+import { handleFailure } from '../result.handler'
 
-import { MaintenantQueryParams } from './validation/jeunes.inputs'
+import { MaintenantQueryParams } from '../validation/jeunes.inputs'
 import {
   DetailSessionJeuneMiloQueryModel,
   SessionJeuneMiloQueryModel
 } from 'src/application/queries/query-models/sessions.milo.query.model'
 import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
 import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
-import { GetSessionsJeunesQueryParams } from './validation/jeunes-milo.inputs'
-import { DateService } from '../../utils/date-service'
+import { GetSessionsJeunesQueryParams } from './validation/jeunes.milo.inputs'
+import { DateService } from '../../../utils/date-service'
 
 @Controller('jeunes')
 @ApiOAuth2([])

@@ -1,20 +1,20 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import * as request from 'supertest'
-import { CloturerAnimationCollectiveCommandHandler } from '../../../src/application/commands/cloturer-animation-collective.command.handler'
-import { GetJeunesByEtablissementQueryHandler } from '../../../src/application/queries/get-jeunes-by-etablissement.query.handler.db'
-import { GetAnimationsCollectivesQueryHandler } from '../../../src/application/queries/rendez-vous/get-animations-collectives.query.handler.db'
+import { CloturerAnimationCollectiveCommandHandler } from '../../../../src/application/commands/cloturer-animation-collective.command.handler'
+import { GetJeunesByEtablissementQueryHandler } from '../../../../src/application/queries/get-jeunes-by-etablissement.query.handler.db'
+import { GetAnimationsCollectivesQueryHandler } from '../../../../src/application/queries/rendez-vous/get-animations-collectives.query.handler.db'
 import {
   emptySuccess,
   success
-} from '../../../src/building-blocks/types/result'
+} from '../../../../src/building-blocks/types/result'
 import {
   unHeaderAuthorization,
   unUtilisateurDecode
-} from '../../fixtures/authentification.fixture'
-import { StubbedClass, expect } from '../../utils'
-import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
+} from '../../../fixtures/authentification.fixture'
+import { StubbedClass, expect } from '../../../utils'
+import { ensureUserAuthenticationFailsIfInvalid } from '../../../utils/ensure-user-authentication-fails-if-invalid'
+import { getApplicationWithStubbedDependencies } from '../../../utils/module-for-testing'
 
 describe('EtablissementsController', () => {
   let getAnimationsCollectivesQueryHandler: StubbedClass<GetAnimationsCollectivesQueryHandler>

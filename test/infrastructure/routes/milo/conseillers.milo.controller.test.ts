@@ -36,18 +36,18 @@ import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-tes
 import {
   CreerJeuneMiloCommand,
   CreerJeuneMiloCommandHandler
-} from '../../../src/application/commands/milo/creer-jeune-milo.command.handler'
+} from '../../../../src/application/commands/milo/creer-jeune-milo.command.handler'
 import {
   QualifierActionsMiloCommand,
   QualifierActionsMiloCommandHandler
-} from '../../../src/application/commands/milo/qualifier-actions-milo.command.handler'
-import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
-import { GetJeuneMiloByDossierQueryHandler } from '../../../src/application/queries/get-jeune-milo-by-dossier.query.handler.db'
-import { Action } from '../../../src/domain/action/action'
-import { QualifierActionsMiloPayload } from '../../../src/infrastructure/routes/validation/conseiller-milo.inputs'
-import { CreerJeuneMiloPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
-import { unDossierMilo } from '../../fixtures/milo.fixture'
-import { unJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
+} from '../../../../src/application/commands/milo/qualifier-actions-milo.command.handler'
+import { GetDossierMiloJeuneQueryHandler } from '../../../../src/application/queries/get-dossier-milo-jeune.query.handler'
+import { GetJeuneMiloByDossierQueryHandler } from '../../../../src/application/queries/get-jeune-milo-by-dossier.query.handler.db'
+import { Action } from '../../../../src/domain/action/action'
+import { QualifierActionsMiloPayload } from '../../../../src/infrastructure/routes/milo/validation/conseillers.milo.inputs'
+import { CreerJeuneMiloPayload } from '../../../../src/infrastructure/routes/validation/conseillers.inputs'
+import { unDossierMilo } from '../../../fixtures/milo.fixture'
+import { unJeuneQueryModel } from '../../../fixtures/query-models/jeunes.query-model.fixtures'
 
 describe('ConseillersMiloController', () => {
   let getDossierMiloJeuneQueryHandler: StubbedClass<GetDossierMiloJeuneQueryHandler>

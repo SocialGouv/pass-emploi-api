@@ -16,9 +16,9 @@ import {
   ValidateIf,
   ValidateNested
 } from 'class-validator'
-import { Action } from '../../../domain/action/action'
-import { SessionMilo } from '../../../domain/milo/session.milo'
-import { transformStringToBoolean } from './utils/transformers'
+import { Action } from '../../../../domain/action/action'
+import { SessionMilo } from '../../../../domain/milo/session.milo'
+import { transformStringToBoolean } from '../../validation/utils/transformers'
 import Inscription = SessionMilo.Inscription
 
 export class GetSessionsQueryParams {
