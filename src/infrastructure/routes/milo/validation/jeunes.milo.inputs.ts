@@ -23,3 +23,13 @@ export class GetSessionsJeunesQueryParams {
   @Transform(params => transformStringToBoolean(params, 'filtrerEstInscrit'))
   filtrerEstInscrit?: boolean
 }
+
+export class MonSuiviQueryParams {
+  @IsNotEmpty()
+  @IsDateString()
+  dateDebut: string
+
+  @IsNotEmpty()
+  @IsDateString()
+  dateFin: string
+}

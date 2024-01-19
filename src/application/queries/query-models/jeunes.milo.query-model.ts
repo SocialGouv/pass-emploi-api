@@ -8,6 +8,7 @@ import { RechercheQueryModel } from './recherches.query-model'
 import { FavorisQueryModel } from './favoris.query-model'
 import { CampagneQueryModel } from './campagne.query-model'
 import { SessionJeuneMiloQueryModel } from 'src/application/queries/query-models/sessions.milo.query.model'
+import { ActionQueryModel } from './actions.query-model'
 
 class ResumeSemaineJeune {
   @ApiProperty()
@@ -46,4 +47,24 @@ export class AccueilJeuneMiloQueryModel {
 
   @ApiPropertyOptional()
   campagne?: CampagneQueryModel
+}
+
+export class MonSuiviQueryModel {
+  @ApiProperty({
+    type: ActionQueryModel,
+    isArray: true
+  })
+  actions: ActionQueryModel[]
+
+  @ApiProperty({
+    type: RendezVousJeuneQueryModel,
+    isArray: true
+  })
+  rendezVous: RendezVousJeuneQueryModel[]
+
+  @ApiProperty({
+    type: SessionJeuneMiloQueryModel,
+    isArray: true
+  })
+  sessionsMilo: SessionJeuneMiloQueryModel[]
 }

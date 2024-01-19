@@ -16,13 +16,20 @@ import { DateService } from 'src/utils/date-service'
 
 import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
 import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/milo/get-accueil-jeune-milo.query.handler.db'
-import { AccueilJeuneMiloQueryModel } from 'src/application/queries/query-models/jeunes.milo.query-model'
+import {
+  AccueilJeuneMiloQueryModel,
+  MonSuiviQueryModel
+} from 'src/application/queries/query-models/jeunes.milo.query-model'
 import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
 import {
   unDetailSessionJeuneMiloQueryModel,
   uneSessionJeuneMiloQueryModel
 } from 'test/fixtures/sessions.fixture'
 import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
+import {
+  MonSuiviQuery,
+  MonSuiviQueryHandler
+} from '../../../../src/application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
 
 describe('JeunesMiloController', () => {
   let getAccueilQueryHandler: StubbedClass<GetAccueilJeuneMiloQueryHandler>
@@ -187,6 +194,58 @@ describe('JeunesMiloController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       `/jeunes/milo/${idJeune}/sessions/${idSession}`
+    )
+  })
+})
+
+describe('MiloJeunesController', () => {
+  let app: INestApplication
+  let jwtService: StubbedClass<JwtService>
+  let monSuiviQueryHandler: StubbedClass<MonSuiviQueryHandler>
+
+  before(async () => {
+    app = await getApplicationWithStubbedDependencies()
+    jwtService = app.get(JwtService)
+    monSuiviQueryHandler = app.get(MonSuiviQueryHandler)
+  })
+
+  beforeEach(() => {
+    jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+  })
+  describe('GET /milo/jeunes/:idJeune/mon-suivi', () => {
+    it('renvoie les informations de suivi du jeune', async () => {
+      // Given
+      const monSuiviQuery: MonSuiviQuery = {
+        idJeune: 'id-jeune',
+        dateDebut: '2024-01-17T12:00:30+02:00',
+        dateFin: '2024-02-17T12:00:30+02:00',
+        accessToken: 'token'
+      }
+      const monSuiviQueryModel: MonSuiviQueryModel = {
+        actions: [],
+        rendezVous: [],
+        sessionsMilo: []
+      }
+      monSuiviQueryHandler.execute
+        .withArgs(monSuiviQuery, unUtilisateurDecode())
+        .resolves(success(monSuiviQueryModel))
+
+      // When
+      await request(app.getHttpServer())
+        .get(
+          `/milo/jeunes/${monSuiviQuery.idJeune}/mon-suivi?dateDebut=2024-01-17T12%3A00%3A30%2B02%3A00&dateFin=2024-02-17T12%3A00%3A30%2B02%3A00`
+        )
+        .set('authorization', `bearer ${monSuiviQuery.accessToken}`)
+        // Then
+        .expect({
+          actions: monSuiviQueryModel.actions,
+          rendezVous: monSuiviQueryModel.rendezVous,
+          sessionsMilo: monSuiviQueryModel.sessionsMilo
+        })
+    })
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/milo/jeunes/1/mon-suivi?dateDebut=2024-01-17T12%3A00%3A30%2B02%3A00&dateFin=2024-02-17T12%3A00%3A30%2B02%3A00'
     )
   })
 })
