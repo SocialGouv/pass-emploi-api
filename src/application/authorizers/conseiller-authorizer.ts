@@ -107,12 +107,16 @@ export class ConseillerAuthorizer {
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
+      const idsJeunesSansDoublons = idsJeunes.filter(
+        (value, index, array) => array.indexOf(value) === index
+      )
+
       const jeunes = await this.jeuneRepository.findAllJeunesByIdsAndConseiller(
-        idsJeunes,
+        idsJeunesSansDoublons,
         utilisateur.id
       )
 
-      if (jeunes.length === idsJeunes.length) {
+      if (jeunes.length === idsJeunesSansDoublons.length) {
         return emptySuccess()
       }
     }
@@ -125,7 +129,10 @@ export class ConseillerAuthorizer {
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      const jeunes = await this.jeuneRepository.findAll(idsJeunes)
+      const idsJeunesSansDoublons = idsJeunes.filter(
+        (value, index, array) => array.indexOf(value) === index
+      )
+      const jeunes = await this.jeuneRepository.findAll(idsJeunesSansDoublons)
 
       for (const jeune of jeunes) {
         const estLeConseiller = jeune.conseiller?.id === utilisateur.id
