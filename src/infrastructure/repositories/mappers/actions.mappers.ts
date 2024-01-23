@@ -59,7 +59,10 @@ function fromSqlToJeuneQueryModel(
 export function buildEtat(
   actionSqlModel: ActionSqlModel
 ): Action.Qualification.Etat {
-  if (actionSqlModel.codeQualification && actionSqlModel.heuresQualifiees) {
+  if (
+    actionSqlModel.codeQualification &&
+    actionSqlModel.heuresQualifiees !== null
+  ) {
     return Action.Qualification.Etat.QUALIFIEE
   }
   if (actionSqlModel.statut === Action.Statut.TERMINEE) {
