@@ -6,13 +6,13 @@ import {
 } from 'src/application/queries/query-models/sessions.milo.query.model'
 import { isSuccess } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { GetSessionsConseillerMiloV2QueryHandler } from '../../../application/queries/milo/v2/get-sessions-conseiller.milo.v2.query.handler.db'
+import { GetSessionsConseillerMiloV2QueryHandler } from '../../../../application/queries/milo/v2/get-sessions-conseiller.milo.v2.query.handler.db'
 import {
   AccessToken,
   Utilisateur
-} from '../../decorators/authenticated.decorator'
-import { handleFailure } from '../result.handler'
-import { GetSessionsV2QueryParams } from '../validation/conseiller-milo.inputs'
+} from '../../../decorators/authenticated.decorator'
+import { handleFailure } from '../../result.handler'
+import { GetSessionsV2QueryParams } from '../validation/conseillers.milo.inputs'
 
 @Controller('v2/conseillers/milo')
 @ApiOAuth2([])

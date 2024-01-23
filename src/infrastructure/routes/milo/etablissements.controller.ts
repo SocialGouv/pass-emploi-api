@@ -1,20 +1,20 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { CloturerAnimationCollectiveCommandHandler } from '../../application/commands/cloturer-animation-collective.command.handler'
-import { GetJeunesByEtablissementQueryHandler } from '../../application/queries/get-jeunes-by-etablissement.query.handler.db'
-import { JeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
+import { CloturerAnimationCollectiveCommandHandler } from '../../../application/commands/cloturer-animation-collective.command.handler'
+import { GetJeunesByEtablissementQueryHandler } from '../../../application/queries/get-jeunes-by-etablissement.query.handler.db'
+import { JeuneQueryModel } from '../../../application/queries/query-models/jeunes.query-model'
 import {
   AnimationCollectiveQueryModel,
   RendezVousConseillerDetailQueryModel
-} from '../../application/queries/query-models/rendez-vous.query-model'
-import { GetAnimationsCollectivesQueryHandler } from '../../application/queries/rendez-vous/get-animations-collectives.query.handler.db'
-import { isSuccess } from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
-import { DateService } from '../../utils/date-service'
-import { Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './result.handler'
-import { GetAnimationsCollectivesQueryParams } from './validation/etablissements.inputs'
-import { ClotureAnimationCollectivePayload } from './validation/structures-milo.inputs'
+} from '../../../application/queries/query-models/rendez-vous.query-model'
+import { GetAnimationsCollectivesQueryHandler } from '../../../application/queries/rendez-vous/get-animations-collectives.query.handler.db'
+import { isSuccess } from '../../../building-blocks/types/result'
+import { Authentification } from '../../../domain/authentification'
+import { DateService } from '../../../utils/date-service'
+import { Utilisateur } from '../../decorators/authenticated.decorator'
+import { handleFailure } from '../result.handler'
+import { GetAnimationsCollectivesQueryParams } from '../validation/etablissements.inputs'
+import { ClotureAnimationCollectivePayload } from './validation/structures.milo.inputs'
 
 @Controller('etablissements')
 @ApiOAuth2([])

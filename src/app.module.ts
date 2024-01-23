@@ -162,7 +162,7 @@ import { EvenementsController } from './infrastructure/routes/evenements.control
 import { FavorisController } from './infrastructure/routes/favoris.controller'
 import { HealthController } from './infrastructure/routes/health.controller'
 import { JeunesController } from './infrastructure/routes/jeunes.controller'
-import { JeunesMiloController } from './infrastructure/routes/jeunes.milo.controller'
+import { JeunesMiloController } from './infrastructure/routes/milo/jeunes.milo.controller'
 import { JeunesControllerV2 } from './infrastructure/routes/v2/jeunes.controller.v2'
 import { ConseillersControllerV2 } from './infrastructure/routes/v2/conseillers.controller.v2'
 import { OffresEmploiController } from './infrastructure/routes/offres-emploi.controller'
@@ -258,7 +258,7 @@ import { GetMetiersRomeQueryHandler } from './application/queries/get-metiers-ro
 import { CreateSuggestionConseillerOffreEmploiCommandHandler } from './application/commands/create-suggestion-conseiller-offre-emploi.command.handler'
 import { CreateSuggestionConseillerServiceCiviqueCommandHandler } from './application/commands/create-suggestion-conseiller-service-civique.command.handler'
 import { CreateSuggestionConseillerImmersionCommandHandler } from './application/commands/create-suggestion-conseiller-immersion.command.handler'
-import { EtablissementsController } from './infrastructure/routes/etablissements.controller'
+import { EtablissementsController } from './infrastructure/routes/milo/etablissements.controller'
 import { EtablissementsControllerV2 } from './infrastructure/routes/v2/etablissements.controller.v2'
 import { ConseillerInterAgenceAuthorizer } from './application/authorizers/conseiller-inter-agence-authorizer'
 import { AnimationCollectiveSqlRepository } from './infrastructure/repositories/rendez-vous/animation-collective-sql.repository.db'
@@ -286,8 +286,8 @@ import { RendezVousMiloHttpRepository } from './infrastructure/repositories/milo
 import { EvenementMiloHttpRepository } from './infrastructure/repositories/milo/evenement-milo-http.repository'
 import { TraiterEvenementMiloJobHandler } from './application/jobs/traiter-evenement-milo.job.handler'
 import {
-  RendezVousMiloRepositoryToken,
-  RendezVousMilo
+  RendezVousMilo,
+  RendezVousMiloRepositoryToken
 } from './domain/milo/rendez-vous.milo'
 import { JeuneMiloRepositoryToken } from './domain/milo/jeune.milo'
 import { MettreAJourLesJeunesCejPeCommandHandler } from './application/commands/mettre-a-jour-les-jeunes-cej-pe.command.handler'
@@ -316,7 +316,7 @@ import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/m
 import { MiloClient } from './infrastructure/clients/milo-client'
 import { ConseillerMiloRepositoryToken } from './domain/milo/conseiller.milo.db'
 import { ConseillerMiloSqlRepository } from './infrastructure/repositories/milo/conseiller.milo.repository.db'
-import { ConseillersMiloController } from './infrastructure/routes/conseillers.milo.controller'
+import { ConseillersMiloController } from './infrastructure/routes/milo/conseillers.milo.controller'
 import { EvenementEmploiCodePostalQueryGetter } from 'src/application/queries/query-getters/evenement-emploi-code-postal.query.getter'
 import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-conseiller.milo.query.handler.db'
 import { UpdateSessionMiloCommandHandler } from './application/commands/milo/update-session-milo.command.handler'
@@ -346,10 +346,10 @@ import { ConseillerInterStructureMiloAuthorizer } from './application/authorizer
 import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
 import { GetSessionsConseillerMiloV2QueryGetter } from './application/queries/query-getters/milo/v2/get-sessions-conseiller.milo.v2.query.getter.db'
 import { GetSessionsConseillerMiloV2QueryHandler } from './application/queries/milo/v2/get-sessions-conseiller.milo.v2.query.handler.db'
-import { ConseillersMiloControllerv2 } from './infrastructure/routes/v2/conseillers.milo.controller.v2'
+import { ConseillersMiloControllerv2 } from './infrastructure/routes/milo/v2/conseillers.milo.controller.v2'
 import { MatomoClient } from './infrastructure/clients/matomo-client'
 import { GetJeunesByStructureMiloQueryHandler } from './application/queries/milo/get-jeunes-by-structure-milo.query.handler.db'
-import { StructuresMiloController } from './infrastructure/routes/structures-milo.controller'
+import { StructuresMiloController } from './infrastructure/routes/milo/structures.milo.controller'
 import { GetJeunesEtablissementV2QueryHandler } from './application/queries/get-jeunes-etablissement-v2.query.handler.db'
 import { GetJeunesByEtablissementQueryHandler } from './application/queries/get-jeunes-by-etablissement.query.handler.db'
 import { AppMobileCacheControlMiddleware } from 'src/infrastructure/middlewares/app-mobile-cache-control.middleware'
@@ -357,6 +357,7 @@ import { EvenementMiloRepositoryToken } from './domain/milo/evenement.milo'
 import { NotifierRappelInstanceSessionMiloJobHandler } from './application/jobs/notifier-rappel-instance-session-milo.job.handler'
 import { ActionMiloRepositoryToken } from './domain/milo/action.milo'
 import { QualifierActionsMiloCommandHandler } from './application/commands/milo/qualifier-actions-milo.command.handler'
+import { GetMonSuiviQueryHandler } from './application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -779,7 +780,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     UpdateSessionMiloCommandHandler,
     EmargerSessionMiloCommandHandler,
     EvenementEmploiCodePostalQueryGetter,
-    GetCatalogueDemarchesQueryHandler
+    GetCatalogueDemarchesQueryHandler,
+    GetMonSuiviQueryHandler
   ]
 }
 

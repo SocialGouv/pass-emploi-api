@@ -5,7 +5,7 @@ import {
   IsOptional
 } from 'class-validator'
 import { Transform } from 'class-transformer'
-import { transformStringToBoolean } from './utils/transformers'
+import { transformStringToBoolean } from '../../validation/utils/transformers'
 
 export class GetSessionsJeunesQueryParams {
   @IsOptional()
@@ -22,4 +22,14 @@ export class GetSessionsJeunesQueryParams {
   @IsBoolean()
   @Transform(params => transformStringToBoolean(params, 'filtrerEstInscrit'))
   filtrerEstInscrit?: boolean
+}
+
+export class GetMonSuiviQueryParams {
+  @IsNotEmpty()
+  @IsDateString()
+  dateDebut: string
+
+  @IsNotEmpty()
+  @IsDateString()
+  dateFin: string
 }

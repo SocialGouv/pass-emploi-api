@@ -1,18 +1,18 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
-import { GetJeunesByStructureMiloQueryHandler } from '../../../src/application/queries/milo/get-jeunes-by-structure-milo.query.handler.db'
+import { GetJeunesByStructureMiloQueryHandler } from '../../../../src/application/queries/milo/get-jeunes-by-structure-milo.query.handler.db'
 import {
   emptySuccess,
   success
-} from '../../../src/building-blocks/types/result'
+} from '../../../../src/building-blocks/types/result'
 import {
   unHeaderAuthorization,
   unUtilisateurDecode
-} from '../../fixtures/authentification.fixture'
-import { expect, StubbedClass } from '../../utils'
-import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
-import { CloturerAnimationCollectiveCommandHandler } from '../../../src/application/commands/cloturer-animation-collective.command.handler'
+} from '../../../fixtures/authentification.fixture'
+import { expect, StubbedClass } from '../../../utils'
+import { ensureUserAuthenticationFailsIfInvalid } from '../../../utils/ensure-user-authentication-fails-if-invalid'
+import { getApplicationWithStubbedDependencies } from '../../../utils/module-for-testing'
+import { CloturerAnimationCollectiveCommandHandler } from '../../../../src/application/commands/cloturer-animation-collective.command.handler'
 
 describe('StructuresMiloController', () => {
   let getJeunesByStructureMiloQueryHandler: StubbedClass<GetJeunesByStructureMiloQueryHandler>
