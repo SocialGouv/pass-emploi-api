@@ -4,6 +4,7 @@ import {
   emptySuccess,
   failure,
   isSuccess,
+  Result,
   success
 } from '../../../../src/building-blocks/types/result'
 import { expect, StubbedClass, stubClass } from '../../../utils'
@@ -16,6 +17,7 @@ import { getDatabase } from '../../../utils/database-for-testing'
 import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import {
+  ErreurHttp,
   JeuneMiloSansIdDossier,
   NonTrouveError
 } from '../../../../src/building-blocks/types/domain-error'
@@ -42,6 +44,8 @@ import { unRendezVousQueryModel } from '../../../fixtures/query-models/rendez-vo
 import { uneSessionJeuneMiloQueryModel } from '../../../fixtures/sessions.fixture'
 import { GetSessionsJeuneMiloQueryGetter } from '../../../../src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { SessionMilo } from '../../../../src/domain/milo/session.milo'
+import { GetMonSuiviQueryModel } from '../../../../src/application/queries/query-models/jeunes.milo.query-model'
+import { SessionJeuneMiloQueryModel } from '../../../../src/application/queries/query-models/sessions.milo.query.model'
 
 describe('GetMonSuiviQueryHandler', () => {
   let handler: GetMonSuiviQueryHandler
@@ -110,9 +114,27 @@ describe('GetMonSuiviQueryHandler', () => {
         })
       })
       describe('avec id partenaire', () => {
-        it('renvoie les actions triées par date', async () => {
+        let result: Result<GetMonSuiviQueryModel>
+        let _actionAvantDateDebut1Heure: AsSql<ActionDto>
+        let actionApresDateDebutUneHeure: AsSql<ActionDto>
+        let actionApresDateDebutUnJour: AsSql<ActionDto>
+        let actionAvantDateFinUnJour: AsSql<ActionDto>
+        let actionAvantDateFinUneHeure: AsSql<ActionDto>
+        let _actionApresDateFinUneHeure: AsSql<ActionDto>
+
+        let _rendezVousAvantDateDebut1Heure: AsSql<RendezVousDto>
+        let rendezVousApresDateDebutUneHeure: AsSql<RendezVousDto>
+        let rendezVousApresDateDebutUnJour: AsSql<RendezVousDto>
+        let rendezVousAvantDateFinUnJour: AsSql<RendezVousDto>
+        let rendezVousAvantDateFinUneHeure: AsSql<RendezVousDto>
+        let _rendezVousApresDateFinUneHeure: AsSql<RendezVousDto>
+
+        let sessionAvecInscriptionAJPlus1: SessionJeuneMiloQueryModel
+        let sessionAvecInscriptionAJPlus2: SessionJeuneMiloQueryModel
+
+        beforeEach(async () => {
           // Given
-          const [
+          ;[
             _actionAvantDateDebut1Heure,
             actionApresDateDebutUneHeure,
             actionApresDateDebutUnJour,
@@ -127,10 +149,52 @@ describe('GetMonSuiviQueryHandler', () => {
             dateFin.minus({ hours: 1 }),
             dateFin.plus({ hours: 1 })
           ])
+          ;[
+            _rendezVousAvantDateDebut1Heure,
+            rendezVousApresDateDebutUneHeure,
+            rendezVousApresDateDebutUnJour,
+            rendezVousAvantDateFinUnJour,
+            rendezVousAvantDateFinUneHeure,
+            _rendezVousApresDateFinUneHeure
+          ] = await createRendezVous(
+            [
+              dateDebut.minus({ hours: 1 }),
+              dateDebut.plus({ hours: 1 }),
+              dateDebut.plus({ days: 1 }),
+              dateFin.minus({ days: 1 }),
+              dateFin.minus({ hours: 1 }),
+              dateFin.plus({ hours: 1 })
+            ],
+            jeuneDto.id
+          )
 
-          // When
-          const result = await handler.handle(query, utilisateurJeune)
+          sessionAvecInscriptionAJPlus1 = uneSessionJeuneMiloQueryModel({
+            dateHeureDebut: dateDebut.plus({ days: 1 }).toISODate(),
+            inscription: SessionMilo.Inscription.Statut.INSCRIT
+          })
+          sessionAvecInscriptionAJPlus2 = uneSessionJeuneMiloQueryModel({
+            dateHeureDebut: dateDebut.plus({ days: 2 }).toISODate(),
+            inscription: SessionMilo.Inscription.Statut.INSCRIT
+          })
 
+          sessionsQueryGetter.handle
+            .withArgs(jeuneDto.id, jeuneDto.idPartenaire!, query.accessToken, {
+              periode: {
+                debut: dateDebut,
+                fin: dateFin
+              },
+              pourConseiller: false,
+              filtrerEstInscrit: true
+            })
+            .resolves(
+              success([
+                sessionAvecInscriptionAJPlus1,
+                sessionAvecInscriptionAJPlus2
+              ])
+            )
+          result = await handler.handle(query, utilisateurJeune)
+        })
+        it('renvoie les actions triées par date', async () => {
           // Then
           const actionsQueryModel: ActionQueryModel[] = [
             uneActionQueryModelSansJeune({
@@ -163,29 +227,6 @@ describe('GetMonSuiviQueryHandler', () => {
           )
         })
         it('renvoie les rendez-vous triés par date', async () => {
-          // Given
-          const [
-            _rendezVousAvantDateDebut1Heure,
-            rendezVousApresDateDebutUneHeure,
-            rendezVousApresDateDebutUnJour,
-            rendezVousAvantDateFinUnJour,
-            rendezVousAvantDateFinUneHeure,
-            _rendezVousApresDateFinUneHeure
-          ] = await createRendezVous(
-            [
-              dateDebut.minus({ hours: 1 }),
-              dateDebut.plus({ hours: 1 }),
-              dateDebut.plus({ days: 1 }),
-              dateFin.minus({ days: 1 }),
-              dateFin.minus({ hours: 1 }),
-              dateFin.plus({ hours: 1 })
-            ],
-            jeuneDto.id
-          )
-
-          // When
-          const result = await handler.handle(query, utilisateurJeune)
-
           // Then
           const rendezVousJeuneQueryModel: RendezVousJeuneQueryModel[] = [
             unRendezVousQueryModel({
@@ -210,32 +251,6 @@ describe('GetMonSuiviQueryHandler', () => {
           )
         })
         it('renvoie les sessions milo triées par date', async () => {
-          // Given
-          const sessionAvecInscriptionAJPlus1 = uneSessionJeuneMiloQueryModel({
-            dateHeureDebut: dateDebut.plus({ days: 1 }).toISODate(),
-            inscription: SessionMilo.Inscription.Statut.INSCRIT
-          })
-          const sessionAvecInscriptionAJPlus2 = uneSessionJeuneMiloQueryModel({
-            dateHeureDebut: dateDebut.plus({ days: 2 }).toISODate(),
-            inscription: SessionMilo.Inscription.Statut.INSCRIT
-          })
-
-          sessionsQueryGetter.handle
-            .withArgs(jeuneDto.id, jeuneDto.idPartenaire!, query.accessToken, {
-              periode: {
-                debut: dateDebut,
-                fin: dateFin
-              },
-              pourConseiller: false,
-              filtrerEstInscrit: true
-            })
-            .resolves(
-              success([
-                sessionAvecInscriptionAJPlus1,
-                sessionAvecInscriptionAJPlus2
-              ])
-            )
-
           // When
           const result = await handler.handle(query, utilisateurJeune)
 
@@ -246,6 +261,34 @@ describe('GetMonSuiviQueryHandler', () => {
             sessionAvecInscriptionAJPlus1,
             sessionAvecInscriptionAJPlus2
           ])
+        })
+      })
+    })
+
+    describe('quand la récupération des sessions échoue', () => {
+      let result: Result<GetMonSuiviQueryModel>
+
+      beforeEach(async () => {
+        // Given
+        sessionsQueryGetter.handle
+          .withArgs(jeuneDto.id, jeuneDto.idPartenaire!, query.accessToken, {
+            periode: {
+              debut: dateDebut,
+              fin: dateFin
+            },
+            pourConseiller: false,
+            filtrerEstInscrit: true
+          })
+          .resolves(failure(new ErreurHttp('Ressource Milo introuvable', 404)))
+        // When
+        result = await handler.handle(query, utilisateurJeune)
+      })
+      it('renvoie null en cas d’impossibilité de récupérer les sessions du bénéficiaire', async () => {
+        // Then
+        expect(isSuccess(result) && result.data).to.deep.equal({
+          actions: [],
+          rendezVous: [],
+          sessionsMilo: null
         })
       })
     })

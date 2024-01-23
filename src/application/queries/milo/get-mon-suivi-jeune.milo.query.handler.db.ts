@@ -26,7 +26,6 @@ import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/ren
 import { fromSqlToRendezVousJeuneQueryModel } from '../query-mappers/rendez-vous-milo.mappers'
 import { GetSessionsJeuneMiloQueryGetter } from '../query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { buildError } from '../../../utils/logger.module'
-import { SessionJeuneMiloQueryModel } from '../query-models/sessions.milo.query.model'
 import { estMilo } from '../../../domain/core'
 
 export interface GetMonSuiviQuery extends Query {
@@ -68,41 +67,34 @@ export class GetMonSuiviQueryHandler extends QueryHandler<
       return failure(new JeuneMiloSansIdDossier(query.idJeune))
     }
 
-    const [actions, rendezVous] = await Promise.all([
+    const [actions, rendezVous, sessionsMilo] = await Promise.all([
       this.recupererLesActions(query),
-      this.recupererLesRendezVous(query, utilisateur.type)
-    ])
-
-    let sessionsMilo: SessionJeuneMiloQueryModel[] = []
-    if (estMilo(utilisateur.structure)) {
-      try {
-        const sessionsQueryModels = await this.sessionsJeuneQueryGetter.handle(
-          query.idJeune,
-          jeuneSqlModel.idPartenaire!,
-          query.accessToken,
-          {
-            periode: {
-              debut: query.dateDebut,
-              fin: query.dateFin
-            },
-            pourConseiller: false,
-            filtrerEstInscrit: true
+      this.recupererLesRendezVous(query, utilisateur.type),
+      this.sessionsJeuneQueryGetter
+        .handle(query.idJeune, jeuneSqlModel.idPartenaire!, query.accessToken, {
+          periode: {
+            debut: query.dateDebut,
+            fin: query.dateFin
+          },
+          pourConseiller: false,
+          filtrerEstInscrit: true
+        })
+        .then(result => {
+          if (isFailure(result)) {
+            return null
           }
-        )
-        if (isFailure(sessionsQueryModels)) {
-          return sessionsQueryModels
-        }
-        sessionsMilo = sessionsQueryModels.data
-      } catch (e) {
-        this.logger.error(
-          buildError(
-            `La récupération des sessions de l'agenda du jeune ${query.idJeune} a échoué`,
-            e
+          return result.data
+        })
+        .catch(error => {
+          this.logger.error(
+            buildError(
+              `La récupération des sessions de l'agenda du jeune ${query.idJeune} a échoué`,
+              error
+            )
           )
-        )
-      }
-    }
-
+          return null
+        })
+    ])
     return success({ actions, rendezVous, sessionsMilo })
   }
 

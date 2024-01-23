@@ -66,5 +66,5 @@ export class GetMonSuiviQueryModel {
     type: SessionJeuneMiloQueryModel,
     isArray: true
   })
-  sessionsMilo: SessionJeuneMiloQueryModel[]
+  sessionsMilo: SessionJeuneMiloQueryModel[] | null
 }

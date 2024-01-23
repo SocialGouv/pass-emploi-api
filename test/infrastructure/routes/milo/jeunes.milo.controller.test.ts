@@ -213,7 +213,7 @@ describe('MiloJeunesController', () => {
   beforeEach(() => {
     jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
   })
-  describe('GET /milo/jeunes/:idJeune/mon-suivi', () => {
+  describe('GET /jeunes/milo/:idJeune/mon-suivi', () => {
     it('renvoie les informations de suivi du jeune', async () => {
       // Given
       const dateDebutString = '2024-01-17T12:00:30+02:00'
@@ -240,7 +240,7 @@ describe('MiloJeunesController', () => {
       // When
       await request(app.getHttpServer())
         .get(
-          `/milo/jeunes/${monSuiviQuery.idJeune}/mon-suivi?dateDebut=2024-01-17T12%3A00%3A30%2B02%3A00&dateFin=2024-02-17T12%3A00%3A30%2B02%3A00`
+          `/jeunes/milo/${monSuiviQuery.idJeune}/mon-suivi?dateDebut=2024-01-17T12%3A00%3A30%2B02%3A00&dateFin=2024-02-17T12%3A00%3A30%2B02%3A00`
         )
         .set('authorization', `bearer ${monSuiviQuery.accessToken}`)
         // Then
@@ -252,7 +252,7 @@ describe('MiloJeunesController', () => {
     })
     ensureUserAuthenticationFailsIfInvalid(
       'get',
-      '/milo/jeunes/1/mon-suivi?dateDebut=2024-01-17T12%3A00%3A30%2B02%3A00&dateFin=2024-02-17T12%3A00%3A30%2B02%3A00'
+      '/jeunes/milo/1/mon-suivi?dateDebut=2024-01-17T12%3A00%3A30%2B02%3A00&dateFin=2024-02-17T12%3A00%3A30%2B02%3A00'
     )
   })
 })
