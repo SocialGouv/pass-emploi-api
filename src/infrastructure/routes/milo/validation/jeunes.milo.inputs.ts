@@ -24,7 +24,7 @@ export class GetSessionsJeunesQueryParams {
   filtrerEstInscrit?: boolean
 }
 
-export class MonSuiviQueryParams {
+export class GetMonSuiviQueryParams {
   @IsNotEmpty()
   @IsDateString()
   dateDebut: string

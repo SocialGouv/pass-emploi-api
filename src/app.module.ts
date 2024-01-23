@@ -162,10 +162,7 @@ import { EvenementsController } from './infrastructure/routes/evenements.control
 import { FavorisController } from './infrastructure/routes/favoris.controller'
 import { HealthController } from './infrastructure/routes/health.controller'
 import { JeunesController } from './infrastructure/routes/jeunes.controller'
-import {
-  JeunesMiloController,
-  MiloJeunesController
-} from './infrastructure/routes/milo/jeunes.milo.controller'
+import { JeunesMiloController } from './infrastructure/routes/milo/jeunes.milo.controller'
 import { JeunesControllerV2 } from './infrastructure/routes/v2/jeunes.controller.v2'
 import { ConseillersControllerV2 } from './infrastructure/routes/v2/conseillers.controller.v2'
 import { OffresEmploiController } from './infrastructure/routes/offres-emploi.controller'
@@ -289,8 +286,8 @@ import { RendezVousMiloHttpRepository } from './infrastructure/repositories/milo
 import { EvenementMiloHttpRepository } from './infrastructure/repositories/milo/evenement-milo-http.repository'
 import { TraiterEvenementMiloJobHandler } from './application/jobs/traiter-evenement-milo.job.handler'
 import {
-  RendezVousMiloRepositoryToken,
-  RendezVousMilo
+  RendezVousMilo,
+  RendezVousMiloRepositoryToken
 } from './domain/milo/rendez-vous.milo'
 import { JeuneMiloRepositoryToken } from './domain/milo/jeune.milo'
 import { MettreAJourLesJeunesCejPeCommandHandler } from './application/commands/mettre-a-jour-les-jeunes-cej-pe.command.handler'
@@ -360,7 +357,7 @@ import { EvenementMiloRepositoryToken } from './domain/milo/evenement.milo'
 import { NotifierRappelInstanceSessionMiloJobHandler } from './application/jobs/notifier-rappel-instance-session-milo.job.handler'
 import { ActionMiloRepositoryToken } from './domain/milo/action.milo'
 import { QualifierActionsMiloCommandHandler } from './application/commands/milo/qualifier-actions-milo.command.handler'
-import { MonSuiviQueryHandler } from './application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
+import { GetMonSuiviQueryHandler } from './application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -381,7 +378,6 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     JeunesController,
     JeunesControllerV2,
     JeunesMiloController,
-    MiloJeunesController,
     JeunesPoleEmploiController,
     ConseillersController,
     ConseillersControllerV2,
@@ -785,7 +781,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     EmargerSessionMiloCommandHandler,
     EvenementEmploiCodePostalQueryGetter,
     GetCatalogueDemarchesQueryHandler,
-    MonSuiviQueryHandler
+    GetMonSuiviQueryHandler
   ]
 }
 

@@ -18,7 +18,7 @@ import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-a
 import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/milo/get-accueil-jeune-milo.query.handler.db'
 import {
   AccueilJeuneMiloQueryModel,
-  MonSuiviQueryModel
+  GetMonSuiviQueryModel
 } from 'src/application/queries/query-models/jeunes.milo.query-model'
 import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
 import {
@@ -27,9 +27,10 @@ import {
 } from 'test/fixtures/sessions.fixture'
 import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
 import {
-  MonSuiviQuery,
-  MonSuiviQueryHandler
+  GetMonSuiviQuery,
+  GetMonSuiviQueryHandler
 } from '../../../../src/application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
+import { DateTime } from 'luxon'
 
 describe('JeunesMiloController', () => {
   let getAccueilQueryHandler: StubbedClass<GetAccueilJeuneMiloQueryHandler>
@@ -201,12 +202,12 @@ describe('JeunesMiloController', () => {
 describe('MiloJeunesController', () => {
   let app: INestApplication
   let jwtService: StubbedClass<JwtService>
-  let monSuiviQueryHandler: StubbedClass<MonSuiviQueryHandler>
+  let monSuiviQueryHandler: StubbedClass<GetMonSuiviQueryHandler>
 
   before(async () => {
     app = await getApplicationWithStubbedDependencies()
     jwtService = app.get(JwtService)
-    monSuiviQueryHandler = app.get(MonSuiviQueryHandler)
+    monSuiviQueryHandler = app.get(GetMonSuiviQueryHandler)
   })
 
   beforeEach(() => {
@@ -215,13 +216,19 @@ describe('MiloJeunesController', () => {
   describe('GET /milo/jeunes/:idJeune/mon-suivi', () => {
     it('renvoie les informations de suivi du jeune', async () => {
       // Given
-      const monSuiviQuery: MonSuiviQuery = {
+      const dateDebutString = '2024-01-17T12:00:30+02:00'
+      const dateFinString = '2024-02-17T12:00:30+02:00'
+      const monSuiviQuery: GetMonSuiviQuery = {
         idJeune: 'id-jeune',
-        dateDebut: '2024-01-17T12:00:30+02:00',
-        dateFin: '2024-02-17T12:00:30+02:00',
+        dateDebut: DateTime.fromISO(dateDebutString, {
+          setZone: true
+        }),
+        dateFin: DateTime.fromISO(dateFinString, {
+          setZone: true
+        }),
         accessToken: 'token'
       }
-      const monSuiviQueryModel: MonSuiviQueryModel = {
+      const monSuiviQueryModel: GetMonSuiviQueryModel = {
         actions: [],
         rendezVous: [],
         sessionsMilo: []

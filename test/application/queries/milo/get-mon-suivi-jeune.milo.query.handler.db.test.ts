@@ -8,8 +8,8 @@ import {
 } from '../../../../src/building-blocks/types/result'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import {
-  MonSuiviQuery,
-  MonSuiviQueryHandler
+  GetMonSuiviQuery,
+  GetMonSuiviQueryHandler
 } from '../../../../src/application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
 import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import { getDatabase } from '../../../utils/database-for-testing'
@@ -43,8 +43,8 @@ import { uneSessionJeuneMiloQueryModel } from '../../../fixtures/sessions.fixtur
 import { GetSessionsJeuneMiloQueryGetter } from '../../../../src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { SessionMilo } from '../../../../src/domain/milo/session.milo'
 
-describe('MonSuiviQueryHandler', () => {
-  let handler: MonSuiviQueryHandler
+describe('GetMonSuiviQueryHandler', () => {
+  let handler: GetMonSuiviQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let sessionsQueryGetter: StubbedClass<GetSessionsJeuneMiloQueryGetter>
 
@@ -55,17 +55,17 @@ describe('MonSuiviQueryHandler', () => {
     await getDatabase().cleanPG()
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     sessionsQueryGetter = stubClass(GetSessionsJeuneMiloQueryGetter)
-    handler = new MonSuiviQueryHandler(jeuneAuthorizer, sessionsQueryGetter)
+    handler = new GetMonSuiviQueryHandler(jeuneAuthorizer, sessionsQueryGetter)
   })
 
   describe('handle', () => {
     const utilisateurJeune = unUtilisateurJeune()
     const jeuneDto = unJeuneDto({ idPartenaire: 'idDossier' })
 
-    const query: MonSuiviQuery = {
+    const query: GetMonSuiviQuery = {
       idJeune: jeuneDto.id,
-      dateDebut: dateDebut.toString(),
-      dateFin: dateFin.toString(),
+      dateDebut,
+      dateFin,
       accessToken: 'token'
     }
 
@@ -253,10 +253,10 @@ describe('MonSuiviQueryHandler', () => {
 
   describe('authorize', () => {
     const jeune = unJeune()
-    const query: MonSuiviQuery = {
+    const query: GetMonSuiviQuery = {
       idJeune: jeune.id,
-      dateDebut: '',
-      dateFin: '',
+      dateDebut,
+      dateFin,
       accessToken: 'token'
     }
 

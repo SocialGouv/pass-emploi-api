@@ -49,7 +49,7 @@ export class AccueilJeuneMiloQueryModel {
   campagne?: CampagneQueryModel
 }
 
-export class MonSuiviQueryModel {
+export class GetMonSuiviQueryModel {
   @ApiProperty({
     type: ActionQueryModel,
     isArray: true

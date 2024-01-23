@@ -9,7 +9,7 @@ import {
 } from '../../../building-blocks/types/result'
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { Authentification } from '../../../domain/authentification'
-import { MonSuiviQueryModel } from '../query-models/jeunes.milo.query-model'
+import { GetMonSuiviQueryModel } from '../query-models/jeunes.milo.query-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { ConseillerSqlModel } from '../../../infrastructure/sequelize/models/conseiller.sql-model'
 import {
@@ -29,35 +29,35 @@ import { buildError } from '../../../utils/logger.module'
 import { SessionJeuneMiloQueryModel } from '../query-models/sessions.milo.query.model'
 import { estMilo } from '../../../domain/core'
 
-export interface MonSuiviQuery extends Query {
+export interface GetMonSuiviQuery extends Query {
   idJeune: string
-  dateDebut: string
-  dateFin: string
+  dateDebut: DateTime
+  dateFin: DateTime
   accessToken: string
 }
 
 @Injectable()
-export class MonSuiviQueryHandler extends QueryHandler<
-  MonSuiviQuery,
-  Result<MonSuiviQueryModel>
+export class GetMonSuiviQueryHandler extends QueryHandler<
+  GetMonSuiviQuery,
+  Result<GetMonSuiviQueryModel>
 > {
   constructor(
     private jeuneAuthorizer: JeuneAuthorizer,
     private sessionsJeuneQueryGetter: GetSessionsJeuneMiloQueryGetter
   ) {
-    super('MonSuiviQueryHandler')
+    super('GetMonSuiviQueryHandler')
   }
   async authorize(
-    query: MonSuiviQuery,
+    query: GetMonSuiviQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     return this.jeuneAuthorizer.autoriserLeJeune(query.idJeune, utilisateur)
   }
 
   async handle(
-    query: MonSuiviQuery,
+    query: GetMonSuiviQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<Result<MonSuiviQueryModel>> {
+  ): Promise<Result<GetMonSuiviQueryModel>> {
     const jeuneSqlModel = await JeuneSqlModel.findByPk(query.idJeune, {
       include: [{ model: ConseillerSqlModel, required: true }]
     })
@@ -68,16 +68,9 @@ export class MonSuiviQueryHandler extends QueryHandler<
       return failure(new JeuneMiloSansIdDossier(query.idJeune))
     }
 
-    const dateDebut = DateTime.fromISO(query.dateDebut, {
-      setZone: true
-    })
-    const dateFin = DateTime.fromISO(query.dateFin, {
-      setZone: true
-    })
-
     const [actions, rendezVous] = await Promise.all([
-      this.recupererLesActions(query, dateDebut, dateFin),
-      this.recupererLesRendezVous(query, dateDebut, dateFin, utilisateur.type)
+      this.recupererLesActions(query),
+      this.recupererLesRendezVous(query, utilisateur.type)
     ])
 
     let sessionsMilo: SessionJeuneMiloQueryModel[] = []
@@ -89,8 +82,8 @@ export class MonSuiviQueryHandler extends QueryHandler<
           query.accessToken,
           {
             periode: {
-              debut: dateDebut,
-              fin: dateFin
+              debut: query.dateDebut,
+              fin: query.dateFin
             },
             pourConseiller: false,
             filtrerEstInscrit: true
@@ -118,16 +111,14 @@ export class MonSuiviQueryHandler extends QueryHandler<
   }
 
   private async recupererLesActions(
-    query: MonSuiviQuery,
-    dateDebut: DateTime,
-    dateFin: DateTime
+    query: GetMonSuiviQuery
   ): Promise<ActionQueryModel[]> {
     const actionsSqlModel = await ActionSqlModel.findAll({
       where: {
         idJeune: query.idJeune,
         dateEcheance: {
-          [Op.gte]: dateDebut.toJSDate(),
-          [Op.lt]: dateFin.toJSDate()
+          [Op.gte]: query.dateDebut.toJSDate(),
+          [Op.lt]: query.dateFin.toJSDate()
         }
       },
       order: [['dateEcheance', 'ASC']]
@@ -137,9 +128,7 @@ export class MonSuiviQueryHandler extends QueryHandler<
   }
 
   private async recupererLesRendezVous(
-    query: MonSuiviQuery,
-    dateDebut: DateTime,
-    dateFin: DateTime,
+    query: GetMonSuiviQuery,
     typeUtilisateur: Authentification.Type
   ): Promise<RendezVousJeuneQueryModel[]> {
     const rendezVousSqlModel = await RendezVousSqlModel.findAll({
@@ -152,8 +141,8 @@ export class MonSuiviQueryHandler extends QueryHandler<
       ],
       where: {
         date: {
-          [Op.gte]: dateDebut.toJSDate(),
-          [Op.lte]: dateFin.toJSDate()
+          [Op.gte]: query.dateDebut.toJSDate(),
+          [Op.lte]: query.dateFin.toJSDate()
         }
       },
       order: [['date', 'ASC']]

@@ -3,7 +3,7 @@ import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/milo/get-accueil-jeune-milo.query.handler.db'
 import {
   AccueilJeuneMiloQueryModel,
-  MonSuiviQueryModel
+  GetMonSuiviQueryModel
 } from 'src/application/queries/query-models/jeunes.milo.query-model'
 
 import { isSuccess, Result } from 'src/building-blocks/types/result'
@@ -23,10 +23,11 @@ import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/g
 import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
 import {
   GetSessionsJeunesQueryParams,
-  MonSuiviQueryParams
+  GetMonSuiviQueryParams
 } from './validation/jeunes.milo.inputs'
 import { DateService } from '../../../utils/date-service'
-import { MonSuiviQueryHandler } from '../../../application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
+import { GetMonSuiviQueryHandler } from '../../../application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
+import { DateTime } from 'luxon'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -35,7 +36,8 @@ export class JeunesMiloController {
   constructor(
     private readonly getAccueilQueryHandler: GetAccueilJeuneMiloQueryHandler,
     private readonly getSessionsQueryHandler: GetSessionsJeuneMiloQueryHandler,
-    private readonly getDetailSessionQueryHandler: GetDetailSessionJeuneMiloQueryHandler
+    private readonly getDetailSessionQueryHandler: GetDetailSessionJeuneMiloQueryHandler,
+    private readonly getMonSuiviQueryHandler: GetMonSuiviQueryHandler
   ) {}
 
   @Get(':idJeune/milo/accueil')
@@ -128,33 +130,30 @@ export class JeunesMiloController {
     }
     throw handleFailure(result)
   }
-}
 
-@Controller('milo/jeunes')
-@ApiOAuth2([])
-@ApiTags('Jeunes Milo')
-export class MiloJeunesController {
-  constructor(private readonly getMonSuiviQueryHandler: MonSuiviQueryHandler) {}
-
-  @Get(':idJeune/mon-suivi')
+  @Get('/milo/:idJeune/mon-suivi')
   @ApiOperation({
     description: "Récupère les éléments de la page 'Mon Suivi' d'un jeune Milo"
   })
   @ApiResponse({
-    type: MonSuiviQueryModel
+    type: GetMonSuiviQueryModel
   })
   async getJeunes(
     @Param('idJeune') idJeune: string,
-    @Query() queryParams: MonSuiviQueryParams,
+    @Query() queryParams: GetMonSuiviQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @AccessToken() accessToken: string
-  ): Promise<MonSuiviQueryModel> {
-    const result: Result<MonSuiviQueryModel> =
+  ): Promise<GetMonSuiviQueryModel> {
+    const result: Result<GetMonSuiviQueryModel> =
       await this.getMonSuiviQueryHandler.execute(
         {
           idJeune,
-          dateDebut: queryParams.dateDebut,
-          dateFin: queryParams.dateFin,
+          dateDebut: DateTime.fromISO(queryParams.dateDebut, {
+            setZone: true
+          }),
+          dateFin: DateTime.fromISO(queryParams.dateFin, {
+            setZone: true
+          }),
           accessToken: accessToken
         },
         utilisateur
