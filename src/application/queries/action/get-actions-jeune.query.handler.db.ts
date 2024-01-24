@@ -58,44 +58,46 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
   ): Promise<Result<ActionsJeuneQueryModel>> {
     const filtres = generateWhere(query)
 
-    const [nombreTotalActionsFiltrees, statutRawCount] = await Promise.all([
+    const [
+      nombreTotalActionsFiltrees,
+      statutRawCount,
+      etatQualificationRawCount
+    ] = await Promise.all([
       ActionSqlModel.count({ where: filtres }),
-      this.compterActionsParStatut(query.idJeune)
+      this.compterActionsParStatut(query.idJeune),
+      this.compterActionsParEtatQualification(query.idJeune)
     ])
 
     if (!laPageExiste(nombreTotalActionsFiltrees, query.page)) {
       return failure(new NonTrouveError('Page', query.page?.toString()))
     }
 
-    const result: ActionsJeuneQueryModel = {
-      actions: [],
-      metadonnees: {
-        nombreTotal: this.compterToutesLesActions(statutRawCount),
-        nombrePasCommencees: this.getCompteDuStatut(
-          statutRawCount,
-          Action.Statut.PAS_COMMENCEE
-        ),
-        nombreEnCours: this.getCompteDuStatut(
-          statutRawCount,
-          Action.Statut.EN_COURS
-        ),
-        nombreTerminees: this.getCompteDuStatut(
-          statutRawCount,
-          Action.Statut.TERMINEE
-        ),
-        nombreAnnulees: this.getCompteDuStatut(
-          statutRawCount,
-          Action.Statut.ANNULEE
-        ),
-        nombreNonQualifiables: 0,
-        nombreAQualifier: 0,
-        nombreQualifiees: 0,
-
-        nombreActionsParPage: LIMITE_NOMBRE_ACTIONS_PAR_PAGE
-      }
+    const metadonnees = {
+      nombreTotal: this.compterToutesLesActions(statutRawCount),
+      nombrePasCommencees: this.getCompte(
+        statutRawCount,
+        Action.Statut.PAS_COMMENCEE
+      ),
+      nombreEnCours: this.getCompte(statutRawCount, Action.Statut.EN_COURS),
+      nombreTerminees: this.getCompte(statutRawCount, Action.Statut.TERMINEE),
+      nombreAnnulees: this.getCompte(statutRawCount, Action.Statut.ANNULEE),
+      nombreNonQualifiables: this.getCompte(
+        etatQualificationRawCount,
+        Action.Qualification.Etat.NON_QUALIFIABLE
+      ),
+      nombreAQualifier: this.getCompte(
+        etatQualificationRawCount,
+        Action.Qualification.Etat.A_QUALIFIER
+      ),
+      nombreQualifiees: this.getCompte(
+        etatQualificationRawCount,
+        Action.Qualification.Etat.QUALIFIEE
+      ),
+      nombreActionsParPage: LIMITE_NOMBRE_ACTIONS_PAR_PAGE
     }
+
     if (nombreTotalActionsFiltrees === 0) {
-      return success(result)
+      return success({ metadonnees, actions: [] })
     }
 
     const actionsSqlModel = await ActionSqlModel.findAll({
@@ -111,34 +113,9 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
       ]
     })
 
-    let nombreNonQualifiables = 0
-    let nombreAQualifier = 0
-    let nombreQualifiees = 0
-    const actions: ActionQueryModel[] = actionsSqlModel.map(sql => {
-      const queryModel: ActionQueryModel = fromSqlToActionQueryModel(sql)
-      switch (queryModel.etat) {
-        case Action.Qualification.Etat.NON_QUALIFIABLE:
-          nombreNonQualifiables++
-          break
-        case Action.Qualification.Etat.A_QUALIFIER:
-          nombreAQualifier++
-          break
-        case Action.Qualification.Etat.QUALIFIEE:
-          nombreQualifiees++
-          break
-      }
-
-      return queryModel
-    })
-
     return success({
-      metadonnees: {
-        ...result.metadonnees,
-        nombreNonQualifiables,
-        nombreAQualifier,
-        nombreQualifiees
-      },
-      actions
+      metadonnees,
+      actions: actionsSqlModel.map(fromSqlToActionQueryModel)
     })
   }
 
@@ -159,13 +136,15 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
     return
   }
 
-  private compterActionsParStatut(idJeune: string): Promise<RawCount[]> {
-    return this.sequelize.query(
+  private compterActionsParStatut(
+    idJeune: string
+  ): Promise<Array<RawCount<Action.Statut>>> {
+    return this.sequelize.query<RawCount<Action.Statut>>(
       `
-        SELECT statut, COUNT(*)
+        SELECT statut AS value, COUNT(*)
         FROM action
         WHERE id_jeune = :idJeune
-        GROUP BY statut;
+        GROUP BY value;
       `,
       {
         type: QueryTypes.SELECT,
@@ -173,21 +152,40 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
           idJeune
         }
       }
-    ) as unknown as Promise<RawCount[]>
-  }
-
-  private compterToutesLesActions(statutRawCount: RawCount[]): number {
-    return statutRawCount.reduce(
-      (total, { count }) => total + parseInt(count),
-      0
     )
   }
 
-  private getCompteDuStatut(
-    statutRawCount: RawCount[],
-    statut: Action.Statut
-  ): number {
-    const count = statutRawCount.find(raw => raw.statut === statut)?.count
+  private compterActionsParEtatQualification(
+    idJeune: string
+  ): Promise<Array<RawCount<Action.Qualification.Etat>>> {
+    return this.sequelize.query<RawCount<Action.Qualification.Etat>>(
+      `
+        SELECT
+            CASE
+                WHEN qualification_heures IS NOT null THEN 'QUALIFIEE'
+                WHEN statut = 'done' THEN 'A_QUALIFIER'
+                ELSE 'NON_QUALIFIABLE'
+            END AS value,
+            COUNT(*)
+        FROM action
+        WHERE id_jeune = :idJeune
+        GROUP BY value;
+      `,
+      {
+        type: QueryTypes.SELECT,
+        replacements: {
+          idJeune
+        }
+      }
+    )
+  }
+
+  private compterToutesLesActions<T>(rawCount: Array<RawCount<T>>): number {
+    return rawCount.reduce((total, { count }) => total + parseInt(count), 0)
+  }
+
+  private getCompte<T>(rawCount: Array<RawCount<T>>, valueACompter: T): number {
+    const count = rawCount.find(({ value }) => value === valueACompter)?.count
     return count ? parseInt(count) : 0
   }
 
@@ -248,7 +246,7 @@ function generateWhere(query: GetActionsJeuneQuery): WhereOptions {
   return filtres
 }
 
-interface RawCount {
-  statut: Action.Statut
+interface RawCount<T> {
+  value: T
   count: string
 }
