@@ -3,6 +3,7 @@ import { SinonSandbox } from 'sinon'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { failure, isSuccess } from 'src/building-blocks/types/result'
 import { uneAction } from 'test/fixtures/action.fixture'
+import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import {
   GetActionsJeuneQuery,
@@ -10,6 +11,7 @@ import {
 } from '../../../../src/application/queries/action/get-actions-jeune.query.handler.db'
 import { ActionQueryModel } from '../../../../src/application/queries/query-models/actions.query-model'
 import { Action } from '../../../../src/domain/action/action'
+import { Core } from '../../../../src/domain/core'
 import { FirebaseClient } from '../../../../src/infrastructure/clients/firebase-client'
 import { ActionSqlRepository } from '../../../../src/infrastructure/repositories/action/action-sql.repository.db'
 import { ConseillerSqlRepository } from '../../../../src/infrastructure/repositories/conseiller-sql.repository.db'
@@ -28,8 +30,6 @@ import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
-import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
-import { Core } from '../../../../src/domain/core'
 
 describe('GetActionsByJeuneQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting

@@ -45,6 +45,12 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
   GetActionsJeuneQuery,
   Result<ActionsJeuneQueryModel>
 > {
+  private readonly CASE_ETATS_QUALIFICATION = `CASE
+      WHEN qualification_heures IS NOT null THEN 'QUALIFIEE'
+      WHEN statut = 'done' THEN 'A_QUALIFIER'
+      ELSE 'NON_QUALIFIABLE'
+    END`
+
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
     private jeuneAuthorizer: JeuneAuthorizer,
@@ -56,19 +62,14 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
   async handle(
     query: GetActionsJeuneQuery
   ): Promise<Result<ActionsJeuneQueryModel>> {
-    const filtres = generateWhere(query)
+    const [actionsFiltrees, statutRawCount, etatQualificationRawCount] =
+      await Promise.all([
+        this.findAndCountAllActionsFiltrees(query),
+        this.compterActionsParStatut(query.idJeune),
+        this.compterActionsParEtatQualification(query.idJeune)
+      ])
 
-    const [
-      nombreTotalActionsFiltrees,
-      statutRawCount,
-      etatQualificationRawCount
-    ] = await Promise.all([
-      ActionSqlModel.count({ where: filtres }),
-      this.compterActionsParStatut(query.idJeune),
-      this.compterActionsParEtatQualification(query.idJeune)
-    ])
-
-    if (!laPageExiste(nombreTotalActionsFiltrees, query.page)) {
+    if (!laPageExiste(actionsFiltrees.count, query.page)) {
       return failure(new NonTrouveError('Page', query.page?.toString()))
     }
 
@@ -96,26 +97,13 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
       nombreActionsParPage: LIMITE_NOMBRE_ACTIONS_PAR_PAGE
     }
 
-    if (nombreTotalActionsFiltrees === 0) {
+    if (actionsFiltrees.count === 0) {
       return success({ metadonnees, actions: [] })
     }
 
-    const actionsSqlModel = await ActionSqlModel.findAll({
-      where: filtres,
-      order: this.trier[query.tri ?? Action.Tri.STATUT],
-      limit: generateLimit(nombreTotalActionsFiltrees, query.page),
-      offset: generateOffset(query.page),
-      include: [
-        {
-          model: JeuneSqlModel,
-          required: true
-        }
-      ]
-    })
-
     return success({
       metadonnees,
-      actions: actionsSqlModel.map(fromSqlToActionQueryModel)
+      actions: actionsFiltrees.rows.map(fromSqlToActionQueryModel)
     })
   }
 
@@ -134,6 +122,26 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
 
   async monitor(): Promise<void> {
     return
+  }
+
+  private async findAndCountAllActionsFiltrees(
+    query: GetActionsJeuneQuery
+  ): Promise<{
+    rows: ActionSqlModel[]
+    count: number
+  }> {
+    return ActionSqlModel.findAndCountAll({
+      where: this.generateWhere(query),
+      order: this.trier[query.tri ?? Action.Tri.STATUT],
+      limit: generateLimit(query.page),
+      offset: generateOffset(query.page),
+      include: [
+        {
+          model: JeuneSqlModel,
+          required: true
+        }
+      ]
+    })
   }
 
   private compterActionsParStatut(
@@ -160,13 +168,7 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
   ): Promise<Array<RawCount<Action.Qualification.Etat>>> {
     return this.sequelize.query<RawCount<Action.Qualification.Etat>>(
       `
-        SELECT
-            CASE
-                WHEN qualification_heures IS NOT null THEN 'QUALIFIEE'
-                WHEN statut = 'done' THEN 'A_QUALIFIER'
-                ELSE 'NON_QUALIFIABLE'
-            END AS value,
-            COUNT(*)
+        SELECT ${this.CASE_ETATS_QUALIFICATION} AS value, COUNT(*)
         FROM action
         WHERE id_jeune = :idJeune
         GROUP BY value;
@@ -189,7 +191,21 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
     return count ? parseInt(count) : 0
   }
 
-  trier: Record<Action.Tri, Order> = {
+  private generateWhere(query: GetActionsJeuneQuery): WhereOptions {
+    const where: WhereOptions = [{ id_jeune: query.idJeune }]
+
+    if (query.etats?.length)
+      where.push(
+        Sequelize.where(this.sequelize.literal(this.CASE_ETATS_QUALIFICATION), {
+          [Op.in]: query.etats
+        })
+      )
+    if (query.statuts) where.push({ statut: query.statuts })
+
+    return where
+  }
+
+  private trier: Record<Action.Tri, Order> = {
     date_croissante: [['date_creation', 'ASC']],
     date_decroissante: [['date_creation', 'DESC']],
     date_echeance_croissante: [['date_echeance', 'ASC']],
@@ -203,8 +219,8 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
   }
 }
 
-function generateLimit(nombreTotalActions: number, page?: number): number {
-  return page ? LIMITE_NOMBRE_ACTIONS_PAR_PAGE : nombreTotalActions
+function generateLimit(page?: number): number | undefined {
+  return page ? LIMITE_NOMBRE_ACTIONS_PAR_PAGE : undefined
 }
 
 function generateOffset(page?: number): number {
@@ -217,33 +233,6 @@ function laPageExiste(nombreTotalActions: number, page?: number): boolean {
   }
   const pageMax = Math.ceil(nombreTotalActions / LIMITE_NOMBRE_ACTIONS_PAR_PAGE)
   return page <= pageMax
-}
-
-function generateWhere(query: GetActionsJeuneQuery): WhereOptions {
-  const filtres: WhereOptions = {
-    idJeune: query.idJeune
-  }
-
-  if (query.etats?.length) {
-    filtres.heuresQualifiees = { [Op.or]: {} }
-    filtres.statut = { [Op.and]: { [Op.or]: {} } }
-    if (query.statuts) filtres.statut[Op.and][Op.in] = query.statuts
-
-    if (query.etats.includes(Action.Qualification.Etat.QUALIFIEE)) {
-      filtres.heuresQualifiees[Op.or][Op.not] = null
-    }
-
-    if (query.etats.includes(Action.Qualification.Etat.A_QUALIFIER)) {
-      filtres.heuresQualifiees[Op.or][Op.is] = null
-      filtres.statut[Op.and][Op.or][Op.eq] = Action.Statut.TERMINEE
-    }
-
-    if (query.etats.includes(Action.Qualification.Etat.NON_QUALIFIABLE)) {
-      filtres.statut[Op.and][Op.or][Op.ne] = Action.Statut.TERMINEE
-    }
-  } else if (query.statuts) filtres.statut = query.statuts
-
-  return filtres
 }
 
 interface RawCount<T> {
