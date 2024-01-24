@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Order, QueryTypes, Sequelize, WhereOptions } from 'sequelize'
+import { Op, Order, QueryTypes, Sequelize, WhereOptions } from 'sequelize'
 import { NonTrouveError } from '../../../building-blocks/types/domain-error'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
@@ -59,9 +59,7 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
     const filtres = generateWhere(query)
 
     const [nombreTotalActionsFiltrees, statutRawCount] = await Promise.all([
-      ActionSqlModel.count({
-        where: filtres
-      }),
+      ActionSqlModel.count({ where: filtres }),
       this.compterActionsParStatut(query.idJeune)
     ])
 
@@ -116,24 +114,22 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
     let nombreNonQualifiables = 0
     let nombreAQualifier = 0
     let nombreQualifiees = 0
-    const actions: ActionQueryModel[] = actionsSqlModel
-      .map(sql => {
-        const queryModel: ActionQueryModel = fromSqlToActionQueryModel(sql)
-        switch (queryModel.etat) {
-          case Action.Qualification.Etat.NON_QUALIFIABLE:
-            nombreNonQualifiables++
-            break
-          case Action.Qualification.Etat.A_QUALIFIER:
-            nombreAQualifier++
-            break
-          case Action.Qualification.Etat.QUALIFIEE:
-            nombreQualifiees++
-            break
-        }
+    const actions: ActionQueryModel[] = actionsSqlModel.map(sql => {
+      const queryModel: ActionQueryModel = fromSqlToActionQueryModel(sql)
+      switch (queryModel.etat) {
+        case Action.Qualification.Etat.NON_QUALIFIABLE:
+          nombreNonQualifiables++
+          break
+        case Action.Qualification.Etat.A_QUALIFIER:
+          nombreAQualifier++
+          break
+        case Action.Qualification.Etat.QUALIFIEE:
+          nombreQualifiees++
+          break
+      }
 
-        return queryModel
-      })
-      .filter(action => filtrerParEtat(query, action))
+      return queryModel
+    })
 
     return success({
       metadonnees: {
@@ -226,24 +222,30 @@ function laPageExiste(nombreTotalActions: number, page?: number): boolean {
 }
 
 function generateWhere(query: GetActionsJeuneQuery): WhereOptions {
-  const filtres: {
-    idJeune: string
-    statut?: Action.Statut[]
-    etats?: Action.Qualification.Etat[]
-  } = {
+  const filtres: WhereOptions = {
     idJeune: query.idJeune
   }
-  if (query.statuts) {
-    filtres.statut = query.statuts
-  }
-  return filtres
-}
 
-function filtrerParEtat(
-  query: GetActionsJeuneQuery,
-  actionQueryModel: ActionQueryModel
-): boolean {
-  return !query.etats?.length || query.etats.includes(actionQueryModel.etat)
+  if (query.etats?.length) {
+    filtres.heuresQualifiees = { [Op.or]: {} }
+    filtres.statut = { [Op.and]: { [Op.or]: {} } }
+    if (query.statuts) filtres.statut[Op.and][Op.in] = query.statuts
+
+    if (query.etats.includes(Action.Qualification.Etat.QUALIFIEE)) {
+      filtres.heuresQualifiees[Op.or][Op.not] = null
+    }
+
+    if (query.etats.includes(Action.Qualification.Etat.A_QUALIFIER)) {
+      filtres.heuresQualifiees[Op.or][Op.is] = null
+      filtres.statut[Op.and][Op.or][Op.eq] = Action.Statut.TERMINEE
+    }
+
+    if (query.etats.includes(Action.Qualification.Etat.NON_QUALIFIABLE)) {
+      filtres.statut[Op.and][Op.or][Op.ne] = Action.Statut.TERMINEE
+    }
+  } else if (query.statuts) filtres.statut = query.statuts
+
+  return filtres
 }
 
 interface RawCount {
