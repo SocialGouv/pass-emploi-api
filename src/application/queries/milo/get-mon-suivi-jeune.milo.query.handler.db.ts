@@ -26,7 +26,7 @@ import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/ren
 import { fromSqlToRendezVousJeuneQueryModel } from '../query-mappers/rendez-vous-milo.mappers'
 import { GetSessionsJeuneMiloQueryGetter } from '../query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { buildError } from '../../../utils/logger.module'
-import { estMilo } from '../../../domain/core'
+import { estMilo, estMiloPassEmploi } from '../../../domain/core'
 
 export interface GetMonSuiviQuery extends Query {
   idJeune: string
@@ -50,7 +50,11 @@ export class GetMonSuiviQueryHandler extends QueryHandler<
     query: GetMonSuiviQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.autoriserLeJeune(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.autoriserLeJeune(
+      query.idJeune,
+      utilisateur,
+      estMiloPassEmploi(utilisateur.structure)
+    )
   }
 
   async handle(
@@ -70,30 +74,37 @@ export class GetMonSuiviQueryHandler extends QueryHandler<
     const [actions, rendezVous, sessionsMilo] = await Promise.all([
       this.recupererLesActions(query),
       this.recupererLesRendezVous(query, utilisateur.type),
-      this.sessionsJeuneQueryGetter
-        .handle(query.idJeune, jeuneSqlModel.idPartenaire!, query.accessToken, {
-          periode: {
-            debut: query.dateDebut,
-            fin: query.dateFin
-          },
-          pourConseiller: false,
-          filtrerEstInscrit: true
-        })
-        .then(result => {
-          if (isFailure(result)) {
-            return null
-          }
-          return result.data
-        })
-        .catch(error => {
-          this.logger.error(
-            buildError(
-              `La récupération des sessions de l'agenda du jeune ${query.idJeune} a échoué`,
-              error
+      estMilo(utilisateur.structure)
+        ? this.sessionsJeuneQueryGetter
+            .handle(
+              query.idJeune,
+              jeuneSqlModel.idPartenaire!,
+              query.accessToken,
+              {
+                periode: {
+                  debut: query.dateDebut,
+                  fin: query.dateFin
+                },
+                pourConseiller: false,
+                filtrerEstInscrit: true
+              }
             )
-          )
-          return null
-        })
+            .then(result => {
+              if (isFailure(result)) {
+                return null
+              }
+              return result.data
+            })
+            .catch(error => {
+              this.logger.error(
+                buildError(
+                  `La récupération des sessions de l'agenda du jeune ${query.idJeune} a échoué`,
+                  error
+                )
+              )
+              return null
+            })
+        : null
     ])
     return success({ actions, rendezVous, sessionsMilo })
   }
