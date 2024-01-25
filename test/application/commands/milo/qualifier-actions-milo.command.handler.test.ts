@@ -102,7 +102,7 @@ describe('QualifierActionsMiloCommandHandler', () => {
           })
           const actionQualifiee: Action.Qualifiee = {
             ...actionTerminee,
-            dateDebut: actionTerminee.dateCreation,
+            dateDebut: actionTerminee.dateEcheance,
             qualification: {
               code: Action.Qualification.Code.SANTE,
               heures: 2,
@@ -214,7 +214,7 @@ describe('QualifierActionsMiloCommandHandler', () => {
           })
           const actionQualifiee: Action.Qualifiee = {
             ...actionTerminee,
-            dateDebut: actionTerminee.dateCreation,
+            dateDebut: actionTerminee.dateEcheance,
             dateFinReelle: uneDatetime(),
             qualification: {
               code: Action.Qualification.Code.NON_SNP,

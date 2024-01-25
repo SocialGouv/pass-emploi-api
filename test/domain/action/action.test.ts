@@ -30,80 +30,6 @@ describe('Action', () => {
       actionFactory = new Action.Factory(idService, dateService)
     })
 
-    describe('updateStatut', () => {
-      describe('quand le statut est fourni', () => {
-        it("renvoie l'action avec le statut et la date à jour", async () => {
-          // Given
-          const action = uneAction({
-            statut: Action.Statut.PAS_COMMENCEE
-          })
-          const enCours = Action.Statut.EN_COURS
-
-          // When
-          const resultAction = actionFactory.updateStatut(action, enCours)
-
-          // Then
-          expect(isSuccess(resultAction)).to.equal(true)
-          if (isSuccess(resultAction)) {
-            expect(resultAction.data.statut).to.equal(enCours)
-            expect(resultAction.data.dateDerniereActualisation).to.equal(now)
-            expect(resultAction.data.dateFinReelle).to.be.undefined()
-          }
-        })
-      })
-
-      describe("quand l'action passe en terminée", () => {
-        it('met à jour la date de fin', () => {
-          // Given
-          const action = uneAction({
-            statut: Action.Statut.EN_COURS
-          })
-
-          // When
-          const resultAction = actionFactory.updateStatut(
-            action,
-            Action.Statut.TERMINEE
-          )
-
-          // Then
-          expect(isSuccess(resultAction)).to.equal(true)
-          if (isSuccess(resultAction)) {
-            expect(resultAction.data.statut).to.equal(Action.Statut.TERMINEE)
-            expect(resultAction.data.dateFinReelle).to.deep.equal(now)
-          }
-        })
-      })
-
-      describe("quand l'action est qualifiée", () => {
-        it('rejette', () => {
-          // Given
-          const action = uneAction({
-            statut: Action.Statut.TERMINEE,
-            qualification: {
-              code: Action.Qualification.Code.EMPLOI,
-              heures: 3,
-              commentaire: 'Un commentaire'
-            }
-          })
-
-          // When
-          const result = actionFactory.updateStatut(
-            action,
-            Action.Statut.EN_COURS
-          )
-
-          // Then
-          expect(result).to.deep.equal(
-            failure(
-              new MauvaiseCommandeError(
-                "Vous ne pouvez pas changer le statut d'une action qualifée"
-              )
-            )
-          )
-        })
-      })
-    })
-
     describe('updateAction', () => {
       describe('Quand on peut modifier l’action', () => {
         it('met à jour les attributs', () => {
@@ -167,7 +93,9 @@ describe('Action', () => {
             expect(isSuccess(resultAction)).to.equal(true)
             if (isSuccess(resultAction)) {
               expect(resultAction.data.statut).to.equal(Action.Statut.TERMINEE)
-              expect(resultAction.data.dateFinReelle).to.deep.equal(now)
+              expect(resultAction.data.dateFinReelle).to.deep.equal(
+                resultAction.data.dateEcheance
+              )
             }
           })
         })
@@ -689,6 +617,7 @@ describe('Action', () => {
       })
     })
   })
+
   describe('qualifier', () => {
     const dateFinReelle = DateTime.fromJSDate(uneDate())
 
@@ -708,7 +637,7 @@ describe('Action', () => {
 
       const expectedAction: Action.Qualifiee = {
         ...actionTerminee,
-        dateDebut: actionTerminee.dateCreation,
+        dateDebut: actionTerminee.dateEcheance,
         dateFinReelle,
         qualification: {
           code: Action.Qualification.Code.NON_SNP,
@@ -720,6 +649,7 @@ describe('Action', () => {
       // Then
       expect(actionQualifiee).to.deep.equal(success(expectedAction))
     })
+
     it("renvoie l'action qualifiée SANTE", () => {
       // Given
       const nouvelleDateFinReelle = DateTime.fromJSDate(uneAutreDate())
@@ -744,11 +674,12 @@ describe('Action', () => {
           heures: 2,
           commentaire: 'Un commentaire'
         },
-        dateDebut: actionTerminee.dateCreation,
+        dateDebut: actionTerminee.dateEcheance,
         dateFinReelle: nouvelleDateFinReelle
       }
       expect(actionQualifiee).to.deep.equal(success(expectedAction))
     })
+
     it("rejette quand l'action est déjà qualifiée", () => {
       // Given
       const actionTerminee: Action = uneAction({
@@ -772,6 +703,7 @@ describe('Action', () => {
         failure(new MauvaiseCommandeError('Action déjà qualifiée'))
       )
     })
+
     it("rejette quand l'action n'est pas terminée", () => {
       // Given
       const actionEnCours: Action = uneAction({
@@ -789,6 +721,7 @@ describe('Action', () => {
         failure(new MauvaiseCommandeError("L'action n'est pas terminée"))
       )
     })
+
     it('rejette quand la date de fin réelle est antécédente à la date de création', () => {
       // Given
       const actionTerminee: Action = uneActionTerminee({
@@ -811,6 +744,7 @@ describe('Action', () => {
         )
       )
     })
+
     it('accepte quand la date de fin réelle est le même jour que la date de création', () => {
       // Given
       const actionTerminee: Action = uneActionTerminee({
@@ -828,6 +762,7 @@ describe('Action', () => {
       // Then
       expect(isSuccess(result)).to.be.true()
     })
+
     it('met une valeur par défaut quand aucun commentaire n’est renseigné pour une SNP', () => {
       // Given
       const actionTerminee: Action = uneActionTerminee()
@@ -844,7 +779,7 @@ describe('Action', () => {
       // Then
       const expectedAction: Action.Qualifiee = {
         ...actionTerminee,
-        dateDebut: actionTerminee.dateCreation,
+        dateDebut: actionTerminee.dateEcheance,
         dateFinReelle,
         qualification: {
           code: Action.Qualification.Code.SANTE,
