@@ -251,28 +251,6 @@ export namespace Action {
       return success(action)
     }
 
-    updateStatut(action: Action, statut: Action.Statut): Result<Action> {
-      if (Action.estQualifiee(action)) {
-        return failure(
-          new MauvaiseCommandeError(
-            "Vous ne pouvez pas changer le statut d'une action qualifée"
-          )
-        )
-      }
-
-      const maintenant = this.dateService.now()
-      return success({
-        ...action,
-        statut,
-        dateFinReelle: this.mettreAJourLaDateDeFinReelle(
-          action,
-          statut,
-          maintenant
-        ),
-        dateDerniereActualisation: maintenant
-      })
-    }
-
     updateAction(
       action: Action,
       infosActionAMettreAJour: InfosActionAMettreAJour

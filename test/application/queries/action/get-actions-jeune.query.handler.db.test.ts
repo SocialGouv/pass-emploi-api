@@ -3,6 +3,7 @@ import { SinonSandbox } from 'sinon'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { failure, isSuccess } from 'src/building-blocks/types/result'
 import { uneAction } from 'test/fixtures/action.fixture'
+import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import {
   GetActionsJeuneQuery,
@@ -10,6 +11,7 @@ import {
 } from '../../../../src/application/queries/action/get-actions-jeune.query.handler.db'
 import { ActionQueryModel } from '../../../../src/application/queries/query-models/actions.query-model'
 import { Action } from '../../../../src/domain/action/action'
+import { Core } from '../../../../src/domain/core'
 import { FirebaseClient } from '../../../../src/infrastructure/clients/firebase-client'
 import { ActionSqlRepository } from '../../../../src/infrastructure/repositories/action/action-sql.repository.db'
 import { ConseillerSqlRepository } from '../../../../src/infrastructure/repositories/conseiller-sql.repository.db'
@@ -28,8 +30,6 @@ import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
-import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
-import { Core } from '../../../../src/domain/core'
 
 describe('GetActionsByJeuneQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
@@ -440,64 +440,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
     })
 
     describe('quand on filtre', () => {
-      describe('statut', () => {
-        it("applique les filtres de statut d'action et donne le nombre total de résultats", async () => {
-          // Given
-          const actionPasCommencee = uneAction({
-            id: '02b3710e-7779-11ec-90d6-0242ac120001',
-            idJeune: jeune.id,
-            statut: Action.Statut.PAS_COMMENCEE,
-            dateDerniereActualisation: DateTime.fromISO(
-              '2020-04-05T12:00:00.000Z'
-            )
-          })
-          const actionEnCours = uneAction({
-            id: '02b3710e-7779-11ec-90d6-0242ac120002',
-            idJeune: jeune.id,
-            statut: Action.Statut.EN_COURS,
-            dateDerniereActualisation: DateTime.fromISO(
-              '2020-04-06T12:00:00.000Z'
-            )
-          })
-          const actionCanceled = uneAction({
-            id: '02b3710e-7779-11ec-90d6-0242ac120003',
-            idJeune: jeune.id,
-            statut: Action.Statut.ANNULEE,
-            dateDerniereActualisation: DateTime.fromISO(
-              '2020-04-07T12:00:00.000Z'
-            )
-          })
-          const actionTerminee = uneAction({
-            id: '02b3710e-7779-11ec-90d6-0242ac120004',
-            idJeune: jeune.id,
-            statut: Action.Statut.TERMINEE,
-            dateDerniereActualisation: DateTime.fromISO(
-              '2020-04-08T12:00:00.000Z'
-            )
-          })
-          await actionSqlRepository.save(actionPasCommencee)
-          await actionSqlRepository.save(actionEnCours)
-          await actionSqlRepository.save(actionCanceled)
-          await actionSqlRepository.save(actionTerminee)
-
-          // When
-          const result = await getActionsByJeuneQueryHandler.handle({
-            idJeune: jeune.id,
-            page: 1,
-            statuts: [Action.Statut.EN_COURS, Action.Statut.PAS_COMMENCEE]
-          })
-
-          // Then
-          expect(isSuccess(result)).to.be.true()
-          if (isSuccess(result)) {
-            expect(result.data.actions).to.be.deep.equal([
-              uneActionQueryModelFromDomain(actionEnCours),
-              uneActionQueryModelFromDomain(actionPasCommencee)
-            ])
-            expect(result.data.metadonnees.nombreTotal).to.equal(4)
-          }
-        })
-      })
       describe('etat', () => {
         let actionNonQualifiable: Action
         let actionAQualifier: Action
@@ -563,6 +505,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
           await actionSqlRepository.save(actionAQualifier)
           await actionSqlRepository.save(actionQualifiee)
         })
+
         it('filtre les non qualifiables', async () => {
           // When
           const result = await getActionsByJeuneQueryHandler.handle({
@@ -576,6 +519,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
             actionQMNonQualifiable
           ])
         })
+
         it('filtre les qualifiées', async () => {
           // When
           const result = await getActionsByJeuneQueryHandler.handle({
@@ -589,6 +533,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
             actionQMQualifiee
           ])
         })
+
         it('filtre les à qualifier', async () => {
           // When
           const result = await getActionsByJeuneQueryHandler.handle({
@@ -602,6 +547,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
             actionQMAQualifier
           ])
         })
+
         it('filtre tout', async () => {
           // When
           const result = await getActionsByJeuneQueryHandler.handle({
@@ -622,6 +568,96 @@ describe('GetActionsByJeuneQueryHandler', () => {
             actionQMQualifiee,
             actionQMAQualifier
           ])
+        })
+      })
+
+      describe('statut', () => {
+        const actionPasCommencee = uneAction({
+          id: '02b3710e-7779-11ec-90d6-0242ac120001',
+          idJeune: jeune.id,
+          statut: Action.Statut.PAS_COMMENCEE,
+          dateDerniereActualisation: DateTime.fromISO(
+            '2020-04-05T12:00:00.000Z'
+          )
+        })
+        const actionEnCours = uneAction({
+          id: '02b3710e-7779-11ec-90d6-0242ac120002',
+          idJeune: jeune.id,
+          statut: Action.Statut.EN_COURS,
+          dateDerniereActualisation: DateTime.fromISO(
+            '2020-04-06T12:00:00.000Z'
+          )
+        })
+        const actionCanceled = uneAction({
+          id: '02b3710e-7779-11ec-90d6-0242ac120003',
+          idJeune: jeune.id,
+          statut: Action.Statut.ANNULEE,
+          dateDerniereActualisation: DateTime.fromISO(
+            '2020-04-07T12:00:00.000Z'
+          )
+        })
+        const actionTerminee = uneAction({
+          id: '02b3710e-7779-11ec-90d6-0242ac120004',
+          idJeune: jeune.id,
+          statut: Action.Statut.TERMINEE,
+          dateDerniereActualisation: DateTime.fromISO(
+            '2020-04-08T12:00:00.000Z'
+          )
+        })
+        beforeEach(async () => {
+          // Given
+          await actionSqlRepository.save(actionPasCommencee)
+          await actionSqlRepository.save(actionEnCours)
+          await actionSqlRepository.save(actionCanceled)
+          await actionSqlRepository.save(actionTerminee)
+        })
+
+        it("applique les filtres de statut d'action et donne le nombre total de résultats", async () => {
+          // When
+          const result = await getActionsByJeuneQueryHandler.handle({
+            idJeune: jeune.id,
+            page: 1,
+            statuts: [Action.Statut.EN_COURS, Action.Statut.PAS_COMMENCEE]
+          })
+          // Then
+          expect(isSuccess(result)).to.be.true()
+          if (isSuccess(result)) {
+            expect(result.data.actions).to.be.deep.equal([
+              uneActionQueryModelFromDomain(actionEnCours),
+              uneActionQueryModelFromDomain(actionPasCommencee)
+            ])
+            expect(result.data.metadonnees.nombreTotal).to.equal(4)
+          }
+        })
+
+        it('intersecte avec les filtres d’état de qualification', async () => {
+          // When
+          const result1 = await getActionsByJeuneQueryHandler.handle({
+            idJeune: jeune.id,
+            page: 1,
+            statuts: [Action.Statut.TERMINEE],
+            etats: [Action.Qualification.Etat.NON_QUALIFIABLE]
+          })
+          // Then
+          expect(isSuccess(result1)).to.be.true()
+          if (isSuccess(result1)) {
+            expect(result1.data.actions).to.be.deep.equal([])
+            expect(result1.data.metadonnees.nombreTotal).to.equal(4)
+          }
+
+          // When
+          const result2 = await getActionsByJeuneQueryHandler.handle({
+            idJeune: jeune.id,
+            page: 1,
+            statuts: [Action.Statut.EN_COURS, Action.Statut.PAS_COMMENCEE],
+            etats: [Action.Qualification.Etat.A_QUALIFIER]
+          })
+          // Then
+          expect(isSuccess(result2)).to.be.true()
+          if (isSuccess(result2)) {
+            expect(result2.data.actions).to.be.deep.equal([])
+            expect(result2.data.metadonnees.nombreTotal).to.equal(4)
+          }
         })
       })
     })
