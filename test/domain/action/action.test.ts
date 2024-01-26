@@ -93,7 +93,9 @@ describe('Action', () => {
             expect(isSuccess(resultAction)).to.equal(true)
             if (isSuccess(resultAction)) {
               expect(resultAction.data.statut).to.equal(Action.Statut.TERMINEE)
-              expect(resultAction.data.dateFinReelle).to.deep.equal(now)
+              expect(resultAction.data.dateFinReelle).to.deep.equal(
+                resultAction.data.dateEcheance
+              )
             }
           })
         })
@@ -615,6 +617,7 @@ describe('Action', () => {
       })
     })
   })
+
   describe('qualifier', () => {
     const dateFinReelle = DateTime.fromJSDate(uneDate())
 
@@ -634,7 +637,7 @@ describe('Action', () => {
 
       const expectedAction: Action.Qualifiee = {
         ...actionTerminee,
-        dateDebut: actionTerminee.dateCreation,
+        dateDebut: actionTerminee.dateEcheance,
         dateFinReelle,
         qualification: {
           code: Action.Qualification.Code.NON_SNP,
@@ -646,6 +649,7 @@ describe('Action', () => {
       // Then
       expect(actionQualifiee).to.deep.equal(success(expectedAction))
     })
+
     it("renvoie l'action qualifiée SANTE", () => {
       // Given
       const nouvelleDateFinReelle = DateTime.fromJSDate(uneAutreDate())
@@ -670,11 +674,12 @@ describe('Action', () => {
           heures: 2,
           commentaire: 'Un commentaire'
         },
-        dateDebut: actionTerminee.dateCreation,
+        dateDebut: actionTerminee.dateEcheance,
         dateFinReelle: nouvelleDateFinReelle
       }
       expect(actionQualifiee).to.deep.equal(success(expectedAction))
     })
+
     it("rejette quand l'action est déjà qualifiée", () => {
       // Given
       const actionTerminee: Action = uneAction({
@@ -698,6 +703,7 @@ describe('Action', () => {
         failure(new MauvaiseCommandeError('Action déjà qualifiée'))
       )
     })
+
     it("rejette quand l'action n'est pas terminée", () => {
       // Given
       const actionEnCours: Action = uneAction({
@@ -715,6 +721,7 @@ describe('Action', () => {
         failure(new MauvaiseCommandeError("L'action n'est pas terminée"))
       )
     })
+
     it('rejette quand la date de fin réelle est antécédente à la date de création', () => {
       // Given
       const actionTerminee: Action = uneActionTerminee({
@@ -737,6 +744,7 @@ describe('Action', () => {
         )
       )
     })
+
     it('accepte quand la date de fin réelle est le même jour que la date de création', () => {
       // Given
       const actionTerminee: Action = uneActionTerminee({
@@ -754,6 +762,7 @@ describe('Action', () => {
       // Then
       expect(isSuccess(result)).to.be.true()
     })
+
     it('met une valeur par défaut quand aucun commentaire n’est renseigné pour une SNP', () => {
       // Given
       const actionTerminee: Action = uneActionTerminee()
@@ -770,7 +779,7 @@ describe('Action', () => {
       // Then
       const expectedAction: Action.Qualifiee = {
         ...actionTerminee,
-        dateDebut: actionTerminee.dateCreation,
+        dateDebut: actionTerminee.dateEcheance,
         dateFinReelle,
         qualification: {
           code: Action.Qualification.Code.SANTE,

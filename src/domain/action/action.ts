@@ -15,9 +15,9 @@ import {
 import { DateService } from '../../utils/date-service'
 import { IdService } from '../../utils/id-service'
 import { Jeune } from '../jeune/jeune'
+import _ACTIONS_PREDEFINIES from './actions-predefinies'
 import * as _Commentaire from './commentaire'
 import * as _Qualification from './qualification'
-import _ACTIONS_PREDEFINIES from './actions-predefinies'
 
 export const ActionRepositoryToken = 'ActionRepositoryToken'
 export const CommentaireActionRepositoryToken =
@@ -154,7 +154,7 @@ export namespace Action {
       return failure(new MauvaiseCommandeError('Action déjà qualifiée'))
     }
 
-    const dateDebutReelle = dateDebut ?? action.dateCreation
+    const dateDebutReelle = dateDebut ?? action.dateEcheance
     const dateFinReelleMiseAJour = dateFinReelle ?? action.dateFinReelle!
 
     if (DateService.isGreater(dateDebutReelle, dateFinReelleMiseAJour)) {
@@ -263,7 +263,6 @@ export namespace Action {
         )
       }
 
-      const maintenant = this.dateService.now()
       const statut = infosActionAMettreAJour.statut ?? action.statut
 
       return success({
@@ -273,12 +272,8 @@ export namespace Action {
         description: infosActionAMettreAJour.description ?? action.description,
         dateEcheance:
           infosActionAMettreAJour.dateEcheance ?? action.dateEcheance,
-        dateFinReelle: this.mettreAJourLaDateDeFinReelle(
-          action,
-          statut,
-          maintenant
-        ),
-        dateDerniereActualisation: maintenant,
+        dateFinReelle: this.mettreAJourLaDateDeFinReelle(action, statut),
+        dateDerniereActualisation: this.dateService.now(),
         qualification: infosActionAMettreAJour.codeQualification
           ? { code: infosActionAMettreAJour.codeQualification }
           : undefined
@@ -325,20 +320,17 @@ export namespace Action {
 
     private mettreAJourLaDateDeFinReelle(
       action: Action,
-      statut: Action.Statut,
-      maintenant: DateTime
+      statut: Action.Statut
     ): DateTime | undefined {
-      let dateFinReelle = action.dateFinReelle
-      const nouveauStatutTermine = statut === Action.Statut.TERMINEE
+      const nouveauStatutTermine =
+        statut === Action.Statut.TERMINEE && statut !== action.statut
+      if (nouveauStatutTermine) return action.dateEcheance
+
       const ancienStatutTermine =
-        !nouveauStatutTermine && action.statut === Action.Statut.TERMINEE
-      if (nouveauStatutTermine) {
-        dateFinReelle = maintenant
-      }
-      if (ancienStatutTermine) {
-        dateFinReelle = undefined
-      }
-      return dateFinReelle
+        action.statut === Action.Statut.TERMINEE && statut !== action.statut
+      if (ancienStatutTermine) return undefined
+
+      return action.dateFinReelle
     }
   }
 }
