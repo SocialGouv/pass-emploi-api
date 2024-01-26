@@ -173,7 +173,7 @@
     "yargs": "^17.7.2"
   },
   "resolutions": {
-    "@nestjs/axios/axios": "1.6.6",
+    "@nestjs/axios/axios": "1.6.7",
     "download/got": "11.8.5"
   },
   "mocha": {
