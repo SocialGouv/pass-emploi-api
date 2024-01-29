@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon'
+import { MauvaiseCommandeError } from '../../../src/building-blocks/types/domain-error'
 import {
   failure,
   isFailure,
@@ -8,11 +10,9 @@ import { Action } from '../../../src/domain/action/action'
 import { DateService } from '../../../src/utils/date-service'
 import { IdService } from '../../../src/utils/id-service'
 import { uneAction, uneActionTerminee } from '../../fixtures/action.fixture'
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { DateTime } from 'luxon'
-import { MauvaiseCommandeError } from '../../../src/building-blocks/types/domain-error'
 import { uneAutreDate, uneDate, uneDatetime } from '../../fixtures/date.fixture'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import { expect, StubbedClass, stubClass } from '../../utils'
 
 describe('Action', () => {
   describe('Factory', () => {
@@ -68,6 +68,31 @@ describe('Action', () => {
             expect(resultAction.data.qualification?.code).to.equal(
               nouveauCodeQualification
             )
+          }
+        })
+
+        it('conserve les attributs non modifiés', () => {
+          // Given
+          const action = uneAction({
+            statut: Action.Statut.EN_COURS,
+            dateDerniereActualisation: DateTime.fromISO('2023-04-12'),
+            qualification: {
+              code: Action.Qualification.Code.CULTURE_SPORT_LOISIRS
+            }
+          })
+
+          // When
+          const resultAction = actionFactory.updateAction(action, {
+            idAction: 'id-action'
+          })
+
+          // Then
+          expect(isSuccess(resultAction)).to.equal(true)
+          if (isSuccess(resultAction)) {
+            expect(resultAction.data).to.deep.equal({
+              ...action,
+              dateDerniereActualisation: now
+            })
           }
         })
 

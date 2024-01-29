@@ -276,7 +276,7 @@ export namespace Action {
         dateDerniereActualisation: this.dateService.now(),
         qualification: infosActionAMettreAJour.codeQualification
           ? { code: infosActionAMettreAJour.codeQualification }
-          : undefined
+          : action.qualification
       })
     }
 

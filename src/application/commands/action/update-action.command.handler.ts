@@ -49,7 +49,7 @@ export class UpdateActionCommandHandler extends CommandHandler<
     command: UpdateActionCommand,
     _utilisateur?: Authentification.Utilisateur,
     action?: Action
-  ): Promise<Result<void>> {
+  ): Promise<Result> {
     if (!action) {
       return failure(new NonTrouveError('Action', command.idAction))
     }
