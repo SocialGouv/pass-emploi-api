@@ -72,7 +72,7 @@ describe('QualifierActionCommandHandler', () => {
             const commentaireQualification = 'Un commentaire'
             const actionQualifiee: Action.Qualifiee = {
               ...actionTerminee,
-              dateDebut: actionTerminee.dateEcheance,
+              dateDebut: actionTerminee.dateFinReelle,
               qualification: {
                 code: Action.Qualification.Code.SANTE,
                 heures: 2,
@@ -150,7 +150,7 @@ describe('QualifierActionCommandHandler', () => {
           })
           const actionQualifiee: Action.Qualifiee = {
             ...actionTerminee,
-            dateDebut: actionTerminee.dateEcheance,
+            dateDebut: actionTerminee.dateFinReelle!,
             dateFinReelle: uneDatetime(),
             qualification: {
               code: Action.Qualification.Code.NON_SNP,
