@@ -118,9 +118,7 @@ describe('Action', () => {
             expect(isSuccess(resultAction)).to.equal(true)
             if (isSuccess(resultAction)) {
               expect(resultAction.data.statut).to.equal(Action.Statut.TERMINEE)
-              expect(resultAction.data.dateFinReelle).to.deep.equal(
-                resultAction.data.dateEcheance
-              )
+              expect(resultAction.data.dateFinReelle).to.deep.equal(now)
             }
           })
         })
@@ -359,7 +357,7 @@ describe('Action', () => {
                 type: Action.TypeCreateur.JEUNE
               },
               dateEcheance: dateEcheanceA9h30,
-              dateFinReelle: dateEcheanceA9h30,
+              dateFinReelle: now,
               rappel: true
             })
 
@@ -405,7 +403,7 @@ describe('Action', () => {
                 type: Action.TypeCreateur.JEUNE
               },
               dateEcheance: dateEcheanceA9h30,
-              dateFinReelle: dateEcheanceA9h30,
+              dateFinReelle: now,
               rappel
             })
 
@@ -662,7 +660,7 @@ describe('Action', () => {
 
       const expectedAction: Action.Qualifiee = {
         ...actionTerminee,
-        dateDebut: actionTerminee.dateEcheance,
+        dateDebut: dateFinReelle,
         dateFinReelle,
         qualification: {
           code: Action.Qualification.Code.NON_SNP,
@@ -699,7 +697,7 @@ describe('Action', () => {
           heures: 2,
           commentaire: 'Un commentaire'
         },
-        dateDebut: actionTerminee.dateEcheance,
+        dateDebut: nouvelleDateFinReelle,
         dateFinReelle: nouvelleDateFinReelle
       }
       expect(actionQualifiee).to.deep.equal(success(expectedAction))
@@ -804,7 +802,7 @@ describe('Action', () => {
       // Then
       const expectedAction: Action.Qualifiee = {
         ...actionTerminee,
-        dateDebut: actionTerminee.dateEcheance,
+        dateDebut: dateFinReelle,
         dateFinReelle,
         qualification: {
           code: Action.Qualification.Code.SANTE,
