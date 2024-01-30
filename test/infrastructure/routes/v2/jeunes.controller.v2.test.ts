@@ -1,36 +1,43 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
+import { DateTime } from 'luxon'
+import { Action } from 'src/domain/action/action'
+import { Qualification } from 'src/domain/action/qualification'
 import * as request from 'supertest'
 import {
   ActionsJeuneQueryModel,
+  GetActionsJeuneQuery,
   GetActionsJeuneQueryHandler
 } from '../../../../src/application/queries/action/get-actions-jeune.query.handler.db'
+import { GetJeuneHomeDemarchesQueryHandler } from '../../../../src/application/queries/get-jeune-home-demarches.query.handler'
+import { GetSuiviSemainePoleEmploiQueryHandler } from '../../../../src/application/queries/get-suivi-semaine-pole-emploi.query.handler'
+import { SuiviSemainePoleEmploiQueryModel } from '../../../../src/application/queries/query-models/home-jeune-suivi.query-model'
+import { JeuneHomeDemarcheQueryModel } from '../../../../src/application/queries/query-models/home-jeune.query-model'
+import { RendezVousJeuneQueryModel } from '../../../../src/application/queries/query-models/rendez-vous.query-model'
+import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../../src/application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
+import { GetRendezVousJeuneQueryHandler } from '../../../../src/application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
 import {
   ErreurHttp,
   NonTrouveError
 } from '../../../../src/building-blocks/types/domain-error'
+import { Cached } from '../../../../src/building-blocks/types/query'
 import { failure, success } from '../../../../src/building-blocks/types/result'
+import { RendezVous } from '../../../../src/domain/rendez-vous/rendez-vous'
+import { JwtService } from '../../../../src/infrastructure/auth/jwt.service'
 import {
   unHeaderAuthorization,
   unJwtPayloadValide,
   unJwtPayloadValideJeunePE,
   unUtilisateurDecode
 } from '../../../fixtures/authentification.fixture'
-import { enleverLesUndefined, expect, StubbedClass } from '../../../utils'
-import { getApplicationWithStubbedDependencies } from '../../../utils/module-for-testing'
-import { SuiviSemainePoleEmploiQueryModel } from '../../../../src/application/queries/query-models/home-jeune-suivi.query-model'
-import { uneDemarcheQueryModel } from '../../../fixtures/query-models/demarche.query-model.fixtures'
-import { DateTime } from 'luxon'
-import { ensureUserAuthenticationFailsIfInvalid } from '../../../utils/ensure-user-authentication-fails-if-invalid'
-import { JwtService } from '../../../../src/infrastructure/auth/jwt.service'
-import { GetSuiviSemainePoleEmploiQueryHandler } from '../../../../src/application/queries/get-suivi-semaine-pole-emploi.query.handler'
 import { uneDatetime } from '../../../fixtures/date.fixture'
-import { GetJeuneHomeDemarchesQueryHandler } from '../../../../src/application/queries/get-jeune-home-demarches.query.handler'
-import { RendezVousJeuneQueryModel } from '../../../../src/application/queries/query-models/rendez-vous.query-model'
-import { RendezVous } from '../../../../src/domain/rendez-vous/rendez-vous'
-import { GetRendezVousJeuneQueryHandler } from '../../../../src/application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
-import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../../src/application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
-import { Cached } from '../../../../src/building-blocks/types/query'
-import { JeuneHomeDemarcheQueryModel } from '../../../../src/application/queries/query-models/home-jeune.query-model'
+import { uneDemarcheQueryModel } from '../../../fixtures/query-models/demarche.query-model.fixtures'
+import { enleverLesUndefined, expect, StubbedClass } from '../../../utils'
+import { ensureUserAuthenticationFailsIfInvalid } from '../../../utils/ensure-user-authentication-fails-if-invalid'
+import { getApplicationWithStubbedDependencies } from '../../../utils/module-for-testing'
+import Statut = Action.Statut
+import Tri = Action.Tri
+import Code = Qualification.Code
+import Etat = Qualification.Etat
 
 describe('JeunesController v2', () => {
   let getActionsByJeuneQueryHandler: StubbedClass<GetActionsJeuneQueryHandler>
@@ -61,15 +68,19 @@ describe('JeunesController v2', () => {
     const idJeune = '1'
     it('renvoie 206', async () => {
       // Given
-      const queryActions = {
+      const queryActions: GetActionsJeuneQuery = {
         idJeune: idJeune,
         page: 1,
-        tri: 'date_croissante'
+        tri: Tri.DATE_CROISSANTE,
+        statuts: [Statut.TERMINEE],
+        etats: [Etat.A_QUALIFIER],
+        codesCategories: [Code.SANTE]
       }
       const actionsByJeuneOutput: ActionsJeuneQueryModel = {
         actions: [],
         metadonnees: {
           nombreTotal: 1,
+          nombreFiltrees: 1,
           nombreEnCours: 2,
           nombreTerminees: 3,
           nombreAnnulees: 4,
@@ -155,6 +166,34 @@ describe('JeunesController v2', () => {
       // Given
       const queryActions = {
         statuts: ['à tes souhaits']
+      }
+      // When
+      await request(app.getHttpServer())
+        .get(`/v2/jeunes/${idJeune}/actions`)
+        .set('authorization', unHeaderAuthorization())
+        .query(queryActions)
+        // Then
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+
+    it('retourne 400 quand le paramètre etats est au mauvais format', async () => {
+      // Given
+      const queryActions = {
+        etats: ['à tes souhaits']
+      }
+      // When
+      await request(app.getHttpServer())
+        .get(`/v2/jeunes/${idJeune}/actions`)
+        .set('authorization', unHeaderAuthorization())
+        .query(queryActions)
+        // Then
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+
+    it('retourne 400 quand le paramètre categories est au mauvais format', async () => {
+      // Given
+      const queryActions = {
+        categories: ['à tes souhaits']
       }
       // When
       await request(app.getHttpServer())

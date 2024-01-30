@@ -660,6 +660,74 @@ describe('GetActionsByJeuneQueryHandler', () => {
           }
         })
       })
+
+      describe('categorie', () => {
+        const actionCitoyennete = uneAction({
+          id: '02b3710e-7779-11ec-90d6-0242ac120001',
+          idJeune: jeune.id,
+          qualification: { code: Action.Qualification.Code.CITOYENNETE }
+        })
+        const actionCitoyennete2 = uneAction({
+          id: '02b3710e-7779-11ec-90d6-0242ac120002',
+          idJeune: jeune.id,
+          qualification: { code: Action.Qualification.Code.CITOYENNETE }
+        })
+        const actionSante = uneAction({
+          id: '02b3710e-7779-11ec-90d6-0242ac120003',
+          idJeune: jeune.id,
+          qualification: { code: Action.Qualification.Code.SANTE }
+        })
+        const actionCulture = uneAction({
+          id: '02b3710e-7779-11ec-90d6-0242ac120004',
+          idJeune: jeune.id,
+          qualification: {
+            code: Action.Qualification.Code.CULTURE_SPORT_LOISIRS
+          }
+        })
+        beforeEach(async () => {
+          // Given
+          await actionSqlRepository.save(actionCitoyennete)
+          await actionSqlRepository.save(actionCitoyennete2)
+          await actionSqlRepository.save(actionSante)
+          await actionSqlRepository.save(actionCulture)
+        })
+
+        it('applique les filtres de catégorie et donne le nombre total de résultats', async () => {
+          // When
+          const result = await getActionsByJeuneQueryHandler.handle({
+            idJeune: jeune.id,
+            page: 1,
+            codesCategories: [Action.Qualification.Code.CITOYENNETE]
+          })
+          // Then
+          expect(isSuccess(result)).to.be.true()
+          if (isSuccess(result)) {
+            expect(result.data.actions).to.be.deep.equal([
+              uneActionQueryModelFromDomain(
+                actionCitoyennete,
+                Action.Qualification.Etat.NON_QUALIFIABLE,
+                {
+                  code: Action.Qualification.Code.CITOYENNETE,
+                  libelle: 'Citoyenneté',
+                  commentaireQualification: '',
+                  heures: undefined
+                }
+              ),
+              uneActionQueryModelFromDomain(
+                actionCitoyennete2,
+                Action.Qualification.Etat.NON_QUALIFIABLE,
+                {
+                  code: Action.Qualification.Code.CITOYENNETE,
+                  libelle: 'Citoyenneté',
+                  commentaireQualification: '',
+                  heures: undefined
+                }
+              )
+            ])
+            expect(result.data.metadonnees.nombreTotal).to.equal(4)
+          }
+        })
+      })
     })
 
     context('metadata', () => {
@@ -737,6 +805,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
           if (isSuccess(result)) {
             expect(result.data.metadonnees).to.deep.equal({
               nombreTotal: 6,
+              nombreFiltrees: 6,
               nombrePasCommencees: 1,
               nombreEnCours: 2,
               nombreTerminees: 2,
