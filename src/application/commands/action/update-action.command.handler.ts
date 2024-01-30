@@ -20,6 +20,7 @@ export interface UpdateActionCommand extends Command {
   contenu?: string
   description?: string
   dateEcheance?: DateTime
+  dateFinReelle?: DateTime
   codeQualification?: Action.Qualification.Code
 }
 
