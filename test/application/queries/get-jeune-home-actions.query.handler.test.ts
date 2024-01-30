@@ -41,6 +41,7 @@ describe('GetJeuneHomeActionsQueryHandler', () => {
         actions: actionsQueryModel,
         metadonnees: {
           nombreTotal: 5,
+          nombreFiltrees: 5,
           nombreEnCours: 2,
           nombreTerminees: 1,
           nombreAnnulees: 1,

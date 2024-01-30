@@ -23,12 +23,14 @@ export interface GetActionsJeuneQuery extends Query {
   tri?: Action.Tri
   statuts?: Action.Statut[]
   etats?: Action.Qualification.Etat[]
+  codesCategories?: Action.Qualification.Code[]
 }
 
 export interface ActionsJeuneQueryModel {
   actions: ActionQueryModel[]
   metadonnees: {
     nombreTotal: number
+    nombreFiltrees: number
     nombrePasCommencees: number
     nombreEnCours: number
     nombreTerminees: number
@@ -75,6 +77,7 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
 
     const metadonnees = {
       nombreTotal: this.compterToutesLesActions(statutRawCount),
+      nombreFiltrees: actionsFiltrees.count,
       nombrePasCommencees: this.getCompte(
         statutRawCount,
         Action.Statut.PAS_COMMENCEE
@@ -194,13 +197,16 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
   private generateWhere(query: GetActionsJeuneQuery): WhereOptions {
     const where: WhereOptions = [{ id_jeune: query.idJeune }]
 
-    if (query.etats?.length)
+    if (query.etats?.length) {
       where.push(
         Sequelize.where(this.sequelize.literal(this.CASE_ETATS_QUALIFICATION), {
           [Op.in]: query.etats
         })
       )
+    }
     if (query.statuts) where.push({ statut: query.statuts })
+    if (query.codesCategories)
+      where.push({ qualification_code: { [Op.in]: query.codesCategories } })
 
     return where
   }

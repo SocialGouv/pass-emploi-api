@@ -121,6 +121,12 @@ export class GetActionsByJeuneV2QueryParams {
   @IsEnum(Action.Qualification.Etat, { each: true })
   @Transform(params => transformStringToArray(params, 'etats'))
   etats?: Action.Qualification.Etat[]
+
+  @ApiPropertyOptional({ enum: Action.Qualification.Code, isArray: true })
+  @IsOptional()
+  @IsEnum(Action.Qualification.Code, { each: true })
+  @Transform(params => transformStringToArray(params, 'categories'))
+  categories?: Action.Qualification.Code[]
 }
 
 export class MaintenantQueryParams {
