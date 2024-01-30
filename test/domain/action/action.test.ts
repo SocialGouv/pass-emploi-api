@@ -6,7 +6,10 @@ import {
   isSuccess,
   success
 } from '../../../src/building-blocks/types/result'
-import { Action } from '../../../src/domain/action/action'
+import {
+  Action,
+  InfosActionAMettreAJour
+} from '../../../src/domain/action/action'
 import { DateService } from '../../../src/utils/date-service'
 import { IdService } from '../../../src/utils/id-service'
 import { uneAction, uneActionTerminee } from '../../fixtures/action.fixture'
@@ -41,12 +44,13 @@ describe('Action', () => {
           const nouvelleDate = DateTime.fromISO('2024-01-01')
           const nouveauCodeQualification = Action.Qualification.Code.CITOYENNETE
 
-          const infosActionAMettreAJour = {
+          const infosActionAMettreAJour: InfosActionAMettreAJour = {
             idAction: 'id-action',
             statut: Action.Statut.TERMINEE,
             description: 'une nouvelle description',
             contenu: 'un nouveau contenu',
             dateEcheance: nouvelleDate,
+            dateFinReelle: nouvelleDate,
             codeQualification: nouveauCodeQualification
           }
 
@@ -59,15 +63,15 @@ describe('Action', () => {
           // Then
           expect(isSuccess(resultAction)).to.equal(true)
           if (isSuccess(resultAction)) {
-            expect(resultAction.data.statut).to.equal(Action.Statut.TERMINEE)
-            expect(resultAction.data.description).to.equal(
-              'une nouvelle description'
-            )
-            expect(resultAction.data.contenu).to.equal('un nouveau contenu')
-            expect(resultAction.data.dateEcheance).to.equal(nouvelleDate)
-            expect(resultAction.data.qualification?.code).to.equal(
-              nouveauCodeQualification
-            )
+            expect(resultAction.data).to.deep.equal({
+              ...action,
+              statut: Action.Statut.TERMINEE,
+              description: 'une nouvelle description',
+              contenu: 'un nouveau contenu',
+              dateEcheance: nouvelleDate,
+              dateFinReelle: nouvelleDate,
+              qualification: { code: nouveauCodeQualification }
+            })
           }
         })
 
@@ -117,8 +121,11 @@ describe('Action', () => {
             // Then
             expect(isSuccess(resultAction)).to.equal(true)
             if (isSuccess(resultAction)) {
-              expect(resultAction.data.statut).to.equal(Action.Statut.TERMINEE)
-              expect(resultAction.data.dateFinReelle).to.deep.equal(now)
+              expect(resultAction.data).to.deep.equal({
+                ...action,
+                statut: Action.Statut.TERMINEE,
+                dateFinReelle: now
+              })
             }
           })
         })
@@ -147,6 +154,27 @@ describe('Action', () => {
               now
             )
           }
+        })
+
+        it("empêche la modification de la date de fin d'une action non terminée", async () => {
+          // Given
+          const action = uneAction({
+            statut: Action.Statut.EN_COURS
+          })
+
+          const infosActionAMettreAJour: InfosActionAMettreAJour = {
+            idAction: 'id-action',
+            dateFinReelle: DateTime.fromISO('2024-01-30')
+          }
+
+          // When
+          const resultAction = actionFactory.updateAction(
+            action,
+            infosActionAMettreAJour
+          )
+
+          // Then
+          expect(isFailure(resultAction)).to.be.true()
         })
       })
 

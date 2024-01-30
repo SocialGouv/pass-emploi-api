@@ -40,12 +40,13 @@ export interface Action {
   commentaires?: Action.Commentaire[]
 }
 
-export interface InfosActionAMettreAJour {
+export type InfosActionAMettreAJour = {
   idAction: Action.Id
   statut?: Action.Statut
   contenu?: string
   description?: string
   dateEcheance?: DateTime
+  dateFinReelle?: DateTime
   codeQualification?: Action.Qualification.Code
 }
 
@@ -261,6 +262,16 @@ export namespace Action {
       }
 
       const statut = infosActionAMettreAJour.statut ?? action.statut
+      if (
+        statut !== Statut.TERMINEE &&
+        infosActionAMettreAJour.dateFinReelle !== undefined
+      ) {
+        return failure(
+          new MauvaiseCommandeError(
+            'Vous ne pouvez pas modifier la date de fin d’une action non terminée'
+          )
+        )
+      }
 
       const maintenant = this.dateService.now()
       return success({
@@ -273,7 +284,8 @@ export namespace Action {
         dateFinReelle: this.mettreAJourLaDateDeFinReelle(
           action,
           statut,
-          maintenant
+          maintenant,
+          infosActionAMettreAJour.dateFinReelle
         ),
         dateDerniereActualisation: maintenant,
         qualification: infosActionAMettreAJour.codeQualification
@@ -323,17 +335,18 @@ export namespace Action {
     private mettreAJourLaDateDeFinReelle(
       action: Action,
       statut: Action.Statut,
-      maintenant: DateTime
+      maintenant: DateTime,
+      nouvelleDateFin?: DateTime
     ): DateTime | undefined {
       const nouveauStatutTermine =
         statut === Action.Statut.TERMINEE && statut !== action.statut
-      if (nouveauStatutTermine) return maintenant
+      if (nouveauStatutTermine) return nouvelleDateFin ?? maintenant
 
       const ancienStatutTermine =
         action.statut === Action.Statut.TERMINEE && statut !== action.statut
       if (ancienStatutTermine) return undefined
 
-      return action.dateFinReelle
+      return nouvelleDateFin ?? action.dateFinReelle
     }
   }
 }
