@@ -178,7 +178,12 @@ export const testConfig = (): ConfigService => {
       recupererStructureMilo: true,
       recupererSessionsMilo: true
     },
-    oidc: {},
+    oidc: {
+      issuerUrl: 'https://keycloak.com',
+      issuerApiUrl: 'https://keycloak-api.com',
+      clientId: 'client',
+      clientSecret: 'chut'
+    },
     values: {
       maxRechercheConseillers: '5'
     },

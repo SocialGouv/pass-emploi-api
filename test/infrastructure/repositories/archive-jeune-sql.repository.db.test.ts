@@ -381,17 +381,23 @@ describe('ArchiveJeuneSqlRepository', () => {
       dateArchivage: maintenant.minus({ years: 1 }).toJSDate()
     })
     const archiveOld1 = uneArchiveJeuneMetadonnees({
-      idJeune: jeuneDto.id,
+      idJeune: 'bb',
       dateArchivage: maintenant.minus({ years: 2 }).toJSDate()
     })
     const archiveOld2 = uneArchiveJeuneMetadonnees({
-      idJeune: jeuneDto.id,
+      idJeune: 'cc',
       dateArchivage: maintenant.minus({ years: 4 }).toJSDate()
     })
 
     beforeEach(async () => {
       await ConseillerSqlModel.upsert(secondConseillerDto)
       await JeuneSqlModel.upsert(jeuneDto)
+      await JeuneSqlModel.upsert(
+        unJeuneDto({ id: 'bb', idConseiller: secondConseillerDto.id })
+      )
+      await JeuneSqlModel.upsert(
+        unJeuneDto({ id: 'cc', idConseiller: secondConseillerDto.id })
+      )
     })
 
     it('retourne tableau vide quand aucune archive à supprimer', async () => {

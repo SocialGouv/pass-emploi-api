@@ -129,7 +129,9 @@ export class KeycloakClient {
           e
         )
       )
-      throw new RuntimeException(e)
+      if (e.response?.status !== 404) {
+        throw new RuntimeException(e)
+      }
     }
   }
 

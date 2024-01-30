@@ -70,6 +70,8 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
       return failure(new NonTrouveError('Jeune', command.idJeune))
     }
 
+    await this.authentificationRepository.deleteUtilisateurIdp(command.idJeune)
+
     const metadonneesArchive: ArchiveJeune.Metadonnees = {
       idJeune: command.idJeune,
       email: jeune.email,
@@ -82,18 +84,22 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
       commentaire: command.commentaire,
       dateArchivage: this.dateService.nowJs()
     }
-    const resultArchiver = await this.archiveJeuneRepository.archiver(
-      metadonneesArchive
-    )
-    if (isFailure(resultArchiver)) {
-      return resultArchiver
+
+    try {
+      const resultArchiver = await this.archiveJeuneRepository.archiver(
+        metadonneesArchive
+      )
+      if (isFailure(resultArchiver)) {
+        return resultArchiver
+      }
+    } catch (e) {
+      this.logger.warn('Archive jeune existante')
     }
 
-    await this.authentificationRepository.deleteUtilisateurIdp(command.idJeune)
     await this.jeuneRepository.supprimer(command.idJeune)
-    await this.chatRepository.supprimerChat(command.idJeune)
+    this.chatRepository.supprimerChat(command.idJeune)
 
-    await this.mailService.envoyerEmailJeuneArchive(
+    this.mailService.envoyerEmailJeuneArchive(
       jeune,
       command.motif,
       command.commentaire
