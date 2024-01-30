@@ -77,6 +77,7 @@ describe('UpdateActionCommandHandler', () => {
       expect(entity).to.deep.equal(undefined)
     })
   })
+
   describe('handle', () => {
     describe('Quand l’action existe', () => {
       it("modifie l'action", async () => {
@@ -88,10 +89,11 @@ describe('UpdateActionCommandHandler', () => {
         })
         const actionModifiee = uneAction({
           id: idAction,
-          statut: Action.Statut.EN_COURS,
+          statut: Action.Statut.TERMINEE,
           contenu: "Nouveau contenu de l'action",
           description: "Nouvelle description de l'action",
-          dateEcheance: DateTime.fromISO('2023-12-27')
+          dateEcheance: DateTime.fromISO('2023-12-27'),
+          dateFinReelle: DateTime.fromISO('2024-01-02')
         })
         actionRepository.get.withArgs(idAction).resolves(actionOrigine)
         actionFactory.updateAction.returns(success(actionModifiee))
@@ -99,10 +101,11 @@ describe('UpdateActionCommandHandler', () => {
         // When
         const command: UpdateActionCommand = {
           idAction: idAction,
-          statut: Action.Statut.EN_COURS,
+          statut: Action.Statut.TERMINEE,
           contenu: "Nouveau contenu de l'action",
           description: "Nouvelle description de l'action",
-          dateEcheance: DateTime.fromISO('2023-12-27')
+          dateEcheance: DateTime.fromISO('2023-12-27'),
+          dateFinReelle: DateTime.fromISO('2024-01-02')
         }
         const result = await updateActionCommandHandler.handle(
           command,

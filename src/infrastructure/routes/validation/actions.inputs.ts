@@ -40,6 +40,11 @@ export class UpdateActionPayload {
   @IsDateString()
   dateEcheance?: string
 
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
+  @IsOptional()
+  @IsDateString()
+  dateFinReelle?: string
+
   @ApiPropertyOptional({ enum: Action.Qualification.Code })
   @IsOptional()
   @IsEnum(Action.Qualification.Code)
