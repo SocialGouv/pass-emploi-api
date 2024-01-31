@@ -74,8 +74,8 @@
     "release:major:push": "scripts/release_and_push.sh major"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.502.0",
-    "@aws-sdk/s3-request-presigner": "3.502.0",
+    "@aws-sdk/client-s3": "3.503.1",
+    "@aws-sdk/s3-request-presigner": "3.503.1",
     "@google-cloud/bigquery": "7.3.0",
     "@nestjs/axios": "1.0.1",
     "@nestjs/common": "9.4.3",
