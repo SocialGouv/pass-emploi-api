@@ -178,6 +178,9 @@ function estConseillerSuperviseur(
   superviseursParEmail: SuperviseurSqlModel[],
   structureDuConseiller: Core.Structure
 ): boolean {
+  if (structureDuConseiller === Core.Structure.MILO) {
+    return true
+  }
   return Boolean(
     superviseursParEmail.find(
       superviseurParEmail =>
