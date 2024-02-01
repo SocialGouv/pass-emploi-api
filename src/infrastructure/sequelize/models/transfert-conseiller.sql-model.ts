@@ -23,6 +23,9 @@ export class TransfertConseillerDto extends Model {
   @Column({ field: 'id_jeune' })
   idJeune: string
 
+  @Column({ field: 'email_jeune', type: DataType.STRING })
+  emailJeune: string | null
+
   @ForeignKey(() => ConseillerSqlModel)
   @Column({ field: 'id_conseiller_source' })
   idConseillerSource: string
@@ -31,11 +34,24 @@ export class TransfertConseillerDto extends Model {
   @Column({ field: 'id_conseiller_cible' })
   idConseillerCible: string
 
+  @ForeignKey(() => ConseillerSqlModel)
+  @Column({
+    field: 'id_conseiller_qui_transfert',
+    type: DataType.STRING
+  })
+  idConseillerQuiTransfert: string | null
+
   @Column({
     field: 'date_transfert',
     type: DataType.DATE
   })
   dateTransfert: Date
+
+  @Column({
+    field: 'type_transfert',
+    type: DataType.STRING
+  })
+  typeTransfert: string | null
 }
 
 @Table({

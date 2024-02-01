@@ -170,7 +170,8 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             [jeune1ApresTransfert, jeune2ApresTransfert],
             conseillerCible.id,
             command.idConseillerSource,
-            command.estTemporaire
+            utilisateur.id,
+            Jeune.TypeTransfert.DEFINITIF
           )
         })
 
@@ -246,7 +247,8 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
               [jeuneApresTransfert],
               command.idConseillerCible,
               command.idConseillerSource,
-              command.estTemporaire
+              utilisateur.id,
+              Jeune.TypeTransfert.TEMPORAIRE
             )
           })
         })
@@ -288,7 +290,8 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
               [jeuneApresTransfert],
               command.idConseillerCible,
               command.idConseillerSource,
-              command.estTemporaire
+              utilisateur.id,
+              Jeune.TypeTransfert.TEMPORAIRE
             )
           })
         })
@@ -331,7 +334,8 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
               [jeuneApresTransfert],
               command.idConseillerCible,
               command.idConseillerSource,
-              command.estTemporaire
+              utilisateur.id,
+              Jeune.TypeTransfert.TEMPORAIRE
             )
           })
         })

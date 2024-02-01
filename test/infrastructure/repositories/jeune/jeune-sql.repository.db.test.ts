@@ -522,7 +522,10 @@ describe('JeuneSqlRepository', () => {
         dateTransfert: new Date('2022-04-02T03:24:00'),
         idJeune: jeuneDto.id,
         idConseillerCible: conseillerDto.id,
-        idConseillerSource: conseillerDto.id
+        idConseillerSource: conseillerDto.id,
+        idConseillerQuiTransfert: null,
+        typeTransfert: null,
+        emailJeune: null
       }
       const evenementEngagement = unEvenementEngagementDto({
         idUtilisateur: jeuneDto.id
@@ -649,7 +652,9 @@ describe('JeuneSqlRepository', () => {
           await jeuneSqlRepository.transferAndSaveAll(
             [jeuneATransferer],
             'idConseillerCible',
-            'idConseillerSource'
+            'idConseillerSource',
+            'idConseillerSource',
+            Jeune.TypeTransfert.DEFINITIF
           )
 
           // Then
@@ -673,6 +678,13 @@ describe('JeuneSqlRepository', () => {
             'idConseillerCible'
           )
           expect(transfertsSql[0].id).to.equal(uuid)
+          expect(transfertsSql[0].emailJeune).to.equal(jeuneATransferer.email)
+          expect(transfertsSql[0].idConseillerQuiTransfert).to.equal(
+            'idConseillerSource'
+          )
+          expect(transfertsSql[0].typeTransfert).to.equal(
+            Jeune.TypeTransfert.DEFINITIF
+          )
           expect(transfertsSql[0].dateTransfert).to.deep.equal(
             uneDatetime().toJSDate()
           )
@@ -696,7 +708,9 @@ describe('JeuneSqlRepository', () => {
           await jeuneSqlRepository.transferAndSaveAll(
             [jeuneATransferer],
             'idConseillerCible',
-            'idConseillerSource'
+            'idConseillerSource',
+            'idConseillerSource',
+            Jeune.TypeTransfert.TEMPORAIRE
           )
 
           // Then
@@ -734,7 +748,9 @@ describe('JeuneSqlRepository', () => {
           await jeuneSqlRepository.transferAndSaveAll(
             [jeuneATransferer],
             'idConseillerCible',
-            'idConseillerSource'
+            'idConseillerSource',
+            'idConseillerSource',
+            Jeune.TypeTransfert.DEFINITIF
           )
 
           // Then

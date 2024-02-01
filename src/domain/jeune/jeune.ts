@@ -52,6 +52,14 @@ export namespace Jeune {
     partageFavoris: boolean
   }
 
+  export enum TypeTransfert {
+    DEFINITIF = 'DEFINITIF',
+    TEMPORAIRE = 'TEMPORAIRE',
+    DEFINITIF_SUPPORT = 'DEFINITIF_SUPPORT',
+    TEMPORAIRE_SUPPORT = 'TEMPORAIRE_SUPPORT',
+    RECUPERATION = 'RECUPERATION'
+  }
+
   export type Id = Brand<string, 'JeuneId'>
 
   export function mettreAJourIdPartenaire(
@@ -97,7 +105,8 @@ export namespace Jeune {
       jeunes: Jeune[],
       idConseillerCible: string,
       idConseillerSource: string,
-      estTemporaire?: boolean
+      idConseillerQuiTransfert: string,
+      typeTransfert: Jeune.TypeTransfert
     ): Promise<void>
   }
 

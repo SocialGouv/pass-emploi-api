@@ -21,6 +21,7 @@ import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
+import { Jeune } from '../../../src/domain/jeune/jeune'
 
 describe('GetConseillersJeuneQueryHandler', () => {
   let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
@@ -106,7 +107,10 @@ describe('GetConseillersJeuneQueryHandler', () => {
           dateTransfert,
           idJeune,
           idConseillerCible: idConseiller,
-          idConseillerSource
+          idConseillerSource,
+          idConseillerQuiTransfert: idConseillerSource,
+          typeTransfert: Jeune.TypeTransfert.DEFINITIF,
+          emailJeune: jeuneDto.email
         }
         await TransfertConseillerSqlModel.creer(unTransfert)
 
@@ -158,7 +162,10 @@ describe('GetConseillersJeuneQueryHandler', () => {
           dateTransfert: dateTransfert1,
           idJeune,
           idConseillerCible: idConseillerSource,
-          idConseillerSource: idConseillerSource2
+          idConseillerSource: idConseillerSource2,
+          idConseillerQuiTransfert: idConseillerSource,
+          typeTransfert: Jeune.TypeTransfert.DEFINITIF,
+          emailJeune: jeuneDto.email
         }
         await TransfertConseillerSqlModel.creer(unTransfert)
         const dateTransfert2 = new Date('2022-04-08T03:24:00')
@@ -167,7 +174,10 @@ describe('GetConseillersJeuneQueryHandler', () => {
           dateTransfert: dateTransfert2,
           idJeune,
           idConseillerCible: idConseiller,
-          idConseillerSource
+          idConseillerSource,
+          idConseillerQuiTransfert: idConseillerSource,
+          typeTransfert: Jeune.TypeTransfert.DEFINITIF,
+          emailJeune: jeuneDto.email
         }
         await TransfertConseillerSqlModel.creer(unAutreTransfert)
 

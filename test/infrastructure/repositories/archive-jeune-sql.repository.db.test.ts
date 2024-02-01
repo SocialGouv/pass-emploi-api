@@ -104,7 +104,10 @@ describe('ArchiveJeuneSqlRepository', () => {
         dateTransfert: new Date('2022-04-02T03:24:00Z'),
         idJeune: jeuneDto.id,
         idConseillerCible: secondConseillerDto.id,
-        idConseillerSource: premierConseillerDto.id
+        idConseillerSource: premierConseillerDto.id,
+        idConseillerQuiTransfert: null,
+        emailJeune: 'plop',
+        typeTransfert: null
       }
       await TransfertConseillerSqlModel.creer(unTransfertDto)
 
