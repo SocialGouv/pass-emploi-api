@@ -28,34 +28,62 @@ describe('AuthentificationSqlRepository', () => {
   })
 
   describe('getConseillerByStructure', () => {
-    const conseillerDto = unConseillerDto({
+    const conseillerDtoMilo = unConseillerDto({
       idAuthentification: 'id-authentification-conseiller',
       structure: Core.Structure.MILO
+    })
+    const conseillerDtoPE = unConseillerDto({
+      id: 'pe',
+      idAuthentification: 'id-authentification-conseiller-pe',
+      structure: Core.Structure.POLE_EMPLOI
     })
 
     beforeEach(async () => {
       // Given
-      await ConseillerSqlModel.creer(conseillerDto)
+      await ConseillerSqlModel.creer(conseillerDtoMilo)
+      await ConseillerSqlModel.creer(conseillerDtoPE)
     })
-    describe("quand c'est un conseiller", () => {
-      it("retourne l'utilisateur quand il existe sans roles", async () => {
+    describe("quand c'est un conseiller non inscrit dans les superviseurs", () => {
+      it("retourne l'utilisateur quand il existe sans roles quand c'est un non MILO", async () => {
         // When
         const utilisateur =
           await authentificationSqlRepository.getConseillerByStructure(
-            'id-authentification-conseiller',
+            conseillerDtoPE.idAuthentification,
+            Core.Structure.POLE_EMPLOI
+          )
+
+        // Then
+        expect(utilisateur).to.deep.equal(
+          unUtilisateurConseiller({
+            id: conseillerDtoPE.id,
+            idAuthentification: conseillerDtoPE.idAuthentification,
+            structure: Core.Structure.POLE_EMPLOI
+          })
+        )
+      })
+      it("retourne l'utilisateur quand il existe avec role SUPERVISEUR quand c'est un MILO", async () => {
+        // When
+        const utilisateur =
+          await authentificationSqlRepository.getConseillerByStructure(
+            conseillerDtoMilo.idAuthentification,
             Core.Structure.MILO
           )
 
         // Then
-        expect(utilisateur).to.deep.equal(unUtilisateurConseiller())
+        expect(utilisateur).to.deep.equal(
+          unUtilisateurConseiller({
+            structure: Core.Structure.MILO,
+            roles: [Authentification.Role.SUPERVISEUR]
+          })
+        )
       })
 
       it("retourne undefined quand il n'existe pas", async () => {
         // When
         const utilisateur =
           await authentificationSqlRepository.getConseillerByStructure(
-            'plop',
-            Core.Structure.MILO
+            conseillerDtoMilo.idAuthentification,
+            Core.Structure.POLE_EMPLOI
           )
 
         // Then
@@ -66,15 +94,15 @@ describe('AuthentificationSqlRepository', () => {
       it("retourne l'utilisateur avec le role SUPERVISEUR uniquement", async () => {
         // Given
         await SuperviseurSqlModel.create({
-          email: conseillerDto.email,
-          structure: conseillerDto.structure
+          email: conseillerDtoMilo.email,
+          structure: conseillerDtoMilo.structure
         })
 
         // When
         const utilisateur =
           await authentificationSqlRepository.getConseillerByStructure(
-            conseillerDto.idAuthentification,
-            conseillerDto.structure
+            conseillerDtoMilo.idAuthentification,
+            conseillerDtoMilo.structure
           )
 
         // Then
@@ -87,26 +115,19 @@ describe('AuthentificationSqlRepository', () => {
       it("retourne l'utilisateur avec le role SUPERVISEUR et SUPERVISEUR_PE_BRSA", async () => {
         // Given
         const structure = Core.Structure.POLE_EMPLOI
-        await ConseillerSqlModel.creer(
-          unConseillerDto({
-            id: 'pe',
-            idAuthentification: 'id-authentification-conseiller',
-            structure
-          })
-        )
         await SuperviseurSqlModel.create({
-          email: conseillerDto.email,
+          email: conseillerDtoMilo.email,
           structure
         })
         await SuperviseurSqlModel.create({
-          email: conseillerDto.email,
+          email: conseillerDtoMilo.email,
           structure: Core.Structure.POLE_EMPLOI_BRSA
         })
 
         // When
         const utilisateur =
           await authentificationSqlRepository.getConseillerByStructure(
-            conseillerDto.idAuthentification,
+            conseillerDtoPE.idAuthentification,
             structure
           )
 
@@ -114,6 +135,7 @@ describe('AuthentificationSqlRepository', () => {
         expect(utilisateur).to.deep.equal(
           unUtilisateurConseiller({
             id: 'pe',
+            idAuthentification: conseillerDtoPE.idAuthentification,
             structure,
             roles: [
               Authentification.Role.SUPERVISEUR,
@@ -332,7 +354,12 @@ describe('AuthentificationSqlRepository', () => {
           'nouvelIdAuthentification',
           Core.Structure.MILO
         )
-      expect(utilisateur).to.deep.equal(unConseillerMisAJour)
+
+      const expectedConseillerUtilisateur = {
+        ...unConseillerMisAJour,
+        roles: [Authentification.Role.SUPERVISEUR]
+      }
+      expect(utilisateur).to.deep.equal(expectedConseillerUtilisateur)
     })
   })
 
@@ -348,7 +375,12 @@ describe('AuthentificationSqlRepository', () => {
             'id-authentification-conseiller',
             Core.Structure.MILO
           )
-        expect(utilisateur).to.deep.equal(unUtilisateurConseiller())
+
+        expect(utilisateur).to.deep.equal(
+          unUtilisateurConseiller({
+            roles: [Authentification.Role.SUPERVISEUR]
+          })
+        )
       })
     })
     describe("quand c'est un conseiller deja existant", () => {
@@ -380,7 +412,10 @@ describe('AuthentificationSqlRepository', () => {
           : undefined
 
         expect(utilisateur).to.deep.equal(
-          unUtilisateurConseiller({ email: nouvelEmail })
+          unUtilisateurConseiller({
+            email: nouvelEmail,
+            roles: [Authentification.Role.SUPERVISEUR]
+          })
         )
 
         expect(conseiller?.dateCreation).to.deep.equal(dateCreation)

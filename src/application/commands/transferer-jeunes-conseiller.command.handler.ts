@@ -82,6 +82,7 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
       )
     }
 
+    let typeTransfert: Jeune.TypeTransfert
     if (command.provenanceUtilisateur === Authentification.Type.CONSEILLER) {
       const superviseurDansLaMemeStructureQueConseillerSourceEtCible =
         utilisateur.structure === conseillerSource.structure &&
@@ -108,6 +109,9 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
           )
         }
       }
+      typeTransfert = command.estTemporaire
+        ? Jeune.TypeTransfert.TEMPORAIRE
+        : Jeune.TypeTransfert.DEFINITIF
     } else if (
       command.provenanceUtilisateur === Authentification.Type.SUPPORT
     ) {
@@ -118,6 +122,9 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
           )
         )
       }
+      typeTransfert = command.estTemporaire
+        ? Jeune.TypeTransfert.TEMPORAIRE_SUPPORT
+        : Jeune.TypeTransfert.DEFINITIF_SUPPORT
     }
 
     const updatedJeunes: Jeune[] = Jeune.changerDeConseiller(
@@ -131,7 +138,8 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
       updatedJeunes,
       command.idConseillerCible,
       command.idConseillerSource,
-      command.estTemporaire
+      utilisateur.id,
+      typeTransfert!
     )
 
     if (

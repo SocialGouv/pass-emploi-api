@@ -123,14 +123,18 @@ describe('RecupererJeunesDuConseillerCommandHandler', () => {
         ).to.deep.equal([
           [expectedJeune1, expectedJeune3],
           command.idConseiller,
-          idConseillerSource1
+          idConseillerSource1,
+          command.idConseiller,
+          Jeune.TypeTransfert.RECUPERATION
         ])
         expect(
           jeuneRepository.transferAndSaveAll.getCall(1).args
         ).to.deep.equal([
           [expectedJeune2],
           command.idConseiller,
-          idConseillerSource2
+          idConseillerSource2,
+          command.idConseiller,
+          Jeune.TypeTransfert.RECUPERATION
         ])
 
         expect(

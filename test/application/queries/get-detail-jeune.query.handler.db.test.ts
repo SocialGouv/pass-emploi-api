@@ -265,7 +265,10 @@ describe('GetDetailJeuneQueryHandler', () => {
           dateTransfert,
           idJeune,
           idConseillerCible: idConseiller,
-          idConseillerSource
+          idConseillerSource,
+          idConseillerQuiTransfert: null,
+          emailJeune: 'plop',
+          typeTransfert: null
         }
         await TransfertConseillerSqlModel.creer(unTransfert)
 
@@ -354,7 +357,10 @@ describe('GetDetailJeuneQueryHandler', () => {
           dateTransfert: dateTransfert1,
           idJeune,
           idConseillerCible: idConseillerSource,
-          idConseillerSource: idConseillerSource2
+          idConseillerSource: idConseillerSource2,
+          idConseillerQuiTransfert: null,
+          emailJeune: 'plop',
+          typeTransfert: null
         }
         await TransfertConseillerSqlModel.creer(unTransfert)
         const dateTransfert2 = new Date('2022-04-08T03:24:00')
@@ -363,7 +369,10 @@ describe('GetDetailJeuneQueryHandler', () => {
           dateTransfert: dateTransfert2,
           idJeune,
           idConseillerCible: idConseiller,
-          idConseillerSource
+          idConseillerSource,
+          idConseillerQuiTransfert: null,
+          emailJeune: 'plop',
+          typeTransfert: null
         }
         await TransfertConseillerSqlModel.creer(unAutreTransfert)
 

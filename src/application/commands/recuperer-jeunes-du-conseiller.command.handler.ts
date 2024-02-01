@@ -64,7 +64,9 @@ export class RecupererJeunesDuConseillerCommandHandler extends CommandHandler<
           await this.jeuneRepository.transferAndSaveAll(
             updatedJeunes,
             command.idConseiller,
-            idConseillerActuel
+            idConseillerActuel,
+            command.idConseiller,
+            Jeune.TypeTransfert.RECUPERATION
           )
           updatedJeunes.forEach(jeune =>
             this.chatRepository.envoyerMessageTransfert(jeune)

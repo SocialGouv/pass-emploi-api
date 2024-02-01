@@ -72,12 +72,20 @@ export class JeuneSqlRepository implements Jeune.Repository {
   async transferAndSaveAll(
     jeunes: Jeune[],
     idConseillerCible: string,
-    idConseillerSource: string
+    idConseillerSource: string,
+    idConseillerQuiTransfert: string,
+    typeTransfert: Jeune.TypeTransfert
   ): Promise<void> {
     const idsJeunes = jeunes.map(jeune => jeune.id)
     await this.firebaseClient.transfererChat(idConseillerCible, idsJeunes)
     await Promise.all([
-      this.creerTransferts(idConseillerSource, idConseillerCible, idsJeunes),
+      this.creerTransferts(
+        jeunes,
+        idConseillerSource,
+        idConseillerCible,
+        idConseillerQuiTransfert,
+        typeTransfert
+      ),
       this.saveAllJeuneTransferes(jeunes)
     ])
   }
@@ -234,19 +242,24 @@ export class JeuneSqlRepository implements Jeune.Repository {
   }
 
   private async creerTransferts(
+    jeunes: Jeune[],
     idConseillerSource: string,
     idConseillerCible: string,
-    idsJeunes: string[]
+    idConseillerQuiTransfert: string,
+    typeTransfert: Jeune.TypeTransfert
   ): Promise<void> {
     const dateTransfert = this.dateService.nowJs()
     await TransfertConseillerSqlModel.bulkCreate(
-      idsJeunes.map(idJeune => {
+      jeunes.map(jeune => {
         return {
           id: this.idService.uuid(),
-          idJeune,
+          idJeune: jeune.id,
+          emailJeune: jeune.email,
           idConseillerSource,
           idConseillerCible,
-          dateTransfert
+          idConseillerQuiTransfert,
+          dateTransfert,
+          typeTransfert
         }
       })
     )
