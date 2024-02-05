@@ -220,6 +220,11 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
             isSuccess(result) &&
               result.data.cetteSemaine.nombreActionsDemarchesARealiser
           ).to.deep.equal(2)
+          expect(
+            isSuccess(result) &&
+              result.data.cetteSemaine
+                .nombreActionsDemarchesAFaireSemaineCalendaire
+          ).to.deep.equal(4)
         })
         it('appelle la query pour récupérer les 3 dernières alertes', async () => {
           // Then

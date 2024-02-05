@@ -17,6 +17,9 @@ class ResumeSemaineJeune {
 
   @ApiProperty()
   nombreActionsDemarchesARealiser: number
+
+  @ApiProperty()
+  nombreActionsDemarchesAFaireSemaineCalendaire: number
 }
 
 export class AccueilJeunePoleEmploiQueryModel {

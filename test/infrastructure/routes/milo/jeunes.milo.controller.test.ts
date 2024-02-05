@@ -69,7 +69,7 @@ describe('JeunesMiloController', () => {
         nombreRendezVous: 1,
         nombreActionsDemarchesEnRetard: 1,
         nombreActionsDemarchesARealiser: 1,
-        nombreActionsAFaireCetteSemaine: 1
+        nombreActionsDemarchesAFaireSemaineCalendaire: 1
       },
       prochainRendezVous: undefined,
       evenementsAVenir: [],

@@ -41,7 +41,8 @@ describe('JeunesPoleEmploiController', () => {
       cetteSemaine: {
         nombreRendezVous: 1,
         nombreActionsDemarchesEnRetard: 1,
-        nombreActionsDemarchesARealiser: 1
+        nombreActionsDemarchesARealiser: 1,
+        nombreActionsDemarchesAFaireSemaineCalendaire: 1
       },
       prochainRendezVous: undefined,
       mesAlertes: [],
@@ -69,7 +70,8 @@ describe('JeunesPoleEmploiController', () => {
           cetteSemaine: {
             nombreRendezVous: 1,
             nombreActionsDemarchesEnRetard: 1,
-            nombreActionsDemarchesARealiser: 1
+            nombreActionsDemarchesARealiser: 1,
+            nombreActionsDemarchesAFaireSemaineCalendaire: 1
           },
           mesAlertes: [],
           mesFavoris: []

@@ -309,7 +309,8 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
         // Then
         expect(
           isSuccess(result) &&
-            result.data.cetteSemaine.nombreActionsAFaireCetteSemaine
+            result.data.cetteSemaine
+              .nombreActionsDemarchesAFaireSemaineCalendaire
         ).to.deep.equal(2)
       })
     })

@@ -59,13 +59,11 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
       jeune.structure
     )
 
-    const dateFinDeSemaine = DateTime.fromISO(query.maintenant, {
-      setZone: true
-    }).endOf('week')
-
     const maintenant = DateTime.fromISO(query.maintenant, {
       setZone: true
     })
+    const dateDebutDeSemaine = maintenant.startOf('week')
+    const dateFinDeSemaine = maintenant.endOf('week')
 
     const [
       resultDemarches,
@@ -108,10 +106,12 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
         unRendezVous.date <= dateFinDeSemaine.toJSDate()
     ).length
 
-    const nombreDedemarchesARealiser = resultDemarches.data.queryModel.filter(
+    const nombreDeDemarchesARealiser = resultDemarches.data.queryModel.filter(
       demarche =>
         DateTime.fromISO(demarche.dateFin) >= maintenant &&
-        DateTime.fromISO(demarche.dateFin) <= dateFinDeSemaine
+        DateTime.fromISO(demarche.dateFin) <= dateFinDeSemaine &&
+        demarche.statut !== Demarche.Statut.REALISEE &&
+        demarche.statut !== Demarche.Statut.ANNULEE
     ).length
     const nombreDeDemarchesEnRetard = resultDemarches.data.queryModel.filter(
       demarche =>
@@ -119,6 +119,14 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
         demarche.statut !== Demarche.Statut.REALISEE &&
         demarche.statut !== Demarche.Statut.ANNULEE
     ).length
+    const nombreDeDemarchesAFaireSemaineCalendaire =
+      resultDemarches.data.queryModel.filter(
+        demarche =>
+          DateTime.fromISO(demarche.dateFin) >= dateDebutDeSemaine &&
+          DateTime.fromISO(demarche.dateFin) <= dateFinDeSemaine &&
+          demarche.statut !== Demarche.Statut.REALISEE &&
+          demarche.statut !== Demarche.Statut.ANNULEE
+      ).length
 
     const prochainRendezVous =
       resultRendezVous.data.queryModel.length > 0
@@ -139,7 +147,9 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
       cetteSemaine: {
         nombreRendezVous: nombreDeRendezVous,
         nombreActionsDemarchesEnRetard: nombreDeDemarchesEnRetard,
-        nombreActionsDemarchesARealiser: nombreDedemarchesARealiser
+        nombreActionsDemarchesARealiser: nombreDeDemarchesARealiser,
+        nombreActionsDemarchesAFaireSemaineCalendaire:
+          nombreDeDemarchesAFaireSemaineCalendaire
       },
       prochainRendezVous,
       mesAlertes: alertesQueryModels,

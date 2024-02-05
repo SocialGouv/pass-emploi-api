@@ -95,7 +95,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       rendezVousSqlModelsProchainRdv,
       actionSqlModelsARealiser,
       actionSqlModelsEnRetard,
-      actionSqlModelsAFaireCetteSemaine,
+      actionSqlModelsAFaireSemaineCalendaire,
       evenementSqlModelAVenir,
       recherchesQueryModels,
       favorisQueryModels,
@@ -137,7 +137,8 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
           resultatSessionsMilo.sessionsInscritCetteSemaine.length,
         nombreActionsDemarchesEnRetard: actionSqlModelsEnRetard,
         nombreActionsDemarchesARealiser: actionSqlModelsARealiser,
-        nombreActionsAFaireCetteSemaine: actionSqlModelsAFaireCetteSemaine
+        nombreActionsDemarchesAFaireSemaineCalendaire:
+          actionSqlModelsAFaireSemaineCalendaire
       },
       prochainRendezVous: rendezVousSqlModelsProchainRdv
         ? fromSqlToRendezVousJeuneQueryModel(
