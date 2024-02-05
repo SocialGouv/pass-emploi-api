@@ -69,6 +69,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       setZone: true
     })
 
+    const dateDebutDeSemaine = maintenant.startOf('week')
     const dateFinDeSemaine = maintenant.endOf('week')
     const datePlus30Jours = maintenant.plus({ days: 30 }).endOf('day')
     const { idJeune } = query
@@ -94,6 +95,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       rendezVousSqlModelsProchainRdv,
       actionSqlModelsARealiser,
       actionSqlModelsEnRetard,
+      actionSqlModelsAFaireCetteSemaine,
       evenementSqlModelAVenir,
       recherchesQueryModels,
       favorisQueryModels,
@@ -108,6 +110,11 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
         dateFinDeSemaine
       ),
       this.countActionsEnRetard(idJeune, maintenant),
+      this.countActionsAFaireCetteSemaine(
+        idJeune,
+        dateDebutDeSemaine,
+        dateFinDeSemaine
+      ),
       this.evenementsAVenir(jeuneSqlModel, maintenant),
       this.getRecherchesSauvegardeesQueryGetter.handle({
         idJeune
@@ -129,7 +136,8 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
           rendezVousSqlModelsCount +
           resultatSessionsMilo.sessionsInscritCetteSemaine.length,
         nombreActionsDemarchesEnRetard: actionSqlModelsEnRetard,
-        nombreActionsDemarchesARealiser: actionSqlModelsARealiser
+        nombreActionsDemarchesARealiser: actionSqlModelsARealiser,
+        nombreActionsAFaireCetteSemaine: actionSqlModelsAFaireCetteSemaine
       },
       prochainRendezVous: rendezVousSqlModelsProchainRdv
         ? fromSqlToRendezVousJeuneQueryModel(
@@ -193,6 +201,27 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
         id_jeune: idJeune,
         dateEcheance: {
           [Op.between]: [maintenant.toJSDate(), dateFinDeSemaine.toJSDate()]
+        },
+        statut: {
+          [Op.in]: [Action.Statut.EN_COURS, Action.Statut.PAS_COMMENCEE]
+        }
+      }
+    })
+  }
+
+  private countActionsAFaireCetteSemaine(
+    idJeune: string,
+    dateDebutDeSemaine: DateTime,
+    dateFinDeSemaine: DateTime
+  ): Promise<number> {
+    return ActionSqlModel.count({
+      where: {
+        id_jeune: idJeune,
+        dateEcheance: {
+          [Op.between]: [
+            dateDebutDeSemaine.toJSDate(),
+            dateFinDeSemaine.toJSDate()
+          ]
         },
         statut: {
           [Op.in]: [Action.Statut.EN_COURS, Action.Statut.PAS_COMMENCEE]

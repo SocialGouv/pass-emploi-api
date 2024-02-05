@@ -36,6 +36,7 @@ describe('JeunesMiloController', () => {
   let getAccueilQueryHandler: StubbedClass<GetAccueilJeuneMiloQueryHandler>
   let getSessionsQueryHandler: StubbedClass<GetSessionsJeuneMiloQueryHandler>
   let getDetailSessionQueryHandler: StubbedClass<GetDetailSessionJeuneMiloQueryHandler>
+  let monSuiviQueryHandler: StubbedClass<GetMonSuiviQueryHandler>
   let jwtService: StubbedClass<JwtService>
   let dateService: StubbedClass<DateService>
   let app: INestApplication
@@ -49,6 +50,7 @@ describe('JeunesMiloController', () => {
     getDetailSessionQueryHandler = app.get(
       GetDetailSessionJeuneMiloQueryHandler
     )
+    monSuiviQueryHandler = app.get(GetMonSuiviQueryHandler)
     jwtService = app.get(JwtService)
     dateService = app.get(DateService)
     dateService.now.returns(now)
@@ -66,7 +68,8 @@ describe('JeunesMiloController', () => {
       cetteSemaine: {
         nombreRendezVous: 1,
         nombreActionsDemarchesEnRetard: 1,
-        nombreActionsDemarchesARealiser: 1
+        nombreActionsDemarchesARealiser: 1,
+        nombreActionsAFaireCetteSemaine: 1
       },
       prochainRendezVous: undefined,
       evenementsAVenir: [],
@@ -197,22 +200,7 @@ describe('JeunesMiloController', () => {
       `/jeunes/milo/${idJeune}/sessions/${idSession}`
     )
   })
-})
 
-describe('MiloJeunesController', () => {
-  let app: INestApplication
-  let jwtService: StubbedClass<JwtService>
-  let monSuiviQueryHandler: StubbedClass<GetMonSuiviQueryHandler>
-
-  before(async () => {
-    app = await getApplicationWithStubbedDependencies()
-    jwtService = app.get(JwtService)
-    monSuiviQueryHandler = app.get(GetMonSuiviQueryHandler)
-  })
-
-  beforeEach(() => {
-    jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
-  })
   describe('GET /jeunes/milo/:idJeune/mon-suivi', () => {
     it('renvoie les informations de suivi du jeune', async () => {
       // Given

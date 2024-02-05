@@ -166,25 +166,25 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
 
       beforeEach(async () => {
         // Given
-        const actionARealiserDto = uneActionDto({
+        const actionARealiserCetteSemaineDto = uneActionDto({
           idJeune: accueilQuery.idJeune,
           dateEcheance: maintenant.plus({ days: 2 }).toJSDate(),
           statut: Action.Statut.EN_COURS
         })
-        const actionEnRetard1Dto = uneActionDto({
+        const actionEnRetardLaSemaineDerniere1Dto = uneActionDto({
           idJeune: accueilQuery.idJeune,
           dateEcheance: maintenant.minus({ days: 1 }).toJSDate(),
           statut: Action.Statut.EN_COURS
         })
-        const actionEnRetard2Dto = uneActionDto({
+        const actionEnRetardCetteSemaine2Dto = uneActionDto({
           idJeune: accueilQuery.idJeune,
           dateEcheance: maintenant.minus({ hours: 1 }).toJSDate(),
           statut: Action.Statut.EN_COURS
         })
         await ActionSqlModel.bulkCreate([
-          actionARealiserDto,
-          actionEnRetard1Dto,
-          actionEnRetard2Dto
+          actionARealiserCetteSemaineDto,
+          actionEnRetardLaSemaineDerniere1Dto,
+          actionEnRetardCetteSemaine2Dto
         ])
 
         rendezVousCetteSemaine = await RendezVousSqlModel.create(
@@ -301,6 +301,16 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
           isSuccess(result) &&
             result.data.cetteSemaine.nombreActionsDemarchesARealiser
         ).to.deep.equal(1)
+      })
+      it('compte les actions à faire cette semaine', async () => {
+        // When
+        result = await handler.handle(accueilQuery)
+
+        // Then
+        expect(
+          isSuccess(result) &&
+            result.data.cetteSemaine.nombreActionsAFaireCetteSemaine
+        ).to.deep.equal(2)
       })
     })
 

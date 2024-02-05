@@ -26,6 +26,8 @@ import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/j
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { getDatabase } from '../../../utils/database-for-testing'
+import { DateService } from '../../../../src/utils/date-service'
+import { DateTime } from 'luxon'
 
 describe('GetSessionsJeuneMiloQueryHandler', () => {
   const query: GetSessionsJeuneMiloQuery = {
@@ -38,7 +40,10 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
   let getSessionsQueryGetter: StubbedClass<GetSessionsJeuneMiloQueryGetter>
   let conseillerAuthorizer: StubbedClass<ConseillerInterStructureMiloAuthorizer>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
+  let dateService: StubbedClass<DateService>
   let sandbox: SinonSandbox
+
+  const maintenant = DateTime.fromISO('2024-02-05T12:00:00Z')
 
   before(async () => {
     sandbox = createSandbox()
@@ -51,11 +56,15 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
     getSessionsQueryGetter = stubClass(GetSessionsJeuneMiloQueryGetter)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     conseillerAuthorizer = stubClass(ConseillerInterStructureMiloAuthorizer)
+    dateService = stubClass(DateService)
+    dateService.now.returns(maintenant)
+
     getSessionsQueryHandler = new GetSessionsJeuneMiloQueryHandler(
       getSessionsQueryGetter,
       jeuneAuthorizer,
       conseillerAuthorizer,
-      testConfig()
+      testConfig(),
+      dateService
     )
   })
 
@@ -164,9 +173,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
           )
 
           const unSuccess = success([uneSessionJeuneMiloQueryModel()])
-          getSessionsQueryGetter.handle
-            .withArgs('idJeune', 'idDossier', 'token')
-            .resolves(unSuccess)
+          getSessionsQueryGetter.handle.resolves(unSuccess)
 
           // When
           const result = await getSessionsQueryHandler.handle(
@@ -175,6 +182,21 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
           )
 
           // Then
+          expect(
+            getSessionsQueryGetter.handle
+          ).to.have.been.calledOnceWithExactly(
+            'idJeune',
+            'idDossier',
+            'token',
+            {
+              periode: {
+                debut: undefined,
+                fin: maintenant.plus({ months: 3 })
+              },
+              pourConseiller: false,
+              filtrerEstInscrit: undefined
+            }
+          )
           expect(result).to.deep.equal(unSuccess)
         })
       })
@@ -204,7 +226,10 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
           ])
           getSessionsQueryGetter.handle
             .withArgs('idJeune', 'idDossier', 'token', {
-              periode: { debut: undefined, fin: undefined },
+              periode: {
+                debut: undefined,
+                fin: maintenant.plus({ months: 3 })
+              },
               filtrerEstInscrit: true,
               pourConseiller: false
             })
@@ -245,7 +270,10 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
           ])
           getSessionsQueryGetter.handle
             .withArgs('idJeune', 'idDossier', 'token', {
-              periode: { debut: undefined, fin: undefined },
+              periode: {
+                debut: undefined,
+                fin: maintenant.plus({ months: 3 })
+              },
               filtrerEstInscrit: undefined,
               pourConseiller: true
             })

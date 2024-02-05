@@ -17,6 +17,7 @@ import { sessionsMiloActives } from '../../../config/feature-flipping'
 import { ConseillerSqlModel } from '../../../infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { ConseillerInterStructureMiloAuthorizer } from '../../authorizers/conseiller-inter-structure-milo-authorizer'
+import { DateService } from '../../../utils/date-service'
 
 export interface GetSessionsJeuneMiloQuery extends Query {
   idJeune: string
@@ -35,7 +36,8 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
     private readonly getSessionsQueryGetter: GetSessionsJeuneMiloQueryGetter,
     private readonly jeuneAuthorizer: JeuneAuthorizer,
     private readonly conseillerStructureMiloAuthorizer: ConseillerInterStructureMiloAuthorizer,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly dateService: DateService
   ) {
     super('GetSessionsJeuneMiloQueryHandler')
   }
@@ -59,12 +61,16 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
       return failure(new JeuneMiloSansIdDossier(query.idJeune))
     }
 
+    const dateFinParDefaut = this.dateService.now().plus({ months: 3 })
     return this.getSessionsQueryGetter.handle(
       query.idJeune,
       jeuneSqlModel.idPartenaire,
       query.accessToken,
       {
-        periode: { debut: query.dateDebut, fin: query.dateFin },
+        periode: {
+          debut: query.dateDebut,
+          fin: query.dateFin ?? dateFinParDefaut
+        },
         pourConseiller: Authentification.estConseiller(utilisateur.type),
         filtrerEstInscrit: query.filtrerEstInscrit
       }

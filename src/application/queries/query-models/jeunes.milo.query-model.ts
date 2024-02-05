@@ -19,6 +19,9 @@ class ResumeSemaineJeune {
 
   @ApiProperty()
   nombreActionsDemarchesARealiser: number
+
+  @ApiProperty()
+  nombreActionsAFaireCetteSemaine: number
 }
 
 export class AccueilJeuneMiloQueryModel {
