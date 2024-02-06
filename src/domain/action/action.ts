@@ -240,7 +240,10 @@ export namespace Action {
         dateDerniereActualisation: now,
         rappel: data.rappel === undefined ? true : data.rappel,
         dateEcheance: dateEcheanceA9Heures30,
-        dateFinReelle: statut === Action.Statut.TERMINEE ? now : undefined,
+        dateFinReelle:
+          statut === Action.Statut.TERMINEE
+            ? dateEcheanceA9Heures30
+            : undefined,
         dateDebut: undefined,
         qualification: data.codeQualification
           ? { code: data.codeQualification }

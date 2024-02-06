@@ -267,6 +267,7 @@ describe('Action', () => {
             })
           })
         })
+
         describe('quand le jeune est le créateur', () => {
           it('crée une action avec le statut fourni', async () => {
             // Given
@@ -359,8 +360,9 @@ describe('Action', () => {
             expect(isSuccess(actual) && actual.data).to.deep.equal(action)
           })
         })
+
         describe("quand l'action est créé Terminée", () => {
-          it('crée une action avec une date de fin réelle', async () => {
+          it('crée une action avec une date de fin réelle à la date d’échéance', async () => {
             // Given
             const contenu = 'test'
             const idJeune = '1'
@@ -385,7 +387,7 @@ describe('Action', () => {
                 type: Action.TypeCreateur.JEUNE
               },
               dateEcheance: dateEcheanceA9h30,
-              dateFinReelle: now,
+              dateFinReelle: dateEcheanceA9h30,
               rappel: true
             })
 
@@ -405,6 +407,7 @@ describe('Action', () => {
             // Then
             expect(isSuccess(actual) && actual.data).to.deep.equal(action)
           })
+
           it('crée une action avec rappel fournis', async () => {
             // Given
             const contenu = 'test'
@@ -431,7 +434,7 @@ describe('Action', () => {
                 type: Action.TypeCreateur.JEUNE
               },
               dateEcheance: dateEcheanceA9h30,
-              dateFinReelle: now,
+              dateFinReelle: dateEcheanceA9h30,
               rappel
             })
 
@@ -454,6 +457,7 @@ describe('Action', () => {
           })
         })
       })
+
       describe('Quand le statut est absent', () => {
         it('crée une action avec le statut PAS_COMMENCEE par défaut', async () => {
           // Given
@@ -493,6 +497,7 @@ describe('Action', () => {
         })
       })
     })
+
     describe('doitPlanifierUneNotificationDeRappel', () => {
       describe('quand il faut planifier un rappel', () => {
         it('renvoie vrai', () => {
