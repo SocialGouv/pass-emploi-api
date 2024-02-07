@@ -21,10 +21,13 @@ import {
 } from '../../../src/infrastructure/clients/dto/milo.dto'
 import { initializeAPMAgent } from '../../../src/infrastructure/monitoring/apm.init'
 import { RateLimiterService } from '../../../src/utils/rate-limiter.service'
+import { DateService } from '../../../src/utils/date-service'
+import { StubbedClass, stubClass } from '../../utils'
 
 initializeAPMAgent()
 
 describe('MiloClient', () => {
+  let dateService: StubbedClass<DateService>
   const configService = testConfig()
   const rateLimiterService = new RateLimiterService(configService)
   let miloClient: MiloClient
@@ -32,7 +35,13 @@ describe('MiloClient', () => {
 
   beforeEach(() => {
     const httpService = new HttpService()
-    miloClient = new MiloClient(httpService, configService, rateLimiterService)
+    dateService = stubClass(DateService)
+    miloClient = new MiloClient(
+      httpService,
+      configService,
+      rateLimiterService,
+      dateService
+    )
   })
 
   describe('getSessionsConseiller', () => {
@@ -72,8 +81,14 @@ describe('MiloClient', () => {
       const idpToken = 'idpToken'
       const idDossier = 'idDossier'
 
+      const maintenant = DateTime.fromISO('2020-04-06T12:00:00.000Z')
+      const dans3mois = DateTime.fromISO('2020-07-06T12:00:00.000Z')
+      dateService.now.returns(maintenant)
+
       nock(MILO_BASE_URL)
-        .get(`/operateurs/sessions?idDossier=${idDossier}`)
+        .get(
+          `/operateurs/sessions?idDossier=${idDossier}&dateFinRecherche=${dans3mois.toISODate()}`
+        )
         .reply(200, uneListeSessionsJeuneDto)
         .isDone()
 
@@ -100,6 +115,27 @@ describe('MiloClient', () => {
       const result = await miloClient.getSessionsJeune(idpToken, idDossier, {
         debut: DateTime.fromISO('2023-07-21T17:53:42'),
         fin: DateTime.fromISO('2023-07-26T22:11:10')
+      })
+
+      // Then
+      expect(result).to.deep.equal(success(uneListeSessionsJeuneDto))
+    })
+
+    it('permet de ne récuperer la liste des sessions avec une date de début uniquement', async () => {
+      // Given
+      const idpToken = 'idpToken'
+      const idDossier = 'idDossier'
+
+      nock(MILO_BASE_URL)
+        .get(
+          `/operateurs/sessions?idDossier=${idDossier}&dateDebutRecherche=2023-07-21&dateFinRecherche=2023-10-21`
+        )
+        .reply(200, uneListeSessionsJeuneDto)
+        .isDone()
+
+      // When
+      const result = await miloClient.getSessionsJeune(idpToken, idDossier, {
+        debut: DateTime.fromISO('2023-07-21T17:53:42')
       })
 
       // Then
