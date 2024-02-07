@@ -24,6 +24,7 @@ import { handleAxiosError } from './utils/axios-error-handler'
 import * as APM from 'elastic-apm-node'
 import { getAPMInstance } from '../monitoring/apm.init'
 import { RateLimiterService } from '../../utils/rate-limiter.service'
+import { DateService } from '../../utils/date-service'
 
 @Injectable()
 export class MiloClient {
@@ -39,7 +40,8 @@ export class MiloClient {
   constructor(
     private httpService: HttpService,
     private configService: ConfigService,
-    private rateLimiterService: RateLimiterService
+    private rateLimiterService: RateLimiterService,
+    private dateService: DateService
   ) {
     this.logger = new Logger('MiloClient')
     this.apmService = getAPMInstance()
@@ -95,6 +97,12 @@ export class MiloClient {
     periode?: { debut?: DateTime; fin?: DateTime }
   ): Promise<Result<ListeSessionsJeuneMiloDto>> {
     await this.rateLimiterService.sessionsJeuneMiloRateLimiter.attendreLaProchaineDisponibilite()
+    if (!periode) {
+      periode = { fin: this.dateService.now().plus({ months: 3 }) }
+    }
+    if (periode.debut && !periode.fin) {
+      periode = { ...periode, fin: periode.debut.plus({ months: 3 }) }
+    }
     return this.recupererSessionsParDossier(
       idpToken,
       idDossier,
