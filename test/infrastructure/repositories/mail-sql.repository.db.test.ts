@@ -21,7 +21,7 @@ describe('MailSqlRepository', () => {
         await ConseillerSqlModel.creer(
           unConseillerDto({
             id: '1',
-            email: 'unEmail',
+            email: 'isabelle.cerutti@pole-emploi.fr',
             nom: 'unNom',
             prenom: 'unPrenom',
             structure: Core.Structure.MILO
@@ -53,7 +53,7 @@ describe('MailSqlRepository', () => {
         // Then
         const expected: Mail.Contact[] = [
           {
-            email: 'unEmail',
+            email: 'isabelle.cerutti@francetravail.fr',
             nom: 'unNom',
             prenom: 'unPrenom'
           },

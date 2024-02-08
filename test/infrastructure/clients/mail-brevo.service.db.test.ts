@@ -46,11 +46,13 @@ describe('MailBrevoService', () => {
     describe('quand tout va bien', () => {
       it('envoie un mail', async () => {
         // Given
-        const conseiller = unConseiller()
+        const conseiller = unConseiller({
+          email: 'isabelle.cerutti@pole-emploi.fr'
+        })
         const expectedBody = {
           to: [
             {
-              email: conseiller.email,
+              email: 'isabelle.cerutti@francetravail.fr',
               name: conseiller.firstName + ' ' + conseiller.lastName
             }
           ],
@@ -149,7 +151,9 @@ describe('MailBrevoService', () => {
   describe('creerContenuMailRendezVous', () => {
     it('renvoie le contenu du mail du nouveau rendez-vous', async () => {
       // Given
-      const conseiller = unConseiller()
+      const conseiller = unConseiller({
+        email: 'isabelle.cerutti@pole-emploi.fr'
+      })
       const rendezVous = unRendezVous()
       const fichierInvitation = fs.readFileSync(
         path.resolve(__dirname, '../../fixtures/invitation-mail.fixture.ics'),
@@ -182,7 +186,7 @@ describe('MailBrevoService', () => {
         templateId: 300,
         to: [
           {
-            email: 'nils.tavernier@passemploi.com',
+            email: 'isabelle.cerutti@francetravail.fr',
             name: 'Nils Tavernier'
           }
         ]
