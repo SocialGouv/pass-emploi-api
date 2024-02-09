@@ -17,7 +17,7 @@ import {
   Authentification,
   AuthentificationRepositoryToken
 } from '../../domain/authentification'
-import { Core } from '../../domain/core'
+import { Core, estMilo } from '../../domain/core'
 import { DateService } from '../../utils/date-service'
 import {
   UtilisateurQueryModel,
@@ -161,10 +161,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       utilisateurConseiller,
       this.dateService.nowJs()
     )
-    if (
-      utilisateurConseiller.structure === Core.Structure.MILO &&
-      utilisateurConseiller.email
-    ) {
+    if (estMilo(utilisateurConseiller.structure)) {
       await this.mailBrevoService.envoyerEmailCreationConseillerMilo(
         utilisateurConseiller
       )
@@ -188,6 +185,29 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     }
 
     await this.authentificationRepository.update(utilisateurMisAJour)
+
+    const estUnConseillerMilo =
+      estMilo(utilisateur.structure) &&
+      utilisateur.type === Authentification.Type.CONSEILLER
+
+    if (estUnConseillerMilo) {
+      const quiVientDeRemplirSonEmail = !utilisateur.email && command.email
+      const dontLaDateDePremiereConnexionEstInferieureA30Jours =
+        utilisateur.datePremiereConnexion &&
+        DateService.isGreater(
+          DateService.fromJSDateToDateTime(utilisateur.datePremiereConnexion)!,
+          this.dateService.now().minus({ days: 30 })
+        )
+
+      if (
+        quiVientDeRemplirSonEmail &&
+        dontLaDateDePremiereConnexionEstInferieureA30Jours
+      ) {
+        await this.mailBrevoService.envoyerEmailCreationConseillerMilo(
+          utilisateurMisAJour
+        )
+      }
+    }
 
     return utilisateurMisAJour
   }
