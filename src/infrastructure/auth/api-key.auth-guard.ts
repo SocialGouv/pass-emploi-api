@@ -29,24 +29,24 @@ export class ApiKeyAuthGuard implements CanActivate {
       )
     }
 
-    let apiKey = ''
+    let apiKeys = []
     const partenaire = this.reflector.get<Authentification.Partenaire>(
       Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
       context.getHandler()
     )
     switch (partenaire) {
       case Authentification.Partenaire.IMMERSION:
-        apiKey = this.configService.get('apiKeys.immersion')!
+        apiKeys = this.configService.get('apiKeys.immersion')!
         break
       case Authentification.Partenaire.KEYCLOAK:
-        apiKey = this.configService.get('apiKeys.keycloak')!
+        apiKeys = this.configService.get('apiKeys.keycloak')!
         break
       case Authentification.Partenaire.POLE_EMPLOI:
-        apiKey = this.configService.get('apiKeys.poleEmploi')!
+        apiKeys = this.configService.get('apiKeys.poleEmploi')!
         break
     }
 
-    if (apiKeyRequest === apiKey) {
+    if (apiKeys.includes(apiKeyRequest)) {
       return true
     }
 
