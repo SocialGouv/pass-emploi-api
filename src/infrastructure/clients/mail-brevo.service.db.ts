@@ -83,19 +83,21 @@ export class MailBrevoService implements Mail.Service {
   async envoyerEmailCreationConseillerMilo(
     utilisateurConseiller: Authentification.Utilisateur
   ): Promise<void> {
-    const mailDataDto: MailDataDto = {
-      to: [
-        {
-          email: utilisateurConseiller.email!,
-          name: `${utilisateurConseiller.prenom} ${utilisateurConseiller.nom}`
+    if (utilisateurConseiller.email) {
+      const mailDataDto: MailDataDto = {
+        to: [
+          {
+            email: utilisateurConseiller.email,
+            name: `${utilisateurConseiller.prenom} ${utilisateurConseiller.nom}`
+          }
+        ],
+        templateId: parseInt(this.templates.creationConseillerMilo),
+        params: {
+          prenom: utilisateurConseiller.prenom
         }
-      ],
-      templateId: parseInt(this.templates.creationConseillerMilo),
-      params: {
-        prenom: utilisateurConseiller.prenom
       }
+      await this.envoyer(mailDataDto)
     }
-    await this.envoyer(mailDataDto)
   }
 
   async envoyerMailRendezVous(
