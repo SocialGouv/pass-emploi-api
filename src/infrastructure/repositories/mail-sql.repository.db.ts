@@ -20,10 +20,10 @@ export class MailSqlRepository implements Mail.Repository {
       }
     })
     // Solution plus lisible/maintenable mais moins performante
-    const contacts: Mail.Contact[] = conseillersSQL.map(conseillerMiloSQL => ({
-      nom: conseillerMiloSQL.nom,
-      prenom: conseillerMiloSQL.prenom,
-      email: conseillerMiloSQL.email!
+    const contacts: Mail.Contact[] = conseillersSQL.map(conseillerSQL => ({
+      nom: conseillerSQL.nom,
+      prenom: conseillerSQL.prenom,
+      email: conseillerSQL.email!.replace(/pole-emploi/g, 'francetravail')
     }))
     return contacts
   }

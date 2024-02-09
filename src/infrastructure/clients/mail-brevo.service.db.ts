@@ -65,7 +65,7 @@ export class MailBrevoService implements Mail.Service {
     const mailDataDto: MailDataDto = {
       to: [
         {
-          email: conseiller.email!,
+          email: conseiller.email!.replace(/pole-emploi/g, 'francetravail'),
           name: `${conseiller.firstName} ${conseiller.lastName}`
         }
       ],
@@ -195,7 +195,7 @@ export class MailBrevoService implements Mail.Service {
     return {
       to: [
         {
-          email: conseiller.email!,
+          email: conseiller.email!.replace(/pole-emploi/g, 'francetravail'),
           name: conseiller.firstName + ' ' + conseiller.lastName
         }
       ],
