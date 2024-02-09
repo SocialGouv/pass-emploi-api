@@ -32,14 +32,16 @@ import {
   success
 } from '../../../src/building-blocks/types/result'
 import { Core } from '../../../src/domain/core'
-import { expect, StubbedClass, stubClass } from '../../utils'
 import { MailBrevoService } from '../../../src/infrastructure/clients/mail-brevo.service.db'
+import { StubbedClass, expect, stubClass } from '../../utils'
 
 describe('UpdateUtilisateurCommandHandler', () => {
   let authentificationRepository: StubbedType<Authentification.Repository>
   let updateUtilisateurCommandHandler: UpdateUtilisateurCommandHandler
   const dateService = stubClass(DateService)
-  dateService.nowJs.returns(uneDate())
+  const maintenant = DateService.fromJSDateToDateTime(uneDate())!
+  dateService.nowJs.returns(maintenant.toJSDate())
+  dateService.now.returns(maintenant)
   let mailBrevoService: StubbedClass<MailBrevoService>
   const uuidGenere = '1'
   const idService: IdService = {
@@ -174,6 +176,9 @@ describe('UpdateUtilisateurCommandHandler', () => {
             )
 
             // Then
+            expect(
+              mailBrevoService.envoyerEmailCreationConseillerMilo
+            ).to.have.callCount(0)
             expect(isSuccess(result)).equal(true)
             if (isSuccess(result)) {
               expect(result.data).to.deep.equal(unUtilisateurQueryModel())
@@ -181,7 +186,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
           })
         })
         describe('conseiller connu avec nouvel email, nom et prenom', async () => {
-          it('met à jour ses infos et retourne le conseiller', async () => {
+          it('met à jour ses infos et retourne le conseiller sans envoi email quand date trop passée', async () => {
             // Given
             const command: UpdateUtilisateurCommand = {
               idUtilisateurAuth: 'nilstavernier',
@@ -192,8 +197,12 @@ describe('UpdateUtilisateurCommandHandler', () => {
               prenom: 'newPrenom'
             }
 
+            const ilYa5Semaines = maintenant.minus({ weeks: 5 }).toJSDate()
+
             const utilisateur = unUtilisateurConseiller({
-              idAuthentification: command.idUtilisateurAuth
+              idAuthentification: command.idUtilisateurAuth,
+              email: undefined,
+              datePremiereConnexion: ilYa5Semaines
             })
             authentificationRepository.getConseillerByStructure
               .withArgs(command.idUtilisateurAuth, command.structure)
@@ -213,7 +222,109 @@ describe('UpdateUtilisateurCommandHandler', () => {
               nom: 'newNom',
               prenom: 'newPrenom',
               dateDerniereConnexion: uneDate(),
-              datePremiereConnexion: uneDate()
+              datePremiereConnexion: ilYa5Semaines
+            })
+            expect(
+              mailBrevoService.envoyerEmailCreationConseillerMilo
+            ).not.to.have.called()
+            expect(isSuccess(result)).equal(true)
+            if (isSuccess(result)) {
+              expect(result.data.email).to.deep.equal('new@email.com')
+            }
+          })
+          it('met à jour ses infos et retourne le conseiller sans envoi email quand mail existant', async () => {
+            // Given
+            const command: UpdateUtilisateurCommand = {
+              idUtilisateurAuth: 'nilstavernier',
+              type: Authentification.Type.CONSEILLER,
+              structure: Core.Structure.MILO,
+              email: 'New@email.com',
+              nom: 'newNom',
+              prenom: 'newPrenom'
+            }
+
+            const ilYa1Semaine = maintenant.minus({ weeks: 1 }).toJSDate()
+
+            const utilisateur = unUtilisateurConseiller({
+              idAuthentification: command.idUtilisateurAuth,
+              email: 'old',
+              datePremiereConnexion: ilYa1Semaine
+            })
+            authentificationRepository.getConseillerByStructure
+              .withArgs(command.idUtilisateurAuth, command.structure)
+              .resolves(utilisateur)
+
+            // When
+            const result = await updateUtilisateurCommandHandler.execute(
+              command
+            )
+
+            // Then
+            expect(
+              authentificationRepository.update
+            ).to.have.been.calledWithExactly({
+              ...utilisateur,
+              email: 'new@email.com',
+              nom: 'newNom',
+              prenom: 'newPrenom',
+              dateDerniereConnexion: uneDate(),
+              datePremiereConnexion: ilYa1Semaine
+            })
+            expect(
+              mailBrevoService.envoyerEmailCreationConseillerMilo
+            ).not.to.have.called()
+            expect(isSuccess(result)).equal(true)
+            if (isSuccess(result)) {
+              expect(result.data.email).to.deep.equal('new@email.com')
+            }
+          })
+          it('met à jour ses infos et retourne le conseiller avec envoi email', async () => {
+            // Given
+            const command: UpdateUtilisateurCommand = {
+              idUtilisateurAuth: 'nilstavernier',
+              type: Authentification.Type.CONSEILLER,
+              structure: Core.Structure.MILO,
+              email: 'New@email.com',
+              nom: 'newNom',
+              prenom: 'newPrenom'
+            }
+
+            const ilYaUneSemaine = maintenant.minus({ weeks: 1 }).toJSDate()
+
+            const utilisateur = unUtilisateurConseiller({
+              idAuthentification: command.idUtilisateurAuth,
+              email: undefined,
+              datePremiereConnexion: ilYaUneSemaine
+            })
+            authentificationRepository.getConseillerByStructure
+              .withArgs(command.idUtilisateurAuth, command.structure)
+              .resolves(utilisateur)
+
+            // When
+            const result = await updateUtilisateurCommandHandler.execute(
+              command
+            )
+
+            // Then
+            expect(
+              authentificationRepository.update
+            ).to.have.been.calledWithExactly({
+              ...utilisateur,
+              email: 'new@email.com',
+              nom: 'newNom',
+              prenom: 'newPrenom',
+              dateDerniereConnexion: uneDate(),
+              datePremiereConnexion: ilYaUneSemaine
+            })
+            expect(
+              mailBrevoService.envoyerEmailCreationConseillerMilo
+            ).to.have.calledOnceWithExactly({
+              ...utilisateur,
+              email: 'new@email.com',
+              nom: 'newNom',
+              prenom: 'newPrenom',
+              dateDerniereConnexion: uneDate(),
+              datePremiereConnexion: ilYaUneSemaine
             })
             expect(isSuccess(result)).equal(true)
             if (isSuccess(result)) {
