@@ -168,9 +168,9 @@ export const testConfig = (): ConfigService => {
       }
     },
     apiKeys: {
-      keycloak: 'api-key-keycloak',
-      immersion: 'api-key-immersion',
-      poleEmploi: 'api-key-consumer-pole-emploi'
+      keycloak: ['api-key-keycloak'],
+      immersion: ['api-key-immersion'],
+      poleEmploi: ['api-key-consumer-pole-emploi']
     },
     features: {
       rendezVousMilo: true,

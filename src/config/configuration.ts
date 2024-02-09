@@ -101,9 +101,9 @@ export default () => {
       clientSecret: process.env.OIDC_CLIENT_SECRET ?? ''
     },
     apiKeys: {
-      keycloak: process.env.API_KEY_KEYCLOAK,
-      immersion: process.env.API_KEY_PARTENAIRE_IMMERSION,
-      poleEmploi: process.env.API_KEY_CONSUMER_POLE_EMPLOI
+      keycloak: JSON.parse(process.env.API_KEY_KEYCLOAK!),
+      immersion: JSON.parse(process.env.API_KEY_PARTENAIRE_IMMERSION!),
+      poleEmploi: JSON.parse(process.env.API_KEY_CONSUMER_POLE_EMPLOI!)
     },
     redis: {
       url: process.env.REDIS_URL
