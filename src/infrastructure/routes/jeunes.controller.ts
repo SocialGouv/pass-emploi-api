@@ -9,6 +9,7 @@ import {
   HttpStatus,
   InternalServerErrorException,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
   Query
@@ -439,7 +440,7 @@ export class JeunesController {
   })
   async getDetailRendezVous(
     @Param('idJeune') idJeune: string,
-    @Param('idRendezVous') idRendezVous: string,
+    @Param('idRendezVous', new ParseUUIDPipe()) idRendezVous: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<RendezVousJeuneDetailQueryModel> {
     const result = await this.getUnRendezVousJeuneQueryHandler.execute(
