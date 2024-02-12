@@ -161,6 +161,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       utilisateurConseiller,
       this.dateService.nowJs()
     )
+
     if (estMilo(utilisateurConseiller.structure)) {
       await this.mailBrevoService.envoyerEmailCreationConseillerMilo(
         utilisateurConseiller

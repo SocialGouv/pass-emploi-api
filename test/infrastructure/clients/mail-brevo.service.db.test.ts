@@ -186,7 +186,7 @@ describe('MailBrevoService', () => {
         templateId: 300,
         to: [
           {
-            email: 'isabelle.cerutti@francetravail.fr',
+            email: 'isabelle.cerutti@pole-emploi.fr',
             name: 'Nils Tavernier'
           }
         ]

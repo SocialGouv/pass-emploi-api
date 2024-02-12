@@ -1,6 +1,7 @@
 import { JWTPayload } from 'jose'
 import { Authentification } from '../../src/domain/authentification'
 import { Core } from '../../src/domain/core'
+import { uneDatetime } from './date.fixture'
 
 export const unUtilisateurConseiller = (
   args: Partial<Authentification.Utilisateur> = {}
@@ -14,7 +15,8 @@ export const unUtilisateurConseiller = (
     email: 'nils.tavernier@passemploi.com',
     structure: Core.Structure.MILO,
     roles: [],
-    dateDerniereConnexion: undefined
+    dateDerniereConnexion: undefined,
+    datePremiereConnexion: uneDatetime().toJSDate()
   }
 
   return {

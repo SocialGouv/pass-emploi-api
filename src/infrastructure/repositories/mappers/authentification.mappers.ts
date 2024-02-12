@@ -16,6 +16,7 @@ export function fromConseillerSqlToUtilisateur(
     type: Authentification.Type.CONSEILLER,
     dateDerniereConnexion:
       conseillerSqlModel.dateDerniereConnexion ?? undefined,
+    datePremiereConnexion: conseillerSqlModel.dateCreation || undefined,
     roles
   }
 }

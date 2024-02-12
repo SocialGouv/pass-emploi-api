@@ -197,7 +197,7 @@ export class MailBrevoService implements Mail.Service {
     return {
       to: [
         {
-          email: conseiller.email!.replace(/pole-emploi/g, 'francetravail'),
+          email: conseiller.email!,
           name: conseiller.firstName + ' ' + conseiller.lastName
         }
       ],
