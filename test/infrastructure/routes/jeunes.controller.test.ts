@@ -855,7 +855,7 @@ describe('JeunesController', () => {
 
   describe('GET /jeunes/:idJeune/rendez-vous/:idRendezVous', () => {
     const idJeune = '1'
-    const idRendezVous = '2'
+    const idRendezVous = 'bcd60403-5f10-4a16-a660-2099d79ebd66'
     const queryModel = unRendezVousJeuneDetailQueryModel()
 
     it('renvoit une 404 quand le rendez vous n"existe pas', async () => {
