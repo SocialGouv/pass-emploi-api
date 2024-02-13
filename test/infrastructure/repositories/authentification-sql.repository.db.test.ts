@@ -344,7 +344,8 @@ describe('AuthentificationSqlRepository', () => {
         prenom: 'nouveauPrenom',
         email: 'nouveauEmail',
         idAuthentification: 'nouvelIdAuthentification',
-        dateDerniereConnexion: uneDate()
+        dateDerniereConnexion: uneDate(),
+        datePremiereConnexion: uneDatetime().toJSDate()
       }
       await authentificationSqlRepository.update(unConseillerMisAJour)
 
@@ -367,7 +368,10 @@ describe('AuthentificationSqlRepository', () => {
     describe("quand c'est un conseiller", () => {
       it("met à jour l'utilisateur", async () => {
         // When
-        await authentificationSqlRepository.save(unUtilisateurConseiller())
+        await authentificationSqlRepository.save(
+          unUtilisateurConseiller(),
+          uneDate()
+        )
 
         // Then
         const utilisateur =
@@ -378,7 +382,8 @@ describe('AuthentificationSqlRepository', () => {
 
         expect(utilisateur).to.deep.equal(
           unUtilisateurConseiller({
-            roles: [Authentification.Role.SUPERVISEUR]
+            roles: [Authentification.Role.SUPERVISEUR],
+            datePremiereConnexion: uneDate()
           })
         )
       })
