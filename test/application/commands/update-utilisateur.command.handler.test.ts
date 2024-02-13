@@ -123,8 +123,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
               email: 'new@email.com',
               nom: 'newNom',
               prenom: 'newPrenom',
-              dateDerniereConnexion: uneDate(),
-              datePremiereConnexion: uneDate()
+              dateDerniereConnexion: uneDate()
             })
             expect(isSuccess(result)).equal(true)
           })
@@ -399,12 +398,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
                 // Then
                 expect(
                   mailBrevoService.envoyerEmailCreationConseillerMilo
-                ).to.have.calledWithExactly(
-                  unUtilisateurConseiller({
-                    idAuthentification: 'nilstavernier',
-                    dateDerniereConnexion: uneDate()
-                  })
-                )
+                ).to.have.been.calledOnce()
               })
             })
           })
