@@ -80,7 +80,9 @@ describe('EvenementsEmploiController', () => {
       // Given
       const idEvenement = '123'
       const evenementQueryModel: EvenementEmploiDetailQueryModel = {
-        id: idEvenement
+        id: idEvenement,
+        dateTimeDebut: '2023-05-17T07:00:00.000Z',
+        dateTimeFin: '2023-05-16T22:09:00.000Z'
       }
       getEvenementEmploiQueryHandler.execute.resolves(
         success(evenementQueryModel)

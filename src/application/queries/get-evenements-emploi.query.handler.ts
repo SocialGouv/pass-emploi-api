@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { ApiProperty } from '@nestjs/swagger'
+import { DateTime } from 'luxon'
 import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
 import {
@@ -31,6 +32,10 @@ class EvenementEmploiQueryModel {
   typeEvenement?: string
   @ApiProperty({ required: false })
   dateEvenement?: string
+  @ApiProperty()
+  dateTimeDebut: string
+  @ApiProperty()
+  dateTimeFin: string
   @ApiProperty({ required: false })
   heureDebut?: string
   @ApiProperty({ required: false })
@@ -100,17 +105,30 @@ export class GetEvenementsEmploiQueryHandler extends QueryHandler<
 
     return success({
       pagination: { page, limit, total: resultEvenements.data.totalElements },
-      results: resultEvenements.data.content.map(evenement => ({
-        id: evenement.id.toString(),
-        ville: evenement.ville,
-        codePostal: evenement.codePostal,
-        titre: evenement.titre,
-        typeEvenement: evenement.type,
-        dateEvenement: evenement.dateEvenement,
-        heureDebut: evenement.heureDebut,
-        heureFin: evenement.heureFin,
-        modalites: evenement.modalites
-      }))
+      results: resultEvenements.data.content.map(evenement => {
+        const dateTimeDebut = DateTime.fromISO(evenement.dateEvenement, {
+          setZone: true
+        })
+        const [heureFin, minuteFin] = evenement.heureFin.split(':')
+        const dateTimeFin = dateTimeDebut.set({
+          hour: parseInt(heureFin),
+          minute: parseInt(minuteFin)
+        })
+
+        return {
+          id: evenement.id.toString(),
+          ville: evenement.ville,
+          codePostal: evenement.codePostal,
+          titre: evenement.titre,
+          typeEvenement: evenement.type,
+          dateEvenement: evenement.dateEvenement,
+          dateTimeDebut: dateTimeDebut.toUTC().toISO(),
+          dateTimeFin: dateTimeFin.toUTC().toISO(),
+          heureDebut: evenement.heureDebut,
+          heureFin: evenement.heureFin,
+          modalites: evenement.modalites
+        }
+      })
     })
   }
   async authorize(): Promise<Result> {

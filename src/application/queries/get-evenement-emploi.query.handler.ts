@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { ApiProperty } from '@nestjs/swagger'
+import { DateTime } from 'luxon'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import {
@@ -31,6 +32,10 @@ export class EvenementEmploiDetailQueryModel {
   typeEvenement?: string
   @ApiProperty({ required: false })
   dateEvenement?: string
+  @ApiProperty()
+  dateTimeDebut: string
+  @ApiProperty()
+  dateTimeFin: string
   @ApiProperty({ required: false })
   heureDebut?: string
   @ApiProperty({ required: false })
@@ -78,6 +83,15 @@ export class GetEvenementEmploiQueryHandler extends QueryHandler<
       return resultEvenement
     }
 
+    const dateTimeDebut = DateTime.fromISO(resultEvenement.data.dateEvenement, {
+      setZone: true
+    })
+    const [heureFin, minuteFin] = resultEvenement.data.heureFin.split(':')
+    const dateTimeFin = dateTimeDebut.set({
+      hour: parseInt(heureFin),
+      minute: parseInt(minuteFin)
+    })
+
     return success({
       id: resultEvenement.data.id.toString(),
       ville: resultEvenement.data.ville,
@@ -90,6 +104,8 @@ export class GetEvenementEmploiQueryHandler extends QueryHandler<
       dateEvenement: resultEvenement.data.dateEvenement,
       heureDebut: resultEvenement.data.heureDebut,
       heureFin: resultEvenement.data.heureFin,
+      dateTimeDebut: dateTimeDebut.toUTC().toISO(),
+      dateTimeFin: dateTimeFin.toUTC().toISO(),
       modalites: resultEvenement.data.modalites,
       deroulement: resultEvenement.data.deroulement,
       nombrePlacesTotalDistancel: resultEvenement.data.nombrePlaceTotalDistance,
