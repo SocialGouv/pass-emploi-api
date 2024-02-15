@@ -53,6 +53,12 @@ describe('GetConseillersQueryHandler', () => {
           prenom: 'toto',
           nom: 'tata',
           email: 'conseiller@passemploi.com'
+        }),
+        unConseillerDto({
+          id: 'autre-conseiller-pe',
+          prenom: 'toto',
+          nom: 'tata',
+          email: 'nils.tavernier@pole-emploi.fr'
         })
       ])
     })
@@ -82,6 +88,30 @@ describe('GetConseillersQueryHandler', () => {
           ])
         )
       })
+      it('retourne le conseiller seul quand le mail est exact PE France Travail', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          structure: Core.Structure.PASS_EMPLOI
+        })
+        // When
+        const actual = await getConseillersQueryHandler.handle(
+          {
+            recherche: 'nils.tavernier@francetravail.fr'
+          },
+          utilisateur
+        )
+
+        expect(actual).to.deep.equal(
+          success([
+            {
+              id: 'autre-conseiller-pe',
+              prenom: 'toto',
+              nom: 'tata',
+              email: 'nils.tavernier@pole-emploi.fr'
+            }
+          ])
+        )
+      })
 
       it('retourne plusieurs conseillers quand le conseiller existe avec email approchant', async () => {
         // Given
@@ -103,6 +133,12 @@ describe('GetConseillersQueryHandler', () => {
               prenom: conseillerDto.prenom,
               nom: conseillerDto.nom,
               email: conseillerDto.email
+            },
+            {
+              id: 'autre-conseiller-pe',
+              prenom: 'toto',
+              nom: 'tata',
+              email: 'nils.tavernier@pole-emploi.fr'
             },
             {
               id: 'autre-conseiller',
