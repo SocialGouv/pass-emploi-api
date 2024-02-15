@@ -62,7 +62,7 @@ export class GetConseillersQueryHandler extends QueryHandler<
       LIMIT :limit;`,
       {
         replacements: {
-          query: recherche,
+          query: recherche.replace(/@francetravail.fr/g, '@pole-emploi.fr'),
           structure,
           limit: this.confiService.get('values.maxRechercheConseillers')
         },
