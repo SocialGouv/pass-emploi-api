@@ -71,6 +71,7 @@ export class GetMonSuiviQueryHandler extends QueryHandler<
       return failure(new JeuneMiloSansIdDossier(query.idJeune))
     }
 
+    let sessionsMiloKO = false
     const [actions, rendezVous, sessionsMilo] = await Promise.all([
       this.recupererLesActions(query),
       this.recupererLesRendezVous(query, utilisateur.type),
@@ -91,22 +92,22 @@ export class GetMonSuiviQueryHandler extends QueryHandler<
             )
             .then(result => {
               if (isFailure(result)) {
+                sessionsMiloKO = true
+                this.logger.error(`Erreur récupération Sessions Mon Suivi`)
                 return null
               }
               return result.data
             })
             .catch(error => {
+              sessionsMiloKO = true
               this.logger.error(
-                buildError(
-                  `La récupération des sessions de l'agenda du jeune ${query.idJeune} a échoué`,
-                  error
-                )
+                buildError(`Erreur récupération Sessions Mon Suivi`, error)
               )
               return null
             })
         : null
     ])
-    return success({ actions, rendezVous, sessionsMilo })
+    return success({ actions, rendezVous, sessionsMilo, sessionsMiloKO })
   }
 
   async monitor(): Promise<void> {

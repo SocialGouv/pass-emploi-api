@@ -255,12 +255,14 @@ describe('GetMonSuiviQueryHandler', () => {
           const result = await handler.handle(query, utilisateurJeune)
 
           // Then
-          expect(
-            isSuccess(result) && result.data.sessionsMilo
-          ).to.be.deep.equal([
-            sessionAvecInscriptionAJPlus1,
-            sessionAvecInscriptionAJPlus2
-          ])
+          expect(isSuccess(result)).to.be.true()
+          if (isSuccess(result)) {
+            expect(result.data.sessionsMilo).to.be.deep.equal([
+              sessionAvecInscriptionAJPlus1,
+              sessionAvecInscriptionAJPlus2
+            ])
+            expect(result.data.sessionsMiloKO).to.be.false()
+          }
         })
       })
     })
@@ -288,7 +290,8 @@ describe('GetMonSuiviQueryHandler', () => {
         expect(isSuccess(result) && result.data).to.deep.equal({
           actions: [],
           rendezVous: [],
-          sessionsMilo: null
+          sessionsMilo: null,
+          sessionsMiloKO: true
         })
       })
     })
@@ -305,14 +308,19 @@ describe('GetMonSuiviQueryHandler', () => {
 
     it('appelle l’authorizer idoine', async () => {
       // Given
-      jeuneAuthorizer.autoriserLeJeune
-        .withArgs(jeune.id, unUtilisateurJeune({ id: jeune.id }))
-        .resolves(emptySuccess())
+      jeuneAuthorizer.autoriserLeJeune.resolves(emptySuccess())
 
       // When
       const result = await handler.authorize(query, unUtilisateurJeune())
 
       // Then
+      expect(
+        jeuneAuthorizer.autoriserLeJeune
+      ).to.have.been.calledOnceWithExactly(
+        jeune.id,
+        unUtilisateurJeune({ id: jeune.id }),
+        true
+      )
       expect(result).to.deep.equal(emptySuccess())
     })
   })

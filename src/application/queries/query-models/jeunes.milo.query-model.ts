@@ -70,4 +70,7 @@ export class GetMonSuiviQueryModel {
     isArray: true
   })
   sessionsMilo: SessionJeuneMiloQueryModel[] | null
+
+  @ApiProperty()
+  sessionsMiloKO: boolean
 }
