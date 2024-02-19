@@ -1,10 +1,11 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { NonTrouveError } from '../../../../building-blocks/types/domain-error'
+import { Cached } from '../../../../building-blocks/types/query'
 import {
+  Result,
   failure,
   isFailure,
-  Result,
   success
 } from '../../../../building-blocks/types/result'
 import { Jeune, JeuneRepositoryToken } from '../../../../domain/jeune/jeune'
@@ -17,12 +18,8 @@ import {
 import { DateService } from '../../../../utils/date-service'
 import { IdService } from '../../../../utils/id-service'
 import { fromRendezVousDtoToRendezVousQueryModel } from '../../query-mappers/rendez-vous-pole-emploi.mappers'
-import {
-  buildDateSansTimezone,
-  fromPrestationDtoToRendezVousQueryModel
-} from '../../query-mappers/rendez-vous-prestation.mappers'
+import { fromPrestationDtoToRendezVousQueryModel } from '../../query-mappers/rendez-vous-prestation.mappers'
 import { RendezVousJeuneQueryModel } from '../../query-models/rendez-vous.query-model'
-import { Cached } from '../../../../building-blocks/types/query'
 
 export interface Query {
   idJeune: string
@@ -91,18 +88,12 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
       responsePrestations.data
         .filter(prestation => !prestation.annule)
         .map(async prestation => {
-          const dateRendezVous = DateTime.fromJSDate(
-            buildDateSansTimezone(prestation.session.dateDebut)
-          )
           const avecVisio =
             prestation.session.natureAnimation === 'INTERNE' ||
             prestation.session.modalitePremierRendezVous === 'WEBCAM'
           let lienVisio = undefined
 
-          const laVisioEstDisponible =
-            avecVisio &&
-            prestation.identifiantStable &&
-            DateService.isSameDateDay(dateRendezVous, maintenant)
+          const laVisioEstDisponible = avecVisio && prestation.identifiantStable
 
           if (laVisioEstDisponible) {
             const responseLienVisio =
