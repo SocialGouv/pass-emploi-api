@@ -46,6 +46,7 @@ import { GetSessionsJeuneMiloQueryGetter } from '../../../../src/application/que
 import { SessionMilo } from '../../../../src/domain/milo/session.milo'
 import { GetMonSuiviQueryModel } from '../../../../src/application/queries/query-models/jeunes.milo.query-model'
 import { SessionJeuneMiloQueryModel } from '../../../../src/application/queries/query-models/sessions.milo.query.model'
+import { UnauthorizedException } from '@nestjs/common'
 
 describe('GetMonSuiviQueryHandler', () => {
   let handler: GetMonSuiviQueryHandler
@@ -261,7 +262,6 @@ describe('GetMonSuiviQueryHandler', () => {
               sessionAvecInscriptionAJPlus1,
               sessionAvecInscriptionAJPlus2
             ])
-            expect(result.data.sessionsMiloKO).to.be.false()
           }
         })
       })
@@ -290,9 +290,43 @@ describe('GetMonSuiviQueryHandler', () => {
         expect(isSuccess(result) && result.data).to.deep.equal({
           actions: [],
           rendezVous: [],
-          sessionsMilo: null,
-          sessionsMiloKO: true
+          sessionsMilo: null
         })
+      })
+    })
+
+    describe('quand la récupération des sessions échoue en UnauthorizedException', () => {
+      it("renvoie l'erreur", async () => {
+        // Given
+        sessionsQueryGetter.handle
+          .withArgs(jeuneDto.id, jeuneDto.idPartenaire!, query.accessToken, {
+            periode: {
+              debut: dateDebut,
+              fin: dateFin
+            },
+            pourConseiller: false,
+            filtrerEstInscrit: true
+          })
+          .throws(
+            new UnauthorizedException({
+              statusCode: 401,
+              code: 'Unauthorized',
+              message: 'token exchange jeune failed'
+            })
+          )
+        // When
+        try {
+          await handler.handle(query, utilisateurJeune)
+          expect.fail(null, null, 'handle test did not reject with an error')
+        } catch (e) {
+          expect(e).to.deep.equal(
+            new UnauthorizedException({
+              statusCode: 401,
+              code: 'Unauthorized',
+              message: 'token exchange jeune failed'
+            })
+          )
+        }
       })
     })
   })

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { mapSessionJeuneDtoToQueryModel } from 'src/application/queries/query-mappers/milo.mappers'
 import { SessionJeuneMiloQueryModel } from 'src/application/queries/query-models/sessions.milo.query.model'
@@ -18,10 +18,14 @@ import { JeuneSqlModel } from '../../../../infrastructure/sequelize/models/jeune
 
 @Injectable()
 export class GetSessionsJeuneMiloQueryGetter {
+  private readonly logger: Logger
+
   constructor(
     private readonly keycloakClient: KeycloakClient,
     private readonly miloClient: MiloClient
-  ) {}
+  ) {
+    this.logger = new Logger('GetSessionsJeuneMiloQueryGetter')
+  }
 
   async handle(
     idJeune: string,
@@ -62,23 +66,34 @@ export class GetSessionsJeuneMiloQueryGetter {
       return resultSessionMiloClient
     }
 
+    this.logger.log(
+      `${
+        resultSessionMiloClient.data.sessions.length
+      } Sessions venant de l'API : 
+        ${JSON.stringify(resultSessionMiloClient.data.sessions)}`
+    )
+
     const sessionsDuJeune: SessionJeuneListeDto[] =
       await recupererSessionsDuJeuneSelonFiltre(
         resultSessionMiloClient.data.sessions,
         options?.filtrerEstInscrit
       )
 
-    return success(
-      sessionsDuJeune
-        .map(sessionDuJeune =>
-          mapSessionJeuneDtoToQueryModel(
-            sessionDuJeune,
-            idPartenaire,
-            timezoneDeLaStructureDuJeune
-          )
+    const sessionsDuJeuneQueryModel = sessionsDuJeune
+      .map(sessionDuJeune =>
+        mapSessionJeuneDtoToQueryModel(
+          sessionDuJeune,
+          idPartenaire,
+          timezoneDeLaStructureDuJeune
         )
-        .sort(compareSessionsByDebut)
+      )
+      .sort(compareSessionsByDebut)
+
+    this.logger.log(
+      `${sessionsDuJeuneQueryModel.length} Sessions query model : 
+        ${JSON.stringify(sessionsDuJeuneQueryModel)}`
     )
+    return success(sessionsDuJeuneQueryModel)
   }
 
   private async getSessionsJeune(

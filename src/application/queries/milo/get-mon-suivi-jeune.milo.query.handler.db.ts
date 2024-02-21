@@ -1,5 +1,5 @@
 import { Query } from '../../../building-blocks/types/query'
-import { Injectable } from '@nestjs/common'
+import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import {
   failure,
@@ -71,7 +71,6 @@ export class GetMonSuiviQueryHandler extends QueryHandler<
       return failure(new JeuneMiloSansIdDossier(query.idJeune))
     }
 
-    let sessionsMiloKO = false
     const [actions, rendezVous, sessionsMilo] = await Promise.all([
       this.recupererLesActions(query),
       this.recupererLesRendezVous(query, utilisateur.type),
@@ -92,14 +91,15 @@ export class GetMonSuiviQueryHandler extends QueryHandler<
             )
             .then(result => {
               if (isFailure(result)) {
-                sessionsMiloKO = true
                 this.logger.error(`Erreur récupération Sessions Mon Suivi`)
                 return null
               }
               return result.data
             })
             .catch(error => {
-              sessionsMiloKO = true
+              if (error instanceof UnauthorizedException) {
+                throw error
+              }
               this.logger.error(
                 buildError(`Erreur récupération Sessions Mon Suivi`, error)
               )
@@ -107,7 +107,7 @@ export class GetMonSuiviQueryHandler extends QueryHandler<
             })
         : null
     ])
-    return success({ actions, rendezVous, sessionsMilo, sessionsMiloKO })
+    return success({ actions, rendezVous, sessionsMilo })
   }
 
   async monitor(): Promise<void> {

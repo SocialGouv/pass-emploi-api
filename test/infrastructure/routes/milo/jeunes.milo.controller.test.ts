@@ -219,8 +219,7 @@ describe('JeunesMiloController', () => {
       const monSuiviQueryModel: GetMonSuiviQueryModel = {
         actions: [],
         rendezVous: [],
-        sessionsMilo: [],
-        sessionsMiloKO: true
+        sessionsMilo: []
       }
       monSuiviQueryHandler.execute
         .withArgs(monSuiviQuery, unUtilisateurDecode())
@@ -236,8 +235,7 @@ describe('JeunesMiloController', () => {
         .expect({
           actions: monSuiviQueryModel.actions,
           rendezVous: monSuiviQueryModel.rendezVous,
-          sessionsMilo: monSuiviQueryModel.sessionsMilo,
-          sessionsMiloKO: true
+          sessionsMilo: monSuiviQueryModel.sessionsMilo
         })
     })
     ensureUserAuthenticationFailsIfInvalid(
