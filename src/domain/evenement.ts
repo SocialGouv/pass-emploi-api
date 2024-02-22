@@ -67,6 +67,7 @@ export namespace Evenement {
     MESSAGE_ENVOYE_MULTIPLE_MANUEL_PJ = 'MESSAGE_ENVOYE_MULTIPLE_MANUEL_PJ',
     MESSAGE_ENVOYE_MULTIPLE_LISTE_PJ = 'MESSAGE_ENVOYE_MULTIPLE_LISTE_PJ',
     MESSAGE_ENVOYE_MULTIPLE_MIXTE_PJ = 'MESSAGE_ENVOYE_MULTIPLE_MIXTE_PJ',
+    MESSAGE_SESSION_MILO_PARTAGE = 'MESSAGE_SESSION_MILO_PARTAGE',
     MESSAGE_OFFRE_PARTAGEE = 'MESSAGE_OFFRE_PARTAGEE',
     OFFRE_ALTERNANCE_AFFICHEE = 'OFFRE_ALTERNANCE_AFFICHEE',
     OFFRE_ALTERNANCE_PARTAGEE = 'OFFRE_ALTERNANCE_PARTAGEE',
@@ -86,6 +87,7 @@ export namespace Evenement {
     OFFRE_IMMERSION_LOCALISATION = 'OFFRE_IMMERSION_LOCALISATION',
     OFFRE_IMMERSION_RECHERCHEE = 'OFFRE_IMMERSION_RECHERCHEE',
     OFFRE_IMMERSION_SAUVEGARDEE = 'OFFRE_IMMERSION_SAUVEGARDEE',
+    OFFRE_IMMERSION_CONTACT_AFFICHEE = 'OFFRE_IMMERSION_CONTACT_AFFICHEE',
     OFFRE_PARTAGEE = 'OFFRE_PARTAGEE',
     OFFRE_POSTULEE = 'OFFRE_POSTULEE',
     OFFRE_SERVICE_CIVIQUE_AFFICHE = 'OFFRE_SERVICE_CIVIQUE_AFFICHE',
@@ -364,6 +366,11 @@ const evenements: {
     action: 'Localiser',
     nom: 'Immersion'
   },
+  [Evenement.Code.OFFRE_IMMERSION_CONTACT_AFFICHEE]: {
+    categorie: 'Offre',
+    action: 'Contact Affiché',
+    nom: 'Immersion'
+  },
   [Evenement.Code.OFFRE_ALTERNANCE_AFFICHEE]: {
     categorie: 'Offre',
     action: 'Détail',
@@ -441,6 +448,11 @@ const evenements: {
     categorie: 'Message',
     action: 'Partage',
     nom: 'Offre'
+  },
+  [Evenement.Code.MESSAGE_SESSION_MILO_PARTAGE]: {
+    categorie: 'Message',
+    action: 'Partage',
+    nom: 'Session Milo'
   },
   [Evenement.Code.RDV_CREE]: { categorie: 'Rendez-vous', action: 'Création' },
   [Evenement.Code.RDV_MODIFIE]: {
