@@ -4,16 +4,16 @@ import {
   GetJeunesByStructureMiloQuery,
   GetJeunesByStructureMiloQueryHandler,
   GetJeunesByStructureMiloQueryModel
-} from '../../../application/queries/milo/get-jeunes-by-structure-milo.query.handler.db'
-import { JeuneQueryModel } from '../../../application/queries/query-models/jeunes.query-model'
-import { Authentification } from '../../../domain/authentification'
-import { Utilisateur } from '../../decorators/authenticated.decorator'
-import { handleFailure, handleResult } from '../result.handler'
+} from '../../application/queries/milo/get-jeunes-by-structure-milo.query.handler.db'
+import { JeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
+import { Authentification } from '../../domain/authentification'
+import { Utilisateur } from '../decorators/authenticated.decorator'
+import { handleFailure, handleResult } from './result.handler'
 import {
   ClotureAnimationCollectivePayload,
   GetJeunesStructureMiloQueryParams
 } from './validation/structures.milo.inputs'
-import { CloturerAnimationCollectiveCommandHandler } from '../../../application/commands/cloturer-animation-collective.command.handler'
+import { CloturerAnimationCollectiveCommandHandler } from '../../application/commands/cloturer-animation-collective.command.handler'
 
 @Controller('structures-milo')
 @ApiOAuth2([])

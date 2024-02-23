@@ -21,7 +21,8 @@ import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/m
 import {
   AgendaConseillerMiloSessionListItemQueryModel,
   DetailSessionConseillerMiloQueryModel,
-  SessionConseillerMiloQueryModel
+  SessionConseillerMiloQueryModel,
+  SessionsConseillerV2QueryModel
 } from 'src/application/queries/query-models/sessions.milo.query.model'
 import { isFailure, isSuccess } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
@@ -29,39 +30,38 @@ import { DateService } from 'src/utils/date-service'
 import {
   CreerJeuneMiloCommand,
   CreerJeuneMiloCommandHandler
-} from '../../../application/commands/milo/creer-jeune-milo.command.handler'
+} from '../../application/commands/milo/creer-jeune-milo.command.handler'
 import {
   EmargerSessionMiloCommand,
   EmargerSessionMiloCommandHandler
-} from '../../../application/commands/milo/emarger-session-milo.command.handler'
+} from '../../application/commands/milo/emarger-session-milo.command.handler'
 import {
   QualificationActionsMiloQueryModel,
   QualifierActionsMiloCommand,
   QualifierActionsMiloCommandHandler
-} from '../../../application/commands/milo/qualifier-actions-milo.command.handler'
-import { GetDossierMiloJeuneQueryHandler } from '../../../application/queries/get-dossier-milo-jeune.query.handler'
-import { GetJeuneMiloByDossierQueryHandler } from '../../../application/queries/get-jeune-milo-by-dossier.query.handler.db'
+} from '../../application/commands/milo/qualifier-actions-milo.command.handler'
+import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
+import { GetJeuneMiloByDossierQueryHandler } from '../../application/queries/get-jeune-milo-by-dossier.query.handler.db'
 import {
   IdentiteJeuneQueryModel,
   JeuneQueryModel
-} from '../../../application/queries/query-models/jeunes.query-model'
-import { DossierJeuneMiloQueryModel } from '../../../application/queries/query-models/milo.query-model'
-import { ErreurHttp } from '../../../building-blocks/types/domain-error'
-import {
-  AccessToken,
-  Utilisateur
-} from '../../decorators/authenticated.decorator'
-import { handleFailure, handleResult } from '../result.handler'
+} from '../../application/queries/query-models/jeunes.query-model'
+import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
+import { ErreurHttp } from '../../building-blocks/types/domain-error'
+import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
+import { handleFailure, handleResult } from './result.handler'
 import {
   EmargementsSessionMiloPayload,
   GetAgendaSessionsQueryParams,
   GetSessionsQueryParams,
+  GetSessionsV2QueryParams,
   QualifierActionsMiloPayload,
   UpdateSessionMiloPayload
 } from './validation/conseillers.milo.inputs'
-import { CreerJeuneMiloPayload } from '../validation/conseillers.inputs'
+import { CreerJeuneMiloPayload } from './validation/conseillers.inputs'
+import { GetSessionsConseillerMiloV2QueryHandler } from '../../application/queries/milo/v2/get-sessions-conseiller.milo.v2.query.handler.db'
 
-@Controller('conseillers/milo')
+@Controller()
 @ApiOAuth2([])
 @ApiTags('Conseillers Milo')
 export class ConseillersMiloController {
@@ -74,13 +74,14 @@ export class ConseillersMiloController {
     private readonly getDossierMiloJeuneQueryHandler: GetDossierMiloJeuneQueryHandler,
     private readonly getJeuneMiloByDossierQueryHandler: GetJeuneMiloByDossierQueryHandler,
     private readonly creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler,
-    private readonly qualifierActionsMiloCommandHandler: QualifierActionsMiloCommandHandler
+    private readonly qualifierActionsMiloCommandHandler: QualifierActionsMiloCommandHandler,
+    private readonly getSessionsV2QueryHandler: GetSessionsConseillerMiloV2QueryHandler
   ) {}
   @ApiOperation({
     summary: "Récupère le dossier Milo d'un jeune",
     description: 'Autorisé pour un conseiller du jeune'
   })
-  @Get('/dossiers/:idDossier')
+  @Get('conseillers/milo/dossiers/:idDossier')
   @ApiResponse({
     type: DossierJeuneMiloQueryModel
   })
@@ -110,7 +111,7 @@ export class ConseillersMiloController {
     summary: 'Récupère un jeune par son idDossier Milo',
     description: 'Autorisé pour un conseiller du jeune'
   })
-  @Get('/jeunes/:idDossier')
+  @Get('conseillers/milo/jeunes/:idDossier')
   @ApiResponse({
     type: JeuneQueryModel
   })
@@ -133,7 +134,7 @@ export class ConseillersMiloController {
     summary: 'Crée un jeune Milo',
     description: 'Autorisé pour un conseiller Milo'
   })
-  @Post('/jeunes')
+  @Post('conseillers/milo/jeunes')
   async postJeuneMilo(
     @Body() creerJeuneMiloPayload: CreerJeuneMiloPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
@@ -159,7 +160,7 @@ export class ConseillersMiloController {
     summary: 'Récupère la liste des sessions de sa structure MILO',
     description: 'Autorisé pour le conseiller Milo'
   })
-  @Get('/:idConseiller/sessions')
+  @Get('conseillers/milo/:idConseiller/sessions')
   @ApiResponse({
     type: SessionConseillerMiloQueryModel,
     isArray: true
@@ -196,7 +197,7 @@ export class ConseillersMiloController {
       'Récupère la liste des sessions de sa structure MILO auxquelles participent ses bénéficiaires',
     description: 'Autorisé pour le conseiller Milo'
   })
-  @Get('/:idConseiller/agenda/sessions')
+  @Get('conseillers/milo/:idConseiller/agenda/sessions')
   @ApiResponse({
     type: AgendaConseillerMiloSessionListItemQueryModel,
     isArray: true
@@ -228,7 +229,7 @@ export class ConseillersMiloController {
       'Récupère le détail d’une session de la structure MILO du conseiller',
     description: 'Autorisé pour le conseiller Milo'
   })
-  @Get('/:idConseiller/sessions/:idSession')
+  @Get('conseillers/milo/:idConseiller/sessions/:idSession')
   @ApiResponse({
     type: DetailSessionConseillerMiloQueryModel
   })
@@ -254,7 +255,7 @@ export class ConseillersMiloController {
       'Permet de clore une session de la structure MILO du conseiller et de faire son émargement.',
     description: 'Autorisé pour le conseiller Milo'
   })
-  @Post('/:idConseiller/sessions/:idSession/cloturer')
+  @Post('conseillers/milo/:idConseiller/sessions/:idSession/cloturer')
   async emargerSession(
     @Param('idConseiller') idConseiller: string,
     @Param('idSession') idSession: string,
@@ -285,7 +286,7 @@ export class ConseillersMiloController {
       'Modifie les informations d’une session de la structure MILO du conseiller (visibilité, inscriptions)',
     description: 'Autorisé pour le conseiller Milo'
   })
-  @Patch('/:idConseiller/sessions/:idSession')
+  @Patch('conseillers/milo/:idConseiller/sessions/:idSession')
   async updateSession(
     @Param('idConseiller') idConseiller: string,
     @Param('idSession') idSession: string,
@@ -316,7 +317,7 @@ export class ConseillersMiloController {
     summary: 'Qualifie des actions en SNP / non-SNP',
     description: 'Autorisé pour un conseiller Milo'
   })
-  @Post('actions/qualifier')
+  @Post('conseillers/milo/actions/qualifier')
   async qualifierActions(
     @Body() qualifierActionsMiloPayload: QualifierActionsMiloPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
@@ -339,5 +340,37 @@ export class ConseillersMiloController {
     )
 
     return handleResult(result)
+  }
+
+  @ApiOperation({
+    summary:
+      'Récupère la liste des sessions avec pagination de sa structure MILO',
+    description: 'Autorisé pour le conseiller Milo'
+  })
+  @Get('v2/conseillers/milo/:idConseiller/sessions')
+  @ApiResponse({
+    type: SessionConseillerMiloQueryModel,
+    isArray: true
+  })
+  async getSessionsV2(
+    @Param('idConseiller') idConseiller: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string,
+    @Query() getSessionsACloreQueryParams: GetSessionsV2QueryParams
+  ): Promise<SessionsConseillerV2QueryModel> {
+    const result = await this.getSessionsV2QueryHandler.execute(
+      {
+        idConseiller,
+        accessToken: accessToken,
+        page: getSessionsACloreQueryParams.page,
+        filtrerAClore: getSessionsACloreQueryParams.filtrerAClore
+      },
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
   }
 }

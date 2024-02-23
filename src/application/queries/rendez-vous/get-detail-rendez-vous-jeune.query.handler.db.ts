@@ -10,22 +10,22 @@ import { RendezVousAuthorizer } from '../../authorizers/rendezvous-authorizer'
 import { fromSqlToRendezVousDetailJeuneQueryModel } from '../query-mappers/rendez-vous-milo.mappers'
 import { RendezVousJeuneDetailQueryModel } from '../query-models/rendez-vous.query-model'
 
-export interface GetUnRendezVousJeuneQuery extends Query {
+export interface GetDetailRendezVousJeuneQuery extends Query {
   idRendezVous: string
   idJeune: string
 }
 
 @Injectable()
-export class GetUnRendezVousJeuneQueryHandler extends QueryHandler<
-  GetUnRendezVousJeuneQuery,
+export class GetDetailRendezVousJeuneQueryHandler extends QueryHandler<
+  GetDetailRendezVousJeuneQuery,
   Result<RendezVousJeuneDetailQueryModel>
 > {
   constructor(private rendezVousAuthorizer: RendezVousAuthorizer) {
-    super('GetUnRendezVousJeuneQueryHandlerQueryHandler')
+    super('GetDetailRendezVousJeuneQueryHandlerQueryHandler')
   }
 
   async authorize(
-    query: GetUnRendezVousJeuneQuery,
+    query: GetDetailRendezVousJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.JEUNE) {
@@ -41,7 +41,7 @@ export class GetUnRendezVousJeuneQueryHandler extends QueryHandler<
   }
 
   async handle(
-    query: GetUnRendezVousJeuneQuery,
+    query: GetDetailRendezVousJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result<RendezVousJeuneDetailQueryModel>> {
     const rendezVousSql = await RendezVousSqlModel.findByPk(
