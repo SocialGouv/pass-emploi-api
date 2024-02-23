@@ -36,18 +36,19 @@ import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-tes
 import {
   CreerJeuneMiloCommand,
   CreerJeuneMiloCommandHandler
-} from '../../../../src/application/commands/milo/creer-jeune-milo.command.handler'
+} from '../../../src/application/commands/milo/creer-jeune-milo.command.handler'
 import {
   QualifierActionsMiloCommand,
   QualifierActionsMiloCommandHandler
-} from '../../../../src/application/commands/milo/qualifier-actions-milo.command.handler'
-import { GetDossierMiloJeuneQueryHandler } from '../../../../src/application/queries/get-dossier-milo-jeune.query.handler'
-import { GetJeuneMiloByDossierQueryHandler } from '../../../../src/application/queries/get-jeune-milo-by-dossier.query.handler.db'
-import { Action } from '../../../../src/domain/action/action'
-import { QualifierActionsMiloPayload } from '../../../../src/infrastructure/routes/milo/validation/conseillers.milo.inputs'
-import { CreerJeuneMiloPayload } from '../../../../src/infrastructure/routes/validation/conseillers.inputs'
-import { unDossierMilo } from '../../../fixtures/milo.fixture'
-import { unJeuneQueryModel } from '../../../fixtures/query-models/jeunes.query-model.fixtures'
+} from '../../../src/application/commands/milo/qualifier-actions-milo.command.handler'
+import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
+import { GetJeuneMiloByDossierQueryHandler } from '../../../src/application/queries/get-jeune-milo-by-dossier.query.handler.db'
+import { Action } from '../../../src/domain/action/action'
+import { QualifierActionsMiloPayload } from '../../../src/infrastructure/routes/validation/conseillers.milo.inputs'
+import { CreerJeuneMiloPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
+import { unDossierMilo } from '../../fixtures/milo.fixture'
+import { unJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
+import { GetSessionsConseillerMiloV2QueryHandler } from '../../../src/application/queries/milo/v2/get-sessions-conseiller.milo.v2.query.handler.db'
 
 describe('ConseillersMiloController', () => {
   let getDossierMiloJeuneQueryHandler: StubbedClass<GetDossierMiloJeuneQueryHandler>
@@ -58,6 +59,7 @@ describe('ConseillersMiloController', () => {
   let getAgendaSessionsQueryHandler: StubbedClass<GetAgendaSessionsConseillerMiloQueryHandler>
   let updateSessionCommandHandler: StubbedClass<UpdateSessionMiloCommandHandler>
   let qualifierActionsMiloCommandHandler: StubbedClass<QualifierActionsMiloCommandHandler>
+  let getSessionsV2QueryHandler: StubbedClass<GetSessionsConseillerMiloV2QueryHandler>
 
   let app: INestApplication
 
@@ -80,6 +82,7 @@ describe('ConseillersMiloController', () => {
     qualifierActionsMiloCommandHandler = app.get(
       QualifierActionsMiloCommandHandler
     )
+    getSessionsV2QueryHandler = app.get(GetSessionsConseillerMiloV2QueryHandler)
   })
 
   describe('GET /conseillers/milo/dossiers/:idDossier', () => {
@@ -590,6 +593,61 @@ describe('ConseillersMiloController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'post',
       '/conseillers/milo/actions/qualifier'
+    )
+  })
+
+  describe('GET /v2/conseillers/milo/:idConseiller/sessions', () => {
+    describe('quand le conseiller a une structure milo renseignée', () => {
+      it('renvoie une 200', async () => {
+        // Given
+        const response = {
+          pagination: {
+            page: 1,
+            limit: 10,
+            total: 1
+          },
+          resultats: [uneSessionConseillerMiloQueryModel]
+        }
+        getSessionsV2QueryHandler.execute.resolves(success(response))
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get('/v2/conseillers/milo/id-conseiller/sessions')
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+          .expect(response)
+
+        expect(
+          getSessionsV2QueryHandler.execute
+        ).to.have.been.calledOnceWithExactly(
+          {
+            idConseiller: 'id-conseiller',
+            accessToken: 'coucou',
+            page: undefined,
+            filtrerAClore: undefined
+          },
+          unUtilisateurDecode()
+        )
+      })
+    })
+
+    describe('quand le conseiller n’a pas de structure milo renseignée', () => {
+      it('renvoie une 404', async () => {
+        // Given
+        getSessionsV2QueryHandler.execute.resolves(
+          failure(new NonTrouveError('Conseiller Milo', 'id-conseiller'))
+        )
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get('/v2/conseillers/milo/id-conseiller/sessions')
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.NOT_FOUND)
+      })
+    })
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/v2/conseillers/milo/1/sessions'
     )
   })
 })

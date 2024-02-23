@@ -9,7 +9,8 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
-  Put
+  Put,
+  Query
 } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Authentification } from '../../domain/authentification'
@@ -21,13 +22,20 @@ import {
 import {
   ActionQueryModel,
   CommentaireActionQueryModel,
+  ListeActionsV2QueryModel,
   QualificationActionQueryModel
 } from '../../application/queries/query-models/actions.query-model'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
-import { isFailure } from '../../building-blocks/types/result'
+import {
+  Result,
+  isFailure,
+  isSuccess
+} from '../../building-blocks/types/result'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import {
   AddCommentaireActionPayload,
+  CreateActionParLeJeunePayload,
+  CreateActionPayload,
   QualifierActionPayload,
   UpdateActionPayload
 } from './validation/actions.inputs'
@@ -47,25 +55,48 @@ import {
   UpdateActionCommand,
   UpdateActionCommandHandler
 } from 'src/application/commands/action/update-action.command.handler'
+import {
+  CreateActionCommandHandler,
+  CreateActionCommand
+} from '../../application/commands/action/create-action.command.handler'
+import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from '../../application/queries/action/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
+import { ResumeActionsDuJeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
+import { Action } from '../../domain/action/action'
+import { DateService } from '../../utils/date-service'
+import { GetActionsConseillerV2QueryHandler } from '../../application/queries/action/get-actions-conseiller-v2.query.handler.db'
+import { GetActionsConseillerV2QueryModel } from '../../application/queries/query-models/conseillers.query-model'
+import { GetActionsConseillerV2QueryParams } from './validation/conseillers.inputs'
+import {
+  GetActionsJeuneQueryHandler,
+  GetActionsJeuneQuery
+} from '../../application/queries/action/get-actions-jeune.query.handler.db'
+import { GetActionsByJeuneV2QueryParams } from './validation/jeunes.inputs'
+import { IdQueryModel } from '../../application/queries/query-models/common.query-models'
+import { Core } from '../../domain/core'
 
-@Controller('actions')
+@Controller()
 @ApiOAuth2([])
-@ApiTags('Actions')
+@ApiTags('Actions du CEJ pour Milo / Pass Emploi')
 export class ActionsController {
   constructor(
+    private readonly dateService: DateService,
     private readonly getDetailActionQueryHandler: GetDetailActionQueryHandler,
     private readonly updateActionCommandHandler: UpdateActionCommandHandler,
     private readonly deleteActionCommandHandler: DeleteActionCommandHandler,
     private readonly addCommentaireActionCommandHandler: AddCommentaireActionCommandHandler,
     private readonly getCommentairesActionQueryHandler: GetCommentairesActionQueryHandler,
-    private readonly qualifierActionCommandHandler: QualifierActionCommandHandler
+    private readonly qualifierActionCommandHandler: QualifierActionCommandHandler,
+    private readonly getResumeActionsDesJeunesDuConseillerQueryHandler: GetResumeActionsDesJeunesDuConseillerQueryHandlerDb,
+    private readonly createActionCommandHandler: CreateActionCommandHandler,
+    private readonly getActionsDuConseillerQueryHandler: GetActionsConseillerV2QueryHandler,
+    private readonly getActionsByJeuneQueryHandler: GetActionsJeuneQueryHandler
   ) {}
 
   @ApiOperation({
     summary: 'Récupère une action',
     description: 'Autorisé pour un jeune et son conseiller'
   })
-  @Get(':idAction')
+  @Get('actions/:idAction')
   @ApiResponse({
     type: ActionQueryModel
   })
@@ -92,7 +123,7 @@ export class ActionsController {
     summary: 'Modifie une action',
     description: 'Autorisé pour un jeune et son conseiller'
   })
-  @Put(':idAction')
+  @Put('actions/:idAction')
   async updateAction(
     @Param('idAction', new ParseUUIDPipe()) idAction: string,
     @Body() updateActionPayload: UpdateActionPayload,
@@ -131,7 +162,7 @@ export class ActionsController {
     summary: 'Supprime une action',
     description: 'Autorisé pour un jeune et son conseiller'
   })
-  @Delete(':idAction')
+  @Delete('actions/:idAction')
   @HttpCode(204)
   async deleteAction(
     @Param('idAction', new ParseUUIDPipe()) idAction: string,
@@ -152,7 +183,7 @@ export class ActionsController {
     summary: 'Ajoute un commentaire à une action',
     description: 'Autorisé pour un jeune et son conseiller'
   })
-  @Post(':idAction/commentaires')
+  @Post('actions/:idAction/commentaires')
   async addCommentaireAction(
     @Param('idAction', new ParseUUIDPipe()) idAction: string,
     @Body() addCommentaireActionPayload: AddCommentaireActionPayload,
@@ -180,7 +211,7 @@ export class ActionsController {
     summary: "Récupère les commentaires d'une action",
     description: 'Autorisé pour un jeune et son conseiller'
   })
-  @Get(':idAction/commentaires')
+  @Get('actions/:idAction/commentaires')
   async getCommentairesAction(
     @Param('idAction', new ParseUUIDPipe()) idAction: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
@@ -200,7 +231,7 @@ export class ActionsController {
     summary: 'Qualifie une action en SNP / non-SNP',
     description: 'Autorisé pour un conseiller'
   })
-  @Post(':idAction/qualifier')
+  @Post('actions/:idAction/qualifier')
   async qualifierAction(
     @Param('idAction', new ParseUUIDPipe()) idAction: string,
     @Body() qualifierActionPayload: QualifierActionPayload,
@@ -236,5 +267,177 @@ export class ActionsController {
     }
 
     return result.data
+  }
+
+  @ApiOperation({
+    summary: 'Crée une action',
+    description: 'Autorisé pour un conseiller du jeune'
+  })
+  @Post('conseillers/:idConseiller/jeunes/:idJeune/action')
+  async createAction(
+    @Param('idConseiller') idConseiller: string,
+    @Param('idJeune') idJeune: string,
+    @Body() createActionPayload: CreateActionPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<{ id: Action.Id }> {
+    const command: CreateActionCommand = {
+      contenu: createActionPayload.content,
+      idJeune,
+      idCreateur: idConseiller,
+      typeCreateur: Action.TypeCreateur.CONSEILLER,
+      commentaire: createActionPayload.comment,
+      rappel: createActionPayload.dateEcheance ? true : false,
+      dateEcheance: createActionPayload.dateEcheance
+        ? DateTime.fromISO(createActionPayload.dateEcheance, { setZone: true })
+        : this.buildDateEcheanceV1(),
+      statut: createActionPayload.status,
+      codeQualification: createActionPayload.codeQualification
+    }
+
+    const result = await this.createActionCommandHandler.execute(
+      command,
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return {
+        id: result.data
+      }
+    }
+    throw handleFailure(result)
+  }
+
+  @Post('jeunes/:idJeune/action')
+  @ApiResponse({
+    type: IdQueryModel
+  })
+  async postNouvelleAction(
+    @Param('idJeune') idJeune: string,
+    @Body() createActionPayload: CreateActionParLeJeunePayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<Core.Id> {
+    const command: CreateActionCommand = {
+      contenu: createActionPayload.content,
+      idJeune,
+      idCreateur: idJeune,
+      typeCreateur: Action.TypeCreateur.JEUNE,
+      commentaire: createActionPayload.comment,
+      statut: createActionPayload.status,
+      dateEcheance: createActionPayload.dateEcheance
+        ? DateTime.fromISO(createActionPayload.dateEcheance, { setZone: true })
+        : this.buildDateEcheanceJeuneV1(createActionPayload.status),
+      rappel: createActionPayload.dateEcheance
+        ? createActionPayload.rappel
+        : false,
+      codeQualification: createActionPayload.codeQualification
+    }
+    const result = await this.createActionCommandHandler.execute(
+      command,
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return {
+        id: result.data
+      }
+    }
+    throw handleFailure(result)
+  }
+
+  @ApiOperation({
+    summary: "Récupère les actions d'un conseiller",
+    description: 'Autorisé pour un conseiller'
+  })
+  @Get('conseillers/:idConseiller/actions')
+  async getActionsConseiller(
+    @Param('idConseiller') idConseiller: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<ResumeActionsDuJeuneQueryModel[]> {
+    return this.getResumeActionsDesJeunesDuConseillerQueryHandler.execute(
+      {
+        idConseiller
+      },
+      utilisateur
+    )
+  }
+
+  @ApiOperation({
+    summary:
+      'Récupère l’ensemble des actions des jeunes du portefeuille du conseiller',
+    description: 'Autorisé pour le conseiller'
+  })
+  @ApiResponse({
+    type: GetActionsConseillerV2QueryModel
+  })
+  @Get('v2/conseillers/:idConseiller/actions')
+  async getActionsConseillerV2(
+    @Param('idConseiller') idConseiller: string,
+    @Query()
+    getActionsConseillerV2QueryParams: GetActionsConseillerV2QueryParams,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<GetActionsConseillerV2QueryModel> {
+    const result: Result<GetActionsConseillerV2QueryModel> =
+      await this.getActionsDuConseillerQueryHandler.execute(
+        {
+          idConseiller,
+          page: getActionsConseillerV2QueryParams.page,
+          limit: getActionsConseillerV2QueryParams.limit,
+          codesCategories: getActionsConseillerV2QueryParams.codesCategories,
+          aQualifier: getActionsConseillerV2QueryParams.aQualifier,
+          tri: getActionsConseillerV2QueryParams.tri
+        },
+        utilisateur
+      )
+    if (isFailure(result)) {
+      throw handleFailure(result)
+    }
+    return result.data
+  }
+
+  @Get('v2/jeunes/:idJeune/actions')
+  @ApiResponse({
+    type: ListeActionsV2QueryModel
+  })
+  @HttpCode(HttpStatus.PARTIAL_CONTENT)
+  async getActionsJeune(
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @Query() getActionsByJeuneQueryParams: GetActionsByJeuneV2QueryParams
+  ): Promise<ListeActionsV2QueryModel> {
+    const query: GetActionsJeuneQuery = {
+      idJeune,
+      page: getActionsByJeuneQueryParams.page,
+      tri: getActionsByJeuneQueryParams.tri,
+      statuts: getActionsByJeuneQueryParams.statuts,
+      etats: getActionsByJeuneQueryParams.etats,
+      codesCategories: getActionsByJeuneQueryParams.categories
+    }
+
+    const result = await this.getActionsByJeuneQueryHandler.execute(
+      query,
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+
+    throw handleFailure(result)
+  }
+
+  private buildDateEcheanceV1(): DateTime {
+    const now = this.dateService.now().set({ second: 59, millisecond: 0 })
+    return now.plus({ months: 3 })
+  }
+
+  private buildDateEcheanceJeuneV1(statutAction?: Action.Statut): DateTime {
+    const statutsDone = [Action.Statut.ANNULEE, Action.Statut.TERMINEE]
+
+    const now = this.dateService.now().set({ second: 59, millisecond: 0 })
+
+    if (statutAction && statutsDone.includes(statutAction)) {
+      return now
+    }
+    return now.plus({ months: 3 })
   }
 }

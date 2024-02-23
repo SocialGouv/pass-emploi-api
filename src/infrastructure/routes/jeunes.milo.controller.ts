@@ -8,13 +8,10 @@ import {
 
 import { isSuccess, Result } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import {
-  AccessToken,
-  Utilisateur
-} from '../../decorators/authenticated.decorator'
-import { handleFailure } from '../result.handler'
+import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
+import { handleFailure } from './result.handler'
 
-import { MaintenantQueryParams } from '../validation/jeunes.inputs'
+import { MaintenantQueryParams } from './validation/jeunes.inputs'
 import {
   DetailSessionJeuneMiloQueryModel,
   SessionJeuneMiloQueryModel
@@ -25,8 +22,8 @@ import {
   GetSessionsJeunesQueryParams,
   GetMonSuiviQueryParams
 } from './validation/jeunes.milo.inputs'
-import { DateService } from '../../../utils/date-service'
-import { GetMonSuiviQueryHandler } from '../../../application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
+import { DateService } from '../../utils/date-service'
+import { GetMonSuiviQueryHandler } from '../../application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
 import { DateTime } from 'luxon'
 
 @Controller('jeunes')

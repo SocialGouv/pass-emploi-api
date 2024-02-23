@@ -29,7 +29,7 @@ import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/m
 import {
   GetMonSuiviQuery,
   GetMonSuiviQueryHandler
-} from '../../../../src/application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
+} from '../../../src/application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
 import { DateTime } from 'luxon'
 
 describe('JeunesMiloController', () => {

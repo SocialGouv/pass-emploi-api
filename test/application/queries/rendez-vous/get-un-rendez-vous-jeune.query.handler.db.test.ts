@@ -1,9 +1,9 @@
 import { RendezVousAuthorizer } from '../../../../src/application/authorizers/rendezvous-authorizer'
 import { RendezVousJeuneDetailQueryModel } from '../../../../src/application/queries/query-models/rendez-vous.query-model'
 import {
-  GetUnRendezVousJeuneQuery,
-  GetUnRendezVousJeuneQueryHandler
-} from '../../../../src/application/queries/rendez-vous/get-un-rendez-vous-jeune.query.handler.db'
+  GetDetailRendezVousJeuneQuery,
+  GetDetailRendezVousJeuneQueryHandler
+} from '../../../../src/application/queries/rendez-vous/get-detail-rendez-vous-jeune.query.handler.db'
 import { isSuccess } from '../../../../src/building-blocks/types/result'
 import {
   CodeTypeRendezVous,
@@ -27,7 +27,7 @@ import { StubbedClass, expect, stubClass } from '../../../utils'
 import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('GetUnRendezVousJeuneQueryHandler', () => {
-  let getUnRendezVousJeuneQueryHandler: GetUnRendezVousJeuneQueryHandler
+  let getUnRendezVousJeuneQueryHandler: GetDetailRendezVousJeuneQueryHandler
   let rendezVousAuthorizer: StubbedClass<RendezVousAuthorizer>
   const maintenant = uneDatetime()
   const utilisateurJeune = unUtilisateurJeune()
@@ -35,7 +35,7 @@ describe('GetUnRendezVousJeuneQueryHandler', () => {
   beforeEach(async () => {
     await getDatabase().cleanPG()
     rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
-    getUnRendezVousJeuneQueryHandler = new GetUnRendezVousJeuneQueryHandler(
+    getUnRendezVousJeuneQueryHandler = new GetDetailRendezVousJeuneQueryHandler(
       rendezVousAuthorizer
     )
   })
@@ -122,7 +122,7 @@ describe('GetUnRendezVousJeuneQueryHandler', () => {
     describe("quand le jeune est dans l'événement", () => {
       it("renvoie l'événement avec l'inscription", async () => {
         // Given
-        const query: GetUnRendezVousJeuneQuery = {
+        const query: GetDetailRendezVousJeuneQuery = {
           idRendezVous: idRendezVous,
           idJeune
         }
@@ -165,7 +165,7 @@ describe('GetUnRendezVousJeuneQueryHandler', () => {
     describe("quand le jeune n'est pas dans l'événement", () => {
       it("renvoie l'événement avec l'inscription à faux", async () => {
         // Given
-        const query: GetUnRendezVousJeuneQuery = {
+        const query: GetDetailRendezVousJeuneQuery = {
           idRendezVous: idAnimationCollective,
           idJeune
         }

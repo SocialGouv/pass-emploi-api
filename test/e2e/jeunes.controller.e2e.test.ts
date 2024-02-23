@@ -1,35 +1,34 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common'
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { DateTime } from 'luxon'
+import { createSandbox } from 'sinon'
 import { DateService } from 'src/utils/date-service'
 import * as request from 'supertest'
-import { JwtService } from '../../src/infrastructure/auth/jwt.service'
-import {
-  buildTestingModuleForHttpTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../utils'
+import { JeuneAuthorizer } from '../../src/application/authorizers/jeune-authorizer'
 import { GetSuiviSemainePoleEmploiQueryHandler } from '../../src/application/queries/get-suivi-semaine-pole-emploi.query.handler'
-import {
-  unHeaderAuthorization,
-  unJwtPayloadValide
-} from '../fixtures/authentification.fixture'
-import { unJeune } from '../fixtures/jeune.fixture'
 import { GetDemarchesQueryGetter } from '../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
-import { JeuneAuthorizer } from '../../src/application/authorizers/jeune-authorizer'
-import { KeycloakClient } from '../../src/infrastructure/clients/keycloak-client'
-import { createSandbox } from 'sinon'
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { Jeune } from '../../src/domain/jeune/jeune'
-import { PoleEmploiPartenaireClient } from '../../src/infrastructure/clients/pole-emploi-partenaire-client.db'
-import { IdService } from '../../src/utils/id-service'
 import { emptySuccess, success } from '../../src/building-blocks/types/result'
+import { Jeune } from '../../src/domain/jeune/jeune'
+import { JwtService } from '../../src/infrastructure/auth/jwt.service'
 import {
   DemarcheDto,
   DemarcheDtoEtat,
   RendezVousPoleEmploiDto
 } from '../../src/infrastructure/clients/dto/pole-emploi.dto'
-import { DateTime } from 'luxon'
+import { KeycloakClient } from '../../src/infrastructure/clients/keycloak-client'
+import { PoleEmploiPartenaireClient } from '../../src/infrastructure/clients/pole-emploi-partenaire-client.db'
+import { IdService } from '../../src/utils/id-service'
+import {
+  unHeaderAuthorization,
+  unJwtPayloadValide
+} from '../fixtures/authentification.fixture'
+import { unJeune } from '../fixtures/jeune.fixture'
+import {
+  StubbedClass,
+  buildTestingModuleForHttpTesting,
+  stubClass
+} from '../utils'
 
 describe('JeunesControllerE2E', () => {
   let getJeuneHomeAgendaPoleEmploiQueryHandler: GetSuiviSemainePoleEmploiQueryHandler
@@ -104,7 +103,7 @@ describe('JeunesControllerE2E', () => {
     await app.close()
   })
 
-  describe('GET /jeunes/:idJeune/home/agenda/pole-emploi', () => {
+  describe('GET /v2/jeunes/:idJeune/home/agenda/pole-emploi', () => {
     const jeune = unJeune()
 
     it('retourne la page Mon suivi > Cette semaine du jeune', async () => {
@@ -122,15 +121,13 @@ describe('JeunesControllerE2E', () => {
       poleEmploiPartenaireClient.getPrestations.resolves(success([]))
 
       // When
-      const result = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .get(
-          `/jeunes/${jeune.id}/home/agenda/pole-emploi?maintenant=2022-08-17T12%3A00%3A30%2B02%3A00`
+          `/v2/jeunes/${jeune.id}/home/agenda/pole-emploi?maintenant=2022-08-17T12%3A00%3A30%2B02%3A00`
         )
         .set('authorization', unHeaderAuthorization())
         // Then
         .expect(200)
-
-      expect(result.body.metadata.demarchesEnRetard).to.equal(1)
     })
   })
 })

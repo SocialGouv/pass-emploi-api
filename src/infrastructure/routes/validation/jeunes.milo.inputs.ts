@@ -5,7 +5,7 @@ import {
   IsOptional
 } from 'class-validator'
 import { Transform } from 'class-transformer'
-import { transformStringToBoolean } from '../../validation/utils/transformers'
+import { transformStringToBoolean } from './utils/transformers'
 
 export class GetSessionsJeunesQueryParams {
   @IsOptional()

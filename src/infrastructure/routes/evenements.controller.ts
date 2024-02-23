@@ -10,7 +10,7 @@ import { Authentification } from '../../domain/authentification'
 
 @Controller('evenements')
 @ApiOAuth2([])
-@ApiTags('Evenements')
+@ApiTags("Evenements d'engagement")
 export class EvenementsController {
   constructor(
     private readonly createEvenementCommandHandler: CreateEvenementCommandHandler

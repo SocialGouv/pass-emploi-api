@@ -1,7 +1,5 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
-import { CreateActionCommandHandler } from 'src/application/commands/action/create-action.command.handler'
 import { DeleteConseillerCommandHandler } from 'src/application/commands/conseiller/delete-conseiller.command.handler'
-import { CreateRendezVousCommandHandler } from 'src/application/commands/create-rendez-vous.command.handler'
 import {
   ModifierConseillerCommand,
   ModifierConseillerCommandHandler
@@ -17,10 +15,8 @@ import { GetDetailConseillerQueryHandler } from 'src/application/queries/get-det
 import { GetIndicateursPourConseillerQueryHandler } from 'src/application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { GetJeunesByConseillerQueryHandler } from 'src/application/queries/get-jeunes-by-conseiller.query.handler.db'
 import { GetJeunesIdentitesQueryHandler } from 'src/application/queries/get-jeunes-identites.query.handler.db'
-import { GetAllRendezVousConseillerQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
 import {
   DroitsInsuffisants,
-  JeuneNonLieAuConseillerError,
   NonTrouveError
 } from 'src/building-blocks/types/domain-error'
 import {
@@ -28,13 +24,8 @@ import {
   failure,
   success
 } from 'src/building-blocks/types/result'
-import { Action } from 'src/domain/action/action'
-import { Qualification } from 'src/domain/action/qualification'
 import { Core } from 'src/domain/core'
-import { CodeTypeRendezVous } from 'src/domain/rendez-vous/rendez-vous'
-import { CreateActionPayload } from 'src/infrastructure/routes/validation/actions.inputs'
 import { EnvoyerNotificationsPayload } from 'src/infrastructure/routes/validation/conseillers.inputs'
-import { CreateRendezVousPayload } from 'src/infrastructure/routes/validation/rendez-vous.inputs'
 import * as request from 'supertest'
 import { uneAgence } from 'test/fixtures/agence.fixture'
 import {
@@ -42,22 +33,17 @@ import {
   unUtilisateurDecode
 } from 'test/fixtures/authentification.fixture'
 import { unConseiller } from 'test/fixtures/conseiller.fixture'
-import { uneDatetime, uneDatetimeAvecOffset } from 'test/fixtures/date.fixture'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import { detailConseillerQueryModel } from 'test/fixtures/query-models/conseiller.query-model.fixtures'
-import { unRendezVousConseillerFutursEtPassesQueryModel } from 'test/fixtures/rendez-vous.fixture'
-import { expect, StubbedClass } from 'test/utils'
+import { StubbedClass, expect } from 'test/utils'
 import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
 
 describe('ConseillersController', () => {
   let getDetailConseillerQueryHandler: StubbedClass<GetDetailConseillerQueryHandler>
   let getConseillersQueryHandler: StubbedClass<GetConseillersQueryHandler>
-  let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
   let getJeunesByConseillerQueryHandler: StubbedClass<GetJeunesByConseillerQueryHandler>
   let sendNotificationsNouveauxMessages: StubbedClass<SendNotificationsNouveauxMessagesCommandHandler>
-  let getAllRendezVousConseillerQueryHandler: StubbedClass<GetAllRendezVousConseillerQueryHandler>
-  let createRendezVousCommandHandler: StubbedClass<CreateRendezVousCommandHandler>
   let deleteConseillerCommandHandler: StubbedClass<DeleteConseillerCommandHandler>
   let modifierConseillerCommandHandler: StubbedClass<ModifierConseillerCommandHandler>
   let recupererJeunesDuConseillerCommandHandler: StubbedClass<RecupererJeunesDuConseillerCommandHandler>
@@ -67,23 +53,16 @@ describe('ConseillersController', () => {
 
   let app: INestApplication
 
-  const now = uneDatetime().set({ second: 59, millisecond: 0 })
-
   before(async () => {
     app = await getApplicationWithStubbedDependencies()
     getDetailConseillerQueryHandler = app.get(GetDetailConseillerQueryHandler)
     getConseillersQueryHandler = app.get(GetConseillersQueryHandler)
-    createActionCommandHandler = app.get(CreateActionCommandHandler)
     getJeunesByConseillerQueryHandler = app.get(
       GetJeunesByConseillerQueryHandler
     )
     sendNotificationsNouveauxMessages = app.get(
       SendNotificationsNouveauxMessagesCommandHandler
     )
-    getAllRendezVousConseillerQueryHandler = app.get(
-      GetAllRendezVousConseillerQueryHandler
-    )
-    createRendezVousCommandHandler = app.get(CreateRendezVousCommandHandler)
     deleteConseillerCommandHandler = app.get(DeleteConseillerCommandHandler)
     modifierConseillerCommandHandler = app.get(ModifierConseillerCommandHandler)
     recupererJeunesDuConseillerCommandHandler = app.get(
@@ -369,86 +348,6 @@ describe('ConseillersController', () => {
     ensureUserAuthenticationFailsIfInvalid('put', '/conseillers/2/jeunes/21')
   })
 
-  describe('POST /conseillers/:idConseiller/jeunes/:idJeune/action', () => {
-    const nowJsPlus3Mois = now.plus({ months: 3 })
-
-    it("renvoie l'id de l'action créée sans dateEcheance", async () => {
-      // Given
-      const actionPayload: CreateActionPayload = {
-        content: "Ceci est un contenu d'action",
-        comment: 'Ceci est un commentaire',
-        codeQualification: Qualification.Code.PROJET_PROFESSIONNEL,
-        status: Action.Statut.TERMINEE
-      }
-      const idAction = '15916d7e-f13a-4158-b7eb-3936aa937a0a'
-      createActionCommandHandler.execute.resolves(success(idAction))
-
-      // When - Then
-      await request(app.getHttpServer())
-        .post('/conseillers/1/jeunes/ABCDE/action')
-        .set('authorization', unHeaderAuthorization())
-        .send(actionPayload)
-        .expect(HttpStatus.CREATED)
-        .expect({ id: idAction })
-
-      expect(createActionCommandHandler.execute).to.have.been.calledWithExactly(
-        {
-          idJeune: 'ABCDE',
-          contenu: "Ceci est un contenu d'action",
-          idCreateur: '1',
-          typeCreateur: Action.TypeCreateur.CONSEILLER,
-          commentaire: 'Ceci est un commentaire',
-          dateEcheance: nowJsPlus3Mois,
-          rappel: false,
-          codeQualification: Qualification.Code.PROJET_PROFESSIONNEL,
-          statut: Action.Statut.TERMINEE
-        },
-        unUtilisateurDecode()
-      )
-    })
-
-    it("renvoie l'id de l'action créée avec dateEcheance", async () => {
-      // Given
-      const actionPayload: CreateActionPayload = {
-        content: "Ceci est un contenu d'action",
-        comment: 'Ceci est un commentaire',
-        codeQualification: Qualification.Code.CITOYENNETE,
-        dateEcheance: uneDatetimeAvecOffset().toISO(),
-        status: Action.Statut.EN_COURS
-      }
-      const idAction = '15916d7e-f13a-4158-b7eb-3936aa937a0a'
-      createActionCommandHandler.execute.resolves(success(idAction))
-
-      // When - Then
-      await request(app.getHttpServer())
-        .post('/conseillers/1/jeunes/ABCDE/action')
-        .set('authorization', unHeaderAuthorization())
-        .send(actionPayload)
-        .expect(HttpStatus.CREATED)
-        .expect({ id: idAction })
-
-      expect(createActionCommandHandler.execute).to.have.been.calledWithExactly(
-        {
-          idJeune: 'ABCDE',
-          contenu: "Ceci est un contenu d'action",
-          idCreateur: '1',
-          typeCreateur: Action.TypeCreateur.CONSEILLER,
-          commentaire: 'Ceci est un commentaire',
-          dateEcheance: uneDatetimeAvecOffset(),
-          rappel: true,
-          codeQualification: Qualification.Code.CITOYENNETE,
-          statut: Action.Statut.EN_COURS
-        },
-        unUtilisateurDecode()
-      )
-    })
-
-    ensureUserAuthenticationFailsIfInvalid(
-      'post',
-      '/conseillers/1/jeunes/ABCDE/action'
-    )
-  })
-
   describe('POST /conseillers/:idConseiller/jeunes/notify-messages', () => {
     describe('quand tout va bien', () => {
       it('renvoie void', async () => {
@@ -487,358 +386,6 @@ describe('ConseillersController', () => {
       'post',
       '/conseillers/1/jeunes/notify-messages'
     )
-  })
-
-  describe('GET /conseillers/:idConseiller/rendezvous', () => {
-    describe('quand le rendez-vous existe', () => {
-      it('renvoie le rendezvous', async () => {
-        // Given
-        getAllRendezVousConseillerQueryHandler.execute
-          .withArgs(
-            { idConseiller: '41', presenceConseiller: undefined },
-            unUtilisateurDecode()
-          )
-          .resolves(unRendezVousConseillerFutursEtPassesQueryModel())
-
-        // When - Then
-        await request(app.getHttpServer())
-          .get('/conseillers/41/rendezvous')
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.OK)
-          .expect(
-            JSON.stringify(unRendezVousConseillerFutursEtPassesQueryModel())
-          )
-      })
-    })
-  })
-
-  describe('POST /conseillers/:idConseiller/rendezvous', () => {
-    describe('quand le payload est bon', () => {
-      describe('quand la commande est en succes', () => {
-        beforeEach(() => {
-          createRendezVousCommandHandler.execute.resolves(success('id-rdv'))
-        })
-        it('crée le rendezvous avec jeunesIds', async () => {
-          // Given
-          const idConseiller = '41'
-          const payload: CreateRendezVousPayload = {
-            jeunesIds: ['1'],
-            comment: '',
-            date: uneDatetime().toJSDate().toISOString(),
-            duration: 30,
-            modality: 'rdv',
-            invitation: true
-          }
-
-          // When - Then
-          await request(app.getHttpServer())
-            .post(`/conseillers/${idConseiller}/rendezvous`)
-            .set('authorization', unHeaderAuthorization())
-            .send(payload)
-            .expect(HttpStatus.CREATED)
-            .expect({ id: 'id-rdv' })
-
-          expect(
-            createRendezVousCommandHandler.execute
-          ).to.have.been.calledWith(
-            {
-              idsJeunes: payload.jeunesIds,
-              commentaire: payload.comment,
-              date: payload.date,
-              duree: payload.duration,
-              modalite: payload.modality,
-              idConseiller: idConseiller,
-              type: undefined,
-              precision: undefined,
-              titre: undefined,
-              adresse: undefined,
-              organisme: undefined,
-              presenceConseiller: undefined,
-              invitation: true,
-              nombreMaxParticipants: undefined
-            },
-            unUtilisateurDecode()
-          )
-        })
-        it("crée le rendezvous sans jeunesIds quand c'est une animation collective", async () => {
-          // Given
-          const idConseiller = '41'
-          const payload: CreateRendezVousPayload = {
-            jeunesIds: [],
-            comment: '',
-            titre: 'aa',
-            date: uneDatetime().toJSDate().toISOString(),
-            duration: 30,
-            modality: 'rdv',
-            invitation: true,
-            type: CodeTypeRendezVous.INFORMATION_COLLECTIVE
-          }
-
-          // When - Then
-          await request(app.getHttpServer())
-            .post(`/conseillers/${idConseiller}/rendezvous`)
-            .set('authorization', unHeaderAuthorization())
-            .send(payload)
-            .expect(HttpStatus.CREATED)
-            .expect({ id: 'id-rdv' })
-        })
-        it("crée le rendezvous avec jeunesIds quand c'est une animation collective", async () => {
-          // Given
-          const idConseiller = '41'
-          const payload: CreateRendezVousPayload = {
-            jeunesIds: ['1'],
-            comment: '',
-            titre: 'aa',
-            date: uneDatetime().toJSDate().toISOString(),
-            duration: 30,
-            modality: 'rdv',
-            invitation: true,
-            type: CodeTypeRendezVous.INFORMATION_COLLECTIVE
-          }
-
-          // When - Then
-          await request(app.getHttpServer())
-            .post(`/conseillers/${idConseiller}/rendezvous`)
-            .set('authorization', unHeaderAuthorization())
-            .send(payload)
-            .expect(HttpStatus.CREATED)
-            .expect({ id: 'id-rdv' })
-        })
-        it('retourne une 200 quand presenceConseiller est undefined pour le type ENTRETIEN_CONSEILLER', async () => {
-          // Given
-          const idConseiller = '41'
-          const payload: CreateRendezVousPayload = {
-            jeunesIds: ['1'],
-            comment: '',
-            date: uneDatetime().toJSDate().toISOString(),
-            duration: 30,
-            type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
-          }
-          createRendezVousCommandHandler.execute.resolves(success('id-rdv'))
-
-          // When - Then
-          await request(app.getHttpServer())
-            .post(`/conseillers/${idConseiller}/rendezvous`)
-            .set('authorization', unHeaderAuthorization())
-            .send(payload)
-            .expect(HttpStatus.CREATED)
-        })
-        it('retourne une 200 quand presenceConseiller est undefined pour le type par defaut', async () => {
-          // Given
-          const idConseiller = '41'
-          const payload: CreateRendezVousPayload = {
-            jeunesIds: ['1'],
-            comment: '',
-            date: uneDatetime().toJSDate().toISOString(),
-            duration: 30
-          }
-          createRendezVousCommandHandler.execute.resolves(success('id-rdv'))
-
-          // When - Then
-          await request(app.getHttpServer())
-            .post(`/conseillers/${idConseiller}/rendezvous`)
-            .set('authorization', unHeaderAuthorization())
-            .send(payload)
-            .expect(HttpStatus.CREATED)
-        })
-        it('retourne une 200 quand presenceConseiller est true pour le type ENTRETIEN_CONSEILLER', async () => {
-          // Given
-          const idConseiller = '41'
-          const payload: CreateRendezVousPayload = {
-            jeunesIds: ['1'],
-            comment: '',
-            date: uneDatetime().toJSDate().toISOString(),
-            duration: 30,
-            type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
-            presenceConseiller: true
-          }
-          createRendezVousCommandHandler.execute.resolves(success('id-rdv'))
-
-          // When - Then
-          await request(app.getHttpServer())
-            .post(`/conseillers/${idConseiller}/rendezvous`)
-            .set('authorization', unHeaderAuthorization())
-            .send(payload)
-            .expect(HttpStatus.CREATED)
-        })
-        it('retourne une 200 quand presenceConseiller est true pour le type par defaut', async () => {
-          // Given
-          const idConseiller = '41'
-          const payload: CreateRendezVousPayload = {
-            jeunesIds: ['1'],
-            comment: '',
-            date: uneDatetime().toJSDate().toISOString(),
-            duration: 30,
-            presenceConseiller: true
-          }
-          createRendezVousCommandHandler.execute.resolves(success('id-rdv'))
-
-          // When - Then
-          await request(app.getHttpServer())
-            .post(`/conseillers/${idConseiller}/rendezvous`)
-            .set('authorization', unHeaderAuthorization())
-            .send(payload)
-            .expect(HttpStatus.CREATED)
-        })
-        it('retourne une 201 quand le champ precision est rempli', async () => {
-          // Given
-          const idConseiller = '41'
-          const payload: CreateRendezVousPayload = {
-            jeunesIds: ['1'],
-            comment: '',
-            date: uneDatetime().toJSDate().toISOString(),
-            duration: 30,
-            type: CodeTypeRendezVous.AUTRE,
-            precision: 'aa'
-          }
-          createRendezVousCommandHandler.execute.resolves(success('id-rdv'))
-
-          // When - Then
-          await request(app.getHttpServer())
-            .post(`/conseillers/${idConseiller}/rendezvous`)
-            .set('authorization', unHeaderAuthorization())
-            .send(payload)
-            .expect(HttpStatus.CREATED)
-            .expect({ id: 'id-rdv' })
-        })
-      })
-      describe('quand la commande est en echec', () => {
-        it('retourne une 403 quand une failure JeuneNonLieAuConseiller est renvoyée', async () => {
-          // Given
-          const idConseiller = '41'
-          const payload: CreateRendezVousPayload = {
-            jeunesIds: ['1'],
-            comment: '',
-            date: uneDatetime().toJSDate().toISOString(),
-            duration: 30,
-            modality: 'rdv',
-            invitation: true
-          }
-          createRendezVousCommandHandler.execute.resolves(
-            failure(new JeuneNonLieAuConseillerError('41', '1'))
-          )
-
-          // When - Then
-          await request(app.getHttpServer())
-            .post(`/conseillers/${idConseiller}/rendezvous`)
-            .set('authorization', unHeaderAuthorization())
-            .send(payload)
-            .expect(HttpStatus.FORBIDDEN)
-        })
-      })
-    })
-    describe("quand le payload n'est pas bon", () => {
-      it('retourne une 400 les jeunes sont vide pour une rdv autre que animation collective', async () => {
-        // Given
-        const idConseiller = '41'
-        const payload: CreateRendezVousPayload = {
-          jeunesIds: [],
-          comment: '',
-          titre: 'aa',
-          date: uneDatetime().toJSDate().toISOString(),
-          duration: 30,
-          modality: 'rdv',
-          invitation: true
-        }
-
-        // When - Then
-        await request(app.getHttpServer())
-          .post(`/conseillers/${idConseiller}/rendezvous`)
-          .set('authorization', unHeaderAuthorization())
-          .send(payload)
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-      it("retourne une 400 quand la date n'est pas une dateString", async () => {
-        // Given
-        const idConseiller = '41'
-        const payload: CreateRendezVousPayload = {
-          jeunesIds: ['1'],
-          comment: '',
-          date: '',
-          duration: 30
-        }
-
-        // When - Then
-        await request(app.getHttpServer())
-          .post(`/conseillers/${idConseiller}/rendezvous`)
-          .set('authorization', unHeaderAuthorization())
-          .send(payload)
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-      it("retourne une 400 quand le type n'est pas bon", async () => {
-        // Given
-        const idConseiller = '41'
-        const payload: CreateRendezVousPayload = {
-          jeunesIds: ['1'],
-          comment: '',
-          date: uneDatetime().toJSDate().toISOString(),
-          duration: 30,
-          type: 'blabla'
-        }
-
-        // When - Then
-        await request(app.getHttpServer())
-          .post(`/conseillers/${idConseiller}/rendezvous`)
-          .set('authorization', unHeaderAuthorization())
-          .send(payload)
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-      it('retourne une 400 quand presenceConseiller est false pour le type ENTRETIEN_CONSEILLER', async () => {
-        // Given
-        const idConseiller = '41'
-        const payload: CreateRendezVousPayload = {
-          jeunesIds: ['1'],
-          comment: '',
-          date: uneDatetime().toJSDate().toISOString(),
-          duration: 30,
-          type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
-          presenceConseiller: false
-        }
-
-        // When - Then
-        await request(app.getHttpServer())
-          .post(`/conseillers/${idConseiller}/rendezvous`)
-          .set('authorization', unHeaderAuthorization())
-          .send(payload)
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-      it('retourne une 400 quand presenceConseiller est false pour le type par defaut', async () => {
-        // Given
-        const idConseiller = '41'
-        const payload: CreateRendezVousPayload = {
-          jeunesIds: ['1'],
-          comment: '',
-          date: uneDatetime().toJSDate().toISOString(),
-          duration: 30,
-          presenceConseiller: false
-        }
-
-        // When - Then
-        await request(app.getHttpServer())
-          .post(`/conseillers/${idConseiller}/rendezvous`)
-          .set('authorization', unHeaderAuthorization())
-          .send(payload)
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-      it("retourne une 400 quand le champ precision n'est pas rempli", async () => {
-        // Given
-        const idConseiller = '41'
-        const payload: CreateRendezVousPayload = {
-          jeunesIds: ['1'],
-          comment: '',
-          date: uneDatetime().toJSDate().toISOString(),
-          duration: 30,
-          type: CodeTypeRendezVous.AUTRE
-        }
-
-        // When - Then
-        await request(app.getHttpServer())
-          .post(`/conseillers/${idConseiller}/rendezvous`)
-          .set('authorization', unHeaderAuthorization())
-          .send(payload)
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-    })
   })
 
   describe('PUT /conseillers/{idConseiller}', () => {
@@ -1032,7 +579,7 @@ describe('ConseillersController', () => {
   })
 
   describe('GET /conseillers/{idConseiller}/jeunes/identites&ids', () => {
-    it('récupère l’identité des jeunes du conseiller', async () => {
+    it("récupère l'identité des jeunes du conseiller", async () => {
       // Given
       const idConseiller = 'idConseiller'
       const idsJeunes = ['id-jeune-1', 'id-jeune-2']
