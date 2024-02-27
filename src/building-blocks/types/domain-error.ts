@@ -99,16 +99,6 @@ export class RessourceIndisponibleError implements DomainError {
   }
 }
 
-export class FavoriNonTrouveError implements DomainError {
-  static CODE = 'FAVORI_NON_TROUVE'
-  readonly code: string = FavoriNonTrouveError.CODE
-  readonly message: string
-
-  constructor(idJeune: string, idOffre: string) {
-    this.message = `Le Favori du jeune ${idJeune} correspondant à l'offre ${idOffre} n'existe pas`
-  }
-}
-
 export class FavoriExisteDejaError implements DomainError {
   static CODE = 'EXISTE_DEJA'
   readonly code: string = FavoriExisteDejaError.CODE

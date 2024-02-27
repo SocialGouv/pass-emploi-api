@@ -43,10 +43,10 @@ import {
   HistoriqueConseillerJeuneQueryModel,
   PreferencesJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-model'
-import { Result, isFailure, isSuccess } from 'src/building-blocks/types/result'
+import { Result } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './result.handler'
+import { handleResult } from './result.handler'
 import {
   ArchiverJeunePayload,
   MaintenantQueryParams,
@@ -88,10 +88,7 @@ export class JeunesController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @Get(':idJeune/conseillers')
@@ -109,10 +106,8 @@ export class JeunesController {
       },
       utilisateur
     )
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+
+    return handleResult(result)
   }
 
   @ApiHeader({
@@ -149,7 +144,7 @@ export class JeunesController {
         utilisateur
       )
 
-    handleFailure(result)
+    return handleResult(result)
   }
 
   @Get(':idJeune/home/actions')
@@ -185,11 +180,7 @@ export class JeunesController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      throw handleFailure(result)
-    }
-
-    return result.data
+    return handleResult(result)
   }
 
   @Post('transferer')
@@ -210,7 +201,7 @@ export class JeunesController {
       utilisateur
     )
 
-    handleFailure(result)
+    return handleResult(result)
   }
 
   @Delete(':idJeune')
@@ -245,7 +236,7 @@ export class JeunesController {
         )
     }
 
-    handleFailure(result)
+    return handleResult(result)
   }
 
   @Post(':idJeune/archiver')
@@ -263,7 +254,8 @@ export class JeunesController {
       },
       utilisateur
     )
-    handleFailure(result)
+
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -283,7 +275,8 @@ export class JeunesController {
       command,
       utilisateur
     )
-    handleFailure(result)
+
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -302,10 +295,6 @@ export class JeunesController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-
-    throw handleFailure(result)
+    return handleResult(result)
   }
 }

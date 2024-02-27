@@ -2,13 +2,11 @@ import {
   Body,
   Controller,
   Get,
-  HttpException,
   Param,
   Patch,
   Post,
   Query
 } from '@nestjs/common'
-import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { DateTime } from 'luxon'
 import {
@@ -24,7 +22,6 @@ import {
   SessionConseillerMiloQueryModel,
   SessionsConseillerV2QueryModel
 } from 'src/application/queries/query-models/sessions.milo.query.model'
-import { isFailure, isSuccess } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { DateService } from 'src/utils/date-service'
 import {
@@ -47,9 +44,8 @@ import {
   JeuneQueryModel
 } from '../../application/queries/query-models/jeunes.query-model'
 import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
-import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure, handleResult } from './result.handler'
+import { handleResult } from './result.handler'
 import {
   EmargementsSessionMiloPayload,
   GetAgendaSessionsQueryParams,
@@ -94,17 +90,7 @@ export class ConseillersMiloController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      if (result.error.code === ErreurHttp.CODE) {
-        throw new HttpException(
-          result.error.message,
-          (result.error as ErreurHttp).statusCode
-        )
-      }
-      throw new RuntimeException(result.error.message)
-    }
-
-    return result.data
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -124,10 +110,7 @@ export class ConseillersMiloController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -150,10 +133,7 @@ export class ConseillersMiloController {
       command,
       utilisateur
     )
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -186,10 +166,7 @@ export class ConseillersMiloController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -218,10 +195,7 @@ export class ConseillersMiloController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -244,10 +218,7 @@ export class ConseillersMiloController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -275,10 +246,7 @@ export class ConseillersMiloController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -307,10 +275,7 @@ export class ConseillersMiloController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -368,9 +333,6 @@ export class ConseillersMiloController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 }

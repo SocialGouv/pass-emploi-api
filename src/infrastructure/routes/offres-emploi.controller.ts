@@ -12,10 +12,9 @@ import {
   OffreEmploiQueryModel,
   OffresEmploiQueryModel
 } from '../../application/queries/query-models/offres-emploi.query-model'
-import { isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './result.handler'
+import { handleResult } from './result.handler'
 import { FindOffresEmploiQueryParams } from './validation/offres-emploi.inputs'
 
 @Controller('offres-emploi')
@@ -54,10 +53,7 @@ export class OffresEmploiController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @Get(':idOffreEmploi')
@@ -74,9 +70,6 @@ export class OffresEmploiController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 }

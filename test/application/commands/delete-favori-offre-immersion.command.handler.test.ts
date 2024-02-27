@@ -1,11 +1,11 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
+import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { FavoriOffresImmersionAuthorizer } from '../../../src/application/authorizers/favori-offres-immersion-authorizer'
 import {
   DeleteFavoriOffreImmersionCommand,
   DeleteFavoriOffreImmersionCommandHandler
 } from '../../../src/application/commands/delete-favori-offre-immersion.command.handler'
-import { FavoriNonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure
@@ -80,7 +80,10 @@ describe('DeleteFavoriOffreImmersionCommandHandler', () => {
         // Then
         expect(result).to.deep.equal(
           failure(
-            new FavoriNonTrouveError(command.idJeune, command.idOffreImmersion)
+            new NonTrouveError(
+              'Favori',
+              `du jeune ${command.idJeune} correspondant à l'offre ${command.idOffreImmersion}`
+            )
           )
         )
         expect(

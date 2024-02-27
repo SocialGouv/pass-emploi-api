@@ -15,10 +15,9 @@ import {
   DiagorienteUrlsQueryModel,
   GetDiagorienteUrlsQueryHandler
 } from '../../application/queries/get-diagoriente-urls.query.handler'
-import { isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './result.handler'
+import { handleResult } from './result.handler'
 import { transformStringToBoolean } from './validation/utils/transformers'
 
 class GetDiagorienteMetiersFavorisQueryParams {
@@ -54,10 +53,7 @@ export class DiagorienteController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @Get('metiers-favoris')
@@ -78,9 +74,6 @@ export class DiagorienteController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 }

@@ -324,9 +324,11 @@ describe('RecherchesController', () => {
         .resolves(failure(new NonTrouveError('Recherche', command.idRecherche)))
 
       const expectedMessageJson = {
-        code: 'NON_TROUVE',
-        message: `Recherche ${command.idRecherche} non trouvé(e)`
+        error: 'Not Found',
+        message: 'Recherche 219e8ba5-cd88-4027-9828-55e8ca99a236 non trouvé(e)',
+        statusCode: 404
       }
+
       //When
       await request(app.getHttpServer())
         .delete(`/jeunes/${jeune.id}/recherches/${recherche.id}`)

@@ -1,3 +1,4 @@
+import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { FavoriOffresEmploiAuthorizer } from '../../../src/application/authorizers/favori-offres-emploi-authorizer'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
@@ -13,7 +14,6 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { FavoriNonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { Offre } from '../../../src/domain/offre/offre'
 
 describe('DeleteFavoriOffreEmploiCommandHandler', () => {
@@ -80,7 +80,10 @@ describe('DeleteFavoriOffreEmploiCommandHandler', () => {
         // Then
         expect(result).to.deep.equal(
           failure(
-            new FavoriNonTrouveError(command.idJeune, command.idOffreEmploi)
+            new NonTrouveError(
+              'Favori',
+              `du jeune ${command.idJeune} correspondant à l'offre ${command.idOffreEmploi}`
+            )
           )
         )
         expect(

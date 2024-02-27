@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ApiConsumes, ApiOAuth2, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { handleResult } from './result.handler'
 import {
   ChangementAgenceQueryModel,
   UpdateAgenceConseillerCommandHandler
@@ -24,10 +25,8 @@ import {
   RefreshJddCommandHandler
 } from '../../application/commands/refresh-jdd.command.handler'
 import { ArchiverJeuneSupportCommandHandler } from '../../application/commands/support/archiver-jeune-support.command.handler'
-import { isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './result.handler'
 import {
   ChangerAgenceConseillerPayload,
   RefreshJDDPayload,
@@ -66,9 +65,8 @@ export class SupportController {
       command,
       utilisateur
     )
-    if (isFailure(result)) {
-      return handleFailure(result)
-    }
+
+    return handleResult(result)
   }
 
   @Post('cej/pole-emploi')
@@ -86,9 +84,8 @@ export class SupportController {
       command,
       utilisateur
     )
-    if (isFailure(result)) {
-      return handleFailure(result)
-    }
+
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -109,10 +106,8 @@ export class SupportController {
       command,
       utilisateur
     )
-    if (isFailure(result)) {
-      throw handleFailure(result)
-    }
-    return result.data
+
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -137,7 +132,8 @@ export class SupportController {
       },
       utilisateur
     )
-    handleFailure(result)
+
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -160,7 +156,8 @@ export class SupportController {
       },
       utilisateur
     )
-    handleFailure(result)
+
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -177,7 +174,7 @@ export class SupportController {
       utilisateur
     )
 
-    handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -195,6 +192,6 @@ export class SupportController {
       utilisateur
     )
 
-    handleFailure(result)
+    return handleResult(result)
   }
 }

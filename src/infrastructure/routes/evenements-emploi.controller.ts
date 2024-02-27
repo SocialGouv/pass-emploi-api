@@ -1,9 +1,8 @@
 import { Controller, Get, Param, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { isSuccess } from '../../building-blocks/types/result'
+import { handleResult } from './result.handler'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './result.handler'
 import { FindEvenementsEmploiQueryParams } from './validation/evenements-emploi.inputs'
 import {
   EvenementsEmploiQueryModel,
@@ -52,10 +51,7 @@ export class EvenementsEmploiController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
   @ApiOperation({
     summary: 'Récupère un évènement emploi par son id',
@@ -74,9 +70,6 @@ export class EvenementsEmploiController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 }

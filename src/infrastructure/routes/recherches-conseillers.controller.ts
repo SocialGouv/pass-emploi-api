@@ -1,5 +1,6 @@
 import { Body, Controller, Param, Post } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { handleResult } from 'src/infrastructure/routes/result.handler'
 import {
   CreateSuggestionConseillerImmersionCommand,
   CreateSuggestionConseillerImmersionCommandHandler
@@ -12,10 +13,8 @@ import {
   CreateSuggestionConseillerServiceCiviqueCommand,
   CreateSuggestionConseillerServiceCiviqueCommandHandler
 } from '../../application/commands/create-suggestion-conseiller-service-civique.command.handler'
-import { isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './result.handler'
 import {
   CreateSuggestionImmersionsPayload,
   CreateSuggestionOffresEmploiPayload,
@@ -60,9 +59,8 @@ export class RecherchesConseillersController {
         command,
         utilisateur
       )
-    if (isFailure(result)) {
-      throw handleFailure(result)
-    }
+
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -92,9 +90,8 @@ export class RecherchesConseillersController {
         command,
         utilisateur
       )
-    if (isFailure(result)) {
-      throw handleFailure(result)
-    }
+
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -124,8 +121,7 @@ export class RecherchesConseillersController {
         command,
         utilisateur
       )
-    if (isFailure(result)) {
-      throw handleFailure(result)
-    }
+
+    return handleResult(result)
   }
 }

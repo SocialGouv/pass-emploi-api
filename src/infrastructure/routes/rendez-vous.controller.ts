@@ -12,9 +12,9 @@ import {
   Put,
   Query
 } from '@nestjs/common'
-import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { DateTime } from 'luxon'
+import { handleResult } from 'src/infrastructure/routes/result.handler'
 import {
   CreateRendezVousCommand,
   CreateRendezVousCommandHandler
@@ -52,15 +52,10 @@ import {
 import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { GetRendezVousJeuneQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
-import {
-  Result,
-  isFailure,
-  isSuccess
-} from '../../building-blocks/types/result'
+import { Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Core, estPoleEmploiBRSA } from '../../domain/core'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './result.handler'
 import {
   EnvoyerNotificationsPayload,
   GetRendezVousConseillerQueryParams,
@@ -110,11 +105,7 @@ export class RendezVousController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @Delete('rendezvous/:idRendezVous')
@@ -130,7 +121,8 @@ export class RendezVousController {
       command,
       utilisateur
     )
-    handleFailure(result)
+
+    return handleResult(result)
   }
 
   @Put('rendezvous/:idRendezVous')
@@ -158,10 +150,7 @@ export class RendezVousController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -205,9 +194,7 @@ export class RendezVousController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      throw new RuntimeException()
-    }
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -240,10 +227,7 @@ export class RendezVousController {
     const result: Result<string> =
       await this.createRendezVousCommandHandler.execute(command, utilisateur)
 
-    if (isSuccess(result)) {
-      return { id: result.data }
-    }
-    throw handleFailure(result)
+    return handleResult(result, id => ({ id }))
   }
 
   @ApiOperation({
@@ -276,11 +260,7 @@ export class RendezVousController {
         utilisateur
       )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @Get('jeunes/:idJeune/rendezvous/:idRendezVous')
@@ -297,10 +277,7 @@ export class RendezVousController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -324,11 +301,7 @@ export class RendezVousController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @Get('jeunes/:idJeune/rendezvous')
@@ -352,17 +325,14 @@ export class RendezVousController {
           },
           utilisateur
         )
-      if (isFailure(result)) {
-        throw handleFailure(result)
-      }
 
-      if (result.data.dateDuCache) {
-        throw new InternalServerErrorException(
-          'Les données de Pôle emploi sont inaccessibles'
-        )
-      }
-
-      return result.data.queryModel
+      return handleResult(result, ({ queryModel, dateDuCache }) => {
+        if (dateDuCache)
+          throw new InternalServerErrorException(
+            'Les données de Pôle emploi sont inaccessibles'
+          )
+        return queryModel
+      })
     } else {
       const result = await this.getRendezVousJeuneQueryHandler.execute(
         {
@@ -371,10 +341,7 @@ export class RendezVousController {
         },
         utilisateur
       )
-      if (isSuccess(result)) {
-        return result.data
-      }
-      throw handleFailure(result)
+      return handleResult(result)
     }
   }
 
@@ -398,13 +365,11 @@ export class RendezVousController {
           },
           utilisateur
         )
-      if (isFailure(result)) {
-        throw handleFailure(result)
-      }
-      return {
-        resultat: result.data.queryModel,
-        dateDerniereMiseAJour: result.data.dateDuCache?.toJSDate()
-      }
+
+      return handleResult(result, ({ queryModel, dateDuCache }) => ({
+        resultat: queryModel,
+        dateDerniereMiseAJour: dateDuCache?.toJSDate()
+      }))
     } else {
       const result = await this.getRendezVousJeuneQueryHandler.execute(
         {
@@ -413,12 +378,8 @@ export class RendezVousController {
         },
         utilisateur
       )
-      if (isSuccess(result)) {
-        return {
-          resultat: result.data
-        }
-      }
-      throw handleFailure(result)
+
+      return handleResult(result, resultat => ({ resultat }))
     }
   }
 }

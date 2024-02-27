@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { FavoriNonTrouveError } from '../../building-blocks/types/domain-error'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import {
   Result,
   emptySuccess,
@@ -39,7 +39,10 @@ export class DeleteFavoriOffreImmersionCommandHandler extends CommandHandler<
     )
     if (!favoriOffreEmploi) {
       return failure(
-        new FavoriNonTrouveError(command.idJeune, command.idOffreImmersion)
+        new NonTrouveError(
+          'Favori',
+          `du jeune ${command.idJeune} correspondant à l'offre ${command.idOffreImmersion}`
+        )
       )
     }
     await this.offresImmersionRepository.delete(

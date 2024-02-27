@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { handleResult } from 'src/infrastructure/routes/result.handler'
 import { CloturerAnimationCollectiveCommandHandler } from '../../application/commands/cloturer-animation-collective.command.handler'
 import { GetJeunesByEtablissementQueryHandler } from '../../application/queries/get-jeunes-by-etablissement.query.handler.db'
 import { GetJeunesEtablissementV2QueryHandler } from '../../application/queries/get-jeunes-etablissement-v2.query.handler.db'
@@ -12,11 +13,9 @@ import {
 } from '../../application/queries/query-models/rendez-vous.query-model'
 import { GetAnimationsCollectivesV2QueryHandler } from '../../application/queries/rendez-vous/get-animations-collectives-v2.query.handler.db'
 import { GetAnimationsCollectivesQueryHandler } from '../../application/queries/rendez-vous/get-animations-collectives.query.handler.db'
-import { isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { DateService } from '../../utils/date-service'
 import { Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './result.handler'
 import {
   GetAnimationsCollectivesQueryParams,
   GetAnimationsCollectivesV2QueryParams,
@@ -65,11 +64,7 @@ export class EtablissementsController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -91,7 +86,7 @@ export class EtablissementsController {
       utilisateur
     )
 
-    handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -112,11 +107,7 @@ export class EtablissementsController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -144,11 +135,7 @@ export class EtablissementsController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -176,10 +163,6 @@ export class EtablissementsController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-
-    throw handleFailure(result)
+    return handleResult(result)
   }
 }

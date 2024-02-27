@@ -10,15 +10,14 @@ import {
   Put
 } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { handleResult } from './result.handler'
 import {
   CreateListeDeDiffusionCommand,
   CreateListeDeDiffusionCommandHandler
 } from '../../application/commands/create-liste-de-diffusion.command.handler'
 import { DeleteListeDeDiffusionCommandHandler } from '../../application/commands/delete-liste-de-diffusion.command.handler'
-import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './result.handler'
 import {
   CreateListeDeDiffusionPayload,
   UpdateListeDeDiffusionPayload
@@ -64,9 +63,7 @@ export class ListesDeDiffusionController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      throw handleFailure(result)
-    }
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -90,9 +87,7 @@ export class ListesDeDiffusionController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      throw handleFailure(result)
-    }
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -113,10 +108,7 @@ export class ListesDeDiffusionController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -133,10 +125,7 @@ export class ListesDeDiffusionController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -154,8 +143,6 @@ export class ListesDeDiffusionController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      handleFailure(result)
-    }
+    return handleResult(result)
   }
 }

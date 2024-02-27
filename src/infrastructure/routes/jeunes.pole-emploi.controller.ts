@@ -1,10 +1,9 @@
 import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { handleResult } from 'src/infrastructure/routes/result.handler'
 
-import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './result.handler'
 
 import { MaintenantQueryParams } from './validation/jeunes.inputs'
 import { GetAccueilJeunePoleEmploiQueryHandler } from '../../application/queries/pole-emploi/get-accueil-jeune-pole-emploi.query.handler.db'
@@ -66,10 +65,7 @@ export class JeunesPoleEmploiController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @Get('jeunes/:idJeune/pole-emploi/cv')
@@ -91,10 +87,7 @@ export class JeunesPoleEmploiController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -125,10 +118,7 @@ export class JeunesPoleEmploiController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return toDemarcheQueryModel(result.data)
-    }
-    throw handleFailure(result)
+    return handleResult(result, toDemarcheQueryModel)
   }
 
   @ApiOperation({
@@ -158,10 +148,7 @@ export class JeunesPoleEmploiController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return toDemarcheQueryModel(result.data)
-    }
-    throw handleFailure(result)
+    return handleResult(result, toDemarcheQueryModel)
   }
 
   @Get('v2/jeunes/:idJeune/home/demarches')
@@ -180,14 +167,11 @@ export class JeunesPoleEmploiController {
       },
       utilisateur
     )
-    if (isFailure(result)) {
-      throw handleFailure(result)
-    }
 
-    return {
-      resultat: result.data.queryModel,
-      dateDerniereMiseAJour: result.data.dateDuCache?.toJSDate()
-    }
+    return handleResult(result, ({ dateDuCache, queryModel }) => ({
+      resultat: queryModel,
+      dateDerniereMiseAJour: dateDuCache?.toJSDate()
+    }))
   }
 
   @Get('v2/jeunes/:idJeune/home/agenda/pole-emploi')
@@ -208,13 +192,9 @@ export class JeunesPoleEmploiController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      throw handleFailure(result)
-    }
-
-    return {
-      resultat: result.data.queryModel,
-      dateDerniereMiseAJour: result.data.dateDuCache?.toJSDate()
-    }
+    return handleResult(result, ({ dateDuCache, queryModel }) => ({
+      resultat: queryModel,
+      dateDerniereMiseAJour: dateDuCache?.toJSDate()
+    }))
   }
 }
