@@ -1,3 +1,4 @@
+import { GetTokenPoleEmploiQueryHandler } from 'src/application/queries/get-token-pole-emploi.query.handler'
 import { StubbedClass, enleverLesUndefined } from '../../utils'
 import { JwtService } from '../../../src/infrastructure/auth/jwt.service'
 import { HttpStatus, INestApplication } from '@nestjs/common'
@@ -40,6 +41,7 @@ import { uneDemarche } from '../../fixtures/demarche.fixture'
 describe('JeunesPoleEmploiController', () => {
   let getAccueilJeunePoleEmploiQueryHandler: StubbedClass<GetAccueilJeunePoleEmploiQueryHandler>
   let getCVPoleEmploiQueryHandler: StubbedClass<GetCVPoleEmploiQueryHandler>
+  let getTokenPoleEmploiQueryHandler: StubbedClass<GetTokenPoleEmploiQueryHandler>
   let getJeuneHomeAgendaPoleEmploiQueryHandler: StubbedClass<GetSuiviSemainePoleEmploiQueryHandler>
   let getJeuneHomeDemarchesQueryHandler: StubbedClass<GetJeuneHomeDemarchesQueryHandler>
   let updateStatutDemarcheCommandHandler: StubbedClass<UpdateStatutDemarcheCommandHandler>
@@ -53,6 +55,7 @@ describe('JeunesPoleEmploiController', () => {
       GetAccueilJeunePoleEmploiQueryHandler
     )
     getCVPoleEmploiQueryHandler = app.get(GetCVPoleEmploiQueryHandler)
+    getTokenPoleEmploiQueryHandler = app.get(GetTokenPoleEmploiQueryHandler)
     getJeuneHomeAgendaPoleEmploiQueryHandler = app.get(
       GetSuiviSemainePoleEmploiQueryHandler
     )
@@ -419,5 +422,25 @@ describe('JeunesPoleEmploiController', () => {
     })
 
     ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/1/demarches')
+  })
+
+  describe('GET /jeunes/:idJeune/pole-emplpoi/idp-token', () => {
+    it('renvoie le token d’identité d’un jeune', async () => {
+      // Given
+      getTokenPoleEmploiQueryHandler.execute.resolves(success('idp-token'))
+
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/id-jeune/pole-emploi/idp-token`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.OK)
+        .expect('idp-token')
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/jeunes/1/pole-emploi/idp-token'
+    )
   })
 })

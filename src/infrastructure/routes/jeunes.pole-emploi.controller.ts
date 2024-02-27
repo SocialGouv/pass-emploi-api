@@ -1,10 +1,11 @@
 import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { GetTokenPoleEmploiQueryHandler } from 'src/application/queries/get-token-pole-emploi.query.handler'
 
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './result.handler'
+import { handleFailure, handleResult } from './result.handler'
 
 import { MaintenantQueryParams } from './validation/jeunes.inputs'
 import { GetAccueilJeunePoleEmploiQueryHandler } from '../../application/queries/pole-emploi/get-accueil-jeune-pole-emploi.query.handler.db'
@@ -42,6 +43,7 @@ export class JeunesPoleEmploiController {
     private readonly getCVPoleEmploiQueryHandler: GetCVPoleEmploiQueryHandler,
     private readonly getJeuneHomeDemarchesQueryHandler: GetJeuneHomeDemarchesQueryHandler,
     private readonly getJeuneHomeAgendaPoleEmploiQueryHandler: GetSuiviSemainePoleEmploiQueryHandler,
+    private readonly getTokenPoleEmploiQueryHandler: GetTokenPoleEmploiQueryHandler,
     private readonly updateStatutDemarcheCommandHandler: UpdateStatutDemarcheCommandHandler,
     private readonly createDemarcheCommandHandler: CreateDemarcheCommandHandler
   ) {}
@@ -216,5 +218,25 @@ export class JeunesPoleEmploiController {
       resultat: result.data.queryModel,
       dateDerniereMiseAJour: result.data.dateDuCache?.toJSDate()
     }
+  }
+
+  @Get('jeunes/:idJeune/pole-emploi/idp-token')
+  @ApiOperation({
+    summary:
+      "Permet de récupérer le token d’identité d'un jeune Pôle Emploi (à échanger par exemple avec CVM)",
+    description: 'Autorisé pour un jeune Pole Emploi'
+  })
+  @ApiResponse({ type: String })
+  async getTokenPoleEmploi(
+    @Param('idJeune') idJeune: string,
+    @AccessToken() accessToken: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<string> {
+    const result = await this.getTokenPoleEmploiQueryHandler.execute(
+      { idJeune, accessToken },
+      utilisateur
+    )
+
+    return handleResult(result)
   }
 }
