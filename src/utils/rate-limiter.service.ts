@@ -60,7 +60,10 @@ export class RateLimiter {
   }
 
   async attendreLaProchaineDisponibilite(quantity = 1): Promise<void> {
-    return this.tokenBucket.removeTokens(quantity)
+    // si ça échoue on laisse quand meme la requete passer
+    try {
+      return this.tokenBucket.removeTokens(quantity)
+    } catch (_e) {}
   }
 }
 
