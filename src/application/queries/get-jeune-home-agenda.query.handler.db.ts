@@ -35,6 +35,7 @@ import { ActionQueryModel } from './query-models/actions.query-model'
 import { JeuneHomeAgendaQueryModel } from './query-models/home-jeune-suivi.query-model'
 import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
 import { SessionJeuneMiloQueryModel } from './query-models/sessions.milo.query.model'
+import estConseiller = Authentification.estConseiller
 
 export interface GetJeuneHomeAgendaQuery extends Query {
   idJeune: string
@@ -84,13 +85,19 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
     ])
 
     let sessionsMilo: SessionJeuneMiloQueryModel[] = []
+    const jeuneStructureDifferenteConseiller =
+      estConseiller(utilisateur.type) &&
+      jeuneSqlModel.idStructureMilo !==
+        jeuneSqlModel.conseiller?.idStructureMilo
     if (
       estMilo(utilisateur.structure) &&
-      sessionsMiloActives(this.configuration)
+      sessionsMiloActives(this.configuration) &&
+      !jeuneStructureDifferenteConseiller
     ) {
       if (!jeuneSqlModel.idPartenaire) {
         return failure(new JeuneMiloSansIdDossier(query.idJeune))
       }
+
       try {
         const sessionsQueryModels =
           await this.getSessionsJeuneQueryGetter.handle(

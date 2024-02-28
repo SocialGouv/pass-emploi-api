@@ -24,6 +24,7 @@ import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseill
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { AsSql } from 'src/infrastructure/sequelize/types'
 import {
   unUtilisateurConseiller,
@@ -37,6 +38,7 @@ import { uneActionDto } from 'test/fixtures/sql-models/action.sql-model'
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from 'test/fixtures/sql-models/rendez-vous.sql-model'
+import { uneStructureMiloDto } from 'test/fixtures/sql-models/structureMilo.sql-model'
 import { expect, StubbedClass, stubClass } from 'test/utils'
 import { getDatabase } from 'test/utils/database-for-testing'
 import { testConfig } from 'test/utils/module-for-testing'
@@ -264,6 +266,32 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
     })
 
     describe('sessionsMilo', () => {
+      it('renvoie un tableau vide si le jeune n’appartient pas à la même structure que son conseiller', async () => {
+        // Given
+        await StructureMiloSqlModel.bulkCreate([
+          uneStructureMiloDto({ id: 'id-structure' }),
+          uneStructureMiloDto({ id: 'id-autre-structure' })
+        ])
+        await ConseillerSqlModel.update(
+          { idStructureMilo: 'id-structure' },
+          { where: { id: jeuneDto.idConseiller } }
+        )
+        await JeuneSqlModel.update(
+          { idStructureMilo: 'id-autre-structure' },
+          { where: { id: jeuneDto.id } }
+        )
+
+        // When
+        const result = await handler.handle(
+          homeQuery,
+          unUtilisateurConseiller()
+        )
+
+        // Then
+        expect(sessionsQueryGetter.handle).not.to.have.been.called()
+        expect(isSuccess(result) && result.data.sessionsMilo).to.be.empty()
+      })
+
       it('renvoie un tableau vide si le jeune n’est inscrit à aucune session sur la période', async () => {
         // Given
         sessionsQueryGetter.handle
