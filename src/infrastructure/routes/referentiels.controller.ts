@@ -1,5 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { handleResult } from './result.handler'
 import { GetActionsPredefiniesQueryHandler } from '../../application/queries/action/get-actions-predefinies.query.handler'
 import { GetAgencesQueryHandler } from '../../application/queries/get-agences.query.handler.db'
 import {
@@ -23,11 +24,9 @@ import { MetiersRomeQueryModel } from '../../application/queries/query-models/me
 import { TypeRendezVousQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
 import { TypesDemarcheQueryModel } from '../../application/queries/query-models/types-demarche.query-model'
 import { RechercherTypesDemarcheQueryHandler } from '../../application/queries/rechercher-types-demarche.query.handler'
-import { isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { Public } from '../decorators/public.decorator'
-import { handleFailure } from './result.handler'
 import { GetAgencesQueryParams } from './validation/agences.inputs'
 import { TypesDemarchesQueryParams } from './validation/demarches.inputs'
 import { ThematiqueQueryModel } from 'src/application/queries/query-models/catalogue.query-model'
@@ -134,10 +133,8 @@ export class ReferentielsController {
     const result = await this.getMotifsSuppressionJeuneQueryHandler.execute({
       structure: utilisateur.structure
     })
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+
+    return handleResult(result)
   }
 
   @Get('qualifications-actions/types')

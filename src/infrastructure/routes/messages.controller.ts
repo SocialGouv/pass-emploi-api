@@ -1,9 +1,8 @@
 import { Body, Controller, Post } from '@nestjs/common'
 import { ApiOAuth2, ApiTags } from '@nestjs/swagger'
+import { handleResult } from './result.handler'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { Authentification } from '../../domain/authentification'
-import { isFailure } from '../../building-blocks/types/result'
-import { handleFailure } from './result.handler'
 import { EnvoyerMessageGroupeCommandHandler } from '../../application/commands/envoyer-message-groupe.command.handler'
 import { EnvoyerMessagePayload } from './validation/messages.input'
 
@@ -32,8 +31,6 @@ export class MessagesController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      return handleFailure(result)
-    }
+    return handleResult(result)
   }
 }

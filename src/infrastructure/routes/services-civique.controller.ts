@@ -1,13 +1,6 @@
-import {
-  Controller,
-  Get,
-  HttpException,
-  NotFoundException,
-  Param,
-  Query
-} from '@nestjs/common'
-import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
+import { Controller, Get, Param, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { handleResult } from 'src/infrastructure/routes/result.handler'
 import {
   GetDetailOffreServiceCiviqueQuery,
   GetDetailOffreServiceCiviqueQueryHandler
@@ -18,14 +11,8 @@ import {
   ServiceCiviqueQueryModel,
   ServicesCiviqueQueryModel
 } from '../../application/queries/query-models/service-civique.query-model'
-import {
-  ErreurHttp,
-  NonTrouveError
-} from '../../building-blocks/types/domain-error'
-import { isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './result.handler'
 import { GetServicesCiviqueQueryParams } from './validation/services-civique.inputs'
 
 @Controller()
@@ -80,20 +67,7 @@ export class ServicesCiviqueController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      if (result.error.code === NonTrouveError.CODE) {
-        throw new NotFoundException(result.error)
-      }
-      if (result.error.code === ErreurHttp.CODE) {
-        throw new HttpException(
-          result.error.message,
-          (result.error as ErreurHttp).statusCode
-        )
-      }
-      throw new RuntimeException(result.error.message)
-    }
-
-    return result.data
+    return handleResult(result)
   }
 
   private async getServicesCivique(
@@ -105,7 +79,6 @@ export class ServicesCiviqueController {
       utilisateur
     )
 
-    if (isFailure(result)) throw handleFailure(result)
-    return result.data
+    return handleResult(result)
   }
 }

@@ -8,7 +8,7 @@ import {
 import { JeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure, handleResult } from './result.handler'
+import { handleResult } from './result.handler'
 import {
   ClotureAnimationCollectivePayload,
   GetJeunesStructureMiloQueryParams
@@ -75,6 +75,6 @@ export class StructuresMiloController {
       utilisateur
     )
 
-    handleFailure(result)
+    return handleResult(result)
   }
 }

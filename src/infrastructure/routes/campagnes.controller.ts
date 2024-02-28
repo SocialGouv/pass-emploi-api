@@ -17,11 +17,10 @@ import {
   CreateEvaluationCommand,
   CreateEvaluationCommandHandler
 } from '../../application/commands/campagne/create-evaluation.command'
-import { isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './result.handler'
+import { handleResult } from './result.handler'
 import {
   CreateCampagnePayload,
   ReponseCampagnePayload
@@ -55,11 +54,7 @@ export class CampagnesController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiTags('Campagnes')
@@ -90,10 +85,6 @@ export class CampagnesController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-
-    throw handleFailure(result)
+    return handleResult(result)
   }
 }

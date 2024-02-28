@@ -14,7 +14,7 @@ import {
   ApiSecurity,
   ApiTags
 } from '@nestjs/swagger'
-import { isSuccess } from 'src/building-blocks/types/result'
+import { handleResult } from 'src/infrastructure/routes/result.handler'
 import { CreerJeunePoleEmploiCommandHandler } from '../../application/commands/pole-emploi/creer-jeune-pole-emploi.command.handler'
 import {
   SendNotificationsNouveauxMessagesExternesCommand,
@@ -25,7 +25,6 @@ import { Authentification } from '../../domain/authentification'
 import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { SkipOidcAuth } from '../decorators/skip-oidc-auth.decorator'
-import { handleFailure } from './result.handler'
 import { EnvoyerNotificationsExternePayload } from './validation/conseiller-pole-emploi.inputs'
 import { CreateJeunePoleEmploiPayload } from './validation/conseillers.inputs'
 
@@ -57,17 +56,12 @@ export class ConseillersPoleEmploiController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      const jeune = result.data
-      return {
-        id: jeune.id,
-        firstName: jeune.firstName,
-        lastName: jeune.lastName,
-        idConseiller: jeune.conseiller!.id
-      }
-    }
-
-    throw handleFailure(result)
+    return handleResult(result, jeune => ({
+      id: jeune.id,
+      firstName: jeune.firstName,
+      lastName: jeune.lastName,
+      idConseiller: jeune.conseiller!.id
+    }))
   }
 
   @ApiOperation({
@@ -106,6 +100,6 @@ export class ConseillersPoleEmploiController {
       command
     )
 
-    handleFailure(result)
+    return handleResult(result)
   }
 }

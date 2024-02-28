@@ -6,10 +6,10 @@ import {
   GetMonSuiviQueryModel
 } from 'src/application/queries/query-models/jeunes.milo.query-model'
 
-import { isSuccess, Result } from 'src/building-blocks/types/result'
+import { Result } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
+import { handleResult } from 'src/infrastructure/routes/result.handler'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './result.handler'
 
 import { MaintenantQueryParams } from './validation/jeunes.inputs'
 import {
@@ -60,10 +60,7 @@ export class JeunesMiloController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -97,10 +94,7 @@ export class JeunesMiloController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -122,10 +116,7 @@ export class JeunesMiloController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @Get('/milo/:idJeune/mon-suivi')
@@ -155,9 +146,6 @@ export class JeunesMiloController {
         },
         utilisateur
       )
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 }

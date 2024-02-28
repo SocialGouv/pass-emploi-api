@@ -4,15 +4,12 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpException,
-  HttpStatus,
-  NotFoundException,
   Param,
   Post,
   Query
 } from '@nestjs/common'
-import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { handleResult } from './result.handler'
 import {
   AddFavoriOffreEmploiCommand,
   AddFavoriOffreEmploiCommandHandler
@@ -56,12 +53,9 @@ import {
   OffreImmersionQueryModel
 } from '../../application/queries/query-models/offres-immersion.query-model'
 import { ServiceCiviqueQueryModel } from '../../application/queries/query-models/service-civique.query-model'
-import { FavoriExisteDejaError } from '../../building-blocks/types/domain-error'
-import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './result.handler'
 import {
   AddFavoriImmersionPayload,
   AddFavoriOffresEmploiPayload,
@@ -182,10 +176,7 @@ export class FavorisController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @Post('favoris/offres-emploi')
@@ -211,12 +202,7 @@ export class FavorisController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      if (result.error.code === FavoriExisteDejaError.CODE) {
-        throw new HttpException(result.error.message, HttpStatus.CONFLICT)
-      }
-      throw new RuntimeException(result.error.message)
-    }
+    return handleResult(result)
   }
 
   @Post('favoris/offres-immersion')
@@ -240,12 +226,7 @@ export class FavorisController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      if (result.error.code === FavoriExisteDejaError.CODE) {
-        throw new HttpException(result.error.message, HttpStatus.CONFLICT)
-      }
-      throw new RuntimeException(result.error.message)
-    }
+    return handleResult(result)
   }
 
   @Post('favoris/services-civique')
@@ -263,12 +244,7 @@ export class FavorisController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      if (result.error.code === FavoriExisteDejaError.CODE) {
-        throw new HttpException(result.error.message, HttpStatus.CONFLICT)
-      }
-      throw new RuntimeException(result.error.message)
-    }
+    return handleResult(result)
   }
 
   @Delete('favoris/offres-emploi/:idOffreEmploi')
@@ -286,9 +262,8 @@ export class FavorisController {
       command,
       utilisateur
     )
-    if (isFailure(result)) {
-      throw new NotFoundException(result.error)
-    }
+
+    return handleResult(result)
   }
 
   @Delete('favoris/offres-immersion/:idOffreImmersion')
@@ -307,9 +282,8 @@ export class FavorisController {
       command,
       utilisateur
     )
-    if (isFailure(result)) {
-      throw new NotFoundException(result.error)
-    }
+
+    return handleResult(result)
   }
 
   @Delete('favoris/services-civique/:idOffre')
@@ -328,8 +302,7 @@ export class FavorisController {
       command,
       utilisateur
     )
-    if (isFailure(result)) {
-      throw new NotFoundException(result.error)
-    }
+
+    return handleResult(result)
   }
 }

@@ -29,7 +29,7 @@ import {
 } from '../../../src/application/commands/delete-favori-offre-service-civique.command.handler'
 import {
   FavoriExisteDejaError,
-  FavoriNonTrouveError
+  NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
@@ -233,14 +233,20 @@ describe('FavorisController', () => {
           .withArgs(command)
           .resolves(
             failure(
-              new FavoriNonTrouveError(command.idJeune, command.idOffreEmploi)
+              new NonTrouveError(
+                'Favori',
+                `du jeune ${command.idJeune} correspondant à l'offre ${command.idOffreEmploi}`
+              )
             )
           )
 
         const expectedMessageJson = {
-          code: 'FAVORI_NON_TROUVE',
-          message: `Le Favori du jeune ${command.idJeune} correspondant à l'offre ${command.idOffreEmploi} n'existe pas`
+          error: 'Not Found',
+          message:
+            "Favori du jeune ABCDE correspondant à l'offre 123DXPM non trouvé(e)",
+          statusCode: 404
         }
+
         //When
         await request(app.getHttpServer())
           .delete(`/jeunes/${jeune.id}/favoris/offres-emploi/${offreEmploi.id}`)
@@ -367,16 +373,18 @@ describe('FavorisController', () => {
           .withArgs(command)
           .resolves(
             failure(
-              new FavoriNonTrouveError(
-                command.idJeune,
-                command.idOffreImmersion
+              new NonTrouveError(
+                'Favori',
+                `du jeune ${command.idJeune} correspondant à l'offre ${command.idOffreImmersion}`
               )
             )
           )
 
         const expectedMessageJson = {
-          code: 'FAVORI_NON_TROUVE',
-          message: `Le Favori du jeune ${command.idJeune} correspondant à l'offre ${command.idOffreImmersion} n'existe pas`
+          error: 'Not Found',
+          message:
+            "Favori du jeune ABCDE correspondant à l'offre 123ABC non trouvé(e)",
+          statusCode: 404
         }
         //When
         await request(app.getHttpServer())
@@ -496,12 +504,19 @@ describe('FavorisController', () => {
         deleteFavoriOffreEngagementCommandHandler.execute
           .withArgs(command)
           .resolves(
-            failure(new FavoriNonTrouveError(command.idJeune, command.idOffre))
+            failure(
+              new NonTrouveError(
+                'Favori',
+                `du jeune ${command.idJeune} correspondant à l'offre ${command.idOffre}`
+              )
+            )
           )
 
         const expectedMessageJson = {
-          code: 'FAVORI_NON_TROUVE',
-          message: `Le Favori du jeune ${command.idJeune} correspondant à l'offre ${command.idOffre} n'existe pas`
+          error: 'Not Found',
+          message:
+            "Favori du jeune ABCDE correspondant à l'offre unId non trouvé(e)",
+          statusCode: 404
         }
         //When
         await request(app.getHttpServer())

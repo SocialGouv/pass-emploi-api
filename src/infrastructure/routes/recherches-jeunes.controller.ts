@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   HttpCode,
-  NotFoundException,
   Param,
   ParseUUIDPipe,
   Post,
@@ -29,11 +28,10 @@ import { GetSuggestionsQueryHandler } from '../../application/queries/get-sugges
 import { toRechercheQueryModel } from '../../application/queries/query-mappers/recherche.mapper'
 import { RechercheQueryModel } from '../../application/queries/query-models/recherches.query-model'
 import { SuggestionQueryModel } from '../../application/queries/query-models/suggestion.query-model'
-import { isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Recherche } from '../../domain/offre/recherche/recherche'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './result.handler'
+import { handleResult } from './result.handler'
 import {
   CreateRechercheImmersionPayload,
   CreateRechercheOffresEmploiPayload,
@@ -146,9 +144,8 @@ export class RecherchesJeunesController {
       command,
       utilisateur
     )
-    if (isFailure(result)) {
-      throw new NotFoundException(result.error)
-    }
+
+    return handleResult(result)
   }
 
   @Get('recherches/suggestions')
@@ -205,11 +202,7 @@ export class RecherchesJeunesController {
         utilisateur
       )
 
-    if (isFailure(result)) {
-      throw handleFailure(result)
-    }
-
-    return toRechercheQueryModel(result.data)
+    return handleResult(result, toRechercheQueryModel)
   }
 
   @Post('recherches/suggestions/:idSuggestion/refuser')
@@ -227,8 +220,6 @@ export class RecherchesJeunesController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      throw handleFailure(result)
-    }
+    return handleResult(result)
   }
 }

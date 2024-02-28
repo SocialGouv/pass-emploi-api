@@ -42,11 +42,10 @@ import {
   DetailJeuneConseillerQueryModel,
   IdentiteJeuneQueryModel
 } from '../../application/queries/query-models/jeunes.query-model'
-import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
-import { handleFailure } from './result.handler'
+import { handleResult } from './result.handler'
 import {
   CreateListeDeDiffusionPayload,
   DetailConseillerPayload,
@@ -89,7 +88,8 @@ export class ConseillersController {
       },
       utilisateur
     )
-    handleFailure(result)
+
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -115,11 +115,7 @@ export class ConseillersController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -144,11 +140,7 @@ export class ConseillersController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -169,11 +161,7 @@ export class ConseillersController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -203,7 +191,8 @@ export class ConseillersController {
       },
       utilisateur
     )
-    handleFailure(result)
+
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -223,7 +212,8 @@ export class ConseillersController {
       },
       utilisateur
     )
-    handleFailure(result)
+
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -247,7 +237,8 @@ export class ConseillersController {
       },
       utilisateur
     )
-    return handleFailure(result)
+
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -282,10 +273,8 @@ export class ConseillersController {
       },
       utilisateur
     )
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -312,9 +301,7 @@ export class ConseillersController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      throw handleFailure(result)
-    }
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -336,9 +323,6 @@ export class ConseillersController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      throw handleFailure(result)
-    }
-    return result.data
+    return handleResult(result)
   }
 }

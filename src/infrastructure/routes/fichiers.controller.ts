@@ -14,6 +14,7 @@ import {
 import { HttpStatus } from '@nestjs/common/enums/http-status.enum'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ApiConsumes, ApiOAuth2, ApiTags } from '@nestjs/swagger'
+import { handleResult } from './result.handler'
 import { SupprimerFichierCommandHandler } from '../../application/commands/supprimer-fichier.command.handler'
 import { TelechargerFichierQueryHandler } from '../../application/queries/telecharger-fichier.query.handler'
 import {
@@ -21,11 +22,9 @@ import {
   TeleverserFichierCommandHandler,
   TeleverserFichierCommandOutput
 } from '../../application/commands/televerser-fichier.command.handler'
-import { isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { OidcQueryToken } from '../decorators/skip-oidc-auth.decorator'
-import { handleFailure } from './result.handler'
 import { TeleverserFichierPayload } from './validation/fichiers.inputs'
 
 @Controller('fichiers')
@@ -46,19 +45,14 @@ export class FilesController {
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<{ url: string; statusCode: number }> {
     const result = await this.telechargerFichierQueryHandler.execute(
-      {
-        idFichier
-      },
+      { idFichier },
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return {
-        url: result.data,
-        statusCode: HttpStatus.TEMPORARY_REDIRECT
-      }
-    }
-    throw handleFailure(result)
+    return handleResult(result, url => ({
+      url,
+      statusCode: HttpStatus.TEMPORARY_REDIRECT
+    }))
   }
 
   @Post()
@@ -88,10 +82,7 @@ export class FilesController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   @Delete(':idFichier')
@@ -105,9 +96,6 @@ export class FilesController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return
-    }
-    throw handleFailure(result)
+    return handleResult(result)
   }
 }

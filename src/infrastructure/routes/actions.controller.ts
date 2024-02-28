@@ -13,6 +13,7 @@ import {
   Query
 } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { handleResult } from 'src/infrastructure/routes/result.handler'
 import { Authentification } from '../../domain/authentification'
 import { DeleteActionCommandHandler } from '../../application/commands/action/delete-action.command.handler'
 import {
@@ -25,12 +26,7 @@ import {
   ListeActionsV2QueryModel,
   QualificationActionQueryModel
 } from '../../application/queries/query-models/actions.query-model'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
-import {
-  Result,
-  isFailure,
-  isSuccess
-} from '../../building-blocks/types/result'
+import { Result } from '../../building-blocks/types/result'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import {
   AddCommentaireActionPayload,
@@ -43,7 +39,6 @@ import {
   AddCommentaireActionCommand,
   AddCommentaireActionCommandHandler
 } from '../../application/commands/action/add-commentaire-action.command.handler'
-import { handleFailure } from './result.handler'
 import { GetCommentairesActionQueryHandler } from '../../application/queries/action/get-commentaires-action.query.handler.db'
 import {
   QualifierActionCommand,
@@ -147,15 +142,7 @@ export class ActionsController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      if (result.error.code === NonTrouveError.CODE) {
-        throw new HttpException(
-          `Action ${idAction} not found`,
-          HttpStatus.NOT_FOUND
-        )
-      }
-      throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST)
-    }
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -174,9 +161,8 @@ export class ActionsController {
       },
       utilisateur
     )
-    if (isFailure(result)) {
-      throw handleFailure(result)
-    }
+
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -200,11 +186,7 @@ export class ActionsController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      throw handleFailure(result)
-    }
-
-    return toCommentaireQueryModel(result.data)
+    return handleResult(result, toCommentaireQueryModel)
   }
 
   @ApiOperation({
@@ -221,10 +203,7 @@ export class ActionsController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      throw handleFailure(result)
-    }
-    return result.data
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -262,11 +241,7 @@ export class ActionsController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      throw handleFailure(result)
-    }
-
-    return result.data
+    return handleResult(result)
   }
 
   @ApiOperation({
@@ -299,12 +274,7 @@ export class ActionsController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return {
-        id: result.data
-      }
-    }
-    throw handleFailure(result)
+    return handleResult(result, id => ({ id }))
   }
 
   @Post('jeunes/:idJeune/action')
@@ -336,12 +306,7 @@ export class ActionsController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return {
-        id: result.data
-      }
-    }
-    throw handleFailure(result)
+    return handleResult(result, id => ({ id }))
   }
 
   @ApiOperation({
@@ -388,10 +353,8 @@ export class ActionsController {
         },
         utilisateur
       )
-    if (isFailure(result)) {
-      throw handleFailure(result)
-    }
-    return result.data
+
+    return handleResult(result)
   }
 
   @Get('v2/jeunes/:idJeune/actions')
@@ -418,11 +381,7 @@ export class ActionsController {
       utilisateur
     )
 
-    if (isSuccess(result)) {
-      return result.data
-    }
-
-    throw handleFailure(result)
+    return handleResult(result)
   }
 
   private buildDateEcheanceV1(): DateTime {
