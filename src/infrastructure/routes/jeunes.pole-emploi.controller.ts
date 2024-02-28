@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { handleResult } from 'src/infrastructure/routes/result.handler'
+import { GetTokenPoleEmploiQueryHandler } from 'src/application/queries/get-token-pole-emploi.query.handler'
 
 import { Authentification } from '../../domain/authentification'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
@@ -41,6 +42,7 @@ export class JeunesPoleEmploiController {
     private readonly getCVPoleEmploiQueryHandler: GetCVPoleEmploiQueryHandler,
     private readonly getJeuneHomeDemarchesQueryHandler: GetJeuneHomeDemarchesQueryHandler,
     private readonly getJeuneHomeAgendaPoleEmploiQueryHandler: GetSuiviSemainePoleEmploiQueryHandler,
+    private readonly getTokenPoleEmploiQueryHandler: GetTokenPoleEmploiQueryHandler,
     private readonly updateStatutDemarcheCommandHandler: UpdateStatutDemarcheCommandHandler,
     private readonly createDemarcheCommandHandler: CreateDemarcheCommandHandler
   ) {}
@@ -196,5 +198,25 @@ export class JeunesPoleEmploiController {
       resultat: queryModel,
       dateDerniereMiseAJour: dateDuCache?.toJSDate()
     }))
+  }
+
+  @Get('jeunes/:idJeune/pole-emploi/idp-token')
+  @ApiOperation({
+    summary:
+      "Permet de récupérer le token d’identité d'un jeune Pôle Emploi (à échanger par exemple avec CVM)",
+    description: 'Autorisé pour un jeune Pole Emploi'
+  })
+  @ApiResponse({ type: String })
+  async getTokenPoleEmploi(
+    @Param('idJeune') idJeune: string,
+    @AccessToken() accessToken: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<string> {
+    const result = await this.getTokenPoleEmploiQueryHandler.execute(
+      { idJeune, accessToken },
+      utilisateur
+    )
+
+    return handleResult(result)
   }
 }

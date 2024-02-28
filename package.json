@@ -1,13 +1,13 @@
 {
   "name": "nest-pass-emploi-api",
-  "version": "5.7.4",
+  "version": "5.8.1",
   "description": "",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
   "engines": {
     "yarn": "3.8.0",
-    "node": "20.10.0"
+    "node": "20.11.0"
   },
   "bin": {
     "vault": "./.vault/vault.cjs"

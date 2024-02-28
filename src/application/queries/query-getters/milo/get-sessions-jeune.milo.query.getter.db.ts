@@ -63,14 +63,14 @@ export class GetSessionsJeuneMiloQueryGetter {
       )
     }
     if (isFailure(resultSessionMiloClient)) {
+      this.logger.log(
+        `Sessions venant de l'API en erreur : ${resultSessionMiloClient.error}`
+      )
       return resultSessionMiloClient
     }
 
     this.logger.log(
-      `${
-        resultSessionMiloClient.data.sessions.length
-      } Sessions venant de l'API : 
-        ${JSON.stringify(resultSessionMiloClient.data.sessions)}`
+      `${resultSessionMiloClient.data.sessions.length} Sessions venant de l'API`
     )
 
     const sessionsDuJeune: SessionJeuneListeDto[] =
