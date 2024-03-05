@@ -21,18 +21,29 @@ import {
 } from '../../../src/infrastructure/clients/dto/milo.dto'
 import { initializeAPMAgent } from '../../../src/infrastructure/monitoring/apm.init'
 import { RateLimiterService } from '../../../src/utils/rate-limiter.service'
+import { DateService } from '../../../src/utils/date-service'
+import { StubbedClass, stubClass } from '../../utils'
+import { uneDatetime } from '../../fixtures/date.fixture'
 
 initializeAPMAgent()
 
 describe('MiloClient', () => {
   const configService = testConfig()
+  let dateService: StubbedClass<DateService>
   const rateLimiterService = new RateLimiterService(configService)
   let miloClient: MiloClient
   const MILO_BASE_URL = 'https://milo.com'
 
   beforeEach(() => {
     const httpService = new HttpService()
-    miloClient = new MiloClient(httpService, configService, rateLimiterService)
+    dateService = stubClass(DateService)
+    dateService.now.returns(uneDatetime())
+    miloClient = new MiloClient(
+      httpService,
+      configService,
+      rateLimiterService,
+      dateService
+    )
   })
 
   describe('getSessionsConseiller', () => {
@@ -73,7 +84,9 @@ describe('MiloClient', () => {
       const idDossier = 'idDossier'
 
       nock(MILO_BASE_URL)
-        .get(`/operateurs/sessions?idDossier=${idDossier}&taillePage=500`)
+        .get(
+          `/operateurs/sessions?idDossier=${idDossier}&taillePage=500&dateFinRecherche=2020-07-06`
+        )
         .reply(200, uneListeSessionsJeuneDto)
         .isDone()
 
@@ -114,7 +127,9 @@ describe('MiloClient', () => {
       const idDossier = 'idDossier'
 
       nock(MILO_BASE_URL)
-        .get(`/operateurs/sessions?idDossier=${idDossier}&taillePage=500`)
+        .get(
+          `/operateurs/sessions?idDossier=${idDossier}&taillePage=500&dateFinRecherche=2020-07-06`
+        )
         .reply(200, uneListeSessionsJeuneDto)
         .isDone()
 
