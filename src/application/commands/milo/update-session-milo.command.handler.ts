@@ -20,6 +20,7 @@ import { Notification } from '../../../domain/notification/notification'
 import { DateService } from '../../../utils/date-service'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import Inscription = SessionMilo.Inscription
+import { Evenement, EvenementService } from '../../../domain/evenement'
 
 export interface UpdateSessionMiloCommand extends Command {
   idSession: string
@@ -44,16 +45,22 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
     private keycloakClient: KeycloakClient,
     private dateService: DateService,
     private conseillerAuthorizer: ConseillerAuthorizer,
-    private notificationService: Notification.Service
+    private notificationService: Notification.Service,
+    private evenementService: EvenementService
   ) {
     super('UpdateSessionMiloCommandHandler')
   }
 
-  async handle(command: UpdateSessionMiloCommand): Promise<Result> {
+  async handle(
+    command: UpdateSessionMiloCommand,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<Result> {
     const conseillerMiloResult = await this.conseillerMiloRepository.get(
       command.idConseiller
     )
-    if (isFailure(conseillerMiloResult)) return conseillerMiloResult
+    if (isFailure(conseillerMiloResult)) {
+      return conseillerMiloResult
+    }
     const { structure: structureConseiller } = conseillerMiloResult.data
 
     const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
@@ -78,7 +85,9 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
       session,
       command.inscriptions ?? []
     )
-    if (isFailure(resultInscriptions)) return resultInscriptions
+    if (isFailure(resultInscriptions)) {
+      return resultInscriptions
+    }
     const inscriptionsATraiter = resultInscriptions.data
 
     const resultSave = await this.sessionMiloRepository.save(
@@ -111,6 +120,10 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
         session.id,
         jeunesANotifierInscription
       )
+      this.evenementService.creer(
+        Evenement.Code.SESSION_INSCRIPTION,
+        utilisateur
+      )
     }
 
     const jeunesANotifierDesinscription =
@@ -139,8 +152,18 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
     )
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    command: UpdateSessionMiloCommand
+  ): Promise<void> {
+    if (Authentification.estConseiller(utilisateur.type)) {
+      if (command.estVisible !== undefined) {
+        this.evenementService.creer(
+          Evenement.Code.SESSION_MODIFICATION,
+          utilisateur
+        )
+      }
+    }
   }
 }
 

@@ -30,6 +30,7 @@ import { unJeune, uneConfiguration } from '../../../fixtures/jeune.fixture'
 import { uneSessionMilo } from '../../../fixtures/sessions.fixture'
 import { stubClassSandbox } from '../../../utils/types'
 import Utilisateur = Authentification.Utilisateur
+import { EvenementService } from '../../../../src/domain/evenement'
 
 describe('UpdateSessionMiloCommandHandler', () => {
   let updateSessionMiloCommandHandler: UpdateSessionMiloCommandHandler
@@ -40,8 +41,10 @@ describe('UpdateSessionMiloCommandHandler', () => {
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let dateService: StubbedClass<DateService>
   let notificationService: StubbedClass<Notification.Service>
+  let evenementService: StubbedClass<EvenementService>
 
   const conseiller = unConseillerMilo()
+  const utilisateur: Utilisateur = unUtilisateurConseiller()
 
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()
@@ -54,6 +57,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
     notificationService = stubClassSandbox(Notification.Service, sandbox)
     notificationService.notifierInscriptionSession.resolves()
     notificationService.notifierDesinscriptionSession.resolves()
+    evenementService = stubClass(EvenementService)
     updateSessionMiloCommandHandler = new UpdateSessionMiloCommandHandler(
       conseillerMiloRepository,
       sessionMiloRepository,
@@ -61,7 +65,8 @@ describe('UpdateSessionMiloCommandHandler', () => {
       keycloakClient,
       dateService,
       conseillerAuthorizer,
-      notificationService
+      notificationService,
+      evenementService
     )
   })
 
@@ -84,7 +89,8 @@ describe('UpdateSessionMiloCommandHandler', () => {
 
       // When
       const result = await updateSessionMiloCommandHandler.handle(
-        commandSansInscription
+        commandSansInscription,
+        utilisateur
       )
 
       // Then
@@ -111,7 +117,8 @@ describe('UpdateSessionMiloCommandHandler', () => {
 
       // When
       const result = await updateSessionMiloCommandHandler.handle(
-        commandSansInscription
+        commandSansInscription,
+        utilisateur
       )
 
       // Then
@@ -142,7 +149,8 @@ describe('UpdateSessionMiloCommandHandler', () => {
 
         // When
         const result = await updateSessionMiloCommandHandler.handle(
-          commandSansInscription
+          commandSansInscription,
+          utilisateur
         )
 
         // Then
@@ -199,7 +207,10 @@ describe('UpdateSessionMiloCommandHandler', () => {
           .resolves([unJeuneANotifier])
 
         // When
-        const result = await updateSessionMiloCommandHandler.handle(command)
+        const result = await updateSessionMiloCommandHandler.handle(
+          command,
+          utilisateur
+        )
 
         // Then
         expect(result).to.deep.equal(emptySuccess())
@@ -219,6 +230,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
         expect(
           notificationService.notifierInscriptionSession
         ).to.have.been.calledOnceWithExactly(session.id, [unJeuneANotifier])
+        expect(evenementService.creer).to.have.been.calledOnce()
       })
 
       it('permet de désinscrire des jeunes de la session', async () => {
@@ -258,7 +270,10 @@ describe('UpdateSessionMiloCommandHandler', () => {
           .resolves([unJeuneHermione])
 
         // When
-        const result = await updateSessionMiloCommandHandler.handle(command)
+        const result = await updateSessionMiloCommandHandler.handle(
+          command,
+          utilisateur
+        )
 
         // Then
         expect(result).to.deep.equal(emptySuccess())
@@ -362,7 +377,10 @@ describe('UpdateSessionMiloCommandHandler', () => {
           .resolves([unJeuneHermione, unJeuneGinny])
 
         // When
-        const result = await updateSessionMiloCommandHandler.handle(command)
+        const result = await updateSessionMiloCommandHandler.handle(
+          command,
+          utilisateur
+        )
 
         // Then
         expect(result).to.deep.equal(emptySuccess())
@@ -467,7 +485,10 @@ describe('UpdateSessionMiloCommandHandler', () => {
         }
 
         // When
-        const result = await updateSessionMiloCommandHandler.handle(command)
+        const result = await updateSessionMiloCommandHandler.handle(
+          command,
+          utilisateur
+        )
 
         // Then
         expect(result).to.deep.equal(emptySuccess())
@@ -569,7 +590,8 @@ describe('UpdateSessionMiloCommandHandler', () => {
           ]
         }
         const result = await updateSessionMiloCommandHandler.handle(
-          commandAvecTropDInscrits
+          commandAvecTropDInscrits,
+          utilisateur
         )
 
         // Then
@@ -588,7 +610,6 @@ describe('UpdateSessionMiloCommandHandler', () => {
         idConseiller: conseiller.id,
         accessToken: 'token'
       }
-      const utilisateur: Utilisateur = unUtilisateurConseiller()
 
       // When
       await updateSessionMiloCommandHandler.authorize(command, utilisateur)
