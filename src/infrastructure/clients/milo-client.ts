@@ -66,7 +66,7 @@ export class MiloClient {
       page?: number
     }
   ): Promise<Result<ListeSessionsConseillerMiloDto>> {
-    const TAILLE_PAGE_LARGE = '500'
+    const TAILLE_PAGE_LARGE = '150'
     const params = new URLSearchParams()
     params.append('taillePage', TAILLE_PAGE_LARGE)
     if (options.periode && options.periode.dateDebut) {
@@ -253,7 +253,7 @@ export class MiloClient {
     apiKey: string,
     periode?: { debut?: DateTime; fin?: DateTime }
   ): Promise<Result<ListeSessionsJeuneMiloDto>> {
-    const TAILLE_PAGE_LARGE = '500'
+    const TAILLE_PAGE_LARGE = '250'
     const params = new URLSearchParams()
     params.append('idDossier', idDossier)
     params.append('taillePage', TAILLE_PAGE_LARGE)
