@@ -48,6 +48,10 @@ export namespace Evenement {
     ANIMATION_COLLECTIVE_SUPPRIMEE = 'ANIMATION_COLLECTIVE_SUPPRIMEE',
     ANIMATION_COLLECTIVE_AFFICHEE = 'ANIMATION_COLLECTIVE_AFFICHEE',
     ANIMATION_COLLECTIVE_PARTAGEE = 'ANIMATION_COLLECTIVE_PARTAGEE',
+    SESSION_AFFICHEE = 'SESSION_AFFICHEE',
+    SESSION_PARTAGEE = 'SESSION_PARTAGEE',
+    SESSION_INSCRIPTION = 'SESSION_INSCRIPTION',
+    SESSION_MODIFICATION = 'SESSION_MODIFICATION',
     EVENEMENT_EXTERNE_RECHERCHE = 'EVENEMENT_EXTERNE_RECHERCHE',
     EVENEMENT_EXTERNE_DETAIL = 'EVENEMENT_EXTERNE_DETAIL',
     EVENEMENT_EXTERNE_PARTAGE = 'EVENEMENT_EXTERNE_PARTAGE',
@@ -255,6 +259,26 @@ const evenements: {
     categorie: 'Evénement',
     action: 'Partage conseiller',
     nom: 'Animation collective'
+  },
+  [Evenement.Code.SESSION_AFFICHEE]: {
+    categorie: 'Evénement',
+    action: 'Détail',
+    nom: 'Session'
+  },
+  [Evenement.Code.SESSION_PARTAGEE]: {
+    categorie: 'Evénement',
+    action: 'Partage conseiller',
+    nom: 'Session'
+  },
+  [Evenement.Code.SESSION_INSCRIPTION]: {
+    categorie: 'Evénement',
+    action: 'Inscription',
+    nom: 'Session'
+  },
+  [Evenement.Code.SESSION_MODIFICATION]: {
+    categorie: 'Evénement',
+    action: 'Modification',
+    nom: 'Session'
   },
   [Evenement.Code.EVENEMENT_EXTERNE_RECHERCHE]: {
     categorie: 'Evénement',
