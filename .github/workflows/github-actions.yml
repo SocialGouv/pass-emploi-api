@@ -16,7 +16,7 @@ jobs:
     if: ${{ !github.event.pull_request.draft }}
     strategy:
       matrix:
-        node-version: [20.10.0]
+        node-version: [20.11.0]
     services:
       postgres:
         image: postgis/postgis:14-3.2-alpine

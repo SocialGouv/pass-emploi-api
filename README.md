@@ -1,6 +1,6 @@
 ## Lancer l'app
 ### Pré-requis <a name="pré-requis"></a>
-- Node 20.10.0
+- Node 20.11.0
 - Docker et docker compose
 - Lancer `yarn`
 ### Récupérer les variables d'environnement
