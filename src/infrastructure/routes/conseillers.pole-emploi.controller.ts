@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   HttpStatus,
-  Param,
   Post,
   SetMetadata,
   UseGuards
@@ -65,9 +64,8 @@ export class ConseillersPoleEmploiController {
   }
 
   @ApiOperation({
-    summary:
-      "Envoie une notification d'un nouveau message à des bénéficiaires du conseiller",
-    description: 'Autorisé pour un conseiller'
+    summary: "Envoie une notification d'un nouveau message à des bénéficiaires",
+    description: 'Autorisé via API KEY (pour France Travail)'
   })
   @SkipOidcAuth()
   @UseGuards(ApiKeyAuthGuard)
@@ -78,21 +76,18 @@ export class ConseillersPoleEmploiController {
   )
   @ApiResponse({
     status: HttpStatus.CREATED,
-    description:
-      'Les notifications sont envoyées aux bénéficiaires du conseiller'
+    description: 'Les notifications sont envoyées aux bénéficiaires'
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description:
       'Si au moins l’un des bénéficiaires n’est pas trouvé dans la système du CEJ (aucune notification ne sera envoyée)'
   })
-  @Post(':idAuthentificationConseiller/beneficiaires/notifier-message')
+  @Post('beneficiaires/notifier-message')
   async postNotifications(
-    @Param('idAuthentificationConseiller') idAuthentificationConseiller: string,
     @Body() envoyerNotificationsPayload: EnvoyerNotificationsExternePayload
   ): Promise<void> {
     const command: SendNotificationsNouveauxMessagesExternesCommand = {
-      idAuthentificationConseiller: idAuthentificationConseiller,
       idsAuthentificationJeunes:
         envoyerNotificationsPayload.idsAuthentificationBeneficiaires
     }

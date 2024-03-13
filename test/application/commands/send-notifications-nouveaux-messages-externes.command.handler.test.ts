@@ -1,7 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { Jeune } from 'src/domain/jeune/jeune'
 import { stubClassSandbox } from 'test/utils/types'
-import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import {
   SendNotificationsNouveauxMessagesExternesCommand,
   SendNotificationsNouveauxMessagesExternesCommandHandler
@@ -10,7 +9,7 @@ import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { failure } from '../../../src/building-blocks/types/result'
 import { Notification } from '../../../src/domain/notification/notification'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { StubbedClass, createSandbox, expect } from '../../utils'
 
 describe('SendNotificationsNouveauxMessagesExternesCommandHandler', () => {
   let sendNotificationsNouveauxMessagesCommandHandler: SendNotificationsNouveauxMessagesExternesCommandHandler
@@ -19,20 +18,17 @@ describe('SendNotificationsNouveauxMessagesExternesCommandHandler', () => {
   const jeune2 = { ...unJeune({ id: '2' }), idAuthentification: 'id-auth-2' }
   let jeuneRepository: StubbedType<Jeune.Repository>
   let notificationService: StubbedClass<Notification.Service>
-  let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
 
   beforeEach(async () => {
     const sandbox = createSandbox()
     jeuneRepository = stubInterface(sandbox)
     notificationService = stubClassSandbox(Notification.Service, sandbox)
-    conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     notificationService.notifierLesJeunesDuNouveauMessage.resolves()
 
     sendNotificationsNouveauxMessagesCommandHandler =
       new SendNotificationsNouveauxMessagesExternesCommandHandler(
         jeuneRepository,
-        notificationService,
-        conseillerAuthorizer
+        notificationService
       )
   })
 
@@ -41,16 +37,12 @@ describe('SendNotificationsNouveauxMessagesExternesCommandHandler', () => {
       it('envoie une notification de type nouveau message aux jeunes', async () => {
         // Given
         const command: SendNotificationsNouveauxMessagesExternesCommand = {
-          idsAuthentificationJeunes: ['id-auth-1', 'id-auth-2'],
-          idAuthentificationConseiller: 'id-authentification-conseiller'
+          idsAuthentificationJeunes: ['id-auth-1', 'id-auth-2']
         }
 
         const jeunes = [jeune1, jeune2]
-        jeuneRepository.findAllJeunesByIdsAuthentificationAndConseiller
-          .withArgs(
-            command.idsAuthentificationJeunes,
-            command.idAuthentificationConseiller
-          )
+        jeuneRepository.findAllJeunesByIdsAuthentification
+          .withArgs(command.idsAuthentificationJeunes)
           .resolves(jeunes)
 
         // When
@@ -71,15 +63,11 @@ describe('SendNotificationsNouveauxMessagesExternesCommandHandler', () => {
             'id-auth-1',
             'id-auth-2',
             'id-auth-inexistant'
-          ],
-          idAuthentificationConseiller: 'id-authentification-conseiller'
+          ]
         }
 
-        jeuneRepository.findAllJeunesByIdsAuthentificationAndConseiller
-          .withArgs(
-            command.idsAuthentificationJeunes,
-            command.idAuthentificationConseiller
-          )
+        jeuneRepository.findAllJeunesByIdsAuthentification
+          .withArgs(command.idsAuthentificationJeunes)
           .resolves([jeune1])
 
         // When
@@ -96,24 +84,6 @@ describe('SendNotificationsNouveauxMessagesExternesCommandHandler', () => {
           )
         )
       })
-    })
-  })
-
-  describe('authorize', () => {
-    it('autorise un conseiller à envoyer des notifications à plusieurs jeunes', async () => {
-      // Given
-      const command: SendNotificationsNouveauxMessagesExternesCommand = {
-        idsAuthentificationJeunes: ['id-auth-1', 'id-auth-2'],
-        idAuthentificationConseiller: 'id-authentification-conseiller'
-      }
-
-      // When
-      await sendNotificationsNouveauxMessagesCommandHandler.authorize(command)
-
-      // Then
-      expect(
-        conseillerAuthorizer.autoriserLeConseillerExterne
-      ).to.have.been.calledWithExactly(command.idAuthentificationConseiller)
     })
   })
 })
