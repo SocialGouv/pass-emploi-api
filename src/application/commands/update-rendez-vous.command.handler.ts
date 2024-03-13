@@ -71,7 +71,10 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     super('UpdateRendezVousCommandHandler')
   }
 
-  async handle(command: UpdateRendezVousCommand): Promise<Result<Core.Id>> {
+  async handle(
+    command: UpdateRendezVousCommand,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<Result<Core.Id>> {
     const rendezVous = await this.rendezVousRepository.get(command.idRendezVous)
     if (!rendezVous) {
       return failure(new NonTrouveError('RendezVous', command.idRendezVous))
@@ -101,7 +104,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
       this.logger,
       this.apmService
     )
-    this.notifierLesJeunes(rendezVous, rendezVousUpdated)
+    this.notifierLesJeunes(rendezVous, rendezVousUpdated, utilisateur)
     if (rendezVousUpdated.invitation) {
       this.envoyerLesInvitationsCalendaires(
         rendezVousUpdated,
@@ -142,7 +145,8 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
 
   private async notifierLesJeunes(
     rendezVous: RendezVous,
-    rendezVousUpdated: RendezVous
+    rendezVousUpdated: RendezVous,
+    utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     const jeunesAnciens: JeuneDuRendezVous[] = rendezVous.jeunes
     const idsJeunesRdvUpdated: string[] = rendezVousUpdated.jeunes.map(
@@ -185,10 +189,26 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
       nouveauRdv,
       Notification.Type.NEW_RENDEZVOUS
     )
+
+    if (
+      RendezVous.estUnTypeAnimationCollective(rendezVous.type) &&
+      jeunesAjoutes.length
+    ) {
+      this.evenementService.creer(
+        Evenement.Code.ANIMATION_COLLECTIVE_INSCRIPTION,
+        utilisateur
+      )
+    }
     if (this.doitNotifierDUneMiseAJour(rendezVous, rendezVousUpdated)) {
       this.notificationService.notifierLesJeunesDuRdv(
         rdvMisAJour,
         Notification.Type.UPDATED_RENDEZVOUS
+      )
+      this.evenementService.creer(
+        RendezVous.estUnTypeAnimationCollective(rendezVous.type)
+          ? Evenement.Code.ANIMATION_COLLECTIVE_MODIFICATION
+          : Evenement.Code.RDV_MODIFIE,
+        utilisateur
       )
     }
   }
@@ -223,6 +243,5 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
       utilisateur
     )
     await this.historiqueRendezVousRepository.save(log)
-    await this.evenementService.creer(Evenement.Code.RDV_MODIFIE, utilisateur)
   }
 }

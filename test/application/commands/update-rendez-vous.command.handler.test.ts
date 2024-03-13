@@ -10,7 +10,10 @@ import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { Notification } from '../../../src/domain/notification/notification'
 import { PlanificateurService } from '../../../src/domain/planificateur'
-import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from '../../../src/domain/rendez-vous/rendez-vous'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
@@ -36,6 +39,7 @@ describe('UpdateRendezVousCommandHandler', () => {
   let updateRendezVousCommandHandler: UpdateRendezVousCommandHandler
   const jeune = unJeune()
   const rendezVous = unRendezVous({ jeunes: [jeune] })
+  const utilisateur = unUtilisateurConseiller()
 
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()
@@ -81,7 +85,10 @@ describe('UpdateRendezVousCommandHandler', () => {
           .withArgs(command.idRendezVous)
           .resolves(undefined)
         // When
-        const result = await updateRendezVousCommandHandler.handle(command)
+        const result = await updateRendezVousCommandHandler.handle(
+          command,
+          utilisateur
+        )
         // Then
         expect(rendezVousRepository.save).to.have.callCount(0)
         expect(notificationService.notifierLesJeunesDuRdv).to.have.callCount(0)
@@ -105,7 +112,10 @@ describe('UpdateRendezVousCommandHandler', () => {
         jeuneRepository.findAll.withArgs([idJeuneNonTrouve]).resolves([])
 
         // When
-        const result = await updateRendezVousCommandHandler.handle(command)
+        const result = await updateRendezVousCommandHandler.handle(
+          command,
+          utilisateur
+        )
         // Then
         expect(rendezVousRepository.save).to.have.callCount(0)
         expect(notificationService.notifierLesJeunesDuRdv).to.have.callCount(0)
@@ -141,7 +151,10 @@ describe('UpdateRendezVousCommandHandler', () => {
           .returns(success(rendezVousUpdated))
 
         // When
-        const result = await updateRendezVousCommandHandler.handle(command)
+        const result = await updateRendezVousCommandHandler.handle(
+          command,
+          utilisateur
+        )
 
         // Then
         expect(result).to.deep.equal(success({ id: rendezVousUpdated.id }))
@@ -180,7 +193,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           .returns(success(rendezVousSansInvitation))
 
         // When
-        await updateRendezVousCommandHandler.handle(command)
+        await updateRendezVousCommandHandler.handle(command, utilisateur)
 
         // Then
         expect(mailService.envoyerMailRendezVous).not.to.have.been.called()
@@ -209,7 +222,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           .returns(success(rendezVousUpdated))
 
         // When
-        await updateRendezVousCommandHandler.handle(command)
+        await updateRendezVousCommandHandler.handle(command, utilisateur)
 
         // Then
         expect(
@@ -235,7 +248,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           .returns(success(rendezVousUpdated))
 
         // When
-        await updateRendezVousCommandHandler.handle(command)
+        await updateRendezVousCommandHandler.handle(command, utilisateur)
 
         // Then
         expect(
@@ -267,7 +280,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           .returns(success(rendezVousUpdated))
 
         // When
-        await updateRendezVousCommandHandler.handle(command)
+        await updateRendezVousCommandHandler.handle(command, utilisateur)
 
         // Then
         expect(
@@ -282,6 +295,10 @@ describe('UpdateRendezVousCommandHandler', () => {
         expect(
           planificateurService.planifierRappelsRendezVous
         ).to.have.been.calledWith(rendezVousUpdated)
+        expect(evenementService.creer).to.have.been.calledOnceWithExactly(
+          Evenement.Code.RDV_MODIFIE,
+          utilisateur
+        )
       })
       it('notifie les jeunes ajoutés de la création du rendez-vous pour leur ajout dans la liste des bénéficiaires', async () => {
         // Given
@@ -292,10 +309,12 @@ describe('UpdateRendezVousCommandHandler', () => {
         }
         const rendezVousInitial: RendezVous = {
           ...rendezVous,
+          type: CodeTypeRendezVous.ATELIER,
           jeunes: [jeune]
         }
         const rendezVousUpdated: RendezVous = {
           ...rendezVous,
+          type: CodeTypeRendezVous.ATELIER,
           jeunes: [jeune, jeuneAjoute]
         }
         rendezVousRepository.get
@@ -313,7 +332,10 @@ describe('UpdateRendezVousCommandHandler', () => {
           .returns(success(rendezVousUpdated))
 
         // When
-        await updateRendezVousCommandHandler.handle(commandAvecUnJeuneEnPlus)
+        await updateRendezVousCommandHandler.handle(
+          commandAvecUnJeuneEnPlus,
+          utilisateur
+        )
 
         // Then
         expect(
@@ -321,6 +343,10 @@ describe('UpdateRendezVousCommandHandler', () => {
         ).to.have.been.calledWith(
           { ...rendezVousUpdated, jeunes: [jeuneAjoute] },
           Notification.Type.NEW_RENDEZVOUS
+        )
+        expect(evenementService.creer).to.have.been.calledOnceWithExactly(
+          Evenement.Code.ANIMATION_COLLECTIVE_INSCRIPTION,
+          utilisateur
         )
       })
       it('notifie les jeunes supprimés de la suppression du rendez-vous pour leur retrait de la liste des bénéficiaires', async () => {
@@ -353,7 +379,10 @@ describe('UpdateRendezVousCommandHandler', () => {
           .returns(success(rendezVousUpdated))
 
         // When
-        await updateRendezVousCommandHandler.handle(commandAvecUnJeuneEnMoins)
+        await updateRendezVousCommandHandler.handle(
+          commandAvecUnJeuneEnMoins,
+          utilisateur
+        )
         // Then
         expect(
           notificationService.notifierLesJeunesDuRdv
@@ -406,15 +435,12 @@ describe('UpdateRendezVousCommandHandler', () => {
       }
     })
 
-    it("créé l'événement idoine", async () => {
+    it("ne crée pas l'événement idoine", async () => {
       // When
       await updateRendezVousCommandHandler.monitor(utilisateur, updateCommand)
 
       // Then
-      expect(evenementService.creer).to.have.been.calledWithExactly(
-        Evenement.Code.RDV_MODIFIE,
-        utilisateur
-      )
+      expect(evenementService.creer).not.to.have.been.called()
     })
 
     it('crée un log de modification de rendez-vous', async () => {

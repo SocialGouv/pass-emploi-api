@@ -45,11 +45,13 @@ export namespace Evenement {
     ACTION_QUALIFIEE_MULTIPLE_SNP = 'ACTION_QUALIFIEE_MULTIPLE_SNP',
     ACTION_QUALIFIEE_MULTIPLE_NON_SNP = 'ACTION_QUALIFIEE_MULTIPLE_NON_SNP',
     ANIMATION_COLLECTIVE_CREEE = 'ANIMATION_COLLECTIVE_CREEE',
+    ANIMATION_COLLECTIVE_INSCRIPTION = 'ANIMATION_COLLECTIVE_INSCRIPTION',
+    ANIMATION_COLLECTIVE_MODIFICATION = 'ANIMATION_COLLECTIVE_MODIFICATION',
     ANIMATION_COLLECTIVE_SUPPRIMEE = 'ANIMATION_COLLECTIVE_SUPPRIMEE',
     ANIMATION_COLLECTIVE_AFFICHEE = 'ANIMATION_COLLECTIVE_AFFICHEE',
     ANIMATION_COLLECTIVE_PARTAGEE = 'ANIMATION_COLLECTIVE_PARTAGEE',
     SESSION_AFFICHEE = 'SESSION_AFFICHEE',
-    SESSION_PARTAGEE = 'SESSION_PARTAGEE',
+    MESSAGE_SESSION_MILO_PARTAGE = 'MESSAGE_SESSION_MILO_PARTAGE',
     SESSION_INSCRIPTION = 'SESSION_INSCRIPTION',
     SESSION_MODIFICATION = 'SESSION_MODIFICATION',
     EVENEMENT_EXTERNE_RECHERCHE = 'EVENEMENT_EXTERNE_RECHERCHE',
@@ -71,7 +73,6 @@ export namespace Evenement {
     MESSAGE_ENVOYE_MULTIPLE_MANUEL_PJ = 'MESSAGE_ENVOYE_MULTIPLE_MANUEL_PJ',
     MESSAGE_ENVOYE_MULTIPLE_LISTE_PJ = 'MESSAGE_ENVOYE_MULTIPLE_LISTE_PJ',
     MESSAGE_ENVOYE_MULTIPLE_MIXTE_PJ = 'MESSAGE_ENVOYE_MULTIPLE_MIXTE_PJ',
-    MESSAGE_SESSION_MILO_PARTAGE = 'MESSAGE_SESSION_MILO_PARTAGE',
     MESSAGE_OFFRE_PARTAGEE = 'MESSAGE_OFFRE_PARTAGEE',
     OFFRE_ALTERNANCE_AFFICHEE = 'OFFRE_ALTERNANCE_AFFICHEE',
     OFFRE_ALTERNANCE_PARTAGEE = 'OFFRE_ALTERNANCE_PARTAGEE',
@@ -103,6 +104,9 @@ export namespace Evenement {
     PIECE_JOINTE_TELECHARGEE = 'PIECE_JOINTE_TELECHARGEE',
     RDV_CREE = 'RDV_CREE',
     RDV_DETAIL = 'RDV_DETAIL',
+    RDV_DETAIL_INDIVIDUEL = 'RDV_DETAIL_INDIVIDUEL',
+    RDV_DETAIL_AC = 'RDV_DETAIL_AC',
+    RDV_DETAIL_SESSION = 'RDV_DETAIL_SESSION',
     RDV_LISTE = 'RDV_LISTE',
     RDV_MODIFIE = 'RDV_MODIFIE',
     RDV_SUPPRIME = 'RDV_SUPPRIME',
@@ -245,6 +249,16 @@ const evenements: {
     action: 'Création',
     nom: 'Animation collective'
   },
+  [Evenement.Code.ANIMATION_COLLECTIVE_INSCRIPTION]: {
+    categorie: 'Rendez-vous',
+    action: 'Inscription',
+    nom: 'Animation collective'
+  },
+  [Evenement.Code.ANIMATION_COLLECTIVE_MODIFICATION]: {
+    categorie: 'Rendez-vous',
+    action: 'Modification',
+    nom: 'Animation collective'
+  },
   [Evenement.Code.ANIMATION_COLLECTIVE_SUPPRIMEE]: {
     categorie: 'Rendez-vous',
     action: 'Suppression',
@@ -265,18 +279,18 @@ const evenements: {
     action: 'Détail',
     nom: 'Session'
   },
-  [Evenement.Code.SESSION_PARTAGEE]: {
+  [Evenement.Code.MESSAGE_SESSION_MILO_PARTAGE]: {
     categorie: 'Evénement',
     action: 'Partage conseiller',
     nom: 'Session'
   },
   [Evenement.Code.SESSION_INSCRIPTION]: {
-    categorie: 'Evénement',
+    categorie: 'Rendez-vous',
     action: 'Inscription',
     nom: 'Session'
   },
   [Evenement.Code.SESSION_MODIFICATION]: {
-    categorie: 'Evénement',
+    categorie: 'Rendez-vous',
     action: 'Modification',
     nom: 'Session'
   },
@@ -473,19 +487,20 @@ const evenements: {
     action: 'Partage',
     nom: 'Offre'
   },
-  [Evenement.Code.MESSAGE_SESSION_MILO_PARTAGE]: {
-    categorie: 'Message',
-    action: 'Partage',
-    nom: 'Session Milo'
+  [Evenement.Code.RDV_CREE]: {
+    categorie: 'Rendez-vous',
+    action: 'Création',
+    nom: 'RDV individuel'
   },
-  [Evenement.Code.RDV_CREE]: { categorie: 'Rendez-vous', action: 'Création' },
   [Evenement.Code.RDV_MODIFIE]: {
     categorie: 'Rendez-vous',
-    action: 'Modification'
+    action: 'Modification',
+    nom: 'RDV individuel'
   },
   [Evenement.Code.RDV_SUPPRIME]: {
     categorie: 'Rendez-vous',
-    action: 'Suppression'
+    action: 'Suppression',
+    nom: 'RDV individuel'
   },
   [Evenement.Code.RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE]: {
     categorie: 'Recherche',
@@ -551,6 +566,21 @@ const evenements: {
     categorie: 'Rendez-vous',
     action: 'Consultation',
     nom: 'Détail'
+  },
+  [Evenement.Code.RDV_DETAIL_INDIVIDUEL]: {
+    categorie: 'Rendez-vous',
+    action: 'Consultation',
+    nom: 'RDV individuel'
+  },
+  [Evenement.Code.RDV_DETAIL_AC]: {
+    categorie: 'Rendez-vous',
+    action: 'Consultation',
+    nom: 'Animation collective'
+  },
+  [Evenement.Code.RDV_DETAIL_SESSION]: {
+    categorie: 'Rendez-vous',
+    action: 'Consultation',
+    nom: 'Session'
   },
   [Evenement.Code.PIECE_JOINTE_TELECHARGEE]: {
     categorie: 'Message',
