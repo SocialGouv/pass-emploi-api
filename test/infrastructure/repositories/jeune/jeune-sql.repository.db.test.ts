@@ -269,9 +269,8 @@ describe('JeuneSqlRepository', () => {
     })
   })
 
-  describe('findAllJeunesByIdsAuthentificationAndConseiller', () => {
+  describe('findAllJeunesByIdsAuthentification', () => {
     const conseiller = unConseiller({ id: 'test' })
-    const conseiller3 = unConseiller({ id: 'test3' })
     const jeune1Id = '1'
     const jeune2Id = '2'
     const jeune3Id = '3'
@@ -282,12 +281,6 @@ describe('JeuneSqlRepository', () => {
         unConseillerDto({
           id: conseiller.id,
           idAuthentification: 'id-auth-conseiller-1'
-        })
-      )
-      await ConseillerSqlModel.creer(
-        unConseillerDto({
-          id: conseiller3.id,
-          idAuthentification: 'id-auth-conseiller-3'
         })
       )
       await JeuneSqlModel.creer(
@@ -307,7 +300,7 @@ describe('JeuneSqlRepository', () => {
       await JeuneSqlModel.creer(
         unJeuneDto({
           id: jeune3Id,
-          idConseiller: conseiller3.id,
+          idConseiller: conseiller.id,
           idAuthentification: 'id-auth-3'
         })
       )
@@ -317,15 +310,17 @@ describe('JeuneSqlRepository', () => {
       it('retourne la liste des jeunes', async () => {
         // When
         const result =
-          await jeuneSqlRepository.findAllJeunesByIdsAuthentificationAndConseiller(
-            ['id-auth-1', 'id-auth-2', 'id-auth-3'],
-            'id-auth-conseiller-1'
-          )
+          await jeuneSqlRepository.findAllJeunesByIdsAuthentification([
+            'id-auth-1',
+            'id-auth-2',
+            'id-auth-3'
+          ])
 
         // Then
-        expect(result.length).to.equal(2)
+        expect(result.length).to.equal(3)
         expect(result[0].id).to.equal(jeune1Id)
         expect(result[1].id).to.equal(jeune2Id)
+        expect(result[2].id).to.equal(jeune3Id)
       })
     })
 
@@ -333,10 +328,9 @@ describe('JeuneSqlRepository', () => {
       it('retourne une liste vide', async () => {
         // When
         const result =
-          await jeuneSqlRepository.findAllJeunesByIdsAuthentificationAndConseiller(
-            ['FAUX_ID'],
-            conseiller.id
-          )
+          await jeuneSqlRepository.findAllJeunesByIdsAuthentification([
+            'FAUX_ID'
+          ])
 
         // Then
         expect(result).to.deep.equal([])

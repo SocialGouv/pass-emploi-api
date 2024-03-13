@@ -114,21 +114,14 @@ export class JeuneSqlRepository implements Jeune.Repository {
     return jeunesSqlModel.map(fromSqlToJeune)
   }
 
-  async findAllJeunesByIdsAuthentificationAndConseiller(
-    idsAuthentificationJeunes: string[],
-    idAuthentificationConseiller: string
+  async findAllJeunesByIdsAuthentification(
+    idsAuthentificationJeunes: string[]
   ): Promise<Array<Jeune & { idAuthentification: string }>> {
-    const conseillerSqlModel = await ConseillerSqlModel.findOne({
-      where: { idAuthentification: idAuthentificationConseiller }
-    })
-    if (!conseillerSqlModel) return []
-
     const jeunesSqlModel = await JeuneSqlModel.findAll({
       where: {
         idAuthentification: {
           [Op.in]: idsAuthentificationJeunes
-        },
-        idConseiller: conseillerSqlModel.id
+        }
       }
     })
     return jeunesSqlModel.map(sqlModel => ({

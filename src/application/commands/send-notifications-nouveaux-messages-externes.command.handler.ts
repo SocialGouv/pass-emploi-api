@@ -3,18 +3,16 @@ import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import {
+  Result,
   emptySuccess,
-  failure,
-  Result
+  failure
 } from '../../building-blocks/types/result'
 import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { Notification } from '../../domain/notification/notification'
-import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 
 export interface SendNotificationsNouveauxMessagesExternesCommand
   extends Command {
   idsAuthentificationJeunes: string[]
-  idAuthentificationConseiller: string
 }
 
 @Injectable()
@@ -25,8 +23,7 @@ export class SendNotificationsNouveauxMessagesExternesCommandHandler extends Com
   constructor(
     @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
-    private notificationService: Notification.Service,
-    private conseillerAuthorizer: ConseillerAuthorizer
+    private notificationService: Notification.Service
   ) {
     super('SendNotificationsNouveauxMessagesExternesCommandHandler')
   }
@@ -35,9 +32,8 @@ export class SendNotificationsNouveauxMessagesExternesCommandHandler extends Com
     command: SendNotificationsNouveauxMessagesExternesCommand
   ): Promise<Result> {
     const jeunes =
-      await this.jeuneRepository.findAllJeunesByIdsAuthentificationAndConseiller(
-        command.idsAuthentificationJeunes,
-        command.idAuthentificationConseiller
+      await this.jeuneRepository.findAllJeunesByIdsAuthentification(
+        command.idsAuthentificationJeunes
       )
 
     if (jeunes.length < command.idsAuthentificationJeunes.length) {
@@ -63,12 +59,8 @@ export class SendNotificationsNouveauxMessagesExternesCommandHandler extends Com
     return emptySuccess()
   }
 
-  async authorize(
-    command: SendNotificationsNouveauxMessagesExternesCommand
-  ): Promise<Result> {
-    return this.conseillerAuthorizer.autoriserLeConseillerExterne(
-      command.idAuthentificationConseiller
-    )
+  async authorize(): Promise<Result> {
+    return emptySuccess()
   }
 
   async monitor(): Promise<void> {
