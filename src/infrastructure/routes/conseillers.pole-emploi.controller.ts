@@ -17,7 +17,8 @@ import { handleResult } from 'src/infrastructure/routes/result.handler'
 import { CreerJeunePoleEmploiCommandHandler } from '../../application/commands/pole-emploi/creer-jeune-pole-emploi.command.handler'
 import {
   SendNotificationsNouveauxMessagesExternesCommand,
-  SendNotificationsNouveauxMessagesExternesCommandHandler
+  SendNotificationsNouveauxMessagesExternesCommandHandler,
+  SendNotificationsNouveauxMessagesExternesResult
 } from '../../application/commands/send-notifications-nouveaux-messages-externes.command.handler'
 import { JeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
 import { Authentification } from '../../domain/authentification'
@@ -86,7 +87,7 @@ export class ConseillersPoleEmploiController {
   @Post('beneficiaires/notifier-message')
   async postNotifications(
     @Body() envoyerNotificationsPayload: EnvoyerNotificationsExternePayload
-  ): Promise<void> {
+  ): Promise<SendNotificationsNouveauxMessagesExternesResult> {
     const command: SendNotificationsNouveauxMessagesExternesCommand = {
       idsAuthentificationJeunes:
         envoyerNotificationsPayload.idsAuthentificationBeneficiaires

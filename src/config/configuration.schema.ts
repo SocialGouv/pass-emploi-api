@@ -145,6 +145,10 @@ export const configurationSchema = Joi.object({
     evenementsEngagement: Joi.object({
       limit: Joi.number().required(),
       interval: Joi.number().required()
+    }),
+    notifsCVM: Joi.object({
+      limit: Joi.number().required(),
+      interval: Joi.number().required()
     })
   }),
   matomo: Joi.object({

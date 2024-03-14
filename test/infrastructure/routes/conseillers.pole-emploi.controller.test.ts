@@ -1,7 +1,7 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
-import { emptySuccess, failure } from 'src/building-blocks/types/result'
+import { failure, success } from 'src/building-blocks/types/result'
 import * as request from 'supertest'
-import { expect, StubbedClass } from 'test/utils'
+import { StubbedClass, expect } from 'test/utils'
 import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
 import { SendNotificationsNouveauxMessagesExternesCommandHandler } from '../../../src/application/commands/send-notifications-nouveaux-messages-externes.command.handler'
 import {
@@ -33,7 +33,7 @@ describe('ConseillersPoleEmploiController', () => {
           .withArgs({
             idsAuthentificationJeunes: ['id-auth-1', 'id-auth-2']
           })
-          .resolves(emptySuccess())
+          .resolves(success({ idsNonTrouves: [] }))
 
         // When - Then
         await request(app.getHttpServer())

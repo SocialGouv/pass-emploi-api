@@ -90,8 +90,9 @@ export namespace Jeune {
       idConseiller: string
     ): Promise<Jeune[]>
 
-    findAllJeunesByIdsAuthentification(
-      idsAuthentificationJeunes: string[]
+    findAllJeunesByIdsAuthentificationAndStructures(
+      idsAuthentificationJeunes: string[],
+      structures: Core.Structure[]
     ): Promise<Array<Jeune & { idAuthentification: string }>>
 
     findAllJeunesByConseillerInitial(idConseiller: string): Promise<Jeune[]>

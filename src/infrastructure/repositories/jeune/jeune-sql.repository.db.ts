@@ -17,6 +17,7 @@ import {
   fromSqlToJeune,
   fromSqlToJeuneHomeQueryModel
 } from '../mappers/jeunes.mappers'
+import { Core } from '../../../domain/core'
 
 @Injectable()
 export class JeuneSqlRepository implements Jeune.Repository {
@@ -114,13 +115,17 @@ export class JeuneSqlRepository implements Jeune.Repository {
     return jeunesSqlModel.map(fromSqlToJeune)
   }
 
-  async findAllJeunesByIdsAuthentification(
-    idsAuthentificationJeunes: string[]
+  async findAllJeunesByIdsAuthentificationAndStructures(
+    idsAuthentificationJeunes: string[],
+    structures: Core.Structure[]
   ): Promise<Array<Jeune & { idAuthentification: string }>> {
     const jeunesSqlModel = await JeuneSqlModel.findAll({
       where: {
         idAuthentification: {
           [Op.in]: idsAuthentificationJeunes
+        },
+        structure: {
+          [Op.in]: structures
         }
       }
     })

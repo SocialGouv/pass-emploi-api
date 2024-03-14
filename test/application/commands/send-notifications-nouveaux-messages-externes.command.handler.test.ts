@@ -6,10 +6,13 @@ import {
   SendNotificationsNouveauxMessagesExternesCommandHandler
 } from '../../../src/application/commands/send-notifications-nouveaux-messages-externes.command.handler'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
-import { failure } from '../../../src/building-blocks/types/result'
+import { failure, success } from '../../../src/building-blocks/types/result'
 import { Notification } from '../../../src/domain/notification/notification'
+import { RateLimiterService } from '../../../src/utils/rate-limiter.service'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { StubbedClass, createSandbox, expect } from '../../utils'
+import { testConfig } from '../../utils/module-for-testing'
+import { Core } from '../../../src/domain/core'
 
 describe('SendNotificationsNouveauxMessagesExternesCommandHandler', () => {
   let sendNotificationsNouveauxMessagesCommandHandler: SendNotificationsNouveauxMessagesExternesCommandHandler
@@ -18,6 +21,8 @@ describe('SendNotificationsNouveauxMessagesExternesCommandHandler', () => {
   const jeune2 = { ...unJeune({ id: '2' }), idAuthentification: 'id-auth-2' }
   let jeuneRepository: StubbedType<Jeune.Repository>
   let notificationService: StubbedClass<Notification.Service>
+  const configService = testConfig()
+  const rateLimiterService = new RateLimiterService(configService)
 
   beforeEach(async () => {
     const sandbox = createSandbox()
@@ -28,7 +33,8 @@ describe('SendNotificationsNouveauxMessagesExternesCommandHandler', () => {
     sendNotificationsNouveauxMessagesCommandHandler =
       new SendNotificationsNouveauxMessagesExternesCommandHandler(
         jeuneRepository,
-        notificationService
+        notificationService,
+        rateLimiterService
       )
   })
 
@@ -41,8 +47,11 @@ describe('SendNotificationsNouveauxMessagesExternesCommandHandler', () => {
         }
 
         const jeunes = [jeune1, jeune2]
-        jeuneRepository.findAllJeunesByIdsAuthentification
-          .withArgs(command.idsAuthentificationJeunes)
+        jeuneRepository.findAllJeunesByIdsAuthentificationAndStructures
+          .withArgs(
+            command.idsAuthentificationJeunes,
+            Core.structuresPoleEmploiBRSA
+          )
           .resolves(jeunes)
 
         // When
@@ -66,9 +75,42 @@ describe('SendNotificationsNouveauxMessagesExternesCommandHandler', () => {
           ]
         }
 
-        jeuneRepository.findAllJeunesByIdsAuthentification
-          .withArgs(command.idsAuthentificationJeunes)
+        jeuneRepository.findAllJeunesByIdsAuthentificationAndStructures
+          .withArgs(
+            command.idsAuthentificationJeunes,
+            Core.structuresPoleEmploiBRSA
+          )
           .resolves([jeune1])
+
+        // When
+        const actual =
+          await sendNotificationsNouveauxMessagesCommandHandler.handle(command)
+
+        // Then
+        expect(
+          notificationService.notifierLesJeunesDuNouveauMessage
+        ).to.have.been.calledWithExactly([jeune1])
+        expect(actual).to.deep.equal(
+          success({
+            idsNonTrouves: ['id-auth-2', 'id-auth-inexistant']
+          })
+        )
+      })
+    })
+
+    describe('quand tous les jeunes n’existent pas', () => {
+      it('renvoie une NonTrouveError', async () => {
+        // Given
+        const command: SendNotificationsNouveauxMessagesExternesCommand = {
+          idsAuthentificationJeunes: ['id-auth-2', 'id-auth-inexistant']
+        }
+
+        jeuneRepository.findAllJeunesByIdsAuthentificationAndStructures
+          .withArgs(
+            command.idsAuthentificationJeunes,
+            Core.structuresPoleEmploiBRSA
+          )
+          .resolves([])
 
         // When
         const actual =

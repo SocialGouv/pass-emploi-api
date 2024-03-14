@@ -269,7 +269,7 @@ describe('JeuneSqlRepository', () => {
     })
   })
 
-  describe('findAllJeunesByIdsAuthentification', () => {
+  describe('findAllJeunesByIdsAuthentificationAndStructures', () => {
     const conseiller = unConseiller({ id: 'test' })
     const jeune1Id = '1'
     const jeune2Id = '2'
@@ -287,14 +287,16 @@ describe('JeuneSqlRepository', () => {
         unJeuneDto({
           id: jeune1Id,
           idConseiller: conseiller.id,
-          idAuthentification: 'id-auth-1'
+          idAuthentification: 'id-auth-1',
+          structure: Core.Structure.POLE_EMPLOI
         })
       )
       await JeuneSqlModel.creer(
         unJeuneDto({
           id: jeune2Id,
           idConseiller: conseiller.id,
-          idAuthentification: 'id-auth-2'
+          idAuthentification: 'id-auth-2',
+          structure: Core.Structure.POLE_EMPLOI_BRSA
         })
       )
       await JeuneSqlModel.creer(
@@ -310,17 +312,15 @@ describe('JeuneSqlRepository', () => {
       it('retourne la liste des jeunes', async () => {
         // When
         const result =
-          await jeuneSqlRepository.findAllJeunesByIdsAuthentification([
-            'id-auth-1',
-            'id-auth-2',
-            'id-auth-3'
-          ])
+          await jeuneSqlRepository.findAllJeunesByIdsAuthentificationAndStructures(
+            ['id-auth-1', 'id-auth-2', 'id-auth-3'],
+            Core.structuresPoleEmploiBRSA
+          )
 
         // Then
-        expect(result.length).to.equal(3)
+        expect(result.length).to.equal(2)
         expect(result[0].id).to.equal(jeune1Id)
         expect(result[1].id).to.equal(jeune2Id)
-        expect(result[2].id).to.equal(jeune3Id)
       })
     })
 
@@ -328,9 +328,10 @@ describe('JeuneSqlRepository', () => {
       it('retourne une liste vide', async () => {
         // When
         const result =
-          await jeuneSqlRepository.findAllJeunesByIdsAuthentification([
-            'FAUX_ID'
-          ])
+          await jeuneSqlRepository.findAllJeunesByIdsAuthentificationAndStructures(
+            ['FAUX_ID'],
+            Core.structuresPoleEmploiBRSA
+          )
 
         // Then
         expect(result).to.deep.equal([])

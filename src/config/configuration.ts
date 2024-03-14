@@ -186,6 +186,10 @@ export default () => {
       evenementsEngagement: {
         limit: process.env.RATE_LIMITER_AE_LIMIT ?? '10',
         interval: process.env.RATE_LIMITER_AE_INTERVAL ?? '1200'
+      },
+      notifsCVM: {
+        limit: process.env.RATE_LIMITER_NOTIFS_CVM_LIMIT ?? '50',
+        interval: process.env.RATE_LIMITER_NOTIFS_CVM_INTERVAL ?? '1000'
       }
     },
     matomo: {
