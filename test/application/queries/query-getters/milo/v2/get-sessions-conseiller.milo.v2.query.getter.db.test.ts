@@ -127,53 +127,32 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
 
       it('récupère et retourne toutes les sessions de la structure du conseiller', async () => {
         // Given
-        const NB_SESSIONS_STRUCTURE = 102
-        const listeSessionsConseillerDto1To50: SessionConseillerDetailDto[] = []
-        const listeSessionsConseillerDto50To100: SessionConseillerDetailDto[] =
-          []
-        const listeSessionsConseillerDto100To102: SessionConseillerDetailDto[] =
-          []
+        const NB_SESSIONS_STRUCTURE = 151
+        const listeSessionsConseillerDto1: SessionConseillerDetailDto[] = []
+        const listeSessionsConseillerDto2: SessionConseillerDetailDto[] = []
 
-        for (let i = 1; i < 51; i++) {
-          listeSessionsConseillerDto1To50.push({
+        for (let i = 1; i <= 150; i++) {
+          listeSessionsConseillerDto1.push({
             ...unDetailSessionConseillerDto,
             session: { ...uneSessionDto, id: i }
           })
         }
 
-        for (let i = 51; i < 101; i++) {
-          listeSessionsConseillerDto50To100.push({
-            ...unDetailSessionConseillerDto,
-            session: { ...uneSessionDto, id: i }
-          })
+        listeSessionsConseillerDto2.push({
+          ...unDetailSessionConseillerDto,
+          session: { ...uneSessionDto, id: 151 }
+        })
+
+        const resultListeSessionsConseillerDto1 = {
+          page: 1,
+          nbSessions: NB_SESSIONS_STRUCTURE,
+          sessions: [...listeSessionsConseillerDto1]
         }
 
-        listeSessionsConseillerDto100To102.push(
-          {
-            ...unDetailSessionConseillerDto,
-            session: { ...uneSessionDto, id: 101 }
-          },
-          {
-            ...unDetailSessionConseillerDto,
-            session: { ...uneSessionDto, id: 102 }
-          }
-        )
-        const resultListeSessionsConseillerDto1To50 = {
-          page: 3,
+        const resultListeSessionsConseillerDto2 = {
+          page: 2,
           nbSessions: NB_SESSIONS_STRUCTURE,
-          sessions: [...listeSessionsConseillerDto1To50]
-        }
-
-        const resultListeSessionsConseillerDto50To100 = {
-          page: 3,
-          nbSessions: NB_SESSIONS_STRUCTURE,
-          sessions: [...listeSessionsConseillerDto50To100]
-        }
-
-        const resultListeSessionsConseillerDto100To102 = {
-          page: 3,
-          nbSessions: NB_SESSIONS_STRUCTURE,
-          sessions: [...listeSessionsConseillerDto100To102]
+          sessions: [...listeSessionsConseillerDto2]
         }
 
         miloClient.getSessionsConseiller
@@ -187,7 +166,7 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
               }
             }
           )
-          .resolves(success(resultListeSessionsConseillerDto1To50))
+          .resolves(success(resultListeSessionsConseillerDto1))
 
         miloClient.getSessionsConseiller
           .withArgs(
@@ -201,21 +180,7 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
               page: 2
             }
           )
-          .resolves(success(resultListeSessionsConseillerDto50To100))
-
-        miloClient.getSessionsConseiller
-          .withArgs(
-            idpToken,
-            conseiller.structure.id,
-            conseiller.structure.timezone,
-            {
-              periode: {
-                dateDebut: dateDebut
-              },
-              page: 3
-            }
-          )
-          .resolves(success(resultListeSessionsConseillerDto100To102))
+          .resolves(success(resultListeSessionsConseillerDto2))
 
         // When
         const result = await getSessionsQueryGetterV2.handle(
@@ -226,7 +191,7 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
         )
 
         // Then
-        expect(miloClient.getSessionsConseiller).to.have.been.callCount(3)
+        expect(miloClient.getSessionsConseiller).to.have.been.callCount(2)
         if (result._isSuccess) {
           expect(result.data.length).to.be.equal(NB_SESSIONS_STRUCTURE)
         }
@@ -234,14 +199,13 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
 
       it('récupère et retourne toutes les sessions A CLORE de la structure du conseiller', async () => {
         // Given
-        const NB_SESSIONS_STRUCTURE = 100
-        const NB_SESSIONS_STRUCTURE_A_CLORE = 50
-        const listeSessionsConseillerDto1To50: SessionConseillerDetailDto[] = []
-        const listeSessionsConseillerDto50To100: SessionConseillerDetailDto[] =
-          []
+        const NB_SESSIONS_STRUCTURE = 300
+        const NB_SESSIONS_STRUCTURE_A_CLORE = 150
+        const listeSessionsConseillerDto1: SessionConseillerDetailDto[] = []
+        const listeSessionsConseillerDto2: SessionConseillerDetailDto[] = []
 
-        for (let i = 1; i < 51; i++) {
-          listeSessionsConseillerDto1To50.push({
+        for (let i = 1; i < 151; i++) {
+          listeSessionsConseillerDto1.push({
             ...unDetailSessionConseillerDto,
             session: {
               ...uneSessionDto,
@@ -252,23 +216,23 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
           })
         }
 
-        for (let i = 51; i < 101; i++) {
-          listeSessionsConseillerDto50To100.push({
+        for (let i = 151; i < 301; i++) {
+          listeSessionsConseillerDto2.push({
             ...unDetailSessionConseillerDto,
             session: { ...uneSessionDto, id: i }
           })
         }
 
-        const resultListeSessionsConseillerDto1To50 = {
-          page: 2,
+        const resultListeSessionsConseillerDto1 = {
+          page: 1,
           nbSessions: NB_SESSIONS_STRUCTURE,
-          sessions: [...listeSessionsConseillerDto1To50]
+          sessions: [...listeSessionsConseillerDto1]
         }
 
-        const resultListeSessionsConseillerDto50To100 = {
+        const resultListeSessionsConseillerDto2 = {
           page: 2,
           nbSessions: NB_SESSIONS_STRUCTURE,
-          sessions: [...listeSessionsConseillerDto50To100]
+          sessions: [...listeSessionsConseillerDto2]
         }
 
         miloClient.getSessionsConseiller
@@ -282,7 +246,7 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
               }
             }
           )
-          .resolves(success(resultListeSessionsConseillerDto1To50))
+          .resolves(success(resultListeSessionsConseillerDto1))
 
         miloClient.getSessionsConseiller
           .withArgs(
@@ -296,7 +260,7 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
               page: 2
             }
           )
-          .resolves(success(resultListeSessionsConseillerDto50To100))
+          .resolves(success(resultListeSessionsConseillerDto2))
 
         // When
         const result = await getSessionsQueryGetterV2.handle(

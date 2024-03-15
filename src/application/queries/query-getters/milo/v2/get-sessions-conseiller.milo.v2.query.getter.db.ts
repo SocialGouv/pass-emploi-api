@@ -17,7 +17,7 @@ import { SessionMilo } from '../../../../../domain/milo/session.milo'
 import { mapSessionConseillerDtoToQueryModel } from '../../../query-mappers/milo.mappers'
 import { SessionMiloSqlModel } from '../../../../../infrastructure/sequelize/models/session-milo.sql-model'
 
-const NOMBRE_MAX_SESSIONS_RECUPERE_PAR_PAGE_MILO_CLIENT = 50
+const NOMBRE_MAX_SESSIONS_RECUPERE_PAR_PAGE_MILO_CLIENT = 150
 
 @Injectable()
 export class GetSessionsConseillerMiloV2QueryGetter {
