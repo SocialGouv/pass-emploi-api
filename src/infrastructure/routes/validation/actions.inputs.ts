@@ -23,37 +23,31 @@ export class UpdateActionPayload {
   @IsOptional()
   @IsString()
   @IsEnum(Action.Statut)
-  @IsNotEmpty()
   status?: Action.Statut
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  @IsNotEmpty()
   contenu?: string
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  @IsNotEmpty()
   description?: string
 
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @IsOptional()
   @IsDateString()
-  @IsNotEmpty()
   dateEcheance?: string
 
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @IsOptional()
   @IsDateString()
-  @IsNotEmpty()
   dateFinReelle?: string
 
   @ApiPropertyOptional({ enum: Action.Qualification.Code })
   @IsOptional()
   @IsEnum(Action.Qualification.Code)
-  @IsNotEmpty()
   codeQualification?: Action.Qualification.Code
 }
 

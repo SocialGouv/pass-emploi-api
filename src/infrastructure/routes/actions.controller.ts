@@ -126,16 +126,16 @@ export class ActionsController {
   ): Promise<void> {
     const command: UpdateActionCommand = {
       idAction,
-      statut: updateActionPayload.status,
-      contenu: updateActionPayload.contenu,
-      description: updateActionPayload.description,
+      statut: updateActionPayload.status || undefined,
+      contenu: updateActionPayload.contenu || undefined,
+      description: updateActionPayload.description || undefined,
       dateEcheance: updateActionPayload.dateEcheance
         ? DateTime.fromISO(updateActionPayload.dateEcheance, { setZone: true })
         : undefined,
       dateFinReelle: updateActionPayload.dateFinReelle
         ? DateTime.fromISO(updateActionPayload.dateFinReelle, { setZone: true })
         : undefined,
-      codeQualification: updateActionPayload.codeQualification ?? undefined
+      codeQualification: updateActionPayload.codeQualification || undefined
     }
     const result = await this.updateActionCommandHandler.execute(
       command,
