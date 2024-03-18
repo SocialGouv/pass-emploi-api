@@ -33,6 +33,7 @@ export class UpdateActionPayload {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @MaxLength(255)
   description?: string
 
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
@@ -55,6 +56,7 @@ export class AddCommentaireActionPayload {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  @MaxLength(255)
   commentaire: string
 }
 
@@ -90,6 +92,7 @@ export class CreateActionPayload {
   @ApiProperty()
   @IsString()
   @IsOptional()
+  @MaxLength(255)
   comment?: string
 
   @IsOptional()
