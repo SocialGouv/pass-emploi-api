@@ -73,6 +73,8 @@ export namespace Evenement {
     MESSAGE_ENVOYE_MULTIPLE_MANUEL_PJ = 'MESSAGE_ENVOYE_MULTIPLE_MANUEL_PJ',
     MESSAGE_ENVOYE_MULTIPLE_LISTE_PJ = 'MESSAGE_ENVOYE_MULTIPLE_LISTE_PJ',
     MESSAGE_ENVOYE_MULTIPLE_MIXTE_PJ = 'MESSAGE_ENVOYE_MULTIPLE_MIXTE_PJ',
+    MESSAGE_MODIFIE = 'MESSAGE_MODIFIE',
+    MESSAGE_SUPPRIME = 'MESSAGE_SUPPRIME',
     MESSAGE_OFFRE_PARTAGEE = 'MESSAGE_OFFRE_PARTAGEE',
     OFFRE_ALTERNANCE_AFFICHEE = 'OFFRE_ALTERNANCE_AFFICHEE',
     OFFRE_ALTERNANCE_PARTAGEE = 'OFFRE_ALTERNANCE_PARTAGEE',
@@ -486,6 +488,14 @@ const evenements: {
     categorie: 'Message',
     action: 'Partage',
     nom: 'Offre'
+  },
+  [Evenement.Code.MESSAGE_MODIFIE]: {
+    categorie: 'Message',
+    action: 'Modification'
+  },
+  [Evenement.Code.MESSAGE_SUPPRIME]: {
+    categorie: 'Message',
+    action: 'Suppression'
   },
   [Evenement.Code.RDV_CREE]: {
     categorie: 'Rendez-vous',
