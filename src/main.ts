@@ -41,7 +41,10 @@ async function bootstrap(): Promise<void> {
     app.useGlobalInterceptors(new ContextInterceptor(context))
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
     app.disable('x-powered-by')
-    await app.listen(port)
+    await app.listen(port).then(server => {
+      const timeoutOf10Seconds = 10000
+      server.setTimeout(timeoutOf10Seconds)
+    })
   }
   app.flushLogs()
 
