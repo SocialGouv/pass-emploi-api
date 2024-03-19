@@ -207,6 +207,12 @@ export namespace ArchiveJeune {
     date: string
     envoyePar: string
     type: string
+    historique?: EntreeHistoriqueMessage[]
+  }
+
+  export type EntreeHistoriqueMessage = {
+    date: string
+    contenuPrecedent: string
   }
 
   export interface Repository {
