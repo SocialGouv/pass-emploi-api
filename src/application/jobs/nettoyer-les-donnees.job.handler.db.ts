@@ -3,16 +3,20 @@ import { Job } from 'bull'
 import { DateTime } from 'luxon'
 import { Op, WhereOptions } from 'sequelize'
 import { JobHandler } from '../../building-blocks/types/job-handler'
+import { isFailure } from '../../building-blocks/types/result'
+import { Action, ActionRepositoryToken } from '../../domain/action/action'
 import { Planificateur, ProcessJobType } from '../../domain/planificateur'
+import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
 import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
+import { ActionSqlRepository } from '../../infrastructure/repositories/action/action-sql.repository.db'
+import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
 import { ArchiveJeuneSqlModel } from '../../infrastructure/sequelize/models/archive-jeune.sql-model'
+import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { LogApiPartenaireSqlModel } from '../../infrastructure/sequelize/models/log-api-partenaire.sql-model'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { SuiviJobSqlModel } from '../../infrastructure/sequelize/models/suivi-job.sql-model'
 import { DateService } from '../../utils/date-service'
-import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
 import Source = RendezVous.Source
-import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.NETTOYER_LES_DONNEES)
@@ -20,7 +24,9 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
   constructor(
     private dateService: DateService,
     @Inject(SuiviJobServiceToken)
-    suiviJobService: SuiviJob.Service
+    suiviJobService: SuiviJob.Service,
+    @Inject(ActionRepositoryToken)
+    private readonly actionRepository: Action.Repository
   ) {
     super(Planificateur.JobType.NETTOYER_LES_DONNEES, suiviJobService)
   }
@@ -28,12 +34,15 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
   async handle(): Promise<SuiviJob> {
     const maintenant = this.dateService.now()
     let nbErreurs = 0
+    let nbErreursQualification = 0
     let nombreArchivesSupprimees = -1
     let nombreLogsApiSupprimes = -1
     let nombreSuiviJobsSupprimes = -1
     let nombreRdvSupprimes = -1
     let nombreRdvMiloSupprimes = -1
     let nombreJeunesPasConnectesDepuis60Jours = -1
+    let nombreActionsSupprimees = -1
+    let nombreActionsQualifiees = 0
 
     try {
       nombreArchivesSupprimees = await ArchiveJeuneSqlModel.destroy({
@@ -90,6 +99,34 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
       nbErreurs++
     }
 
+    try {
+      nombreActionsSupprimees = await ActionSqlModel.destroy({
+        where: dateEcheanceSuperieureADeuxAns(maintenant)
+      })
+    } catch (_e) {
+      nbErreurs++
+    }
+
+    try {
+      const actionsInProgress = await ActionSqlModel.findAll({
+        where: actionsInProgressAvecDateEcheanceSuperieureA4Mois(maintenant)
+      })
+      for (const action of actionsInProgress) {
+        const qualifierResult = Action.qualifier(
+          ActionSqlRepository.actionFromSqlModel(action),
+          Action.Qualification.Code.NON_SNP
+        )
+        if (isFailure(qualifierResult)) {
+          nbErreursQualification++
+          continue
+        }
+        await this.actionRepository.save(qualifierResult.data)
+        nombreActionsQualifiees++
+      }
+    } catch (_e) {
+      nbErreursQualification++
+    }
+
     return {
       jobType: this.jobType,
       nbErreurs,
@@ -102,7 +139,10 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
         nombreSuiviJobsSupprimes,
         nombreRdvSupprimes,
         nombreRdvMiloSupprimes,
-        nombreJeunesPasConnectesDepuis60Jours
+        nombreJeunesPasConnectesDepuis60Jours,
+        nombreActionsSupprimees,
+        nombreActionsQualifiees,
+        nbErreursQualification
       }
     }
   }
@@ -151,5 +191,20 @@ function dateConnexionSuperieureA60Jours(maintenant: DateTime): WhereOptions {
     pushNotificationToken: {
       [Op.ne]: null
     }
+  }
+}
+
+function dateEcheanceSuperieureADeuxAns(maintenant: DateTime): WhereOptions {
+  return {
+    date_echeance: { [Op.lt]: maintenant.minus({ years: 2 }).toJSDate() }
+  }
+}
+
+function actionsInProgressAvecDateEcheanceSuperieureA4Mois(
+  maintenant: DateTime
+): WhereOptions {
+  return {
+    statut: Action.Statut.EN_COURS,
+    dateEcheance: { [Op.lt]: maintenant.minus({ years: 2 }).toJSDate() }
   }
 }
