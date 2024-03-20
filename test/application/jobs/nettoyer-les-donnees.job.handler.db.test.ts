@@ -20,10 +20,13 @@ import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
 import Source = RendezVous.Source
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
+import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
+import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
 
 const idJeune1 = 'push1'
 const idJeune2 = 'push2'
 const idJeune3 = 'push3'
+const maintenant = uneDatetime()
 
 describe('NettoyerLesDonneesJobHandler', () => {
   let nettoyerLesDonneesJobHandler: NettoyerLesDonneesJobHandler
@@ -40,7 +43,7 @@ describe('NettoyerLesDonneesJobHandler', () => {
     await getDatabase().cleanPG()
     const sandbox: SinonSandbox = createSandbox()
     dateService = stubClass(DateService)
-    dateService.now.returns(uneDatetime())
+    dateService.now.returns(maintenant)
     suiviJobService = stubInterface(sandbox)
 
     nettoyerLesDonneesJobHandler = new NettoyerLesDonneesJobHandler(
@@ -54,7 +57,7 @@ describe('NettoyerLesDonneesJobHandler', () => {
       prenom: 'prenom',
       nom: 'nom',
       motif: 'motif',
-      dateArchivage: uneDatetime().minus({ years: 2, day: 1 }).toJSDate(),
+      dateArchivage: maintenant.minus({ years: 2, day: 1 }).toJSDate(),
       donnees: { nom: 'nom' }
     })
     await ArchiveJeuneSqlModel.create({
@@ -62,17 +65,14 @@ describe('NettoyerLesDonneesJobHandler', () => {
       prenom: 'prenom',
       nom: 'nom',
       motif: 'motif',
-      dateArchivage: uneDatetime()
-        .minus({ years: 2 })
-        .plus({ day: 1 })
-        .toJSDate(),
+      dateArchivage: maintenant.minus({ years: 2 }).plus({ day: 1 }).toJSDate(),
       donnees: { nom: 'nom' }
     })
 
     // Given - Log Api Partenaire
     await LogApiPartenaireSqlModel.create({
       id: 'a282ae5e-b1f0-4a03-86a3-1870d913da93',
-      date: uneDatetime().minus({ week: 1, day: 1 }).toJSDate(),
+      date: maintenant.minus({ week: 1, day: 1 }).toJSDate(),
       idUtilisateur: 'idUtilisateur',
       typeUtilisateur: 'typeUtilisateur',
       pathPartenaire: 'pathASupprimer',
@@ -82,7 +82,7 @@ describe('NettoyerLesDonneesJobHandler', () => {
     })
     await LogApiPartenaireSqlModel.create({
       id: '826553e8-7581-44ab-9d76-f04be13f8971',
-      date: uneDatetime().minus({ week: 1 }).plus({ day: 1 }).toJSDate(),
+      date: maintenant.minus({ week: 1 }).plus({ day: 1 }).toJSDate(),
       idUtilisateur: 'idUtilisateur',
       typeUtilisateur: 'typeUtilisateur',
       pathPartenaire: 'pathAGarder',
@@ -94,7 +94,7 @@ describe('NettoyerLesDonneesJobHandler', () => {
     // Given - Suivi Job
     await SuiviJobSqlModel.create({
       id: 1,
-      dateExecution: uneDatetime().minus({ days: 3 }).toJSDate(),
+      dateExecution: maintenant.minus({ days: 3 }).toJSDate(),
       jobType: Planificateur.JobType.NETTOYER_LES_DONNEES,
       succes: false,
       resultat: {},
@@ -103,7 +103,7 @@ describe('NettoyerLesDonneesJobHandler', () => {
     })
     await SuiviJobSqlModel.create({
       id: 2,
-      dateExecution: uneDatetime().minus({ days: 1 }).toJSDate(),
+      dateExecution: maintenant.minus({ days: 1 }).toJSDate(),
       jobType: Planificateur.JobType.NETTOYER_LES_DONNEES,
       succes: false,
       resultat: {},
@@ -113,7 +113,7 @@ describe('NettoyerLesDonneesJobHandler', () => {
 
     // Given - Rendez-vous
     rendezVousDto = unRendezVousDto({
-      dateSuppression: uneDatetime().minus({ months: 4 }).toJSDate()
+      dateSuppression: maintenant.minus({ months: 4 }).toJSDate()
     })
     rendezVousDtoSansDateSuppression = unRendezVousDto({
       dateSuppression: null
@@ -125,11 +125,11 @@ describe('NettoyerLesDonneesJobHandler', () => {
     )
     // Given - Rendez-vous Milo
     rendezVousDtoMiloASupprimer = unRendezVousDto({
-      date: uneDatetime().minus({ months: 7 }).toJSDate(),
+      date: maintenant.minus({ months: 7 }).toJSDate(),
       source: Source.MILO
     })
     rendezVousDtoAvecUneDateRecente = unRendezVousDto({
-      date: uneDatetime().minus({ months: 1 }).toJSDate(),
+      date: maintenant.minus({ months: 1 }).toJSDate(),
       source: Source.MILO
     })
     await RendezVousSqlModel.create(rendezVousDtoMiloASupprimer)
@@ -143,13 +143,28 @@ describe('NettoyerLesDonneesJobHandler', () => {
       unJeuneDto({ id: idJeune1, idConseiller: undefined }),
       unJeuneDto({
         id: idJeune2,
-        dateDerniereConnexion: uneDatetime().minus({ days: 59 }).toJSDate(),
+        dateDerniereConnexion: maintenant.minus({ days: 59 }).toJSDate(),
         idConseiller: undefined
       }),
       unJeuneDto({
         id: idJeune3,
-        dateDerniereConnexion: uneDatetime().minus({ days: 62 }).toJSDate(),
+        dateDerniereConnexion: maintenant.minus({ days: 62 }).toJSDate(),
         idConseiller: undefined
+      })
+    ])
+
+    // Given - Actions
+    await ActionSqlModel.bulkCreate([
+      uneActionDto({
+        idJeune: idJeune1,
+        dateEcheance: maintenant.minus({ years: 2, days: 1 }).toJSDate()
+      }),
+      uneActionDto({
+        idJeune: idJeune1,
+        dateEcheance: maintenant
+          .minus({ years: 2 })
+          .plus({ days: 1 })
+          .toJSDate()
       })
     ])
 
@@ -221,6 +236,14 @@ describe('NettoyerLesDonneesJobHandler', () => {
       expect(jeunes[1].pushNotificationToken).to.equal('token')
       expect(jeunes[2].id).to.equal(idJeune3)
       expect(jeunes[2].pushNotificationToken).to.equal(null)
+    })
+  })
+
+  describe('actions', () => {
+    it('supprime les action arrivées à échance il y a plus de 2 ans', async () => {
+      // Then
+      const actionsApresNettoyage = await ActionSqlModel.findAll()
+      expect(actionsApresNettoyage.length).to.equal(1)
     })
   })
 })

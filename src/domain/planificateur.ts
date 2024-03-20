@@ -70,7 +70,8 @@ export namespace Planificateur {
     NETTOYER_EVENEMENTS_CHARGES_ANALYTICS = 'NETTOYER_EVENEMENTS_CHARGES_ANALYTICS',
     ENRICHIR_EVENEMENTS_ANALYTICS = 'ENRICHIR_EVENEMENTS_ANALYTICS',
     CHARGER_LES_VUES_ANALYTICS = 'CHARGER_LES_VUES_ANALYTICS',
-    INITIALISER_LES_VUES = 'INITIALISER_LES_VUES'
+    INITIALISER_LES_VUES = 'INITIALISER_LES_VUES',
+    QUALIFIER_ACTIONS = 'QUALIFIER_ACTIONS'
   }
 
   export interface JobRendezVous {
@@ -150,6 +151,12 @@ export const listeCronJobs: Planificateur.CronJob[] = [
     expression: '0 5 * * *',
     description:
       "Tous les jours à 5h. Supprime les archives, les logs et les évènements d'engagement hebdo."
+  },
+  {
+    type: Planificateur.JobType.QUALIFIER_ACTIONS,
+    expression: '0 6 * * *',
+    description:
+      'Tous les jours à 6h. Qualifie en NON SNP les actions EN COURS il y a plus de 4 mois.'
   },
   {
     type: Planificateur.JobType.MAIL_CONSEILLER_MESSAGES,

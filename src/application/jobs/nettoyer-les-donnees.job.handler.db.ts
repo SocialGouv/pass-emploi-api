@@ -4,15 +4,16 @@ import { DateTime } from 'luxon'
 import { Op, WhereOptions } from 'sequelize'
 import { JobHandler } from '../../building-blocks/types/job-handler'
 import { Planificateur, ProcessJobType } from '../../domain/planificateur'
+import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
 import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
+import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
 import { ArchiveJeuneSqlModel } from '../../infrastructure/sequelize/models/archive-jeune.sql-model'
+import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { LogApiPartenaireSqlModel } from '../../infrastructure/sequelize/models/log-api-partenaire.sql-model'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { SuiviJobSqlModel } from '../../infrastructure/sequelize/models/suivi-job.sql-model'
 import { DateService } from '../../utils/date-service'
-import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
 import Source = RendezVous.Source
-import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.NETTOYER_LES_DONNEES)
@@ -34,6 +35,7 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
     let nombreRdvSupprimes = -1
     let nombreRdvMiloSupprimes = -1
     let nombreJeunesPasConnectesDepuis60Jours = -1
+    let nombreActionsSupprimees = -1
 
     try {
       nombreArchivesSupprimees = await ArchiveJeuneSqlModel.destroy({
@@ -90,6 +92,14 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
       nbErreurs++
     }
 
+    try {
+      nombreActionsSupprimees = await ActionSqlModel.destroy({
+        where: dateEcheanceSuperieureADeuxAns(maintenant)
+      })
+    } catch (_e) {
+      nbErreurs++
+    }
+
     return {
       jobType: this.jobType,
       nbErreurs,
@@ -102,7 +112,8 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
         nombreSuiviJobsSupprimes,
         nombreRdvSupprimes,
         nombreRdvMiloSupprimes,
-        nombreJeunesPasConnectesDepuis60Jours
+        nombreJeunesPasConnectesDepuis60Jours,
+        nombreActionsSupprimees
       }
     }
   }
@@ -151,5 +162,11 @@ function dateConnexionSuperieureA60Jours(maintenant: DateTime): WhereOptions {
     pushNotificationToken: {
       [Op.ne]: null
     }
+  }
+}
+
+function dateEcheanceSuperieureADeuxAns(maintenant: DateTime): WhereOptions {
+  return {
+    date_echeance: { [Op.lt]: maintenant.minus({ years: 2 }).toJSDate() }
   }
 }
