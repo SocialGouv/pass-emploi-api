@@ -35,39 +35,35 @@ export class AuthentificationSqlRepository
     if (conseillerSqlModel) {
       const roles = []
 
-      if (conseillerSqlModel.email) {
-        if (estMilo(conseillerSqlModel.structure)) {
-          roles.push(Authentification.Role.SUPERVISEUR)
-        } else {
-          const superviseursParEmail = await SuperviseurSqlModel.findAll({
-            where: {
-              email: {
-                [Op.like]: `%${conseillerSqlModel
-                  .email!.replace(/pole-emploi.fr/g, '')
-                  .replace(/francetravail.fr/g, '')}%`
-              }
+      if (estMilo(conseillerSqlModel.structure)) {
+        roles.push(Authentification.Role.SUPERVISEUR)
+      } else if (conseillerSqlModel.email) {
+        const superviseursParEmail = await SuperviseurSqlModel.findAll({
+          where: {
+            email: {
+              [Op.like]: `${conseillerSqlModel.email.split('@')[0]}%`
             }
-          })
-
-          const estSuperviseur = estConseillerSuperviseur(
-            superviseursParEmail,
-            structure
-          )
-          const estSuperviseurPEBRSA = estConseillerSuperviseurPEBRSA(
-            superviseursParEmail,
-            structure,
-            estSuperviseur
-          )
-
-          if (estSuperviseur) {
-            roles.push(Authentification.Role.SUPERVISEUR)
           }
-          if (estSuperviseurPEBRSA) {
-            roles.push(Authentification.Role.SUPERVISEUR_PE_BRSA)
-          }
+        })
+
+        const estSuperviseur = estConseillerSuperviseur(
+          superviseursParEmail,
+          structure
+        )
+        const estSuperviseurPEBRSA = estConseillerSuperviseurPEBRSA(
+          superviseursParEmail,
+          structure,
+          estSuperviseur
+        )
+
+        if (estSuperviseur) {
+          roles.push(Authentification.Role.SUPERVISEUR)
         }
-        return fromConseillerSqlToUtilisateur(conseillerSqlModel, roles)
+        if (estSuperviseurPEBRSA) {
+          roles.push(Authentification.Role.SUPERVISEUR_PE_BRSA)
+        }
       }
+      return fromConseillerSqlToUtilisateur(conseillerSqlModel, roles)
     }
 
     return undefined
@@ -190,9 +186,6 @@ function estConseillerSuperviseur(
   superviseursParEmail: SuperviseurSqlModel[],
   structureDuConseiller: Core.Structure
 ): boolean {
-  if (structureDuConseiller === Core.Structure.MILO) {
-    return true
-  }
   return Boolean(
     superviseursParEmail.find(
       superviseurParEmail =>
