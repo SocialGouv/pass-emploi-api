@@ -93,7 +93,7 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
         return resultArchiver
       }
     } catch (e) {
-      this.logger.warn('Archive jeune existante')
+      this.logger.error(e)
     }
 
     await this.jeuneRepository.supprimer(command.idJeune)
