@@ -35,7 +35,8 @@ describe('AuthentificationSqlRepository', () => {
     const conseillerDtoPE = unConseillerDto({
       id: 'pe',
       idAuthentification: 'id-authentification-conseiller-pe',
-      structure: Core.Structure.POLE_EMPLOI
+      structure: Core.Structure.POLE_EMPLOI,
+      email: 'nils.tavernier@pole-emploi.fr'
     })
 
     beforeEach(async () => {
@@ -56,6 +57,7 @@ describe('AuthentificationSqlRepository', () => {
         expect(utilisateur).to.deep.equal(
           unUtilisateurConseiller({
             id: conseillerDtoPE.id,
+            email: conseillerDtoPE.email!,
             idAuthentification: conseillerDtoPE.idAuthentification,
             structure: Core.Structure.POLE_EMPLOI
           })
@@ -91,36 +93,43 @@ describe('AuthentificationSqlRepository', () => {
       })
     })
     describe("quand c'est un conseiller superviseur", () => {
+      const structure = Core.Structure.POLE_EMPLOI
       it("retourne l'utilisateur avec le role SUPERVISEUR uniquement", async () => {
         // Given
         await SuperviseurSqlModel.create({
-          email: conseillerDtoMilo.email,
-          structure: conseillerDtoMilo.structure
+          email: conseillerDtoPE.email?.replace(
+            /pole-emploi/g,
+            'francetravail'
+          ),
+          structure: conseillerDtoPE.structure
         })
 
         // When
         const utilisateur =
           await authentificationSqlRepository.getConseillerByStructure(
-            conseillerDtoMilo.idAuthentification,
-            conseillerDtoMilo.structure
+            conseillerDtoPE.idAuthentification,
+            conseillerDtoPE.structure
           )
 
         // Then
         expect(utilisateur).to.deep.equal(
           unUtilisateurConseiller({
+            id: conseillerDtoPE.id,
+            email: conseillerDtoPE.email!,
+            idAuthentification: conseillerDtoPE.idAuthentification,
+            structure,
             roles: [Authentification.Role.SUPERVISEUR]
           })
         )
       })
       it("retourne l'utilisateur avec le role SUPERVISEUR et SUPERVISEUR_PE_BRSA", async () => {
         // Given
-        const structure = Core.Structure.POLE_EMPLOI
         await SuperviseurSqlModel.create({
-          email: conseillerDtoMilo.email,
+          email: conseillerDtoPE.email,
           structure
         })
         await SuperviseurSqlModel.create({
-          email: conseillerDtoMilo.email,
+          email: conseillerDtoPE.email,
           structure: Core.Structure.POLE_EMPLOI_BRSA
         })
 
@@ -134,7 +143,8 @@ describe('AuthentificationSqlRepository', () => {
         // Then
         expect(utilisateur).to.deep.equal(
           unUtilisateurConseiller({
-            id: 'pe',
+            id: conseillerDtoPE.id,
+            email: conseillerDtoPE.email!,
             idAuthentification: conseillerDtoPE.idAuthentification,
             structure,
             roles: [
