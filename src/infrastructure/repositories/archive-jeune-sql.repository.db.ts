@@ -79,7 +79,7 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
   ): Promise<Result<ArchiveJeune>> {
     const idJeune = metadonnes.idJeune
 
-    const messages = await this.firebaseClient.getChat(idJeune)
+    const messages = await this.firebaseClient.getChatAArchiver(idJeune)
     const jeuneSqlModel = await JeuneSqlModel.findByPk(idJeune, {
       include: [
         ConseillerSqlModel,

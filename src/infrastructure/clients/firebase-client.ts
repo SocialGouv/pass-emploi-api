@@ -46,6 +46,7 @@ export interface IFirebaseClient {
 const FIREBASE_CHAT_PATH = 'chat'
 const FIREBASE_GROUP_PATH = 'groupe'
 const FIREBASE_MESSAGES_PATH = 'messages'
+const FIREBASE_MESSAGES_HISTORY_PATH = 'history'
 const SENT_BY_CONSEILLER = 'conseiller'
 
 @Injectable()
@@ -376,40 +377,83 @@ export class FirebaseClient implements IFirebaseClient {
     }
   }
 
-  async getChat(idJeune: string): Promise<ArchiveJeune.Message[]> {
+  async getChatAArchiver(idJeune: string): Promise<ArchiveJeune.Message[]> {
     const collection = this.firestore.collection(FIREBASE_CHAT_PATH)
     const chats = await collection.where('jeuneId', '==', idJeune).get()
 
+    const messagesArchive = []
     if (!chats.empty) {
       const messagesChiffres = await chats.docs[0].ref
         .collection(FIREBASE_MESSAGES_PATH)
         .get()
-      return messagesChiffres.docs.map(
-        this.fromMessageChiffreToMessageArchive.bind(this)
-      )
+
+      for (const messageChiffre of messagesChiffres.docs) {
+        const messageAArchiver = await this.fromMessageChiffreToMessageArchive(
+          messageChiffre
+        )
+        messagesArchive.push(messageAArchiver)
+      }
     }
-    return []
+
+    return messagesArchive
   }
 
-  private fromMessageChiffreToMessageArchive(
+  private async fromMessageChiffreToMessageArchive(
     message: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>
-  ): ArchiveJeune.Message {
+  ): Promise<ArchiveJeune.Message> {
     const messageFirebase = message.data()
     const key = Utf8.parse(this.configService.get('firebase').encryptionKey)
+    const iv = Base64.parse(messageFirebase.iv)
 
-    const contenu = AES.decrypt(messageFirebase.content, key, {
-      iv: Base64.parse(messageFirebase.iv)
-    }).toString(Utf8)
+    const contenu = AES.decrypt(messageFirebase.content, key, { iv }).toString(
+      Utf8
+    )
     const date = new Date(
       parseInt(messageFirebase.creationDate._seconds) * 1000
     ).toISOString()
-
-    return {
+    const messageArchive: ArchiveJeune.Message = {
       contenu,
       date,
       envoyePar: messageFirebase.sentBy,
       type: messageFirebase.type
     }
+
+    try {
+      const historique = await message.ref
+        .collection(FIREBASE_MESSAGES_HISTORY_PATH)
+        .get()
+      if (!historique.empty)
+        messageArchive.historique = historique.docs.map(doc =>
+          this.fromHistoriqueChiffreToHistoriqueArchive(doc, key, iv)
+        )
+    } catch (e) {
+      this.logger.error(
+        buildError(
+          `Échec de la récupération de l’historique du message ${message.id}`,
+          e
+        )
+      )
+    }
+
+    return messageArchive
+  }
+
+  private fromHistoriqueChiffreToHistoriqueArchive(
+    doc: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>,
+    key: unknown,
+    iv: unknown
+  ): ArchiveJeune.EntreeHistoriqueMessage {
+    const entreeHistorique = doc.data()
+    const contenuPrecedent = AES.decrypt(
+      entreeHistorique.previousContent,
+      key,
+      { iv }
+    ).toString(Utf8)
+    const date = new Date(
+      parseInt(entreeHistorique.date._seconds) * 1000
+    ).toISOString()
+
+    return { date, contenuPrecedent }
   }
 }
 

@@ -51,7 +51,7 @@ describe('ArchiveJeuneSqlRepository', () => {
 
   let rechercheSqlRepository: RechercheSqlRepository
   const firebaseClient = stubClass(FirebaseClient)
-  firebaseClient.getChat.resolves([])
+  firebaseClient.getChatAArchiver.resolves([])
   const archiveJeuneSqlRepository = new ArchiveJeuneSqlRepository(
     firebaseClient
   )
