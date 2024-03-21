@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { Authentification } from '../../domain/authentification'
-import { Core, estPoleEmploiBRSA } from '../../domain/core'
+import { Core, estMilo, estPoleEmploiBRSA } from '../../domain/core'
 import { KeycloakClient } from '../clients/keycloak-client'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
@@ -9,6 +9,7 @@ import {
   fromConseillerSqlToUtilisateur,
   fromJeuneSqlToUtilisateur
 } from './mappers/authentification.mappers'
+import { Op } from 'sequelize'
 
 @Injectable()
 export class AuthentificationSqlRepository
@@ -32,28 +33,35 @@ export class AuthentificationSqlRepository
     })
 
     if (conseillerSqlModel) {
-      const superviseursParEmail = await SuperviseurSqlModel.findAll({
-        where: {
-          email: conseillerSqlModel.email
-        }
-      })
-
-      const estSuperviseur = estConseillerSuperviseur(
-        superviseursParEmail,
-        structure
-      )
-      const estSuperviseurPEBRSA = estConseillerSuperviseurPEBRSA(
-        superviseursParEmail,
-        structure,
-        estSuperviseur
-      )
       const roles = []
 
-      if (estSuperviseur) {
+      if (estMilo(conseillerSqlModel.structure)) {
         roles.push(Authentification.Role.SUPERVISEUR)
-      }
-      if (estSuperviseurPEBRSA) {
-        roles.push(Authentification.Role.SUPERVISEUR_PE_BRSA)
+      } else if (conseillerSqlModel.email) {
+        const superviseursParEmail = await SuperviseurSqlModel.findAll({
+          where: {
+            email: {
+              [Op.like]: `${conseillerSqlModel.email.split('@')[0]}%`
+            }
+          }
+        })
+
+        const estSuperviseur = estConseillerSuperviseur(
+          superviseursParEmail,
+          structure
+        )
+        const estSuperviseurPEBRSA = estConseillerSuperviseurPEBRSA(
+          superviseursParEmail,
+          structure,
+          estSuperviseur
+        )
+
+        if (estSuperviseur) {
+          roles.push(Authentification.Role.SUPERVISEUR)
+        }
+        if (estSuperviseurPEBRSA) {
+          roles.push(Authentification.Role.SUPERVISEUR_PE_BRSA)
+        }
       }
       return fromConseillerSqlToUtilisateur(conseillerSqlModel, roles)
     }
@@ -178,9 +186,6 @@ function estConseillerSuperviseur(
   superviseursParEmail: SuperviseurSqlModel[],
   structureDuConseiller: Core.Structure
 ): boolean {
-  if (structureDuConseiller === Core.Structure.MILO) {
-    return true
-  }
   return Boolean(
     superviseursParEmail.find(
       superviseurParEmail =>
