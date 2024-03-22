@@ -80,7 +80,8 @@ export class GetAgendaSessionsConseillerMiloQueryHandler extends QueryHandler<
         periode: {
           dateDebut: query.dateDebut,
           dateFin: query.dateFin
-        }
+        },
+        avecInscrits: true
       }
     )
 
@@ -97,14 +98,9 @@ export class GetAgendaSessionsConseillerMiloQueryHandler extends QueryHandler<
 
     const resultData: AgendaConseillerMiloSessionListItemQueryModel[] = []
     for (const sessionDto of sessionsDto) {
-      const resultInscrits = await this.miloClient.getListeInscritsSession(
-        idpToken,
-        sessionDto.session.id.toString()
-      )
-      if (isFailure(resultInscrits)) continue
       const listeInscritsQueryModels =
         this.extractJeunesDuConseillerParticipants(
-          resultInscrits.data,
+          sessionDto.session.instances ?? [],
           jeunesByIdPartenaire,
           sessionDto
         )

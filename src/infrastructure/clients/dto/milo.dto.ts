@@ -18,6 +18,7 @@ export interface SessionDto {
   lieu: string
   nbPlacesDisponibles: number | null
   commentaire: string | null
+  instances: InscritSessionMiloDto[] | null
 }
 
 export interface OffreDto {
