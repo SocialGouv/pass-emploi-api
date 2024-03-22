@@ -22,5 +22,6 @@ export const uneOffreImmersionDtov2 = (): PartenaireImmersion.DtoV2 => ({
   contactMode: PartenaireImmersion.ContactMode.IN_PERSON,
   appellations: [
     { appellationLabel: 'Boulanger-Traiteur', appellationCode: 'D1102' }
-  ]
+  ],
+  locationId: 'locationId'
 })

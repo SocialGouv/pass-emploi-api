@@ -6,6 +6,7 @@ export namespace PartenaireImmersion {
     nafLabel: string
     siret: string
     name: string
+    locationId: string | null
     customizedName?: string
     voluntaryToImmersion: boolean
     position: { lat: number; lon: number }

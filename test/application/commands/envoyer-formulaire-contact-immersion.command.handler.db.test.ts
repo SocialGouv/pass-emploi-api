@@ -2,7 +2,11 @@ import {
   EnvoyerFormulaireContactImmersionCommand,
   EnvoyerFormulaireContactImmersionCommandHandler
 } from 'src/application/commands/envoyer-formulaire-contact-immersion.command.handler.db'
-import { emptySuccess, failure } from 'src/building-blocks/types/result'
+import {
+  emptySuccess,
+  failure,
+  success
+} from 'src/building-blocks/types/result'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { ImmersionClient } from 'src/infrastructure/clients/immersion-client'
 import { unUtilisateurJeune } from 'test/fixtures/authentification.fixture'
@@ -15,6 +19,7 @@ import {
 import { unMetierRomeDto } from '../../fixtures/sql-models/metier-rome.sql-model'
 import { MetierRomeSqlModel } from '../../../src/infrastructure/sequelize/models/metier-rome.sql-model'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import { uneOffreImmersionDtov2 } from '../../fixtures/offre-immersion.dto.fixture'
 
 describe('EnvoyerFormulaireContactImmersionCommandHandler', () => {
   let databaseForTesting: DatabaseForTesting
@@ -67,6 +72,9 @@ describe('EnvoyerFormulaireContactImmersionCommandHandler', () => {
           message: 'test'
         }
 
+        immersionClient.getDetailOffre
+          .withArgs('siret/11573')
+          .resolves(success(uneOffreImmersionDtov2()))
         immersionClient.envoyerFormulaireImmersion.resolves(emptySuccess())
 
         // When
@@ -84,7 +92,8 @@ describe('EnvoyerFormulaireContactImmersionCommandHandler', () => {
           potentialBeneficiaryPhone: '0600000000',
           immersionObjective: "Découvrir un métier ou un secteur d'activité",
           contactMode: command.contactMode,
-          message: command.message
+          message: command.message,
+          locationId: 'locationId'
         })
       })
     })
@@ -121,7 +130,12 @@ describe('EnvoyerFormulaireContactImmersionCommandHandler', () => {
 
         // Then
         expect(result).to.deep.equal(
-          failure(new NonTrouveError('Un label rome qui n’existe pas'))
+          failure(
+            new NonTrouveError(
+              'Offre Immersion',
+              'Un label rome qui n’existe pas'
+            )
+          )
         )
       })
     })
