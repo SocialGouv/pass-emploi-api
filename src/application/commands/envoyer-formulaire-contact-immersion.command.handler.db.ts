@@ -1,17 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { QueryTypes, Sequelize } from 'sequelize'
 import { CommandHandler } from 'src/building-blocks/types/command-handler'
-import { failure, Result } from 'src/building-blocks/types/result'
+import { Result, failure, isFailure } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import {
   FormulaireImmersionPayload,
   ImmersionClient
 } from 'src/infrastructure/clients/immersion-client'
-import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
-import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
-import { QueryTypes, Sequelize } from 'sequelize'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { PartenaireImmersion } from '../../infrastructure/repositories/dto/immersion.dto'
+import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 
 export interface EnvoyerFormulaireContactImmersionCommand {
   idJeune: string
@@ -57,7 +57,14 @@ export class EnvoyerFormulaireContactImmersionCommandHandler extends CommandHand
     )
 
     if (!appellationCode) {
-      return failure(new NonTrouveError(command.labelRome))
+      return failure(new NonTrouveError('Offre Immersion', command.labelRome))
+    }
+
+    const offre = await this.immersionClient.getDetailOffre(
+      `${command.siret}/${appellationCode}`
+    )
+    if (isFailure(offre)) {
+      return failure(new NonTrouveError('Offre Immersion', command.labelRome))
     }
 
     const params: FormulaireImmersionPayload = {
@@ -69,7 +76,8 @@ export class EnvoyerFormulaireContactImmersionCommandHandler extends CommandHand
       potentialBeneficiaryPhone: '0600000000',
       immersionObjective: "Découvrir un métier ou un secteur d'activité",
       contactMode: PartenaireImmersion.ContactMode.EMAIL,
-      message: command.message ? command.message : defaultMessage
+      message: command.message ?? defaultMessage,
+      locationId: offre.data.locationId
     }
 
     return this.immersionClient.envoyerFormulaireImmersion(params)

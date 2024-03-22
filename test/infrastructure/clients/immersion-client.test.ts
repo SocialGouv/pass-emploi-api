@@ -156,7 +156,8 @@ describe('ImmersionClient', () => {
         potentialBeneficiaryPhone: 'non communiqué',
         immersionObjective: "Découvrir un métier ou un secteur d'activité",
         contactMode: 'EMAIL',
-        message: 'test'
+        message: 'test',
+        locationId: ''
       }
 
       nock('https://api.api-immersion.beta.gouv.op')
@@ -181,7 +182,8 @@ describe('ImmersionClient', () => {
         potentialBeneficiaryPhone: 'non communiqué',
         immersionObjective: "Découvrir un métier ou un secteur d'activité",
         contactMode: 'EMAIL',
-        message: 'test'
+        message: 'test',
+        locationId: ''
       }
 
       nock('https://api.api-immersion.beta.gouv.op')

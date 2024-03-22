@@ -17,6 +17,7 @@ export interface FormulaireImmersionPayload {
   contactMode: string
   potentialBeneficiaryPhone: string
   immersionObjective: string
+  locationId: string | null
   message?: string
 }
 
