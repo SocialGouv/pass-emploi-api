@@ -1193,9 +1193,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@google-cloud/bigquery@npm:7.5.0":
-  version: 7.5.0
-  resolution: "@google-cloud/bigquery@npm:7.5.0"
+"@google-cloud/bigquery@npm:7.5.2":
+  version: 7.5.2
+  resolution: "@google-cloud/bigquery@npm:7.5.2"
   dependencies:
     "@google-cloud/common": "npm:^5.0.0"
     "@google-cloud/paginator": "npm:^5.0.0"
@@ -1208,7 +1208,7 @@ __metadata:
     is: "npm:^3.3.0"
     stream-events: "npm:^1.0.5"
     uuid: "npm:^9.0.0"
-  checksum: 10/e9e35626352f96014019e530115de3d08ed3b3f7a0d3ba1d4f0fe083be71196decd37eb90e333230eeefd023665de65bf6c179d22f98bfe72b6d4dc2ff9c7a6a
+  checksum: 10/b95bef3c4fb327de8608792e0e8aed00e367c108f2a533b23374e96c6d1e5c2085b93e9fe429d08f3a017aeb166f7d561f9e6d41fe529ce63b2b46fbec93647b
   languageName: node
   linkType: hard
 
@@ -9272,7 +9272,7 @@ __metadata:
   dependencies:
     "@aws-sdk/client-s3": "npm:3.537.0"
     "@aws-sdk/s3-request-presigner": "npm:3.537.0"
-    "@google-cloud/bigquery": "npm:7.5.0"
+    "@google-cloud/bigquery": "npm:7.5.2"
     "@nestjs/axios": "npm:1.0.1"
     "@nestjs/cli": "npm:^9.5.0"
     "@nestjs/common": "npm:9.4.3"
