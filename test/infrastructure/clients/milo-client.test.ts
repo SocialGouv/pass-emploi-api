@@ -54,7 +54,7 @@ describe('MiloClient', () => {
 
       nock(MILO_BASE_URL)
         .get(
-          `/operateurs/structures/${idStructure}/sessions?dateDebutRecherche=2023-05-31&dateFinRecherche=2023-06-29&taillePage=150`
+          `/operateurs/structures/${idStructure}/sessions?dateDebutRecherche=2023-05-31&dateFinRecherche=2023-06-29&taillePage=150&rechercheInscrits=true`
         )
         .reply(200, uneListeSessionsConseillerDto)
         .isDone()
@@ -68,8 +68,31 @@ describe('MiloClient', () => {
           periode: {
             dateDebut: DateTime.fromISO('2023-06-01T00:00:00'),
             dateFin: DateTime.fromISO('2023-06-30T00:00:00')
-          }
+          },
+          avecInscrits: true
         }
+      )
+
+      // Then
+      expect(result).to.deep.equal(success(uneListeSessionsConseillerDto))
+    })
+
+    it('recupere la liste des sessions milo de la structure du conseiller', async () => {
+      // Given
+      const idpToken = 'idpToken'
+      const idStructure = '1'
+
+      nock(MILO_BASE_URL)
+        .get(`/operateurs/structures/${idStructure}/sessions?taillePage=150`)
+        .reply(200, uneListeSessionsConseillerDto)
+        .isDone()
+
+      // When
+      const result = await miloClient.getSessionsConseiller(
+        idpToken,
+        idStructure,
+        'America/Cayenne',
+        {}
       )
 
       // Then

@@ -21,7 +21,8 @@ export const uneSessionDto: SessionDto = {
   animateur: 'Un-animateur',
   lieu: 'Un-lieu',
   nbPlacesDisponibles: 10,
-  commentaire: 'Un-commentaire'
+  commentaire: 'Un-commentaire',
+  instances: null
 }
 
 export const uneOffreDto: OffreDto = {
