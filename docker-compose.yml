@@ -1,6 +1,4 @@
 ---
-version: '3.7'
-
 volumes:
   api-db-data:
   analytics-db-data:

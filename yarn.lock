@@ -1999,14 +1999,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@redis/client@npm:1.5.13":
-  version: 1.5.13
-  resolution: "@redis/client@npm:1.5.13"
+"@redis/client@npm:1.5.14":
+  version: 1.5.14
+  resolution: "@redis/client@npm:1.5.14"
   dependencies:
     cluster-key-slot: "npm:1.1.2"
     generic-pool: "npm:3.9.0"
     yallist: "npm:4.0.0"
-  checksum: 10/757e38a5ebedd772fc051756971ad158878c95aa5bf8b2ab94b28e179f8a9cceb31a009c5d59c9efaf7640ef93a1936a8c54500c4c4065bfbd3e7fcc71f6dac6
+  checksum: 10/aab53eff9456e0a5e0ef78ce16db3eca4b837274b8285c5d66ced549573dbacf75972935806911274d6dd906a53d982ef9b1a6f11a8efe4a18efa94ec9c2a4b3
   languageName: node
   linkType: hard
 
@@ -2836,10 +2836,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/chai@npm:*, @types/chai@npm:^4.3.11":
+"@types/chai@npm:*":
   version: 4.3.11
   resolution: "@types/chai@npm:4.3.11"
   checksum: 10/c83a00359684bf06114d5ad0ffa62c78b2fbfe09a985eda56e55cd3c191fe176052aef6e297a8c8a3608efb8ea7a44598cf7e0ae1a3a9311af892417e95b0b28
+  languageName: node
+  linkType: hard
+
+"@types/chai@npm:^4.3.14":
+  version: 4.3.14
+  resolution: "@types/chai@npm:4.3.14"
+  checksum: 10/300be72bb22657c1e449b27a5f0ab24405edf3be5c42ea0095f8e1c6daabc29c3028eee2421cc443c01a098da47ba32baecc363be7324433132281b9d9a8216f
   languageName: node
   linkType: hard
 
@@ -2868,10 +2875,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/crypto-js@npm:^4.2.1":
-  version: 4.2.1
-  resolution: "@types/crypto-js@npm:4.2.1"
-  checksum: 10/413a3de36ff916fd796aac6069dc4afba26c3add11c2570eff43f98eb86e34ed8fa2693636743d13685f038f9d3a21e3327b33e3a06c3cb332be5ca64b802925
+"@types/crypto-js@npm:^4.2.2":
+  version: 4.2.2
+  resolution: "@types/crypto-js@npm:4.2.2"
+  checksum: 10/a40fc5a9219fd33f54ba3e094c5e5ab2904d3106681a76f1029bb038976591e9c8959099963bf4474fde21c2d8d00c1f896445206a3a58f85588f9cb1bd96a9a
   languageName: node
   linkType: hard
 
@@ -2945,10 +2952,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/geojson@npm:^7946.0.13":
-  version: 7946.0.13
-  resolution: "@types/geojson@npm:7946.0.13"
-  checksum: 10/b3b68457c89bc3f0445dc9eb54d07e6f89658672867c54989bc7f71f87d54e562195b291d43e1b84476493351271d7ccb9f5c6ab2012b29fbafbb0e8e43c4bca
+"@types/geojson@npm:^7946.0.14":
+  version: 7946.0.14
+  resolution: "@types/geojson@npm:7946.0.14"
+  checksum: 10/ae511bee6488ae3bd5a3a3347aedb0371e997b14225b8983679284e22fa4ebd88627c6e3ff8b08bf4cc35068cb29310c89427311ffc9322c255615821a922e71
   languageName: node
   linkType: hard
 
@@ -3014,10 +3021,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/luxon@npm:^3.4.1":
-  version: 3.4.1
-  resolution: "@types/luxon@npm:3.4.1"
-  checksum: 10/dc133d28dee98fd7944e81fbde8df4fcdd7b602139259b5566b556a09da296a6c57e02899b0068470465d5b3798f551edafe0a6c8fb89fcd327d799ff7d37c92
+"@types/luxon@npm:^3.4.2":
+  version: 3.4.2
+  resolution: "@types/luxon@npm:3.4.2"
+  checksum: 10/fd89566e3026559f2bc4ddcc1e70a2c16161905ed50be9473ec0cfbbbe919165041408c4f6e06c4bcf095445535052e2c099087c76b1b38e368127e618fc968d
   languageName: node
   linkType: hard
 
@@ -3258,10 +3265,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/uuid@npm:^9.0.7":
-  version: 9.0.7
-  resolution: "@types/uuid@npm:9.0.7"
-  checksum: 10/c7321194aeba9ea173efd1e721403bdf4e7ae6945f8f8cdbc87c791f4b505ccf3dbc4a8883d90b394ef13b7c2dc778045792b05dbb23b3c746f8ea347804d448
+"@types/uuid@npm:^9.0.8":
+  version: 9.0.8
+  resolution: "@types/uuid@npm:9.0.8"
+  checksum: 10/b8c60b7ba8250356b5088302583d1704a4e1a13558d143c549c408bf8920535602ffc12394ede77f8a8083511b023704bc66d1345792714002bfa261b17c5275
   languageName: node
   linkType: hard
 
@@ -4337,23 +4344,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bull-repl@npm:^0.29.0":
-  version: 0.29.0
-  resolution: "bull-repl@npm:0.29.0"
+"bull-repl@npm:^0.29.1":
+  version: 0.29.1
+  resolution: "bull-repl@npm:0.29.1"
   dependencies:
     "@moleculer/vorpal": "npm:^1.11.5"
-    bull: "npm:^4.10.1"
+    bull: "npm:^4.12.2"
     chalk: "npm:^4.1.0"
     ms: "npm:^2.1.3"
-    node-jq: "npm:^2.3.4"
-    redis-url-plus: "npm:^1.0.0"
+    node-jq: "npm:^4.3.0"
+    redis-url-plus: "npm:^1.1.0"
   bin:
     bull-repl: index.js
-  checksum: 10/480c6219bcd3fcdc1d04a4b1c28b857348b67f6805619538725c5ec5accb296cd05dabd133438006773c20ecb8965b1e58bfefaab400b9de4d9a74cf2b0c50aa
+  checksum: 10/ea7eaa481278b03f03e037b19752bd03761b8735dbe2ac8607885e8193f215713d49238228a45b57a2e454ed3bf1035c9434d46ab6009a20a04571526beaec4a
   languageName: node
   linkType: hard
 
-"bull@npm:*, bull@npm:4.12.2, bull@npm:^4.10.1":
+"bull@npm:*, bull@npm:4.12.2, bull@npm:^4.12.2":
   version: 4.12.2
   resolution: "bull@npm:4.12.2"
   dependencies:
@@ -7287,12 +7294,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:^9.0.0":
-  version: 9.0.5
-  resolution: "husky@npm:9.0.5"
+"husky@npm:^9.0.11":
+  version: 9.0.11
+  resolution: "husky@npm:9.0.11"
   bin:
-    husky: bin.js
-  checksum: 10/0f9c88867adca36efe01e1fc90ffa89234d57568935dde073b8b12e64f484e1cf3fe7183ef6ed5978fc8aa063e3607de7a6691b33aa7ff7d041516f9e34c546c
+    husky: bin.mjs
+  checksum: 10/8a9b7cb9dc8494b470b3b47b386e65d579608c6206da80d3cc8b71d10e37947264af3dfe00092368dad9673b51d2a5ee87afb4b2291e77ba9e7ec1ac36e56cd1
   languageName: node
   linkType: hard
 
@@ -8348,29 +8355,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lint-staged@npm:^15.2.0":
-  version: 15.2.0
-  resolution: "lint-staged@npm:15.2.0"
+"lint-staged@npm:^15.2.2":
+  version: 15.2.2
+  resolution: "lint-staged@npm:15.2.2"
   dependencies:
     chalk: "npm:5.3.0"
     commander: "npm:11.1.0"
     debug: "npm:4.3.4"
     execa: "npm:8.0.1"
     lilconfig: "npm:3.0.0"
-    listr2: "npm:8.0.0"
+    listr2: "npm:8.0.1"
     micromatch: "npm:4.0.5"
     pidtree: "npm:0.6.0"
     string-argv: "npm:0.3.2"
     yaml: "npm:2.3.4"
   bin:
     lint-staged: bin/lint-staged.js
-  checksum: 10/2a20e9b15f7e7419e92a2014afb01feb58798341a4a56aa1b9c8570297681cf54919f645df3c221e4348fd262df38c1e711a245a645d477bf870841e27c604f2
+  checksum: 10/5855ae7abf3ffdc2d66e8ad20759915e76544e7c4bcdfef78c82b5c126502284320d9fb0ecde554a6d07747311ab751d0bccbe3468aa5d5a7661774317cd7437
   languageName: node
   linkType: hard
 
-"listr2@npm:8.0.0":
-  version: 8.0.0
-  resolution: "listr2@npm:8.0.0"
+"listr2@npm:8.0.1":
+  version: 8.0.1
+  resolution: "listr2@npm:8.0.1"
   dependencies:
     cli-truncate: "npm:^4.0.0"
     colorette: "npm:^2.0.20"
@@ -8378,7 +8385,7 @@ __metadata:
     log-update: "npm:^6.0.0"
     rfdc: "npm:^1.3.0"
     wrap-ansi: "npm:^9.0.0"
-  checksum: 10/d5a53b6d5feaa3a45c3750ebf10d242d42f11741b890edf8de7d68a002c36f15d0683f25742a0eb055763f04c005210a5cd61ef6c24ebac099d597cb21b06f29
+  checksum: 10/3fa83e8b709306b7efab69884ac1af08de3e18449bccf0b4d81f78dc7235dc921a32a5875b1e7deea0650f0faef2bca2d8992f16377d858158eb5a57bbb0d025
   languageName: node
   linkType: hard
 
@@ -9285,15 +9292,15 @@ __metadata:
     "@nestjs/testing": "npm:^9.4.3"
     "@salesforce/ts-sinon": "npm:^1.4.19"
     "@types/bull": "npm:^4.10.0"
-    "@types/chai": "npm:^4.3.11"
+    "@types/chai": "npm:^4.3.14"
     "@types/chai-as-promised": "npm:^7.1.8"
     "@types/compression": "npm:^1.7.5"
-    "@types/crypto-js": "npm:^4.2.1"
+    "@types/crypto-js": "npm:^4.2.2"
     "@types/dirty-chai": "npm:^2.0.4"
     "@types/express": "npm:^4.17.21"
-    "@types/geojson": "npm:^7946.0.13"
+    "@types/geojson": "npm:^7946.0.14"
     "@types/lodash.isequal": "npm:^4.5.8"
-    "@types/luxon": "npm:^3.4.1"
+    "@types/luxon": "npm:^3.4.2"
     "@types/mocha": "npm:^10.0.6"
     "@types/multer": "npm:^1.4.11"
     "@types/node": "npm:^20.11.4"
@@ -9302,12 +9309,12 @@ __metadata:
     "@types/sinon": "npm:^17.0.3"
     "@types/sinon-chai": "npm:^3.2.12"
     "@types/supertest": "npm:^2.0.16"
-    "@types/uuid": "npm:^9.0.7"
+    "@types/uuid": "npm:^9.0.8"
     "@types/yargs": "npm:^17.0.32"
     "@typescript-eslint/eslint-plugin": "npm:^6.19.0"
     "@typescript-eslint/parser": "npm:^6.19.0"
     bull: "npm:4.12.2"
-    bull-repl: "npm:^0.29.0"
+    bull-repl: "npm:^0.29.1"
     chai: "npm:^4.4.1"
     chai-as-promised: "npm:^7.1.1"
     chai-exclude: "npm:^2.1.0"
@@ -9328,16 +9335,16 @@ __metadata:
     firebase-admin: "npm:12.0.0"
     geojson: "npm:0.5.0"
     helmet: "npm:7.1.0"
-    husky: "npm:^9.0.0"
+    husky: "npm:^9.0.11"
     ics: "npm:3.7.2"
     joi: "npm:17.12.2"
     jose: "npm:5.2.3"
-    lint-staged: "npm:^15.2.0"
+    lint-staged: "npm:^15.2.2"
     lodash.isequal: "npm:4.5.0"
     luxon: "npm:3.4.4"
     mocha: "npm:^10.2.0"
     nestjs-pino: "npm:4.0.0"
-    nock: "npm:^13.5.0"
+    nock: "npm:^13.5.4"
     nyc: "npm:^15.1.0"
     openid-client: "npm:5.6.5"
     pg: "npm:8.11.3"
@@ -9345,7 +9352,7 @@ __metadata:
     pg-copy-streams: "npm:6.0.6"
     pino-http: "npm:9.0.0"
     prettier: "npm:^2.8.8"
-    redis: "npm:^4.6.12"
+    redis: "npm:^4.6.13"
     reflect-metadata: "npm:0.2.1"
     remove-accents: "npm:0.5.0"
     rimraf: "npm:5.0.5"
@@ -9420,14 +9427,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nock@npm:^13.5.0":
-  version: 13.5.0
-  resolution: "nock@npm:13.5.0"
+"nock@npm:^13.5.4":
+  version: 13.5.4
+  resolution: "nock@npm:13.5.4"
   dependencies:
     debug: "npm:^4.1.0"
     json-stringify-safe: "npm:^5.0.1"
     propagate: "npm:^2.0.0"
-  checksum: 10/347e6804d3eadb2ec81e3a0808b4cf8d826e5a6b52aa91b31db9c78c9afb58f0af0d1c941dff13d78ff99968b025dea9593f341cc515463270cb69d8e293c9cf
+  checksum: 10/75bad391bae4efb81b742734af5f2d87309cd93d3ca6b78372fd37946d78ccb254d79104676619866915e6734abfc1b00fee2aa42073a4843ca3c746aad35a4d
   languageName: node
   linkType: hard
 
@@ -9508,9 +9515,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-jq@npm:^2.3.4":
-  version: 2.3.5
-  resolution: "node-jq@npm:2.3.5"
+"node-jq@npm:^4.3.0":
+  version: 4.3.1
+  resolution: "node-jq@npm:4.3.1"
   dependencies:
     bin-build: "npm:^3.0.0"
     is-valid-path: "npm:^0.1.1"
@@ -9518,7 +9525,9 @@ __metadata:
     node-downloader-helper: "npm:^2.1.6"
     strip-final-newline: "npm:^2.0.0"
     tempfile: "npm:^3.0.0"
-  checksum: 10/fe11259ceabc8cbedea7db54df142abdeb1e78b9d666f7443a458d74f1338486ac117f35b1a5ce8355aaa382286afc30e0fed4f63dc9606f16010b18be329a0a
+  bin:
+    node-jq: bin/jq
+  checksum: 10/38febc06de88ff4686e485220dacbcf24139392a06f378f074e8281168c6c481bcd4e6dc34d27a89e418afc177048d217c6ba6d1cf044335c4c0f21a8c910c55
   languageName: node
   linkType: hard
 
@@ -10788,7 +10797,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redis-url-plus@npm:^1.0.0":
+"redis-url-plus@npm:^1.1.0":
   version: 1.1.0
   resolution: "redis-url-plus@npm:1.1.0"
   checksum: 10/e6603c80024e7447c926815125b9bf92a053b1f589d0d5bd951108230e500d3280e0173a54f18d15ee31d9f7d56b598b0c68d2d6142b584636c603d39c48dd53
@@ -10802,17 +10811,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redis@npm:^4.6.12":
-  version: 4.6.12
-  resolution: "redis@npm:4.6.12"
+"redis@npm:^4.6.13":
+  version: 4.6.13
+  resolution: "redis@npm:4.6.13"
   dependencies:
     "@redis/bloom": "npm:1.2.0"
-    "@redis/client": "npm:1.5.13"
+    "@redis/client": "npm:1.5.14"
     "@redis/graph": "npm:1.1.1"
     "@redis/json": "npm:1.0.6"
     "@redis/search": "npm:1.1.6"
     "@redis/time-series": "npm:1.0.5"
-  checksum: 10/4b6819518840fe15c1ecf6b41aa7cb9d3a73707b951e2d734f461e123f33acba63e35bf38fd51b3c3a2aaac10787bf9b7c6f6bbc5b479967ae89e39f9232d46f
+  checksum: 10/cc66182b8fa78c2a63b5300b15fa6fbf8908773d78bc5ca3960018f465595b51dfecaebe8c848111a3b723530f17bdaa1c186f73875cd9ba351f32d2e5e14d5f
   languageName: node
   linkType: hard
 
