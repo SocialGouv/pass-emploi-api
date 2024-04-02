@@ -71,11 +71,7 @@ export class FilesController {
         size: fichier.size
       },
       jeunesIds: payload.jeunesIds,
-      listesDeDiffusionIds: payload.listesDeDiffusionIds,
-      createur: {
-        id: utilisateur.id,
-        type: utilisateur.type
-      }
+      listesDeDiffusionIds: payload.listesDeDiffusionIds
     }
     const result = await this.televerserFichierCommandHandler.execute(
       command,

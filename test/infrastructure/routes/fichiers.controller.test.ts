@@ -92,11 +92,7 @@ describe('FichiersController', () => {
           size: image.size
         },
         jeunesIds: ['1'],
-        listesDeDiffusionIds: undefined,
-        createur: {
-          id: utilisateur.id,
-          type: utilisateur.type
-        }
+        listesDeDiffusionIds: undefined
       }
       const commandOutput: TeleverserFichierCommandOutput = {
         id: idFichier,
@@ -131,11 +127,7 @@ describe('FichiersController', () => {
           size: image.size
         },
         jeunesIds: ['1'],
-        listesDeDiffusionIds: undefined,
-        createur: {
-          id: utilisateur.id,
-          type: utilisateur.type
-        }
+        listesDeDiffusionIds: undefined
       }
       televerserFichierCommandHandler.execute
         .withArgs(command, utilisateur)
