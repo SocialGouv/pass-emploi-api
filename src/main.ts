@@ -5,7 +5,11 @@ import { initializeAPMAgent } from './infrastructure/monitoring/apm.init'
 initializeAPMAgent()
 
 import * as compression from 'compression'
-import { ValidationPipe } from '@nestjs/common'
+import {
+  BadRequestException,
+  ValidationError,
+  ValidationPipe
+} from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 import { NestExpressApplication } from '@nestjs/platform-express'
@@ -39,7 +43,18 @@ async function bootstrap(): Promise<void> {
     app.use(helmet())
     app.enableCors()
     app.useGlobalInterceptors(new ContextInterceptor(context))
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        enableDebugMessages: true,
+        exceptionFactory: (
+          validationErrors: ValidationError[] = []
+        ): unknown => {
+          logger.warn(JSON.stringify(validationErrors))
+          return new BadRequestException(validationErrors)
+        }
+      })
+    )
     app.disable('x-powered-by')
     await app.listen(port).then(server => {
       const timeoutOf10Seconds = 10000
