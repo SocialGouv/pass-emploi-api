@@ -37,7 +37,8 @@ export default () => {
     nodeEnv: process.env.NODE_ENV ?? 'production',
     frontEndUrl: process.env.FRONTEND_URL,
     passEmploiContactEmail:
-      process.env.PASS_EMPLOI_CONTACT_EMAIL ?? 'pass.emploi.contact@gmail.com',
+      process.env.PASS_EMPLOI_CONTACT_EMAIL ??
+      'no-reply@pass-emploi.beta.gouv.fr',
     baseUrl,
     poleEmploi: {
       url:
