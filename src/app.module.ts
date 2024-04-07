@@ -355,6 +355,7 @@ import { DateService } from './utils/date-service'
 import { IdService } from './utils/id-service'
 import { configureLoggerModule } from './utils/logger.module'
 import { RateLimiterService } from './utils/rate-limiter.service'
+import { QualifierActionsJobHandler } from './application/jobs/qualifier-actions.job.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -808,7 +809,8 @@ export const JobHandlerProviders = [
   NettoyerEvenementsChargesAnalyticsJobHandler,
   EnrichirEvenementsJobHandler,
   ChargerLesVuesJobHandler,
-  InitialiserLesVuesJobHandler
+  InitialiserLesVuesJobHandler,
+  QualifierActionsJobHandler
 ]
 
 @Module(buildModuleMetadata())
