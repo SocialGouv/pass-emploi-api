@@ -369,7 +369,11 @@ describe('UpdateUtilisateurCommandHandler', () => {
               // Then
               expect(isSuccess(result)).equal(true)
               if (isSuccess(result)) {
-                expect(result.data).to.deep.equal(unUtilisateurQueryModel())
+                expect(result.data).to.deep.equal(
+                  unUtilisateurQueryModel({
+                    roles: [Authentification.Role.SUPERVISEUR]
+                  })
+                )
               }
             })
             describe('Pôle Emploi', () => {
@@ -402,7 +406,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
               })
             })
           })
-          describe("quand il est valide mais il manque l' email", () => {
+          describe("quand il est valide mais il manque l'email", () => {
             it('crée et retourne le conseiller', async () => {
               // Given
               const command: UpdateUtilisateurCommand = {
@@ -438,9 +442,10 @@ describe('UpdateUtilisateurCommandHandler', () => {
               // Then
               expect(isSuccess(result)).equal(true)
               if (isSuccess(result)) {
-                expect(result.data).to.deep.equal(
-                  unUtilisateurSansEmailQueryModel()
-                )
+                expect(result.data).to.deep.equal({
+                  ...unUtilisateurSansEmailQueryModel(),
+                  roles: [Authentification.Role.SUPERVISEUR]
+                })
               }
             })
           })

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { ConseillerNonValide } from '../building-blocks/types/domain-error'
 import { failure, Result, success } from '../building-blocks/types/result'
 import { IdService } from '../utils/id-service'
-import { Core } from './core'
+import { Core, estMilo } from './core'
 
 export const AuthentificationRepositoryToken = 'Authentification.Repository'
 
@@ -107,7 +107,7 @@ export namespace Authentification {
         email: email,
         type: Type.CONSEILLER,
         structure: structure,
-        roles: []
+        roles: estMilo(structure) ? [Authentification.Role.SUPERVISEUR] : []
       }
       return success(utilisateur)
     }
