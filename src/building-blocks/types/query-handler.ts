@@ -12,7 +12,7 @@ import * as APM from 'elastic-apm-node'
  * @see https://martinfowler.com/bliki/CommandQuerySeparation.html
  * @see https://udidahan.com/2009/12/09/clarified-cqrs/
  */
-export abstract class QueryHandler<Q extends Query | void, QM> {
+export abstract class QueryHandler<Q extends Query | void, R> {
   protected logger: Logger
   private queryHandlerName: string
   private apmService: APM.Agent
@@ -26,7 +26,7 @@ export abstract class QueryHandler<Q extends Query | void, QM> {
   async execute(
     query: Q,
     utilisateur?: Authentification.Utilisateur
-  ): Promise<QM> {
+  ): Promise<R> {
     try {
       const authorizedResult = await this.authorize(query, utilisateur)
       if (isFailure(authorizedResult)) {
@@ -35,7 +35,7 @@ export abstract class QueryHandler<Q extends Query | void, QM> {
 
       const result = await this.handle(query, utilisateur)
 
-      this.monitor(utilisateur, query).catch(error => {
+      this.monitor(utilisateur, query, result).catch(error => {
         this.apmService.captureError(error)
         this.logger.error(error)
       })
@@ -51,7 +51,7 @@ export abstract class QueryHandler<Q extends Query | void, QM> {
   abstract handle(
     query: Q,
     utilisateur?: Authentification.Utilisateur
-  ): Promise<QM>
+  ): Promise<R>
 
   abstract authorize(
     query?: Q,
@@ -60,7 +60,8 @@ export abstract class QueryHandler<Q extends Query | void, QM> {
 
   abstract monitor(
     utilisateur?: Authentification.Utilisateur,
-    query?: Q
+    query?: Q,
+    result?: R
   ): Promise<void>
 
   protected logAfter(

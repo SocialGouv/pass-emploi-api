@@ -1,5 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { createSandbox } from 'sinon'
+import { Authentification } from 'src/domain/authentification'
 import { ObjectStorageClient } from 'src/infrastructure/clients/object-storage.client'
 import {
   unUtilisateurConseiller,
@@ -80,8 +81,9 @@ describe('TelechargerFichierQueryHandler', () => {
       const result = await telechargerFichierQueryHandler.handle(query)
 
       // Then
-      expect(result).to.deep.equal(success(url))
+      expect(result).to.deep.equal(success({ metadata: fichierMetadata, url }))
     })
+
     it('retourne une failure quand le fichier a une date de suppression', async () => {
       // Given
       const fichierMetadata = unFichierMetadata({ dateSuppression: new Date() })
@@ -104,16 +106,48 @@ describe('TelechargerFichierQueryHandler', () => {
     })
   })
   describe('monitor', () => {
+    it('envoie un évènement de récuperation d’une piece jointe d´un conseiller', async () => {
+      // Given
+      const utilisateur = unUtilisateurJeune()
+
+      // When
+      await telechargerFichierQueryHandler.monitor(
+        utilisateur,
+        { idFichier: 'test' },
+        success({
+          metadata: unFichierMetadata({
+            typeCreateur: Authentification.Type.CONSEILLER
+          }),
+          url: 'pouet'
+        })
+      )
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.PIECE_JOINTE_CONSEILLER_TELECHARGEE,
+        utilisateur
+      )
+    })
+
     it('envoie un évènement de récuperation d’une piece jointe', async () => {
       // Given
       const utilisateur = unUtilisateurJeune()
 
       // When
-      await telechargerFichierQueryHandler.monitor(utilisateur)
+      await telechargerFichierQueryHandler.monitor(
+        utilisateur,
+        { idFichier: 'test' },
+        success({
+          metadata: unFichierMetadata({
+            typeCreateur: Authentification.Type.JEUNE
+          }),
+          url: 'pouet'
+        })
+      )
 
       // Then
       expect(evenementService.creer).to.have.been.calledWithExactly(
-        Evenement.Code.PIECE_JOINTE_TELECHARGEE,
+        Evenement.Code.PIECE_JOINTE_BENEFICIAIRE_TELECHARGEE,
         utilisateur
       )
     })

@@ -24,7 +24,7 @@ import {
   unHeaderAuthorization,
   unUtilisateurDecode
 } from '../../fixtures/authentification.fixture'
-import { uneImage } from '../../fixtures/fichier.fixture'
+import { uneImage, unFichierMetadata } from '../../fixtures/fichier.fixture'
 import { StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
@@ -50,7 +50,7 @@ describe('FichiersController', () => {
 
       telechargerFichierQueryHandler.execute
         .withArgs({ idFichier }, unUtilisateurDecode())
-        .resolves(success(url))
+        .resolves(success({ metadata: unFichierMetadata(), url }))
 
       // When
       await request(app.getHttpServer())
