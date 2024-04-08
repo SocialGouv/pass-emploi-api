@@ -11,6 +11,18 @@ export const databaseProviders = [
     provide: SequelizeInjectionToken,
     inject: [ConfigService],
     useFactory: async (configService: ConfigService): Promise<Sequelize> => {
+      let otherOptions = {}
+      if (configService.get('environment') === 'staging') {
+        otherOptions = {
+          dialectOptions: {
+            ssl: {
+              require: true,
+              rejectUnauthorized: false
+            }
+          }
+        }
+      }
+
       const sequelize = new Sequelize({
         host: configService.get<string>('database.host'),
         port: configService.get<number>('database.port'),
@@ -26,7 +38,8 @@ export const databaseProviders = [
           acquire: configService.get<number>('database.acquireConnections'),
           idle: configService.get<number>('database.idleConnections'),
           evict: configService.get<number>('database.evictConnections')
-        }
+        },
+        ...otherOptions
       })
       sequelize.addModels(sqlModels)
       const logger = new Logger('Sequelize')
