@@ -7829,10 +7829,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jose@npm:5.2.3":
-  version: 5.2.3
-  resolution: "jose@npm:5.2.3"
-  checksum: 10/33056092ed6c1539eee6c0c75bd3664a39c639e02f21ec5cb32ddd231b9345f239e7bffe3f4741c903c711e237ceafb816ed634bd9cd5e4fb61b5a1f067e2c40
+"jose@npm:5.2.4":
+  version: 5.2.4
+  resolution: "jose@npm:5.2.4"
+  checksum: 10/0b09df51d70dad34d301f444dfe44681a157c5e166df88e4a05892ddd7181e42e883c83ed7fae8a41960237343dd4c72282c4aeb10ec94801782be47e3f62170
   languageName: node
   linkType: hard
 
@@ -9119,7 +9119,7 @@ __metadata:
     husky: "npm:^9.0.11"
     ics: "npm:3.7.2"
     joi: "npm:17.12.2"
-    jose: "npm:5.2.3"
+    jose: "npm:5.2.4"
     lint-staged: "npm:^15.2.2"
     lodash.isequal: "npm:4.5.0"
     luxon: "npm:3.4.4"
