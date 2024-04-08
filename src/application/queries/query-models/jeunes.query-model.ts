@@ -154,6 +154,9 @@ export class DetailJeuneQueryModel {
   urlDossier?: string
 
   @ApiProperty({ required: false })
+  estAArchiver?: boolean
+
+  @ApiProperty({ required: false })
   idPartenaire?: string
 
   @ApiProperty({ required: false })
