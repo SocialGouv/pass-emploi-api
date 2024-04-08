@@ -103,7 +103,8 @@ export namespace Evenement {
     OFFRE_SERVICE_CIVIQUE_POSTULEE = 'OFFRE_SERVICE_CIVIQUE_POSTULEE',
     OFFRE_SERVICE_CIVIQUE_SAUVEGARDEE = 'OFFRE_SERVICE_CIVIQUE_SAUVEGARDEE',
     OFFRE_SERVICE_CIVIQUE_RECHERCHEE = 'OFFRE_SERVICE_CIVIQUE_RECHERCHEE',
-    PIECE_JOINTE_TELECHARGEE = 'PIECE_JOINTE_TELECHARGEE',
+    PIECE_JOINTE_CONSEILLER_TELECHARGEE = 'PIECE_JOINTE_CONSEILLER_TELECHARGEE',
+    PIECE_JOINTE_BENEFICIAIRE_TELECHARGEE = 'PIECE_JOINTE_BENEFICIAIRE_TELECHARGEE',
     RDV_CREE = 'RDV_CREE',
     RDV_DETAIL = 'RDV_DETAIL',
     RDV_DETAIL_INDIVIDUEL = 'RDV_DETAIL_INDIVIDUEL',
@@ -592,9 +593,13 @@ const evenements: {
     action: 'Consultation',
     nom: 'Session'
   },
-  [Evenement.Code.PIECE_JOINTE_TELECHARGEE]: {
+  [Evenement.Code.PIECE_JOINTE_CONSEILLER_TELECHARGEE]: {
     categorie: 'Message',
-    action: 'Ouverture PJ'
+    action: 'Ouverture PJ conseiller'
+  },
+  [Evenement.Code.PIECE_JOINTE_BENEFICIAIRE_TELECHARGEE]: {
+    categorie: 'Message',
+    action: 'Ouverture PJ bénéficiaire'
   },
   [Evenement.Code.PREFERENCES_MISES_A_JOUR]: {
     categorie: 'Préférences',
