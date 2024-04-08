@@ -3,20 +3,31 @@ import { RessourceIndisponibleError } from '../../building-blocks/types/domain-e
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { ObjectStorageClient } from '../../infrastructure/clients/object-storage.client'
-import { failure, Result, success } from '../../building-blocks/types/result'
+import {
+  failure,
+  isFailure,
+  Result,
+  success
+} from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Evenement, EvenementService } from '../../domain/evenement'
-import { Fichier, FichierRepositoryToken } from '../../domain/fichier'
+import {
+  Fichier,
+  FichierMetadata,
+  FichierRepositoryToken
+} from '../../domain/fichier'
 import { FichierAuthorizer } from '../authorizers/fichier-authorizer'
 
 export interface TelechargerFichierQuery extends Query {
   idFichier: string
 }
 
+type TelechargerFichierQueryModel = { metadata: FichierMetadata; url: string }
+
 @Injectable()
 export class TelechargerFichierQueryHandler extends QueryHandler<
   TelechargerFichierQuery,
-  Result<string>
+  Result<TelechargerFichierQueryModel>
 > {
   constructor(
     @Inject(FichierRepositoryToken)
@@ -38,7 +49,9 @@ export class TelechargerFichierQueryHandler extends QueryHandler<
     )
   }
 
-  async handle(query: TelechargerFichierQuery): Promise<Result<string>> {
+  async handle(
+    query: TelechargerFichierQuery
+  ): Promise<Result<TelechargerFichierQueryModel>> {
     const fichierMetadata = (await this.fichierRepository.getFichierMetadata(
       query.idFichier
     ))!
@@ -53,13 +66,27 @@ export class TelechargerFichierQueryHandler extends QueryHandler<
 
     const url = await this.objectStorageClient.getUrlPresignee(fichierMetadata)
 
-    return success(url)
+    return success({ metadata: fichierMetadata, url })
   }
 
-  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creer(
-      Evenement.Code.PIECE_JOINTE_TELECHARGEE,
-      utilisateur
-    )
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    _: TelechargerFichierQuery,
+    result: Result<TelechargerFichierQueryModel>
+  ): Promise<void> {
+    if (isFailure(result)) return
+
+    switch (result.data.metadata.typeCreateur) {
+      case Authentification.Type.JEUNE:
+        return this.evenementService.creer(
+          Evenement.Code.PIECE_JOINTE_BENEFICIAIRE_TELECHARGEE,
+          utilisateur
+        )
+      case Authentification.Type.CONSEILLER:
+        return this.evenementService.creer(
+          Evenement.Code.PIECE_JOINTE_CONSEILLER_TELECHARGEE,
+          utilisateur
+        )
+    }
   }
 }
