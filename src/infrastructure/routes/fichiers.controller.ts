@@ -49,7 +49,7 @@ export class FilesController {
       utilisateur
     )
 
-    return handleResult(result, url => ({
+    return handleResult(result, ({ url }) => ({
       url,
       statusCode: HttpStatus.TEMPORARY_REDIRECT
     }))
