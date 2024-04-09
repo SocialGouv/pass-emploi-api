@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
 import { before } from 'mocha'
+import { JeuneMiloAArchiverSqlModel } from 'src/infrastructure/sequelize/models/jeune-milo-a-archiver.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { SituationsMiloSqlModel } from 'src/infrastructure/sequelize/models/situations-milo.sql-model'
 import {
@@ -485,11 +486,11 @@ describe('JeuneSqlRepository', () => {
       await JeuneSqlModel.creer(unJeuneDto({ idConseiller: conseillerDto.id }))
 
       // When
-      await expect(await jeuneSqlRepository.get('ABCDE')).not.to.be.undefined
+      expect(await jeuneSqlRepository.get('ABCDE')).not.to.be.undefined()
       await jeuneSqlRepository.supprimer('ABCDE')
 
       // Then
-      await expect(await jeuneSqlRepository.get('ABCDE')).to.be.undefined
+      expect(await jeuneSqlRepository.get('ABCDE')).to.be.undefined()
     })
 
     describe('supprime toutes les dépendences au jeune', () => {
@@ -543,65 +544,76 @@ describe('JeuneSqlRepository', () => {
         await TransfertConseillerSqlModel.create(unTransfertDto)
         await EvenementEngagementHebdoSqlModel.create(evenementEngagement)
         await SituationsMiloSqlModel.create(situations)
+        // await JeuneMiloAArchiverSqlModel.create({ idJeune: jeuneDto.id })
 
         await jeuneSqlRepository.supprimer(jeuneDto.id)
       })
 
       it('supprime le jeune', async () => {
-        await expect(await jeuneSqlRepository.get(jeuneDto.id)).to.be.undefined
+        expect(await jeuneSqlRepository.get(jeuneDto.id)).to.be.undefined()
       })
       it('supprime les actions du jeune', async () => {
-        await expect(await ActionSqlModel.findByPk(actionDto.id)).to.be.null
+        expect(await ActionSqlModel.findByPk(actionDto.id)).to.be.null()
       })
       it('supprime les recherches du jeune', async () => {
-        await expect(await RechercheSqlModel.findByPk(rechercheEmploi.id)).to.be
-          .null
+        expect(
+          await RechercheSqlModel.findByPk(rechercheEmploi.id)
+        ).to.be.null()
       })
       it('supprime les transferts du jeune', async () => {
-        await expect(
+        expect(
           await TransfertConseillerSqlModel.findByPk(unTransfertDto.id)
-        ).to.be.null
+        ).to.be.null()
       })
       it('supprime les favoris emploi du jeune', async () => {
-        await expect(
+        expect(
           await FavoriOffreEmploiSqlModel.findByPk(favoriOffreEmploi.id)
-        ).to.be.null
+        ).to.be.null()
       })
       it('supprime les favoris engagement du jeune', async () => {
-        await expect(
+        expect(
           await FavoriOffreEngagementSqlModel.findByPk(favoriOffreEngagement.id)
-        ).to.be.null
+        ).to.be.null()
       })
       it('supprime les favoris immersion du jeune', async () => {
-        await expect(
+        expect(
           await FavoriOffreImmersionSqlModel.findByPk(favoriOffreImmersion.id)
-        ).to.be.null
+        ).to.be.null()
       })
       it('ne supprime pas le conseiller du jeune', async () => {
-        await expect(await ConseillerSqlModel.findByPk(conseillerDto.id)).not.to
-          .be.null
+        expect(
+          await ConseillerSqlModel.findByPk(conseillerDto.id)
+        ).not.to.be.null()
       })
       it("supprime l'association rendez-vous jeune", async () => {
-        await expect(
+        expect(
           await RendezVousJeuneAssociationSqlModel.findAll({
             where: { idJeune: jeuneDto.id }
           })
         ).to.deep.equal([])
       })
       it('ne supprime pas le rendez-vous', async () => {
-        await expect(await RendezVousSqlModel.findByPk(rendezVousDto.id)).not.to
-          .be.null
+        expect(
+          await RendezVousSqlModel.findByPk(rendezVousDto.id)
+        ).not.to.be.null()
       })
       it("ne supprime pas les evenements d'engagement du jeune", async () => {
-        await expect(
-          await EvenementEngagementHebdoSqlModel.findByPk(
-            evenementEngagement.id
-          )
-        ).not.to.be.null
+        expect(
+          await EvenementEngagementHebdoSqlModel.findAll({
+            where: { idUtilisateur: jeuneDto.id }
+          })
+        ).not.to.be.null()
       })
       it('supprime les situations du jeune', async () => {
-        await expect(
+        expect(
           await SituationsMiloSqlModel.findAll({
+            where: { idJeune: jeuneDto.id }
+          })
+        ).to.deep.equal([])
+      })
+      it('supprime le marquage du jeune à archiver', async () => {
+        await expect(
+          await JeuneMiloAArchiverSqlModel.findAll({
             where: { idJeune: jeuneDto.id }
           })
         ).to.deep.equal([])
