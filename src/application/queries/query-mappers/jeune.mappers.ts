@@ -8,7 +8,10 @@ import {
 
 export function fromSqlToDetailJeuneQueryModel(
   jeuneSqlModel: JeuneSqlModel,
-  baseUrlDossier?: string
+  optionsMilo?: {
+    baseUrlDossier: string
+    estAArchiver: boolean
+  }
 ): DetailJeuneQueryModel {
   const depuis =
     jeuneSqlModel.transferts.length > 0
@@ -39,9 +42,10 @@ export function fromSqlToDetailJeuneQueryModel(
       : undefined,
     idPartenaire: jeuneSqlModel.idPartenaire ?? undefined,
     urlDossier:
-      baseUrlDossier && jeuneSqlModel.idPartenaire
-        ? `${baseUrlDossier}/${jeuneSqlModel.idPartenaire}/acces-externe`
-        : undefined
+      optionsMilo?.baseUrlDossier && jeuneSqlModel.idPartenaire
+        ? `${optionsMilo.baseUrlDossier}/${jeuneSqlModel.idPartenaire}/acces-externe`
+        : undefined,
+    estAArchiver: optionsMilo?.estAArchiver
   }
 }
 
