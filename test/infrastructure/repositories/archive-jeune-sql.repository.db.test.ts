@@ -1,5 +1,7 @@
 import { uneArchiveJeuneMetadonnees } from 'test/fixtures/archiveJeune.fixture'
 import { uneDatetime, uneDatetimeLocale } from 'test/fixtures/date.fixture'
+import { MauvaiseCommandeError } from '../../../src/building-blocks/types/domain-error'
+import { failure } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action/action'
 import { ArchiveJeune } from '../../../src/domain/archive-jeune'
 import { Recherche } from '../../../src/domain/offre/recherche/recherche'
@@ -11,6 +13,10 @@ import { OffreServiceCiviqueHttpSqlRepository } from '../../../src/infrastructur
 import { RechercheSqlRepository } from '../../../src/infrastructure/repositories/offre/recherche/recherche-sql.repository.db'
 import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
 import { ArchiveJeuneSqlModel } from '../../../src/infrastructure/sequelize/models/archive-jeune.sql-model'
+import {
+  CommentaireDto,
+  CommentaireSqlModel
+} from '../../../src/infrastructure/sequelize/models/commentaire.sql-model'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
@@ -20,6 +26,8 @@ import {
   TransfertConseillerSqlModel
 } from '../../../src/infrastructure/sequelize/models/transfert-conseiller.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
+import { DateService } from '../../../src/utils/date-service'
+import { unCommentaire } from '../../fixtures/action.fixture'
 import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
 import { unFavoriOffreImmersion } from '../../fixtures/offre-immersion.fixture'
 import { uneOffreServiceCivique } from '../../fixtures/offre-service-civique.fixture'
@@ -32,18 +40,10 @@ import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { unCommentaire } from '../../fixtures/action.fixture'
-import {
-  CommentaireDto,
-  CommentaireSqlModel
-} from '../../../src/infrastructure/sequelize/models/commentaire.sql-model'
 import {
   DatabaseForTesting,
   getDatabase
 } from '../../utils/database-for-testing'
-import { DateService } from '../../../src/utils/date-service'
-import { failure } from '../../../src/building-blocks/types/result'
-import { MauvaiseCommandeError } from '../../../src/building-blocks/types/domain-error'
 
 describe('ArchiveJeuneSqlRepository', () => {
   let database: DatabaseForTesting

@@ -3,6 +3,7 @@ import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { failure, isSuccess, success } from 'src/building-blocks/types/result'
 import { Core } from 'src/domain/core'
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneMiloAArchiverSqlModel } from 'src/infrastructure/sequelize/models/jeune-milo-a-archiver.sql-model'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { SituationsMiloSqlModel } from 'src/infrastructure/sequelize/models/situations-milo.sql-model'
 import {
@@ -132,7 +133,8 @@ describe('GetDetailJeuneQueryHandler', () => {
           },
           situations: undefined,
           dateFinCEJ: DateService.fromJSDateToISOString(uneDate()),
-          urlDossier: 'https://milo.com/1234/acces-externe'
+          urlDossier: 'https://milo.com/1234/acces-externe',
+          estAArchiver: false
         })
         expect(actual).to.deep.equal(success(expected))
       })
@@ -186,14 +188,18 @@ describe('GetDetailJeuneQueryHandler', () => {
                 idPartenaire: '123'
               })
             )
+            await JeuneMiloAArchiverSqlModel.create({ idJeune })
+
             // When
             const result = await getDetailJeuneQueryHandler.handle({ idJeune })
+
             // Then
             expect(result._isSuccess).to.be.true()
             if (isSuccess(result)) {
               expect(result.data.urlDossier).to.equal(
                 'https://milo.com/123/acces-externe'
               )
+              expect(result.data.estAArchiver).to.equal(true)
             }
           })
         })

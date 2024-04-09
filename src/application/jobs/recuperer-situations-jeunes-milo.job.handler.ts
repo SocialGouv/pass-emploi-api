@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import { Job } from '../../building-blocks/types/job'
 import { JobHandler } from '../../building-blocks/types/job-handler'
 import { isFailure } from '../../building-blocks/types/result'
@@ -62,6 +63,10 @@ export class RecupererSituationsJeunesMiloJobHandler extends JobHandler<Job> {
           )
 
           if (isFailure(dossier)) {
+            if ((dossier.error as ErreurHttp).statusCode === 404) {
+              await this.miloRepository.marquerAARchiver(jeune.id, true)
+            }
+
             stats.dossiersNonTrouves++
             return
           }
@@ -85,6 +90,7 @@ export class RecupererSituationsJeunesMiloJobHandler extends JobHandler<Job> {
             situations: situationsTriees
           }
 
+          await this.miloRepository.marquerAARchiver(jeune.id, false)
           await this.miloRepository.saveSituationsJeune(situationsDuJeune)
           stats.situationsJeuneSauvegardees++
         })

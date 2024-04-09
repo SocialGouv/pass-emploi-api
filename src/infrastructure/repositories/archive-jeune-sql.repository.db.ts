@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common'
 import { Op } from 'sequelize'
 import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
 import {
-  Result,
   emptySuccess,
   failure,
   isFailure,
+  Result,
   success
 } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action/action'
@@ -33,9 +33,7 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
 
   async archiver(metadonnees: ArchiveJeune.Metadonnees): Promise<Result> {
     const archiveResult = await this.construire(metadonnees)
-    if (isFailure(archiveResult)) {
-      return archiveResult
-    }
+    if (isFailure(archiveResult)) return archiveResult
 
     await ArchiveJeuneSqlModel.creer({
       idJeune: metadonnees.idJeune,
@@ -50,6 +48,7 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
       dateArchivage: metadonnees.dateArchivage,
       donnees: archiveResult.data
     })
+
     return emptySuccess()
   }
 

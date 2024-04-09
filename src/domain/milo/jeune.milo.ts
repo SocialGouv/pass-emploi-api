@@ -68,6 +68,9 @@ export namespace JeuneMilo {
     ): Promise<
       Result<{ idAuthentification?: string; existeDejaChezMilo: boolean }>
     >
+
+    marquerAARchiver(id: string, aArchiver: boolean): Promise<void>
+    estAArchiver(id: string): Promise<boolean>
   }
 
   export function trierSituations(situations: Situation[]): Situation[] {

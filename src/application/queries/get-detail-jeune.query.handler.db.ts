@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { JeuneMiloAArchiverSqlModel } from '../../infrastructure/sequelize/models/jeune-milo-a-archiver.sql-model'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
@@ -50,11 +51,20 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
 
-    let urlDossier
     if (estMilo(jeuneSqlModel.structure)) {
-      urlDossier = this.configService.get('milo.urlWeb')
+      const baseUrlDossier = this.configService.get('milo.urlWeb')
+      const estAArchiver = await JeuneMiloAArchiverSqlModel.findByPk(
+        jeuneSqlModel.id
+      )
+      return success(
+        fromSqlToDetailJeuneQueryModel(jeuneSqlModel, {
+          baseUrlDossier,
+          estAArchiver: Boolean(estAArchiver)
+        })
+      )
     }
-    return success(fromSqlToDetailJeuneQueryModel(jeuneSqlModel, urlDossier))
+
+    return success(fromSqlToDetailJeuneQueryModel(jeuneSqlModel))
   }
 
   async authorize(

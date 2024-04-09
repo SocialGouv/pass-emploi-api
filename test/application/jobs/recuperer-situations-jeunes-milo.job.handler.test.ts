@@ -106,6 +106,7 @@ describe('RecupererSituationsJeunesMiloJobHandler', () => {
         erreurs: 0
       })
     })
+
     it("ne s'arrete pas pas quand une erreur se produit", async () => {
       // Given
       miloRepository.getJeunesMiloAvecIdDossier
@@ -136,6 +137,7 @@ describe('RecupererSituationsJeunesMiloJobHandler', () => {
         erreurs: 1
       })
     })
+
     it('récupère et sauvegarde une date de fin de CEJ quand elle existe ', async () => {
       // Given
       miloRepository.getJeunesMiloAvecIdDossier
@@ -157,11 +159,36 @@ describe('RecupererSituationsJeunesMiloJobHandler', () => {
 
       // Then
       expect(result.succes).to.equal(true)
+      expect(
+        miloRepository.marquerAARchiver
+      ).to.have.been.calledOnceWithExactly(jeune1.id, false)
       expect(miloRepository.save).to.have.calledOnceWithExactly(
         jeune1,
         '9222000',
         uneDatetime()
       )
+    })
+
+    it('marque un jeune à archiver', async () => {
+      // Given
+      miloRepository.getJeunesMiloAvecIdDossier
+        .withArgs(0, 100)
+        .resolves([jeune1])
+      miloRepository.getJeunesMiloAvecIdDossier.withArgs(100, 100).resolves([])
+
+      miloRepository.getDossier
+        .withArgs(jeune1.idPartenaire)
+        .resolves(failure(new ErreurHttp('Erreur', 404)))
+
+      // When
+      const result = await recupererSituationsJeunesMiloJobHandler.handle()
+
+      // Then
+      expect(result.succes).to.equal(true)
+      expect(
+        miloRepository.marquerAARchiver
+      ).to.have.been.calledOnceWithExactly(jeune1.id, true)
+      expect(miloRepository.save).not.to.have.been.called()
     })
   })
 

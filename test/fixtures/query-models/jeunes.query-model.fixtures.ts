@@ -49,7 +49,8 @@ export function unDetailJeuneQueryModel(
     urlDossier: undefined,
     idPartenaire: '1234',
     structureMilo: undefined,
-    dateFinCEJ: undefined
+    dateFinCEJ: undefined,
+    estAArchiver: undefined
   }
 
   return { ...defaults, ...args }

@@ -1,3 +1,4 @@
+import { JeuneMiloAArchiverSqlModel } from './jeune-milo-a-archiver.sql-model'
 import { ActionSqlModel } from './action.sql-model'
 import { CommuneSqlModel } from './commune.sql-model'
 import { ConseillerSqlModel } from './conseiller.sql-model'
@@ -61,5 +62,6 @@ export const sqlModels = [
   ListeDeDiffusionJeuneAssociationSqlModel,
   SuiviPeCejSqlModel,
   StructureMiloSqlModel,
-  SessionMiloSqlModel
+  SessionMiloSqlModel,
+  JeuneMiloAArchiverSqlModel
 ]
