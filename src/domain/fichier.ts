@@ -62,6 +62,8 @@ export namespace Fichier {
         png: 'image/png',
         jpg: 'image/jpeg'
       }
+      console.log('>>>', { mime: fichierACreer.fichier.mimeType })
+
       const typeDuFichierAccepte = Object.values(TYPES_AUTORISES).includes(
         fichierACreer.fichier.mimeType
       )
