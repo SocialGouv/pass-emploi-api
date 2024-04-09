@@ -35,7 +35,7 @@ import {
 } from '../../../utils/database-for-testing'
 import { testConfig } from '../../../utils/module-for-testing'
 
-describe('MiloHttpRepository', () => {
+describe('JeuneMiloHttpRepository', () => {
   let databaseForTesting: DatabaseForTesting
   const configService = testConfig()
   const rateLimiterService = new RateLimiterService(configService)
