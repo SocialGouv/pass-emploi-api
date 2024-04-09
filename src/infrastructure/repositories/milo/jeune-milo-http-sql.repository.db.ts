@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { firstValueFrom } from 'rxjs'
 import { Op } from 'sequelize'
+import { JeuneMiloAArchiverSqlModel } from 'src/infrastructure/sequelize/models/jeune-milo-a-archiver.sql-model'
 import {
   ErreurHttp,
   NonTrouveError
@@ -206,7 +207,7 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
 
     await JeuneSqlModel.update(
       {
-        dateFinCEJ: dateFinCEJ === null ? dateFinCEJ : dateFinCEJ?.toJSDate(),
+        dateFinCEJ: dateFinCEJ && dateFinCEJ.toJSDate(),
         idStructureMilo: nouveauCodeStructure
       },
       { where: { id: jeune.id } }
@@ -227,5 +228,15 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
           situations: situationsSql.situations
         }
       : undefined
+  }
+
+  async estAArchiver(id: string): Promise<boolean> {
+    const estAArchiver = await JeuneMiloAArchiverSqlModel.findByPk(id)
+    return Boolean(estAArchiver)
+  }
+
+  async marquerAARchiver(id: string, aArchiver: boolean): Promise<void> {
+    if (aArchiver) await JeuneMiloAArchiverSqlModel.upsert({ idJeune: id })
+    else await JeuneMiloAArchiverSqlModel.destroy({ where: { idJeune: id } })
   }
 }
