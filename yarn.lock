@@ -3998,6 +3998,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios@npm:^1.6.8":
+  version: 1.6.8
+  resolution: "axios@npm:1.6.8"
+  dependencies:
+    follow-redirects: "npm:^1.15.6"
+    form-data: "npm:^4.0.0"
+    proxy-from-env: "npm:^1.1.0"
+  checksum: 10/3f9a79eaf1d159544fca9576261ff867cbbff64ed30017848e4210e49f3b01e97cf416390150e6fdf6633f336cd43dc1151f890bbd09c3c01ad60bb0891eee63
+  languageName: node
+  linkType: hard
+
 "babel-polyfill@npm:^6.3.14":
   version: 6.26.0
   resolution: "babel-polyfill@npm:6.26.0"
@@ -6420,7 +6431,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.15.4":
+"follow-redirects@npm:^1.15.4, follow-redirects@npm:^1.15.6":
   version: 1.15.6
   resolution: "follow-redirects@npm:1.15.6"
   peerDependenciesMeta:
@@ -9094,6 +9105,7 @@ __metadata:
     "@types/yargs": "npm:^17.0.32"
     "@typescript-eslint/eslint-plugin": "npm:^6.21.0"
     "@typescript-eslint/parser": "npm:^6.21.0"
+    axios: "npm:^1.6.8"
     bull: "npm:4.12.2"
     bull-repl: "npm:^0.29.1"
     chai: "npm:^4.4.1"
