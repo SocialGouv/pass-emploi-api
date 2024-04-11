@@ -34,35 +34,15 @@ export class AuthentificationSqlRepository
 
     if (conseillerSqlModel) {
       const roles = []
-
-      if (estMilo(conseillerSqlModel.structure)) {
+      const estSuperviseur = await this.estConseillerSuperviseur(
+        conseillerSqlModel.structure,
+        conseillerSqlModel.email
+      )
+      if (estSuperviseur.dansSaStructure)
         roles.push(Authentification.Role.SUPERVISEUR)
-      } else if (conseillerSqlModel.email) {
-        const superviseursParEmail = await SuperviseurSqlModel.findAll({
-          where: {
-            email: {
-              [Op.like]: `${conseillerSqlModel.email.split('@')[0]}%`
-            }
-          }
-        })
+      if (estSuperviseur.crossStructures)
+        roles.push(Authentification.Role.SUPERVISEUR_PE_BRSA)
 
-        const estSuperviseur = estConseillerSuperviseur(
-          superviseursParEmail,
-          structure
-        )
-        const estSuperviseurPEBRSA = estConseillerSuperviseurPEBRSA(
-          superviseursParEmail,
-          structure,
-          estSuperviseur
-        )
-
-        if (estSuperviseur) {
-          roles.push(Authentification.Role.SUPERVISEUR)
-        }
-        if (estSuperviseurPEBRSA) {
-          roles.push(Authentification.Role.SUPERVISEUR_PE_BRSA)
-        }
-      }
       return fromConseillerSqlToUtilisateur(conseillerSqlModel, roles)
     }
 
@@ -180,9 +160,32 @@ export class AuthentificationSqlRepository
     await this.keycloakClient.deleteUserByIdUser(idUtilisateur)
     this.logger.log(`Utilisateur ${idUtilisateur} supprimé de keycloak`)
   }
+
+  async estConseillerSuperviseur(
+    structure: Core.Structure,
+    email?: string | null
+  ): Promise<{ dansSaStructure: boolean; crossStructures: boolean }> {
+    if (estMilo(structure))
+      return { dansSaStructure: true, crossStructures: false }
+    if (!email) return { dansSaStructure: false, crossStructures: false }
+
+    const superviseursParEmail = await SuperviseurSqlModel.findAll({
+      where: { email: { [Op.like]: `${email.split('@')[0]}%` } }
+    })
+    const estSuperviseur = checkEstSuperviseur(superviseursParEmail, structure)
+    const estSuperviseurPEBRSA = checkEstSuperviseurPEBRSA(
+      superviseursParEmail,
+      structure,
+      estSuperviseur
+    )
+    return {
+      dansSaStructure: estSuperviseur,
+      crossStructures: estSuperviseurPEBRSA
+    }
+  }
 }
 
-function estConseillerSuperviseur(
+function checkEstSuperviseur(
   superviseursParEmail: SuperviseurSqlModel[],
   structureDuConseiller: Core.Structure
 ): boolean {
@@ -194,7 +197,7 @@ function estConseillerSuperviseur(
   )
 }
 
-function estConseillerSuperviseurPEBRSA(
+function checkEstSuperviseurPEBRSA(
   superviseursParEmail: SuperviseurSqlModel[],
   structureDuConseiller: Core.Structure,
   estSuperviseur: boolean

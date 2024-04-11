@@ -348,6 +348,10 @@ describe('UpdateUtilisateurCommandHandler', () => {
               authentificationRepository.getConseillerByStructure
                 .withArgs(command.idUtilisateurAuth, command.structure)
                 .resolves(undefined)
+              authentificationRepository.estConseillerSuperviseur.resolves({
+                dansSaStructure: true,
+                crossStructures: false
+              })
 
               const utilisateur: Authentification.Utilisateur = {
                 id: '1',
@@ -420,6 +424,10 @@ describe('UpdateUtilisateurCommandHandler', () => {
               authentificationRepository.getConseillerByStructure
                 .withArgs(command.idUtilisateurAuth, command.structure)
                 .resolves(undefined)
+              authentificationRepository.estConseillerSuperviseur.resolves({
+                dansSaStructure: true,
+                crossStructures: false
+              })
 
               const utilisateur: Authentification.Utilisateur = {
                 id: '1',
