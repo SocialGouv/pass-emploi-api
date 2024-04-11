@@ -47,7 +47,7 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
 
     try {
       nombreLogsApiSupprimes = await LogApiPartenaireSqlModel.destroy({
-        where: dateSuperieureAUneSemaine(maintenant)
+        where: dateSuperieureADeuxSemaines(maintenant)
       })
     } catch (_e) {
       nbErreurs++
@@ -125,9 +125,9 @@ function dateArchivageSuperieureADeuxAns(maintenant: DateTime): WhereOptions {
   }
 }
 
-function dateSuperieureAUneSemaine(maintenant: DateTime): WhereOptions {
+function dateSuperieureADeuxSemaines(maintenant: DateTime): WhereOptions {
   return {
-    date: { [Op.lt]: maintenant.minus({ week: 1 }).toJSDate() }
+    date: { [Op.lt]: maintenant.minus({ week: 2 }).toJSDate() }
   }
 }
 

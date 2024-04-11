@@ -72,7 +72,7 @@ describe('NettoyerLesDonneesJobHandler', () => {
     // Given - Log Api Partenaire
     await LogApiPartenaireSqlModel.create({
       id: 'a282ae5e-b1f0-4a03-86a3-1870d913da93',
-      date: maintenant.minus({ week: 1, day: 1 }).toJSDate(),
+      date: maintenant.minus({ week: 2, day: 1 }).toJSDate(),
       idUtilisateur: 'idUtilisateur',
       typeUtilisateur: 'typeUtilisateur',
       pathPartenaire: 'pathASupprimer',
@@ -82,7 +82,7 @@ describe('NettoyerLesDonneesJobHandler', () => {
     })
     await LogApiPartenaireSqlModel.create({
       id: '826553e8-7581-44ab-9d76-f04be13f8971',
-      date: maintenant.minus({ week: 1 }).plus({ day: 1 }).toJSDate(),
+      date: maintenant.minus({ week: 2 }).plus({ day: 1 }).toJSDate(),
       idUtilisateur: 'idUtilisateur',
       typeUtilisateur: 'typeUtilisateur',
       pathPartenaire: 'pathAGarder',
@@ -182,7 +182,7 @@ describe('NettoyerLesDonneesJobHandler', () => {
   })
 
   describe('logs api partenaires', () => {
-    it("supprime les logs de plus d'une semaine", async () => {
+    it('supprime les logs de plus de deux semaines', async () => {
       // Then
       const logs = await LogApiPartenaireSqlModel.findAll()
       expect(logs).to.have.length(1)
