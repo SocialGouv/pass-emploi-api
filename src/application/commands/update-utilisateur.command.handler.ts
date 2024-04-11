@@ -141,12 +141,19 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
   private async creerNouveauConseiller(
     command: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
+    const estSuperviseur =
+      await this.authentificationRepository.estConseillerSuperviseur(
+        command.structure,
+        command.email
+      )
+
     const result = this.authentificationFactory.buildConseiller(
       command.idUtilisateurAuth,
       command.nom,
       command.prenom,
       command.email,
-      command.structure
+      command.structure,
+      estSuperviseur
     )
 
     if (isFailure(result)) {

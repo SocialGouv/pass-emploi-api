@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { ConseillerNonValide } from '../building-blocks/types/domain-error'
 import { failure, Result, success } from '../building-blocks/types/result'
 import { IdService } from '../utils/id-service'
-import { Core, estMilo } from './core'
+import { Core } from './core'
 
 export const AuthentificationRepositoryToken = 'Authentification.Repository'
 
@@ -82,6 +82,11 @@ export namespace Authentification {
     ): Promise<void>
 
     deleteUtilisateurIdp(idJeune: string): Promise<void>
+
+    estConseillerSuperviseur(
+      structure: Core.Structure,
+      email?: string | null
+    ): Promise<{ dansSaStructure: boolean; crossStructures: boolean }>
   }
 
   @Injectable()
@@ -93,11 +98,18 @@ export namespace Authentification {
       nom: string | undefined,
       prenom: string | undefined,
       email: string | undefined,
-      structure: Core.Structure
+      structure: Core.Structure,
+      superviseur: { dansSaStructure: boolean; crossStructures: boolean }
     ): Result<Utilisateur> {
       if (!nom || !prenom) {
         return failure(new ConseillerNonValide())
       }
+
+      const roles = []
+      if (superviseur.dansSaStructure)
+        roles.push(Authentification.Role.SUPERVISEUR)
+      if (superviseur.crossStructures)
+        roles.push(Authentification.Role.SUPERVISEUR_PE_BRSA)
 
       const utilisateur: Utilisateur = {
         id: this.idService.uuid(),
@@ -107,7 +119,7 @@ export namespace Authentification {
         email: email,
         type: Type.CONSEILLER,
         structure: structure,
-        roles: estMilo(structure) ? [Authentification.Role.SUPERVISEUR] : []
+        roles
       }
       return success(utilisateur)
     }
