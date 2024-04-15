@@ -7,8 +7,6 @@ import { uneDate } from '../fixtures/date.fixture'
 import { unFichier, unFichierACreer } from '../fixtures/fichier.fixture'
 import { expect, stubClass } from '../utils'
 
-const fichierACreer = unFichierACreer()
-
 describe('Fichier', () => {
   let fichierFactory: Fichier.Factory
 
@@ -23,23 +21,63 @@ describe('Fichier', () => {
   })
 
   describe('creer', () => {
-    it('retourne un Fichier quand le fichier est valide', () => {
+    it('autorise le format pdf', () => {
       // Given
-      const fichier: Fichier = unFichier({ mimeType: 'image/jpeg' })
+      const fichierACreer = unFichierACreer()
+      fichierACreer.fichier.mimeType = 'application/pdf'
 
       // When
       const result = fichierFactory.creer(fichierACreer)
 
       // Then
+      const fichier: Fichier = unFichier({ mimeType: 'application/pdf' })
       expect(result).to.deep.equal(success(fichier))
     })
+
+    it('autorise le format jpeg', () => {
+      // Given
+      const fichierACreer = unFichierACreer()
+      fichierACreer.fichier.mimeType = 'image/jpeg'
+
+      // When
+      const result = fichierFactory.creer(fichierACreer)
+
+      // Then
+      const fichier: Fichier = unFichier({ mimeType: 'image/jpeg' })
+      expect(result).to.deep.equal(success(fichier))
+    })
+
+    it('autorise le format png', () => {
+      // Given
+      const fichierACreer = unFichierACreer()
+      fichierACreer.fichier.mimeType = 'image/png'
+
+      // When
+      const result = fichierFactory.creer(fichierACreer)
+
+      // Then
+      const fichier: Fichier = unFichier({ mimeType: 'image/png' })
+      expect(result).to.deep.equal(success(fichier))
+    })
+
+    it('autorise le format webp', () => {
+      // Given
+      const fichierACreer = unFichierACreer()
+      fichierACreer.fichier.mimeType = 'image/webp'
+
+      // When
+      const result = fichierFactory.creer(fichierACreer)
+
+      // Then
+      const fichier: Fichier = unFichier({ mimeType: 'image/webp' })
+      expect(result).to.deep.equal(success(fichier))
+    })
+
     it('retourne une failure quand la taille du fichier est trop grande', () => {
       // When
-      const result = fichierFactory.creer(
-        unFichierACreer({
-          fichier: { ...fichierACreer.fichier, size: 787878787878 }
-        })
-      )
+      const fichierACreer = unFichierACreer()
+      fichierACreer.fichier.size = 787878787878
+      const result = fichierFactory.creer(fichierACreer)
 
       // Then
       expect(result).to.deep.equal(
@@ -48,17 +86,18 @@ describe('Fichier', () => {
         )
       )
     })
+
     it('retourne une failure quand le type du fichier est invalide', () => {
       // When
-      const result = fichierFactory.creer(
-        unFichierACreer({
-          fichier: { ...fichierACreer.fichier, mimeType: 'video/mpeg' }
-        })
-      )
+      const fichierACreer = unFichierACreer()
+      fichierACreer.fichier.mimeType = 'video/mpeg'
+      const result = fichierFactory.creer(fichierACreer)
 
       // Then
       expect(result).to.deep.equal(
-        failure(new MauvaiseCommandeError('Types acceptés : pdf, png, jpg'))
+        failure(
+          new MauvaiseCommandeError('Types acceptés : pdf, png, jpg, webp')
+        )
       )
     })
   })
