@@ -60,7 +60,8 @@ export namespace Fichier {
       const TYPES_AUTORISES = {
         pdf: 'application/pdf',
         png: 'image/png',
-        jpg: 'image/jpeg'
+        jpg: 'image/jpeg',
+        webp: 'image/webp'
       }
       const typeDuFichierAccepte = Object.values(TYPES_AUTORISES).includes(
         fichierACreer.fichier.mimeType
