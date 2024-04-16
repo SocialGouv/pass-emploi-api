@@ -6,7 +6,7 @@ import { SuiviJob } from '../../../src/domain/suivi-job'
 import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { DateService } from '../../../src/utils/date-service'
-import { uneDatetime } from '../../fixtures/date.fixture'
+import { uneDate, uneDatetime } from '../../fixtures/date.fixture'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { StubbedClass, createSandbox, expect, stubClass } from '../../utils'
@@ -70,6 +70,12 @@ describe('QualifierActionsJobHandler', () => {
         uneActionDto({
           idJeune,
           statut: Action.Statut.TERMINEE,
+          dateEcheance: maintenant.minus({ months: 4, days: 1 }).toJSDate(),
+          dateFinReelle: uneDate()
+        }),
+        uneActionDto({
+          idJeune,
+          statut: Action.Statut.ANNULEE,
           dateEcheance: maintenant.minus({ months: 4, days: 1 }).toJSDate()
         }),
         uneActionDto({
@@ -103,7 +109,7 @@ describe('QualifierActionsJobHandler', () => {
         nbErreursCatchees: 0,
         nbFailuresUpdate: 0,
         nbFailuresQualification: 0,
-        nombreActionsQualifiees: 2
+        nombreActionsQualifiees: 3
       })
     })
   })

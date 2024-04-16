@@ -54,6 +54,22 @@ module.exports = {
         id_authentification: 'e6d4a5bf-0189-4581-8350-f772bca0d4a1',
         notifications_sonores: false,
         id_structure_milo: '80620S00'
+      },
+      {
+        id: 'cbf8fb13-8438-4981-8bbd-d74fbfb71fda',
+        prenom: 'TNAN',
+        nom: '0480',
+        structure: 'POLE_EMPLOI',
+        id_authentification: 'TNAN0480',
+        notifications_sonores: false
+      },
+      {
+        id: '401f0f85-c678-49b6-996a-f9759136d43b',
+        prenom: 'TNAN',
+        nom: '0500',
+        structure: 'POLE_EMPLOI_BRSA',
+        id_authentification: 'TNAN0500',
+        notifications_sonores: false
       }
     ])
   },

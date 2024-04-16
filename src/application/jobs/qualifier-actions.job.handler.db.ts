@@ -34,24 +34,29 @@ export class QualifierActionsJobHandler extends JobHandler<Job> {
 
     try {
       const actionsInProgress = await ActionSqlModel.findAll({
-        where: actionsNonTermineesAvecDateEcheanceSuperieureA4Mois(maintenant)
+        where: actionsNonAnnuleesAvecDateEcheanceSuperieureA4Mois(maintenant)
       })
 
       for (const actionSql of actionsInProgress) {
         const action = ActionSqlRepository.actionFromSqlModel(actionSql)
-        const updateResult = this.actionFactory.updateAction(action, {
-          idAction: action.id,
-          statut: Action.Statut.TERMINEE,
-          dateFinReelle: this.dateService.now()
-        })
-        if (isFailure(updateResult)) {
-          this.logger.warn(updateResult.error.message)
-          nbFailuresUpdate++
-          continue
+        let actionAQualifier: Action = action
+
+        if (action.statut !== Action.Statut.TERMINEE) {
+          const updateResult = this.actionFactory.updateAction(action, {
+            idAction: action.id,
+            statut: Action.Statut.TERMINEE,
+            dateFinReelle: this.dateService.now()
+          })
+          if (isFailure(updateResult)) {
+            this.logger.warn(updateResult.error.message)
+            nbFailuresUpdate++
+            continue
+          }
+          actionAQualifier = updateResult?.data
         }
-        const actionTerminee = updateResult.data
+
         const qualifierResult = Action.qualifier(
-          actionTerminee,
+          actionAQualifier,
           Action.Qualification.Code.NON_SNP
         )
         if (isFailure(qualifierResult)) {
@@ -83,11 +88,17 @@ export class QualifierActionsJobHandler extends JobHandler<Job> {
   }
 }
 
-function actionsNonTermineesAvecDateEcheanceSuperieureA4Mois(
+function actionsNonAnnuleesAvecDateEcheanceSuperieureA4Mois(
   maintenant: DateTime
 ): WhereOptions {
   return {
-    statut: { [Op.in]: [Action.Statut.PAS_COMMENCEE, Action.Statut.EN_COURS] },
+    statut: {
+      [Op.in]: [
+        Action.Statut.PAS_COMMENCEE,
+        Action.Statut.EN_COURS,
+        Action.Statut.TERMINEE
+      ]
+    },
     dateEcheance: { [Op.lt]: maintenant.minus({ months: 4 }).toJSDate() }
   }
 }
