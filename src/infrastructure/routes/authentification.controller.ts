@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
   HttpStatus,
   Param,
@@ -30,13 +31,18 @@ import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { SkipOidcAuth } from '../decorators/skip-oidc-auth.decorator'
 import { handleResult } from './result.handler'
-import { UpdateUserPayload } from './validation/authentification.inputs'
+import {
+  GetUtilisateurQueryParams,
+  PutUtilisateurPayload
+} from './validation/authentification.inputs'
+import { GetUtilisateurQueryHandler } from '../../application/queries/get-utilisateur.query.handler'
 
-@Controller()
+@Controller('auth')
 @ApiTags('Authentification')
 export class AuthentificationController {
   constructor(
     private updateUtilisateurCommandHandler: UpdateUtilisateurCommandHandler,
+    private getUtilisateurQueryHandler: GetUtilisateurQueryHandler,
     private getChatSecretsQueryHandler: GetChatSecretsQueryHandler
   ) {}
 
@@ -49,21 +55,48 @@ export class AuthentificationController {
   )
   @ApiOperation({
     summary:
-      "Récupère un jeune/conseiller, crée le conseiller PE/Milo si il n'existe pas"
+      "Récupère un utilisateur jeune/conseiller, crée le conseiller PE/Milo si il n'existe pas"
   })
-  @Put('auth/users/:idUtilisateurAuth')
+  @Put('users/:idAuthentification')
   @ApiResponse({
     type: UtilisateurQueryModel
   })
   async putUtilisateur(
-    @Param('idUtilisateurAuth') idUtilisateurAuth: string,
-    @Body() updateUserPayload: UpdateUserPayload
+    @Param('idAuthentification') idAuthentification: string,
+    @Body() updateUserPayload: PutUtilisateurPayload
   ): Promise<UtilisateurQueryModel> {
     const command: UpdateUtilisateurCommand = {
       ...updateUserPayload,
-      idUtilisateurAuth: idUtilisateurAuth
+      idUtilisateurAuth: idAuthentification
     }
     const result = await this.updateUtilisateurCommandHandler.execute(command)
+
+    return handleResult(result)
+  }
+
+  @SkipOidcAuth()
+  @UseGuards(ApiKeyAuthGuard)
+  @ApiSecurity('api_key')
+  @SetMetadata(
+    Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
+    Authentification.Partenaire.KEYCLOAK
+  )
+  @ApiOperation({
+    summary: 'Récupère un utilisateur jeune/conseiller'
+  })
+  @Get('users/:idAuthentification')
+  @ApiResponse({
+    type: UtilisateurQueryModel
+  })
+  async getUtilisateur(
+    @Param('idAuthentification') idAuthentification: string,
+    @Body() queryParams: GetUtilisateurQueryParams
+  ): Promise<UtilisateurQueryModel> {
+    const result = await this.getUtilisateurQueryHandler.execute({
+      idAuthentification: idAuthentification,
+      typeUtilisateur: queryParams.typeUtilisateur,
+      structureUtilisateur: queryParams.structureUtilisateur
+    })
 
     return handleResult(result)
   }
@@ -71,7 +104,7 @@ export class AuthentificationController {
   @ApiOperation({
     summary: 'Récupère le token et la clé de chiffrement du chat du jeune'
   })
-  @Post('auth/firebase/token')
+  @Post('firebase/token')
   @ApiOAuth2([])
   async postFirebaseToken(
     @Utilisateur() utilisateur: Authentification.Utilisateur
