@@ -27,3 +27,8 @@ export class TeleverserFichierPayload {
   @IsOptional()
   idMessage?: string
 }
+
+export class AnalyserFichierPayload {
+  @ApiProperty({ type: 'string', format: 'binary' })
+  fichier: Express.Multer.File
+}

@@ -57,6 +57,12 @@ export const configurationSchema = Joi.object({
     clientId: Joi.string().required(),
     clientSecret: Joi.string().required()
   },
+  jecliqueoupas: {
+    url: Joi.string().uri().required(),
+    ip: Joi.string().ip({ version: 'ipv4' }).required(),
+    token: Joi.string().required(),
+    cert: Joi.string().base64().required()
+  },
   serviceCivique: {
     url: Joi.string().uri().required(),
     apiKey: Joi.string().required()

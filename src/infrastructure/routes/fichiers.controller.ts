@@ -14,18 +14,26 @@ import {
 import { HttpStatus } from '@nestjs/common/enums/http-status.enum'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ApiConsumes, ApiOAuth2, ApiTags } from '@nestjs/swagger'
-import { handleResult } from './result.handler'
+import {
+  AnalyserFichierCommand,
+  AnalyserFichierCommandHandler,
+  AnalyserFichierCommandOutput
+} from 'src/application/commands/analyser-fichier.command.handler'
 import { SupprimerFichierCommandHandler } from '../../application/commands/supprimer-fichier.command.handler'
-import { TelechargerFichierQueryHandler } from '../../application/queries/telecharger-fichier.query.handler'
 import {
   TeleverserFichierCommand,
   TeleverserFichierCommandHandler,
   TeleverserFichierCommandOutput
 } from '../../application/commands/televerser-fichier.command.handler'
+import { TelechargerFichierQueryHandler } from '../../application/queries/telecharger-fichier.query.handler'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { OidcQueryToken } from '../decorators/skip-oidc-auth.decorator'
-import { TeleverserFichierPayload } from './validation/fichiers.inputs'
+import { handleResult } from './result.handler'
+import {
+  AnalyserFichierPayload,
+  TeleverserFichierPayload
+} from './validation/fichiers.inputs'
 
 @Controller('fichiers')
 @ApiOAuth2([])
@@ -34,6 +42,7 @@ export class FilesController {
   constructor(
     private telechargerFichierQueryHandler: TelechargerFichierQueryHandler,
     private televerserFichierCommandHandler: TeleverserFichierCommandHandler,
+    private analyserFichierCommandHandler: AnalyserFichierCommandHandler,
     private supprimerFichierCommandHandler: SupprimerFichierCommandHandler
   ) {}
 
@@ -75,6 +84,30 @@ export class FilesController {
       idMessage: payload.idMessage
     }
     const result = await this.televerserFichierCommandHandler.execute(
+      command,
+      utilisateur
+    )
+
+    return handleResult(result)
+  }
+
+  @Post('analyse')
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('fichier'))
+  async postAnalyse(
+    @UploadedFile() fichier: Express.Multer.File,
+    @Body() _: AnalyserFichierPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<AnalyserFichierCommandOutput> {
+    const command: AnalyserFichierCommand = {
+      fichier: {
+        buffer: fichier.buffer,
+        mimeType: fichier.mimetype,
+        name: fichier.originalname,
+        size: fichier.size
+      }
+    }
+    const result = await this.analyserFichierCommandHandler.execute(
       command,
       utilisateur
     )

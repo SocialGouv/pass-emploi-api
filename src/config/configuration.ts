@@ -85,6 +85,12 @@ export default () => {
       clientId: process.env.DIAGORIENTE_CLIENT_ID ?? '',
       clientSecret: process.env.DIAGORIENTE_CLIENT_SECRET ?? ''
     },
+    jecliqueoupas: {
+      url: process.env.JECLIQUEOUPAS_API_URL,
+      ip: process.env.JECLIQUEOUPAS_API_IP,
+      token: process.env.JECLIQUEOUPAS_API_TOKEN,
+      cert: process.env.JECLIQUEOUPAS_API_CERT
+    },
     serviceCivique: {
       url:
         process.env.SERVICE_CIVIQUE_API_URL ??
