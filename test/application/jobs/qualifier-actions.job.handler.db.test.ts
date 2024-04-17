@@ -71,6 +71,13 @@ describe('QualifierActionsJobHandler', () => {
           idJeune,
           statut: Action.Statut.TERMINEE,
           dateEcheance: maintenant.minus({ months: 4, days: 1 }).toJSDate(),
+          dateFinReelle: uneDate(),
+          heuresQualifiees: 10
+        }),
+        uneActionDto({
+          idJeune,
+          statut: Action.Statut.TERMINEE,
+          dateEcheance: maintenant.minus({ months: 4, days: 1 }).toJSDate(),
           dateFinReelle: uneDate()
         }),
         uneActionDto({
