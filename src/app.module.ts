@@ -356,6 +356,7 @@ import { IdService } from './utils/id-service'
 import { configureLoggerModule } from './utils/logger.module'
 import { RateLimiterService } from './utils/rate-limiter.service'
 import { QualifierActionsJobHandler } from './application/jobs/qualifier-actions.job.handler.db'
+import { GetUtilisateurQueryHandler } from './application/queries/get-utilisateur.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -628,6 +629,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetDetailActionQueryHandler,
     GetDetailJeuneQueryHandler,
     GetJeunesByEtablissementQueryHandler,
+    GetUtilisateurQueryHandler,
     GetJeunesEtablissementV2QueryHandler,
     GetJeunesByStructureMiloQueryHandler,
     GetActionsJeuneQueryHandler,
