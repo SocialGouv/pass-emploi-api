@@ -14,6 +14,7 @@ export interface FichierMetadata {
   idCreateur: string
   typeCreateur: Authentification.Type
   dateSuppression?: Date
+  idMessage?: string
 }
 export interface Fichier extends FichierMetadata {
   buffer: Buffer
@@ -34,6 +35,7 @@ export namespace Fichier {
       id: string
       type: Authentification.Type
     }
+    idMessage?: string
   }
 
   export interface Repository {
@@ -90,7 +92,8 @@ export namespace Fichier {
         idsJeunes: fichierACreer.jeunesIds,
         dateCreation: this.dateService.nowJs(),
         idCreateur: fichierACreer.createur.id,
-        typeCreateur: fichierACreer.createur.type
+        typeCreateur: fichierACreer.createur.type,
+        idMessage: fichierACreer.idMessage
       }
       return success(fichier)
     }

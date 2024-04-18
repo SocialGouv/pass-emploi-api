@@ -35,7 +35,8 @@ describe('TeleverserFichierCommandHandler', () => {
       name: 'fichier-test.jpg',
       size: 1000
     },
-    jeunesIds: ['1']
+    jeunesIds: ['1'],
+    idMessage: 'id-message'
   }
 
   beforeEach(() => {

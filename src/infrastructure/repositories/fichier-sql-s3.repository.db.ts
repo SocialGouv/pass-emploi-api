@@ -15,7 +15,11 @@ export class FichierSqlS3Repository implements Fichier.Repository {
   async save(fichier: Fichier): Promise<void> {
     await this.objectStorageClient.uploader(fichier)
 
-    await FichierSqlModel.creer({ ...fichier, dateSuppression: null })
+    await FichierSqlModel.creer({
+      ...fichier,
+      idMessage: fichier.idMessage ?? null,
+      dateSuppression: null
+    })
   }
 
   async delete(idFichier: string): Promise<void> {
@@ -58,11 +62,7 @@ export class FichierSqlS3Repository implements Fichier.Repository {
   async getFichierMetadata(
     idFichier: string
   ): Promise<FichierMetadata | undefined> {
-    const fichierSql = await FichierSqlModel.findOne({
-      where: {
-        id: idFichier
-      }
-    })
+    const fichierSql = await FichierSqlModel.findByPk(idFichier)
 
     if (fichierSql) {
       return {
@@ -73,7 +73,8 @@ export class FichierSqlS3Repository implements Fichier.Repository {
         dateCreation: fichierSql.dateCreation,
         idCreateur: fichierSql.idCreateur,
         typeCreateur: fichierSql.typeCreateur,
-        dateSuppression: fichierSql.dateSuppression ?? undefined
+        dateSuppression: fichierSql.dateSuppression ?? undefined,
+        idMessage: fichierSql.idMessage ?? undefined
       }
     }
     return undefined

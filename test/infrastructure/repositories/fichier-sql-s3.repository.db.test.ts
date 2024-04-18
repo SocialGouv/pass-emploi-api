@@ -40,6 +40,7 @@ describe('FichierSqlS3Repository', () => {
         fichierImage
       )
     })
+
     it('persiste en db les metadonnees du fichier ', async () => {
       // When
       await fichierSqlS3Repository.save(fichierImage)
@@ -53,6 +54,7 @@ describe('FichierSqlS3Repository', () => {
       expect(fichierCree.dateCreation).to.be.deep.equal(
         fichierImage.dateCreation
       )
+      expect(fichierCree.idMessage).to.be.deep.equal(fichierImage.idMessage)
     })
   })
 
@@ -84,7 +86,12 @@ describe('FichierSqlS3Repository', () => {
       const result = await fichierSqlS3Repository.getFichierMetadata(fichier.id)
       // Then
       expect(result?.id).to.equal(fichier.id)
+      expect(result).to.deep.equal({
+        ...unFichierMetadata(),
+        dateSuppression: undefined
+      })
     })
+
     it('renvoie undefined quand le fichier est inconnu', async () => {
       // When
       const result = await fichierSqlS3Repository.getFichierMetadata(
@@ -93,6 +100,7 @@ describe('FichierSqlS3Repository', () => {
       // Then
       expect(result).to.be.undefined()
     })
+
     it('renvoie les metadonnees avec une date de suppression quand elle existe', async () => {
       // Given
       await FichierSqlModel.upsert({

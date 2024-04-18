@@ -22,4 +22,8 @@ export class TeleverserFichierPayload {
   @ApiPropertyOptional()
   @IsOptional()
   nom?: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  idMessage?: string
 }

@@ -92,7 +92,8 @@ describe('FichiersController', () => {
           size: image.size
         },
         jeunesIds: ['1'],
-        listesDeDiffusionIds: undefined
+        listesDeDiffusionIds: undefined,
+        idMessage: 'id-message'
       }
       const commandOutput: TeleverserFichierCommandOutput = {
         id: idFichier,
@@ -107,7 +108,8 @@ describe('FichiersController', () => {
         .post('/fichiers')
         .field({
           jeunesIds: '1',
-          nom: 'image.jpg'
+          nom: 'image.jpg',
+          idMessage: 'id-message'
         })
         .attach('fichier', 'test/fixtures/image.jpg')
         .set('authorization', unHeaderAuthorization())
@@ -115,6 +117,7 @@ describe('FichiersController', () => {
         .expect(HttpStatus.CREATED)
         .expect({ id: idFichier, nom: 'image.jpg' })
     })
+
     it('renvoie une erreur 400 quand la validation du fichier echoue', async () => {
       // Given
       const utilisateur = unUtilisateurDecode()
@@ -127,7 +130,8 @@ describe('FichiersController', () => {
           size: image.size
         },
         jeunesIds: ['1'],
-        listesDeDiffusionIds: undefined
+        listesDeDiffusionIds: undefined,
+        idMessage: undefined
       }
       televerserFichierCommandHandler.execute
         .withArgs(command, utilisateur)
@@ -144,6 +148,7 @@ describe('FichiersController', () => {
         // Then
         .expect(HttpStatus.BAD_REQUEST)
     })
+
     ensureUserAuthenticationFailsIfInvalid('post', '/fichiers')
   })
 

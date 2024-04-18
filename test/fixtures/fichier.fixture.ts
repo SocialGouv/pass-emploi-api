@@ -12,7 +12,8 @@ export const unFichier = (args: Partial<Fichier> = {}): Fichier => {
     idsJeunes: ['1'],
     dateCreation: uneDate(),
     idCreateur: '1',
-    typeCreateur: Authentification.Type.CONSEILLER
+    typeCreateur: Authentification.Type.CONSEILLER,
+    idMessage: 'id-message'
   }
   return { ...defaults, ...args }
 }
@@ -31,7 +32,8 @@ export const unFichierACreer = (
     createur: {
       id: '1',
       type: Authentification.Type.CONSEILLER
-    }
+    },
+    idMessage: 'id-message'
   }
   return { ...defaults, ...args }
 }
@@ -46,7 +48,8 @@ export const unFichierMetadata = (
     idsJeunes: ['1'],
     dateCreation: uneDate(),
     idCreateur: '1',
-    typeCreateur: Authentification.Type.CONSEILLER
+    typeCreateur: Authentification.Type.CONSEILLER,
+    idMessage: 'id-message'
   }
   return { ...defaults, ...args }
 }
@@ -72,7 +75,8 @@ export const unFichierImage = (): Fichier => ({
   idsJeunes: ['aa'],
   id: '640c1e15-f2dc-4944-8d82-bc421a3c92db',
   idCreateur: '1',
-  typeCreateur: Authentification.Type.CONSEILLER
+  typeCreateur: Authentification.Type.CONSEILLER,
+  idMessage: 'id-message'
 })
 
 const bufferData = [
