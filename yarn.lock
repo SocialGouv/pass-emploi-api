@@ -7816,16 +7816,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"joi@npm:17.12.2, joi@npm:^17.4.0, joi@npm:^17.6.0":
-  version: 17.12.2
-  resolution: "joi@npm:17.12.2"
+"joi@npm:17.13.0, joi@npm:^17.4.0, joi@npm:^17.6.0":
+  version: 17.13.0
+  resolution: "joi@npm:17.13.0"
   dependencies:
     "@hapi/hoek": "npm:^9.3.0"
     "@hapi/topo": "npm:^5.1.0"
     "@sideway/address": "npm:^4.1.5"
     "@sideway/formula": "npm:^3.0.1"
     "@sideway/pinpoint": "npm:^2.0.0"
-  checksum: 10/42257382802f622a4152cc4dbf5bca226a312a8315bf826262f5643d8e450d2f2d9c753abfef247b8c3121423639a02945b322ccac5abde17402dedcb26b9365
+  checksum: 10/aae196d71edeb752b76c12560728e0c5a2b813956934443ddf5294af993a0bdf81c22cffc2170e4751f2adaa56873a4eafc24d697c2ec7055709219505e3e56b
   languageName: node
   linkType: hard
 
@@ -9118,7 +9118,7 @@ __metadata:
     helmet: "npm:7.1.0"
     husky: "npm:^9.0.11"
     ics: "npm:3.7.2"
-    joi: "npm:17.12.2"
+    joi: "npm:17.13.0"
     jose: "npm:5.2.4"
     lint-staged: "npm:^15.2.2"
     lodash.isequal: "npm:4.5.0"
