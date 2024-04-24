@@ -175,7 +175,8 @@
   "resolutions": {
     "@nestjs/axios/axios": "1.6.7",
     "@nestjs/platform-express/express": "4.19.2",
-    "download/got": "11.8.5"
+    "download/got": "11.8.5",
+    "supertest/superagent": "9.0.1"
   },
   "mocha": {
     "require": [
