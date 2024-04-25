@@ -82,7 +82,8 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
       datePremiereConnexion: jeune.datePremiereConnexion?.toJSDate(),
       motif: command.motif,
       commentaire: command.commentaire,
-      dateArchivage: this.dateService.nowJs()
+      dateArchivage: this.dateService.nowJs(),
+      idPartenaire: jeune.idPartenaire
     }
 
     try {

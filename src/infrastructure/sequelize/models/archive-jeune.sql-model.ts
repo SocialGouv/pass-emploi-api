@@ -52,6 +52,18 @@ export class ArchiveJeuneDto extends Model {
   structure: string | null
 
   @Column({
+    field: 'id_structure_milo',
+    type: DataType.STRING
+  })
+  idStructureMilo: string | null
+
+  @Column({
+    field: 'id_partenaire',
+    type: DataType.STRING
+  })
+  idPartenaire: string | null
+
+  @Column({
     field: 'date_creation',
     type: DataType.DATE
   })
