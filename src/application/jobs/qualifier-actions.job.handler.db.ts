@@ -42,7 +42,7 @@ export class QualifierActionsJobHandler extends JobHandler<Job> {
           where: actionsAQualifierAvecEcheancePlusDe4Mois(maintenant),
           offset,
           limit: MAX_ACTIONS,
-          order: [['dateCreation', 'ASC']]
+          order: [['date_creation', 'ASC']]
         })
         offset = offset + MAX_ACTIONS
 

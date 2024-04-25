@@ -156,7 +156,7 @@ export class RechercheSqlRepository implements Recherche.Repository {
       attributes: {
         exclude: ['geometrie']
       },
-      order: [['dateCreation', 'ASC']],
+      order: [['date_creation', 'ASC']],
       limit,
       offset,
       where: {
@@ -242,7 +242,7 @@ export class RechercheSqlRepository implements Recherche.Repository {
       attributes: {
         exclude: ['geometrie']
       },
-      order: [['dateCreation', 'ASC']],
+      order: [['date_creation', 'ASC']],
       limit,
       offset,
       where: {
