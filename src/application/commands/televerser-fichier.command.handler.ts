@@ -26,6 +26,7 @@ export interface TeleverserFichierCommand extends Command {
   }
   jeunesIds?: string[]
   listesDeDiffusionIds?: string[]
+  idMessage?: string
 }
 export interface TeleverserFichierCommandOutput {
   id: string

@@ -54,6 +54,9 @@ export class FichierDto extends Model {
 
   @Column({ field: 'date_suppression', type: DataType.DATE })
   dateSuppression: Date | null
+
+  @Column({ field: 'id_message', type: DataType.STRING })
+  idMessage: string | null
 }
 
 @Table({
