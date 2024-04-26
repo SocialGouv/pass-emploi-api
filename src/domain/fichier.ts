@@ -15,6 +15,7 @@ export interface FichierMetadata {
   typeCreateur: Authentification.Type
   dateSuppression?: Date
   idMessage?: string
+  idAnalyse?: string
 }
 export interface Fichier extends FichierMetadata {
   buffer: Buffer
@@ -44,6 +45,7 @@ export namespace Fichier {
     softDelete(idFichier: string): Promise<void>
     getIdsFichiersBefore(date: Date): Promise<string[]>
     getFichierMetadata(idFichier: string): Promise<FichierMetadata | undefined>
+    declencherAnalyseAsynchrone(fichier: Fichier): Promise<Result>
   }
 
   @Injectable()

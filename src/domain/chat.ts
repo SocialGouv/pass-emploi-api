@@ -27,10 +27,11 @@ export interface MessageGroupe extends MessageIndividuel {
 }
 
 export namespace Chat {
-  export enum TypeMessage {
-    MESSAGE = 'MESSAGE',
-    MESSAGE_PJ = 'MESSAGE_PJ'
-  }
+  export type TypeMessage =
+    | 'MESSAGE'
+    | 'MESSAGE_PJ'
+    | 'NOUVEAU_CONSEILLER'
+    | 'NOUVEAU_CONSEILLER_TEMPORAIRE'
 
   export interface MessageACreer {
     message: string
@@ -45,6 +46,12 @@ export namespace Chat {
   export interface MessageGroupeACreer extends MessageACreer {
     idsBeneficiaires: string[]
   }
+
+  export type StatutAnalysePJ =
+    | 'ANALYSE_EN_COURS'
+    | 'ERREUR_ANALYSE'
+    | 'FICHIER_SAIN'
+    | 'FICHIER_MALVEILLANT'
 
   export interface Repository {
     initializeChatIfNotExists(
@@ -82,6 +89,12 @@ export namespace Chat {
     supprimerListeDeDiffusion(idListe: string): Promise<void>
 
     envoyerMessageTransfert(jeune: Jeune): Promise<void>
+
+    envoyerStatutAnalysePJ(
+      idJeune: string,
+      idMessage: string,
+      statut: StatutAnalysePJ
+    ): Promise<void>
   }
 
   export function creerMessage(aCreer: MessageACreer): MessageIndividuel {
@@ -89,9 +102,7 @@ export namespace Chat {
       message: aCreer.message,
       iv: aCreer.iv,
       idConseiller: aCreer.idConseiller,
-      type: aCreer.infoPieceJointe
-        ? Chat.TypeMessage.MESSAGE_PJ
-        : Chat.TypeMessage.MESSAGE,
+      type: aCreer.infoPieceJointe ? 'MESSAGE_PJ' : 'MESSAGE',
       infoPieceJointe: aCreer.infoPieceJointe
     }
   }
@@ -103,9 +114,7 @@ export namespace Chat {
       message: aCreer.message,
       iv: aCreer.iv,
       idConseiller: aCreer.idConseiller,
-      type: aCreer.infoPieceJointe
-        ? Chat.TypeMessage.MESSAGE_PJ
-        : Chat.TypeMessage.MESSAGE,
+      type: aCreer.infoPieceJointe ? 'MESSAGE_PJ' : 'MESSAGE',
       infoPieceJointe: aCreer.infoPieceJointe,
       idsBeneficiaires: aCreer.idsBeneficiaires
     }

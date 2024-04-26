@@ -71,7 +71,8 @@ export namespace Planificateur {
     ENRICHIR_EVENEMENTS_ANALYTICS = 'ENRICHIR_EVENEMENTS_ANALYTICS',
     CHARGER_LES_VUES_ANALYTICS = 'CHARGER_LES_VUES_ANALYTICS',
     INITIALISER_LES_VUES = 'INITIALISER_LES_VUES',
-    QUALIFIER_ACTIONS = 'QUALIFIER_ACTIONS'
+    QUALIFIER_ACTIONS = 'QUALIFIER_ACTIONS',
+    RECUPERERE_ANALYSE_ANTIVIRUS = 'RECUPERERE_ANALYSE_ANTIVIRUS'
   }
 
   export interface JobRendezVous {
@@ -91,6 +92,10 @@ export namespace Planificateur {
   export interface JobGenererJDD {
     idConseiller: string
     menage: boolean
+  }
+
+  export type JobRecuperereAnalyseAntivirus = {
+    idFichier: string
   }
 
   export type JobTraiterEvenementMilo = EvenementMilo

@@ -13,13 +13,14 @@ export interface FirebaseChat {
 export interface FirebaseMessage {
   content: string
   iv: string
-  conseillerId: string
-  sentBy: 'conseiller'
+  conseillerId?: string
+  sentBy: 'conseiller' | 'jeune'
   creationDate: Timestamp
   type: Chat.TypeMessage
   piecesJointes?: Array<{
     id: string
     nom: string
+    statut?: string
   }>
 }
 

@@ -269,3 +269,33 @@ export class EmargementIncorrect implements DomainError {
       'Tous les jeunes inscrits, et uniquement eux, doivent être émargés'
   }
 }
+
+export class AnalyseAntivirusEchouee implements DomainError {
+  static CODE = 'ANALYSE_ANTIVIRUS_ECHOUEE'
+  readonly code: string = AnalyseAntivirusEchouee.CODE
+  readonly message: string
+
+  constructor(message: string) {
+    this.message = "L'analyse du fichier par l’antivirus a échoué : " + message
+  }
+}
+
+export class AnalyseAntivirusPasTerminee implements DomainError {
+  static CODE = 'ANALYSE_ANTIVIRUS_EN_COURS'
+  readonly code: string = AnalyseAntivirusPasTerminee.CODE
+  readonly message: string
+
+  constructor() {
+    this.message = "L'analyse du fichier par l’antivirus n’est pas terminée"
+  }
+}
+
+export class FichierMalveillant implements DomainError {
+  static CODE = 'FICHIER_MALVEILLANT'
+  readonly code: string = FichierMalveillant.CODE
+  readonly message: string
+
+  constructor() {
+    this.message = 'Le fichier analysé est malveillant'
+  }
+}

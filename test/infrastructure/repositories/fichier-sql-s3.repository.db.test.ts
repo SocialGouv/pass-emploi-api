@@ -1,3 +1,5 @@
+import { emptySuccess, success } from 'src/building-blocks/types/result'
+import { AntivirusClient } from 'src/infrastructure/clients/antivirus-client'
 import { DateService } from 'src/utils/date-service'
 import { uneDate, uneDatetime } from 'test/fixtures/date.fixture'
 import { ObjectStorageClient } from '../../../src/infrastructure/clients/object-storage.client'
@@ -14,6 +16,7 @@ import { getDatabase } from '../../utils/database-for-testing'
 describe('FichierSqlS3Repository', () => {
   let fichierSqlS3Repository: FichierSqlS3Repository
   let objectStorageClient: StubbedClass<ObjectStorageClient>
+  let antivirusClient: StubbedClass<AntivirusClient>
   const dateService = stubClass(DateService)
   const maintenant = uneDatetime()
   const quatreMoisPlusTot = uneDatetime().minus({ months: 4 })
@@ -23,9 +26,11 @@ describe('FichierSqlS3Repository', () => {
     dateService.now.returns(maintenant)
     dateService.nowJs.returns(maintenant.toJSDate())
     objectStorageClient = stubClass(ObjectStorageClient)
+    antivirusClient = stubClass(AntivirusClient)
     fichierSqlS3Repository = new FichierSqlS3Repository(
       objectStorageClient,
-      dateService
+      dateService,
+      antivirusClient
     )
   })
 
@@ -88,6 +93,7 @@ describe('FichierSqlS3Repository', () => {
       expect(result?.id).to.equal(fichier.id)
       expect(result).to.deep.equal({
         ...unFichierMetadata(),
+        idAnalyse: undefined,
         dateSuppression: undefined
       })
     })
@@ -172,6 +178,35 @@ describe('FichierSqlS3Repository', () => {
       expect(fichierTrouve?.dateSuppression).to.deep.equal(
         maintenant.toJSDate()
       )
+    })
+  })
+
+  describe('.declencherAnalyseAsynchrone', () => {
+    it('declenche l’analyse et enregistre son id', async () => {
+      // Given
+      const fichier = unFichier()
+      await fichierSqlS3Repository.save(fichier)
+      antivirusClient.declencherAnalyseAsynchrone.resolves(
+        success('uuid-analyse')
+      )
+
+      expect(
+        (await FichierSqlModel.findByPk(fichier.id))!.idAnalyse
+      ).to.be.null()
+
+      // When
+      const result = await fichierSqlS3Repository.declencherAnalyseAsynchrone(
+        fichier
+      )
+
+      // Then
+      expect(
+        antivirusClient.declencherAnalyseAsynchrone
+      ).to.have.been.calledOnceWithExactly(fichier)
+      expect((await FichierSqlModel.findByPk(fichier.id))!.idAnalyse).to.equal(
+        'uuid-analyse'
+      )
+      expect(result).to.deep.equal(emptySuccess())
     })
   })
 })
