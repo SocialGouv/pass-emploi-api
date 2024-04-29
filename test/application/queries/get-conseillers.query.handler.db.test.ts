@@ -59,6 +59,12 @@ describe('GetConseillersQueryHandler', () => {
           prenom: 'toto',
           nom: 'tata',
           email: 'nils.tavernier@pole-emploi.fr'
+        }),
+        unConseillerDto({
+          id: 'autre-conseiller-ft',
+          prenom: 'toto',
+          nom: 'tata',
+          email: 'new@francetravail.fr'
         })
       ])
     })
@@ -108,6 +114,54 @@ describe('GetConseillersQueryHandler', () => {
               prenom: 'toto',
               nom: 'tata',
               email: 'nils.tavernier@pole-emploi.fr'
+            }
+          ])
+        )
+      })
+      it('retourne le conseiller seul quand le mail est exact FT', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          structure: Core.Structure.PASS_EMPLOI
+        })
+        // When
+        const actual = await getConseillersQueryHandler.handle(
+          {
+            recherche: 'new@francetravail.fr'
+          },
+          utilisateur
+        )
+
+        expect(actual).to.deep.equal(
+          success([
+            {
+              id: 'autre-conseiller-ft',
+              prenom: 'toto',
+              nom: 'tata',
+              email: 'new@francetravail.fr'
+            }
+          ])
+        )
+      })
+      it('retourne le conseiller seul quand le mail est exact PE', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          structure: Core.Structure.PASS_EMPLOI
+        })
+        // When
+        const actual = await getConseillersQueryHandler.handle(
+          {
+            recherche: 'new@pole-emploi.fr'
+          },
+          utilisateur
+        )
+
+        expect(actual).to.deep.equal(
+          success([
+            {
+              id: 'autre-conseiller-ft',
+              prenom: 'toto',
+              nom: 'tata',
+              email: 'new@francetravail.fr'
             }
           ])
         )

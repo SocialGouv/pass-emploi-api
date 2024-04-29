@@ -54,15 +54,17 @@ export class GetConseillersQueryHandler extends QueryHandler<
             conseiller.nom as nom,
             conseiller.prenom as prenom,
             conseiller.email as email,
-            GREATEST(SIMILARITY(CONCAT(conseiller.nom, ' ', conseiller.prenom), :query), SIMILARITY(conseiller.email, :query)) as greatestscore
+            GREATEST(SIMILARITY(CONCAT(conseiller.nom, ' ', conseiller.prenom), :query), SIMILARITY(conseiller.email, :queryPE), SIMILARITY(conseiller.email, :queryFT)) as greatestscore
       FROM conseiller
       WHERE structure = :structure
-        AND GREATEST(SIMILARITY(CONCAT(conseiller.nom, ' ', conseiller.prenom), :query), SIMILARITY(conseiller.email, :query)) > 0.1 
+        AND GREATEST(SIMILARITY(CONCAT(conseiller.nom, ' ', conseiller.prenom), :query), SIMILARITY(conseiller.email, :queryPE), SIMILARITY(conseiller.email, :queryFT)) > 0.1 
       ORDER BY greatestscore DESC
       LIMIT :limit;`,
       {
         replacements: {
-          query: recherche.replace(/@francetravail.fr/g, '@pole-emploi.fr'),
+          query: recherche,
+          queryPE: recherche.replace(/@francetravail.fr/g, '@pole-emploi.fr'),
+          queryFT: recherche.replace(/@pole-emploi.fr/g, '@francetravail.fr'),
           structure,
           limit: this.confiService.get('values.maxRechercheConseillers')
         },
