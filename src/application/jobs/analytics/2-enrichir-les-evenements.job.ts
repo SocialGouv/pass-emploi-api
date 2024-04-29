@@ -37,6 +37,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     await this.determinerLaSemaineEtLeJourALaFinDuTraitement(connexion)
 
     await this.associerChaqueConseillerASonDernierAE(connexion)
+    await this.associerChaqueConseillerASonPremierAE(connexion)
 
     await connexion.close()
 
@@ -72,6 +73,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     await connexion.query(`
       ALTER TABLE conseiller
         ADD COLUMN IF NOT EXISTS "date_dernier_ae"     TIMESTAMP;
+        ADD COLUMN IF NOT EXISTS "date_premier_ae"     TIMESTAMP;
     `)
     await connexion.query(`
       ALTER TABLE archive_jeune
@@ -159,5 +161,21 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
             group by id_utilisateur
         ) as dernier_ae_conseiller
         where conseiller.id = dernier_ae_conseiller.id_utilisateur;`)
+  }
+
+  private async associerChaqueConseillerASonPremierAE(
+    connexion: Sequelize
+  ): Promise<void> {
+    this.logger.log('Associer chaque conseiller à la date de son premier AE')
+    await connexion.query(`
+        update conseiller
+        set date_premier_ae = premier_ae_conseiller.date_premier_ae
+        from (
+            select id_utilisateur, min(date_evenement) as date_premier_ae
+            from evenement_engagement
+            where type_utilisateur = 'CONSEILLER'
+            group by id_utilisateur
+        ) as premier_ae_conseiller
+        where conseiller.id = premier_ae_conseiller.id_utilisateur;`)
   }
 }

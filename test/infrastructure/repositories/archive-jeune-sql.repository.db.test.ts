@@ -44,6 +44,10 @@ import {
   DatabaseForTesting,
   getDatabase
 } from '../../utils/database-for-testing'
+import { StructureMiloSqlModel } from '../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
+import { uneStructureMiloDto } from '../../fixtures/sql-models/structureMilo.sql-model'
+
+const idStructureMilo = 'test'
 
 describe('ArchiveJeuneSqlRepository', () => {
   let database: DatabaseForTesting
@@ -97,7 +101,10 @@ describe('ArchiveJeuneSqlRepository', () => {
       // Given
       await ConseillerSqlModel.upsert(premierConseillerDto)
       await ConseillerSqlModel.upsert(secondConseillerDto)
-      await JeuneSqlModel.upsert(jeuneDto)
+      await StructureMiloSqlModel.create(
+        uneStructureMiloDto({ id: idStructureMilo })
+      )
+      await JeuneSqlModel.upsert({ ...jeuneDto, idStructureMilo })
 
       const unTransfertDto: AsSql<TransfertConseillerDto> = {
         id: '070fa845-7316-496e-b96c-b69c2a1f4ce8',
@@ -163,6 +170,7 @@ describe('ArchiveJeuneSqlRepository', () => {
         nomJeune: jeuneDto.nom,
         prenomJeune: jeuneDto.prenom,
         structure: jeuneDto.structure,
+        idPartenaire: jeuneDto.idPartenaire!,
         email: jeuneDto.email!,
         dateCreation: new Date('2022-01-05T09:23:00Z'),
         datePremiereConnexion: new Date('2022-01-06T09:23:00Z'),
@@ -217,6 +225,8 @@ describe('ArchiveJeuneSqlRepository', () => {
       )
       expect(archiveJeuneSql!.motif).to.equal(metadonnees.motif)
       expect(archiveJeuneSql!.commentaire).to.equal(metadonnees.commentaire)
+      expect(archiveJeuneSql!.idPartenaire).to.equal(metadonnees.idPartenaire)
+      expect(archiveJeuneSql!.idStructureMilo).to.equal(idStructureMilo)
     })
 
     it('sauvegarde le dernier conseiller', () => {

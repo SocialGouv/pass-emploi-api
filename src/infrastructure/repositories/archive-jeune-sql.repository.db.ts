@@ -41,12 +41,14 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
       prenom: metadonnees.prenomJeune,
       nom: metadonnees.nomJeune,
       structure: metadonnees.structure,
+      idPartenaire: metadonnees.idPartenaire ?? null,
       dateCreation: metadonnees.dateCreation,
       datePremiereConnexion: metadonnees.datePremiereConnexion ?? null,
       motif: metadonnees.motif,
       commentaire: metadonnees.commentaire ?? null,
       dateArchivage: metadonnees.dateArchivage,
-      donnees: archiveResult.data
+      idStructureMilo: archiveResult.data.idStructureMilo,
+      donnees: archiveResult.data.donnees
     })
 
     return emptySuccess()
@@ -75,7 +77,9 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
 
   private async construire(
     metadonnes: ArchiveJeune.Metadonnees
-  ): Promise<Result<ArchiveJeune>> {
+  ): Promise<
+    Result<{ donnees: ArchiveJeune; idStructureMilo: string | null }>
+  > {
     const idJeune = metadonnes.idJeune
 
     const messages = await this.firebaseClient.getChatAArchiver(idJeune)
@@ -137,8 +141,8 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
       where: { idJeune }
     })
 
-    return success(
-      this.mapToArchiveJeune(
+    return success({
+      donnees: this.mapToArchiveJeune(
         jeuneSqlModel,
         metadonnes,
         rdv,
@@ -148,8 +152,9 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
         favorisOffreEngagement,
         recherches,
         messages
-      )
-    )
+      ),
+      idStructureMilo: jeuneSqlModel.idStructureMilo ?? null
+    })
   }
 
   private mapToArchiveJeune(

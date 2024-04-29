@@ -98,6 +98,7 @@ describe('ArchiverJeuneCommandHandler', () => {
           prenomJeune: jeune.firstName,
           nomJeune: jeune.lastName,
           structure: Structure.MILO,
+          idPartenaire: jeune.idPartenaire,
           dateCreation: jeune.creationDate.toJSDate(),
           datePremiereConnexion: jeune.creationDate.plus({ day: 1 }).toJSDate(),
           motif: command.motif,
