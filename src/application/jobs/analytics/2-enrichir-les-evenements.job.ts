@@ -37,7 +37,6 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     await this.determinerLaSemaineEtLeJourALaFinDuTraitement(connexion)
 
     await this.associerChaqueConseillerASonDernierAE(connexion)
-    await this.associerChaqueConseillerASonPremierAE(connexion)
 
     await connexion.close()
 
@@ -72,7 +71,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     `)
     await connexion.query(`
       ALTER TABLE conseiller
-        ADD COLUMN IF NOT EXISTS "date_dernier_ae"     TIMESTAMP;
+        ADD COLUMN IF NOT EXISTS "date_dernier_ae"     TIMESTAMP,
         ADD COLUMN IF NOT EXISTS "date_premier_ae"     TIMESTAMP;
     `)
     await connexion.query(`
