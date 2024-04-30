@@ -77,7 +77,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     `)
     await connexion.query(`
       ALTER TABLE archive_jeune
-        DROP COLUMN donnees;
+        DROP IF EXISTS COLUMN donnees;
     `)
   }
 
