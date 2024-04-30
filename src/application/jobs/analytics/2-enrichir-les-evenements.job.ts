@@ -37,6 +37,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     await this.determinerLaSemaineEtLeJourALaFinDuTraitement(connexion)
 
     await this.associerChaqueConseillerASonDernierAE(connexion)
+    await this.associerChaqueConseillerASonPremierAE(connexion)
 
     await connexion.close()
 
