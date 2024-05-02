@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   SetMetadata,
   UseGuards
 } from '@nestjs/common'
@@ -90,7 +91,7 @@ export class AuthentificationController {
   })
   async getUtilisateur(
     @Param('idAuthentification') idAuthentification: string,
-    @Body() queryParams: GetUtilisateurQueryParams
+    @Query() queryParams: GetUtilisateurQueryParams
   ): Promise<UtilisateurQueryModel> {
     const result = await this.getUtilisateurQueryHandler.execute({
       idAuthentification: idAuthentification,

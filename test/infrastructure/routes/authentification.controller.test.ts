@@ -263,7 +263,7 @@ describe('AuthentificationController', () => {
       const result = await request(app.getHttpServer())
         .get(`/auth/users/${query.idAuthentification}`)
         .set({ 'X-API-KEY': 'api-key-keycloak' })
-        .send(qp)
+        .query(qp)
         .expect(HttpStatus.OK)
 
       expect(result.body).to.deep.equal(utilisateur)
@@ -289,7 +289,7 @@ describe('AuthentificationController', () => {
       await request(app.getHttpServer())
         .get(`/auth/users/${query.idAuthentification}`)
         .set({ 'X-API-KEY': 'api-key-keycloak' })
-        .send(qp)
+        .query(qp)
         .expect(HttpStatus.NOT_FOUND)
     })
 
@@ -304,7 +304,7 @@ describe('AuthentificationController', () => {
       await request(app.getHttpServer())
         .get(`/auth/users/un-id`)
         .set({ 'X-API-KEY': 'api-key-keycloak' })
-        .send(qp)
+        .query(qp)
         .expect(HttpStatus.BAD_REQUEST)
     })
 
@@ -319,7 +319,7 @@ describe('AuthentificationController', () => {
       await request(app.getHttpServer())
         .get(`/auth/users/un-id`)
         .set({ 'X-API-KEY': 'api-key-keycloak' })
-        .send(qp)
+        .query(qp)
         .expect(HttpStatus.BAD_REQUEST)
     })
 
