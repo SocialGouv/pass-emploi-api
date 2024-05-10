@@ -105,6 +105,9 @@ export class TeleverserFichierCommandHandler extends CommandHandler<
       if (command.jeunesIds?.length) jeunesIds.push(...command.jeunesIds)
     }
     if (estJeune(utilisateur.type) && !command.idMessage) {
+      this.logger.warn(
+        'Id du message manquant pour une pièce-jointe envoyée par un bénéficiaire'
+      )
       return failure(new MauvaiseCommandeError('Id du message manquant'))
     }
 
@@ -114,20 +117,22 @@ export class TeleverserFichierCommandHandler extends CommandHandler<
       createur: { id: utilisateur.id, type: utilisateur.type }
     }
 
-    const result = this.fichierFactory.creer(fichierACreer)
-    if (isFailure(result)) return result
-    await this.fichierRepository.save(result.data)
+    const resultCreationFichier = this.fichierFactory.creer(fichierACreer)
+    if (isFailure(resultCreationFichier)) {
+      return resultCreationFichier
+    }
+    await this.fichierRepository.save(resultCreationFichier.data)
 
     if (estJeune(utilisateur.type)) {
       this.declencherAnalyseAsynchrone(
-        result.data,
+        resultCreationFichier.data,
         utilisateur.id,
         command.idMessage!
       )
     }
     return success({
-      id: result.data.id,
-      nom: result.data.nom
+      id: resultCreationFichier.data.id,
+      nom: resultCreationFichier.data.nom
     })
   }
 
@@ -142,12 +147,13 @@ export class TeleverserFichierCommandHandler extends CommandHandler<
   ): Promise<void> {
     const resultAnalyse =
       await this.fichierRepository.declencherAnalyseAsynchrone(fichier)
+
     if (isFailure(resultAnalyse)) {
       // TODO softDelete ou job pour ressayer l'analyse ?
       this.chatRepository.envoyerStatutAnalysePJ(
         idJeune,
         idMessage,
-        'ERREUR_ANALYSE'
+        Chat.StatutAnalysePJ.ERREUR_ANALYSE
       )
       return
     }
@@ -155,15 +161,17 @@ export class TeleverserFichierCommandHandler extends CommandHandler<
     this.chatRepository.envoyerStatutAnalysePJ(
       idJeune,
       idMessage,
-      'ANALYSE_EN_COURS'
+      Chat.StatutAnalysePJ.ANALYSE_EN_COURS
     )
-    const intervalle = this.configService.get<number>(
+    const intervalleRecuperationResultat = this.configService.get<number>(
       'jecliqueoupas.intervalleAnalyse'
     )
-    const dateExecution = this.dateService.now().plus({ seconds: intervalle })
+    const dateExecutionRecuperationResultat = this.dateService
+      .now()
+      .plus({ seconds: intervalleRecuperationResultat })
     this.planificateurRepository.creerJob({
-      dateExecution: dateExecution.toJSDate(),
-      type: Planificateur.JobType.RECUPERERE_ANALYSE_ANTIVIRUS,
+      dateExecution: dateExecutionRecuperationResultat.toJSDate(),
+      type: Planificateur.JobType.RECUPERER_ANALYSE_ANTIVIRUS,
       contenu: { idFichier: fichier.id }
     })
   }

@@ -88,13 +88,13 @@ export class ChatFirebaseRepository implements Chat.Repository {
 
 function mapStatutAnalyse(statut: Chat.StatutAnalysePJ): string {
   switch (statut) {
-    case 'ANALYSE_EN_COURS':
+    case Chat.StatutAnalysePJ.ANALYSE_EN_COURS:
       return 'analyse_en_cours'
-    case 'ERREUR_ANALYSE':
+    case Chat.StatutAnalysePJ.ERREUR_ANALYSE:
       return 'erreur_analyse'
-    case 'FICHIER_SAIN':
-      return 'fichier_sain'
-    case 'FICHIER_MALVEILLANT':
-      return 'fichier_malveillant'
+    case Chat.StatutAnalysePJ.FICHIER_SAIN:
+      return 'valide'
+    case Chat.StatutAnalysePJ.FICHIER_MALVEILLANT:
+      return 'non_valide'
   }
 }

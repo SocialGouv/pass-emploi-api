@@ -214,7 +214,7 @@ describe('TeleverserFichierCommandHandler', () => {
             planificateurRepository.creerJob
           ).to.have.been.calledOnceWithExactly({
             dateExecution: new Date('2024-04-12T12:00:15'),
-            type: Planificateur.JobType.RECUPERERE_ANALYSE_ANTIVIRUS,
+            type: Planificateur.JobType.RECUPERER_ANALYSE_ANTIVIRUS,
             contenu: { idFichier: fichier.id }
           })
         })

@@ -358,6 +358,7 @@ import { configureLoggerModule } from './utils/logger.module'
 import { RateLimiterService } from './utils/rate-limiter.service'
 import { QualifierActionsJobHandler } from './application/jobs/qualifier-actions.job.handler.db'
 import { GetUtilisateurQueryHandler } from './application/queries/get-utilisateur.query.handler'
+import { RecupererAnalyseAntivirusJobHandler } from './application/jobs/recuperer-analyse-antivirus.job.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -814,7 +815,8 @@ export const JobHandlerProviders = [
   EnrichirEvenementsJobHandler,
   ChargerLesVuesJobHandler,
   InitialiserLesVuesJobHandler,
-  QualifierActionsJobHandler
+  QualifierActionsJobHandler,
+  RecupererAnalyseAntivirusJobHandler
 ]
 
 @Module(buildModuleMetadata())

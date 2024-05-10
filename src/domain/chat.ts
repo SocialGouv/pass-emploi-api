@@ -47,11 +47,12 @@ export namespace Chat {
     idsBeneficiaires: string[]
   }
 
-  export type StatutAnalysePJ =
-    | 'ANALYSE_EN_COURS'
-    | 'ERREUR_ANALYSE'
-    | 'FICHIER_SAIN'
-    | 'FICHIER_MALVEILLANT'
+  export enum StatutAnalysePJ {
+    ANALYSE_EN_COURS = 'ANALYSE_EN_COURS',
+    ERREUR_ANALYSE = 'ERREUR_ANALYSE',
+    FICHIER_SAIN = 'FICHIER_SAIN',
+    FICHIER_MALVEILLANT = 'FICHIER_MALVEILLANT'
+  }
 
   export interface Repository {
     initializeChatIfNotExists(

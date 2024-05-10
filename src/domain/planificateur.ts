@@ -72,7 +72,7 @@ export namespace Planificateur {
     CHARGER_LES_VUES_ANALYTICS = 'CHARGER_LES_VUES_ANALYTICS',
     INITIALISER_LES_VUES = 'INITIALISER_LES_VUES',
     QUALIFIER_ACTIONS = 'QUALIFIER_ACTIONS',
-    RECUPERERE_ANALYSE_ANTIVIRUS = 'RECUPERERE_ANALYSE_ANTIVIRUS'
+    RECUPERER_ANALYSE_ANTIVIRUS = 'RECUPERER_ANALYSE_ANTIVIRUS'
   }
 
   export interface JobRendezVous {
@@ -94,7 +94,7 @@ export namespace Planificateur {
     menage: boolean
   }
 
-  export type JobRecuperereAnalyseAntivirus = {
+  export type JobRecupererAnalyseAntivirus = {
     idFichier: string
   }
 

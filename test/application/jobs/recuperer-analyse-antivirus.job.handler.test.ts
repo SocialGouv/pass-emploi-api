@@ -26,9 +26,9 @@ describe('RecupererAnalyseAntivirusJobHandler', () => {
   let dateService: StubbedClass<DateService>
   let suiviJobService: StubbedType<SuiviJob.Service>
 
-  const job: Planificateur.Job<Planificateur.JobRecuperereAnalyseAntivirus> = {
+  const job: Planificateur.Job<Planificateur.JobRecupererAnalyseAntivirus> = {
     dateExecution: uneDatetime().toJSDate(),
-    type: Planificateur.JobType.RECUPERERE_ANALYSE_ANTIVIRUS,
+    type: Planificateur.JobType.RECUPERER_ANALYSE_ANTIVIRUS,
     contenu: { idFichier: 'id-fichier' }
   }
 
@@ -133,7 +133,7 @@ describe('RecupererAnalyseAntivirusJobHandler', () => {
     expect(planificateurRepository.creerJob).to.have.been.calledOnceWithExactly(
       {
         dateExecution: dateService.now().plus({ seconds: 15 }).toJSDate(),
-        type: Planificateur.JobType.RECUPERERE_ANALYSE_ANTIVIRUS,
+        type: Planificateur.JobType.RECUPERER_ANALYSE_ANTIVIRUS,
         contenu: { idFichier: 'id-fichier' }
       }
     )

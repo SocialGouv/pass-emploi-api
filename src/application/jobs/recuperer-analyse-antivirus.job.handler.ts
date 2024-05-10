@@ -24,7 +24,7 @@ import { AntivirusClient } from '../../infrastructure/clients/antivirus-client'
 import { DateService } from '../../utils/date-service'
 
 @Injectable()
-@ProcessJobType(Planificateur.JobType.RECUPERERE_ANALYSE_ANTIVIRUS)
+@ProcessJobType(Planificateur.JobType.RECUPERER_ANALYSE_ANTIVIRUS)
 export class RecupererAnalyseAntivirusJobHandler extends JobHandler<Job> {
   constructor(
     @Inject(FichierRepositoryToken)
@@ -39,11 +39,11 @@ export class RecupererAnalyseAntivirusJobHandler extends JobHandler<Job> {
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service
   ) {
-    super(Planificateur.JobType.RECUPERERE_ANALYSE_ANTIVIRUS, suiviJobService)
+    super(Planificateur.JobType.RECUPERER_ANALYSE_ANTIVIRUS, suiviJobService)
   }
 
   async handle(
-    job: Planificateur.Job<Planificateur.JobRecuperereAnalyseAntivirus>
+    job: Planificateur.Job<Planificateur.JobRecupererAnalyseAntivirus>
   ): Promise<SuiviJob> {
     const debut = this.dateService.now()
 
@@ -66,6 +66,8 @@ export class RecupererAnalyseAntivirusJobHandler extends JobHandler<Job> {
 
       if (resultat.error instanceof AnalyseAntivirusPasTerminee)
         return this.replanifierAnalyse(debut, job)
+
+      return this.buildSuiviSucces(debut, 'Erreur API jecliqueoupas')
     }
 
     return this.enregistrerFichierSain(debut, fichierMetadata)
@@ -78,7 +80,7 @@ export class RecupererAnalyseAntivirusJobHandler extends JobHandler<Job> {
     await this.chatRepository.envoyerStatutAnalysePJ(
       idCreateur,
       idMessage!,
-      'FICHIER_SAIN'
+      Chat.StatutAnalysePJ.FICHIER_SAIN
     )
     return this.buildSuiviSucces(debut, 'Fichier sain')
   }
@@ -90,7 +92,7 @@ export class RecupererAnalyseAntivirusJobHandler extends JobHandler<Job> {
     await this.chatRepository.envoyerStatutAnalysePJ(
       idCreateur,
       idMessage!,
-      'FICHIER_MALVEILLANT'
+      Chat.StatutAnalysePJ.FICHIER_MALVEILLANT
     )
     await this.fichierRepository.softDelete(id)
     return this.buildSuiviSucces(debut, 'Fichier malveillant')
@@ -98,7 +100,7 @@ export class RecupererAnalyseAntivirusJobHandler extends JobHandler<Job> {
 
   private async replanifierAnalyse(
     debut: DateTime,
-    job: Planificateur.Job<Planificateur.JobRecuperereAnalyseAntivirus>
+    job: Planificateur.Job<Planificateur.JobRecupererAnalyseAntivirus>
   ): Promise<SuiviJob> {
     const intervalle = this.configService.get<number>(
       'jecliqueoupas.intervalleAnalyse'

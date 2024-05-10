@@ -52,7 +52,9 @@ export class AntivirusClient {
         )
       )
       const data = response.data
-      if (data.status) return success(data.uuid)
+      if (data.status) {
+        return success(data.uuid)
+      }
 
       const analyseAntivirusEchouee = new AnalyseAntivirusEchouee(data.error)
       this.logger.error(analyseAntivirusEchouee)
