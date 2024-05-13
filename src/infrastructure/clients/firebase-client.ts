@@ -1,8 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import * as APM from 'elastic-apm-node'
 import admin, { firestore } from 'firebase-admin'
 import { getMessaging, TokenMessage } from 'firebase-admin/messaging'
+import { DateTime } from 'luxon'
 import { ArchiveJeune } from '../../domain/archive-jeune'
 import { Authentification } from '../../domain/authentification'
 import {
@@ -21,9 +23,10 @@ import {
   FirebaseGroupeMessage,
   FirebaseMessage
 } from './dto/firebase.dto'
+import CollectionReference = firestore.CollectionReference
+import DocumentReference = firestore.DocumentReference
 import Timestamp = firestore.Timestamp
 import UpdateData = firestore.UpdateData
-import { DateTime } from 'luxon'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Utf8 = require('crypto-js/enc-utf8')
@@ -32,6 +35,7 @@ const AES = require('crypto-js/aes')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Base64 = require('crypto-js/enc-base64')
 
+// FIXME ça dégage ?
 export interface IFirebaseClient {
   send(tokenMessage: TokenMessage): Promise<void>
 
@@ -198,7 +202,7 @@ export class FirebaseClient implements IFirebaseClient {
       firebaseMessage.piecesJointes = [message.infoPieceJointe]
     }
 
-    await chat.collection(FIREBASE_MESSAGES_PATH).add(firebaseMessage)
+    await getMessagesRef(chat).add(firebaseMessage)
     await chat.update(updatedFirebaseChat)
   }
 
@@ -228,7 +232,7 @@ export class FirebaseClient implements IFirebaseClient {
       firebaseMessage.piecesJointes = [message.infoPieceJointe]
     }
 
-    await groupe.collection(FIREBASE_MESSAGES_PATH).add(firebaseMessage)
+    await getMessagesRef<FirebaseGroupeMessage>(groupe).add(firebaseMessage)
     await groupe.update(updatedFirebaseChat)
   }
 
@@ -319,22 +323,16 @@ export class FirebaseClient implements IFirebaseClient {
           .get()
 
         for (const conversationCible of conversationsCibles.docs) {
-          t.set(
-            conversations
-              .doc(conversationCible.id)
-              .collection(FIREBASE_MESSAGES_PATH)
-              .doc(),
-            {
-              sentBy: SENT_BY_CONSEILLER,
-              conseillerId: jeune.conseiller?.id,
-              type: Jeune.estSuiviTemporairement(jeune)
-                ? 'NOUVEAU_CONSEILLER_TEMPORAIRE'
-                : 'NOUVEAU_CONSEILLER',
-              content: encryptedText,
-              iv: iv,
-              creationDate: firestore.Timestamp.fromDate(new Date())
-            }
-          )
+          t.set(getMessagesRef(conversations.doc(conversationCible.id)).doc(), {
+            sentBy: SENT_BY_CONSEILLER,
+            conseillerId: jeune.conseiller?.id,
+            type: Jeune.estSuiviTemporairement(jeune)
+              ? 'NOUVEAU_CONSEILLER_TEMPORAIRE'
+              : 'NOUVEAU_CONSEILLER',
+            content: encryptedText,
+            iv: iv,
+            creationDate: firestore.Timestamp.fromDate(new Date())
+          })
         }
       })
       this.logger.log(
@@ -383,9 +381,7 @@ export class FirebaseClient implements IFirebaseClient {
 
     const messagesArchive = []
     if (!chats.empty) {
-      const messagesChiffres = await chats.docs[0].ref
-        .collection(FIREBASE_MESSAGES_PATH)
-        .get()
+      const messagesChiffres = await getMessagesRef(chats.docs[0].ref).get()
 
       for (const messageChiffre of messagesChiffres.docs) {
         const messageAArchiver = await this.fromMessageChiffreToMessageArchive(
@@ -396,6 +392,31 @@ export class FirebaseClient implements IFirebaseClient {
     }
 
     return messagesArchive
+  }
+
+  async envoyerStatutAnalysePJ(
+    idJeune: string,
+    idMessage: string,
+    statut: string
+  ): Promise<void> {
+    const collectionChats = this.firestore.collection(FIREBASE_CHAT_PATH)
+    const chats = await collectionChats.where('jeuneId', '==', idJeune).get()
+    if (chats.empty)
+      throw new RuntimeException(`Conversation avec ${idJeune} non trouvée`)
+    const chat = chats.docs[0]
+
+    const messageRef = getMessagesRef(chat.ref).doc(idMessage)
+    const message = await messageRef.get()
+    if (!message.exists)
+      throw new RuntimeException(
+        `Message ${idMessage} avec ${idJeune} non trouvée`
+      )
+
+    const data = message.data()!
+    if (!data.piecesJointes) throw new RuntimeException(`PJ non trouvée`)
+
+    const [pj, ...other] = data.piecesJointes
+    await messageRef.update({ piecesJointes: [{ ...pj, statut }, ...other] })
   }
 
   private async fromMessageChiffreToMessageArchive(
@@ -466,4 +487,14 @@ function chunkify<T>(tableau: T[]): T[][] {
   }
 
   return resultat
+}
+
+function getMessagesRef<T extends FirebaseMessage>(
+  chatRef: DocumentReference
+): CollectionReference<T> {
+  return chatRef.collection(FIREBASE_MESSAGES_PATH).withConverter({
+    toFirestore: (data: T) => data,
+    fromFirestore: (snap: FirebaseFirestore.QueryDocumentSnapshot) =>
+      snap.data() as T
+  })
 }

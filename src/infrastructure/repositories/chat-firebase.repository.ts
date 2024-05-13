@@ -71,4 +71,30 @@ export class ChatFirebaseRepository implements Chat.Repository {
   envoyerMessageTransfert(jeune: Jeune): Promise<void> {
     return this.firebaseClient.envoyerMessageTransfertJeune(jeune)
   }
+
+  envoyerStatutAnalysePJ(
+    idJeune: string,
+    idMessage: string,
+    _statut: Chat.StatutAnalysePJ
+  ): Promise<void> {
+    const statutFirebase = mapStatutAnalyse(_statut)
+    return this.firebaseClient.envoyerStatutAnalysePJ(
+      idJeune,
+      idMessage,
+      statutFirebase
+    )
+  }
+}
+
+function mapStatutAnalyse(statut: Chat.StatutAnalysePJ): string {
+  switch (statut) {
+    case Chat.StatutAnalysePJ.ANALYSE_EN_COURS:
+      return 'analyse_en_cours'
+    case Chat.StatutAnalysePJ.ERREUR_ANALYSE:
+      return 'erreur_analyse'
+    case Chat.StatutAnalysePJ.FICHIER_SAIN:
+      return 'valide'
+    case Chat.StatutAnalysePJ.FICHIER_MALVEILLANT:
+      return 'non_valide'
+  }
 }

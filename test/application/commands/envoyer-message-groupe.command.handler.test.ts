@@ -85,7 +85,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
             message: 'un message',
             iv: '123456',
             idConseiller: '41',
-            type: Chat.TypeMessage.MESSAGE,
+            type: 'MESSAGE',
             infoPieceJointe: undefined
           })
           expect(
@@ -94,7 +94,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
             message: 'un message',
             iv: '123456',
             idConseiller: '41',
-            type: Chat.TypeMessage.MESSAGE,
+            type: 'MESSAGE',
             infoPieceJointe: undefined
           })
         })
@@ -134,7 +134,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
             message: 'un message',
             iv: '123456',
             idConseiller: '41',
-            type: Chat.TypeMessage.MESSAGE_PJ,
+            type: 'MESSAGE_PJ',
             infoPieceJointe: {
               id: 'id',
               nom: 'nom'
@@ -146,7 +146,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
             message: 'un message',
             iv: '123456',
             idConseiller: '41',
-            type: Chat.TypeMessage.MESSAGE_PJ,
+            type: 'MESSAGE_PJ',
             infoPieceJointe: {
               id: 'id',
               nom: 'nom'
@@ -219,7 +219,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
             message: 'un message',
             iv: '123456',
             idConseiller: '41',
-            type: Chat.TypeMessage.MESSAGE,
+            type: 'MESSAGE',
             infoPieceJointe: undefined
           })
           expect(
@@ -228,7 +228,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
             message: 'un message',
             iv: '123456',
             idConseiller: '41',
-            type: Chat.TypeMessage.MESSAGE,
+            type: 'MESSAGE',
             infoPieceJointe: undefined
           })
         })
@@ -246,7 +246,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
               message: 'un message',
               iv: '123456',
               idConseiller: '41',
-              type: Chat.TypeMessage.MESSAGE,
+              type: 'MESSAGE',
               infoPieceJointe: undefined,
               idsBeneficiaires: ['jeune-1']
             }
@@ -257,7 +257,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
               message: 'un message',
               iv: '123456',
               idConseiller: '41',
-              type: Chat.TypeMessage.MESSAGE,
+              type: 'MESSAGE',
               infoPieceJointe: undefined,
               idsBeneficiaires: ['jeune-2']
             }
@@ -310,7 +310,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
             message: 'un message',
             iv: '123456',
             idConseiller: '41',
-            type: Chat.TypeMessage.MESSAGE,
+            type: 'MESSAGE',
             infoPieceJointe: undefined
           })
         })

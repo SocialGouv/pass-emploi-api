@@ -20,6 +20,7 @@ import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/m
 import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
 import { EvenementEmploiCodePostalQueryGetter } from 'src/application/queries/query-getters/evenement-emploi-code-postal.query.getter'
 import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
+import { AntivirusClient } from 'src/infrastructure/clients/antivirus-client'
 import { AppMobileCacheControlMiddleware } from 'src/infrastructure/middlewares/app-mobile-cache-control.middleware'
 import { ActionAuthorizer } from './application/authorizers/action-authorizer'
 import { ConseillerAuthorizer } from './application/authorizers/conseiller-authorizer'
@@ -189,13 +190,13 @@ import { RechercherTypesDemarcheQueryHandler } from './application/queries/reche
 import { GetAnimationsCollectivesJeuneQueryHandler } from './application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
 import { GetAnimationsCollectivesV2QueryHandler } from './application/queries/rendez-vous/get-animations-collectives-v2.query.handler.db'
 import { GetAnimationsCollectivesQueryHandler } from './application/queries/rendez-vous/get-animations-collectives.query.handler.db'
+import { GetDetailRendezVousJeuneQueryHandler } from './application/queries/rendez-vous/get-detail-rendez-vous-jeune.query.handler.db'
 import { GetDetailRendezVousQueryHandler } from './application/queries/rendez-vous/get-detail-rendez-vous.query.handler.db'
 import { GetRendezVousConseillerPaginesQueryHandler } from './application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
 import { GetAllRendezVousConseillerQueryHandler } from './application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from './application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { GetRendezVousJeuneQueryHandler } from './application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
 import { GetTypesRendezVousQueryHandler } from './application/queries/rendez-vous/get-types-rendez-vous.query.handler'
-import { GetDetailRendezVousJeuneQueryHandler } from './application/queries/rendez-vous/get-detail-rendez-vous-jeune.query.handler.db'
 import { TelechargerFichierQueryHandler } from './application/queries/telecharger-fichier.query.handler'
 import { TaskService } from './application/task.service'
 import { InitCronsCommandHandler } from './application/tasks/init-crons.command'
@@ -357,6 +358,7 @@ import { configureLoggerModule } from './utils/logger.module'
 import { RateLimiterService } from './utils/rate-limiter.service'
 import { QualifierActionsJobHandler } from './application/jobs/qualifier-actions.job.handler.db'
 import { GetUtilisateurQueryHandler } from './application/queries/get-utilisateur.query.handler'
+import { RecupererAnalyseAntivirusJobHandler } from './application/jobs/recuperer-analyse-antivirus.job.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -424,6 +426,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     EngagementClient,
     MatomoClient,
     ObjectStorageClient,
+    AntivirusClient,
     Action.Factory,
     Action.Commentaire.Factory,
     Conseiller.Milo.Service,
@@ -812,7 +815,8 @@ export const JobHandlerProviders = [
   EnrichirEvenementsJobHandler,
   ChargerLesVuesJobHandler,
   InitialiserLesVuesJobHandler,
-  QualifierActionsJobHandler
+  QualifierActionsJobHandler,
+  RecupererAnalyseAntivirusJobHandler
 ]
 
 @Module(buildModuleMetadata())

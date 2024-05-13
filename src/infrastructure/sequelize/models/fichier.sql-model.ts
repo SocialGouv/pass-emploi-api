@@ -57,6 +57,9 @@ export class FichierDto extends Model {
 
   @Column({ field: 'id_message', type: DataType.STRING })
   idMessage: string | null
+
+  @Column({ field: 'id_analyse', type: DataType.STRING })
+  idAnalyse: string | null
 }
 
 @Table({
