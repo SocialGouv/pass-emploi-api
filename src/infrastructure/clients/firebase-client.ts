@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import * as APM from 'elastic-apm-node'
 import admin, { firestore } from 'firebase-admin'
 import { getMessaging, TokenMessage } from 'firebase-admin/messaging'
@@ -401,21 +400,26 @@ export class FirebaseClient implements IFirebaseClient {
   ): Promise<void> {
     const collectionChats = this.firestore.collection(FIREBASE_CHAT_PATH)
     const chats = await collectionChats.where('jeuneId', '==', idJeune).get()
-    if (chats.empty)
-      throw new RuntimeException(`Conversation avec ${idJeune} non trouvée`)
+    if (chats.empty) {
+      this.logger.error(`Conversation avec ${idJeune} non trouvée`)
+      return
+    }
     const chat = chats.docs[0]
 
     const messageRef = getMessagesRef(chat.ref).doc(idMessage)
     const message = await messageRef.get()
-    if (!message.exists)
-      throw new RuntimeException(
-        `Message ${idMessage} avec ${idJeune} non trouvée`
-      )
-
+    if (!message.exists) {
+      this.logger.error(`Message ${idMessage} avec ${idJeune} non trouvée`)
+      return
+    }
     const data = message.data()!
-    if (!data.piecesJointes) throw new RuntimeException(`PJ non trouvée`)
 
+    if (!data.piecesJointes) {
+      this.logger.error(`PJ non trouvée`)
+      return
+    }
     const [pj, ...other] = data.piecesJointes
+
     await messageRef.update({ piecesJointes: [{ ...pj, statut }, ...other] })
   }
 

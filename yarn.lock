@@ -2839,10 +2839,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/chai@npm:*, @types/chai@npm:^4.3.14":
+"@types/chai@npm:*":
   version: 4.3.14
   resolution: "@types/chai@npm:4.3.14"
   checksum: 10/300be72bb22657c1e449b27a5f0ab24405edf3be5c42ea0095f8e1c6daabc29c3028eee2421cc443c01a098da47ba32baecc363be7324433132281b9d9a8216f
+  languageName: node
+  linkType: hard
+
+"@types/chai@npm:^4.3.16":
+  version: 4.3.16
+  resolution: "@types/chai@npm:4.3.16"
+  checksum: 10/f84a9049a7f13284f7237236872ed4afce5045dd6ea3926c8b0ac995490f5a524b247b2e70fcd3ebc85832201349a8f026bd0c336b90b5baca9eed0c7a4dbd3f
   languageName: node
   linkType: hard
 
@@ -3061,12 +3068,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=13.7.0, @types/node@npm:^20.10.3, @types/node@npm:^20.12.7":
+"@types/node@npm:*, @types/node@npm:>=13.7.0, @types/node@npm:^20.10.3":
   version: 20.12.7
   resolution: "@types/node@npm:20.12.7"
   dependencies:
     undici-types: "npm:~5.26.4"
   checksum: 10/b4a28a3b593a9bdca5650880b6a9acef46911d58cf7cfa57268f048e9a7157a7c3196421b96cea576850ddb732e3b54bc982c8eb5e1e5ef0635d4424c2fce801
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^20.12.11":
+  version: 20.12.11
+  resolution: "@types/node@npm:20.12.11"
+  dependencies:
+    undici-types: "npm:~5.26.4"
+  checksum: 10/c6afe7c2c4504a4f488814d7b306ebad16bf42cbb43bf9db9fe1aed8c5fb99235593c3be5088979a64526b106cf022256688e2f002811be8273d87dc2e0d484f
   languageName: node
   linkType: hard
 
@@ -4288,7 +4304,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bull@npm:*, bull@npm:4.12.2, bull@npm:^4.12.2":
+"bull@npm:*, bull@npm:^4.12.2":
   version: 4.12.2
   resolution: "bull@npm:4.12.2"
   dependencies:
@@ -4300,6 +4316,21 @@ __metadata:
     semver: "npm:^7.5.2"
     uuid: "npm:^8.3.0"
   checksum: 10/9cc78d1a2cfd3e9e541dc01ab9857f8eed876277f666527c7977433fa19789aa11c521742a8a31c9a1785441eec8c7c034bb25d7f2620b4a4dae245f9dc82faf
+  languageName: node
+  linkType: hard
+
+"bull@npm:4.12.3":
+  version: 4.12.3
+  resolution: "bull@npm:4.12.3"
+  dependencies:
+    cron-parser: "npm:^4.2.1"
+    get-port: "npm:^5.1.1"
+    ioredis: "npm:^5.3.2"
+    lodash: "npm:^4.17.21"
+    msgpackr: "npm:^1.10.1"
+    semver: "npm:^7.5.2"
+    uuid: "npm:^8.3.0"
+  checksum: 10/da6448c9663b9e5a63dfdd8f5ad1c68272dffda348f4d7af2224ee8128171e2eefc20947762e87164c04fbf37b572176bcaa2228077443da0fbe5881ccf6e4e3
   languageName: node
   linkType: hard
 
@@ -4433,14 +4464,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chai-as-promised@npm:^7.1.1":
-  version: 7.1.1
-  resolution: "chai-as-promised@npm:7.1.1"
+"chai-as-promised@npm:^7.1.2":
+  version: 7.1.2
+  resolution: "chai-as-promised@npm:7.1.2"
   dependencies:
     check-error: "npm:^1.0.2"
   peerDependencies:
-    chai: ">= 2.1.2 < 5"
-  checksum: 10/5d9ecab37b313047f5ea25d00b1cb6e7f2710c6e2f57d91aed7cfed5008d995cb65ea723af4e5d782bafd9a6eff5a4267af53dfe7212dc10dd1d92b9127bc531
+    chai: ">= 2.1.2 < 6"
+  checksum: 10/be372540dad92ef85cde3954bc0e9b0b33e4e6454f3740b17bfb16e36eda638911619089c05a4e4f2bf6722563bf893bb78c2af59b318c23abb2199e5c20ca1f
   languageName: node
   linkType: hard
 
@@ -5350,9 +5381,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv-cli@npm:^7.4.1":
-  version: 7.4.1
-  resolution: "dotenv-cli@npm:7.4.1"
+"dotenv-cli@npm:^7.4.2":
+  version: 7.4.2
+  resolution: "dotenv-cli@npm:7.4.2"
   dependencies:
     cross-spawn: "npm:^7.0.3"
     dotenv: "npm:^16.3.0"
@@ -5360,7 +5391,7 @@ __metadata:
     minimist: "npm:^1.2.6"
   bin:
     dotenv: cli.js
-  checksum: 10/213ed2a446db0aed329fb8792107dd3bacab409eb4904137f57f6e428e0de7abfce2e1cbf34b311ce8b36090931a316e943cf193975a2eb8e855ad7db3df8cf5
+  checksum: 10/48d887ea9be08f7453dc87d6c938311989e951d0b43028eadcbaff3be1ca56180f8c38b8f932fc2e59f0210e59f4b5c59cf8a34da3e6c92f63fe6d7ce4f09f65
   languageName: node
   linkType: hard
 
@@ -9123,7 +9154,7 @@ __metadata:
     "@nestjs/testing": "npm:^9.4.3"
     "@salesforce/ts-sinon": "npm:^1.4.19"
     "@types/bull": "npm:^4.10.0"
-    "@types/chai": "npm:^4.3.14"
+    "@types/chai": "npm:^4.3.16"
     "@types/chai-as-promised": "npm:^7.1.8"
     "@types/compression": "npm:^1.7.5"
     "@types/crypto-js": "npm:^4.2.2"
@@ -9134,7 +9165,7 @@ __metadata:
     "@types/luxon": "npm:^3.4.2"
     "@types/mocha": "npm:^10.0.6"
     "@types/multer": "npm:^1.4.11"
-    "@types/node": "npm:^20.12.7"
+    "@types/node": "npm:^20.12.11"
     "@types/pg-copy-streams": "npm:^1.2.5"
     "@types/pino-multi-stream": "npm:^5.1.6"
     "@types/sinon": "npm:^17.0.3"
@@ -9144,10 +9175,10 @@ __metadata:
     "@types/yargs": "npm:^17.0.32"
     "@typescript-eslint/eslint-plugin": "npm:^6.21.0"
     "@typescript-eslint/parser": "npm:^6.21.0"
-    bull: "npm:4.12.2"
+    bull: "npm:4.12.3"
     bull-repl: "npm:^0.29.1"
     chai: "npm:^4.4.1"
-    chai-as-promised: "npm:^7.1.1"
+    chai-as-promised: "npm:^7.1.2"
     chai-exclude: "npm:^2.1.0"
     class-transformer: "npm:0.5.1"
     class-validator: "npm:0.14.1"
@@ -9155,7 +9186,7 @@ __metadata:
     cron-parser: "npm:4.9.0"
     crypto-js: "npm:4.2.0"
     dirty-chai: "npm:^2.0.1"
-    dotenv-cli: "npm:^7.4.1"
+    dotenv-cli: "npm:^7.4.2"
     dotvault: "npm:^0.0.9"
     elastic-apm-node: "npm:3.51.0"
     eslint: "npm:^8.57.0"
@@ -9186,7 +9217,7 @@ __metadata:
     redis: "npm:^4.6.13"
     reflect-metadata: "npm:0.2.2"
     remove-accents: "npm:0.5.0"
-    rimraf: "npm:5.0.5"
+    rimraf: "npm:5.0.7"
     rxjs: "npm:7.8.1"
     sequelize: "npm:6.37.3"
     sequelize-cli: "npm:6.6.2"
@@ -10903,14 +10934,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rimraf@npm:5.0.5":
-  version: 5.0.5
-  resolution: "rimraf@npm:5.0.5"
+"rimraf@npm:5.0.7":
+  version: 5.0.7
+  resolution: "rimraf@npm:5.0.7"
   dependencies:
     glob: "npm:^10.3.7"
   bin:
     rimraf: dist/esm/bin.mjs
-  checksum: 10/a612c7184f96258b7d1328c486b12ca7b60aa30e04229a08bbfa7e964486deb1e9a1b52d917809311bdc39a808a4055c0f950c0280fba194ba0a09e6f0d404f6
+  checksum: 10/1e3cecfe59ee2383dfd9ba5373caeed48ed941318a0360119419b7dffc63115661408b9427f67e1f66b5bbb8855a3953db09e55a7362b3df904a44453dfa22fb
   languageName: node
   linkType: hard
 
