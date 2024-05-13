@@ -92,7 +92,7 @@ describe('RecupererAnalyseAntivirusJobHandler', () => {
       'FICHIER_SAIN'
     )
     expect(result.succes).to.be.true()
-    expect(result.resultat).to.equal('Fichier sain')
+    expect(result.resultat).to.deep.equal({ resultat: 'Fichier sain' })
   })
 
   it('signale un fichier malveillant', async () => {
@@ -116,7 +116,7 @@ describe('RecupererAnalyseAntivirusJobHandler', () => {
       'id-fichier'
     )
     expect(result.succes).to.be.true()
-    expect(result.resultat).to.equal('Fichier malveillant')
+    expect(result.resultat).to.deep.equal({ resultat: 'Fichier malveillant' })
   })
 
   it('replanifie la vérification d’une analyse en cours', async () => {
@@ -138,8 +138,8 @@ describe('RecupererAnalyseAntivirusJobHandler', () => {
       }
     )
     expect(result.succes).to.be.true()
-    expect(result.resultat).to.equal(
-      'Récupération résultat analyse replanifiée'
-    )
+    expect(result.resultat).to.deep.equal({
+      resultat: 'Récupération résultat analyse replanifiée'
+    })
   })
 })

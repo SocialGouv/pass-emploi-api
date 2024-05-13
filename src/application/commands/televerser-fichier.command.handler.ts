@@ -25,6 +25,7 @@ import {
 } from '../../domain/milo/liste-de-diffusion'
 import estJeune = Authentification.estJeune
 import estConseiller = Authentification.estConseiller
+import { buildError } from '../../utils/logger.module'
 
 export interface TeleverserFichierCommand extends Command {
   fichier: {
@@ -145,35 +146,40 @@ export class TeleverserFichierCommandHandler extends CommandHandler<
     idJeune: string,
     idMessage: string
   ): Promise<void> {
-    const resultAnalyse =
-      await this.fichierRepository.declencherAnalyseAsynchrone(fichier)
+    try {
+      const resultAnalyse =
+        await this.fichierRepository.declencherAnalyseAsynchrone(fichier)
 
-    if (isFailure(resultAnalyse)) {
-      // TODO softDelete ou job pour ressayer l'analyse ?
+      if (isFailure(resultAnalyse)) {
+        // TODO softDelete ou job pour ressayer l'analyse ?
+        this.chatRepository.envoyerStatutAnalysePJ(
+          idJeune,
+          idMessage,
+          Chat.StatutAnalysePJ.ERREUR_ANALYSE
+        )
+        return
+      }
+
       this.chatRepository.envoyerStatutAnalysePJ(
         idJeune,
         idMessage,
-        Chat.StatutAnalysePJ.ERREUR_ANALYSE
+        Chat.StatutAnalysePJ.ANALYSE_EN_COURS
       )
-      return
+      const intervalleRecuperationResultat = this.configService.get<number>(
+        'jecliqueoupas.intervalleAnalyse'
+      )
+      const dateExecutionRecuperationResultat = this.dateService
+        .now()
+        .plus({ seconds: intervalleRecuperationResultat })
+      this.logger.log('Planification JOB récupération analyse PJ')
+      this.planificateurRepository.creerJob({
+        dateExecution: dateExecutionRecuperationResultat.toJSDate(),
+        type: Planificateur.JobType.RECUPERER_ANALYSE_ANTIVIRUS,
+        contenu: { idFichier: fichier.id }
+      })
+    } catch (e) {
+      this.logger.error(buildError('Erreur Analyse PJ', e))
     }
-
-    this.chatRepository.envoyerStatutAnalysePJ(
-      idJeune,
-      idMessage,
-      Chat.StatutAnalysePJ.ANALYSE_EN_COURS
-    )
-    const intervalleRecuperationResultat = this.configService.get<number>(
-      'jecliqueoupas.intervalleAnalyse'
-    )
-    const dateExecutionRecuperationResultat = this.dateService
-      .now()
-      .plus({ seconds: intervalleRecuperationResultat })
-    this.planificateurRepository.creerJob({
-      dateExecution: dateExecutionRecuperationResultat.toJSDate(),
-      type: Planificateur.JobType.RECUPERER_ANALYSE_ANTIVIRUS,
-      contenu: { idFichier: fichier.id }
-    })
   }
 }
 

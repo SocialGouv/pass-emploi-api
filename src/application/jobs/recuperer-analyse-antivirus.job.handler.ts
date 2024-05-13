@@ -123,7 +123,7 @@ export class RecupererAnalyseAntivirusJobHandler extends JobHandler<Job> {
       succes: false,
       dateExecution: date,
       tempsExecution: DateService.calculerTempsExecution(date),
-      resultat: erreur
+      resultat: { resultat: erreur }
     }
   }
 
@@ -134,7 +134,7 @@ export class RecupererAnalyseAntivirusJobHandler extends JobHandler<Job> {
       succes: true,
       dateExecution: date,
       tempsExecution: DateService.calculerTempsExecution(date),
-      resultat: succes
+      resultat: { resultat: succes }
     }
   }
 }
