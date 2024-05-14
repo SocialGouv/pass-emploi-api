@@ -6689,6 +6689,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fuse.js@npm:7.0.0":
+  version: 7.0.0
+  resolution: "fuse.js@npm:7.0.0"
+  checksum: 10/d75d35f2d61afa85b8248f9cbfc7d4df29ae47ea574a15ad5c3c2a41930c5ed78668346295508b59ec4929fcb1a5cd6d9a8c649b5a3bc8b18e515f4e4cb9809d
+  languageName: node
+  linkType: hard
+
 "gaxios@npm:^6.0.0, gaxios@npm:^6.0.2, gaxios@npm:^6.1.1":
   version: 6.5.0
   resolution: "gaxios@npm:6.5.0"
@@ -9195,6 +9202,7 @@ __metadata:
     eslint-plugin-mocha: "npm:^10.4.3"
     eslint-plugin-prettier: "npm:^4.2.1"
     firebase-admin: "npm:12.1.0"
+    fuse.js: "npm:7.0.0"
     geojson: "npm:0.5.0"
     helmet: "npm:7.1.0"
     husky: "npm:^9.0.11"
