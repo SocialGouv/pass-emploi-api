@@ -25,4 +25,11 @@ export class ChatCryptoService {
       iv: encrypted.iv.toString(CryptoJS.enc.Base64)
     }
   }
+
+  decrypt(iv64: string, content: string): string {
+    const iv = CryptoJS.enc.Base64.parse(iv64)
+    return CryptoJS.AES.decrypt(content, this.key, { iv }).toString(
+      CryptoJS.enc.Utf8
+    )
+  }
 }
