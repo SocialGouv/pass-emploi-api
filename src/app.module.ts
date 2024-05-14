@@ -358,6 +358,7 @@ import { configureLoggerModule } from './utils/logger.module'
 import { RateLimiterService } from './utils/rate-limiter.service'
 import { QualifierActionsJobHandler } from './application/jobs/qualifier-actions.job.handler.db'
 import { GetUtilisateurQueryHandler } from './application/queries/get-utilisateur.query.handler'
+import { RechercherMessageQueryHandler } from 'src/application/queries/rechercher-message.query.handler'
 import { RecupererAnalyseAntivirusJobHandler } from './application/jobs/recuperer-analyse-antivirus.job.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
@@ -620,6 +621,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     ConseillerAuthorizer,
     FavoriOffresEmploiAuthorizer,
     FavoriOffresImmersionAuthorizer,
+    RechercherMessageQueryHandler,
     JeuneAuthorizer,
     RechercheAuthorizer,
     RendezVousAuthorizer,

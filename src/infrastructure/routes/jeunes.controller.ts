@@ -54,6 +54,9 @@ import {
   UpdateConfigurationInput,
   UpdateJeunePreferencesPayload
 } from './validation/jeunes.inputs'
+import { ResultatsRechercheMessageQueryModel } from 'src/application/queries/query-models/resultats-recherche-message-query.model'
+import { RechercherMessagePayload } from 'src/infrastructure/routes/validation/messages.input'
+import { RechercherMessageQueryHandler } from 'src/application/queries/rechercher-message.query.handler'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -70,7 +73,8 @@ export class JeunesController {
     private readonly deleteJeuneInactifCommandHandler: DeleteJeuneInactifCommandHandler,
     private readonly getConseillersJeuneQueryHandler: GetConseillersJeuneQueryHandler,
     private readonly updateJeunePreferencesCommandHandler: UpdateJeunePreferencesCommandHandler,
-    private readonly getPreferencesJeuneQueryHandler: GetPreferencesJeuneQueryHandler
+    private readonly getPreferencesJeuneQueryHandler: GetPreferencesJeuneQueryHandler,
+    private rechercherMessageCommandHandler: RechercherMessageQueryHandler
   ) {}
 
   @Get(':idJeune')
@@ -292,6 +296,30 @@ export class JeunesController {
     }
     const result = await this.getPreferencesJeuneQueryHandler.execute(
       query,
+      utilisateur
+    )
+
+    return handleResult(result)
+  }
+
+  @Get(':idJeune/messages')
+  @ApiOperation({
+    summary: 'Recherche un mot-clé dans une conversation',
+    description: 'Autorisé pour un conseiller'
+  })
+  @ApiResponse({
+    type: ResultatsRechercheMessageQueryModel
+  })
+  async rechercherMessage(
+    @Param('idJeune') idJeune: string,
+    @Query() query: RechercherMessagePayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<ResultatsRechercheMessageQueryModel> {
+    const result = await this.rechercherMessageCommandHandler.execute(
+      {
+        recherche: query.recherche,
+        idBeneficiaire: idJeune
+      },
       utilisateur
     )
 

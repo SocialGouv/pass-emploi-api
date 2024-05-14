@@ -40,3 +40,9 @@ export class EnvoyerMessagePayload {
   @Type(() => InfoPieceJointePayload)
   infoPieceJointe?: InfoPieceJointePayload
 }
+
+export class RechercherMessagePayload {
+  @ApiProperty()
+  @IsString()
+  recherche: string
+}

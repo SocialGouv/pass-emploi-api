@@ -4,7 +4,8 @@ import {
   ChatIndividuel,
   ChatGroupe,
   MessageIndividuel,
-  MessageGroupe
+  MessageGroupe,
+  MessageRecherche
 } from '../../domain/chat'
 import { Jeune } from '../../domain/jeune/jeune'
 import { FirebaseClient } from '../clients/firebase-client'
@@ -28,6 +29,12 @@ export class ChatFirebaseRepository implements Chat.Repository {
       idConseiller,
       idListeDeDiffusion
     )
+  }
+
+  async recupererMessagesConversation(
+    idBeneficiaire: string
+  ): Promise<MessageRecherche[]> {
+    return this.firebaseClient.recupereMessagesConversation(idBeneficiaire)
   }
 
   async recupererConversationIndividuelle(
