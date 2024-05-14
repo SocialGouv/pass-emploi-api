@@ -47,6 +47,12 @@ import { StubbedClass, enleverLesUndefined, expect } from 'test/utils'
 import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
 import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
+import {
+  RechercherMessageQuery,
+  RechercherMessageQueryHandler
+} from 'src/application/queries/rechercher-message.query.handler'
+import { RechercherMessagePayload } from 'src/infrastructure/routes/validation/messages.input'
+import { ResultatsRechercheMessageQueryModel } from 'src/application/queries/query-models/resultats-recherche-message-query.model'
 
 describe('JeunesController', () => {
   let getDetailJeuneQueryHandler: StubbedClass<GetDetailJeuneQueryHandler>
@@ -60,6 +66,8 @@ describe('JeunesController', () => {
   let archiverJeuneCommandHandler: StubbedClass<ArchiverJeuneCommandHandler>
   let updateJeunePreferencesCommandHandler: StubbedClass<UpdateJeunePreferencesCommandHandler>
   let getPreferencesJeuneQueryHandler: StubbedClass<GetPreferencesJeuneQueryHandler>
+  let rechercherMessageQueryHandler: StubbedClass<RechercherMessageQueryHandler>
+
   let jwtService: StubbedClass<JwtService>
   let dateService: StubbedClass<DateService>
   let app: INestApplication
@@ -86,6 +94,7 @@ describe('JeunesController', () => {
       UpdateJeunePreferencesCommandHandler
     )
     getPreferencesJeuneQueryHandler = app.get(GetPreferencesJeuneQueryHandler)
+    rechercherMessageQueryHandler = app.get(RechercherMessageQueryHandler)
 
     jwtService = app.get(JwtService)
     dateService = app.get(DateService)
@@ -742,5 +751,51 @@ describe('JeunesController', () => {
     })
 
     ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1/preferences')
+  })
+
+  describe('GET /jeunes/:idJeune/messages', () => {
+    const idJeune = '1'
+    const query: RechercherMessageQuery = {
+      recherche: 'rendez-vous',
+      idBeneficiaire: idJeune
+    }
+
+    const payload: RechercherMessagePayload = {
+      recherche: 'rendez-vous'
+    }
+
+    it('recherche une string dans une conversation', async () => {
+      // Given
+      const queryModel: ResultatsRechercheMessageQueryModel = {
+        resultats: [
+          {
+            id: 'id-message',
+            message: {
+              message: 'Contenu du message',
+              id: 'id-message',
+              idConseiller: 'id-conseiller'
+            }
+          }
+        ]
+      }
+
+      rechercherMessageQueryHandler.execute
+        .withArgs(query)
+        .resolves(success(queryModel))
+
+      // When - Then
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/messages`)
+        .query(payload)
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+        .expect(queryModel)
+
+      expect(
+        rechercherMessageQueryHandler.execute
+      ).to.have.been.calledWithExactly(query, unUtilisateurDecode())
+
+      rechercherMessageQueryHandler.execute.withArgs(query).resolves()
+    })
   })
 })

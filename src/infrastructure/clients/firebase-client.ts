@@ -10,7 +10,8 @@ import {
   ChatGroupe,
   ChatIndividuel,
   MessageGroupe,
-  MessageIndividuel
+  MessageIndividuel,
+  MessageRecherche
 } from '../../domain/chat'
 import { Jeune } from '../../domain/jeune/jeune'
 import { ChatCryptoService } from '../../utils/chat-crypto-service'
@@ -26,6 +27,8 @@ import CollectionReference = firestore.CollectionReference
 import DocumentReference = firestore.DocumentReference
 import Timestamp = firestore.Timestamp
 import UpdateData = firestore.UpdateData
+import DocumentData = firestore.DocumentData
+import QueryDocumentSnapshot = firestore.QueryDocumentSnapshot
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Utf8 = require('crypto-js/enc-utf8')
@@ -141,6 +144,41 @@ export class FirebaseClient implements IFirebaseClient {
       }
       await this.firestore.collection(collectionPath).add(newGroup)
     }
+  }
+
+  private dechiffrerMessage(
+    message: MessageIndividuel & { id: string }
+  ): MessageIndividuel & { id: string } {
+    const iv = message.iv
+    if (!iv) return message
+
+    const decryptedMessage: {
+      content: string
+      infoPieceJointe?: { id: string; nom: string }
+    } = {
+      content: this.chatCryptoService.decrypt(iv, message.message)
+    }
+
+    if (message.infoPieceJointe) {
+      decryptedMessage.infoPieceJointe = {
+        id: message.infoPieceJointe.id,
+        nom: this.chatCryptoService.decrypt(iv, message.infoPieceJointe.nom)
+      }
+    }
+
+    return {
+      ...message,
+      message: decryptedMessage.content
+    }
+  }
+
+  async recupereMessagesConversation(
+    idBeneficiaire: string
+  ): Promise<MessageRecherche[]> {
+    const collection = this.firestore.collection(FIREBASE_CHAT_PATH)
+    const chat = await collection.where('jeuneId', '==', idBeneficiaire).get()
+
+    return chat.docs.map(messageSnapshotToMessageIndividuelDechiffre)
   }
 
   async recupererChatIndividuel(
@@ -491,6 +529,24 @@ function chunkify<T>(tableau: T[]): T[][] {
   }
 
   return resultat
+}
+
+function messageSnapshotToMessageIndividuelDechiffre(
+  docSnapshot: QueryDocumentSnapshot<DocumentData, DocumentData>
+): MessageRecherche {
+  const firebaseMessage = docSnapshot.data()
+  const message: MessageRecherche = {
+    id: docSnapshot.id,
+    content: firebaseMessage.content,
+    iv: firebaseMessage.iv,
+    rawMessage: firebaseMessage
+  }
+
+  if (firebaseMessage.type === 'MESSAGE_PJ') {
+    message.piecesJointes = firebaseMessage.piecesJointes ?? []
+  }
+
+  return this.dechiffrerMessage(message)
 }
 
 function getMessagesRef<T extends FirebaseMessage>(

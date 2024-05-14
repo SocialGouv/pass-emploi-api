@@ -22,6 +22,14 @@ export interface MessageIndividuel {
   }
 }
 
+export interface MessageRecherche {
+  content: string
+  id: string
+  iv: string
+  piecesJointes?: Array<{ nom: string }>
+  rawMessage: object
+}
+
 export interface MessageGroupe extends MessageIndividuel {
   idsBeneficiaires: string[]
 }
@@ -72,6 +80,10 @@ export namespace Chat {
     recupererConversationGroupe(
       idListeDeDiffusion: string
     ): Promise<ChatGroupe | undefined>
+
+    recupererMessagesConversation(
+      idBeneficiaire: string
+    ): Promise<MessageRecherche[]>
 
     envoyerMessageIndividuel(
       idChat: string,
