@@ -76,6 +76,7 @@ export namespace Evenement {
     MESSAGE_MODIFIE = 'MESSAGE_MODIFIE',
     MESSAGE_SUPPRIME = 'MESSAGE_SUPPRIME',
     MESSAGE_OFFRE_PARTAGEE = 'MESSAGE_OFFRE_PARTAGEE',
+    MESSAGE_IMPORTANT_MODIFIE = 'MESSAGE_IMPORTANT_MODIFIE',
     OFFRE_ALTERNANCE_AFFICHEE = 'OFFRE_ALTERNANCE_AFFICHEE',
     OFFRE_ALTERNANCE_PARTAGEE = 'OFFRE_ALTERNANCE_PARTAGEE',
     OFFRE_ALTERNANCE_POSTULEE = 'OFFRE_ALTERNANCE_POSTULEE',
@@ -497,6 +498,10 @@ const evenements: {
   [Evenement.Code.MESSAGE_SUPPRIME]: {
     categorie: 'Message',
     action: 'Suppression'
+  },
+  [Evenement.Code.MESSAGE_IMPORTANT_MODIFIE]: {
+    categorie: 'Message',
+    action: 'Message important'
   },
   [Evenement.Code.RDV_CREE]: {
     categorie: 'Rendez-vous',
