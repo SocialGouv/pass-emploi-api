@@ -53,6 +53,7 @@ export function estNotifiable(suiviJob: SuiviJob): boolean {
       Planificateur.JobType.SUIVRE_FILE_EVENEMENTS_MILO,
       Planificateur.JobType.NOTIFIER_RENDEZVOUS_PE,
       Planificateur.JobType.RENDEZVOUS,
+      Planificateur.JobType.RAPPEL_SESSION,
       Planificateur.JobType.RAPPEL_ACTION,
       Planificateur.JobType.TRAITER_EVENEMENT_MILO
     ].includes(suiviJob.jobType)
