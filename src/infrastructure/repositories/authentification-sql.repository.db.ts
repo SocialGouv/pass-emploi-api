@@ -117,6 +117,7 @@ export class AuthentificationSqlRepository
         {
           idAuthentification: utilisateur.idAuthentification,
           email: utilisateur.email,
+          username: utilisateur.username,
           nom: utilisateur.nom,
           prenom: utilisateur.prenom,
           dateDerniereConnexion: utilisateur.dateDerniereConnexion,
@@ -136,7 +137,8 @@ export class AuthentificationSqlRepository
         id: utilisateur.id,
         nom: utilisateur.nom,
         prenom: utilisateur.prenom,
-        email: utilisateur.email ? utilisateur.email : null,
+        email: utilisateur.email ?? null,
+        username: utilisateur.username ?? null,
         structure: utilisateur.structure,
         idAuthentification: utilisateur.idAuthentification,
         dateCreation: dateCreation ?? undefined,

@@ -31,6 +31,7 @@ export interface UpdateUtilisateurCommand extends Command {
   nom?: string
   prenom?: string
   email?: string
+  username?: string
   type: Authentification.Type
   structure: Core.Structure
   federatedToken?: string
@@ -152,6 +153,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       command.nom,
       command.prenom,
       command.email,
+      command.username,
       command.structure,
       estSuperviseur
     )
@@ -188,7 +190,8 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       nom: command.nom ?? utilisateur.nom,
       prenom: command.prenom ?? utilisateur.prenom,
       dateDerniereConnexion: maintenant,
-      datePremiereConnexion: utilisateur.datePremiereConnexion ?? maintenant
+      datePremiereConnexion: utilisateur.datePremiereConnexion ?? maintenant,
+      username: command.username ?? utilisateur.username
     }
 
     await this.authentificationRepository.update(utilisateurMisAJour)

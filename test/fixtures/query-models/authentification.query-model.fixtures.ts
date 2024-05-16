@@ -12,7 +12,8 @@ export function unUtilisateurQueryModel(
     type: Authentification.Type.CONSEILLER,
     email: 'nils.tavernier@passemploi.com',
     structure: Core.Structure.MILO,
-    roles: []
+    roles: [],
+    username: undefined
   }
   return { ...defaults, ...overrides }
 }

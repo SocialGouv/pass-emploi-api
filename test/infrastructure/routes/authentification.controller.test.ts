@@ -42,14 +42,15 @@ describe('AuthentificationController', () => {
   describe('PUT auth/users/:idUtilisateurAuth', () => {
     it('met à jour et retourne un utilisateur', async () => {
       // Given
-      const utilisateur = unUtilisateurQueryModel()
+      const utilisateur = unUtilisateurQueryModel({ username: 'test' })
 
       const body: PutUtilisateurPayload = {
         nom: 'Tavernier',
         prenom: 'Nils',
         type: Authentification.Type.CONSEILLER,
         email: 'nils.tavernier@passemploi.com',
-        structure: Core.Structure.MILO
+        structure: Core.Structure.MILO,
+        username: 'test'
       }
 
       const command: UpdateUtilisateurCommand = {
@@ -57,9 +58,7 @@ describe('AuthentificationController', () => {
         idUtilisateurAuth: 'nilstavernier'
       }
 
-      updateUtilisateurCommandHandler.execute
-        .withArgs(command)
-        .resolves(success(utilisateur))
+      updateUtilisateurCommandHandler.execute.resolves(success(utilisateur))
 
       // When - Then
       const result = await request(app.getHttpServer())
@@ -68,6 +67,9 @@ describe('AuthentificationController', () => {
         .send(body)
         .expect(HttpStatus.OK)
 
+      expect(
+        updateUtilisateurCommandHandler.execute
+      ).to.have.been.calledOnceWithExactly(command)
       expect(result.body).to.deep.equal(utilisateur)
     })
 
@@ -254,7 +256,7 @@ describe('AuthentificationController', () => {
         ...qp,
         idAuthentification: 'test-sub'
       }
-      const utilisateur = unUtilisateurQueryModel()
+      const utilisateur = unUtilisateurQueryModel({ username: 'test' })
       getUtilisateurQueryHandler.execute
         .withArgs(query)
         .resolves(success(utilisateur))
