@@ -13,15 +13,69 @@ export function useSwagger(
 ): void {
   const issuerUrl = appConfig.get('oidc.issuerUrl')
   const baserUrl = appConfig.get('baseUrl')
-  const oauth2SecuritySchemeObject: SecuritySchemeObject = {
+  const peConseiller: SecuritySchemeObject = {
     type: 'oauth2',
-    description: 'client_id: pass-emploi-swagger',
     flows: {
-      implicit: {
-        authorizationUrl: `${issuerUrl}/protocol/openid-connect/auth`,
+      authorizationCode: {
+        authorizationUrl: `${issuerUrl}/protocol/openid-connect/auth?kc_idp_hint=pe-conseiller`,
         refreshUrl: `${issuerUrl}/protocol/openid-connect/token`,
         tokenUrl: `${issuerUrl}/protocol/openid-connect/token`,
-        scopes: {}
+        scopes: { openid: '', email: '', profile: '' }
+      }
+    }
+  }
+  const peJeune: SecuritySchemeObject = {
+    type: 'oauth2',
+    flows: {
+      authorizationCode: {
+        authorizationUrl: `${issuerUrl}/protocol/openid-connect/auth?kc_idp_hint=pe-jeune`,
+        refreshUrl: `${issuerUrl}/protocol/openid-connect/token`,
+        tokenUrl: `${issuerUrl}/protocol/openid-connect/token`,
+        scopes: { openid: '', email: '', profile: '' }
+      }
+    }
+  }
+  const peConseillerBRSA: SecuritySchemeObject = {
+    type: 'oauth2',
+    flows: {
+      authorizationCode: {
+        authorizationUrl: `${issuerUrl}/protocol/openid-connect/auth?kc_idp_hint=pe-brsa-conseiller`,
+        refreshUrl: `${issuerUrl}/protocol/openid-connect/token`,
+        tokenUrl: `${issuerUrl}/protocol/openid-connect/token`,
+        scopes: { openid: '', email: '', profile: '' }
+      }
+    }
+  }
+  const peJeuneBRSA: SecuritySchemeObject = {
+    type: 'oauth2',
+    flows: {
+      authorizationCode: {
+        authorizationUrl: `${issuerUrl}/protocol/openid-connect/auth?kc_idp_hint=pe-brsa-jeune`,
+        refreshUrl: `${issuerUrl}/protocol/openid-connect/token`,
+        tokenUrl: `${issuerUrl}/protocol/openid-connect/token`,
+        scopes: { openid: '', email: '', profile: '' }
+      }
+    }
+  }
+  const miloConseiller: SecuritySchemeObject = {
+    type: 'oauth2',
+    flows: {
+      authorizationCode: {
+        authorizationUrl: `${issuerUrl}/protocol/openid-connect/auth?kc_idp_hint=similo-conseiller`,
+        refreshUrl: `${issuerUrl}/protocol/openid-connect/token`,
+        tokenUrl: `${issuerUrl}/protocol/openid-connect/token`,
+        scopes: { openid: '', email: '', profile: '' }
+      }
+    }
+  }
+  const miloJeune: SecuritySchemeObject = {
+    type: 'oauth2',
+    flows: {
+      authorizationCode: {
+        authorizationUrl: `${issuerUrl}/protocol/openid-connect/auth?kc_idp_hint=similo-jeune`,
+        refreshUrl: `${issuerUrl}/protocol/openid-connect/token`,
+        tokenUrl: `${issuerUrl}/protocol/openid-connect/token`,
+        scopes: { openid: '', email: '', profile: '' }
       }
     }
   }
@@ -33,14 +87,28 @@ export function useSwagger(
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Pass Emploi Api')
     .setVersion('1.0')
-    .addOAuth2(oauth2SecuritySchemeObject)
+    .addOAuth2(peConseiller, 'France Travail Conseiller CEJ')
+    .addOAuth2(peConseillerBRSA, 'BRSA Conseiller')
+    .addOAuth2(peJeune, 'France Travail Jeune CEJ')
+    .addOAuth2(peJeuneBRSA, 'BRSA')
+    .addOAuth2(miloJeune, 'MILO Jeune')
+    .addOAuth2(miloConseiller, 'MILO Conseiller')
     .addSecurity('api_key', apiKeySecuritySchemeObject)
     .build()
   const document = SwaggerModule.createDocument(app, swaggerConfig)
+
   const customOptions: SwaggerCustomOptions = {
     swaggerOptions: {
       persistAuthorization: true,
-      oauth2RedirectUrl: `${baserUrl}/documentation/oauth2-redirect.html`
+      oauth2RedirectUrl: `${baserUrl}/documentation/oauth2-redirect.html`,
+      initOAuth: {
+        clientId: 'pass-emploi-swagger',
+        clientSecret: 'jopa',
+        scopes: ['openid', 'email', 'profile'],
+        scopeSeparator: ' ',
+        usePkceWithAuthorizationCodeGrant: true,
+        useBasicAuthenticationWithAccessCodeGrant: true
+      }
     }
   }
   SwaggerModule.setup('documentation', app, document, customOptions)
