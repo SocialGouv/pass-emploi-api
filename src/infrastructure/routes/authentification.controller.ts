@@ -23,6 +23,7 @@ import {
   UpdateUtilisateurCommandHandler
 } from '../../application/commands/update-utilisateur.command.handler'
 import { GetChatSecretsQueryHandler } from '../../application/queries/get-chat-secrets.query.handler'
+import { GetUtilisateurQueryHandler } from '../../application/queries/get-utilisateur.query.handler'
 import {
   ChatSecretsQueryModel,
   UtilisateurQueryModel
@@ -36,7 +37,6 @@ import {
   GetUtilisateurQueryParams,
   PutUtilisateurPayload
 } from './validation/authentification.inputs'
-import { GetUtilisateurQueryHandler } from '../../application/queries/get-utilisateur.query.handler'
 
 @Controller('auth')
 @ApiTags('Authentification')

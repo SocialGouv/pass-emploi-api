@@ -41,6 +41,12 @@ export class ConseillerDto extends Model {
   email: string | null
 
   @Column({
+    field: 'username',
+    type: DataType.STRING
+  })
+  username: string | null
+
+  @Column({
     field: 'structure',
     type: DataType.STRING
   })

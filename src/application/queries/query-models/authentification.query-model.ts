@@ -18,6 +18,9 @@ export class UtilisateurQueryModel {
   @ApiProperty({ required: false })
   email?: string
 
+  @ApiProperty({ required: false })
+  username?: string
+
   @ApiProperty({
     enum: Core.Structure
   })
@@ -45,6 +48,7 @@ export function queryModelFromUtilisateur(
     prenom: utilisateur.prenom,
     nom: utilisateur.nom,
     email: utilisateur.email,
+    username: utilisateur.username,
     structure: utilisateur.structure,
     type: utilisateur.type,
     roles: utilisateur.roles

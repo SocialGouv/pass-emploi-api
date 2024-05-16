@@ -12,6 +12,7 @@ export function fromConseillerSqlToUtilisateur(
     prenom: conseillerSqlModel.prenom,
     nom: conseillerSqlModel.nom,
     email: conseillerSqlModel.email ? conseillerSqlModel.email : undefined,
+    username: conseillerSqlModel.username || undefined,
     structure: conseillerSqlModel.structure,
     type: Authentification.Type.CONSEILLER,
     dateDerniereConnexion:

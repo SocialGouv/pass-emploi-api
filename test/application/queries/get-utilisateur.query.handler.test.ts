@@ -15,7 +15,7 @@ import { createSandbox, expect } from '../../utils'
 import { queryModelFromUtilisateur } from '../../../src/application/queries/query-models/authentification.query-model'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 
-describe('GetChatSecretsQueryHandler', () => {
+describe('GetUtilisateurQueryHandler', () => {
   let authentificationRepository: StubbedType<Authentification.Repository>
   let getUtilisateurQueryHandler: GetUtilisateurQueryHandler
   let sandbox: SinonSandbox

@@ -98,6 +98,7 @@ export namespace Authentification {
       nom: string | undefined,
       prenom: string | undefined,
       email: string | undefined,
+      username: string | undefined,
       structure: Core.Structure,
       superviseur: { dansSaStructure: boolean; crossStructures: boolean }
     ): Result<Utilisateur> {
@@ -117,6 +118,7 @@ export namespace Authentification {
         prenom: prenom,
         nom: nom,
         email: email,
+        username,
         type: Type.CONSEILLER,
         structure: structure,
         roles
