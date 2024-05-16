@@ -121,6 +121,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             ).to.have.been.calledWithExactly({
               ...utilisateur,
               email: 'new@email.com',
+              username: undefined,
               nom: 'newNom',
               prenom: 'newPrenom',
               dateDerniereConnexion: uneDate()
@@ -193,7 +194,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
               structure: Core.Structure.MILO,
               email: 'New@email.com',
               nom: 'newNom',
-              prenom: 'newPrenom'
+              prenom: 'newPrenom',
+              username: 'milou'
             }
 
             const ilYa5Semaines = maintenant.minus({ weeks: 5 }).toJSDate()
@@ -218,6 +220,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             ).to.have.been.calledWithExactly({
               ...utilisateur,
               email: 'new@email.com',
+              username: 'milou',
               nom: 'newNom',
               prenom: 'newPrenom',
               dateDerniereConnexion: uneDate(),
@@ -239,7 +242,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
               structure: Core.Structure.MILO,
               email: 'New@email.com',
               nom: 'newNom',
-              prenom: 'newPrenom'
+              prenom: 'newPrenom',
+              username: 'milou'
             }
 
             const ilYa1Semaine = maintenant.minus({ weeks: 1 }).toJSDate()
@@ -264,6 +268,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             ).to.have.been.calledWithExactly({
               ...utilisateur,
               email: 'new@email.com',
+              username: 'milou',
               nom: 'newNom',
               prenom: 'newPrenom',
               dateDerniereConnexion: uneDate(),
@@ -285,7 +290,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
               structure: Core.Structure.MILO,
               email: 'New@email.com',
               nom: 'newNom',
-              prenom: 'newPrenom'
+              prenom: 'newPrenom',
+              username: 'milou'
             }
 
             const ilYaUneSemaine = maintenant.minus({ weeks: 1 }).toJSDate()
@@ -310,6 +316,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             ).to.have.been.calledWithExactly({
               ...utilisateur,
               email: 'new@email.com',
+              username: 'milou',
               nom: 'newNom',
               prenom: 'newPrenom',
               dateDerniereConnexion: uneDate(),
@@ -320,6 +327,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             ).to.have.calledOnceWithExactly({
               ...utilisateur,
               email: 'new@email.com',
+              username: command.username,
               nom: 'newNom',
               prenom: 'newPrenom',
               dateDerniereConnexion: uneDate(),
@@ -340,7 +348,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
               type: Authentification.Type.CONSEILLER,
               email: 'Nils.Tavernier@Passemploi.com',
               idUtilisateurAuth: 'nilstavernier',
-              structure: Core.Structure.MILO
+              structure: Core.Structure.MILO,
+              username: 'milou'
             }
 
             beforeEach(() => {
@@ -358,6 +367,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
                 prenom: command.prenom || '',
                 nom: command.nom || '',
                 email: command.email,
+                username: command.username,
                 type: command.type,
                 structure: command.structure,
                 roles: []
@@ -375,7 +385,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
               if (isSuccess(result)) {
                 expect(result.data).to.deep.equal(
                   unUtilisateurQueryModel({
-                    roles: [Authentification.Role.SUPERVISEUR]
+                    roles: [Authentification.Role.SUPERVISEUR],
+                    username: 'milou'
                   })
                 )
               }
@@ -434,6 +445,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
                 prenom: command.prenom || '',
                 nom: command.nom || '',
                 email: command.email,
+                username: command.username,
                 type: command.type,
                 structure: command.structure,
                 roles: []
@@ -542,7 +554,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
       })
       describe("jeune venant de l'idp MILO", async () => {
         describe("jeune connu par son id d'authentification", async () => {
-          it('retourne le jeune quand', async () => {
+          it('retourne le jeune', async () => {
             // Given
             const command: UpdateUtilisateurCommand = {
               idUtilisateurAuth: 'nilstavernier',
@@ -571,7 +583,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
                 prenom: 'John',
                 roles: [],
                 structure: 'MILO',
-                type: 'JEUNE'
+                type: 'JEUNE',
+                username: undefined
               })
             )
           })
@@ -700,7 +713,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
                 prenom: 'John',
                 roles: [],
                 structure: 'POLE_EMPLOI',
-                type: 'JEUNE'
+                type: 'JEUNE',
+                username: undefined
               })
             )
           })
@@ -773,7 +787,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
                 prenom: 'prenom jeune',
                 roles: [],
                 structure: 'POLE_EMPLOI',
-                type: 'JEUNE'
+                type: 'JEUNE',
+                username: undefined
               })
             )
             expect(
