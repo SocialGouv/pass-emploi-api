@@ -21,7 +21,8 @@ export function unConseillerDto(
     idAgence: undefined,
     nomManuelAgence: undefined,
     notificationsSonores: false,
-    idStructureMilo: null
+    idStructureMilo: null,
+    username: null
   }
 
   return { ...defaults, ...args }

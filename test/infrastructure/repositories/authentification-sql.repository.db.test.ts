@@ -355,7 +355,8 @@ describe('AuthentificationSqlRepository', () => {
         email: 'nouveauEmail',
         idAuthentification: 'nouvelIdAuthentification',
         dateDerniereConnexion: uneDate(),
-        datePremiereConnexion: uneDatetime().toJSDate()
+        datePremiereConnexion: uneDatetime().toJSDate(),
+        username: 'milou'
       }
       await authentificationSqlRepository.update(unConseillerMisAJour)
 

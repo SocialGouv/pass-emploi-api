@@ -16,7 +16,8 @@ export const unUtilisateurConseiller = (
     structure: Core.Structure.MILO,
     roles: [],
     dateDerniereConnexion: undefined,
-    datePremiereConnexion: uneDatetime().toJSDate()
+    datePremiereConnexion: uneDatetime().toJSDate(),
+    username: undefined
   }
 
   return {

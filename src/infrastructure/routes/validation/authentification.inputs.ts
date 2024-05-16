@@ -20,6 +20,11 @@ export class PutUtilisateurPayload {
   @IsEmail()
   email?: string
 
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  username?: string
+
   @ApiProperty({ enum: Authentification.Type })
   @IsString()
   @IsEnum(Authentification.Type)
