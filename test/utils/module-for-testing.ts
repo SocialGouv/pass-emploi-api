@@ -128,7 +128,9 @@ export const testConfig = (): ConfigService => {
         conversationsNonLuesBRSA: '363',
         nouveauRendezvous: '300',
         rappelRendezvous: '400',
-        compteJeuneArchive: '500'
+        compteJeuneArchiveMILO: '500',
+        compteJeuneArchivePECEJ: '501',
+        compteJeuneArchivePEBRSA: '502'
       }
     },
     serviceCivique: {

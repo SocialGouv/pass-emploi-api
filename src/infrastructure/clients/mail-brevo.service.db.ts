@@ -12,7 +12,7 @@ import { InvitationIcsClient } from './invitation-ics.client'
 import { Jeune } from '../../domain/jeune/jeune'
 import { ArchiveJeune } from '../../domain/archive-jeune'
 import { Authentification } from '../../domain/authentification'
-import { estBRSA } from '../../domain/core'
+import { Core, estBRSA } from '../../domain/core'
 
 export type ICS = string
 
@@ -26,7 +26,9 @@ export class MailBrevoService implements Mail.Service {
     nouveauRendezvous: string
     rappelRendezvous: string
     rendezVousSupprime: string
-    compteJeuneArchive: string
+    compteJeuneArchiveMILO: string
+    compteJeuneArchivePECEJ: string
+    compteJeuneArchivePEBRSA: string
     creationConseillerMilo: string
   }
   private readonly frontendUrl: string
@@ -134,6 +136,20 @@ export class MailBrevoService implements Mail.Service {
     motif: ArchiveJeune.MotifSuppression | ArchiveJeune.MotifSuppressionSupport,
     commentaire?: string
   ): Promise<void> {
+    let templateId
+    switch (jeune.structure) {
+      case Core.Structure.MILO:
+        templateId = parseInt(this.templates.compteJeuneArchiveMILO)
+        break
+      case Core.Structure.POLE_EMPLOI:
+        templateId = parseInt(this.templates.compteJeuneArchivePECEJ)
+        break
+      case Core.Structure.POLE_EMPLOI_BRSA:
+        templateId = parseInt(this.templates.compteJeuneArchivePEBRSA)
+        break
+      default:
+        templateId = parseInt(this.templates.compteJeuneArchiveMILO)
+    }
     const mailDataDto: MailDataDto = {
       to: [
         {
@@ -141,7 +157,7 @@ export class MailBrevoService implements Mail.Service {
           name: `${jeune.firstName} ${jeune.lastName}`
         }
       ],
-      templateId: parseInt(this.templates.compteJeuneArchive),
+      templateId,
       params: {
         prenom: jeune.firstName,
         nom: jeune.lastName,

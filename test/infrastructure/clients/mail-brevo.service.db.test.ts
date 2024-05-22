@@ -144,7 +144,7 @@ describe('MailBrevoService', () => {
     })
   })
   describe('envoyerEmailJeuneArchive', () => {
-    it('envoie un email avec les bons paramètres', async () => {
+    it('envoie un email MILO avec les bons paramètres', async () => {
       // Given
       const jeune = unJeune()
       const command = {
@@ -159,7 +159,87 @@ describe('MailBrevoService', () => {
             name: `${jeune.firstName} ${jeune.lastName}`
           }
         ],
-        templateId: parseInt(config.get('brevo').templates.compteJeuneArchive),
+        templateId: parseInt(
+          config.get('brevo').templates.compteJeuneArchiveMILO
+        ),
+        params: {
+          prenom: jeune.firstName,
+          nom: jeune.lastName,
+          motif: command.motif,
+          commentaireMotif: 'test'
+        }
+      }
+      const scope = nock(config.get('brevo').url)
+        .post('/v3/smtp/email', JSON.stringify(mailDataDtoAttendu))
+        .reply(200)
+
+      // When
+      await mailBrevoService.envoyerEmailJeuneArchive(
+        jeune,
+        command.motif,
+        command.commentaireMotif
+      )
+
+      // Then
+      expect(scope.isDone()).to.equal(true)
+    })
+    it('envoie un email PE CEJ avec les bons paramètres', async () => {
+      // Given
+      const jeune = unJeune({ structure: Core.Structure.POLE_EMPLOI })
+      const command = {
+        jeune,
+        motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE,
+        commentaireMotif: 'test'
+      }
+      const mailDataDtoAttendu: MailDataDto = {
+        to: [
+          {
+            email: jeune.email,
+            name: `${jeune.firstName} ${jeune.lastName}`
+          }
+        ],
+        templateId: parseInt(
+          config.get('brevo').templates.compteJeuneArchivePECEJ
+        ),
+        params: {
+          prenom: jeune.firstName,
+          nom: jeune.lastName,
+          motif: command.motif,
+          commentaireMotif: 'test'
+        }
+      }
+      const scope = nock(config.get('brevo').url)
+        .post('/v3/smtp/email', JSON.stringify(mailDataDtoAttendu))
+        .reply(200)
+
+      // When
+      await mailBrevoService.envoyerEmailJeuneArchive(
+        jeune,
+        command.motif,
+        command.commentaireMotif
+      )
+
+      // Then
+      expect(scope.isDone()).to.equal(true)
+    })
+    it('envoie un email PE BRSA avec les bons paramètres', async () => {
+      // Given
+      const jeune = unJeune({ structure: Core.Structure.POLE_EMPLOI_BRSA })
+      const command = {
+        jeune,
+        motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE,
+        commentaireMotif: 'test'
+      }
+      const mailDataDtoAttendu: MailDataDto = {
+        to: [
+          {
+            email: jeune.email,
+            name: `${jeune.firstName} ${jeune.lastName}`
+          }
+        ],
+        templateId: parseInt(
+          config.get('brevo').templates.compteJeuneArchivePEBRSA
+        ),
         params: {
           prenom: jeune.firstName,
           nom: jeune.lastName,

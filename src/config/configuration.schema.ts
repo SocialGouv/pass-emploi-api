@@ -98,7 +98,9 @@ export const configurationSchema = Joi.object({
       rendezVousSupprime: Joi.number().required(),
       suppressionJeuneMilo: Joi.number().required(),
       suppressionJeunePE: Joi.number().required(),
-      compteJeuneArchive: Joi.number().required()
+      compteJeuneArchiveMILO: Joi.number().required(),
+      compteJeuneArchivePECEJ: Joi.number().required(),
+      compteJeuneArchivePEBRSA: Joi.number().required()
     }),
     mailingLists: Joi.object({
       poleEmploi: Joi.number().required(),
