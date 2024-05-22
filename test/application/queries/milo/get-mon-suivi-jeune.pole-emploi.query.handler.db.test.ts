@@ -1,19 +1,20 @@
 import { DateTime } from 'luxon'
-import { GetDemarchesQueryGetter } from 'src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
-import { GetRendezVousJeunePoleEmploiQueryGetter } from 'src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
-import { GetMonSuiviPoleEmploiQueryModel } from 'src/application/queries/query-models/jeunes.pole-emploi.query-model'
-import { Core } from 'src/domain/core'
-import { uneDemarcheQueryModel } from 'test/fixtures/query-models/demarche.query-model.fixtures'
-import { unRendezVousQueryModel } from 'test/fixtures/query-models/rendez-vous.query-model.fixtures'
 import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import { GetMonSuiviPoleEmploiQueryHandler } from '../../../../src/application/queries/milo/get-mon-suivi-jeune.pole-emploi.query.handler.db'
+import { GetDemarchesQueryGetter } from '../../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
+import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
+import { MonSuiviPoleEmploiQueryModel } from '../../../../src/application/queries/query-models/jeunes.pole-emploi.query-model'
+import { Cached } from '../../../../src/building-blocks/types/query'
 import {
   emptySuccess,
   isSuccess,
   Result,
   success
 } from '../../../../src/building-blocks/types/result'
+import { Core } from '../../../../src/domain/core'
 import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
+import { uneDemarcheQueryModel } from '../../../fixtures/query-models/demarche.query-model.fixtures'
+import { unRendezVousQueryModel } from '../../../fixtures/query-models/rendez-vous.query-model.fixtures'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import Structure = Core.Structure
 
@@ -50,7 +51,7 @@ describe('GetMonSuiviPoleEmploiQueryHandler', () => {
     })
     const demarche = uneDemarcheQueryModel()
 
-    let result: Result<GetMonSuiviPoleEmploiQueryModel>
+    let result: Result<Cached<MonSuiviPoleEmploiQueryModel>>
     beforeEach(async () => {
       getRendezVousJeuneQueryGetter.handle.resolves(
         success({
@@ -79,7 +80,9 @@ describe('GetMonSuiviPoleEmploiQueryHandler', () => {
         dateDebut,
         accessToken: 'accessToken'
       })
-      expect(isSuccess(result) && result.data.rendezVous).to.deep.equal([rdv])
+      expect(
+        isSuccess(result) && result.data.queryModel.rendezVous
+      ).to.deep.equal([rdv])
     })
 
     it('renvoie les démarches', async () => {
@@ -91,9 +94,9 @@ describe('GetMonSuiviPoleEmploiQueryHandler', () => {
           accessToken: 'accessToken'
         }
       )
-      expect(isSuccess(result) && result.data.demarches).to.deep.equal([
-        demarche
-      ])
+      expect(
+        isSuccess(result) && result.data.queryModel.demarches
+      ).to.deep.equal([demarche])
     })
   })
 
@@ -120,34 +123,3 @@ describe('GetMonSuiviPoleEmploiQueryHandler', () => {
     })
   })
 })
-
-// async function createActions(
-//   dates: DateTime[],
-//   statut?: Action.Statut
-// ): Promise<Array<AsSql<ActionDto>>> {
-//   const dtos = dates.map(date => {
-//     return uneActionDto({
-//       dateEcheance: date.toJSDate(),
-//       statut: statut ?? Action.Statut.PAS_COMMENCEE
-//     })
-//   })
-//   await ActionSqlModel.bulkCreate(dtos)
-//   return dtos
-// }
-
-// async function createRendezVous(
-//   dates: DateTime[],
-//   idJeune: string
-// ): Promise<Array<AsSql<RendezVousDto>>> {
-//   const rendezVousDtos = dates.map(date => {
-//     return unRendezVousDto({
-//       date: date.toJSDate()
-//     })
-//   })
-//   const associationDtos = rendezVousDtos.map(rdv => {
-//     return { idJeune, idRendezVous: rdv.id }
-//   })
-//   await RendezVousSqlModel.bulkCreate(rendezVousDtos)
-//   await RendezVousJeuneAssociationSqlModel.bulkCreate(associationDtos)
-//   return rendezVousDtos
-// }
