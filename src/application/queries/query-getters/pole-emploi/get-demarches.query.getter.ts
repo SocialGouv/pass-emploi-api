@@ -1,5 +1,7 @@
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
 import { NonTrouveError } from '../../../../building-blocks/types/domain-error'
+import { Cached } from '../../../../building-blocks/types/query'
 import {
   failure,
   isFailure,
@@ -15,21 +17,19 @@ import {
 } from '../../../../infrastructure/clients/pole-emploi-partenaire-client.db'
 import { DateService } from '../../../../utils/date-service'
 import { fromDemarcheDtoToDemarche } from '../../query-mappers/actions-pole-emploi.mappers'
-import { DemarcheQueryModel } from '../../query-models/actions.query-model'
 import { toDemarcheQueryModel } from '../../query-mappers/demarche.mappers'
-import { Cached } from '../../../../building-blocks/types/query'
+import { DemarcheQueryModel } from '../../query-models/actions.query-model'
 
 export interface Query {
   idJeune: string
   tri: GetDemarchesQueryGetter.TriQuery
   accessToken: string
+  dateDebut?: DateTime
   idpToken?: string
 }
 
 @Injectable()
 export class GetDemarchesQueryGetter {
-  private logger: Logger
-
   constructor(
     @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
@@ -37,9 +37,7 @@ export class GetDemarchesQueryGetter {
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,
     private dateService: DateService,
     private keycloakClient: KeycloakClient
-  ) {
-    this.logger = new Logger('GetDemarchesQueryGetter')
-  }
+  ) {}
 
   async handle(query: Query): Promise<Result<Cached<DemarcheQueryModel[]>>> {
     const jeune = await this.jeuneRepository.get(query.idJeune)
@@ -61,11 +59,18 @@ export class GetDemarchesQueryGetter {
       return demarchesDto
     }
 
-    const demarches = demarchesDto.data
+    let demarches = demarchesDto.data
       .map(demarcheDto =>
         fromDemarcheDtoToDemarche(demarcheDto, this.dateService)
       )
       .sort(query.tri)
+
+    if (query.dateDebut) {
+      demarches = demarches.filter(({ dateDebut, dateFin }) => {
+        if (dateDebut) return dateDebut >= query.dateDebut!
+        return dateFin >= query.dateDebut!
+      })
+    }
 
     const data: Cached<DemarcheQueryModel[]> = {
       queryModel: demarches.map(toDemarcheQueryModel),

@@ -1,7 +1,9 @@
 import { DateTime } from 'luxon'
+import { GetDemarchesQueryGetter } from 'src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from 'src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { GetMonSuiviPoleEmploiQueryModel } from 'src/application/queries/query-models/jeunes.pole-emploi.query-model'
 import { Core } from 'src/domain/core'
+import { uneDemarcheQueryModel } from 'test/fixtures/query-models/demarche.query-model.fixtures'
 import { unRendezVousQueryModel } from 'test/fixtures/query-models/rendez-vous.query-model.fixtures'
 import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import { GetMonSuiviPoleEmploiQueryHandler } from '../../../../src/application/queries/milo/get-mon-suivi-jeune.pole-emploi.query.handler.db'
@@ -17,6 +19,7 @@ import Structure = Core.Structure
 
 describe('GetMonSuiviPoleEmploiQueryHandler', () => {
   let getRendezVousJeuneQueryGetter: StubbedClass<GetRendezVousJeunePoleEmploiQueryGetter>
+  let getDemarchesQueryGetter: StubbedClass<GetDemarchesQueryGetter>
   let handler: GetMonSuiviPoleEmploiQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
 
@@ -31,68 +34,67 @@ describe('GetMonSuiviPoleEmploiQueryHandler', () => {
     getRendezVousJeuneQueryGetter = stubClass(
       GetRendezVousJeunePoleEmploiQueryGetter
     )
+    getDemarchesQueryGetter = stubClass(GetDemarchesQueryGetter)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
+
     handler = new GetMonSuiviPoleEmploiQueryHandler(
       jeuneAuthorizer,
-      getRendezVousJeuneQueryGetter
+      getRendezVousJeuneQueryGetter,
+      getDemarchesQueryGetter
     )
   })
 
   describe('handle', () => {
-    const rdv1 = unRendezVousQueryModel({
+    const rdv = unRendezVousQueryModel({
       date: dateDebut.plus({ hour: 1 }).toJSDate()
     })
-    const rdv2 = unRendezVousQueryModel({
-      date: dateDebut.plus({ day: 1 }).toJSDate()
-    })
-    const rdv3 = unRendezVousQueryModel({
-      date: dateDebut.plus({ week: 1 }).toJSDate()
-    })
+    const demarche = uneDemarcheQueryModel()
 
     let result: Result<GetMonSuiviPoleEmploiQueryModel>
     beforeEach(async () => {
       getRendezVousJeuneQueryGetter.handle.resolves(
         success({
-          queryModel: [rdv1, rdv2, rdv3]
+          queryModel: [rdv]
+        })
+      )
+      getDemarchesQueryGetter.handle.resolves(
+        success({
+          queryModel: [demarche]
         })
       )
 
-      result = await handler.handle(
+      result = await handler.handle({
+        idJeune: 'id-jeune',
+        dateDebut,
+        accessToken: 'accessToken'
+      })
+    })
+
+    it('renvoie les rendez-vous', async () => {
+      // Then
+      expect(
+        getRendezVousJeuneQueryGetter.handle
+      ).to.have.been.calledOnceWithExactly({
+        idJeune: 'id-jeune',
+        dateDebut,
+        accessToken: 'accessToken'
+      })
+      expect(isSuccess(result) && result.data.rendezVous).to.deep.equal([rdv])
+    })
+
+    it('renvoie les démarches', async () => {
+      expect(getDemarchesQueryGetter.handle).to.have.been.calledOnceWithExactly(
         {
           idJeune: 'id-jeune',
+          tri: GetDemarchesQueryGetter.Tri.parDateFin,
           dateDebut,
           accessToken: 'accessToken'
-        },
-        utilisateurJeunePE
+        }
       )
-    })
-
-    it('renvoie les rendez-vous triés par date', async () => {
-      // Then
-      expect(isSuccess(result) && result.data.rendezVous).to.deep.equal([
-        rdv1,
-        rdv2,
-        rdv3
+      expect(isSuccess(result) && result.data.demarches).to.deep.equal([
+        demarche
       ])
     })
-
-    it('renvoie les démarches triées par date', async () => {
-      expect(true).to.equal(false)
-    })
-
-    //   it('renvoie les sessions milo triées par date', async () => {
-    //     // When
-    //     const result = await handler.handle(query, utilisateurJeune)
-    //
-    //     // Then
-    //     expect(isSuccess(result)).to.be.true()
-    //     if (isSuccess(result)) {
-    //       expect(result.data.sessionsMilo).to.be.deep.equal([
-    //         sessionAvecInscriptionAJPlus1,
-    //         sessionAvecInscriptionAJPlus2
-    //       ])
-    //     }
-    // })
   })
 
   describe('authorize', () => {

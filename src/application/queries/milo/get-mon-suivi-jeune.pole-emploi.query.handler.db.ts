@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
+import { GetDemarchesQueryGetter } from 'src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from 'src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import {
-  isSuccess,
+  isFailure,
   Result,
   success
 } from '../../../building-blocks/types/result'
@@ -25,8 +26,9 @@ export class GetMonSuiviPoleEmploiQueryHandler extends QueryHandler<
   Result<GetMonSuiviPoleEmploiQueryModel>
 > {
   constructor(
-    private jeuneAuthorizer: JeuneAuthorizer,
-    private getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter
+    private readonly jeuneAuthorizer: JeuneAuthorizer,
+    private readonly getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter,
+    private readonly getDemarchesQueryGetter: GetDemarchesQueryGetter
   ) {
     super('GetMonSuiviPoleEmploiQueryHandler')
   }
@@ -43,15 +45,23 @@ export class GetMonSuiviPoleEmploiQueryHandler extends QueryHandler<
   }
 
   async handle(
-    query: GetMonSuiviPoleEmploiQuery,
-    _utilisateur: Authentification.Utilisateur
+    query: GetMonSuiviPoleEmploiQuery
   ): Promise<Result<GetMonSuiviPoleEmploiQueryModel>> {
-    const rdvs = await this.getRendezVousJeunePoleEmploiQueryGetter.handle(
-      query
-    )
+    const [rdvs, demarches] = await Promise.all([
+      await this.getRendezVousJeunePoleEmploiQueryGetter.handle(query),
+      await this.getDemarchesQueryGetter.handle({
+        ...query,
+        tri: GetDemarchesQueryGetter.Tri.parDateFin
+      })
+    ])
 
-    if (isSuccess(rdvs)) return success({ rendezVous: rdvs.data.queryModel })
-    return rdvs
+    if (isFailure(rdvs)) return rdvs
+    if (isFailure(demarches)) return demarches
+
+    return success({
+      rendezVous: rdvs.data.queryModel,
+      demarches: demarches.data.queryModel
+    })
   }
 
   async monitor(): Promise<void> {
