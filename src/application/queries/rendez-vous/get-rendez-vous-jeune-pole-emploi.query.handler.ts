@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { DateService } from 'src/utils/date-service'
 import { Cached, Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import { Result } from '../../../building-blocks/types/result'
@@ -24,7 +25,8 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
   constructor(
     private getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter,
     private jeuneAuthorizer: JeuneAuthorizer,
-    private evenementService: EvenementService
+    private evenementService: EvenementService,
+    private dateService: DateService
   ) {
     super('GetRendezVousJeunePoleEmploiQueryHandler')
   }
@@ -32,7 +34,20 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
   async handle(
     query: GetRendezVousJeunePoleEmploiQuery
   ): Promise<Result<Cached<RendezVousJeuneQueryModel[]>>> {
-    return this.getRendezVousJeunePoleEmploiQueryGetter.handle(query)
+    const { periode, idJeune, accessToken } = query
+    if (periode === RendezVous.Periode.PASSES) {
+      return this.getRendezVousJeunePoleEmploiQueryGetter.handle({
+        idJeune,
+        accessToken,
+        dateFin: this.dateService.now()
+      })
+    } else {
+      return this.getRendezVousJeunePoleEmploiQueryGetter.handle({
+        idJeune,
+        accessToken,
+        dateDebut: this.dateService.now()
+      })
+    }
   }
 
   async authorize(

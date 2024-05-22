@@ -43,10 +43,6 @@ interface PoleEmploiPartenaireClientI {
   getDemarches(tokenDuJeune: string): Promise<ResultApi<DemarcheDto[]>>
 
   getRendezVous(
-    tokenDuJeune: string
-  ): Promise<ResultApi<RendezVousPoleEmploiDto[]>>
-
-  getRendezVousPasses(
     tokenDuJeune: string,
     dateDebut: DateTime
   ): Promise<ResultApi<RendezVousPoleEmploiDto[]>>
@@ -108,22 +104,12 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
   }
 
   async getRendezVous(
-    tokenDuJeune: string
-  ): Promise<ResultApi<RendezVousPoleEmploiDto[]>> {
-    this.logger.log('recuperation des rendez-vous du jeune')
-    return this.getWithCache<RendezVousPoleEmploiDto[]>(
-      'peconnect-rendezvousagenda/v1/listerendezvous',
-      tokenDuJeune
-    )
-  }
-
-  async getRendezVousPasses(
     tokenDuJeune: string,
     dateDebut: DateTime
   ): Promise<ResultApi<RendezVousPoleEmploiDto[]>> {
     this.logger.log('recuperation des rendez-vous passés du jeune')
     const params = new URLSearchParams()
-    params.append('dateDebut', dateDebut.toISO())
+    params.append('dateDebut', dateDebut.toUTC().toISO())
     return this.getWithCache<RendezVousPoleEmploiDto[]>(
       'peconnect-rendezvousagenda/v2/listerendezvous',
       tokenDuJeune,
@@ -141,10 +127,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
       )}`
     )
     const params = new URLSearchParams()
-    params.append(
-      'dateRecherche',
-      dateRechercheRendezVous.toFormat('yyyy-MM-dd')
-    )
+    params.append('dateRecherche', dateRechercheRendezVous.toISODate())
 
     return this.getWithCache<PrestationDto[]>(
       'peconnect-gerer-prestations/v1/rendez-vous',

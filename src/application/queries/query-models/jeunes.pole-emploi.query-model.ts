@@ -1,4 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ActionQueryModel } from 'src/application/queries/query-models/actions.query-model'
+import { SessionJeuneMiloQueryModel } from 'src/application/queries/query-models/sessions.milo.query.model'
 
 import {
   RendezVousJeuneDetailQueryModel,
@@ -58,4 +60,18 @@ export class CVPoleEmploiQueryModel {
 
   @ApiProperty()
   nomFichier: string
+}
+
+export class GetMonSuiviPoleEmploiQueryModel {
+  // @ApiProperty({
+  //   type: ActionQueryModel,
+  //   isArray: true
+  // })
+  // demarches: ActionQueryModel[]
+
+  @ApiProperty({
+    type: RendezVousJeuneQueryModel,
+    isArray: true
+  })
+  rendezVous: RendezVousJeuneQueryModel[]
 }

@@ -44,7 +44,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
     poleEmploiPartenaireClient.getDemarches.resolves(success([]))
 
     poleEmploiPartenaireClient.getPrestations.resolves(success([]))
-    poleEmploiPartenaireClient.getRendezVousPasses.resolves(success([]))
+    poleEmploiPartenaireClient.getRendezVous.resolves(success([]))
 
     dateService = stubClass(DateService)
     dateService.now.returns(maintenant)
@@ -66,7 +66,6 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
       new GetRendezVousJeunePoleEmploiQueryGetter(
         jeunesRepository,
         poleEmploiPartenaireClient,
-        dateService,
         idService,
         keycloakClient
       )
@@ -76,7 +75,8 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
       getDemarchesQueryGetter,
       getRendezVousJeunePoleEmploiQueryGetter,
       jeuneAuthorizer,
-      keycloakClient
+      keycloakClient,
+      dateService
     )
   })
 

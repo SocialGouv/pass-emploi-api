@@ -173,7 +173,7 @@ import { GetSuggestionsQueryHandler } from './application/queries/get-suggestion
 import { GetSuiviSemainePoleEmploiQueryHandler } from './application/queries/get-suivi-semaine-pole-emploi.query.handler'
 import { GetAccueilJeuneMiloQueryHandler } from './application/queries/milo/get-accueil-jeune-milo.query.handler.db'
 import { GetJeunesByStructureMiloQueryHandler } from './application/queries/milo/get-jeunes-by-structure-milo.query.handler.db'
-import { GetMonSuiviQueryHandler } from './application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
+import { GetMonSuiviMiloQueryHandler } from './application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
 import { GetSessionsConseillerMiloV2QueryHandler } from './application/queries/milo/v2/get-sessions-conseiller.milo.v2.query.handler.db'
 import { GetAccueilJeunePoleEmploiQueryHandler } from './application/queries/pole-emploi/get-accueil-jeune-pole-emploi.query.handler.db'
 import { GetFavorisAccueilQueryGetter } from './application/queries/query-getters/accueil/get-favoris.query.getter.db'
@@ -782,7 +782,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     EmargerSessionMiloCommandHandler,
     EvenementEmploiCodePostalQueryGetter,
     GetCatalogueDemarchesQueryHandler,
-    GetMonSuiviQueryHandler,
+    GetMonSuiviMiloQueryHandler,
     GetTokenPoleEmploiQueryHandler
   ]
 }

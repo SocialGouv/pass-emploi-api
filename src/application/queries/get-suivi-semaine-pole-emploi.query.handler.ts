@@ -1,12 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
+import { DateService } from 'src/utils/date-service'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Cached, Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import {
-  Result,
   failure,
   isFailure,
+  Result,
   success
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
@@ -18,7 +19,6 @@ import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from './query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { SuiviSemainePoleEmploiQueryModel } from './query-models/home-jeune-suivi.query-model'
-import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
 
 export interface GetSuiviSemainePoleEmploiQuery extends Query {
   idJeune: string
@@ -37,7 +37,8 @@ export class GetSuiviSemainePoleEmploiQueryHandler extends QueryHandler<
     private getDemarchesQueryGetter: GetDemarchesQueryGetter,
     private getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter,
     private jeuneAuthorizer: JeuneAuthorizer,
-    private keycloakClient: KeycloakClient
+    private keycloakClient: KeycloakClient,
+    private dateService: DateService
   ) {
     super('GetSuiviSemainePoleEmploiQueryHandler')
   }
@@ -66,7 +67,7 @@ export class GetSuiviSemainePoleEmploiQueryHandler extends QueryHandler<
       this.getRendezVousJeunePoleEmploiQueryGetter.handle({
         ...query,
         idpToken,
-        periode: RendezVous.Periode.PASSES
+        dateFin: this.dateService.now()
       })
     ])
 

@@ -2,6 +2,7 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DateTime } from 'luxon'
 import { describe } from 'mocha'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { DateService } from 'src/utils/date-service'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import {
   GetSuiviSemainePoleEmploiQuery,
@@ -26,7 +27,6 @@ import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
 import { unRendezVousQueryModel } from '../../fixtures/query-models/rendez-vous.query-model.fixtures'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
 
 describe('GetSuiviSemainePoleEmploiQueryHandler', () => {
   let handler: GetSuiviSemainePoleEmploiQueryHandler
@@ -35,8 +35,10 @@ describe('GetSuiviSemainePoleEmploiQueryHandler', () => {
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let keycloakClient: StubbedClass<KeycloakClient>
   let jeuneRepository: StubbedType<Jeune.Repository>
+  let dateService: StubbedClass<DateService>
   const idpToken = 'id-token'
   const jeune = unJeune()
+  const maintenant = DateTime.fromISO('2020-04-06T12:00:00.000Z')
 
   beforeEach(() => {
     const sandbox = createSandbox()
@@ -50,17 +52,20 @@ describe('GetSuiviSemainePoleEmploiQueryHandler', () => {
     keycloakClient.exchangeTokenJeune.resolves(idpToken)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
 
+    dateService = stubClass(DateService)
+    dateService.now.returns(maintenant)
+
     handler = new GetSuiviSemainePoleEmploiQueryHandler(
       jeuneRepository,
       getDemarchesQueryGetter,
       getRendezVousJeunePoleEmploiQueryGetter,
       jeuneAuthorizer,
-      keycloakClient
+      keycloakClient,
+      dateService
     )
   })
 
   describe('handle', () => {
-    const maintenant = DateTime.fromISO('2020-04-06T12:00:00.000Z')
     const lundiPasse = maintenant.startOf('week')
     const dimancheEnHuit = maintenant.endOf('week').plus({ week: 1 })
 
@@ -123,7 +128,7 @@ describe('GetSuiviSemainePoleEmploiQueryHandler', () => {
             .withArgs({
               ...query,
               idpToken,
-              periode: RendezVous.Periode.PASSES
+              dateFin: maintenant
             })
             .resolves(
               success({
@@ -139,6 +144,7 @@ describe('GetSuiviSemainePoleEmploiQueryHandler', () => {
           // When
           result = await handler.handle(query)
         })
+
         it('retourne des démarches filtrées entre lundi passé et dimanche en huit', () => {
           // Then
           expect(

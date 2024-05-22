@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon'
+import { DateService } from 'src/utils/date-service'
 import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import {
   GetRendezVousJeunePoleEmploiQuery,
@@ -8,29 +10,36 @@ import { expect, StubbedClass, stubClass } from '../../../utils'
 import { RendezVous } from '../../../../src/domain/rendez-vous/rendez-vous'
 import { Evenement, EvenementService } from '../../../../src/domain/evenement'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
-import Periode = RendezVous.Periode
 
 describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   let queryGetter: StubbedClass<GetRendezVousJeunePoleEmploiQueryGetter>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let getRendezVousJeunePoleEmploiQueryHandler: GetRendezVousJeunePoleEmploiQueryHandler
   let evenementService: StubbedClass<EvenementService>
+  let dateService: StubbedClass<DateService>
+  const maintenant = DateTime.fromISO('2022-05-09T10:11:00+02:00', {
+    setZone: true
+  })
 
   beforeEach(() => {
     queryGetter = stubClass(GetRendezVousJeunePoleEmploiQueryGetter)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     evenementService = stubClass(EvenementService)
 
+    dateService = stubClass(DateService)
+    dateService.now.returns(maintenant)
+
     getRendezVousJeunePoleEmploiQueryHandler =
       new GetRendezVousJeunePoleEmploiQueryHandler(
         queryGetter,
         jeuneAuthorizer,
-        evenementService
+        evenementService,
+        dateService
       )
   })
 
   describe('handle', () => {
-    it('retourne les rendez vous des jeunes PE', () => {
+    it('retourne les rendez vous des jeunes PE dans le passé', () => {
       // When
       getRendezVousJeunePoleEmploiQueryHandler.handle({
         idJeune: 'idJeune',
@@ -42,7 +51,23 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       expect(queryGetter.handle).to.have.been.calledWithExactly({
         idJeune: 'idJeune',
         accessToken: 'accessToken',
-        periode: RendezVous.Periode.PASSES
+        dateFin: maintenant
+      })
+    })
+
+    it('retourne les rendez vous des jeunes PE dans le futur', () => {
+      // When
+      getRendezVousJeunePoleEmploiQueryHandler.handle({
+        idJeune: 'idJeune',
+        accessToken: 'accessToken',
+        periode: RendezVous.Periode.FUTURS
+      })
+
+      // Then
+      expect(queryGetter.handle).to.have.been.calledWithExactly({
+        idJeune: 'idJeune',
+        accessToken: 'accessToken',
+        dateDebut: maintenant
       })
     })
   })
@@ -95,7 +120,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       const query: GetRendezVousJeunePoleEmploiQuery = {
         idJeune: 'id',
         accessToken: 'accessToken',
-        periode: Periode.FUTURS
+        periode: RendezVous.Periode.FUTURS
       }
 
       // When
@@ -114,7 +139,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       const query: GetRendezVousJeunePoleEmploiQuery = {
         idJeune: 'id',
         accessToken: 'accessToken',
-        periode: Periode.PASSES
+        periode: RendezVous.Periode.PASSES
       }
 
       // When
