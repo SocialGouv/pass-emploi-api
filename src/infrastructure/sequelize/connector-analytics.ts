@@ -1,15 +1,15 @@
 import { Logger } from '@nestjs/common'
 import { buildError } from '../../utils/logger.module'
 import { parse } from 'pg-connection-string'
-import { Sequelize } from 'sequelize-typescript'
-import { Pool, PoolClient } from 'pg'
+import { Sequelize, SequelizeOptions } from 'sequelize-typescript'
+import { Pool, PoolClient, PoolConfig } from 'pg'
 
 export async function createSequelizeForAnalytics(): Promise<Sequelize> {
   // eslint-disable-next-line no-process-env
   const databaseUrl = process.env.DUMP_RESTORE_DB_TARGET as string
   const { host, port, database, user, password } = parse(databaseUrl)
 
-  const sequelize = new Sequelize({
+  const options: SequelizeOptions = {
     host: host as string,
     port: Number(port),
     dialect: 'postgres',
@@ -17,7 +17,17 @@ export async function createSequelizeForAnalytics(): Promise<Sequelize> {
     password: password as string,
     database: database as string,
     logging: false
-  })
+  }
+  // eslint-disable-next-line no-process-env
+  if (process.env.ENVIRONMENT === 'staging') {
+    options.dialectOptions = {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      }
+    }
+  }
+  const sequelize = new Sequelize(options)
   const logger = new Logger('SequelizeAnalytics')
   try {
     logger.log('Connecting to PostgreSQL Analytics database')
@@ -46,14 +56,18 @@ export async function getConnexionToDBTarget(): Promise<PgConnexion> {
 
 async function getPGConnexion(databaseUrl: string): Promise<PgConnexion> {
   const { host, port, database, user, password } = parse(databaseUrl)
-
-  const pool = new Pool({
+  const options: PoolConfig = {
     host: host as string,
     port: Number(port),
     user: user as string,
     password: password as string,
     database: database as string
-  })
+  }
+  // eslint-disable-next-line no-process-env
+  if (process.env.ENVIRONMENT === 'staging') {
+    options.ssl = true
+  }
+  const pool = new Pool(options)
   const client = await pool.connect()
   return {
     client,
