@@ -102,8 +102,10 @@ export function useSwagger(
       persistAuthorization: true,
       oauth2RedirectUrl: `${baserUrl}/documentation/oauth2-redirect.html`,
       initOAuth: {
-        clientId: 'pass-emploi-swagger',
-        clientSecret: 'jopa',
+        // eslint-disable-next-line no-process-env
+        clientId: process.env.SWAGGER_CLIENT_ID,
+        // eslint-disable-next-line no-process-env
+        clientSecret: process.env.SWAGGER_CLIENT_SECRET,
         scopes: ['openid', 'email', 'profile'],
         scopeSeparator: ' ',
         usePkceWithAuthorizationCodeGrant: true,
