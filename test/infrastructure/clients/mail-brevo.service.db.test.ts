@@ -17,6 +17,7 @@ import {
   getDatabase
 } from '../../utils/database-for-testing'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import { Core } from '../../../src/domain/core'
 
 describe('MailBrevoService', () => {
   let databaseForTesting: DatabaseForTesting
@@ -58,6 +59,39 @@ describe('MailBrevoService', () => {
           ],
           templateId: parseInt(
             config.get('brevo').templates.conversationsNonLues
+          ),
+          params: {
+            prenom: conseiller.firstName,
+            conversationsNonLues: 22,
+            nom: conseiller.lastName,
+            lien: config.get('frontEndUrl')
+          }
+        }
+        const scope = nock(config.get('brevo').url)
+          .post('/v3/smtp/email', JSON.stringify(expectedBody))
+          .reply(200)
+
+        // When
+        await mailBrevoService.envoyerMailConversationsNonLues(conseiller, 22)
+
+        // Then
+        expect(scope.isDone()).to.equal(true)
+      })
+      it('envoie un mail BRSA', async () => {
+        // Given
+        const conseiller = unConseiller({
+          email: 'isabelle.cerutti@pole-emploi.fr',
+          structure: Core.Structure.POLE_EMPLOI_BRSA
+        })
+        const expectedBody = {
+          to: [
+            {
+              email: 'isabelle.cerutti@francetravail.fr',
+              name: conseiller.firstName + ' ' + conseiller.lastName
+            }
+          ],
+          templateId: parseInt(
+            config.get('brevo').templates.conversationsNonLuesBRSA
           ),
           params: {
             prenom: conseiller.firstName,

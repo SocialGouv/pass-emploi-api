@@ -91,6 +91,7 @@ export const configurationSchema = Joi.object({
     apiKey: Joi.string().required(),
     templates: Joi.object({
       conversationsNonLues: Joi.number().required(),
+      conversationsNonLuesBRSA: Joi.number().required(),
       creationConseillerMilo: Joi.number().required(),
       nouveauRendezvous: Joi.number().required(),
       rappelRendezvous: Joi.number().required(),

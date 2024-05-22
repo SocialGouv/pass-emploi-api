@@ -12,6 +12,7 @@ import { InvitationIcsClient } from './invitation-ics.client'
 import { Jeune } from '../../domain/jeune/jeune'
 import { ArchiveJeune } from '../../domain/archive-jeune'
 import { Authentification } from '../../domain/authentification'
+import { estBRSA } from '../../domain/core'
 
 export type ICS = string
 
@@ -21,6 +22,7 @@ export class MailBrevoService implements Mail.Service {
   private readonly apiKey: string
   private templates: {
     conversationsNonLues: string
+    conversationsNonLuesBRSA: string
     nouveauRendezvous: string
     rappelRendezvous: string
     rendezVousSupprime: string
@@ -69,7 +71,9 @@ export class MailBrevoService implements Mail.Service {
           name: `${conseiller.firstName} ${conseiller.lastName}`
         }
       ],
-      templateId: parseInt(this.templates.conversationsNonLues),
+      templateId: estBRSA(conseiller.structure)
+        ? parseInt(this.templates.conversationsNonLuesBRSA)
+        : parseInt(this.templates.conversationsNonLues),
       params: {
         prenom: conseiller.firstName,
         conversationsNonLues: nombreDeConversationNonLues,

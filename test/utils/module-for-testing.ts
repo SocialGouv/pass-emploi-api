@@ -125,6 +125,7 @@ export const testConfig = (): ConfigService => {
       apiKey: 'brevoApiKey',
       templates: {
         conversationsNonLues: '200',
+        conversationsNonLuesBRSA: '363',
         nouveauRendezvous: '300',
         rappelRendezvous: '400',
         compteJeuneArchive: '500'

@@ -90,7 +90,7 @@ export default () => {
       ip: process.env.JECLIQUEOUPAS_API_IP,
       token: process.env.JECLIQUEOUPAS_API_TOKEN,
       cert: process.env.JECLIQUEOUPAS_API_CERT,
-      intervalleAnalyse: process.env.JECLIQUEOUPAS_API_INTERVALLE_ANALYSE || 15,
+      intervalleAnalyse: process.env.JECLIQUEOUPAS_API_INTERVALLE_ANALYSE || 15
     },
     serviceCivique: {
       url:
@@ -122,6 +122,8 @@ export default () => {
       templates: {
         conversationsNonLues:
           process.env.SENDINBLUE_CONVERSATIONS_TEMPLATE_ID ?? '2',
+        conversationsNonLuesBRSA:
+          process.env.SENDINBLUE_CONVERSATIONS_BRSA_TEMPLATE_ID ?? '363',
         nouveauRendezvous:
           process.env.SENDINBLUE_NOUVEAU_RENDEZVOUS_TEMPLATE_ID ?? '3',
         rappelRendezvous:
