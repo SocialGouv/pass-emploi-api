@@ -146,39 +146,17 @@ export class FirebaseClient implements IFirebaseClient {
     }
   }
 
-  private dechiffrerMessage(
-    message: MessageIndividuel & { id: string }
-  ): MessageIndividuel & { id: string } {
-    const iv = message.iv
-    if (!iv) return message
-
-    const decryptedMessage: {
-      content: string
-      infoPieceJointe?: { id: string; nom: string }
-    } = {
-      content: this.chatCryptoService.decrypt(iv, message.message)
-    }
-
-    if (message.infoPieceJointe) {
-      decryptedMessage.infoPieceJointe = {
-        id: message.infoPieceJointe.id,
-        nom: this.chatCryptoService.decrypt(iv, message.infoPieceJointe.nom)
-      }
-    }
-
-    return {
-      ...message,
-      message: decryptedMessage.content
-    }
-  }
-
   async recupereMessagesConversation(
     idBeneficiaire: string
   ): Promise<MessageRecherche[]> {
     const collection = this.firestore.collection(FIREBASE_CHAT_PATH)
-    const chat = await collection.where('jeuneId', '==', idBeneficiaire).get()
+    const chats = await collection.where('jeuneId', '==', idBeneficiaire).get()
+    if (chats.empty) return []
 
-    return chat.docs.map(messageSnapshotToMessageIndividuelDechiffre)
+    const messages = await getMessagesRef(chats.docs[0].ref).get()
+    return messages.docs.map(doc =>
+      this.messageSnapshotToMessageIndividuelDechiffre(doc)
+    )
   }
 
   async recupererChatIndividuel(
@@ -461,6 +439,49 @@ export class FirebaseClient implements IFirebaseClient {
     await messageRef.update({ piecesJointes: [{ ...pj, statut }, ...other] })
   }
 
+  private messageSnapshotToMessageIndividuelDechiffre(
+    docSnapshot: QueryDocumentSnapshot<DocumentData, DocumentData>
+  ): MessageRecherche {
+    const firebaseMessage = docSnapshot.data()
+    const message: MessageRecherche = {
+      id: docSnapshot.id,
+      content: firebaseMessage.content,
+      iv: firebaseMessage.iv,
+      rawMessage: firebaseMessage
+    }
+
+    if (firebaseMessage.type === 'MESSAGE_PJ') {
+      message.piecesJointes = firebaseMessage.piecesJointes ?? []
+    }
+
+    return this.dechiffrerMessage(message)
+  }
+
+  private dechiffrerMessage(message: MessageRecherche): MessageRecherche {
+    const iv = message.iv
+    if (!iv) return message
+
+    const decryptedMessage: {
+      content: string
+      piecesJointes?: Array<{ nom: string }>
+    } = {
+      content: this.chatCryptoService.decrypt(iv, message.content),
+      piecesJointes: message.piecesJointes
+        ? message.piecesJointes.map(pj => {
+            return {
+              nom: this.chatCryptoService.decrypt(iv, pj.nom)
+            }
+          })
+        : undefined
+    }
+
+    return {
+      ...message,
+      content: decryptedMessage.content,
+      piecesJointes: decryptedMessage.piecesJointes
+    }
+  }
+
   private async fromMessageChiffreToMessageArchive(
     message: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>
   ): Promise<ArchiveJeune.Message> {
@@ -529,24 +550,6 @@ function chunkify<T>(tableau: T[]): T[][] {
   }
 
   return resultat
-}
-
-function messageSnapshotToMessageIndividuelDechiffre(
-  docSnapshot: QueryDocumentSnapshot<DocumentData, DocumentData>
-): MessageRecherche {
-  const firebaseMessage = docSnapshot.data()
-  const message: MessageRecherche = {
-    id: docSnapshot.id,
-    content: firebaseMessage.content,
-    iv: firebaseMessage.iv,
-    rawMessage: firebaseMessage
-  }
-
-  if (firebaseMessage.type === 'MESSAGE_PJ') {
-    message.piecesJointes = firebaseMessage.piecesJointes ?? []
-  }
-
-  return this.dechiffrerMessage(message)
 }
 
 function getMessagesRef<T extends FirebaseMessage>(
