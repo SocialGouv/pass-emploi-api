@@ -159,7 +159,9 @@ export class AuthentificationSqlRepository
   }
 
   async deleteUtilisateurIdp(idUtilisateur: string): Promise<void> {
-    await this.keycloakClient.deleteUserByIdUser(idUtilisateur)
+    try {
+      await this.keycloakClient.deleteUserByIdUser(idUtilisateur)
+    } catch (_e) {}
     this.logger.log(`Utilisateur ${idUtilisateur} supprimé de keycloak`)
   }
 
