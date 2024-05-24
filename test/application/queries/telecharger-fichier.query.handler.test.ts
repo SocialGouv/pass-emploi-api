@@ -105,10 +105,11 @@ describe('TelechargerFichierQueryHandler', () => {
       )
     })
   })
+
   describe('monitor', () => {
     it('envoie un évènement de récuperation d’une piece jointe d´un conseiller', async () => {
       // Given
-      const utilisateur = unUtilisateurJeune()
+      const utilisateur = unUtilisateurConseiller()
 
       // When
       await telechargerFichierQueryHandler.monitor(
@@ -131,7 +132,7 @@ describe('TelechargerFichierQueryHandler', () => {
 
     it('envoie un évènement de récuperation d’une piece jointe', async () => {
       // Given
-      const utilisateur = unUtilisateurJeune()
+      const utilisateur = unUtilisateurConseiller()
 
       // When
       await telechargerFichierQueryHandler.monitor(
@@ -150,6 +151,26 @@ describe('TelechargerFichierQueryHandler', () => {
         Evenement.Code.PIECE_JOINTE_BENEFICIAIRE_TELECHARGEE,
         utilisateur
       )
+    })
+
+    it('n’envoie pas d’évènement quand l’utilisateur est un jeune', async () => {
+      // Given
+      const utilisateur = unUtilisateurJeune()
+
+      // When
+      await telechargerFichierQueryHandler.monitor(
+        utilisateur,
+        { idFichier: 'test' },
+        success({
+          metadata: unFichierMetadata({
+            typeCreateur: Authentification.Type.JEUNE
+          }),
+          url: 'pouet'
+        })
+      )
+
+      // Then
+      expect(evenementService.creer).not.to.have.been.called()
     })
   })
 })
