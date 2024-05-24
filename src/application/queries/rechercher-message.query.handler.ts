@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Chat, ChatRepositoryToken, MessageRecherche } from 'src/domain/chat'
-import { Jeune, JeuneRepositoryToken } from 'src/domain/jeune/jeune'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
 import { Query } from 'src/building-blocks/types/query'
@@ -25,9 +25,8 @@ export class RechercherMessageQueryHandler extends QueryHandler<
   constructor(
     @Inject(ChatRepositoryToken)
     private chatRepository: Chat.Repository,
-    @Inject(JeuneRepositoryToken)
-    private jeuneRepository: Jeune.Repository,
-    private conseillerAuthorizer: ConseillerAuthorizer
+    private conseillerAuthorizer: ConseillerAuthorizer,
+    private evenementService: EvenementService
   ) {
     super('RechercherMessageQueryHandler')
   }
@@ -61,8 +60,11 @@ export class RechercherMessageQueryHandler extends QueryHandler<
     )
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creer(
+      Evenement.Code.RECHERCHE_MESSAGE,
+      utilisateur
+    )
   }
 }
 
