@@ -2839,14 +2839,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/chai@npm:*":
-  version: 4.3.14
-  resolution: "@types/chai@npm:4.3.14"
-  checksum: 10/300be72bb22657c1e449b27a5f0ab24405edf3be5c42ea0095f8e1c6daabc29c3028eee2421cc443c01a098da47ba32baecc363be7324433132281b9d9a8216f
-  languageName: node
-  linkType: hard
-
-"@types/chai@npm:^4.3.16":
+"@types/chai@npm:*, @types/chai@npm:^4.3.16":
   version: 4.3.16
   resolution: "@types/chai@npm:4.3.16"
   checksum: 10/f84a9049a7f13284f7237236872ed4afce5045dd6ea3926c8b0ac995490f5a524b247b2e70fcd3ebc85832201349a8f026bd0c336b90b5baca9eed0c7a4dbd3f
@@ -3068,16 +3061,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=13.7.0, @types/node@npm:^20.10.3":
-  version: 20.12.7
-  resolution: "@types/node@npm:20.12.7"
-  dependencies:
-    undici-types: "npm:~5.26.4"
-  checksum: 10/b4a28a3b593a9bdca5650880b6a9acef46911d58cf7cfa57268f048e9a7157a7c3196421b96cea576850ddb732e3b54bc982c8eb5e1e5ef0635d4424c2fce801
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^20.12.11":
+"@types/node@npm:*, @types/node@npm:>=13.7.0, @types/node@npm:^20.10.3, @types/node@npm:^20.12.11":
   version: 20.12.11
   resolution: "@types/node@npm:20.12.11"
   dependencies:
@@ -4304,22 +4288,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bull@npm:*, bull@npm:^4.12.2":
-  version: 4.12.2
-  resolution: "bull@npm:4.12.2"
-  dependencies:
-    cron-parser: "npm:^4.2.1"
-    get-port: "npm:^5.1.1"
-    ioredis: "npm:^5.3.2"
-    lodash: "npm:^4.17.21"
-    msgpackr: "npm:^1.10.1"
-    semver: "npm:^7.5.2"
-    uuid: "npm:^8.3.0"
-  checksum: 10/9cc78d1a2cfd3e9e541dc01ab9857f8eed876277f666527c7977433fa19789aa11c521742a8a31c9a1785441eec8c7c034bb25d7f2620b4a4dae245f9dc82faf
-  languageName: node
-  linkType: hard
-
-"bull@npm:4.12.3":
+"bull@npm:*, bull@npm:4.12.3, bull@npm:^4.12.2":
   version: 4.12.3
   resolution: "bull@npm:4.12.3"
   dependencies:
@@ -5790,12 +5759,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-chai-friendly@npm:^0.7.4":
-  version: 0.7.4
-  resolution: "eslint-plugin-chai-friendly@npm:0.7.4"
+"eslint-plugin-chai-friendly@npm:^0.8.0":
+  version: 0.8.0
+  resolution: "eslint-plugin-chai-friendly@npm:0.8.0"
   peerDependencies:
     eslint: ">=3.0.0"
-  checksum: 10/c7022be5f864dfc8a1a18494f0de357f245a37cf3f5ca0fec95b14bc3fb249e5ccfa01c3ab66a2203163b61272df495fa6b71b496467a49c131a35d1f8a0f9df
+  checksum: 10/c8ed96ab42f1a327fc0c98e153d8c72748a53cc855d06570354ec6a3d6620e2c07c91ca5d92e017cb668fca019a51dc25b192a49c16e6e4fe8cdf7e554ad8db9
   languageName: node
   linkType: hard
 
@@ -9198,7 +9167,7 @@ __metadata:
     elastic-apm-node: "npm:3.51.0"
     eslint: "npm:^8.57.0"
     eslint-config-prettier: "npm:^9.1.0"
-    eslint-plugin-chai-friendly: "npm:^0.7.4"
+    eslint-plugin-chai-friendly: "npm:^0.8.0"
     eslint-plugin-mocha: "npm:^10.4.3"
     eslint-plugin-prettier: "npm:^4.2.1"
     firebase-admin: "npm:12.1.0"

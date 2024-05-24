@@ -153,7 +153,7 @@
     "dotvault": "^0.0.9",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-chai-friendly": "^0.7.4",
+    "eslint-plugin-chai-friendly": "^0.8.0",
     "eslint-plugin-mocha": "^10.4.3",
     "eslint-plugin-prettier": "^4.2.1",
     "husky": "^9.0.11",
