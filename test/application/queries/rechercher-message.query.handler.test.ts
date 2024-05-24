@@ -1,8 +1,8 @@
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { expect, StubbedClass, stubClass } from 'test/utils'
 import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
 import { RechercherMessageQueryHandler } from 'src/application/queries/rechercher-message.query.handler'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { Jeune } from 'src/domain/jeune/jeune'
 import { Chat, MessageRecherche } from 'src/domain/chat'
 import { createSandbox } from 'sinon'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
@@ -11,7 +11,7 @@ describe('RechercheMessageQueryHandler', () => {
   const sandbox = createSandbox()
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let chatRepository: StubbedType<Chat.Repository>
-  let jeuneRepository: StubbedType<Jeune.Repository>
+  let evenementService: EvenementService
   let handler: RechercherMessageQueryHandler
 
   const messages: MessageRecherche[] = [
@@ -74,11 +74,11 @@ describe('RechercheMessageQueryHandler', () => {
   beforeEach(async () => {
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     chatRepository = stubInterface(sandbox)
-    jeuneRepository = stubInterface(sandbox)
+    evenementService = stubClass(EvenementService)
     handler = new RechercherMessageQueryHandler(
       chatRepository,
-      jeuneRepository,
-      conseillerAuthorizer
+      conseillerAuthorizer,
+      evenementService
     )
 
     chatRepository.recupererMessagesConversation.resolves(messages)
@@ -143,6 +143,19 @@ describe('RechercheMessageQueryHandler', () => {
           ]
         }
       })
+    })
+  })
+
+  describe('monitor', () => {
+    it('crée un AE', async () => {
+      // When
+      await handler.monitor(unUtilisateurConseiller())
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWith(
+        Evenement.Code.RECHERCHE_MESSAGE,
+        unUtilisateurConseiller()
+      )
     })
   })
 })
