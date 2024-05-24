@@ -32,10 +32,12 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     const connexion = await createSequelizeForAnalytics()
     await this.mettreAJourLeSchema(connexion)
     await this.indexerLesColonnes(connexion)
+    await this.creerTableAEJeune(connexion)
     await this.ajouterLesAgencesConseiller(connexion)
     await this.ajouterLesAgencesJeune(connexion)
     await this.determinerLaSemaineEtLeJourALaFinDuTraitement(connexion)
 
+    await this.enrichirTableAEJeune(connexion)
     await this.associerChaqueConseillerASonDernierAE(connexion)
     await this.associerChaqueConseillerASonPremierAE(connexion)
 
@@ -177,5 +179,89 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
             group by id_utilisateur
         ) as premier_ae_conseiller
         where conseiller.id = premier_ae_conseiller.id_utilisateur;`)
+  }
+
+  private async creerTableAEJeune(connexion: Sequelize): Promise<void> {
+    this.logger.log('Création vue AE Jeune')
+    await connexion.query(`
+      CREATE TABLE IF NOT EXISTS evenement_engagement_jeune
+      (
+        id_utilisateur              varchar(255),
+        nb_action_cree              integer,
+        nb_message_envoye           integer,
+        nb_consultation_rdv         integer,
+        nb_consultation_offre       integer,
+        nb_postuler_offre           integer,
+        nb_consultation_evenement   integer,
+        date_premier_ae             timestamp with time zone,
+        date_dernier_ae             timestamp with time zone
+      );
+    `)
+  }
+
+  private async enrichirTableAEJeune(connexion: Sequelize): Promise<void> {
+    this.logger.log('Création vue AE Jeune')
+    await connexion.query(`
+      INSERT INTO evenement_engagement_jeune (id_utilisateur, nb_action_cree, nb_message_envoye, nb_consultation_rdv, nb_consultation_offre, nb_postuler_offre, nb_consultation_evenement, date_premier_ae, date_dernier_ae)
+      WITH
+        evenement_engagement_modif AS (
+          SELECT
+            id_utilisateur,
+            date_evenement,
+            CASE
+              WHEN categorie = 'Action'
+              AND ACTION = 'Création'
+              OR code = 'ACTION_CREE' THEN 1
+              ELSE 0
+            END AS creation_action,
+            CASE
+              WHEN categorie = 'Message'
+              AND ACTION = 'Envoi' THEN 1
+              ELSE 0
+            END AS envoi_message,
+            CASE
+              WHEN categorie = 'Rendez-vous'
+              AND ACTION = 'Consultation' THEN 1
+              ELSE 0
+            END AS consultation_rdv,
+            CASE
+              WHEN categorie = 'Offre'
+              AND (
+                ACTION = 'Recherche'
+                OR ACTION = 'Détail'
+                OR ACTION = 'favori'
+              ) THEN 1
+              ELSE 0
+            END AS consultation_offre,
+            CASE
+              WHEN categorie = 'Offre'
+              AND ACTION = 'Postuler' THEN 1
+              ELSE 0
+            END AS postuler_offre,
+            CASE
+              WHEN categorie = 'Evénement' THEN 1
+              ELSE 0
+            END AS consultation_evenement
+          FROM
+            evenement_engagement
+          WHERE
+            type_utilisateur = 'JEUNE'
+        )
+      SELECT
+        id_utilisateur,
+        sum(creation_action) AS nb_action_cree,
+        sum(envoi_message) AS nb_message_envoye,
+        sum(consultation_rdv) AS nb_consultation_rdv,
+        sum(consultation_offre) AS nb_consultation_offre,
+        sum(postuler_offre) AS nb_postuler_offre,
+        sum(consultation_evenement) AS nb_consultation_evenement,
+        min(date_evenement) AS date_premier_ae,
+        max(date_evenement) AS date_dernier_ae
+      FROM
+        evenement_engagement_modif
+      GROUP BY
+        id_utilisateur
+      ;
+    `)
   }
 }
