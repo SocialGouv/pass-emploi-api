@@ -75,6 +75,7 @@ export class TelechargerFichierQueryHandler extends QueryHandler<
     result: Result<TelechargerFichierQueryModel>
   ): Promise<void> {
     if (isFailure(result)) return
+    if (Authentification.estJeune(utilisateur.type)) return // L'app gère l'envoie de l'événement
 
     switch (result.data.metadata.typeCreateur) {
       case Authentification.Type.JEUNE:
