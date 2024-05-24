@@ -1,27 +1,33 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { Op } from 'sequelize'
 import { SinonSandbox } from 'sinon'
 import { SuiviJob } from 'src/domain/suivi-job'
+import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { uneDatetime } from 'test/fixtures/date.fixture'
-import { DateService } from '../../../src/utils/date-service'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { NettoyerLesDonneesJobHandler } from '../../../src/application/jobs/nettoyer-les-donnees.job.handler.db'
-import { ArchiveJeuneSqlModel } from '../../../src/infrastructure/sequelize/models/archive-jeune.sql-model'
-import { LogApiPartenaireSqlModel } from '../../../src/infrastructure/sequelize/models/log-api-partenaire.sql-model'
-import { getDatabase } from '../../utils/database-for-testing'
-import { SuiviJobSqlModel } from '../../../src/infrastructure/sequelize/models/suivi-job.sql-model'
 import { Planificateur } from '../../../src/domain/planificateur'
+import {
+  CodeTypeRendezVous,
+  RendezVous,
+  TYPES_ANIMATIONS_COLLECTIVES
+} from '../../../src/domain/rendez-vous/rendez-vous'
+import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
+import { ArchiveJeuneSqlModel } from '../../../src/infrastructure/sequelize/models/archive-jeune.sql-model'
+import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { LogApiPartenaireSqlModel } from '../../../src/infrastructure/sequelize/models/log-api-partenaire.sql-model'
 import {
   RendezVousDto,
   RendezVousSqlModel
 } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
+import { SuiviJobSqlModel } from '../../../src/infrastructure/sequelize/models/suivi-job.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
-import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
-import Source = RendezVous.Source
-import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
+import { DateService } from '../../../src/utils/date-service'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
+import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
+import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { getDatabase } from '../../utils/database-for-testing'
+import Source = RendezVous.Source
 
 const idJeune1 = 'push1'
 const idJeune2 = 'push2'
@@ -38,9 +44,13 @@ describe('NettoyerLesDonneesJobHandler', () => {
   let rendezVousDtoAvecUneDateRecente: AsSql<RendezVousDto>
   let rendezVousMiloAvantNettoyage: RendezVousSqlModel | null
   let rendezVousAvantNettoyage: RendezVousSqlModel | null
+  let animationsCollectivesFutureSansInscrit: AsSql<RendezVousDto>
+  let animationsCollectivesPasseesAvecInscrits: AsSql<RendezVousDto>
 
   before(async () => {
-    await getDatabase().cleanPG()
+    const databaseForTesting = getDatabase()
+    await databaseForTesting.cleanPG()
+
     const sandbox: SinonSandbox = createSandbox()
     dateService = stubClass(DateService)
     dateService.now.returns(maintenant)
@@ -48,7 +58,8 @@ describe('NettoyerLesDonneesJobHandler', () => {
 
     nettoyerLesDonneesJobHandler = new NettoyerLesDonneesJobHandler(
       dateService,
-      suiviJobService
+      suiviJobService,
+      databaseForTesting.sequelize
     )
 
     // Given - Archive
@@ -168,6 +179,29 @@ describe('NettoyerLesDonneesJobHandler', () => {
       })
     ])
 
+    // Given - Animations collectives
+    const animationsCollectivesPasseesSansInscrit = unRendezVousDto({
+      date: maintenant.minus({ day: 1 }).toJSDate(),
+      type: CodeTypeRendezVous.INFORMATION_COLLECTIVE
+    })
+    animationsCollectivesFutureSansInscrit = unRendezVousDto({
+      date: maintenant.plus({ day: 1 }).toJSDate(),
+      type: CodeTypeRendezVous.INFORMATION_COLLECTIVE
+    })
+    animationsCollectivesPasseesAvecInscrits = unRendezVousDto({
+      date: maintenant.minus({ day: 1 }).toJSDate(),
+      type: CodeTypeRendezVous.INFORMATION_COLLECTIVE
+    })
+    await RendezVousSqlModel.bulkCreate([
+      animationsCollectivesPasseesSansInscrit,
+      animationsCollectivesFutureSansInscrit,
+      animationsCollectivesPasseesAvecInscrits
+    ])
+    await RendezVousJeuneAssociationSqlModel.create({
+      idJeune: idJeune1,
+      idRendezVous: animationsCollectivesPasseesAvecInscrits.id
+    })
+
     // When
     await nettoyerLesDonneesJobHandler.handle()
   })
@@ -244,6 +278,26 @@ describe('NettoyerLesDonneesJobHandler', () => {
       // Then
       const actionsApresNettoyage = await ActionSqlModel.findAll()
       expect(actionsApresNettoyage.length).to.equal(1)
+    })
+  })
+
+  describe('animations collectives', () => {
+    it('clôt les animations collectives passées sans incrit', async () => {
+      const animationsApresNettoyage = await RendezVousSqlModel.findAll({
+        where: {
+          dateCloture: null,
+          type: {
+            [Op.in]: TYPES_ANIMATIONS_COLLECTIVES
+          }
+        }
+      })
+
+      expect(animationsApresNettoyage.map(({ id }) => id)).to.deep.equal(
+        [
+          animationsCollectivesFutureSansInscrit,
+          animationsCollectivesPasseesAvecInscrits
+        ].map(({ id }) => id)
+      )
     })
   })
 })
