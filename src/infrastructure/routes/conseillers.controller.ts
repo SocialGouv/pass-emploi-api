@@ -10,13 +10,7 @@ import {
   Put,
   Query
 } from '@nestjs/common'
-import {
-  ApiBody,
-  ApiOAuth2,
-  ApiOperation,
-  ApiResponse,
-  ApiTags
-} from '@nestjs/swagger'
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { DeleteConseillerCommandHandler } from '../../application/commands/conseiller/delete-conseiller.command.handler'
 import {
   CreateListeDeDiffusionCommand,
@@ -45,6 +39,7 @@ import {
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import { handleResult } from './result.handler'
 import {
   CreateListeDeDiffusionPayload,
@@ -56,7 +51,7 @@ import {
 } from './validation/conseillers.inputs'
 
 @Controller('conseillers')
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags('Conseillers')
 export class ConseillersController {
   constructor(

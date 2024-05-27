@@ -7,78 +7,21 @@ import {
 } from '@nestjs/swagger'
 import { SecuritySchemeObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface'
 
+export enum IDPName {
+  PE_JEUNE = 'pe-jeune',
+  PE_CONSEILLER = 'pe-conseiller',
+  PE_BRSA_JEUNE = 'pe-brsa-jeune',
+  PE_BRSA_CONSEILLER = 'pe-brsa-conseiller',
+  SIMILO_JEUNE = 'similo-jeune',
+  SIMILO_CONSEILLER = 'similo-conseiller'
+}
+
 export function useSwagger(
   appConfig: ConfigService,
   app: NestExpressApplication
 ): void {
   const issuerUrl = appConfig.get('oidc.issuerUrl')
   const baserUrl = appConfig.get('baseUrl')
-  const peConseiller: SecuritySchemeObject = {
-    type: 'oauth2',
-    flows: {
-      authorizationCode: {
-        authorizationUrl: `${issuerUrl}/protocol/openid-connect/auth?kc_idp_hint=pe-conseiller`,
-        refreshUrl: `${issuerUrl}/protocol/openid-connect/token`,
-        tokenUrl: `${issuerUrl}/protocol/openid-connect/token`,
-        scopes: { openid: '', email: '', profile: '' }
-      }
-    }
-  }
-  const peJeune: SecuritySchemeObject = {
-    type: 'oauth2',
-    flows: {
-      authorizationCode: {
-        authorizationUrl: `${issuerUrl}/protocol/openid-connect/auth?kc_idp_hint=pe-jeune`,
-        refreshUrl: `${issuerUrl}/protocol/openid-connect/token`,
-        tokenUrl: `${issuerUrl}/protocol/openid-connect/token`,
-        scopes: { openid: '', email: '', profile: '' }
-      }
-    }
-  }
-  const peConseillerBRSA: SecuritySchemeObject = {
-    type: 'oauth2',
-    flows: {
-      authorizationCode: {
-        authorizationUrl: `${issuerUrl}/protocol/openid-connect/auth?kc_idp_hint=pe-brsa-conseiller`,
-        refreshUrl: `${issuerUrl}/protocol/openid-connect/token`,
-        tokenUrl: `${issuerUrl}/protocol/openid-connect/token`,
-        scopes: { openid: '', email: '', profile: '' }
-      }
-    }
-  }
-  const peJeuneBRSA: SecuritySchemeObject = {
-    type: 'oauth2',
-    flows: {
-      authorizationCode: {
-        authorizationUrl: `${issuerUrl}/protocol/openid-connect/auth?kc_idp_hint=pe-brsa-jeune`,
-        refreshUrl: `${issuerUrl}/protocol/openid-connect/token`,
-        tokenUrl: `${issuerUrl}/protocol/openid-connect/token`,
-        scopes: { openid: '', email: '', profile: '' }
-      }
-    }
-  }
-  const miloConseiller: SecuritySchemeObject = {
-    type: 'oauth2',
-    flows: {
-      authorizationCode: {
-        authorizationUrl: `${issuerUrl}/protocol/openid-connect/auth?kc_idp_hint=similo-conseiller`,
-        refreshUrl: `${issuerUrl}/protocol/openid-connect/token`,
-        tokenUrl: `${issuerUrl}/protocol/openid-connect/token`,
-        scopes: { openid: '', email: '', profile: '' }
-      }
-    }
-  }
-  const miloJeune: SecuritySchemeObject = {
-    type: 'oauth2',
-    flows: {
-      authorizationCode: {
-        authorizationUrl: `${issuerUrl}/protocol/openid-connect/auth?kc_idp_hint=similo-jeune`,
-        refreshUrl: `${issuerUrl}/protocol/openid-connect/token`,
-        tokenUrl: `${issuerUrl}/protocol/openid-connect/token`,
-        scopes: { openid: '', email: '', profile: '' }
-      }
-    }
-  }
   const apiKeySecuritySchemeObject: SecuritySchemeObject = {
     type: 'apiKey',
     in: 'header',
@@ -87,12 +30,30 @@ export function useSwagger(
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Pass Emploi Api')
     .setVersion('1.0')
-    .addOAuth2(peConseiller, 'France Travail Conseiller CEJ')
-    .addOAuth2(peConseillerBRSA, 'BRSA Conseiller')
-    .addOAuth2(peJeune, 'France Travail Jeune CEJ')
-    .addOAuth2(peJeuneBRSA, 'BRSA')
-    .addOAuth2(miloJeune, 'MILO Jeune')
-    .addOAuth2(miloConseiller, 'MILO Conseiller')
+    .addOAuth2(
+      createSecurityScheme(issuerUrl, IDPName.PE_BRSA_CONSEILLER),
+      IDPName.PE_BRSA_CONSEILLER
+    )
+    .addOAuth2(
+      createSecurityScheme(issuerUrl, IDPName.PE_BRSA_JEUNE),
+      IDPName.PE_BRSA_JEUNE
+    )
+    .addOAuth2(
+      createSecurityScheme(issuerUrl, IDPName.PE_CONSEILLER),
+      IDPName.PE_CONSEILLER
+    )
+    .addOAuth2(
+      createSecurityScheme(issuerUrl, IDPName.PE_JEUNE),
+      IDPName.PE_JEUNE
+    )
+    .addOAuth2(
+      createSecurityScheme(issuerUrl, IDPName.SIMILO_CONSEILLER),
+      IDPName.SIMILO_CONSEILLER
+    )
+    .addOAuth2(
+      createSecurityScheme(issuerUrl, IDPName.SIMILO_JEUNE),
+      IDPName.SIMILO_JEUNE
+    )
     .addSecurity('api_key', apiKeySecuritySchemeObject)
     .build()
   const document = SwaggerModule.createDocument(app, swaggerConfig)
@@ -114,4 +75,21 @@ export function useSwagger(
     }
   }
   SwaggerModule.setup('documentation', app, document, customOptions)
+}
+
+function createSecurityScheme(
+  issuerUrl: string,
+  idp: IDPName
+): SecuritySchemeObject {
+  return {
+    type: 'oauth2',
+    flows: {
+      authorizationCode: {
+        authorizationUrl: `${issuerUrl}/protocol/openid-connect/auth?kc_idp_hint=${idp}`,
+        refreshUrl: `${issuerUrl}/protocol/openid-connect/token`,
+        tokenUrl: `${issuerUrl}/protocol/openid-connect/token`,
+        scopes: {}
+      }
+    }
+  }
 }

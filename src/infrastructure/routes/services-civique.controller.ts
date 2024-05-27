@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common'
-import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiResponse, ApiTags } from '@nestjs/swagger'
 import { handleResult } from 'src/infrastructure/routes/result.handler'
 import {
   GetDetailOffreServiceCiviqueQuery,
@@ -13,10 +13,11 @@ import {
 } from '../../application/queries/query-models/service-civique.query-model'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import { GetServicesCiviqueQueryParams } from './validation/services-civique.inputs'
 
 @Controller()
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags('Services Civique')
 export class ServicesCiviqueController {
   constructor(

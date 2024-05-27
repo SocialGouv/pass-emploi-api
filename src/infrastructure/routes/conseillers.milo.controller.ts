@@ -7,7 +7,7 @@ import {
   Post,
   Query
 } from '@nestjs/common'
-import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { DateTime } from 'luxon'
 import {
   UpdateSessionMiloCommand,
@@ -39,13 +39,16 @@ import {
 } from '../../application/commands/milo/qualifier-actions-milo.command.handler'
 import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
 import { GetJeuneMiloByDossierQueryHandler } from '../../application/queries/get-jeune-milo-by-dossier.query.handler.db'
+import { GetSessionsConseillerMiloV2QueryHandler } from '../../application/queries/milo/v2/get-sessions-conseiller.milo.v2.query.handler.db'
 import {
   IdentiteJeuneQueryModel,
   JeuneQueryModel
 } from '../../application/queries/query-models/jeunes.query-model'
 import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import { handleResult } from './result.handler'
+import { CreerJeuneMiloPayload } from './validation/conseillers.inputs'
 import {
   EmargementsSessionMiloPayload,
   GetAgendaSessionsQueryParams,
@@ -54,11 +57,9 @@ import {
   QualifierActionsMiloPayload,
   UpdateSessionMiloPayload
 } from './validation/conseillers.milo.inputs'
-import { CreerJeuneMiloPayload } from './validation/conseillers.inputs'
-import { GetSessionsConseillerMiloV2QueryHandler } from '../../application/queries/milo/v2/get-sessions-conseiller.milo.v2.query.handler.db'
 
 @Controller()
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags('Conseillers Milo')
 export class ConseillersMiloController {
   constructor(

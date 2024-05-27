@@ -9,7 +9,7 @@ import {
   SetMetadata,
   UseGuards
 } from '@nestjs/common'
-import { ApiOAuth2, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger'
+import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger'
 import { EnvoyerFormulaireContactImmersionCommandHandler } from '../../application/commands/envoyer-formulaire-contact-immersion.command.handler.db'
 import { NotifierNouvellesImmersionsCommandHandler } from '../../application/commands/notifier-nouvelles-immersions.command.handler'
 import {
@@ -28,6 +28,7 @@ import { Authentification } from '../../domain/authentification'
 import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { SkipOidcAuth } from '../decorators/skip-oidc-auth.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import { handleResult } from './result.handler'
 import {
   GetOffresImmersionQueryParams,
@@ -36,7 +37,7 @@ import {
 } from './validation/offres-immersion.inputs'
 
 @Controller()
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags("Offres d'immersion")
 export class OffresImmersionController {
   constructor(

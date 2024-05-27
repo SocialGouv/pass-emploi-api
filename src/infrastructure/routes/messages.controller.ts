@@ -1,13 +1,14 @@
 import { Body, Controller, Post } from '@nestjs/common'
-import { ApiOAuth2, ApiTags } from '@nestjs/swagger'
-import { handleResult } from './result.handler'
-import { Utilisateur } from '../decorators/authenticated.decorator'
-import { Authentification } from '../../domain/authentification'
+import { ApiTags } from '@nestjs/swagger'
 import { EnvoyerMessageGroupeCommandHandler } from '../../application/commands/envoyer-message-groupe.command.handler'
+import { Authentification } from '../../domain/authentification'
+import { Utilisateur } from '../decorators/authenticated.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
+import { handleResult } from './result.handler'
 import { EnvoyerMessagePayload } from './validation/messages.input'
 
 @Controller('messages')
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags('Messages')
 export class MessagesController {
   constructor(

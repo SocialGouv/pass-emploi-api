@@ -12,7 +12,6 @@ import {
   UseGuards
 } from '@nestjs/common'
 import {
-  ApiOAuth2,
   ApiOperation,
   ApiResponse,
   ApiSecurity,
@@ -32,6 +31,7 @@ import { Authentification } from '../../domain/authentification'
 import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { SkipOidcAuth } from '../decorators/skip-oidc-auth.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import { handleResult } from './result.handler'
 import {
   GetUtilisateurQueryParams,
@@ -106,7 +106,7 @@ export class AuthentificationController {
     summary: 'Récupère le token et la clé de chiffrement du chat du jeune'
   })
   @Post('firebase/token')
-  @ApiOAuth2([])
+  @CustomSwaggerApiOAuth2()
   async postFirebaseToken(
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<ChatSecretsQueryModel> {

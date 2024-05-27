@@ -9,29 +9,30 @@ import {
   Post,
   Put
 } from '@nestjs/common'
-import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { handleResult } from './result.handler'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   CreateListeDeDiffusionCommand,
   CreateListeDeDiffusionCommandHandler
 } from '../../application/commands/create-liste-de-diffusion.command.handler'
 import { DeleteListeDeDiffusionCommandHandler } from '../../application/commands/delete-liste-de-diffusion.command.handler'
-import { Authentification } from '../../domain/authentification'
-import { Utilisateur } from '../decorators/authenticated.decorator'
-import {
-  CreateListeDeDiffusionPayload,
-  UpdateListeDeDiffusionPayload
-} from './validation/conseillers.inputs'
-import { ListeDeDiffusionQueryModel } from '../../application/queries/query-models/liste-de-diffusion.query-model'
-import { GetListesDeDiffusionDuConseillerQueryHandler } from '../../application/queries/get-listes-de-diffusion-du-conseiller.query.handler.db'
 import {
   UpdateListeDeDiffusionCommand,
   UpdateListeDeDiffusionCommandHandler
 } from '../../application/commands/update-liste-de-diffusion.command.handler'
 import { GetDetailListeDeDiffusionQueryHandler } from '../../application/queries/get-detail-liste-de-diffusion.query.handler.db'
+import { GetListesDeDiffusionDuConseillerQueryHandler } from '../../application/queries/get-listes-de-diffusion-du-conseiller.query.handler.db'
+import { ListeDeDiffusionQueryModel } from '../../application/queries/query-models/liste-de-diffusion.query-model'
+import { Authentification } from '../../domain/authentification'
+import { Utilisateur } from '../decorators/authenticated.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
+import { handleResult } from './result.handler'
+import {
+  CreateListeDeDiffusionPayload,
+  UpdateListeDeDiffusionPayload
+} from './validation/conseillers.inputs'
 
 @Controller()
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags('Listes de diffusion')
 export class ListesDeDiffusionController {
   constructor(

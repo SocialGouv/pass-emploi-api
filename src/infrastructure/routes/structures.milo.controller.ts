@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
-import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { CloturerAnimationCollectiveCommandHandler } from '../../application/commands/cloturer-animation-collective.command.handler'
 import {
   GetJeunesByStructureMiloQuery,
   GetJeunesByStructureMiloQueryHandler,
@@ -8,15 +9,15 @@ import {
 import { JeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import { handleResult } from './result.handler'
 import {
   ClotureAnimationCollectivePayload,
   GetJeunesStructureMiloQueryParams
 } from './validation/structures.milo.inputs'
-import { CloturerAnimationCollectiveCommandHandler } from '../../application/commands/cloturer-animation-collective.command.handler'
 
 @Controller('structures-milo')
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags('Structures Milo')
 export class StructuresMiloController {
   constructor(

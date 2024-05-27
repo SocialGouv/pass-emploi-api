@@ -12,13 +12,7 @@ import {
   Put,
   Query
 } from '@nestjs/common'
-import {
-  ApiHeader,
-  ApiOAuth2,
-  ApiOperation,
-  ApiResponse,
-  ApiTags
-} from '@nestjs/swagger'
+import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ArchiverJeuneCommandHandler } from 'src/application/commands/archiver-jeune.command.handler'
 import { DeleteJeuneInactifCommandHandler } from 'src/application/commands/delete-jeune-inactif.command.handler'
 import { DeleteJeuneCommandHandler } from 'src/application/commands/delete-jeune.command.handler'
@@ -43,9 +37,13 @@ import {
   HistoriqueConseillerJeuneQueryModel,
   PreferencesJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-model'
+import { ResultatsRechercheMessageQueryModel } from 'src/application/queries/query-models/resultats-recherche-message-query.model'
+import { RechercherMessageQueryHandler } from 'src/application/queries/rechercher-message.query.handler'
 import { Result } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
+import { RechercherMessagePayload } from 'src/infrastructure/routes/validation/messages.input'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import { handleResult } from './result.handler'
 import {
   ArchiverJeunePayload,
@@ -54,12 +52,9 @@ import {
   UpdateConfigurationInput,
   UpdateJeunePreferencesPayload
 } from './validation/jeunes.inputs'
-import { ResultatsRechercheMessageQueryModel } from 'src/application/queries/query-models/resultats-recherche-message-query.model'
-import { RechercherMessagePayload } from 'src/infrastructure/routes/validation/messages.input'
-import { RechercherMessageQueryHandler } from 'src/application/queries/rechercher-message.query.handler'
 
 @Controller('jeunes')
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags('Jeunes')
 export class JeunesController {
   constructor(
