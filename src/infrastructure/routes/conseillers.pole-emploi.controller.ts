@@ -7,7 +7,6 @@ import {
   UseGuards
 } from '@nestjs/common'
 import {
-  ApiOAuth2,
   ApiOperation,
   ApiResponse,
   ApiSecurity,
@@ -25,11 +24,12 @@ import { Authentification } from '../../domain/authentification'
 import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { SkipOidcAuth } from '../decorators/skip-oidc-auth.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import { EnvoyerNotificationsExternePayload } from './validation/conseiller-pole-emploi.inputs'
 import { CreateJeunePoleEmploiPayload } from './validation/conseillers.inputs'
 
 @Controller('conseillers/pole-emploi')
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags('Conseillers Pôle emploi')
 export class ConseillersPoleEmploiController {
   constructor(

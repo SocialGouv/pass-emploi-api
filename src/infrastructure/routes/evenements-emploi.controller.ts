@@ -1,21 +1,22 @@
 import { Controller, Get, Param, Query } from '@nestjs/common'
-import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { handleResult } from './result.handler'
-import { Authentification } from '../../domain/authentification'
-import { Utilisateur } from '../decorators/authenticated.decorator'
-import { FindEvenementsEmploiQueryParams } from './validation/evenements-emploi.inputs'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import {
+  EvenementEmploiDetailQueryModel,
+  GetEvenementEmploiQueryHandler
+} from '../../application/queries/get-evenement-emploi.query.handler'
 import {
   EvenementsEmploiQueryModel,
   GetEvenementsEmploiQuery,
   GetEvenementsEmploiQueryHandler
 } from '../../application/queries/get-evenements-emploi.query.handler'
-import {
-  EvenementEmploiDetailQueryModel,
-  GetEvenementEmploiQueryHandler
-} from '../../application/queries/get-evenement-emploi.query.handler'
+import { Authentification } from '../../domain/authentification'
+import { Utilisateur } from '../decorators/authenticated.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
+import { handleResult } from './result.handler'
+import { FindEvenementsEmploiQueryParams } from './validation/evenements-emploi.inputs'
 
 @Controller('evenements-emploi')
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags('Evenements Emploi')
 export class EvenementsEmploiController {
   constructor(

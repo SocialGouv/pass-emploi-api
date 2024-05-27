@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common'
-import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   GetDetailOffreEmploiQuery,
   GetDetailOffreEmploiQueryHandler
@@ -14,11 +14,12 @@ import {
 } from '../../application/queries/query-models/offres-emploi.query-model'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import { handleResult } from './result.handler'
 import { FindOffresEmploiQueryParams } from './validation/offres-emploi.inputs'
 
 @Controller('offres-emploi')
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags("Offres d'emploi")
 export class OffresEmploiController {
   constructor(

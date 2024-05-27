@@ -1,5 +1,5 @@
 import { Body, Controller, Param, Post } from '@nestjs/common'
-import { ApiOAuth2, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { handleResult } from 'src/infrastructure/routes/result.handler'
 import {
   CreateSuggestionConseillerImmersionCommand,
@@ -15,6 +15,7 @@ import {
 } from '../../application/commands/create-suggestion-conseiller-service-civique.command.handler'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import {
   CreateSuggestionImmersionsPayload,
   CreateSuggestionOffresEmploiPayload,
@@ -22,7 +23,7 @@ import {
 } from './validation/recherches.inputs'
 
 @Controller('conseillers/:idConseiller')
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags('Recherches')
 export class RecherchesConseillersController {
   constructor(

@@ -13,22 +13,23 @@ import {
 } from '@nestjs/common'
 import { HttpStatus } from '@nestjs/common/enums/http-status.enum'
 import { FileInterceptor } from '@nestjs/platform-express'
-import { ApiConsumes, ApiOAuth2, ApiTags } from '@nestjs/swagger'
-import { handleResult } from './result.handler'
+import { ApiConsumes, ApiTags } from '@nestjs/swagger'
 import { SupprimerFichierCommandHandler } from '../../application/commands/supprimer-fichier.command.handler'
-import { TelechargerFichierQueryHandler } from '../../application/queries/telecharger-fichier.query.handler'
 import {
   TeleverserFichierCommand,
   TeleverserFichierCommandHandler,
   TeleverserFichierCommandOutput
 } from '../../application/commands/televerser-fichier.command.handler'
+import { TelechargerFichierQueryHandler } from '../../application/queries/telecharger-fichier.query.handler'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { OidcQueryToken } from '../decorators/skip-oidc-auth.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
+import { handleResult } from './result.handler'
 import { TeleverserFichierPayload } from './validation/fichiers.inputs'
 
 @Controller('fichiers')
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags('Fichiers')
 export class FilesController {
   constructor(

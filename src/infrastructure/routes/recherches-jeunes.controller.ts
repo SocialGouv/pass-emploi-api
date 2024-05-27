@@ -9,7 +9,8 @@ import {
   Post,
   Query
 } from '@nestjs/common'
-import { ApiOAuth2, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { RafraichirSuggestionsCommandHandler } from 'src/application/commands/rafraichir-suggestions.command.handler'
 import { CreateRechercheFromSuggestionCommandHandler } from '../../application/commands/create-recherche-from-suggestion.command.handler'
 import {
   CreateRechercheCommand,
@@ -31,6 +32,7 @@ import { SuggestionQueryModel } from '../../application/queries/query-models/sug
 import { Authentification } from '../../domain/authentification'
 import { Recherche } from '../../domain/offre/recherche/recherche'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import { handleResult } from './result.handler'
 import {
   CreateRechercheImmersionPayload,
@@ -42,10 +44,9 @@ import {
   DiagorienteInformationsPayload,
   FindSuggestionsQueryParams
 } from './validation/suggestions-inputs'
-import { RafraichirSuggestionsCommandHandler } from 'src/application/commands/rafraichir-suggestions.command.handler'
 
 @Controller('jeunes/:idJeune')
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags('Recherches')
 export class RecherchesJeunesController {
   constructor(

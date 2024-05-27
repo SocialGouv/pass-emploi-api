@@ -6,7 +6,7 @@ import {
   ParseUUIDPipe,
   Post
 } from '@nestjs/common'
-import { ApiBody, ApiOAuth2, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { ValidateNested } from 'class-validator'
 import { DateTime } from 'luxon'
 import {
@@ -20,6 +20,7 @@ import {
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { Utilisateur } from '../decorators/authenticated.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import { handleResult } from './result.handler'
 import {
   CreateCampagnePayload,
@@ -27,7 +28,7 @@ import {
 } from './validation/campagnes.inputs'
 
 @Controller()
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 export class CampagnesController {
   constructor(
     private createCampagneCommandHandler: CreateCampagneCommandHandler,

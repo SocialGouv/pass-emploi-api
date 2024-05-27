@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common'
-import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/milo/get-accueil-jeune-milo.query.handler.db'
 import {
   AccueilJeuneMiloQueryModel,
@@ -11,23 +11,24 @@ import { Authentification } from 'src/domain/authentification'
 import { handleResult } from 'src/infrastructure/routes/result.handler'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 
-import { MaintenantQueryParams } from './validation/jeunes.inputs'
+import { DateTime } from 'luxon'
+import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
+import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
 import {
   DetailSessionJeuneMiloQueryModel,
   SessionJeuneMiloQueryModel
 } from 'src/application/queries/query-models/sessions.milo.query.model'
-import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
-import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
-import {
-  GetSessionsJeunesQueryParams,
-  GetMonSuiviQueryParams
-} from './validation/jeunes.milo.inputs'
-import { DateService } from '../../utils/date-service'
 import { GetMonSuiviQueryHandler } from '../../application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
-import { DateTime } from 'luxon'
+import { DateService } from '../../utils/date-service'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
+import { MaintenantQueryParams } from './validation/jeunes.inputs'
+import {
+  GetMonSuiviQueryParams,
+  GetSessionsJeunesQueryParams
+} from './validation/jeunes.milo.inputs'
 
 @Controller('jeunes')
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags('Jeunes Milo')
 export class JeunesMiloController {
   constructor(
