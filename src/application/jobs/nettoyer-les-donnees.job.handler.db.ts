@@ -1,10 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Job } from 'bull'
 import { DateTime } from 'luxon'
-import { Op, WhereOptions } from 'sequelize'
+import { Op, QueryTypes, Sequelize, WhereOptions } from 'sequelize'
+import { SequelizeInjectionToken } from 'src/infrastructure/sequelize/providers'
 import { JobHandler } from '../../building-blocks/types/job-handler'
 import { Planificateur, ProcessJobType } from '../../domain/planificateur'
-import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
+import {
+  RendezVous,
+  TYPES_ANIMATIONS_COLLECTIVES
+} from '../../domain/rendez-vous/rendez-vous'
 import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
 import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
 import { ArchiveJeuneSqlModel } from '../../infrastructure/sequelize/models/archive-jeune.sql-model'
@@ -21,7 +25,8 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
   constructor(
     private dateService: DateService,
     @Inject(SuiviJobServiceToken)
-    suiviJobService: SuiviJob.Service
+    suiviJobService: SuiviJob.Service,
+    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
   ) {
     super(Planificateur.JobType.NETTOYER_LES_DONNEES, suiviJobService)
   }
@@ -36,6 +41,7 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
     let nombreRdvMiloSupprimes = -1
     let nombreJeunesPasConnectesDepuis60Jours = -1
     let nombreActionsSupprimees = -1
+    let nombreAnimationsCollectivesCloses = -1
 
     try {
       nombreArchivesSupprimees = await ArchiveJeuneSqlModel.destroy({
@@ -100,6 +106,42 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
       nbErreurs++
     }
 
+    try {
+      const animationsCollectivesPasseesSansInscrit: Array<{ id: string }> =
+        await this.sequelize.query(
+          `SELECT rendez_vous.id
+            FROM rendez_vous
+            LEFT OUTER JOIN rendez_vous_jeune_association
+            ON rendez_vous_jeune_association.id_rendez_vous = rendez_vous.id
+            WHERE rendez_vous.type IN (:typesAC)
+                AND rendez_vous.date < :aujourdhui
+            GROUP BY rendez_vous.id
+          HAVING COUNT(rendez_vous_jeune_association.id_rendez_vous) = 0`,
+          {
+            type: QueryTypes.SELECT,
+            replacements: {
+              typesAC: TYPES_ANIMATIONS_COLLECTIVES,
+              aujourdhui: maintenant.startOf('day').toJSDate()
+            }
+          }
+        )
+
+      ;[nombreAnimationsCollectivesCloses] = await RendezVousSqlModel.update(
+        { dateCloture: maintenant.toJSDate() },
+        {
+          where: {
+            id: {
+              [Op.in]: animationsCollectivesPasseesSansInscrit.map(
+                ({ id }) => id
+              )
+            }
+          }
+        }
+      )
+    } catch (_e) {
+      nbErreurs++
+    }
+
     return {
       jobType: this.jobType,
       nbErreurs,
@@ -113,7 +155,8 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
         nombreRdvSupprimes,
         nombreRdvMiloSupprimes,
         nombreJeunesPasConnectesDepuis60Jours,
-        nombreActionsSupprimees
+        nombreActionsSupprimees,
+        nombreAnimationsCollectivesCloses
       }
     }
   }
