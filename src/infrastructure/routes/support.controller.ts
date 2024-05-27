@@ -10,35 +10,34 @@ import {
   UseInterceptors
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
-import { ApiConsumes, ApiOAuth2, ApiOperation, ApiTags } from '@nestjs/swagger'
-import { handleResult } from './result.handler'
+import { ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { CreerSuperviseursCommandHandler } from '../../application/commands/creer-superviseurs.command.handler'
+import { DeleteSuperviseursCommandHandler } from '../../application/commands/delete-superviseurs.command.handler'
 import {
-  ChangementAgenceQueryModel,
-  UpdateAgenceConseillerCommandHandler
-} from '../../application/commands/support/update-agence-conseiller.command.handler'
-import {
-  MettreAJourLesJeunesCejPeCommandHandler,
-  MettreAJourLesJeunesCEJPoleEmploiCommand
+  MettreAJourLesJeunesCEJPoleEmploiCommand,
+  MettreAJourLesJeunesCejPeCommandHandler
 } from '../../application/commands/mettre-a-jour-les-jeunes-cej-pe.command.handler'
 import {
   RefreshJddCommand,
   RefreshJddCommandHandler
 } from '../../application/commands/refresh-jdd.command.handler'
 import { ArchiverJeuneSupportCommandHandler } from '../../application/commands/support/archiver-jeune-support.command.handler'
+import {
+  ChangementAgenceQueryModel,
+  UpdateAgenceConseillerCommandHandler
+} from '../../application/commands/support/update-agence-conseiller.command.handler'
+import { TransfererJeunesConseillerCommandHandler } from '../../application/commands/transferer-jeunes-conseiller.command.handler'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
+import { handleResult } from './result.handler'
+import { SuperviseursPayload } from './validation/conseillers.inputs'
 import {
   ChangerAgenceConseillerPayload,
   RefreshJDDPayload,
   TeleverserCsvPayload,
   TransfererJeunesPayload
 } from './validation/support.inputs'
-import { TransfererJeunesConseillerCommandHandler } from '../../application/commands/transferer-jeunes-conseiller.command.handler'
-import { CreerSuperviseursCommandHandler } from '../../application/commands/creer-superviseurs.command.handler'
-import { DeleteSuperviseursCommandHandler } from '../../application/commands/delete-superviseurs.command.handler'
-import { SuperviseursPayload } from './validation/conseillers.inputs'
 
-@ApiOAuth2([])
 @Controller('support')
 @ApiTags('Support')
 export class SupportController {

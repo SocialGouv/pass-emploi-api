@@ -1,40 +1,41 @@
 import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common'
-import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { handleResult } from 'src/infrastructure/routes/result.handler'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GetTokenPoleEmploiQueryHandler } from 'src/application/queries/get-token-pole-emploi.query.handler'
+import { handleResult } from 'src/infrastructure/routes/result.handler'
 
 import { Authentification } from '../../domain/authentification'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 
-import { MaintenantQueryParams } from './validation/jeunes.inputs'
+import { DateTime } from 'luxon'
+import {
+  CreateDemarcheCommand,
+  CreateDemarcheCommandHandler
+} from '../../application/commands/pole-emploi/create-demarche.command.handler'
+import {
+  UpdateStatutDemarcheCommand,
+  UpdateStatutDemarcheCommandHandler
+} from '../../application/commands/pole-emploi/update-demarche.command.handler'
+import { GetCVPoleEmploiQueryHandler } from '../../application/queries/get-cv-pole-emploi.query.handler'
+import { GetJeuneHomeDemarchesQueryHandler } from '../../application/queries/get-jeune-home-demarches.query.handler'
+import { GetSuiviSemainePoleEmploiQueryHandler } from '../../application/queries/get-suivi-semaine-pole-emploi.query.handler'
 import { GetAccueilJeunePoleEmploiQueryHandler } from '../../application/queries/pole-emploi/get-accueil-jeune-pole-emploi.query.handler.db'
+import { toDemarcheQueryModel } from '../../application/queries/query-mappers/demarche.mappers'
+import { DemarcheQueryModel } from '../../application/queries/query-models/actions.query-model'
+import { JeuneHomeAgendaPoleEmploiQueryModelV2 } from '../../application/queries/query-models/home-jeune-suivi.query-model'
+import { JeuneHomeDemarcheQueryModelV2 } from '../../application/queries/query-models/home-jeune.query-model'
 import {
   AccueilJeunePoleEmploiQueryModel,
   CVPoleEmploiQueryModel
 } from '../../application/queries/query-models/jeunes.pole-emploi.query-model'
-import { GetCVPoleEmploiQueryHandler } from '../../application/queries/get-cv-pole-emploi.query.handler'
-import { GetSuiviSemainePoleEmploiQueryHandler } from '../../application/queries/get-suivi-semaine-pole-emploi.query.handler'
-import { DateTime } from 'luxon'
-import { JeuneHomeAgendaPoleEmploiQueryModelV2 } from '../../application/queries/query-models/home-jeune-suivi.query-model'
-import { GetJeuneHomeDemarchesQueryHandler } from '../../application/queries/get-jeune-home-demarches.query.handler'
-import { JeuneHomeDemarcheQueryModelV2 } from '../../application/queries/query-models/home-jeune.query-model'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import {
-  CreateDemarcheCommandHandler,
-  CreateDemarcheCommand
-} from '../../application/commands/pole-emploi/create-demarche.command.handler'
-import {
-  UpdateStatutDemarcheCommandHandler,
-  UpdateStatutDemarcheCommand
-} from '../../application/commands/pole-emploi/update-demarche.command.handler'
-import { toDemarcheQueryModel } from '../../application/queries/query-mappers/demarche.mappers'
-import { DemarcheQueryModel } from '../../application/queries/query-models/actions.query-model'
-import {
-  UpdateStatutDemarchePayload,
-  CreateDemarchePayload
+  CreateDemarchePayload,
+  UpdateStatutDemarchePayload
 } from './validation/demarches.inputs'
+import { MaintenantQueryParams } from './validation/jeunes.inputs'
 
 @Controller()
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags('Jeunes Pôle Emploi')
 export class JeunesPoleEmploiController {
   constructor(

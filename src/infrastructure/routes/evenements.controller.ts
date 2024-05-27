@@ -1,15 +1,16 @@
 import { Body, Controller, Post } from '@nestjs/common'
-import { ApiOAuth2, ApiTags } from '@nestjs/swagger'
+import { ApiTags } from '@nestjs/swagger'
 import {
   CreateEvenementCommand,
   CreateEvenementCommandHandler
 } from '../../application/commands/create-evenement.command.handler'
-import { CreateEvenementPayload } from './validation/evenements.inputs'
-import { Utilisateur } from '../decorators/authenticated.decorator'
 import { Authentification } from '../../domain/authentification'
+import { Utilisateur } from '../decorators/authenticated.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
+import { CreateEvenementPayload } from './validation/evenements.inputs'
 
 @Controller('evenements')
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags("Evenements d'engagement")
 export class EvenementsController {
   constructor(

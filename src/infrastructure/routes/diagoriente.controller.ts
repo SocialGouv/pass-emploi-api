@@ -1,10 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common'
-import {
-  ApiOAuth2,
-  ApiPropertyOptional,
-  ApiResponse,
-  ApiTags
-} from '@nestjs/swagger'
+import { ApiPropertyOptional, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
 import { IsBoolean, IsIn, IsOptional } from 'class-validator'
 import {
@@ -17,6 +12,7 @@ import {
 } from '../../application/queries/get-diagoriente-urls.query.handler'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import { handleResult } from './result.handler'
 import { transformStringToBoolean } from './validation/utils/transformers'
 
@@ -30,7 +26,7 @@ class GetDiagorienteMetiersFavorisQueryParams {
 }
 
 @Controller('jeunes/:idJeune/diagoriente')
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags('Diagoriente')
 export class DiagorienteController {
   constructor(

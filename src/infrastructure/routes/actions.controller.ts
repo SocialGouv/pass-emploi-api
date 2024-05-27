@@ -12,22 +12,54 @@ import {
   Put,
   Query
 } from '@nestjs/common'
-import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { DateTime } from 'luxon'
+import {
+  UpdateActionCommand,
+  UpdateActionCommandHandler
+} from 'src/application/commands/action/update-action.command.handler'
 import { handleResult } from 'src/infrastructure/routes/result.handler'
-import { Authentification } from '../../domain/authentification'
+import {
+  AddCommentaireActionCommand,
+  AddCommentaireActionCommandHandler
+} from '../../application/commands/action/add-commentaire-action.command.handler'
+import {
+  CreateActionCommand,
+  CreateActionCommandHandler
+} from '../../application/commands/action/create-action.command.handler'
 import { DeleteActionCommandHandler } from '../../application/commands/action/delete-action.command.handler'
+import {
+  QualifierActionCommand,
+  QualifierActionCommandHandler
+} from '../../application/commands/milo/qualifier-action.command.handler'
+import { GetActionsConseillerV2QueryHandler } from '../../application/queries/action/get-actions-conseiller-v2.query.handler.db'
+import {
+  GetActionsJeuneQuery,
+  GetActionsJeuneQueryHandler
+} from '../../application/queries/action/get-actions-jeune.query.handler.db'
+import { GetCommentairesActionQueryHandler } from '../../application/queries/action/get-commentaires-action.query.handler.db'
 import {
   GetDetailActionQuery,
   GetDetailActionQueryHandler
 } from '../../application/queries/action/get-detail-action.query.handler.db'
+import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from '../../application/queries/action/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
+import { toCommentaireQueryModel } from '../../application/queries/query-mappers/commentaire.mapper'
 import {
   ActionQueryModel,
   CommentaireActionQueryModel,
   ListeActionsV2QueryModel,
   QualificationActionQueryModel
 } from '../../application/queries/query-models/actions.query-model'
+import { IdQueryModel } from '../../application/queries/query-models/common.query-models'
+import { GetActionsConseillerV2QueryModel } from '../../application/queries/query-models/conseillers.query-model'
+import { ResumeActionsDuJeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
 import { Result } from '../../building-blocks/types/result'
+import { Action } from '../../domain/action/action'
+import { Authentification } from '../../domain/authentification'
+import { Core } from '../../domain/core'
+import { DateService } from '../../utils/date-service'
 import { Utilisateur } from '../decorators/authenticated.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import {
   AddCommentaireActionPayload,
   CreateActionParLeJeunePayload,
@@ -35,42 +67,11 @@ import {
   QualifierActionPayload,
   UpdateActionPayload
 } from './validation/actions.inputs'
-import {
-  AddCommentaireActionCommand,
-  AddCommentaireActionCommandHandler
-} from '../../application/commands/action/add-commentaire-action.command.handler'
-import { GetCommentairesActionQueryHandler } from '../../application/queries/action/get-commentaires-action.query.handler.db'
-import {
-  QualifierActionCommand,
-  QualifierActionCommandHandler
-} from '../../application/commands/milo/qualifier-action.command.handler'
-import { DateTime } from 'luxon'
-import { toCommentaireQueryModel } from '../../application/queries/query-mappers/commentaire.mapper'
-import {
-  UpdateActionCommand,
-  UpdateActionCommandHandler
-} from 'src/application/commands/action/update-action.command.handler'
-import {
-  CreateActionCommandHandler,
-  CreateActionCommand
-} from '../../application/commands/action/create-action.command.handler'
-import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from '../../application/queries/action/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
-import { ResumeActionsDuJeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
-import { Action } from '../../domain/action/action'
-import { DateService } from '../../utils/date-service'
-import { GetActionsConseillerV2QueryHandler } from '../../application/queries/action/get-actions-conseiller-v2.query.handler.db'
-import { GetActionsConseillerV2QueryModel } from '../../application/queries/query-models/conseillers.query-model'
 import { GetActionsConseillerV2QueryParams } from './validation/conseillers.inputs'
-import {
-  GetActionsJeuneQueryHandler,
-  GetActionsJeuneQuery
-} from '../../application/queries/action/get-actions-jeune.query.handler.db'
 import { GetActionsByJeuneV2QueryParams } from './validation/jeunes.inputs'
-import { IdQueryModel } from '../../application/queries/query-models/common.query-models'
-import { Core } from '../../domain/core'
 
 @Controller()
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags('Actions du CEJ pour Milo / Pass Emploi')
 export class ActionsController {
   constructor(

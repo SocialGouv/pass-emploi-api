@@ -12,7 +12,7 @@ import {
   Put,
   Query
 } from '@nestjs/common'
-import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { DateTime } from 'luxon'
 import { handleResult } from 'src/infrastructure/routes/result.handler'
 import {
@@ -56,6 +56,7 @@ import { Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Core, estPoleEmploiBRSA } from '../../domain/core'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import {
   EnvoyerNotificationsPayload,
   GetRendezVousConseillerQueryParams,
@@ -71,7 +72,7 @@ import {
 } from './validation/rendez-vous.inputs'
 
 @Controller()
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags(
   'Rendez-vous du CEJ pour Milo / Pass Emploi (uniquement GET liste pour PE)'
 )

@@ -8,8 +8,7 @@ import {
   Post,
   Query
 } from '@nestjs/common'
-import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { handleResult } from './result.handler'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   AddFavoriOffreEmploiCommand,
   AddFavoriOffreEmploiCommandHandler
@@ -35,10 +34,10 @@ import {
   DeleteFavoriOffreServiceCiviqueCommandHandler
 } from '../../application/commands/delete-favori-offre-service-civique.command.handler'
 import { GetFavorisJeuneQueryHandler } from '../../application/queries/favoris/get-favoris-jeune.query.handler.db'
+import { GetMetadonneesFavorisJeuneQueryHandler } from '../../application/queries/favoris/get-metadonnees-favoris-jeune.query.handler.db'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from '../../application/queries/get-favoris-offres-emploi-jeune.query.handler.db'
 import { GetFavorisOffresImmersionJeuneQueryHandler } from '../../application/queries/get-favoris-offres-immersion-jeune.query.handler.db'
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../application/queries/get-favoris-service-civique-jeune.query.handler.db'
-import { GetMetadonneesFavorisJeuneQueryHandler } from '../../application/queries/favoris/get-metadonnees-favoris-jeune.query.handler.db'
 import {
   FavorisQueryModel,
   MetadonneesFavorisQueryModel
@@ -56,6 +55,8 @@ import { ServiceCiviqueQueryModel } from '../../application/queries/query-models
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { Utilisateur } from '../decorators/authenticated.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
+import { handleResult } from './result.handler'
 import {
   AddFavoriImmersionPayload,
   AddFavoriOffresEmploiPayload,
@@ -66,7 +67,7 @@ import {
 } from './validation/favoris.inputs'
 
 @Controller('jeunes/:idJeune')
-@ApiOAuth2([])
+@CustomSwaggerApiOAuth2()
 @ApiTags('Favoris')
 export class FavorisController {
   constructor(

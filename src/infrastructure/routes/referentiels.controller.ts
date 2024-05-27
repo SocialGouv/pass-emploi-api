@@ -1,7 +1,9 @@
 import { Controller, Get, Query } from '@nestjs/common'
-import { ApiOAuth2, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { handleResult } from './result.handler'
+import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { GetCatalogueDemarchesQueryHandler } from 'src/application/queries/get-catalogue-demarches.query.handler'
+import { ThematiqueQueryModel } from 'src/application/queries/query-models/catalogue.query-model'
 import { GetActionsPredefiniesQueryHandler } from '../../application/queries/action/get-actions-predefinies.query.handler'
+import { GetTypesQualificationsQueryHandler } from '../../application/queries/action/get-types-qualifications.query.handler'
 import { GetAgencesQueryHandler } from '../../application/queries/get-agences.query.handler.db'
 import {
   GetCommunesEtDepartementsQuery,
@@ -12,26 +14,25 @@ import {
   GetMetiersRomeQueryHandler
 } from '../../application/queries/get-metiers-rome.query.handler.db'
 import { GetMotifsSuppressionJeuneQueryHandler } from '../../application/queries/get-motifs-suppression-jeune.query.handler'
-import { GetTypesQualificationsQueryHandler } from '../../application/queries/action/get-types-qualifications.query.handler'
-import { GetTypesRendezVousQueryHandler } from '../../application/queries/rendez-vous/get-types-rendez-vous.query.handler'
 import {
   ActionPredefinieQueryModel,
   TypeQualificationQueryModel
 } from '../../application/queries/query-models/actions.query-model'
+import { AgenceQueryModel } from '../../application/queries/query-models/agence.query-model'
 import { CommunesEtDepartementsQueryModel } from '../../application/queries/query-models/communes-et-departements.query-model'
 import { MotifSuppressionJeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
 import { MetiersRomeQueryModel } from '../../application/queries/query-models/metiers-rome.query-model'
 import { TypeRendezVousQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
 import { TypesDemarcheQueryModel } from '../../application/queries/query-models/types-demarche.query-model'
 import { RechercherTypesDemarcheQueryHandler } from '../../application/queries/rechercher-types-demarche.query.handler'
+import { GetTypesRendezVousQueryHandler } from '../../application/queries/rendez-vous/get-types-rendez-vous.query.handler'
 import { Authentification } from '../../domain/authentification'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { Public } from '../decorators/public.decorator'
+import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
+import { handleResult } from './result.handler'
 import { GetAgencesQueryParams } from './validation/agences.inputs'
 import { TypesDemarchesQueryParams } from './validation/demarches.inputs'
-import { ThematiqueQueryModel } from 'src/application/queries/query-models/catalogue.query-model'
-import { GetCatalogueDemarchesQueryHandler } from 'src/application/queries/get-catalogue-demarches.query.handler'
-import { AgenceQueryModel } from '../../application/queries/query-models/agence.query-model'
 
 @Controller('referentiels')
 @ApiTags('Referentiels')
@@ -88,7 +89,7 @@ export class ReferentielsController {
   }
 
   @Get('pole-emploi/types-demarches')
-  @ApiOAuth2([])
+  @CustomSwaggerApiOAuth2()
   async getTypesDemarches(
     @Query() query: TypesDemarchesQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
@@ -97,7 +98,7 @@ export class ReferentielsController {
   }
 
   @Get('pole-emploi/catalogue-demarches')
-  @ApiOAuth2([])
+  @CustomSwaggerApiOAuth2()
   async getCatalogueDemarches(
     @AccessToken() accessToken: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
@@ -109,7 +110,7 @@ export class ReferentielsController {
   }
 
   @Get('agences')
-  @ApiOAuth2([])
+  @CustomSwaggerApiOAuth2()
   @ApiResponse({
     type: AgenceQueryModel,
     isArray: true
@@ -122,7 +123,7 @@ export class ReferentielsController {
   }
 
   @Get('motifs-suppression-jeune')
-  @ApiOAuth2([])
+  @CustomSwaggerApiOAuth2()
   @ApiResponse({
     type: MotifSuppressionJeuneQueryModel,
     isArray: true
@@ -138,7 +139,7 @@ export class ReferentielsController {
   }
 
   @Get('qualifications-actions/types')
-  @ApiOAuth2([])
+  @CustomSwaggerApiOAuth2()
   @ApiResponse({
     type: TypeQualificationQueryModel,
     isArray: true
@@ -150,7 +151,7 @@ export class ReferentielsController {
   }
 
   @Get('actions-predefinies')
-  @ApiOAuth2([])
+  @CustomSwaggerApiOAuth2()
   @ApiResponse({
     type: ActionPredefinieQueryModel,
     isArray: true
