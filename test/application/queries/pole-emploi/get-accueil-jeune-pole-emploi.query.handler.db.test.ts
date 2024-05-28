@@ -1,3 +1,4 @@
+import { DateService } from 'src/utils/date-service'
 import { GetDemarchesQueryGetter } from '../../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { AccueilJeunePoleEmploiQueryModel } from '../../../../src/application/queries/query-models/jeunes.pole-emploi.query-model'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
@@ -41,6 +42,7 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let keycloakClient: StubbedClass<KeycloakClient>
   let jeuneRepository: StubbedType<Jeune.Repository>
+  let dateService: StubbedClass<DateService>
   const idpToken = 'id-token'
   const jeune = unJeune({ structure: Core.Structure.POLE_EMPLOI })
 
@@ -60,6 +62,7 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
     keycloakClient = stubClass(KeycloakClient)
     keycloakClient.exchangeTokenJeune.resolves(idpToken)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
+    dateService = stubClass(DateService)
 
     handler = new GetAccueilJeunePoleEmploiQueryHandler(
       jeuneRepository,
@@ -69,7 +72,8 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
       getRendezVousJeunePoleEmploiQueryGetter,
       getRecherchesSauvegardeesQueryGetter,
       getFavorisQueryGetter,
-      getCampagneQueryGetter
+      getCampagneQueryGetter,
+      dateService
     )
   })
 
@@ -137,6 +141,8 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
       describe('mapping et filtres', () => {
         beforeEach(async () => {
           // Given
+          dateService.now.returns(maintenant)
+
           getDemarchesQueryGetter.handle
             .withArgs({
               ...query,
@@ -159,7 +165,8 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
           getRendezVousJeunePoleEmploiQueryGetter.handle
             .withArgs({
               ...query,
-              idpToken
+              idpToken,
+              dateDebut: maintenant
             })
             .resolves(
               success({

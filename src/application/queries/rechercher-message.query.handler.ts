@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { FuseResult } from 'fuse.js'
+import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
+import { ResultatsRechercheMessageQueryModel } from 'src/application/queries/query-models/resultats-recherche-message-query.model'
+import { Query } from 'src/building-blocks/types/query'
+import { QueryHandler } from 'src/building-blocks/types/query-handler'
 import { Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Chat, ChatRepositoryToken, MessageRecherche } from 'src/domain/chat'
 import { Evenement, EvenementService } from 'src/domain/evenement'
-import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
-import { QueryHandler } from 'src/building-blocks/types/query-handler'
-import { Query } from 'src/building-blocks/types/query'
-import { ResultatsRechercheMessageQueryModel } from 'src/application/queries/query-models/resultats-recherche-message-query.model'
-import { FuseResult } from 'fuse.js'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Fuse = require('fuse.js')

@@ -1,4 +1,5 @@
 import { GetTokenPoleEmploiQueryHandler } from 'src/application/queries/get-token-pole-emploi.query.handler'
+import { GetMonSuiviPoleEmploiQueryHandler } from 'src/application/queries/milo/get-mon-suivi-jeune.pole-emploi.query.handler.db'
 import { StubbedClass, enleverLesUndefined } from '../../utils'
 import { JwtService } from '../../../src/infrastructure/auth/jwt.service'
 import { HttpStatus, INestApplication } from '@nestjs/common'
@@ -16,7 +17,8 @@ import {
 } from '../../../src/building-blocks/types/domain-error'
 import {
   AccueilJeunePoleEmploiQueryModel,
-  CVPoleEmploiQueryModel
+  CVPoleEmploiQueryModel,
+  MonSuiviPoleEmploiQueryModel
 } from '../../../src/application/queries/query-models/jeunes.pole-emploi.query-model'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import * as request from 'supertest'
@@ -46,6 +48,7 @@ describe('JeunesPoleEmploiController', () => {
   let getJeuneHomeDemarchesQueryHandler: StubbedClass<GetJeuneHomeDemarchesQueryHandler>
   let updateStatutDemarcheCommandHandler: StubbedClass<UpdateStatutDemarcheCommandHandler>
   let createDemarcheCommandHandler: StubbedClass<CreateDemarcheCommandHandler>
+  let getMonSuiviPoleEmploiCommandHandler: StubbedClass<GetMonSuiviPoleEmploiQueryHandler>
   let jwtService: StubbedClass<JwtService>
   let app: INestApplication
 
@@ -64,6 +67,9 @@ describe('JeunesPoleEmploiController', () => {
     )
     updateStatutDemarcheCommandHandler = app.get(
       UpdateStatutDemarcheCommandHandler
+    )
+    getMonSuiviPoleEmploiCommandHandler = app.get(
+      GetMonSuiviPoleEmploiQueryHandler
     )
     createDemarcheCommandHandler = app.get(CreateDemarcheCommandHandler)
     jwtService = app.get(JwtService)
@@ -436,6 +442,43 @@ describe('JeunesPoleEmploiController', () => {
         // Then
         .expect(HttpStatus.OK)
         .expect('idp-token')
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/jeunes/1/pole-emploi/idp-token'
+    )
+  })
+
+  describe('GET /jeunes/:idJeune/pole-emploi/mon-suivi', () => {
+    it('renvoie le suivi d’un jeune', async () => {
+      // Given
+      const data: Cached<MonSuiviPoleEmploiQueryModel> = {
+        queryModel: { demarches: [], rendezVous: [] },
+        dateDuCache: uneDatetime()
+      }
+      getMonSuiviPoleEmploiCommandHandler.execute
+        .withArgs(
+          {
+            idJeune: 'id-jeune',
+            dateDebut: DateTime.fromISO('2023-04-12'),
+            accessToken: 'coucou'
+          },
+          unUtilisateurDecode()
+        )
+        .resolves(success(data))
+
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/id-jeune/pole-emploi/mon-suivi`)
+        .query({ dateDebut: '2023-04-12' })
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.OK)
+        .expect({
+          resultat: data.queryModel,
+          dateDerniereMiseAJour: uneDatetime().toISO()
+        })
     })
 
     ensureUserAuthenticationFailsIfInvalid(

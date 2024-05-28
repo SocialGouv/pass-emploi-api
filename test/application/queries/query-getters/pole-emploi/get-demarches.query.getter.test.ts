@@ -189,6 +189,7 @@ describe('GetDemarchesQueryGetter', () => {
         }
         expect(result).to.deep.equal(success(expected))
       })
+
       it('récupère les demarches Pole Emploi du jeune triés par statut et par date de fin', async () => {
         const query = {
           idJeune: '1',
@@ -224,6 +225,7 @@ describe('GetDemarchesQueryGetter', () => {
           expect(demarches[5].id).to.equal(demarcheDtoRealisee.idDemarche)
         }
       })
+
       it('récupère les demarches Pole Emploi du jeune triés par date de fin', async () => {
         const query = {
           idJeune: '1',
@@ -258,7 +260,43 @@ describe('GetDemarchesQueryGetter', () => {
           expect(demarches[5].id).to.equal(demarcheDtoRetard.idDemarche)
         }
       })
+
+      it('récupère les demarches Pole Emploi du jeune après la date de début', async () => {
+        const query = {
+          idJeune: '1',
+          accessToken: 'token',
+          tri: GetDemarchesQueryGetter.Tri.parDateFin,
+          dateDebut: DateTime.fromISO('2020-04-03')
+        }
+        jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
+        poleEmploiPartenaireClient.getDemarches
+          .withArgs(idpToken)
+          .resolves(
+            success([
+              demarcheDtoAnnulee,
+              demarcheDtoEnCours,
+              demarcheDtoRetard,
+              demarcheDtoRealisee,
+              demarcheDtoAFaireAuMilieu,
+              demarcheDtoEnCoursProche
+            ])
+          )
+
+        // When
+        const result = await getDemarchesQueryGetter.handle(query)
+        // Then
+        expect(isSuccess(result)).to.be.true()
+        if (isSuccess(result)) {
+          const demarches = result.data.queryModel
+          expect(demarches.length).to.equal(4)
+          expect(demarches[0].id).to.equal(demarcheDtoAnnulee.idDemarche)
+          expect(demarches[1].id).to.equal(demarcheDtoEnCoursProche.idDemarche)
+          expect(demarches[2].id).to.equal(demarcheDtoEnCours.idDemarche)
+          expect(demarches[3].id).to.equal(demarcheDtoRealisee.idDemarche)
+        }
+      })
     })
+
     describe('quand une erreur se produit', () => {
       it('renvoie une failure quand une erreur client se produit', async () => {
         // Given
@@ -279,6 +317,7 @@ describe('GetDemarchesQueryGetter', () => {
       })
     })
   })
+
   describe("quand le jeune n'existe pas", () => {
     it('renvoie une failure', async () => {
       // Given

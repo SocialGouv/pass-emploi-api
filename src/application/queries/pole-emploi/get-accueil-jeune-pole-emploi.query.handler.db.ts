@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
+import { DateService } from 'src/utils/date-service'
 import { NonTrouveError } from '../../../building-blocks/types/domain-error'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
@@ -42,7 +43,8 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
     private getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter,
     private getRecherchesSauvegardeesQueryGetter: GetRecherchesSauvegardeesQueryGetter,
     private getFavorisQueryGetter: GetFavorisAccueilQueryGetter,
-    private getCampagneQueryGetter: GetCampagneQueryGetter
+    private getCampagneQueryGetter: GetCampagneQueryGetter,
+    private dateService: DateService
   ) {
     super('GetAccueilJeunePoleEmploiQueryHandler')
   }
@@ -79,7 +81,8 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
       }),
       this.getRendezVousJeunePoleEmploiQueryGetter.handle({
         ...query,
-        idpToken
+        idpToken,
+        dateDebut: this.dateService.now()
       }),
       this.getRecherchesSauvegardeesQueryGetter.handle({
         idJeune: query.idJeune
