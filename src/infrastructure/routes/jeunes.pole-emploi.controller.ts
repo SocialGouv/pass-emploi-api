@@ -1,12 +1,11 @@
 import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { GetTokenPoleEmploiQueryHandler } from 'src/application/queries/get-token-pole-emploi.query.handler'
-import { handleResult } from 'src/infrastructure/routes/result.handler'
-
-import { Authentification } from '../../domain/authentification'
-import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 
 import { DateTime } from 'luxon'
+import { GetTokenPoleEmploiQueryHandler } from 'src/application/queries/get-token-pole-emploi.query.handler'
+import { GetMonSuiviPoleEmploiQueryHandler } from 'src/application/queries/milo/get-mon-suivi-jeune.pole-emploi.query.handler.db'
+import { handleResult } from 'src/infrastructure/routes/result.handler'
+import { GetMonSuiviQueryParams } from 'src/infrastructure/routes/validation/jeunes.pole-emploi.inputs'
 import {
   CreateDemarcheCommand,
   CreateDemarcheCommandHandler
@@ -25,8 +24,12 @@ import { JeuneHomeAgendaPoleEmploiQueryModelV2 } from '../../application/queries
 import { JeuneHomeDemarcheQueryModelV2 } from '../../application/queries/query-models/home-jeune.query-model'
 import {
   AccueilJeunePoleEmploiQueryModel,
-  CVPoleEmploiQueryModel
+  CVPoleEmploiQueryModel,
+  GetMonSuiviPoleEmploiQueryModel
 } from '../../application/queries/query-models/jeunes.pole-emploi.query-model'
+
+import { Authentification } from '../../domain/authentification'
+import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import {
   CreateDemarchePayload,
@@ -45,7 +48,8 @@ export class JeunesPoleEmploiController {
     private readonly getJeuneHomeAgendaPoleEmploiQueryHandler: GetSuiviSemainePoleEmploiQueryHandler,
     private readonly getTokenPoleEmploiQueryHandler: GetTokenPoleEmploiQueryHandler,
     private readonly updateStatutDemarcheCommandHandler: UpdateStatutDemarcheCommandHandler,
-    private readonly createDemarcheCommandHandler: CreateDemarcheCommandHandler
+    private readonly createDemarcheCommandHandler: CreateDemarcheCommandHandler,
+    private readonly getMonSuiviPoleEmploiQueryHandler: GetMonSuiviPoleEmploiQueryHandler
   ) {}
 
   @Get('jeunes/:idJeune/pole-emploi/accueil')
@@ -219,5 +223,36 @@ export class JeunesPoleEmploiController {
     )
 
     return handleResult(result)
+  }
+
+  @Get('/jeunes/:idJeune/pole-emploi/mon-suivi')
+  @ApiOperation({
+    description:
+      "Récupère les éléments de la page 'Mon Suivi' d'un jeune Pôle emploi"
+  })
+  @ApiResponse({
+    type: GetMonSuiviPoleEmploiQueryModel
+  })
+  async getSuivi(
+    @Param('idJeune') idJeune: string,
+    @Query() queryParams: GetMonSuiviQueryParams,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string
+  ): Promise<GetMonSuiviPoleEmploiQueryModel> {
+    const result = await this.getMonSuiviPoleEmploiQueryHandler.execute(
+      {
+        idJeune,
+        dateDebut: DateTime.fromISO(queryParams.dateDebut, {
+          setZone: true
+        }),
+        accessToken: accessToken
+      },
+      utilisateur
+    )
+
+    return handleResult(result, ({ dateDuCache, queryModel }) => ({
+      resultat: queryModel,
+      dateDerniereMiseAJour: dateDuCache?.toISO()
+    }))
   }
 }

@@ -67,7 +67,6 @@ describe('JeunesControllerE2E', () => {
       new GetRendezVousJeunePoleEmploiQueryGetter(
         jeuneRepository,
         poleEmploiPartenaireClient,
-        dateService,
         idService,
         keycloakClient
       )
@@ -78,7 +77,8 @@ describe('JeunesControllerE2E', () => {
         getDemarchesQueryGetter,
         getRendezVousJeunePoleEmploiQueryGetter,
         jeuneAuthorizer,
-        keycloakClient
+        keycloakClient,
+        dateService
       )
 
     const testingModule = await buildTestingModuleForHttpTesting()
@@ -115,7 +115,7 @@ describe('JeunesControllerE2E', () => {
       poleEmploiPartenaireClient.getDemarches.resolves(
         success(demarchesPoleEmploi)
       )
-      poleEmploiPartenaireClient.getRendezVousPasses.resolves(
+      poleEmploiPartenaireClient.getRendezVous.resolves(
         success(rendezVousPoleEmploi)
       )
       poleEmploiPartenaireClient.getPrestations.resolves(success([]))
