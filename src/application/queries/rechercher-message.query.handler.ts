@@ -6,8 +6,14 @@ import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
 import { Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { Chat, ChatRepositoryToken, MessageRecherche } from 'src/domain/chat'
+import {
+  Chat,
+  ChatRepositoryToken,
+  MessageRecherche,
+  MessageRechercheMatches
+} from 'src/domain/chat'
 import { Evenement, EvenementService } from 'src/domain/evenement'
+import * as process from 'process'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Fuse = require('fuse.js')
@@ -45,7 +51,8 @@ export class RechercherMessageQueryHandler extends QueryHandler<
     return success({
       resultats: resultatRecherche.map(message => ({
         id: message.id,
-        message: message.rawMessage
+        message: message.rawMessage,
+        matches: message.matches
       }))
     })
   }
@@ -71,11 +78,26 @@ export class RechercherMessageQueryHandler extends QueryHandler<
 async function chercherMessage(
   messages: MessageRecherche[],
   recherche: string
-): Promise<MessageRecherche[]> {
-  const results: Array<FuseResult<MessageRecherche>> = new Fuse(messages, {
-    keys: ['content', 'piecesJointes.nom'],
-    ignoreLocation: true
-  }).search(recherche)
+): Promise<MessageRechercheMatches[]> {
+  const results: Array<FuseResult<MessageRechercheMatches>> = new Fuse(
+    messages,
+    {
+      keys: ['content', 'piecesJointes.nom'],
+      includeScore: true,
+      includeMatches: true,
+      ignoreLocation: true,
+      // eslint-disable-next-line no-process-env
+      threshold: process.env.THRESHOLD_SEARCH_MESSAGES,
+      minMatchCharLength: recherche.length
+    }
+  ).search(recherche)
 
-  return results.map(fuseResult => fuseResult.item)
+  return results.map(fuseResult => {
+    const matches = fuseResult.matches!.map(m => m.indices[0])
+
+    return {
+      ...fuseResult.item,
+      matches
+    }
+  })
 }

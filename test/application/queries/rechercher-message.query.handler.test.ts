@@ -120,6 +120,7 @@ describe('RechercheMessageQueryHandler', () => {
           resultats: [
             {
               id: '3',
+              matches: [[0, 21]],
               message: {
                 idConseiller: 'id-conseiller',
                 infoPieceJointe: {
@@ -133,6 +134,7 @@ describe('RechercheMessageQueryHandler', () => {
             },
             {
               id: '1',
+              matches: [[14, 24]],
               message: {
                 idConseiller: 'id-conseiller',
                 iv: 'iv-message-1',
