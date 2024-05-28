@@ -16,6 +16,7 @@ import { GetTokenPoleEmploiQueryHandler } from 'src/application/queries/get-toke
 import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
 import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-conseiller.milo.query.handler.db'
 import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
+import { GetMonSuiviPoleEmploiQueryHandler } from 'src/application/queries/milo/get-mon-suivi-jeune.pole-emploi.query.handler.db'
 import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-sessions-conseiller.milo.query.handler.db'
 import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
 import { EvenementEmploiCodePostalQueryGetter } from 'src/application/queries/query-getters/evenement-emploi-code-postal.query.getter'
@@ -173,7 +174,7 @@ import { GetSuggestionsQueryHandler } from './application/queries/get-suggestion
 import { GetSuiviSemainePoleEmploiQueryHandler } from './application/queries/get-suivi-semaine-pole-emploi.query.handler'
 import { GetAccueilJeuneMiloQueryHandler } from './application/queries/milo/get-accueil-jeune-milo.query.handler.db'
 import { GetJeunesByStructureMiloQueryHandler } from './application/queries/milo/get-jeunes-by-structure-milo.query.handler.db'
-import { GetMonSuiviQueryHandler } from './application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
+import { GetMonSuiviMiloQueryHandler } from './application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
 import { GetSessionsConseillerMiloV2QueryHandler } from './application/queries/milo/v2/get-sessions-conseiller.milo.v2.query.handler.db'
 import { GetAccueilJeunePoleEmploiQueryHandler } from './application/queries/pole-emploi/get-accueil-jeune-pole-emploi.query.handler.db'
 import { GetFavorisAccueilQueryGetter } from './application/queries/query-getters/accueil/get-favoris.query.getter.db'
@@ -782,8 +783,9 @@ export function buildQueryCommandsProviders(): Provider[] {
     EmargerSessionMiloCommandHandler,
     EvenementEmploiCodePostalQueryGetter,
     GetCatalogueDemarchesQueryHandler,
-    GetMonSuiviQueryHandler,
-    GetTokenPoleEmploiQueryHandler
+    GetMonSuiviMiloQueryHandler,
+    GetTokenPoleEmploiQueryHandler,
+    GetMonSuiviPoleEmploiQueryHandler
   ]
 }
 

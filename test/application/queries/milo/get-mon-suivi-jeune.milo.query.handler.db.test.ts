@@ -9,8 +9,8 @@ import {
 } from '../../../../src/building-blocks/types/result'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import {
-  GetMonSuiviQuery,
-  GetMonSuiviQueryHandler
+  GetMonSuiviMiloQuery,
+  GetMonSuiviMiloQueryHandler
 } from '../../../../src/application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
 import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import { getDatabase } from '../../../utils/database-for-testing'
@@ -44,12 +44,12 @@ import { unRendezVousQueryModel } from '../../../fixtures/query-models/rendez-vo
 import { uneSessionJeuneMiloQueryModel } from '../../../fixtures/sessions.fixture'
 import { GetSessionsJeuneMiloQueryGetter } from '../../../../src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { SessionMilo } from '../../../../src/domain/milo/session.milo'
-import { GetMonSuiviQueryModel } from '../../../../src/application/queries/query-models/jeunes.milo.query-model'
+import { GetMonSuiviMiloQueryModel } from '../../../../src/application/queries/query-models/jeunes.milo.query-model'
 import { SessionJeuneMiloQueryModel } from '../../../../src/application/queries/query-models/sessions.milo.query.model'
 import { UnauthorizedException } from '@nestjs/common'
 
-describe('GetMonSuiviQueryHandler', () => {
-  let handler: GetMonSuiviQueryHandler
+describe('GetMonSuiviMiloQueryHandler', () => {
+  let handler: GetMonSuiviMiloQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let sessionsQueryGetter: StubbedClass<GetSessionsJeuneMiloQueryGetter>
 
@@ -60,14 +60,17 @@ describe('GetMonSuiviQueryHandler', () => {
     await getDatabase().cleanPG()
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     sessionsQueryGetter = stubClass(GetSessionsJeuneMiloQueryGetter)
-    handler = new GetMonSuiviQueryHandler(jeuneAuthorizer, sessionsQueryGetter)
+    handler = new GetMonSuiviMiloQueryHandler(
+      jeuneAuthorizer,
+      sessionsQueryGetter
+    )
   })
 
   describe('handle', () => {
     const utilisateurJeune = unUtilisateurJeune()
     const jeuneDto = unJeuneDto({ idPartenaire: 'idDossier' })
 
-    const query: GetMonSuiviQuery = {
+    const query: GetMonSuiviMiloQuery = {
       idJeune: jeuneDto.id,
       dateDebut,
       dateFin,
@@ -115,7 +118,7 @@ describe('GetMonSuiviQueryHandler', () => {
         })
       })
       describe('avec id partenaire', () => {
-        let result: Result<GetMonSuiviQueryModel>
+        let result: Result<GetMonSuiviMiloQueryModel>
         let _actionAvantDateDebut1Heure: AsSql<ActionDto>
         let actionApresDateDebutUneHeure: AsSql<ActionDto>
         let actionApresDateDebutUnJour: AsSql<ActionDto>
@@ -268,7 +271,7 @@ describe('GetMonSuiviQueryHandler', () => {
     })
 
     describe('quand la récupération des sessions échoue', () => {
-      let result: Result<GetMonSuiviQueryModel>
+      let result: Result<GetMonSuiviMiloQueryModel>
 
       beforeEach(async () => {
         // Given
@@ -333,7 +336,7 @@ describe('GetMonSuiviQueryHandler', () => {
 
   describe('authorize', () => {
     const jeune = unJeune()
-    const query: GetMonSuiviQuery = {
+    const query: GetMonSuiviMiloQuery = {
       idJeune: jeune.id,
       dateDebut,
       dateFin,

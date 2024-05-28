@@ -3,13 +3,12 @@ import { DateTime } from 'luxon'
 import { NonTrouveError } from '../../../../building-blocks/types/domain-error'
 import { Cached } from '../../../../building-blocks/types/query'
 import {
-  Result,
   failure,
   isFailure,
+  Result,
   success
 } from '../../../../building-blocks/types/result'
 import { Jeune, JeuneRepositoryToken } from '../../../../domain/jeune/jeune'
-import { RendezVous } from '../../../../domain/rendez-vous/rendez-vous'
 import { KeycloakClient } from '../../../../infrastructure/clients/keycloak-client'
 import {
   PoleEmploiPartenaireClient,
@@ -23,8 +22,9 @@ import { RendezVousJeuneQueryModel } from '../../query-models/rendez-vous.query-
 
 export interface Query {
   idJeune: string
-  periode?: RendezVous.Periode
   accessToken: string
+  dateDebut?: DateTime
+  dateFin?: DateTime
   idpToken?: string
 }
 
@@ -37,7 +37,6 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
     private jeuneRepository: Jeune.Repository,
     @Inject(PoleEmploiPartenaireClientToken)
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,
-    private dateService: DateService,
     private idService: IdService,
     private keycloakClient: KeycloakClient
   ) {
@@ -58,33 +57,17 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
         jeune.structure
       ))
 
-    const maintenant = this.dateService.now()
-    let responsePrestations
-    let responseRendezVous
-
-    if (query.periode === RendezVous.Periode.PASSES) {
-      ;[responsePrestations, responseRendezVous] = await Promise.all([
-        this.poleEmploiPartenaireClient.getPrestations(
-          idpToken,
-          jeune.creationDate
-        ),
-        this.poleEmploiPartenaireClient.getRendezVousPasses(
-          idpToken,
-          jeune.creationDate.toUTC()
-        )
-      ])
-    } else {
-      ;[responsePrestations, responseRendezVous] = await Promise.all([
-        this.poleEmploiPartenaireClient.getPrestations(idpToken, maintenant),
-        this.poleEmploiPartenaireClient.getRendezVous(idpToken)
-      ])
-    }
+    const dateDebut = query.dateDebut ?? jeune.creationDate
+    const [responsePrestations, responseRendezVous] = await Promise.all([
+      this.poleEmploiPartenaireClient.getPrestations(idpToken, dateDebut),
+      this.poleEmploiPartenaireClient.getRendezVous(idpToken, dateDebut)
+    ])
 
     if (isFailure(responsePrestations)) {
       return responsePrestations
     }
 
-    let rendezVousPrestations = await Promise.all(
+    const rendezVousPrestations = await Promise.all(
       responsePrestations.data
         .filter(prestation => !prestation.annule)
         .map(async prestation => {
@@ -132,16 +115,16 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
           )
         })
 
-    if (query.periode === RendezVous.Periode.PASSES) {
-      rendezVousPrestations = rendezVousPrestations.filter(prestations =>
-        DateService.isGreater(
-          maintenant,
-          DateService.fromJSDateToDateTime(prestations.date)!
+    const rendezVousPrestationsFiltres = query.dateFin
+      ? rendezVousPrestations.filter(prestations =>
+          DateService.isGreater(
+            query.dateFin!,
+            DateService.fromJSDateToDateTime(prestations.date)!
+          )
         )
-      )
-    }
+      : rendezVousPrestations
 
-    const rendezVousDuJeune = rendezVousPrestations
+    const rendezVousDuJeune = rendezVousPrestationsFiltres
       .concat(rendezVousPoleEmploi)
       .sort(sortRendezVousByDate)
 

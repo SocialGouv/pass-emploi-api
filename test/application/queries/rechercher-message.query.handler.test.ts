@@ -1,11 +1,11 @@
 import { Evenement, EvenementService } from 'src/domain/evenement'
-import { expect, StubbedClass, stubClass } from 'test/utils'
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { createSandbox } from 'sinon'
 import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
 import { RechercherMessageQueryHandler } from 'src/application/queries/rechercher-message.query.handler'
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { Chat, MessageRecherche } from 'src/domain/chat'
-import { createSandbox } from 'sinon'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
+import { expect, StubbedClass, stubClass } from 'test/utils'
 
 describe('RechercheMessageQueryHandler', () => {
   const sandbox = createSandbox()

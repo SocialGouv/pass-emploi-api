@@ -3,7 +3,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/milo/get-accueil-jeune-milo.query.handler.db'
 import {
   AccueilJeuneMiloQueryModel,
-  GetMonSuiviQueryModel
+  GetMonSuiviMiloQueryModel
 } from 'src/application/queries/query-models/jeunes.milo.query-model'
 
 import { Result } from 'src/building-blocks/types/result'
@@ -18,7 +18,7 @@ import {
   DetailSessionJeuneMiloQueryModel,
   SessionJeuneMiloQueryModel
 } from 'src/application/queries/query-models/sessions.milo.query.model'
-import { GetMonSuiviQueryHandler } from '../../application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
+import { GetMonSuiviMiloQueryHandler } from '../../application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
 import { DateService } from '../../utils/date-service'
 import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import { MaintenantQueryParams } from './validation/jeunes.inputs'
@@ -35,7 +35,7 @@ export class JeunesMiloController {
     private readonly getAccueilQueryHandler: GetAccueilJeuneMiloQueryHandler,
     private readonly getSessionsQueryHandler: GetSessionsJeuneMiloQueryHandler,
     private readonly getDetailSessionQueryHandler: GetDetailSessionJeuneMiloQueryHandler,
-    private readonly getMonSuiviQueryHandler: GetMonSuiviQueryHandler
+    private readonly getMonSuiviMiloQueryHandler: GetMonSuiviMiloQueryHandler
   ) {}
 
   @Get(':idJeune/milo/accueil')
@@ -125,16 +125,16 @@ export class JeunesMiloController {
     description: "Récupère les éléments de la page 'Mon Suivi' d'un jeune Milo"
   })
   @ApiResponse({
-    type: GetMonSuiviQueryModel
+    type: GetMonSuiviMiloQueryModel
   })
   async getJeunes(
     @Param('idJeune') idJeune: string,
     @Query() queryParams: GetMonSuiviQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @AccessToken() accessToken: string
-  ): Promise<GetMonSuiviQueryModel> {
-    const result: Result<GetMonSuiviQueryModel> =
-      await this.getMonSuiviQueryHandler.execute(
+  ): Promise<GetMonSuiviMiloQueryModel> {
+    const result: Result<GetMonSuiviMiloQueryModel> =
+      await this.getMonSuiviMiloQueryHandler.execute(
         {
           idJeune,
           dateDebut: DateTime.fromISO(queryParams.dateDebut, {

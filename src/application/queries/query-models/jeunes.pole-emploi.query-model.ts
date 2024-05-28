@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-
+import { DemarcheQueryModel } from 'src/application/queries/query-models/actions.query-model'
 import {
   RendezVousJeuneDetailQueryModel,
   RendezVousJeuneQueryModel
@@ -58,4 +58,26 @@ export class CVPoleEmploiQueryModel {
 
   @ApiProperty()
   nomFichier: string
+}
+
+export class MonSuiviPoleEmploiQueryModel {
+  @ApiProperty({
+    type: DemarcheQueryModel,
+    isArray: true
+  })
+  demarches: DemarcheQueryModel[]
+
+  @ApiProperty({
+    type: RendezVousJeuneQueryModel,
+    isArray: true
+  })
+  rendezVous: RendezVousJeuneQueryModel[]
+}
+
+export class GetMonSuiviPoleEmploiQueryModel {
+  @ApiProperty()
+  resultat: MonSuiviPoleEmploiQueryModel
+
+  @ApiPropertyOptional({ type: Date })
+  dateDerniereMiseAJour?: string
 }
