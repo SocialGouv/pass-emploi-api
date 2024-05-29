@@ -30,10 +30,6 @@ export interface MessageRecherche {
   rawMessage: object
 }
 
-export interface MessageRechercheMatches extends MessageRecherche {
-  matches: Array<[number, number]>
-}
-
 export interface MessageGroupe extends MessageIndividuel {
   idsBeneficiaires: string[]
 }

@@ -245,6 +245,9 @@ export default () => {
     },
     headers: {
       maxAge: process.env.CACHE_CONTROL_MAX_AGE_APP_MOBILE_EN_SECONDES
+    },
+    recherche: {
+      seuil: process.env.THRESHOLD_SEARCH_MESSAGES
     }
   }
   return Joi.attempt(configuration, configurationSchema)

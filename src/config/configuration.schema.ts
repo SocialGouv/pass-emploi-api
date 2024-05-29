@@ -192,5 +192,8 @@ export const configurationSchema = Joi.object({
   }),
   headers: Joi.object({
     maxAge: Joi.number().required()
+  }),
+  recherche: Joi.object({
+    seuil: Joi.number().required()
   })
 })
