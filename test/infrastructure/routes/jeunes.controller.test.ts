@@ -771,10 +771,11 @@ describe('JeunesController', () => {
           {
             id: 'id-message',
             message: {
-              message: 'Contenu du message',
+              message: 'Nous avions rendez-vous à 16h',
               id: 'id-message',
               idConseiller: 'id-conseiller'
-            }
+            },
+            matches: [[12, 22]]
           }
         ]
       }

@@ -6,12 +6,14 @@ import { RechercherMessageQueryHandler } from 'src/application/queries/recherche
 import { Chat, MessageRecherche } from 'src/domain/chat'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { expect, StubbedClass, stubClass } from 'test/utils'
+import { ConfigService } from '@nestjs/config'
 
 describe('RechercheMessageQueryHandler', () => {
   const sandbox = createSandbox()
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let chatRepository: StubbedType<Chat.Repository>
   let evenementService: EvenementService
+  let configService: ConfigService
   let handler: RechercherMessageQueryHandler
 
   const messages: MessageRecherche[] = [
@@ -75,10 +77,12 @@ describe('RechercheMessageQueryHandler', () => {
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     chatRepository = stubInterface(sandbox)
     evenementService = stubClass(EvenementService)
+    configService = stubClass(ConfigService)
     handler = new RechercherMessageQueryHandler(
       chatRepository,
       conseillerAuthorizer,
-      evenementService
+      evenementService,
+      configService
     )
 
     chatRepository.recupererMessagesConversation.resolves(messages)
@@ -102,7 +106,7 @@ describe('RechercheMessageQueryHandler', () => {
   })
 
   describe('handle', () => {
-    it('renvoie la liste des ids de messages', async () => {
+    it('renvoie la liste des messages', async () => {
       //Given
       const idBeneficiaire = '1'
       const recherche = 'rendez-vous'
@@ -120,6 +124,7 @@ describe('RechercheMessageQueryHandler', () => {
           resultats: [
             {
               id: '3',
+              matches: [[0, 21]],
               message: {
                 idConseiller: 'id-conseiller',
                 infoPieceJointe: {
@@ -133,6 +138,7 @@ describe('RechercheMessageQueryHandler', () => {
             },
             {
               id: '1',
+              matches: [[14, 24]],
               message: {
                 idConseiller: 'id-conseiller',
                 iv: 'iv-message-1',

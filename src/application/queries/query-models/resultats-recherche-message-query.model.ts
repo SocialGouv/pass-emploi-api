@@ -6,6 +6,9 @@ export class MessageIndividuelQueryModel {
 
   @ApiProperty()
   message: object
+
+  @ApiProperty()
+  matches: Array<[number, number]>
 }
 export class ResultatsRechercheMessageQueryModel {
   @ApiProperty({ type: MessageIndividuelQueryModel, isArray: true })
