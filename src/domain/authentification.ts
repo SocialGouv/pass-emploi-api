@@ -59,10 +59,7 @@ export namespace Authentification {
   }
 
   export interface Repository {
-    getConseillerByStructure(
-      idAuthentification: string,
-      structure: Core.Structure
-    ): Promise<Utilisateur | undefined>
+    getConseiller(idAuthentification: string): Promise<Utilisateur | undefined>
 
     getJeuneByStructure(
       idAuthentification: string,

@@ -27,7 +27,7 @@ describe('AuthentificationSqlRepository', () => {
     )
   })
 
-  describe('getConseillerByStructure', () => {
+  describe('getConseiller', () => {
     const conseillerDtoMilo = unConseillerDto({
       idAuthentification: 'id-authentification-conseiller',
       structure: Core.Structure.MILO
@@ -47,11 +47,9 @@ describe('AuthentificationSqlRepository', () => {
     describe("quand c'est un conseiller non inscrit dans les superviseurs", () => {
       it("retourne l'utilisateur quand il existe sans roles quand c'est un non MILO", async () => {
         // When
-        const utilisateur =
-          await authentificationSqlRepository.getConseillerByStructure(
-            conseillerDtoPE.idAuthentification,
-            Core.Structure.POLE_EMPLOI
-          )
+        const utilisateur = await authentificationSqlRepository.getConseiller(
+          conseillerDtoPE.idAuthentification
+        )
 
         // Then
         expect(utilisateur).to.deep.equal(
@@ -65,11 +63,9 @@ describe('AuthentificationSqlRepository', () => {
       })
       it("retourne l'utilisateur quand il existe avec role SUPERVISEUR quand c'est un MILO", async () => {
         // When
-        const utilisateur =
-          await authentificationSqlRepository.getConseillerByStructure(
-            conseillerDtoMilo.idAuthentification,
-            Core.Structure.MILO
-          )
+        const utilisateur = await authentificationSqlRepository.getConseiller(
+          conseillerDtoMilo.idAuthentification
+        )
 
         // Then
         expect(utilisateur).to.deep.equal(
@@ -82,11 +78,9 @@ describe('AuthentificationSqlRepository', () => {
 
       it("retourne undefined quand il n'existe pas", async () => {
         // When
-        const utilisateur =
-          await authentificationSqlRepository.getConseillerByStructure(
-            conseillerDtoMilo.idAuthentification,
-            Core.Structure.POLE_EMPLOI
-          )
+        const utilisateur = await authentificationSqlRepository.getConseiller(
+          'id-auth-inconnu'
+        )
 
         // Then
         expect(utilisateur).to.deep.equal(undefined)
@@ -105,11 +99,9 @@ describe('AuthentificationSqlRepository', () => {
         })
 
         // When
-        const utilisateur =
-          await authentificationSqlRepository.getConseillerByStructure(
-            conseillerDtoPE.idAuthentification,
-            conseillerDtoPE.structure
-          )
+        const utilisateur = await authentificationSqlRepository.getConseiller(
+          conseillerDtoPE.idAuthentification
+        )
 
         // Then
         expect(utilisateur).to.deep.equal(
@@ -134,11 +126,9 @@ describe('AuthentificationSqlRepository', () => {
         })
 
         // When
-        const utilisateur =
-          await authentificationSqlRepository.getConseillerByStructure(
-            conseillerDtoPE.idAuthentification,
-            structure
-          )
+        const utilisateur = await authentificationSqlRepository.getConseiller(
+          conseillerDtoPE.idAuthentification
+        )
 
         // Then
         expect(utilisateur).to.deep.equal(
@@ -361,11 +351,9 @@ describe('AuthentificationSqlRepository', () => {
       await authentificationSqlRepository.update(unConseillerMisAJour)
 
       // Then
-      const utilisateur =
-        await authentificationSqlRepository.getConseillerByStructure(
-          'nouvelIdAuthentification',
-          Core.Structure.MILO
-        )
+      const utilisateur = await authentificationSqlRepository.getConseiller(
+        'nouvelIdAuthentification'
+      )
 
       const expectedConseillerUtilisateur = {
         ...unConseillerMisAJour,
@@ -385,11 +373,9 @@ describe('AuthentificationSqlRepository', () => {
         )
 
         // Then
-        const utilisateur =
-          await authentificationSqlRepository.getConseillerByStructure(
-            'id-authentification-conseiller',
-            Core.Structure.MILO
-          )
+        const utilisateur = await authentificationSqlRepository.getConseiller(
+          'id-authentification-conseiller'
+        )
 
         expect(utilisateur).to.deep.equal(
           unUtilisateurConseiller({
@@ -417,11 +403,9 @@ describe('AuthentificationSqlRepository', () => {
         })
 
         // Then
-        const utilisateur =
-          await authentificationSqlRepository.getConseillerByStructure(
-            'id-authentification-conseiller',
-            Core.Structure.MILO
-          )
+        const utilisateur = await authentificationSqlRepository.getConseiller(
+          'id-authentification-conseiller'
+        )
 
         const conseiller = utilisateur
           ? await ConseillerSqlModel.findOne({ where: { id: utilisateur.id } })

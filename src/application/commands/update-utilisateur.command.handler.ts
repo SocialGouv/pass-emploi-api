@@ -18,13 +18,13 @@ import {
   AuthentificationRepositoryToken
 } from '../../domain/authentification'
 import { Core, estMilo } from '../../domain/core'
+import { MailServiceToken } from '../../domain/mail'
+import { MailBrevoService } from '../../infrastructure/clients/mail-brevo.service.db'
 import { DateService } from '../../utils/date-service'
 import {
   UtilisateurQueryModel,
   queryModelFromUtilisateur
 } from '../queries/query-models/authentification.query-model'
-import { MailBrevoService } from '../../infrastructure/clients/mail-brevo.service.db'
-import { MailServiceToken } from '../../domain/mail'
 
 export interface UpdateUtilisateurCommand extends Command {
   idUtilisateurAuth: string
@@ -226,11 +226,13 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     commandSanitized: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
     const utilisateurTrouve =
-      await this.authentificationRepository.getConseillerByStructure(
-        commandSanitized.idUtilisateurAuth,
-        commandSanitized.structure
+      await this.authentificationRepository.getConseiller(
+        commandSanitized.idUtilisateurAuth
       )
-    if (!utilisateurTrouve) {
+    if (
+      !utilisateurTrouve ||
+      utilisateurTrouve.structure !== commandSanitized.structure
+    ) {
       return failure(new NonTrouveError(commandSanitized.idUtilisateurAuth))
     } else {
       const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
@@ -316,19 +318,27 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     commandSanitized: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
     const utilisateurTrouve =
-      await this.authentificationRepository.getConseillerByStructure(
-        commandSanitized.idUtilisateurAuth,
-        commandSanitized.structure
+      await this.authentificationRepository.getConseiller(
+        commandSanitized.idUtilisateurAuth
       )
     if (!utilisateurTrouve) {
       return this.creerNouveauConseiller(commandSanitized)
-    } else {
-      const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
-        utilisateurTrouve,
-        commandSanitized
-      )
-      return success(queryModelFromUtilisateur(utilisateurMisAJour))
     }
+    if (utilisateurTrouve.structure !== commandSanitized.structure) {
+      return failure(
+        new NonTraitableError(
+          'Utilisateur',
+          commandSanitized.idUtilisateurAuth,
+          NonTraitableError.CODE_UTILISATEUR_CONSEILLER_MAUVAISE_STRUCTURE
+        )
+      )
+    }
+
+    const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
+      utilisateurTrouve,
+      commandSanitized
+    )
+    return success(queryModelFromUtilisateur(utilisateurMisAJour))
   }
 }
 

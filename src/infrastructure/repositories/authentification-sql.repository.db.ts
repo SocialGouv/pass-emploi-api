@@ -21,14 +21,12 @@ export class AuthentificationSqlRepository
     this.logger = new Logger('AuthentificationSqlRepository')
   }
 
-  async getConseillerByStructure(
-    idUtilisateurAuth: string,
-    structure: Core.Structure
+  async getConseiller(
+    idUtilisateurAuth: string
   ): Promise<Authentification.Utilisateur | undefined> {
     const conseillerSqlModel = await ConseillerSqlModel.findOne({
       where: {
-        idAuthentification: idUtilisateurAuth,
-        structure: structure
+        idAuthentification: idUtilisateurAuth
       }
     })
 

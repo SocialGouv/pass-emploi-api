@@ -50,11 +50,12 @@ export class GetUtilisateurQueryHandler extends QueryHandler<
         break
       }
       case Authentification.Type.CONSEILLER: {
-        utilisateur =
-          await this.authentificationRepository.getConseillerByStructure(
-            query.idAuthentification,
-            query.structureUtilisateur
-          )
+        utilisateur = await this.authentificationRepository.getConseiller(
+          query.idAuthentification
+        )
+        if (utilisateur?.structure !== query.structureUtilisateur) {
+          utilisateur = undefined
+        }
         break
       }
     }

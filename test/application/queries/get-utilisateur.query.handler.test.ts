@@ -58,10 +58,10 @@ describe('GetUtilisateurQueryHandler', () => {
       const query: GetUtilisateurQuery = {
         idAuthentification: 'test-sub',
         typeUtilisateur: Authentification.Type.CONSEILLER,
-        structureUtilisateur: Core.Structure.POLE_EMPLOI
+        structureUtilisateur: Core.Structure.MILO
       }
-      authentificationRepository.getConseillerByStructure
-        .withArgs(query.idAuthentification, query.structureUtilisateur)
+      authentificationRepository.getConseiller
+        .withArgs(query.idAuthentification)
         .returns(unUtilisateurConseiller())
 
       // When
@@ -70,6 +70,25 @@ describe('GetUtilisateurQueryHandler', () => {
       // Then
       expect(result).to.deep.equal(
         success(queryModelFromUtilisateur(unUtilisateurConseiller()))
+      )
+    })
+    it('retourne undefined quand conseiller avec mauvaise structure', async () => {
+      // Given
+      const query: GetUtilisateurQuery = {
+        idAuthentification: 'test-sub',
+        typeUtilisateur: Authentification.Type.CONSEILLER,
+        structureUtilisateur: Core.Structure.POLE_EMPLOI
+      }
+      authentificationRepository.getConseiller
+        .withArgs(query.idAuthentification)
+        .returns(unUtilisateurConseiller())
+
+      // When
+      const result = await getUtilisateurQueryHandler.handle(query)
+
+      // Then
+      expect(result).to.deep.equal(
+        failure(new NonTrouveError('Utilisateur', query.idAuthentification))
       )
     })
     it('retourne non trouvé', async () => {

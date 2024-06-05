@@ -75,9 +75,11 @@ describe('UpdateUtilisateurCommandHandler', () => {
               structure: Core.Structure.PASS_EMPLOI
             }
 
-            const utilisateur = unUtilisateurConseiller()
-            authentificationRepository.getConseillerByStructure
-              .withArgs(command.idUtilisateurAuth, command.structure)
+            const utilisateur = unUtilisateurConseiller({
+              structure: Core.Structure.PASS_EMPLOI
+            })
+            authentificationRepository.getConseiller
+              .withArgs(command.idUtilisateurAuth)
               .resolves(utilisateur)
 
             // When
@@ -87,7 +89,11 @@ describe('UpdateUtilisateurCommandHandler', () => {
             // Then
             expect(isSuccess(result)).equal(true)
             if (isSuccess(result)) {
-              expect(result.data).to.deep.equal(unUtilisateurQueryModel())
+              expect(result.data).to.deep.equal(
+                unUtilisateurQueryModel({
+                  structure: Core.Structure.PASS_EMPLOI
+                })
+              )
             }
           })
         })
@@ -104,10 +110,11 @@ describe('UpdateUtilisateurCommandHandler', () => {
             }
 
             const utilisateur = unUtilisateurConseiller({
-              idAuthentification: command.idUtilisateurAuth
+              idAuthentification: command.idUtilisateurAuth,
+              structure: Core.Structure.PASS_EMPLOI
             })
-            authentificationRepository.getConseillerByStructure
-              .withArgs(command.idUtilisateurAuth, command.structure)
+            authentificationRepository.getConseiller
+              .withArgs(command.idUtilisateurAuth)
               .resolves(utilisateur)
 
             // When
@@ -138,8 +145,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
               structure: Core.Structure.PASS_EMPLOI
             }
 
-            authentificationRepository.getConseillerByStructure
-              .withArgs(command.idUtilisateurAuth, command.structure)
+            authentificationRepository.getConseiller
+              .withArgs(command.idUtilisateurAuth)
               .resolves(undefined)
 
             // When
@@ -166,8 +173,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
             }
 
             const utilisateur = unUtilisateurConseiller()
-            authentificationRepository.getConseillerByStructure
-              .withArgs(command.idUtilisateurAuth, command.structure)
+            authentificationRepository.getConseiller
+              .withArgs(command.idUtilisateurAuth)
               .resolves(utilisateur)
 
             // When
@@ -184,7 +191,41 @@ describe('UpdateUtilisateurCommandHandler', () => {
               expect(result.data).to.deep.equal(unUtilisateurQueryModel())
             }
           })
+          describe('conseiller connu avec mauvaise structure', async () => {
+            it('retourne failure', async () => {
+              // Given
+              const command: UpdateUtilisateurCommand = {
+                idUtilisateurAuth: 'nilstavernier',
+                type: Authentification.Type.CONSEILLER,
+                structure: Core.Structure.POLE_EMPLOI
+              }
+
+              const utilisateur = unUtilisateurConseiller({
+                structure: Core.Structure.POLE_EMPLOI_BRSA
+              })
+              authentificationRepository.getConseiller
+                .withArgs(command.idUtilisateurAuth)
+                .resolves(utilisateur)
+
+              // When
+              const result = await updateUtilisateurCommandHandler.execute(
+                command
+              )
+
+              // Then
+              expect(result).to.deep.equal(
+                failure(
+                  new NonTraitableError(
+                    'Utilisateur',
+                    command.idUtilisateurAuth,
+                    NonTraitableError.CODE_UTILISATEUR_CONSEILLER_MAUVAISE_STRUCTURE
+                  )
+                )
+              )
+            })
+          })
         })
+
         describe('conseiller connu avec nouvel email, nom et prenom', async () => {
           it('met à jour ses infos et retourne le conseiller sans envoi email quand date trop passée', async () => {
             // Given
@@ -205,8 +246,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
               email: undefined,
               datePremiereConnexion: ilYa5Semaines
             })
-            authentificationRepository.getConseillerByStructure
-              .withArgs(command.idUtilisateurAuth, command.structure)
+            authentificationRepository.getConseiller
+              .withArgs(command.idUtilisateurAuth)
               .resolves(utilisateur)
 
             // When
@@ -253,8 +294,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
               email: 'old',
               datePremiereConnexion: ilYa1Semaine
             })
-            authentificationRepository.getConseillerByStructure
-              .withArgs(command.idUtilisateurAuth, command.structure)
+            authentificationRepository.getConseiller
+              .withArgs(command.idUtilisateurAuth)
               .resolves(utilisateur)
 
             // When
@@ -301,8 +342,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
               email: undefined,
               datePremiereConnexion: ilYaUneSemaine
             })
-            authentificationRepository.getConseillerByStructure
-              .withArgs(command.idUtilisateurAuth, command.structure)
+            authentificationRepository.getConseiller
+              .withArgs(command.idUtilisateurAuth)
               .resolves(utilisateur)
 
             // When
@@ -354,8 +395,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
 
             beforeEach(() => {
               // Given
-              authentificationRepository.getConseillerByStructure
-                .withArgs(command.idUtilisateurAuth, command.structure)
+              authentificationRepository.getConseiller
+                .withArgs(command.idUtilisateurAuth)
                 .resolves(undefined)
               authentificationRepository.estConseillerSuperviseur.resolves({
                 dansSaStructure: true,
@@ -432,8 +473,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
                 structure: Core.Structure.MILO
               }
 
-              authentificationRepository.getConseillerByStructure
-                .withArgs(command.idUtilisateurAuth, command.structure)
+              authentificationRepository.getConseiller
+                .withArgs(command.idUtilisateurAuth)
                 .resolves(undefined)
               authentificationRepository.estConseillerSuperviseur.resolves({
                 dansSaStructure: true,
@@ -479,8 +520,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
                 email: 'Un-Email@valide.fr'
               }
 
-              authentificationRepository.getConseillerByStructure
-                .withArgs(command.idUtilisateurAuth, command.structure)
+              authentificationRepository.getConseiller
+                .withArgs(command.idUtilisateurAuth)
                 .resolves(undefined)
 
               // When
