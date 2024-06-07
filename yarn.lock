@@ -9203,7 +9203,7 @@ __metadata:
     sinon-chai: "npm:^3.7.0"
     source-map-support: "npm:^0.5.21"
     supertest: "npm:^7.0.0"
-    swagger-ui-express: "npm:5.0.0"
+    swagger-ui-express: "npm:5.0.1"
     tokenbucket: "npm:0.3.2"
     ts-loader: "npm:^9.5.1"
     ts-node: "npm:^10.9.2"
@@ -11845,14 +11845,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"swagger-ui-express@npm:5.0.0":
-  version: 5.0.0
-  resolution: "swagger-ui-express@npm:5.0.0"
+"swagger-ui-express@npm:5.0.1":
+  version: 5.0.1
+  resolution: "swagger-ui-express@npm:5.0.1"
   dependencies:
     swagger-ui-dist: "npm:>=5.0.0"
   peerDependencies:
     express: ">=4.0.0 || >=5.0.0-beta"
-  checksum: 10/e970d99cb33b8db235feb23d24b79d680cfbb8f9e920863990df5549ae56a35b12dfa761bbdde22cd8cbec2823b7d1078710b4a1970c9441b541917b56d197cc
+  checksum: 10/13d95e6683214717f98dd53063bf398751ea798e971c43ece949b67a45102cc48995da319547002b2acc262d39f1994bd4af39828d99e95658966d6b332b585e
   languageName: node
   linkType: hard
 
