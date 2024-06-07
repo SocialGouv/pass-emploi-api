@@ -21,6 +21,7 @@ describe('RechercheMessageQueryHandler', () => {
       id: '0',
       iv: 'iv-0',
       content: 'Nous allons cueillir des champignons',
+      idConversation: 'id-conversation',
       rawMessage: {
         message: 'Nous allons cueillir des champignons',
         iv: 'iv-message-0',
@@ -32,6 +33,7 @@ describe('RechercheMessageQueryHandler', () => {
       id: '1',
       iv: 'iv-1',
       content: 'Je vous donne rendez-vous ce mardi à 18h.',
+      idConversation: 'id-conversation',
       rawMessage: {
         message: 'Je vous donne rendez-vous ce mardi à 18h.',
         iv: 'iv-message-1',
@@ -43,6 +45,7 @@ describe('RechercheMessageQueryHandler', () => {
       id: '2',
       iv: 'iv-2',
       content: 'Matez cette PJ de ouf.',
+      idConversation: 'id-conversation',
       piecesJointes: [{ nom: 'tchoupi-fait-du-velo.jpg' }],
       rawMessage: {
         message: 'Matez cette PJ de ouf.',
@@ -59,6 +62,7 @@ describe('RechercheMessageQueryHandler', () => {
       id: '3',
       iv: 'iv-3',
       content: 'Matez cette PJ de ouf.',
+      idConversation: 'id-conversation',
       piecesJointes: [{ nom: 'rendez-vous-du-vendredi.jpg' }],
       rawMessage: {
         message: 'Matez cette PJ de ouf.',
@@ -124,6 +128,7 @@ describe('RechercheMessageQueryHandler', () => {
           resultats: [
             {
               id: '3',
+              idConversation: 'id-conversation',
               matches: [[0, 21]],
               message: {
                 idConseiller: 'id-conseiller',
@@ -138,6 +143,7 @@ describe('RechercheMessageQueryHandler', () => {
             },
             {
               id: '1',
+              idConversation: 'id-conversation',
               matches: [[14, 24]],
               message: {
                 idConseiller: 'id-conseiller',

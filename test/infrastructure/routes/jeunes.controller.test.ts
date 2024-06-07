@@ -770,6 +770,7 @@ describe('JeunesController', () => {
         resultats: [
           {
             id: 'id-message',
+            idConversation: 'id-conversation',
             message: {
               message: 'Nous avions rendez-vous à 16h',
               id: 'id-message',

@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { FuseResult } from 'fuse.js'
 import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
 import {
@@ -11,7 +12,6 @@ import { Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Chat, ChatRepositoryToken, MessageRecherche } from 'src/domain/chat'
 import { Evenement, EvenementService } from 'src/domain/evenement'
-import { ConfigService } from '@nestjs/config'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Fuse = require('fuse.js')
@@ -83,10 +83,12 @@ export class RechercherMessageQueryHandler extends QueryHandler<
 
     return results.map(fuseResult => {
       const matches = fuseResult.matches!.map(m => m.indices[0])
+      const { idConversation, id, rawMessage } = fuseResult.item
 
       return {
-        id: fuseResult.item.id,
-        message: fuseResult.item.rawMessage,
+        id: id,
+        idConversation: idConversation,
+        message: rawMessage,
         matches
       }
     })

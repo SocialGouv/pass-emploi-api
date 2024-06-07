@@ -447,6 +447,7 @@ export class FirebaseClient implements IFirebaseClient {
       id: docSnapshot.id,
       content: firebaseMessage.content,
       iv: firebaseMessage.iv,
+      idConversation: docSnapshot.ref.parent.parent!.id,
       rawMessage: firebaseMessage
     }
 

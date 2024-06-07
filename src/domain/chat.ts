@@ -26,8 +26,9 @@ export interface MessageRecherche {
   content: string
   id: string
   iv: string
-  piecesJointes?: Array<{ nom: string }>
+  idConversation: string
   rawMessage: object
+  piecesJointes?: Array<{ nom: string }>
 }
 
 export interface MessageGroupe extends MessageIndividuel {

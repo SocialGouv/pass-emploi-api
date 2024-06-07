@@ -5,6 +5,9 @@ export class MessageIndividuelQueryModel {
   id: string
 
   @ApiProperty()
+  idConversation: string
+
+  @ApiProperty()
   message: object
 
   @ApiProperty()
