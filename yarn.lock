@@ -5759,12 +5759,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-chai-friendly@npm:^0.7.4":
-  version: 0.7.4
-  resolution: "eslint-plugin-chai-friendly@npm:0.7.4"
+"eslint-plugin-chai-friendly@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "eslint-plugin-chai-friendly@npm:1.0.0"
   peerDependencies:
     eslint: ">=3.0.0"
-  checksum: 10/c7022be5f864dfc8a1a18494f0de357f245a37cf3f5ca0fec95b14bc3fb249e5ccfa01c3ab66a2203163b61272df495fa6b71b496467a49c131a35d1f8a0f9df
+  checksum: 10/3aaaa31b5d9e6865c27b33243ac6ed1575cef55aa37812e5708eddeaafacb63d6fe6fb22930fa35508361bc62000cfb39be3bc480bc17210117b405d9015ab6b
   languageName: node
   linkType: hard
 
@@ -9167,7 +9167,7 @@ __metadata:
     elastic-apm-node: "npm:3.51.0"
     eslint: "npm:^8.57.0"
     eslint-config-prettier: "npm:^9.1.0"
-    eslint-plugin-chai-friendly: "npm:^0.7.4"
+    eslint-plugin-chai-friendly: "npm:^1.0.0"
     eslint-plugin-mocha: "npm:^10.4.3"
     eslint-plugin-prettier: "npm:^4.2.1"
     firebase-admin: "npm:12.1.1"
