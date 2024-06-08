@@ -27,35 +27,39 @@ export function useSwagger(
     in: 'header',
     name: 'X-API-KEY'
   }
-  const swaggerConfig = new DocumentBuilder()
+  const swaggerConfigBuilder = new DocumentBuilder()
     .setTitle('Pass Emploi Api')
     .setVersion('1.0')
-    .addOAuth2(
-      createSecurityScheme(issuerUrl, IDPName.PE_BRSA_CONSEILLER),
-      IDPName.PE_BRSA_CONSEILLER
-    )
-    .addOAuth2(
-      createSecurityScheme(issuerUrl, IDPName.PE_BRSA_JEUNE),
-      IDPName.PE_BRSA_JEUNE
-    )
-    .addOAuth2(
-      createSecurityScheme(issuerUrl, IDPName.PE_CONSEILLER),
-      IDPName.PE_CONSEILLER
-    )
-    .addOAuth2(
-      createSecurityScheme(issuerUrl, IDPName.PE_JEUNE),
-      IDPName.PE_JEUNE
-    )
-    .addOAuth2(
-      createSecurityScheme(issuerUrl, IDPName.SIMILO_CONSEILLER),
-      IDPName.SIMILO_CONSEILLER
-    )
-    .addOAuth2(
-      createSecurityScheme(issuerUrl, IDPName.SIMILO_JEUNE),
-      IDPName.SIMILO_JEUNE
-    )
     .addSecurity('api_key', apiKeySecuritySchemeObject)
-    .build()
+
+  if (appConfig.get('environment') !== 'prod') {
+    swaggerConfigBuilder
+      .addOAuth2(
+        createSecurityScheme(issuerUrl, IDPName.PE_BRSA_CONSEILLER),
+        IDPName.PE_BRSA_CONSEILLER
+      )
+      .addOAuth2(
+        createSecurityScheme(issuerUrl, IDPName.PE_BRSA_JEUNE),
+        IDPName.PE_BRSA_JEUNE
+      )
+      .addOAuth2(
+        createSecurityScheme(issuerUrl, IDPName.PE_CONSEILLER),
+        IDPName.PE_CONSEILLER
+      )
+      .addOAuth2(
+        createSecurityScheme(issuerUrl, IDPName.PE_JEUNE),
+        IDPName.PE_JEUNE
+      )
+      .addOAuth2(
+        createSecurityScheme(issuerUrl, IDPName.SIMILO_CONSEILLER),
+        IDPName.SIMILO_CONSEILLER
+      )
+      .addOAuth2(
+        createSecurityScheme(issuerUrl, IDPName.SIMILO_JEUNE),
+        IDPName.SIMILO_JEUNE
+      )
+  }
+  const swaggerConfig = swaggerConfigBuilder.build()
   const document = SwaggerModule.createDocument(app, swaggerConfig)
 
   const customOptions: SwaggerCustomOptions = {
