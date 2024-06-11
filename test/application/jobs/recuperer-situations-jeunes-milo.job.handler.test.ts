@@ -169,7 +169,7 @@ describe('RecupererSituationsJeunesMiloJobHandler', () => {
       )
     })
 
-    it('marque un jeune à archiver', async () => {
+    it('marque un jeune 404 à archiver', async () => {
       // Given
       miloRepository.getJeunesMiloAvecIdDossier
         .withArgs(0, 100)
@@ -179,6 +179,32 @@ describe('RecupererSituationsJeunesMiloJobHandler', () => {
       miloRepository.getDossier
         .withArgs(jeune1.idPartenaire)
         .resolves(failure(new ErreurHttp('Erreur', 404)))
+
+      // When
+      const result = await recupererSituationsJeunesMiloJobHandler.handle()
+
+      // Then
+      expect(result.succes).to.equal(true)
+      expect(
+        miloRepository.marquerAARchiver
+      ).to.have.been.calledOnceWithExactly(jeune1.id, true)
+      expect(miloRepository.save).not.to.have.been.called()
+    })
+
+    it('marque un jeune 403 à archiver', async () => {
+      // Given
+      miloRepository.getJeunesMiloAvecIdDossier
+        .withArgs(0, 100)
+        .resolves([jeune1])
+      miloRepository.getJeunesMiloAvecIdDossier.withArgs(100, 100).resolves([])
+
+      miloRepository.getDossier
+        .withArgs(jeune1.idPartenaire)
+        .resolves(
+          failure(
+            new ErreurHttp("Le dossier correspondant n'est pas justifié", 403)
+          )
+        )
 
       // When
       const result = await recupererSituationsJeunesMiloJobHandler.handle()

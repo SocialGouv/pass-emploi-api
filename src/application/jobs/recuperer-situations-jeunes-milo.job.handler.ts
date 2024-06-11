@@ -63,7 +63,11 @@ export class RecupererSituationsJeunesMiloJobHandler extends JobHandler<Job> {
           )
 
           if (isFailure(dossier)) {
-            if ((dossier.error as ErreurHttp).statusCode === 404) {
+            const { statusCode, message } = dossier.error as ErreurHttp
+            if (
+              statusCode === 404 ||
+              (statusCode === 403 && /pas justifié/.test(message))
+            ) {
               await this.miloRepository.marquerAARchiver(jeune.id, true)
             }
 
