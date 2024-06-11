@@ -23,7 +23,19 @@ export namespace Authentification {
   export enum Partenaire {
     KEYCLOAK = 'KEYCLOAK',
     IMMERSION = 'IMMERSION',
-    POLE_EMPLOI = 'POLE_EMPLOI'
+    POLE_EMPLOI = 'POLE_EMPLOI',
+    SUPPORT = 'SUPPORT'
+  }
+
+  export function unUtilisateurSupport(): Utilisateur {
+    return {
+      id: 'SUPPORT',
+      prenom: 'support',
+      nom: 'cej',
+      structure: Core.Structure.PASS_EMPLOI,
+      type: Authentification.Type.SUPPORT,
+      roles: []
+    }
   }
 
   export interface Utilisateur {

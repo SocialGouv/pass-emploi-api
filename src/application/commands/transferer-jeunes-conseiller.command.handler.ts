@@ -12,12 +12,12 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
+import { estPoleEmploiBRSA } from '../../domain/core'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import {
   Conseiller,
   ConseillerRepositoryToken
 } from '../../domain/milo/conseiller'
-import { estPoleEmploiBRSA } from '../../domain/core'
-import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { SupportAuthorizer } from '../authorizers/support-authorizer'
@@ -27,10 +27,9 @@ export interface TransfererJeunesConseillerCommand extends Command {
   idConseillerCible: string
   idsJeunes: string[]
   estTemporaire: boolean
-  provenanceUtilisateur: Extract<
-    Authentification.Type,
-    Authentification.Type.SUPPORT | Authentification.Type.CONSEILLER
-  >
+  provenanceUtilisateur:
+    | Authentification.Type.CONSEILLER
+    | Authentification.Type.SUPPORT
 }
 
 @Injectable()

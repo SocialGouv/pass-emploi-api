@@ -1,31 +1,26 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
 import { ArchiverJeuneSupportCommandHandler } from '../../../src/application/commands/support/archiver-jeune-support.command.handler'
+import {
+  CreerSuperviseursCommand,
+  CreerSuperviseursCommandHandler
+} from '../../../src/application/commands/support/creer-superviseurs.command.handler'
+import { DeleteSuperviseursCommandHandler } from '../../../src/application/commands/support/delete-superviseurs.command.handler'
 import { UpdateAgenceConseillerCommandHandler } from '../../../src/application/commands/support/update-agence-conseiller.command.handler'
+import {
+  TransfererJeunesConseillerCommand,
+  TransfererJeunesConseillerCommandHandler
+} from '../../../src/application/commands/transferer-jeunes-conseiller.command.handler'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
   success
 } from '../../../src/building-blocks/types/result'
-import {
-  unHeaderAuthorization,
-  unUtilisateurDecode
-} from '../../fixtures/authentification.fixture'
-import { expect, StubbedClass } from '../../utils'
-import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 import { Authentification } from '../../../src/domain/authentification'
-import {
-  TransfererJeunesConseillerCommand,
-  TransfererJeunesConseillerCommandHandler
-} from '../../../src/application/commands/transferer-jeunes-conseiller.command.handler'
-import {
-  CreerSuperviseursCommandHandler,
-  CreerSuperviseursCommand
-} from '../../../src/application/commands/creer-superviseurs.command.handler'
-import { DeleteSuperviseursCommandHandler } from '../../../src/application/commands/delete-superviseurs.command.handler'
 import { Core } from '../../../src/domain/core'
+import { StubbedClass, expect } from '../../utils'
+import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
 describe('SupportController', () => {
   let archiverJeuneSupportCommandHandler: StubbedClass<ArchiverJeuneSupportCommandHandler>
@@ -58,13 +53,16 @@ describe('SupportController', () => {
         // When
         await request(app.getHttpServer())
           .post('/support/archiver-jeune/test')
-          .set('authorization', unHeaderAuthorization())
+          .set({ 'X-API-KEY': 'api-key-support' })
           // Then
           .expect(HttpStatus.NO_CONTENT)
 
         expect(
           archiverJeuneSupportCommandHandler.execute
-        ).to.have.been.calledWith({ idJeune })
+        ).to.have.been.calledOnceWithExactly(
+          { idJeune },
+          Authentification.unUtilisateurSupport()
+        )
       })
     })
     describe('quand la commande est en echec', () => {
@@ -78,20 +76,34 @@ describe('SupportController', () => {
         // When
         await request(app.getHttpServer())
           .post('/support/archiver-jeune/test')
-          .set('authorization', unHeaderAuthorization())
+          .set({ 'X-API-KEY': 'api-key-support' })
           // Then
           .expect(HttpStatus.NOT_FOUND)
 
         expect(
           archiverJeuneSupportCommandHandler.execute
-        ).to.have.been.calledWith({ idJeune })
+        ).to.have.been.calledOnceWithExactly(
+          { idJeune },
+          Authentification.unUtilisateurSupport()
+        )
       })
     })
+    describe('auth', () => {
+      it('fail avec mauvaise api key', async () => {
+        // Given
+        const idJeune = 'test'
+        archiverJeuneSupportCommandHandler.execute.resolves(
+          failure(new NonTrouveError('Jeune', idJeune))
+        )
 
-    ensureUserAuthenticationFailsIfInvalid(
-      'POST',
-      '/support/archiver-jeune/test'
-    )
+        // When
+        await request(app.getHttpServer())
+          .post('/support/archiver-jeune/test')
+          .set({ 'X-API-KEY': 'api-key-inconnue' })
+          // Then
+          .expect(HttpStatus.UNAUTHORIZED)
+      })
+    })
   })
 
   describe('POST /support/changer-agence-conseiller', () => {
@@ -111,7 +123,7 @@ describe('SupportController', () => {
         // When
         await request(app.getHttpServer())
           .post('/support/changer-agence-conseiller')
-          .set('authorization', unHeaderAuthorization())
+          .set({ 'X-API-KEY': 'api-key-support' })
           .send({ idConseiller, idNouvelleAgence })
           // Then
           .expect(HttpStatus.CREATED)
@@ -120,7 +132,7 @@ describe('SupportController', () => {
           updateAgenceCommandHandler.execute
         ).to.have.been.calledOnceWithExactly(
           { idConseiller, idNouvelleAgence },
-          unUtilisateurDecode()
+          Authentification.unUtilisateurSupport()
         )
       })
     })
@@ -134,7 +146,7 @@ describe('SupportController', () => {
         // When
         await request(app.getHttpServer())
           .post('/support/changer-agence-conseiller')
-          .set('authorization', unHeaderAuthorization())
+          .set({ 'X-API-KEY': 'api-key-support' })
           .send({ idConseiller, idNouvelleAgence })
           // Then
           .expect(HttpStatus.NOT_FOUND)
@@ -143,15 +155,26 @@ describe('SupportController', () => {
           updateAgenceCommandHandler.execute
         ).to.have.been.calledOnceWithExactly(
           { idConseiller, idNouvelleAgence },
-          unUtilisateurDecode()
+          Authentification.unUtilisateurSupport()
         )
       })
     })
+    describe('auth', () => {
+      it('fail sans api key', async () => {
+        // Given
+        updateAgenceCommandHandler.execute.resolves(
+          failure(new NonTrouveError('Agence', 'b'))
+        )
 
-    ensureUserAuthenticationFailsIfInvalid(
-      'POST',
-      '/support/changer-agence-conseiller'
-    )
+        // When
+        await request(app.getHttpServer())
+          .post('/support/changer-agence-conseiller')
+          .set({ 'X-API-KEY': 'api-key' })
+          .send({ idConseiller, idNouvelleAgence })
+          // Then
+          .expect(HttpStatus.UNAUTHORIZED)
+      })
+    })
   })
 
   describe('POST /support/transferer-jeunes', () => {
@@ -176,18 +199,19 @@ describe('SupportController', () => {
         // When
         await request(app.getHttpServer())
           .post('/support/transferer-jeunes')
-          .set('authorization', unHeaderAuthorization())
+          .set({ 'X-API-KEY': 'api-key-support' })
           .send(payload)
           // Then
           .expect(HttpStatus.NO_CONTENT)
 
         expect(
           transfererJeunesConseillerCommandHandler.execute
-        ).to.have.been.calledOnceWithExactly(command, unUtilisateurDecode())
+        ).to.have.been.calledOnceWithExactly(
+          command,
+          Authentification.unUtilisateurSupport()
+        )
       })
     })
-
-    ensureUserAuthenticationFailsIfInvalid('POST', '/support/transferer-jeunes')
   })
 
   describe('POST /support/superviseurs', () => {
@@ -201,14 +225,14 @@ describe('SupportController', () => {
         }
 
         creerSuperviseursCommandHandler.execute
-          .withArgs(command, unUtilisateurDecode())
+          .withArgs(command)
           .resolves(emptySuccess())
 
         // When - Then
         await request(app.getHttpServer())
           .post('/support/superviseurs')
           .send(command)
-          .set('authorization', unHeaderAuthorization())
+          .set({ 'X-API-KEY': 'api-key-support' })
           .expect(HttpStatus.CREATED)
       })
     })
@@ -223,7 +247,7 @@ describe('SupportController', () => {
         await request(app.getHttpServer())
           .post('/support/superviseurs')
           .send(payload)
-          .set('authorization', unHeaderAuthorization())
+          .set({ 'X-API-KEY': 'api-key-support' })
           .expect(HttpStatus.BAD_REQUEST)
       })
       it('renvoie 400 quand le superviseur est incomplet', async () => {
@@ -236,12 +260,10 @@ describe('SupportController', () => {
         await request(app.getHttpServer())
           .post('/support/superviseurs')
           .send(payload)
-          .set('authorization', unHeaderAuthorization())
+          .set({ 'X-API-KEY': 'api-key-support' })
           .expect(HttpStatus.BAD_REQUEST)
       })
     })
-
-    ensureUserAuthenticationFailsIfInvalid('get', '/conseillers/superviseurs')
   })
 
   describe('DELETE /support/superviseurs', () => {
@@ -255,14 +277,14 @@ describe('SupportController', () => {
         }
 
         deleteSuperviseursCommandHandler.execute
-          .withArgs(command, unUtilisateurDecode())
+          .withArgs(command)
           .resolves(emptySuccess())
 
         // When - Then
         await request(app.getHttpServer())
           .delete('/support/superviseurs')
           .send(command)
-          .set('authorization', unHeaderAuthorization())
+          .set({ 'X-API-KEY': 'api-key-support' })
           .expect(HttpStatus.NO_CONTENT)
       })
     })
@@ -277,7 +299,7 @@ describe('SupportController', () => {
         await request(app.getHttpServer())
           .delete('/support/superviseurs')
           .send(payload)
-          .set('authorization', unHeaderAuthorization())
+          .set({ 'X-API-KEY': 'api-key-support' })
           .expect(HttpStatus.BAD_REQUEST)
       })
       it('renvoie 400 quand le superviseur est incomplet', async () => {
@@ -290,11 +312,9 @@ describe('SupportController', () => {
         await request(app.getHttpServer())
           .delete('/support/superviseurs')
           .send(payload)
-          .set('authorization', unHeaderAuthorization())
+          .set({ 'X-API-KEY': 'api-key-support' })
           .expect(HttpStatus.BAD_REQUEST)
       })
     })
-
-    ensureUserAuthenticationFailsIfInvalid('get', '/conseillers/superviseurs')
   })
 })

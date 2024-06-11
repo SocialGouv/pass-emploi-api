@@ -6,21 +6,28 @@ import {
   HttpStatus,
   Param,
   Post,
+  SetMetadata,
   UploadedFile,
+  UseGuards,
   UseInterceptors
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
-import { ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger'
-import { CreerSuperviseursCommandHandler } from '../../application/commands/creer-superviseurs.command.handler'
-import { DeleteSuperviseursCommandHandler } from '../../application/commands/delete-superviseurs.command.handler'
+import {
+  ApiConsumes,
+  ApiOperation,
+  ApiSecurity,
+  ApiTags
+} from '@nestjs/swagger'
+import { CreerSuperviseursCommandHandler } from '../../application/commands/support/creer-superviseurs.command.handler'
+import { DeleteSuperviseursCommandHandler } from '../../application/commands/support/delete-superviseurs.command.handler'
 import {
   MettreAJourLesJeunesCEJPoleEmploiCommand,
   MettreAJourLesJeunesCejPeCommandHandler
-} from '../../application/commands/mettre-a-jour-les-jeunes-cej-pe.command.handler'
+} from '../../application/commands/support/mettre-a-jour-les-jeunes-cej-pe.command.handler'
 import {
   RefreshJddCommand,
   RefreshJddCommandHandler
-} from '../../application/commands/refresh-jdd.command.handler'
+} from '../../application/commands/support//refresh-jdd.command.handler'
 import { ArchiverJeuneSupportCommandHandler } from '../../application/commands/support/archiver-jeune-support.command.handler'
 import {
   ChangementAgenceQueryModel,
@@ -28,7 +35,8 @@ import {
 } from '../../application/commands/support/update-agence-conseiller.command.handler'
 import { TransfererJeunesConseillerCommandHandler } from '../../application/commands/transferer-jeunes-conseiller.command.handler'
 import { Authentification } from '../../domain/authentification'
-import { Utilisateur } from '../decorators/authenticated.decorator'
+import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
+import { SkipOidcAuth } from '../decorators/skip-oidc-auth.decorator'
 import { handleResult } from './result.handler'
 import { SuperviseursPayload } from './validation/conseillers.inputs'
 import {
@@ -40,6 +48,9 @@ import {
 
 @Controller('support')
 @ApiTags('Support')
+@SkipOidcAuth()
+@UseGuards(ApiKeyAuthGuard)
+@ApiSecurity('api_key')
 export class SupportController {
   constructor(
     private refreshJddCommandHandler: RefreshJddCommandHandler,
@@ -51,42 +62,50 @@ export class SupportController {
     private readonly deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler
   ) {}
 
+  @SetMetadata(
+    Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
+    Authentification.Partenaire.SUPPORT
+  )
   @Post('jdd')
-  async refresh(
-    @Body() payload: RefreshJDDPayload,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  async refresh(@Body() payload: RefreshJDDPayload): Promise<void> {
     const command: RefreshJddCommand = {
       idConseiller: payload.idConseiller,
       menage: payload.menage
     }
     const result = await this.refreshJddCommandHandler.execute(
       command,
-      utilisateur
+      Authentification.unUtilisateurSupport()
     )
 
     return handleResult(result)
   }
 
+  @SetMetadata(
+    Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
+    Authentification.Partenaire.SUPPORT
+  )
   @Post('cej/pole-emploi')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('fichier'))
   async postFichierCEJ(
     @Body() _payload: TeleverserCsvPayload,
-    @UploadedFile() fichier: Express.Multer.File,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
+    @UploadedFile() fichier: Express.Multer.File
   ): Promise<void> {
     const command: MettreAJourLesJeunesCEJPoleEmploiCommand = {
       fichier: fichier
     }
     const result = await this.mettreAJourLesJeunesCejPeCommandHandler.execute(
       command,
-      utilisateur
+      Authentification.unUtilisateurSupport()
     )
 
     return handleResult(result)
   }
 
+  @SetMetadata(
+    Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
+    Authentification.Partenaire.SUPPORT
+  )
   @ApiOperation({
     summary:
       'Attribue une nouvelle agence au conseiller identifié par son ID (ID en base, et pas ID Authentification)',
@@ -94,8 +113,7 @@ export class SupportController {
   })
   @Post('changer-agence-conseiller')
   async changerAgenceConseiller(
-    @Body() payload: ChangerAgenceConseillerPayload,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
+    @Body() payload: ChangerAgenceConseillerPayload
   ): Promise<ChangementAgenceQueryModel> {
     const command: ChangerAgenceConseillerPayload = {
       idConseiller: payload.idConseiller,
@@ -103,12 +121,16 @@ export class SupportController {
     }
     const result = await this.updateAgenceCommandHandler.execute(
       command,
-      utilisateur
+      Authentification.unUtilisateurSupport()
     )
 
     return handleResult(result)
   }
 
+  @SetMetadata(
+    Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
+    Authentification.Partenaire.SUPPORT
+  )
   @ApiOperation({
     summary:
       'Archive le jeune identifié par son ID (ID en base, et pas ID Authentification)',
@@ -121,20 +143,21 @@ export class SupportController {
   })
   @Post('archiver-jeune/:idJeune')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async archiverJeune(
-    @Param('idJeune') idJeune: string,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  async archiverJeune(@Param('idJeune') idJeune: string): Promise<void> {
     const result = await this.archiverJeuneSupportCommandHandler.execute(
       {
         idJeune
       },
-      utilisateur
+      Authentification.unUtilisateurSupport()
     )
 
     return handleResult(result)
   }
 
+  @SetMetadata(
+    Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
+    Authentification.Partenaire.SUPPORT
+  )
   @ApiOperation({
     summary: 'Transférer les jeunes renseignés d’un conseiller à un autre',
     description: 'Autorisé pour le support'
@@ -142,8 +165,7 @@ export class SupportController {
   @Post('transferer-jeunes')
   @HttpCode(HttpStatus.NO_CONTENT)
   async transfererJeunesSupport(
-    @Body() payload: TransfererJeunesPayload,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
+    @Body() payload: TransfererJeunesPayload
   ): Promise<void> {
     const result = await this.transfererJeunesConseillerCommandHandler.execute(
       {
@@ -153,29 +175,36 @@ export class SupportController {
         estTemporaire: false,
         provenanceUtilisateur: Authentification.Type.SUPPORT
       },
-      utilisateur
+      Authentification.unUtilisateurSupport()
     )
 
     return handleResult(result)
   }
 
+  @SetMetadata(
+    Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
+    Authentification.Partenaire.SUPPORT
+  )
   @ApiOperation({
     summary: 'Ajoute des droits de supervision à des conseillers',
     description: 'Autorisé pour le support'
   })
   @Post('superviseurs')
   async postSuperviseurs(
-    @Body() superviseursPayload: SuperviseursPayload,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
+    @Body() superviseursPayload: SuperviseursPayload
   ): Promise<void> {
     const result = await this.creerSuperviseursCommandHandler.execute(
       { superviseurs: superviseursPayload.superviseurs },
-      utilisateur
+      Authentification.unUtilisateurSupport()
     )
 
     return handleResult(result)
   }
 
+  @SetMetadata(
+    Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
+    Authentification.Partenaire.SUPPORT
+  )
   @ApiOperation({
     summary: 'Supprime des droits de supervision à des conseillers',
     description: 'Autorisé pour le support'
@@ -183,12 +212,11 @@ export class SupportController {
   @Delete('superviseurs')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteSuperviseurs(
-    @Body() superviseursPayload: SuperviseursPayload,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
+    @Body() superviseursPayload: SuperviseursPayload
   ): Promise<void> {
     const result = await this.deleteSuperviseursCommandHandler.execute(
       { superviseurs: superviseursPayload.superviseurs },
-      utilisateur
+      Authentification.unUtilisateurSupport()
     )
 
     return handleResult(result)

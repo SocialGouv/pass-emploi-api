@@ -2,16 +2,16 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { SupportAuthorizer } from 'src/application/authorizers/support-authorizer'
 import {
-  CreerSuperviseursCommand,
-  CreerSuperviseursCommandHandler
-} from 'src/application/commands/creer-superviseurs.command.handler'
+  DeleteSuperviseursCommand,
+  DeleteSuperviseursCommandHandler
+} from 'src/application/commands/support/delete-superviseurs.command.handler'
 import { Superviseur } from 'src/domain/superviseur'
-import { emptySuccess } from '../../../src/building-blocks/types/result'
-import { Core } from '../../../src/domain/core'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { emptySuccess } from '../../../../src/building-blocks/types/result'
+import { Core } from '../../../../src/domain/core'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 
-describe('CreerSuperviseursCommandHandler', () => {
-  let creerSuperviseursCommandHandler: CreerSuperviseursCommandHandler
+describe('DeleteSuperviseursCommandHandler', () => {
+  let deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler
   let superviseurRepository: StubbedType<Superviseur.Repository>
   let supportAuthorizer: StubbedClass<SupportAuthorizer>
 
@@ -20,32 +20,32 @@ describe('CreerSuperviseursCommandHandler', () => {
     superviseurRepository = stubInterface(sandbox)
     supportAuthorizer = stubClass(SupportAuthorizer)
 
-    creerSuperviseursCommandHandler = new CreerSuperviseursCommandHandler(
+    deleteSuperviseursCommandHandler = new DeleteSuperviseursCommandHandler(
       superviseurRepository,
       supportAuthorizer
     )
   })
 
   describe('handle', () => {
-    describe('quand on veut enregistrer une liste de superviseurs', () => {
+    describe('quand on veut supprimer une liste de superviseurs', () => {
       it('retourne un succes', async () => {
         // Given
-        const command: CreerSuperviseursCommand = {
+        const command: DeleteSuperviseursCommand = {
           superviseurs: [
             { email: 'test', structure: Core.Structure.MILO },
             { email: 'test2', structure: Core.Structure.PASS_EMPLOI }
           ]
         }
 
-        superviseurRepository.saveSuperviseurs
+        superviseurRepository.deleteSuperviseurs
           .withArgs(command.superviseurs)
           .resolves(emptySuccess())
 
         // When
-        const result = await creerSuperviseursCommandHandler.handle(command)
+        const result = await deleteSuperviseursCommandHandler.handle(command)
 
         // Then
-        expect(superviseurRepository.saveSuperviseurs).to.have.callCount(1)
+        expect(superviseurRepository.deleteSuperviseurs).to.have.callCount(1)
         expect(result._isSuccess).to.equal(true)
       })
     })

@@ -1,20 +1,20 @@
-import { CommandHandler } from '../../building-blocks/types/command-handler'
-import {
-  emptySuccess,
-  failure,
-  Result
-} from '../../building-blocks/types/result'
-import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
-import { AgenceSqlModel } from '../../infrastructure/sequelize/models/agence.sql-model'
-import { Authentification } from '../../domain/authentification'
-import { ID_AGENCE_MILO_JDD } from '../queries/get-agences.query.handler.db'
 import { Inject, Injectable } from '@nestjs/common'
-import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
+import { CommandHandler } from '../../../building-blocks/types/command-handler'
+import {
+  Result,
+  emptySuccess,
+  failure
+} from '../../../building-blocks/types/result'
+import { Authentification } from '../../../domain/authentification'
 import {
   Planificateur,
   PlanificateurRepositoryToken
-} from '../../domain/planificateur'
-import { DateService } from '../../utils/date-service'
+} from '../../../domain/planificateur'
+import { DateService } from '../../../utils/date-service'
+import { ConseillerSqlModel } from '../../../infrastructure/sequelize/models/conseiller.sql-model'
+import { AgenceSqlModel } from '../../../infrastructure/sequelize/models/agence.sql-model'
+import { DroitsInsuffisants } from '../../../building-blocks/types/domain-error'
+import { ID_AGENCE_MILO_JDD } from '../../queries/get-agences.query.handler.db'
 
 export interface RefreshJddCommand {
   idConseiller: string

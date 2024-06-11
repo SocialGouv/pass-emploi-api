@@ -4,19 +4,21 @@ import {
   Param,
   ParseArrayPipe,
   ParseUUIDPipe,
-  Post
+  Post,
+  SetMetadata,
+  UseGuards
 } from '@nestjs/common'
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiBody, ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger'
 import { ValidateNested } from 'class-validator'
 import { DateTime } from 'luxon'
 import {
   CreateCampagneCommand,
   CreateCampagneCommandHandler
-} from '../../application/commands/campagne/create-campagne.command'
+} from '../../application/commands/campagne/create-campagne.command.handler'
 import {
   CreateEvaluationCommand,
   CreateEvaluationCommandHandler
-} from '../../application/commands/campagne/create-evaluation.command'
+} from '../../application/commands/campagne/create-evaluation.command.handler'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { Utilisateur } from '../decorators/authenticated.decorator'
@@ -26,6 +28,8 @@ import {
   CreateCampagnePayload,
   ReponseCampagnePayload
 } from './validation/campagnes.inputs'
+import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
+import { SkipOidcAuth } from '../decorators/skip-oidc-auth.decorator'
 
 @Controller()
 @CustomSwaggerApiOAuth2()
@@ -36,14 +40,20 @@ export class CampagnesController {
   ) {}
 
   @ApiTags('Support')
+  @SkipOidcAuth()
+  @UseGuards(ApiKeyAuthGuard)
+  @ApiSecurity('api_key')
+  @SetMetadata(
+    Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
+    Authentification.Partenaire.SUPPORT
+  )
   @ApiOperation({
     summary: "Création d'une nouvelle campagne",
     description: 'Autorisé pour le support'
   })
   @Post('campagnes')
   async creerCampagne(
-    @Body() createCampagnePayload: CreateCampagnePayload,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
+    @Body() createCampagnePayload: CreateCampagnePayload
   ): Promise<Core.Id> {
     const command: CreateCampagneCommand = {
       nom: createCampagnePayload.nom,
@@ -52,7 +62,7 @@ export class CampagnesController {
     }
     const result = await this.createCampagneCommandHandler.execute(
       command,
-      utilisateur
+      Authentification.unUtilisateurSupport()
     )
 
     return handleResult(result)

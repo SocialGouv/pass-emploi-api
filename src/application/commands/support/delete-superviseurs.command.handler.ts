@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Authentification } from '../../domain/authentification'
+import { Command } from '../../../building-blocks/types/command'
+import { CommandHandler } from '../../../building-blocks/types/command-handler'
+import { Result, emptySuccess } from '../../../building-blocks/types/result'
+import { Authentification } from '../../../domain/authentification'
 import {
   Superviseur,
   SuperviseursRepositoryToken
-} from '../../domain/superviseur'
-import { Command } from '../../building-blocks/types/command'
-import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { emptySuccess, Result } from '../../building-blocks/types/result'
-import { SupportAuthorizer } from '../authorizers/support-authorizer'
+} from '../../../domain/superviseur'
+import { SupportAuthorizer } from '../../authorizers/support-authorizer'
 
 export interface DeleteSuperviseursCommand extends Command {
   superviseurs: Superviseur[]
@@ -21,7 +21,7 @@ export class DeleteSuperviseursCommandHandler extends CommandHandler<
   constructor(
     @Inject(SuperviseursRepositoryToken)
     private readonly superviseurRepository: Superviseur.Repository,
-    private supportAuthorizer: SupportAuthorizer
+    private readonly supportAuthorizer: SupportAuthorizer
   ) {
     super('DeleteSuperviseursCommandHandler')
   }

@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import * as os from 'os'
-import { Command } from '../../building-blocks/types/command'
-import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { emptySuccess, Result } from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
-import { SuiviPeCejSqlModel } from '../../infrastructure/sequelize/models/suivi-pe-cej.sql-model'
-import { SupportAuthorizer } from '../authorizers/support-authorizer'
+import { Command } from '../../../building-blocks/types/command'
+import { CommandHandler } from '../../../building-blocks/types/command-handler'
+import { emptySuccess, Result } from '../../../building-blocks/types/result'
+import { Authentification } from '../../../domain/authentification'
+import { SuiviPeCejSqlModel } from '../../../infrastructure/sequelize/models/suivi-pe-cej.sql-model'
+import { SupportAuthorizer } from '../../authorizers/support-authorizer'
 
 export interface MettreAJourLesJeunesCEJPoleEmploiCommand extends Command {
   fichier: Express.Multer.File

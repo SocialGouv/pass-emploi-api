@@ -1,7 +1,7 @@
 import {
   CreateEvaluationCommand,
   CreateEvaluationCommandHandler
-} from '../../../../src/application/commands/campagne/create-evaluation.command'
+} from '../../../../src/application/commands/campagne/create-evaluation.command.handler'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import { Campagne } from '../../../../src/domain/campagne'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'

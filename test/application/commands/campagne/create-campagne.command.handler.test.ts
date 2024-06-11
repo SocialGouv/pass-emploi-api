@@ -1,24 +1,23 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { SupportAuthorizer } from 'src/application/authorizers/support-authorizer'
-import { Authentification } from 'src/domain/authentification'
+import { SupportAuthorizer } from '../../../../src/application/authorizers/support-authorizer'
 import {
   CreateCampagneCommand,
   CreateCampagneCommandHandler
-} from '../../../../src/application/commands/campagne/create-campagne.command'
+} from '../../../../src/application/commands/campagne/create-campagne.command.handler'
 import { CampagneExisteDejaError } from '../../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../../src/building-blocks/types/result'
 import { Campagne } from '../../../../src/domain/campagne'
-import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
+import { unUtilisateurSupport } from '../../../fixtures/authentification.fixture'
 import { uneCampagne } from '../../../fixtures/campagne.fixture'
 import { uneDatetime } from '../../../fixtures/date.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
+import { StubbedClass, createSandbox, expect, stubClass } from '../../../utils'
 
 describe('CreateCampagneCommandHandler', () => {
   let campagneRepository: StubbedType<Campagne.Repository>
   let campagneFactory: StubbedClass<Campagne.Factory>
-  let createCampagneCommandeHandler: CreateCampagneCommandHandler
   let supportAuthorizer: StubbedClass<SupportAuthorizer>
+  let createCampagneCommandeHandler: CreateCampagneCommandHandler
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
@@ -77,18 +76,17 @@ describe('CreateCampagneCommandHandler', () => {
       dateDebut: uneDatetime(),
       dateFin: uneDatetime().plus({ week: 2 })
     }
-    const utilisateur: Authentification.Utilisateur = unUtilisateurConseiller()
 
     it('autorise le support', async () => {
       // When
       await createCampagneCommandeHandler.authorize(
         command,
-        unUtilisateurConseiller()
+        unUtilisateurSupport()
       )
 
       // Then
       expect(supportAuthorizer.autoriserSupport).to.have.been.calledWithExactly(
-        utilisateur
+        unUtilisateurSupport()
       )
     })
   })

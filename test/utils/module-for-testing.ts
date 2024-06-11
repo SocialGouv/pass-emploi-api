@@ -180,6 +180,7 @@ export const testConfig = (): ConfigService => {
     apiKeys: {
       keycloak: ['api-key-keycloak'],
       immersion: ['api-key-immersion'],
+      support: ['api-key-support'],
       poleEmploi: ['api-key-consumer-pole-emploi']
     },
     features: {

@@ -5,7 +5,7 @@ import {
   MauvaiseCommandeError,
   NonTrouveError
 } from '../../../building-blocks/types/domain-error'
-import { failure, Result, success } from '../../../building-blocks/types/result'
+import { Result, failure, success } from '../../../building-blocks/types/result'
 import { Agence, AgenceRepositoryToken } from '../../../domain/agence'
 import { Authentification } from '../../../domain/authentification'
 import {
@@ -80,7 +80,7 @@ export class UpdateAgenceConseillerCommandHandler extends CommandHandler<
     @Inject(AnimationCollectiveRepositoryToken)
     private animationCollectiveRepository: AnimationCollective.Repository,
     private animationCollectiveService: AnimationCollective.Service,
-    private authorizeSupport: SupportAuthorizer
+    private supportAuthorizer: SupportAuthorizer
   ) {
     super('UpdateAgenceConseillerCommandHandler')
   }
@@ -89,7 +89,7 @@ export class UpdateAgenceConseillerCommandHandler extends CommandHandler<
     _command: UpdateAgenceConseillerCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.authorizeSupport.autoriserSupport(utilisateur)
+    return this.supportAuthorizer.autoriserSupport(utilisateur)
   }
   async monitor(): Promise<void> {
     return
