@@ -5,7 +5,7 @@ import { Core, estPoleEmploiBRSA } from '../../../src/domain/core'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { StubbedClass, expect, stubClass } from '../../utils'
 import { GetCatalogueDemarchesQueryHandler } from 'src/application/queries/get-catalogue-demarches.query.handler'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
 import { success } from 'src/building-blocks/types/result'
 
 describe('GetCatalogueQueryHandler', () => {

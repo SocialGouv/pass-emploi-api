@@ -18,7 +18,7 @@ import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from 'test/utils'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
 import { DateService } from 'src/utils/date-service'
 import { uneSessionMilo } from '../../../fixtures/sessions.fixture'
 import {

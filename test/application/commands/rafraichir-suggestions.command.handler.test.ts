@@ -2,7 +2,7 @@ import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-auth
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { Suggestion } from '../../../src/domain/offre/recherche/suggestion/suggestion'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client'
+import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client.db'
 import { createSandbox } from 'sinon'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import {

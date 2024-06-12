@@ -90,7 +90,7 @@ export namespace Authentification {
       utilisateur: Partial<Authentification.Utilisateur>
     ): Promise<void>
 
-    deleteUtilisateurIdp(idJeune: string): Promise<void>
+    deleteUtilisateurIdp(idUserCEJ: string): Promise<void>
 
     estConseillerSuperviseur(
       structure: Core.Structure,

@@ -10,7 +10,7 @@ import {
   MILO_PRESENT,
   SessionJeuneListeDto
 } from 'src/infrastructure/clients/dto/milo.dto'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'

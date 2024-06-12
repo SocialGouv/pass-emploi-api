@@ -8,7 +8,7 @@ import {
   mapCodeLabelTypeRendezVous,
   RendezVous
 } from '../../domain/rendez-vous/rendez-vous'
-import { InvitationIcsClient } from './invitation-ics.client'
+import { InvitationIcsClient } from './invitation-ics.client.db'
 import { Jeune } from '../../domain/jeune/jeune'
 import { ArchiveJeune } from '../../domain/archive-jeune'
 import { Authentification } from '../../domain/authentification'

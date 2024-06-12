@@ -1,7 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DateTime } from 'luxon'
 import { describe } from 'mocha'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
 import { DateService } from 'src/utils/date-service'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import {

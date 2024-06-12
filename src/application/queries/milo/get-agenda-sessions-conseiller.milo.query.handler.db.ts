@@ -14,7 +14,7 @@ import {
   MILO_PRESENT,
   SessionConseillerDetailDto
 } from '../../../infrastructure/clients/dto/milo.dto'
-import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client'
+import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client.db'
 import { MiloClient } from '../../../infrastructure/clients/milo-client'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'

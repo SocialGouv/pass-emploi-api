@@ -14,7 +14,7 @@ import {
   SessionMilo,
   SessionMiloRepositoryToken
 } from 'src/domain/milo/session.milo'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
 import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import { Notification } from '../../../domain/notification/notification'
 import { DateService } from '../../../utils/date-service'

@@ -29,7 +29,7 @@ import { Jeune } from '../../../../../src/domain/jeune/jeune'
 import { DateService } from '../../../../../src/utils/date-service'
 import { IdService } from '../../../../../src/utils/id-service'
 import { PoleEmploiPartenaireClient } from '../../../../../src/infrastructure/clients/pole-emploi-partenaire-client.db'
-import { KeycloakClient } from '../../../../../src/infrastructure/clients/keycloak-client'
+import { KeycloakClient } from '../../../../../src/infrastructure/clients/keycloak-client.db'
 import { SinonSandbox } from 'sinon'
 import {
   GetRendezVousJeunePoleEmploiQueryGetter,

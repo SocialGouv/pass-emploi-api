@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { DateService } from '../../../../../utils/date-service'
 import { DateTime } from 'luxon'

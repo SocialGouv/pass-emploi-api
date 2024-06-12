@@ -9,7 +9,7 @@ import {
 import { Authentification } from '../../domain/authentification'
 import { Inject, Injectable } from '@nestjs/common'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
-import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
+import { KeycloakClient } from '../../infrastructure/clients/keycloak-client.db'
 import {
   Suggestion,
   SuggestionsPoleEmploiRepositoryToken

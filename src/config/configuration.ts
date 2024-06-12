@@ -105,8 +105,10 @@ export default () => {
     oidc: {
       issuerUrl: process.env.OIDC_ISSUER_URL ?? '',
       issuerApiUrl: process.env.OIDC_ISSUER_API_URL ?? '',
+      issuerNewApiUrl: process.env.OIDC_NEW_ISSUER_API_URL ?? '',
       clientId: process.env.OIDC_CLIENT_ID ?? '',
-      clientSecret: process.env.OIDC_CLIENT_SECRET ?? ''
+      clientSecret: process.env.OIDC_CLIENT_SECRET ?? '',
+      apiKey: process.env.OIDC_API_KEY
     },
     apiKeys: {
       keycloak: JSON.parse(process.env.API_KEY_KEYCLOAK!),
@@ -239,7 +241,8 @@ export default () => {
       recupererStructureMilo:
         process.env.FEATURE_RECUPERER_STRUCTURE_MILO === 'true',
       recupererSessionsMilo:
-        process.env.FEATURE_RECUPERER_SESSIONS_MILO === 'true'
+        process.env.FEATURE_RECUPERER_SESSIONS_MILO === 'true',
+      useNewAuth: process.env.FEATURE_USE_NEW_AUTH === 'true'
     },
     values: {
       maxRechercheConseillers: process.env.MAX_RECHERCHE_CONSEILLERS ?? '10'

@@ -192,8 +192,10 @@ export const testConfig = (): ConfigService => {
     oidc: {
       issuerUrl: 'https://keycloak.com',
       issuerApiUrl: 'https://keycloak-api.com',
+      issuerNewApiUrl: 'https://new-api.com',
       clientId: 'client',
-      clientSecret: 'chut'
+      clientSecret: 'chut',
+      useNewAuth: 'false'
     },
     values: {
       maxRechercheConseillers: '5'

@@ -15,7 +15,7 @@ import {
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { ConseillerMiloRepositoryToken } from '../../../domain/milo/conseiller.milo.db'
 import { Conseiller } from '../../../domain/milo/conseiller'
-import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client'
+import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client.db'
 import { DateService } from 'src/utils/date-service'
 
 export interface EmargerSessionMiloCommand extends Command {

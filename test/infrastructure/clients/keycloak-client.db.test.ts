@@ -1,15 +1,19 @@
 import { HttpService } from '@nestjs/axios'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import * as nock from 'nock'
-import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client'
+import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client.db'
 import { expect } from '../../utils'
 import { testConfig } from '../../utils/module-for-testing'
+import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
+import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('KeycloakClient', () => {
   let keycloakClient: KeycloakClient
   const configService = testConfig()
   const issuerUrl = configService.get('oidc').issuerUrl
-  const apiUrl = configService.get('oidc').issuerApiUrl
   const clientId = configService.get('oidc').clientId
   const clientSecret = configService.get('oidc').clientSecret
 
@@ -19,6 +23,7 @@ describe('KeycloakClient', () => {
   })
 
   describe('deleteUserByIdUser', () => {
+    const apiUrl = configService.get('oidc').issuerApiUrl
     it('echoue lorsque la récupération du token est en erreur', async () => {
       // Given
       nock(issuerUrl)
@@ -186,6 +191,56 @@ describe('KeycloakClient', () => {
         // Then
         expect.fail(null, null, 'handle test rejected with an error')
       }
+    })
+  })
+
+  describe('deleteAccountFromNewAuth', () => {
+    const apiUrl = configService.get('oidc').issuerNewApiUrl
+    beforeEach(async () => {
+      await getDatabase().cleanPG()
+    })
+    it("passe lorsque l'appel d'api est ok avec user jeune", async () => {
+      // Given
+      const idAuthentification = 'idAuth'
+      const id = 'idCejJeune'
+      await ConseillerSqlModel.create(unConseillerDto())
+      await JeuneSqlModel.create(unJeuneDto({ id, idAuthentification }))
+      nock(apiUrl).delete('/accounts/idAuth').reply(204)
+
+      try {
+        // When
+        await keycloakClient.deleteAccountFromNewAuth(id)
+      } catch (e) {
+        // Then
+        expect.fail(null, null, 'handle test rejected with an error')
+      }
+    })
+    it("passe lorsque l'appel d'api est ok avec user conseiller", async () => {
+      // Given
+      const idAuthentification = 'idAuth'
+      const id = 'idCejConseiller'
+      await ConseillerSqlModel.create(
+        unConseillerDto({ id, idAuthentification })
+      )
+      nock(apiUrl).delete('/accounts/idAuth').reply(204)
+
+      try {
+        // When
+        await keycloakClient.deleteAccountFromNewAuth(id)
+      } catch (e) {
+        // Then
+        expect.fail(null, null, 'handle test rejected with an error')
+      }
+    })
+    it("echoue lorsque l'appel d'api est ko", async () => {
+      // Given
+      nock(apiUrl).delete('/accounts/idAuth').reply(500)
+
+      try {
+        // When
+        await keycloakClient.deleteAccountFromNewAuth('idAuth')
+        expect.fail(null, null, 'handle test did not reject with an error')
+      } catch (e) {}
     })
   })
 })

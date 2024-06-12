@@ -18,7 +18,7 @@ import { Demarche } from '../../../../src/domain/demarche'
 import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
 import { unRendezVousQueryModel } from '../../../fixtures/query-models/rendez-vous.query-model.fixtures'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
-import { KeycloakClient } from '../../../../src/infrastructure/clients/keycloak-client'
+import { KeycloakClient } from '../../../../src/infrastructure/clients/keycloak-client.db'
 import { Core, estPoleEmploiBRSA } from '../../../../src/domain/core'
 import Structure = Core.Structure
 import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'

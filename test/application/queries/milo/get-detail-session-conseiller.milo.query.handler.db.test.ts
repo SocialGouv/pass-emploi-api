@@ -6,7 +6,7 @@ import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/quer
 import { ConseillerMiloSansStructure } from 'src/building-blocks/types/domain-error'
 import { failure, isSuccess, success } from 'src/building-blocks/types/result'
 import { ConseillerMilo } from 'src/domain/milo/conseiller.milo.db'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
 import {

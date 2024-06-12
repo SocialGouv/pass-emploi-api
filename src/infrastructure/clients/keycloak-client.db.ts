@@ -1,11 +1,18 @@
 import { HttpService } from '@nestjs/axios'
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common'
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  UnauthorizedException
+} from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import { firstValueFrom } from 'rxjs'
 import { Core, estMilo, estPoleEmploiBRSA } from 'src/domain/core'
 import { buildError } from 'src/utils/logger.module'
+import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
+import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 
 @Injectable()
 export class KeycloakClient {
@@ -13,14 +20,12 @@ export class KeycloakClient {
   private issuerUrl: string
   private clientId: string
   private clientSecret: string
-  private issuerApiUrl: string
 
   constructor(
     private configService: ConfigService,
     private httpService: HttpService
   ) {
     this.logger = new Logger('KeycloakClient')
-    this.issuerApiUrl = this.configService.get('oidc').issuerApiUrl
     this.issuerUrl = this.configService.get('oidc').issuerUrl
     this.clientId = this.configService.get('oidc').clientId
     this.clientSecret = this.configService.get('oidc').clientSecret
@@ -93,15 +98,15 @@ export class KeycloakClient {
     }
   }
 
-  public async deleteUserByIdUser(idUser: string): Promise<void> {
+  public async deleteUserByIdUser(idUserCEJ: string): Promise<void> {
     const token = await this.getToken()
-    const url = `${this.issuerApiUrl}/users`
+    const url = `${this.configService.get('oidc').issuerApiUrl}/users`
 
     const headers = {
       Authorization: `Bearer ${token}`
     }
     const params = {
-      q: `id_user:${idUser}`
+      q: `id_user:${idUserCEJ}`
     }
 
     try {
@@ -118,20 +123,54 @@ export class KeycloakClient {
         await firstValueFrom(
           this.httpService.delete(`${url}/${userIdKeycloak}`, { headers })
         )
-        this.logger.log(`utilisateur ${idUser} supprimé`)
+        this.logger.log(`utilisateur ${idUserCEJ} supprimé`)
       } else {
-        this.logger.log(`utilisateur ${idUser} n'existe pas dans keycloak`)
+        this.logger.log(`utilisateur ${idUserCEJ} n'existe pas dans keycloak`)
       }
     } catch (e) {
       this.logger.error(
         buildError(
-          `erreur lors de la suppression de l\'utilisateur ${idUser}`,
+          `erreur lors de la suppression de l'utilisateur ${idUserCEJ}`,
           e
         )
       )
       if (e.response?.status !== 404) {
         throw new RuntimeException(e)
       }
+    }
+  }
+  public async deleteAccountFromNewAuth(idUser: string): Promise<void> {
+    const apiKey = this.configService.get('oidc.apiKey')
+    const url = `${this.configService.get('oidc').issuerNewApiUrl}/accounts`
+
+    const headers = {
+      'X-API-KEY': apiKey
+    }
+
+    const jeune = await JeuneSqlModel.findByPk(idUser)
+    let idAuth = jeune?.idAuthentification
+
+    if (!idAuth) {
+      const conseiller = await ConseillerSqlModel.findByPk(idUser)
+      idAuth = conseiller?.idAuthentification
+    }
+
+    if (!idAuth) {
+      throw new NotFoundException('User to delete not found')
+    }
+    try {
+      await firstValueFrom(
+        this.httpService.delete(`${url}/${idAuth}`, { headers })
+      )
+      this.logger.log(`utilisateur ${idUser} supprimé`)
+    } catch (e) {
+      this.logger.error(
+        buildError(
+          `erreur lors de la suppression de l'utilisateur ${idUser}`,
+          e
+        )
+      )
+      throw e
     }
   }
 

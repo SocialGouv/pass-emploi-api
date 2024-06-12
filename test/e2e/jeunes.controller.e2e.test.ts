@@ -16,7 +16,7 @@ import {
   DemarcheDtoEtat,
   RendezVousPoleEmploiDto
 } from '../../src/infrastructure/clients/dto/pole-emploi.dto'
-import { KeycloakClient } from '../../src/infrastructure/clients/keycloak-client'
+import { KeycloakClient } from '../../src/infrastructure/clients/keycloak-client.db'
 import { PoleEmploiPartenaireClient } from '../../src/infrastructure/clients/pole-emploi-partenaire-client.db'
 import { IdService } from '../../src/utils/id-service'
 import {

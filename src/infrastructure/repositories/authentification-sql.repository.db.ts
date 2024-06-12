@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { Authentification } from '../../domain/authentification'
 import { Core, estMilo, estPoleEmploiBRSA } from '../../domain/core'
-import { KeycloakClient } from '../clients/keycloak-client'
+import { KeycloakClient } from '../clients/keycloak-client.db'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { SuperviseurSqlModel } from '../sequelize/models/superviseur.sql-model'
@@ -10,6 +10,7 @@ import {
   fromJeuneSqlToUtilisateur
 } from './mappers/authentification.mappers'
 import { Op } from 'sequelize'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class AuthentificationSqlRepository
@@ -17,7 +18,10 @@ export class AuthentificationSqlRepository
 {
   private logger: Logger
 
-  constructor(private keycloakClient: KeycloakClient) {
+  constructor(
+    private keycloakClient: KeycloakClient,
+    private readonly configService: ConfigService
+  ) {
     this.logger = new Logger('AuthentificationSqlRepository')
   }
 
@@ -156,11 +160,15 @@ export class AuthentificationSqlRepository
     )
   }
 
-  async deleteUtilisateurIdp(idUtilisateur: string): Promise<void> {
+  async deleteUtilisateurIdp(idUserCEJ: string): Promise<void> {
     try {
-      await this.keycloakClient.deleteUserByIdUser(idUtilisateur)
+      if (this.configService.get('features.useNewAuth')) {
+        await this.keycloakClient.deleteAccountFromNewAuth(idUserCEJ)
+      } else {
+        await this.keycloakClient.deleteUserByIdUser(idUserCEJ)
+      }
     } catch (_e) {}
-    this.logger.log(`Utilisateur ${idUtilisateur} supprimé de keycloak`)
+    this.logger.log(`Utilisateur ${idUserCEJ} supprimé de keycloak`)
   }
 
   async estConseillerSuperviseur(

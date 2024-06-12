@@ -1,7 +1,7 @@
 import { describe } from 'mocha'
 import { createSandbox, SinonSandbox } from 'sinon'
 import { isSuccess, success } from 'src/building-blocks/types/result'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
 import {

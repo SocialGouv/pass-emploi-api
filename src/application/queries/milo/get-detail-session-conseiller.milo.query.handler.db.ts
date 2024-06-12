@@ -6,7 +6,7 @@ import { Authentification } from 'src/domain/authentification'
 import { Conseiller } from 'src/domain/milo/conseiller'
 import { estMilo } from 'src/domain/core'
 import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo.db'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
 import {
   SessionMilo,
   SessionMiloRepositoryToken

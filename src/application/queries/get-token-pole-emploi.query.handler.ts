@@ -4,7 +4,7 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { estPoleEmploiBRSA } from '../../domain/core'
-import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
+import { KeycloakClient } from '../../infrastructure/clients/keycloak-client.db'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 
 export interface GetTokenPoleEmploiQuery extends Query {

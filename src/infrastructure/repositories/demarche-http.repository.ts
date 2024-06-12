@@ -3,7 +3,7 @@ import { fromDemarcheDtoToDemarche } from '../../application/queries/query-mappe
 import { isSuccess, Result, success } from '../../building-blocks/types/result'
 import { Demarche } from '../../domain/demarche'
 import { DateService } from '../../utils/date-service'
-import { KeycloakClient } from '../clients/keycloak-client'
+import { KeycloakClient } from '../clients/keycloak-client.db'
 import {
   PoleEmploiPartenaireClient,
   PoleEmploiPartenaireClientToken

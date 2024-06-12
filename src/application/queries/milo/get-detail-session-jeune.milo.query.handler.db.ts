@@ -20,7 +20,7 @@ import {
 } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { estMilo } from 'src/domain/core'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'

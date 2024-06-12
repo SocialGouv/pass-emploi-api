@@ -4,7 +4,7 @@ import { uneDate, uneDatetime } from 'test/fixtures/date.fixture'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { Authentification } from '../../../src/domain/authentification'
 import { Core } from '../../../src/domain/core'
-import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client'
+import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client.db'
 import { AuthentificationSqlRepository } from '../../../src/infrastructure/repositories/authentification-sql.repository.db'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import {
@@ -14,16 +14,19 @@ import {
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
+import { testConfig } from '../../utils/module-for-testing'
 
 describe('AuthentificationSqlRepository', () => {
   let authentificationSqlRepository: AuthentificationSqlRepository
   let keycloakClient: StubbedClass<KeycloakClient>
+  const configService = testConfig()
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
     keycloakClient = stubClass(KeycloakClient)
     authentificationSqlRepository = new AuthentificationSqlRepository(
-      keycloakClient
+      keycloakClient,
+      configService
     )
   })
 

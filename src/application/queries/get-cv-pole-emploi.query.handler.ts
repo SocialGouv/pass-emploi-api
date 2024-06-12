@@ -12,7 +12,7 @@ import { Authentification } from '../../domain/authentification'
 import { estPoleEmploiBRSA } from '../../domain/core'
 import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { DocumentPoleEmploiDto } from '../../infrastructure/clients/dto/pole-emploi.dto'
-import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
+import { KeycloakClient } from '../../infrastructure/clients/keycloak-client.db'
 import {
   PoleEmploiPartenaireClient,
   PoleEmploiPartenaireClientToken

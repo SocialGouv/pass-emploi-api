@@ -6,7 +6,7 @@ import { Core, estPoleEmploiBRSA } from '../../domain/core'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { ThematiqueQueryModel } from './query-models/catalogue.query-model'
 import { Query } from 'src/building-blocks/types/query'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
 import {
   PoleEmploiPartenaireClient,
   PoleEmploiPartenaireClientToken

@@ -10,7 +10,7 @@ import {
 } from '../../../../building-blocks/types/result'
 import { Demarche } from '../../../../domain/demarche'
 import { Jeune, JeuneRepositoryToken } from '../../../../domain/jeune/jeune'
-import { KeycloakClient } from '../../../../infrastructure/clients/keycloak-client'
+import { KeycloakClient } from '../../../../infrastructure/clients/keycloak-client.db'
 import {
   PoleEmploiPartenaireClient,
   PoleEmploiPartenaireClientToken
