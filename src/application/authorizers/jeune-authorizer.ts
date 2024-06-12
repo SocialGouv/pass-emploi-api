@@ -28,6 +28,6 @@ export class JeuneAuthorizer {
       }
     }
 
-    return failure(new DroitsInsuffisants())
+    return failure(new DroitsInsuffisants('auth_user_not_found'))
   }
 }

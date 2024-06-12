@@ -43,7 +43,9 @@ describe('JeuneAuthorizer', () => {
         )
 
         // Then
-        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
+        expect(result).to.deep.equal(
+          failure(new DroitsInsuffisants('auth_user_not_found'))
+        )
       })
     })
     describe("quand l'utilisateur est de la bonne strucutre", () => {
@@ -98,7 +100,9 @@ describe('JeuneAuthorizer', () => {
         )
 
         // Then
-        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
+        expect(result).to.deep.equal(
+          failure(new DroitsInsuffisants('auth_user_not_found'))
+        )
       })
       describe('quand un conseiller est connecté', () => {
         it('retourne une failure', async () => {
@@ -114,7 +118,9 @@ describe('JeuneAuthorizer', () => {
           )
 
           // Then
-          expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
+          expect(result).to.deep.equal(
+            failure(new DroitsInsuffisants('auth_user_not_found'))
+          )
         })
       })
     })
@@ -133,7 +139,9 @@ describe('JeuneAuthorizer', () => {
         )
 
         // Then
-        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
+        expect(result).to.deep.equal(
+          failure(new DroitsInsuffisants('auth_user_not_found'))
+        )
       })
     })
   })

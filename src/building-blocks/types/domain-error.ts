@@ -206,6 +206,10 @@ export class DroitsInsuffisants implements DomainError {
   static CODE = 'DROITS_INSUFFISANTS'
   readonly code: string = DroitsInsuffisants.CODE
   readonly message: string = "Vous n'avez pas le droit d'effectuer cette action"
+
+  constructor(message?: string) {
+    if (message) this.message = message
+  }
 }
 
 export class ErreurHttp implements DomainError {
