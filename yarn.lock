@@ -7254,14 +7254,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ics@npm:3.7.2":
-  version: 3.7.2
-  resolution: "ics@npm:3.7.2"
+"ics@npm:3.7.6":
+  version: 3.7.6
+  resolution: "ics@npm:3.7.6"
   dependencies:
     nanoid: "npm:^3.1.23"
     runes2: "npm:^1.1.2"
     yup: "npm:^1.2.0"
-  checksum: 10/a0e6e939496449bbc252a3ad100b157ed0fdf94677dc4572396f3564df1471f51b0139e527b1784efef969bbb56259e44c7e658c9fe303ee499e5b49a9199fc2
+  checksum: 10/aeb64f562649801292f48786a3cce60201dfe524437cbf8224fc5f679234e2226ded5105c47c0c80302e770a9109262c25ce7cc75010e1f0b1a75f3297f866eb
   languageName: node
   linkType: hard
 
@@ -9175,7 +9175,7 @@ __metadata:
     geojson: "npm:0.5.0"
     helmet: "npm:7.1.0"
     husky: "npm:^9.0.11"
-    ics: "npm:3.7.2"
+    ics: "npm:3.7.6"
     joi: "npm:17.13.1"
     jose: "npm:5.3.0"
     lint-staged: "npm:^15.2.2"
