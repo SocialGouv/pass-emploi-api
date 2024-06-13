@@ -82,12 +82,15 @@ export class KeycloakClient {
       return result.access_token
     } catch (e) {
       this.logger.error(buildError('erreur lors du token exchange', e))
-
-      let message = 'token_expired'
-      if (estPoleEmploiBRSA(structure)) {
-        message = 'token_pole_emploi_expired'
-      } else if (estMilo(structure)) {
-        message = 'token_milo_expired'
+      let message
+      if (e.code === 'ECONNABORTED' || e.status >= '500') {
+        message = 'token_exchange_error'
+      } else {
+        if (estPoleEmploiBRSA(structure)) {
+          message = 'token_pole_emploi_expired'
+        } else if (estMilo(structure)) {
+          message = 'token_milo_expired'
+        }
       }
 
       throw new UnauthorizedException({
