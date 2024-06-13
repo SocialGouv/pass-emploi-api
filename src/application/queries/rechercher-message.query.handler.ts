@@ -82,7 +82,12 @@ export class RechercherMessageQueryHandler extends QueryHandler<
     }).search(recherche)
 
     return results.map(fuseResult => {
-      const matches = fuseResult.matches!.map(m => m.indices[0])
+      const matches = fuseResult.matches!.map(({ indices, key }) => {
+        return {
+          match: indices[0],
+          key
+        }
+      })
       const { idConversation, id, rawMessage } = fuseResult.item
 
       return {

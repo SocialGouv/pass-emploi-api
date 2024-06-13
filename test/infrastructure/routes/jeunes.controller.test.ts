@@ -776,7 +776,11 @@ describe('JeunesController', () => {
               id: 'id-message',
               idConseiller: 'id-conseiller'
             },
-            matches: [[12, 22]]
+            matches: [
+              {
+                match: [12, 22]
+              }
+            ]
           }
         ]
       }
