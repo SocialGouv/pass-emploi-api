@@ -1,4 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+
+class ResultatRechercheMatchQueryModel {
+  @ApiProperty()
+  match: [number, number]
+
+  @ApiPropertyOptional()
+  key?: string
+}
 
 export class MessageIndividuelQueryModel {
   @ApiProperty()
@@ -11,7 +19,7 @@ export class MessageIndividuelQueryModel {
   message: object
 
   @ApiProperty()
-  matches: Array<[number, number]>
+  matches: ResultatRechercheMatchQueryModel[]
 }
 export class ResultatsRechercheMessageQueryModel {
   @ApiProperty({ type: MessageIndividuelQueryModel, isArray: true })
