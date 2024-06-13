@@ -11,9 +11,6 @@ import {
   NonTraitableError
 } from '../building-blocks/types/domain-error'
 import { Recherche } from './offre/recherche/recherche'
-import estAcceptee = Suggestion.estAcceptee
-import estRefusee = Suggestion.estRefusee
-import estTraitee = Suggestion.estTraitee
 
 export const EvenementsRepositoryToken = 'EvenementsRepositoryToken'
 
@@ -34,6 +31,7 @@ export namespace Evenement {
     ACTION_CREEE_HORS_SUGGESTION = 'ACTION_CREEE_HORS_SUGGESTION',
     ACTION_CREEE_SUGGESTION = 'ACTION_CREEE_SUGGESTION',
     ACTION_DETAIL = 'ACTION_DETAIL',
+    ACTION_DUPLIQUEE = 'ACTION_DUPLIQUEE',
     ACTION_LISTE = 'ACTION_LISTE',
     ACTION_CATEGORIE_MODIFIEE = 'ACTION_CATEGORIE_MODIFIEE',
     ACTION_TEXTE_MODIFIE = 'ACTION_TEXTE_MODIFIE',
@@ -199,6 +197,10 @@ const evenements: {
     categorie: 'Action',
     action: 'Consultation',
     nom: 'Détail'
+  },
+  [Evenement.Code.ACTION_DUPLIQUEE]: {
+    categorie: 'Action',
+    action: 'Duplication'
   },
   [Evenement.Code.ACTION_LISTE]: {
     categorie: 'Action',
@@ -852,14 +854,14 @@ export class EvenementService {
       throw failure(new MauvaiseCommandeError('Suggestion non trouvée'))
     }
 
-    if (estTraitee(suggestion)) {
+    if (Suggestion.estTraitee(suggestion)) {
       await this.creer(fromSuggestionToCodeEvenement(suggestion), utilisateur)
     }
   }
 }
 
 function fromSuggestionToCodeEvenement(suggestion: Suggestion): Evenement.Code {
-  if (estAcceptee(suggestion)) {
+  if (Suggestion.estAcceptee(suggestion)) {
     switch (suggestion.type) {
       case Recherche.Type.OFFRES_EMPLOI:
         {
@@ -914,7 +916,7 @@ function fromSuggestionToCodeEvenement(suggestion: Suggestion): Evenement.Code {
         break
     }
   }
-  if (estRefusee(suggestion)) {
+  if (Suggestion.estRefusee(suggestion)) {
     switch (suggestion.type) {
       case Recherche.Type.OFFRES_EMPLOI:
         {
