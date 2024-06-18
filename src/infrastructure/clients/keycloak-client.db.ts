@@ -44,6 +44,8 @@ export class KeycloakClient {
         return this.exchangeToken(bearer, 'pe-jeune', structure)
       case Core.Structure.POLE_EMPLOI_BRSA:
         return this.exchangeToken(bearer, 'pe-brsa-jeune', structure)
+      case Core.Structure.POLE_EMPLOI_AIJ:
+        return this.exchangeToken(bearer, 'pe-aij-jeune', structure)
       case Core.Structure.MILO:
         return this.exchangeToken(bearer, 'similo-jeune', structure)
     }
