@@ -20,35 +20,21 @@ export class SuiviJobService implements SuiviJob.Service {
   ) {}
 
   async notifierResultatJob(suiviJob: SuiviJob): Promise<void> {
-    const webhookUrl = this.configService.get('mattermost.jobWebhookUrl')
-
-    const payload = {
-      username: BOT_USERNAME,
-      text: construireMessage(suiviJob)
-    }
-    await firstValueFrom(this.httpService.post(webhookUrl, payload))
+    await this.envoyerMessageMattermost(construireMessage(suiviJob))
 
     const messageDErreur = suiviJob.erreur?.stack ?? suiviJob.erreur?.message
     if (messageDErreur) {
-      await firstValueFrom(
-        this.httpService.post(webhookUrl, {
-          username: BOT_USERNAME,
-          text: '```\n' + messageDErreur + '\n```'
-        })
-      )
+      await this.envoyerMessageMattermost('```\n' + messageDErreur + '\n```')
     }
   }
 
   async envoyerRapport(rapportJobs: RapportJob24h[]): Promise<void> {
-    const webhookUrl = this.configService.get('mattermost.jobWebhookUrl')
     const logsUrl = this.configService.get('monitoring').dashboardUrl
 
     if (rapportJobs.length) {
-      const payload = {
-        username: BOT_USERNAME,
-        text: construireRapport(rapportJobs, logsUrl)
-      }
-      await firstValueFrom(this.httpService.post(webhookUrl, payload))
+      await this.envoyerMessageMattermost(
+        construireRapport(rapportJobs, logsUrl)
+      )
     }
   }
 
@@ -62,6 +48,18 @@ export class SuiviJobService implements SuiviJob.Service {
       tempsExecution: suiviJob.tempsExecution
     }
     await SuiviJobSqlModel.create(dto)
+  }
+
+  private async envoyerMessageMattermost(message: string): Promise<void> {
+    const webhookUrl = this.configService.get('mattermost.jobWebhookUrl')
+
+    try {
+      const payload = {
+        username: BOT_USERNAME,
+        text: message
+      }
+      await firstValueFrom(this.httpService.post(webhookUrl, payload))
+    } catch (_e) {}
   }
 }
 
