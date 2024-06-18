@@ -7,11 +7,12 @@ export namespace Core {
     POLE_EMPLOI_AIJ = 'POLE_EMPLOI_AIJ'
   }
 
-  export const structuresPoleEmploiBRSA = [
+  export const structuresPoleEmploi = [
     Core.Structure.POLE_EMPLOI,
+    Core.Structure.POLE_EMPLOI_AIJ,
     Core.Structure.POLE_EMPLOI_BRSA
   ]
-  export type StructuresPoleEmploiBRSA =
+  export type StructuresPoleEmploi =
     | Core.Structure.POLE_EMPLOI
     | Core.Structure.POLE_EMPLOI_BRSA
 
@@ -25,19 +26,26 @@ export function estMilo(structure: Core.Structure): boolean {
 }
 
 export function estPoleEmploi(structure: Core.Structure): boolean {
-  return structure === Core.Structure.POLE_EMPLOI
+  return [
+    Core.Structure.POLE_EMPLOI,
+    Core.Structure.POLE_EMPLOI_BRSA,
+    Core.Structure.POLE_EMPLOI_AIJ
+  ].includes(structure)
 }
 
-export function estBRSA(structure: Core.Structure): boolean {
-  return structure === Core.Structure.POLE_EMPLOI_BRSA
+export function estPassEmploi(structure: Core.Structure): boolean {
+  return [
+    Core.Structure.POLE_EMPLOI_BRSA,
+    Core.Structure.POLE_EMPLOI_AIJ
+  ].includes(structure)
 }
 
-export function estPoleEmploiBRSA(structure: Core.Structure): boolean {
-  return [Core.Structure.POLE_EMPLOI, Core.Structure.POLE_EMPLOI_BRSA].includes(
-    structure
-  )
-}
-
-export function estNonBRSA(structure: Core.Structure): boolean {
-  return structure !== Core.Structure.POLE_EMPLOI_BRSA
+export function aAccesAuxAlternancesEtServicesCiviques(
+  structure: Core.Structure
+): boolean {
+  return [
+    Core.Structure.MILO,
+    Core.Structure.POLE_EMPLOI,
+    Core.Structure.POLE_EMPLOI_AIJ
+  ].includes(structure)
 }

@@ -102,6 +102,13 @@ describe('MajSegmentsJobHandler', () => {
             instanceId: 'instanceId5'
           })
         )
+        await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: 'j6',
+            structure: Core.Structure.POLE_EMPLOI_AIJ,
+            instanceId: 'instanceId6'
+          })
+        )
 
         // When
         result = await majSegmentsJobHandler.handle()
@@ -112,7 +119,7 @@ describe('MajSegmentsJobHandler', () => {
         expect(result.succes).to.equal(true)
         expect(result.resultat).to.deep.equal({
           nbCampagnesNonRepondues: 0,
-          nbJeunes: 4
+          nbJeunes: 5
         })
       })
       it('construit le fichier memberships', async () => {
@@ -173,6 +180,13 @@ describe('MajSegmentsJobHandler', () => {
             instanceId: 'instanceId5'
           })
         )
+        await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: 'j6',
+            structure: Core.Structure.POLE_EMPLOI_AIJ,
+            instanceId: 'instanceId6'
+          })
+        )
         await CampagneSqlModel.create(
           uneCampagne({ dateFin: DateTime.now().plus({ years: 1 }) })
         )
@@ -188,7 +202,7 @@ describe('MajSegmentsJobHandler', () => {
         expect(result.succes).to.equal(true)
         expect(result.resultat).to.deep.equal({
           nbCampagnesNonRepondues: 2,
-          nbJeunes: 4
+          nbJeunes: 5
         })
       })
       it('construit le fichier metadata', async () => {

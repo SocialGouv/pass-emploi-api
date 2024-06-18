@@ -125,7 +125,7 @@ export default () => {
       templates: {
         conversationsNonLues:
           process.env.SENDINBLUE_CONVERSATIONS_TEMPLATE_ID ?? '2',
-        conversationsNonLuesBRSA:
+        conversationsNonLuesPassEmploi:
           process.env.SENDINBLUE_CONVERSATIONS_BRSA_TEMPLATE_ID ?? '363',
         nouveauRendezvous:
           process.env.SENDINBLUE_NOUVEAU_RENDEZVOUS_TEMPLATE_ID ?? '3',

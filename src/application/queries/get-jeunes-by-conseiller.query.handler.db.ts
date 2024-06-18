@@ -17,7 +17,7 @@ import {
 } from '../../domain/milo/conseiller'
 import { toDetailJeuneConseillerQueryModel } from './query-mappers/jeune.mappers'
 import { DetailJeuneConseillerQueryModel } from './query-models/jeunes.query-model'
-import { estPoleEmploiBRSA } from '../../domain/core'
+import { estPoleEmploi } from '../../domain/core'
 
 export interface GetJeunesByConseillerQuery extends Query {
   idConseiller: string
@@ -107,7 +107,7 @@ function utilisateurEstSuperviseurPEBRSA(
 ): boolean {
   return (
     Authentification.estSuperviseurPEBRSA(utilisateur) &&
-    estPoleEmploiBRSA(conseiller.structure)
+    estPoleEmploi(conseiller.structure)
   )
 }
 

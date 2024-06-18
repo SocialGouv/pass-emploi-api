@@ -13,7 +13,7 @@ import {
   Result,
   success
 } from '../../../../building-blocks/types/result'
-import { Core, estNonBRSA } from '../../../core'
+import { aAccesAuxAlternancesEtServicesCiviques, Core } from '../../../core'
 import { Diagoriente } from './diagoriente'
 import { DiagorienteInformationsPayload } from 'src/infrastructure/routes/validation/suggestions-inputs'
 
@@ -196,7 +196,9 @@ export namespace Suggestion {
             maintenant
           )
         )
-      const suggestionsServiceCivique = estNonBRSA(structureDuJeune)
+      const suggestionsServiceCivique = aAccesAuxAlternancesEtServicesCiviques(
+        structureDuJeune
+      )
         ? suggestionsPoleEmploi
             .filter(this.estUneSuggestionServiceCivique.bind(this))
             .map(suggestionPoleEmploi =>

@@ -11,7 +11,7 @@ import {
   success
 } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
-import { estBRSA, estPoleEmploiBRSA } from '../../../domain/core'
+import { estPassEmploi, estPoleEmploi } from '../../../domain/core'
 import { Demarche } from '../../../domain/demarche'
 import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client.db'
@@ -90,7 +90,7 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
       this.getFavorisQueryGetter.handle({
         idJeune: query.idJeune
       }),
-      estBRSA(jeune.structure)
+      estPassEmploi(jeune.structure)
         ? Promise.resolve(undefined)
         : this.getCampagneQueryGetter.handle({ idJeune: query.idJeune })
     ])
@@ -169,7 +169,7 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
-      estPoleEmploiBRSA(utilisateur.structure)
+      estPoleEmploi(utilisateur.structure)
     )
   }
 

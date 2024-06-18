@@ -13,7 +13,7 @@ import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
 
 export interface GetConseillersQuery extends Query {
   recherche: string
-  structureDifferenteRecherchee?: Core.StructuresPoleEmploiBRSA
+  structureDifferenteRecherchee?: Core.StructuresPoleEmploi
 }
 
 @Injectable()

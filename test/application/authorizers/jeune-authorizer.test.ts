@@ -2,7 +2,7 @@ import { UnauthorizedException } from '@nestjs/common'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { emptySuccess } from 'src/building-blocks/types/result'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
-import { Core, estMilo, estPoleEmploiBRSA } from '../../../src/domain/core'
+import { Core, estMilo, estPoleEmploi } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import {
   unUtilisateurConseiller,
@@ -69,7 +69,7 @@ describe('JeuneAuthorizer', () => {
         const result = await jeuneAuthorizer.autoriserLeJeune(
           'jeune-id',
           utilisateur,
-          estPoleEmploiBRSA(utilisateur.structure)
+          estPoleEmploi(utilisateur.structure)
         )
 
         // Then

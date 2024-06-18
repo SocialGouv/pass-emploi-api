@@ -25,7 +25,8 @@ enum SEGMENTS {
   CAMPAGNE_NON_REPONDUE = 'CAMPAGNE_NON_REPONDUE',
   JEUNES_MILO = 'JEUNES_MILO',
   JEUNES_POLE_EMPLOI = 'JEUNES_POLE_EMPLOI',
-  JEUNES_POLE_EMPLOI_BRSA = 'JEUNES_POLE_EMPLOI_BRSA'
+  JEUNES_POLE_EMPLOI_BRSA = 'JEUNES_POLE_EMPLOI_BRSA',
+  JEUNES_POLE_EMPLOI_AIJ = 'JEUNES_POLE_EMPLOI_AIJ'
 }
 
 @Injectable()
@@ -85,7 +86,7 @@ export class MajSegmentsJobHandler extends JobHandler<Job> {
     }
   }
 
-  async fetchJeunesNonBRSAInstanceIdNayantPasReponduAUneCampagneActive(): Promise<
+  async fetchJeunesCEJInstanceIdNayantPasReponduAUneCampagneActive(): Promise<
     RawJeune[]
   > {
     const sqlCampagneEnCours = `select id
@@ -102,7 +103,7 @@ export class MajSegmentsJobHandler extends JobHandler<Job> {
     const sql = `select instance_id, structure
                      from jeune
                      where instance_id is not null
-                       and structure <> 'POLE_EMPLOI_BRSA'
+                       and (structure = 'POLE_EMPLOI' OR structure = 'MILO') 
                        and id not in (select id_jeune
                                       from reponse_campagne
                                       where id_campagne in
@@ -139,6 +140,10 @@ export class MajSegmentsJobHandler extends JobHandler<Job> {
       {
         segment_label: SEGMENTS.JEUNES_POLE_EMPLOI_BRSA,
         display_name: 'Jeunes POLE EMPLOI BRSA'
+      },
+      {
+        segment_label: SEGMENTS.JEUNES_POLE_EMPLOI_AIJ,
+        display_name: 'Jeunes POLE EMPLOI AIJ'
       }
     ]
     metadatas.forEach(metadata => {
@@ -181,6 +186,8 @@ export class MajSegmentsJobHandler extends JobHandler<Job> {
         return SEGMENTS.JEUNES_MILO
       case Core.Structure.POLE_EMPLOI_BRSA:
         return SEGMENTS.JEUNES_POLE_EMPLOI_BRSA
+      case Core.Structure.POLE_EMPLOI_AIJ:
+        return SEGMENTS.JEUNES_POLE_EMPLOI_AIJ
       default:
         throw new Error(`Unknown structure ${structure}`)
     }
@@ -190,7 +197,7 @@ export class MajSegmentsJobHandler extends JobHandler<Job> {
     segments: Map<string, string[]>
   ): Promise<number> {
     const jeunes: RawJeune[] =
-      await this.fetchJeunesNonBRSAInstanceIdNayantPasReponduAUneCampagneActive()
+      await this.fetchJeunesCEJInstanceIdNayantPasReponduAUneCampagneActive()
     jeunes.forEach(jeune => {
       this.addOrSetSegment(
         segments,

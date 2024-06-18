@@ -1,7 +1,7 @@
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { GetTokenPoleEmploiQueryHandler } from '../../../src/application/queries/get-token-pole-emploi.query.handler'
 import { emptySuccess } from '../../../src/building-blocks/types/result'
-import { estPoleEmploiBRSA } from '../../../src/domain/core'
+import { estPoleEmploi } from '../../../src/domain/core'
 import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client.db'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { expect, StubbedClass, stubClass } from '../../utils'
@@ -53,7 +53,7 @@ describe('GetTokenPoleEmploiQueryHandler', () => {
         .withArgs(
           query.idJeune,
           utilisateur,
-          estPoleEmploiBRSA(utilisateur.structure)
+          estPoleEmploi(utilisateur.structure)
         )
         .resolves(emptySuccess())
 

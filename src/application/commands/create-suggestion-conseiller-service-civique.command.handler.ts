@@ -8,7 +8,7 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { estNonBRSA } from '../../domain/core'
+import { aAccesAuxAlternancesEtServicesCiviques } from '../../domain/core'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { Recherche } from '../../domain/offre/recherche/recherche'
@@ -51,7 +51,7 @@ export class CreateSuggestionConseillerServiceCiviqueCommandHandler extends Comm
     return this.conseillerAuthorizer.autoriserLeConseiller(
       command.idConseiller,
       utilisateur,
-      estNonBRSA(utilisateur.structure)
+      aAccesAuxAlternancesEtServicesCiviques(utilisateur.structure)
     )
   }
 

@@ -1,7 +1,7 @@
 import { PoleEmploiPartenaireClient } from 'src/infrastructure/clients/pole-emploi-partenaire-client.db'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 
-import { Core, estPoleEmploiBRSA } from '../../../src/domain/core'
+import { Core, estPoleEmploi } from '../../../src/domain/core'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { StubbedClass, expect, stubClass } from '../../utils'
 import { GetCatalogueDemarchesQueryHandler } from 'src/application/queries/get-catalogue-demarches.query.handler'
@@ -164,7 +164,7 @@ describe('GetCatalogueQueryHandler', () => {
       ).to.have.been.calledOnceWithExactly(
         utilisateur.id,
         utilisateur,
-        estPoleEmploiBRSA(utilisateur.structure)
+        estPoleEmploi(utilisateur.structure)
       )
     })
   })

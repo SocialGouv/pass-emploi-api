@@ -37,7 +37,7 @@ export class GetConseillersQueryParams {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsIn(Core.structuresPoleEmploiBRSA)
+  @IsIn([Core.Structure.POLE_EMPLOI, Core.Structure.POLE_EMPLOI_BRSA])
   structure?: string
 }
 

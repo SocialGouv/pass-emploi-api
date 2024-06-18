@@ -10,7 +10,7 @@ import {
 import { EmailExisteDejaError } from '../../../../src/building-blocks/types/domain-error'
 import { Chat } from '../../../../src/domain/chat'
 import { Conseiller } from '../../../../src/domain/milo/conseiller'
-import { Core, estPoleEmploiBRSA } from '../../../../src/domain/core'
+import { Core, estPoleEmploi } from '../../../../src/domain/core'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
 import { DateService } from '../../../../src/utils/date-service'
 import { IdService } from '../../../../src/utils/id-service'
@@ -158,7 +158,7 @@ describe('CreateJeunePoleEmploiCommandHandler', () => {
       ).to.have.been.calledWithExactly(
         command.idConseiller,
         utilisateur,
-        estPoleEmploiBRSA(utilisateur.structure)
+        estPoleEmploi(utilisateur.structure)
       )
     })
   })
