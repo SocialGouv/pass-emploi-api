@@ -22,7 +22,7 @@ import {
   success
 } from 'src/building-blocks/types/result'
 import { Action } from 'src/domain/action/action'
-import { Core, estMiloPassEmploi } from 'src/domain/core'
+import { Core, estMilo } from 'src/domain/core'
 import { SessionMilo } from 'src/domain/milo/session.milo'
 import { CodeTypeRendezVous } from 'src/domain/rendez-vous/rendez-vous'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
@@ -655,7 +655,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         query.idJeune,
         utilisateur,
-        estMiloPassEmploi(utilisateur.structure)
+        estMilo(utilisateur.structure)
       )
     })
   })

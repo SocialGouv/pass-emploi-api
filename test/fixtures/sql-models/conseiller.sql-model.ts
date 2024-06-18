@@ -11,7 +11,7 @@ export function unConseillerDto(
     prenom: 'Nils',
     nom: 'Tavernier',
     email: 'nils.tavernier@passemploi.com',
-    structure: Core.Structure.PASS_EMPLOI,
+    structure: Core.Structure.MILO,
     idAuthentification: 'un-id',
     dateCreation: uneDatetime().toJSDate(),
     dateVerificationMessages: uneDatetime().toJSDate(),

@@ -116,7 +116,7 @@ describe('InvitationIcsClient', () => {
         },
         method: 'REQUEST',
         organizer: {
-          email: 'pass.emploi.contact@gmail.com',
+          email: 'no-reply@pass-emploi.beta.gouv.fr',
           name: 'Tavernier Nils'
         },
         sequence: 0,
@@ -168,7 +168,7 @@ describe('InvitationIcsClient', () => {
         },
         method: 'REQUEST',
         organizer: {
-          email: 'pass.emploi.contact@gmail.com',
+          email: 'no-reply@pass-emploi.beta.gouv.fr',
           name: 'Tavernier Nils'
         },
         sequence: 0,

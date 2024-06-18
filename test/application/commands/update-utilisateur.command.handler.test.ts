@@ -3,8 +3,7 @@ import { SinonSandbox, createSandbox } from 'sinon'
 import {
   ConseillerNonValide,
   NonTraitableError,
-  NonTraitableInexistantError,
-  NonTrouveError
+  NonTraitableInexistantError
 } from 'src/building-blocks/types/domain-error'
 import { Authentification } from 'src/domain/authentification'
 import { DateService } from 'src/utils/date-service'
@@ -64,104 +63,6 @@ describe('UpdateUtilisateurCommandHandler', () => {
 
   describe('execute', () => {
     describe('Conseiller', () => {
-      describe("conseiller venant de l'idp PASS_EMPLOI", async () => {
-        describe('conseiller connu', async () => {
-          let result: Result<UtilisateurQueryModel>
-          beforeEach(async () => {
-            // Given
-            const command: UpdateUtilisateurCommand = {
-              idUtilisateurAuth: 'nilstavernier',
-              type: Authentification.Type.CONSEILLER,
-              structure: Core.Structure.PASS_EMPLOI
-            }
-
-            const utilisateur = unUtilisateurConseiller({
-              structure: Core.Structure.PASS_EMPLOI
-            })
-            authentificationRepository.getConseiller
-              .withArgs(command.idUtilisateurAuth)
-              .resolves(utilisateur)
-
-            // When
-            result = await updateUtilisateurCommandHandler.execute(command)
-          })
-          it('retourne le conseiller', async () => {
-            // Then
-            expect(isSuccess(result)).equal(true)
-            if (isSuccess(result)) {
-              expect(result.data).to.deep.equal(
-                unUtilisateurQueryModel({
-                  structure: Core.Structure.PASS_EMPLOI
-                })
-              )
-            }
-          })
-        })
-        describe('conseiller connu avec nouvel email, nom et prenom', async () => {
-          it('met à jour ses infos et retourne le conseiller', async () => {
-            // Given
-            const command: UpdateUtilisateurCommand = {
-              idUtilisateurAuth: 'nilstavernier',
-              type: Authentification.Type.CONSEILLER,
-              structure: Core.Structure.PASS_EMPLOI,
-              email: 'New@email.com',
-              nom: 'newNom',
-              prenom: 'newPrenom'
-            }
-
-            const utilisateur = unUtilisateurConseiller({
-              idAuthentification: command.idUtilisateurAuth,
-              structure: Core.Structure.PASS_EMPLOI
-            })
-            authentificationRepository.getConseiller
-              .withArgs(command.idUtilisateurAuth)
-              .resolves(utilisateur)
-
-            // When
-            const result = await updateUtilisateurCommandHandler.execute(
-              command
-            )
-
-            // Then
-            expect(
-              authentificationRepository.update
-            ).to.have.been.calledWithExactly({
-              ...utilisateur,
-              email: 'new@email.com',
-              username: undefined,
-              nom: 'newNom',
-              prenom: 'newPrenom',
-              dateDerniereConnexion: uneDate()
-            })
-            expect(isSuccess(result)).equal(true)
-          })
-        })
-        describe('conseiller inconnu', async () => {
-          it('retourne une erreur', async () => {
-            // Given
-            const command: UpdateUtilisateurCommand = {
-              idUtilisateurAuth: 'nilstavernier',
-              type: Authentification.Type.CONSEILLER,
-              structure: Core.Structure.PASS_EMPLOI
-            }
-
-            authentificationRepository.getConseiller
-              .withArgs(command.idUtilisateurAuth)
-              .resolves(undefined)
-
-            // When
-            const result = await updateUtilisateurCommandHandler.execute(
-              command
-            )
-
-            // Then
-            expect(result).to.deep.equal(
-              failure(new NonTrouveError(command.idUtilisateurAuth))
-            )
-          })
-        })
-      })
-
       describe("conseiller venant de l'idp MILO ou Pole Emploi", async () => {
         describe('conseiller connu', async () => {
           it('retourne le conseiller', async () => {
@@ -541,58 +442,6 @@ describe('UpdateUtilisateurCommandHandler', () => {
     })
 
     describe('Jeune', () => {
-      describe("jeune venant de l'idp PASS_EMPLOI", async () => {
-        describe('jeune connu', async () => {
-          it('retourne le jeune', async () => {
-            // Given
-            const command: UpdateUtilisateurCommand = {
-              idUtilisateurAuth: 'nilstavernier',
-              type: Authentification.Type.JEUNE,
-              structure: Core.Structure.PASS_EMPLOI
-            }
-
-            const utilisateur = unUtilisateurConseiller()
-            authentificationRepository.getJeuneByStructure
-              .withArgs(command.idUtilisateurAuth, command.structure)
-              .resolves(utilisateur)
-
-            // When
-            const result = await updateUtilisateurCommandHandler.execute(
-              command
-            )
-
-            // Then
-            expect(isSuccess(result)).equal(true)
-            if (isSuccess(result)) {
-              expect(result.data).to.deep.equal(unUtilisateurQueryModel())
-            }
-          })
-        })
-        describe('jeune inconnu', async () => {
-          it('retourne une erreur', async () => {
-            // Given
-            const command: UpdateUtilisateurCommand = {
-              idUtilisateurAuth: 'nilstavernier',
-              type: Authentification.Type.JEUNE,
-              structure: Core.Structure.PASS_EMPLOI
-            }
-
-            authentificationRepository.getJeuneByStructure
-              .withArgs(command.idUtilisateurAuth, command.structure)
-              .resolves(undefined)
-
-            // When
-            const result = await updateUtilisateurCommandHandler.execute(
-              command
-            )
-
-            // Then
-            expect(result).to.deep.equal(
-              failure(new NonTrouveError(command.idUtilisateurAuth))
-            )
-          })
-        })
-      })
       describe("jeune venant de l'idp MILO", async () => {
         describe("jeune connu par son id d'authentification", async () => {
           it('retourne le jeune', async () => {

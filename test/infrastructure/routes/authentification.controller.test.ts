@@ -80,7 +80,7 @@ describe('AuthentificationController', () => {
         prenom: 'Nils',
         type: Authentification.Type.CONSEILLER,
         email: 'nils.tavernier@passemploi.com',
-        structure: Core.Structure.PASS_EMPLOI
+        structure: Core.Structure.MILO
       }
 
       const command: UpdateUtilisateurCommand = {
@@ -109,7 +109,7 @@ describe('AuthentificationController', () => {
         prenom: 'Nils',
         type: Authentification.Type.CONSEILLER,
         email: 'nils.tavernier@passemploi.com',
-        structure: Core.Structure.PASS_EMPLOI
+        structure: Core.Structure.MILO
       }
 
       const command: UpdateUtilisateurCommand = {
@@ -140,7 +140,7 @@ describe('AuthentificationController', () => {
         prenom: 'Nils',
         type: Authentification.Type.CONSEILLER,
         email: 'nils.tavernier@passemploi.com',
-        structure: Core.Structure.PASS_EMPLOI
+        structure: Core.Structure.MILO
       }
 
       const command: UpdateUtilisateurCommand = {

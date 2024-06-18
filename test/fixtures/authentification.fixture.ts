@@ -82,7 +82,7 @@ export const unUtilisateurSupport = (
     prenom: 'John',
     type: Authentification.Type.SUPPORT,
     email: 'john.doe@plop.io',
-    structure: Core.Structure.PASS_EMPLOI,
+    structure: Core.Structure.SUPPORT,
     roles: []
   }
 

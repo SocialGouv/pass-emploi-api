@@ -11,7 +11,7 @@ import {
   Conseiller,
   ConseillerRepositoryToken
 } from '../../domain/milo/conseiller'
-import { Core, estMiloPassEmploi } from '../../domain/core'
+import { estMilo } from '../../domain/core'
 import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import {
   RendezVous,
@@ -98,7 +98,7 @@ export class ConseillerInterAgenceAuthorizer {
   ): Promise<Result> {
     if (
       utilisateur.type === Authentification.Type.CONSEILLER &&
-      this.structureAutoriseeInterAgence(utilisateur.structure)
+      estMilo(utilisateur.structure)
     ) {
       const rendezVous = await this.rendezVousRepository.get(idRendezVous)
       const conseillerUtilisateur = await this.conseillerRepository.get(
@@ -135,10 +135,6 @@ export class ConseillerInterAgenceAuthorizer {
     return failure(new DroitsInsuffisants())
   }
 
-  structureAutoriseeInterAgence(structure: Core.Structure): boolean {
-    return estMiloPassEmploi(structure)
-  }
-
   private async autoriserPourSonJeuneOuUnJeuneDeSonAgenceMilo(
     utilisateur: Authentification.Utilisateur,
     jeune?: Jeune
@@ -147,10 +143,7 @@ export class ConseillerInterAgenceAuthorizer {
       if (jeune.conseiller?.id === utilisateur.id) {
         return emptySuccess()
       }
-      if (
-        this.structureAutoriseeInterAgence(utilisateur.structure) &&
-        jeune.conseiller?.idAgence
-      ) {
+      if (estMilo(utilisateur.structure) && jeune.conseiller?.idAgence) {
         const conseillerUtilisateur = await this.conseillerRepository.get(
           utilisateur.id
         )

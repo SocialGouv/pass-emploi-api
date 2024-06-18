@@ -22,7 +22,7 @@ export const configurationSchema = Joi.object({
   logLevel: Joi.string().default('INFO'),
   nodeEnv: Joi.string().required(),
   frontEndUrl: Joi.string().uri().required(),
-  passEmploiContactEmail: Joi.string().email().required(),
+  noReplyContactEmail: Joi.string().email().required(),
   baseUrl: Joi.string().uri().required(),
   poleEmploi: Joi.object({
     url: Joi.string().uri().required(),

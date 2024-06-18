@@ -81,7 +81,6 @@ export namespace ArchiveJeune {
     [CodeMotifSuppression.EMPLOI_DURABLE]: {
       motif: MotifSuppression.EMPLOI_DURABLE,
       structures: [
-        Structure.PASS_EMPLOI,
         Structure.POLE_EMPLOI,
         Structure.MILO,
         Structure.POLE_EMPLOI_BRSA
@@ -91,50 +90,45 @@ export namespace ArchiveJeune {
     },
     [CodeMotifSuppression.EMPLOI_COURT]: {
       motif: MotifSuppression.EMPLOI_COURT,
-      structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI, Structure.MILO]
+      structures: [Structure.POLE_EMPLOI, Structure.MILO]
     },
     [CodeMotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE]: {
       motif: MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE,
-      structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI, Structure.MILO]
+      structures: [Structure.POLE_EMPLOI, Structure.MILO]
     },
     [CodeMotifSuppression.CESSATION_INSCRIPTION]: {
       motif: MotifSuppression.CESSATION_INSCRIPTION,
-      structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI_BRSA]
+      structures: [Structure.POLE_EMPLOI_BRSA]
     },
     [CodeMotifSuppression.LIMITE_AGE]: {
       motif: MotifSuppression.LIMITE_AGE,
-      structures: [
-        Structure.PASS_EMPLOI,
-        Structure.POLE_EMPLOI,
-        Structure.MILO
-      ],
+      structures: [Structure.POLE_EMPLOI, Structure.MILO],
       description:
         "Motif valable uniquement à partir de la fin du premier mois des 26 ans. A noter : dans le cas oû le jeune est considéré en tant que travailleur handicapé, l'âge passe à 30 ans."
     },
     [CodeMotifSuppression.CHANGEMENT_ACCOMPAGNEMENT]: {
       motif: MotifSuppression.CHANGEMENT_ACCOMPAGNEMENT,
-      structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI_BRSA]
+      structures: [Structure.POLE_EMPLOI_BRSA]
     },
     [CodeMotifSuppression.DEMANDE_DU_JEUNE]: {
       motif: MotifSuppression.DEMANDE_DU_JEUNE,
-      structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI, Structure.MILO]
+      structures: [Structure.POLE_EMPLOI, Structure.MILO]
     },
     [CodeMotifSuppression.DEMANDE_DU_CONSEILLER]: {
       motif: MotifSuppression.DEMANDE_DU_CONSEILLER,
-      structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI_BRSA]
+      structures: [Structure.POLE_EMPLOI_BRSA]
     },
     [CodeMotifSuppression.DEMANDE_DU_BENEFICIAIRE_BRSA]: {
       motif: MotifSuppression.DEMANDE_DU_BENEFICIAIRE_BRSA,
-      structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI_BRSA]
+      structures: [Structure.POLE_EMPLOI_BRSA]
     },
     [CodeMotifSuppression.NON_RESPECT_OU_ABANDON]: {
       motif: MotifSuppression.NON_RESPECT_OU_ABANDON,
-      structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI, Structure.MILO]
+      structures: [Structure.POLE_EMPLOI, Structure.MILO]
     },
     [CodeMotifSuppression.DEMENAGEMENT]: {
       motif: MotifSuppression.DEMENAGEMENT,
       structures: [
-        Structure.PASS_EMPLOI,
         Structure.POLE_EMPLOI,
         Structure.MILO,
         Structure.POLE_EMPLOI_BRSA
@@ -142,16 +136,15 @@ export namespace ArchiveJeune {
     },
     [CodeMotifSuppression.DEMENAGEMENT_TERRITOIRE_HORS_EXPERIMENTATION]: {
       motif: MotifSuppression.DEMENAGEMENT_TERRITOIRE_HORS_EXPERIMENTATION,
-      structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI_BRSA]
+      structures: [Structure.POLE_EMPLOI_BRSA]
     },
     [CodeMotifSuppression.CHANGEMENT_CONSEILLER]: {
       motif: MotifSuppression.CHANGEMENT_CONSEILLER,
-      structures: [Structure.PASS_EMPLOI, Structure.POLE_EMPLOI, Structure.MILO]
+      structures: [Structure.POLE_EMPLOI, Structure.MILO]
     },
     [CodeMotifSuppression.AUTRE]: {
       motif: MotifSuppression.AUTRE,
       structures: [
-        Structure.PASS_EMPLOI,
         Structure.POLE_EMPLOI,
         Structure.MILO,
         Structure.POLE_EMPLOI_BRSA

@@ -331,7 +331,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
     it('appelle l’authorizer idoine pou un jeune', async () => {
       // Given
       const utilisateur = unUtilisateurJeune({
-        structure: Core.Structure.PASS_EMPLOI
+        structure: Core.Structure.MILO
       })
 
       // When

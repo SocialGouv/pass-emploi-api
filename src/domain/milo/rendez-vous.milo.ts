@@ -93,15 +93,15 @@ export namespace RendezVousMilo {
     }
 
     updateRendezVousCEJ(
-      rendezVousPassEmploi: RendezVous,
+      rendezVousCEJ: RendezVous,
       rendezVousMilo: RendezVousMilo
     ): RendezVous {
       const { dateTimeDebut, duree } = this.getDateEtDuree(
         rendezVousMilo,
-        rendezVousPassEmploi.jeunes[0]
+        rendezVousCEJ.jeunes[0]
       )
       return {
-        ...rendezVousPassEmploi,
+        ...rendezVousCEJ,
         titre: rendezVousMilo.titre,
         date: dateTimeDebut.toJSDate(),
         duree,

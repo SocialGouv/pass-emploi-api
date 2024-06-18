@@ -25,7 +25,10 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { SupportAuthorizer } from '../../../src/application/authorizers/support-authorizer'
 import { Authentification } from '../../../src/domain/authentification'
 import Structure = Core.Structure
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurSupport
+} from '../../fixtures/authentification.fixture'
 
 describe('TransfererJeunesConseillerCommandHandler', () => {
   let transfererJeunesConseillerCommandHandler: TransfererJeunesConseillerCommandHandler
@@ -583,7 +586,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
           it('retourne une MauvaiseCommandeError', async () => {
             const conseillerSource = unConseiller({
               id: '1',
-              structure: Structure.PASS_EMPLOI
+              structure: Structure.POLE_EMPLOI
             })
             const conseillerCible = unConseiller({
               id: '2',
@@ -598,9 +601,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
               idsJeunes: ['1', '2'],
               provenanceUtilisateur: Authentification.Type.SUPPORT
             }
-            const utilisateurPassEmploi = unUtilisateurConseiller({
-              structure: Core.Structure.PASS_EMPLOI
-            })
+            const utilisateurSupport = unUtilisateurSupport()
 
             conseillerRepository.get
               .onFirstCall()
@@ -617,7 +618,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             const result =
               await transfererJeunesConseillerCommandHandler.handle(
                 command,
-                utilisateurPassEmploi
+                utilisateurSupport
               )
 
             // Then

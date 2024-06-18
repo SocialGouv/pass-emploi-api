@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { estMilo } from 'src/domain/core'
 import { NonTrouveError } from '../../../building-blocks/types/domain-error'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
@@ -73,11 +74,7 @@ export class GetDetailRendezVousQueryHandler extends QueryHandler<
     query: GetDetailRendezVousQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (
-      this.conseillerAgenceAuthorizer.structureAutoriseeInterAgence(
-        utilisateur.structure
-      )
-    ) {
+    if (estMilo(utilisateur.structure)) {
       return this.conseillerAgenceAuthorizer.autoriserConseillerMiloPourUnRdvDeSonAgenceOuAvecUnJeuneDansLeRdv(
         query.idRendezVous,
         utilisateur

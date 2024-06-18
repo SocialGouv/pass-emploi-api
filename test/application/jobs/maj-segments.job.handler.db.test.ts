@@ -69,7 +69,7 @@ describe('MajSegmentsJobHandler', () => {
   })
 
   describe('handle', () => {
-    describe('des jeunes MILO/PE/PASS_EMPLOI et pas de campagne active', () => {
+    describe('des jeunes MILO/PE et pas de campagne active', () => {
       let result: SuiviJob
       beforeEach(async () => {
         // Given
@@ -97,13 +97,6 @@ describe('MajSegmentsJobHandler', () => {
         )
         await JeuneSqlModel.creer(
           unJeuneDto({
-            id: 'j4',
-            structure: Core.Structure.PASS_EMPLOI,
-            instanceId: 'instanceId4'
-          })
-        )
-        await JeuneSqlModel.creer(
-          unJeuneDto({
             id: 'j5',
             structure: Core.Structure.POLE_EMPLOI_BRSA,
             instanceId: 'instanceId5'
@@ -119,7 +112,7 @@ describe('MajSegmentsJobHandler', () => {
         expect(result.succes).to.equal(true)
         expect(result.resultat).to.deep.equal({
           nbCampagnesNonRepondues: 0,
-          nbJeunes: 5
+          nbJeunes: 4
         })
       })
       it('construit le fichier memberships', async () => {
@@ -175,13 +168,6 @@ describe('MajSegmentsJobHandler', () => {
         )
         await JeuneSqlModel.creer(
           unJeuneDto({
-            id: 'j4',
-            structure: Core.Structure.PASS_EMPLOI,
-            instanceId: 'instanceId4'
-          })
-        )
-        await JeuneSqlModel.creer(
-          unJeuneDto({
             id: 'j5',
             structure: Core.Structure.POLE_EMPLOI_BRSA,
             instanceId: 'instanceId5'
@@ -201,8 +187,8 @@ describe('MajSegmentsJobHandler', () => {
 
         expect(result.succes).to.equal(true)
         expect(result.resultat).to.deep.equal({
-          nbCampagnesNonRepondues: 3,
-          nbJeunes: 5
+          nbCampagnesNonRepondues: 2,
+          nbJeunes: 4
         })
       })
       it('construit le fichier metadata', async () => {

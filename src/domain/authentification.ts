@@ -32,7 +32,7 @@ export namespace Authentification {
       id: 'SUPPORT',
       prenom: 'support',
       nom: 'cej',
-      structure: Core.Structure.PASS_EMPLOI,
+      structure: Core.Structure.SUPPORT,
       type: Authentification.Type.SUPPORT,
       roles: []
     }

@@ -157,7 +157,7 @@ export const testConfig = (): ConfigService => {
       key: '{"type": "service_account","project_id": "pass-emploi-test","private_key_id": "xx","private_key": "xx","client_email": "test@pass-emploi-test.iam.gserviceaccount.com","client_id": "xx","auth_uri": "https://accounts.google.com/o/oauth2/auth","token_uri": "https://oauth2.googleapis.com/token","auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/test"}',
       encryptionKey: 'firebase-encryption-key'
     },
-    passEmploiContactEmail: 'pass.emploi.contact@gmail.com',
+    noReplyContactEmail: 'no-reply@pass-emploi.beta.gouv.fr',
     frontEndUrl: 'http://frontend.com',
     matomo: {
       siteId: 0,

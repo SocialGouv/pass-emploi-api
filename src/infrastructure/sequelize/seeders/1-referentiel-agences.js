@@ -1,7 +1,7 @@
 'use strict'
 const agencesMilo = require('./data/agences_milo.json')
 const agencesPE = require('./data/agences_pe.json')
-const agencePassEmploi = {
+const agenceMiloCEJ = {
   id: 9999,
   nom_agence: 'Agence Du CEJ MILO',
   nom_region: 'Pays de la Loire',
@@ -21,7 +21,7 @@ module.exports = {
         await queryInterface.bulkInsert('agence', agencesPE, {
           transaction
         })
-        await queryInterface.bulkInsert('agence', [agencePassEmploi], {
+        await queryInterface.bulkInsert('agence', [agenceMiloCEJ], {
           transaction
         })
       }

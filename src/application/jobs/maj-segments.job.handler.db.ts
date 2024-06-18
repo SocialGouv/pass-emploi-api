@@ -25,7 +25,6 @@ enum SEGMENTS {
   CAMPAGNE_NON_REPONDUE = 'CAMPAGNE_NON_REPONDUE',
   JEUNES_MILO = 'JEUNES_MILO',
   JEUNES_POLE_EMPLOI = 'JEUNES_POLE_EMPLOI',
-  JEUNES_PASS_EMPLOI = 'JEUNES_PASS_EMPLOI',
   JEUNES_POLE_EMPLOI_BRSA = 'JEUNES_POLE_EMPLOI_BRSA'
 }
 
@@ -138,10 +137,6 @@ export class MajSegmentsJobHandler extends JobHandler<Job> {
         display_name: 'Jeunes POLE EMPLOI'
       },
       {
-        segment_label: SEGMENTS.JEUNES_PASS_EMPLOI,
-        display_name: 'Jeunes PASS EMPLOI'
-      },
-      {
         segment_label: SEGMENTS.JEUNES_POLE_EMPLOI_BRSA,
         display_name: 'Jeunes POLE EMPLOI BRSA'
       }
@@ -184,8 +179,6 @@ export class MajSegmentsJobHandler extends JobHandler<Job> {
         return SEGMENTS.JEUNES_POLE_EMPLOI
       case Core.Structure.MILO:
         return SEGMENTS.JEUNES_MILO
-      case Core.Structure.PASS_EMPLOI:
-        return SEGMENTS.JEUNES_PASS_EMPLOI
       case Core.Structure.POLE_EMPLOI_BRSA:
         return SEGMENTS.JEUNES_POLE_EMPLOI_BRSA
       default:
