@@ -3,7 +3,8 @@ export namespace Core {
     PASS_EMPLOI = 'PASS_EMPLOI',
     MILO = 'MILO',
     POLE_EMPLOI = 'POLE_EMPLOI',
-    POLE_EMPLOI_BRSA = 'POLE_EMPLOI_BRSA'
+    POLE_EMPLOI_BRSA = 'POLE_EMPLOI_BRSA',
+    POLE_EMPLOI_AIJ = 'POLE_EMPLOI_AIJ'
   }
 
   export const structuresPoleEmploiBRSA = [

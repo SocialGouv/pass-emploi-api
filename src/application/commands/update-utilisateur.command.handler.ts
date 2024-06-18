@@ -67,6 +67,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
         case Core.Structure.MILO:
         case Core.Structure.POLE_EMPLOI:
         case Core.Structure.POLE_EMPLOI_BRSA:
+        case Core.Structure.POLE_EMPLOI_AIJ:
           return this.authentificationConseillerSSO(commandSanitized)
       }
     }
@@ -78,6 +79,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
           return this.authentificationJeuneMilo(commandSanitized)
         case Core.Structure.POLE_EMPLOI:
         case Core.Structure.POLE_EMPLOI_BRSA:
+        case Core.Structure.POLE_EMPLOI_AIJ:
           return this.authentificationJeunePoleEmploi(commandSanitized)
       }
     }
@@ -366,6 +368,11 @@ function verifierStructureUtilisteur(
         codeErreur = dejaConnecte
           ? NonTraitableError.CODE_UTILISATEUR_DEJA_PE_BRSA
           : NonTraitableError.CODE_UTILISATEUR_NOUVEAU_PE_BRSA
+        break
+      case Core.Structure.POLE_EMPLOI_AIJ:
+        codeErreur = dejaConnecte
+          ? NonTraitableError.CODE_UTILISATEUR_DEJA_PE_AIJ
+          : NonTraitableError.CODE_UTILISATEUR_NOUVEAU_PE_AIJ
         break
     }
 
