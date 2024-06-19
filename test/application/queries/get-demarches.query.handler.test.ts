@@ -4,7 +4,7 @@ import {
 } from 'src/application/queries/get-demarches.query.handler'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { GetDemarchesQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
-import { estPoleEmploiBRSA } from '../../../src/domain/core'
+import { estPoleEmploi } from '../../../src/domain/core'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { StubbedClass, expect, stubClass } from '../../utils'
 
@@ -55,7 +55,7 @@ describe('GetDemarchesQueryHandler', () => {
       expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         query.idJeune,
         utilisateur,
-        estPoleEmploiBRSA(utilisateur.structure)
+        estPoleEmploi(utilisateur.structure)
       )
     })
   })

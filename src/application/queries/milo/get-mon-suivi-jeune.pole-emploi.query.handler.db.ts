@@ -10,7 +10,7 @@ import {
   success
 } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
-import { estPoleEmploiBRSA } from '../../../domain/core'
+import { estPoleEmploi } from '../../../domain/core'
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { MonSuiviPoleEmploiQueryModel } from '../query-models/jeunes.pole-emploi.query-model'
 
@@ -40,7 +40,7 @@ export class GetMonSuiviPoleEmploiQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
-      estPoleEmploiBRSA(utilisateur.structure)
+      estPoleEmploi(utilisateur.structure)
     )
   }
 

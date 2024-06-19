@@ -3,8 +3,7 @@ import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
   NonTraitableError,
-  NonTraitableInexistantError,
-  NonTrouveError
+  NonTraitableInexistantError
 } from '../../building-blocks/types/domain-error'
 import {
   Result,
@@ -62,8 +61,6 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     }
     if (commandSanitized.type === Authentification.Type.CONSEILLER) {
       switch (commandSanitized.structure) {
-        case Core.Structure.PASS_EMPLOI:
-          return this.authentificationConseillerPassEmploi(commandSanitized)
         case Core.Structure.MILO:
         case Core.Structure.POLE_EMPLOI:
         case Core.Structure.POLE_EMPLOI_BRSA:
@@ -73,8 +70,6 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     }
     if (commandSanitized.type === Authentification.Type.JEUNE) {
       switch (commandSanitized.structure) {
-        case Core.Structure.PASS_EMPLOI:
-          return this.authentificationJeunePassEmploi(commandSanitized)
         case Core.Structure.MILO:
           return this.authentificationJeuneMilo(commandSanitized)
         case Core.Structure.POLE_EMPLOI:
@@ -224,26 +219,6 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     return utilisateurMisAJour
   }
 
-  private async authentificationConseillerPassEmploi(
-    commandSanitized: UpdateUtilisateurCommand
-  ): Promise<Result<UtilisateurQueryModel>> {
-    const utilisateurTrouve =
-      await this.authentificationRepository.getConseiller(
-        commandSanitized.idUtilisateurAuth
-      )
-    if (
-      !utilisateurTrouve ||
-      utilisateurTrouve.structure !== commandSanitized.structure
-    ) {
-      return failure(new NonTrouveError(commandSanitized.idUtilisateurAuth))
-    } else {
-      const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
-        utilisateurTrouve,
-        commandSanitized
-      )
-      return success(queryModelFromUtilisateur(utilisateurMisAJour))
-    }
-  }
   private async authentificationJeuneMilo(
     commandSanitized: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
@@ -295,25 +270,6 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     )
 
     return success(queryModelFromUtilisateur(utilisateurMisAJour))
-  }
-
-  private async authentificationJeunePassEmploi(
-    commandSanitized: UpdateUtilisateurCommand
-  ): Promise<Result<UtilisateurQueryModel>> {
-    const utilisateurTrouve =
-      await this.authentificationRepository.getJeuneByStructure(
-        commandSanitized.idUtilisateurAuth,
-        commandSanitized.structure
-      )
-    if (!utilisateurTrouve) {
-      return failure(new NonTrouveError(commandSanitized.idUtilisateurAuth))
-    } else {
-      const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
-        utilisateurTrouve,
-        commandSanitized
-      )
-      return success(queryModelFromUtilisateur(utilisateurMisAJour))
-    }
   }
 
   private async authentificationConseillerSSO(

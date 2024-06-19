@@ -17,7 +17,7 @@ import {
 } from 'src/building-blocks/types/result'
 import { Action } from 'src/domain/action/action'
 import { Authentification } from 'src/domain/authentification'
-import { estMilo, estMiloPassEmploi } from 'src/domain/core'
+import { estMilo } from 'src/domain/core'
 
 import { ConfigService } from '@nestjs/config'
 import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
@@ -81,10 +81,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
 
-    if (
-      sessionsMiloActives(this.configService) &&
-      estMilo(jeuneSqlModel.structure)
-    ) {
+    if (sessionsMiloActives(this.configService)) {
       if (!jeuneSqlModel.idPartenaire) {
         return failure(new JeuneMiloSansIdDossier(query.idJeune))
       }
@@ -169,7 +166,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
-      estMiloPassEmploi(utilisateur.structure)
+      estMilo(utilisateur.structure)
     )
   }
 
@@ -312,11 +309,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     let sessionsInscritCetteSemaine: SessionJeuneMiloQueryModel[] = []
     let sessionsNonInscrit: SessionJeuneMiloQueryModel[] = []
 
-    if (
-      sessionsMiloActives(this.configService) &&
-      estMilo(jeuneSqlModel.structure) &&
-      jeuneSqlModel.idPartenaire
-    ) {
+    if (sessionsMiloActives(this.configService) && jeuneSqlModel.idPartenaire) {
       try {
         const sessionsQueryModels = await this.getSessionsQueryGetter.handle(
           query.idJeune,

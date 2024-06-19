@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { Authentification } from '../../domain/authentification'
-import { Core, estMilo, estPoleEmploiBRSA } from '../../domain/core'
+import { Core, estMilo, estPoleEmploi } from '../../domain/core'
 import { KeycloakClient } from '../clients/keycloak-client.db'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
@@ -213,7 +213,7 @@ function checkEstSuperviseurPEBRSA(
   estSuperviseur: boolean
 ): boolean {
   return (
-    estPoleEmploiBRSA(structureDuConseiller) &&
+    estPoleEmploi(structureDuConseiller) &&
     estSuperviseur &&
     Boolean(
       superviseursParEmail.find(

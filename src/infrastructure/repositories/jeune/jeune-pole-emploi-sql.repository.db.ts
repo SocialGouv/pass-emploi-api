@@ -10,7 +10,7 @@ export class JeunePoleEmploiSqlRepository
     const jeunesSqlModel = await JeuneSqlModel.findAll({
       where: {
         structure: {
-          [Op.in]: Core.structuresPoleEmploiBRSA
+          [Op.in]: Core.structuresPoleEmploi
         },
         pushNotificationToken: { [Op.ne]: null },
         idAuthentification: { [Op.ne]: null }

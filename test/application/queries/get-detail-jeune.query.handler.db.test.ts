@@ -83,7 +83,7 @@ describe('GetDetailJeuneQueryHandler', () => {
           unJeuneDto({
             id: idJeune,
             idConseiller,
-            structure: Core.Structure.PASS_EMPLOI
+            structure: Core.Structure.MILO
           })
         )
 
@@ -101,7 +101,9 @@ describe('GetDetailJeuneQueryHandler', () => {
               unDetailJeuneQueryModel().creationDate
             ).toISOString()
           },
-          situations: undefined
+          situations: undefined,
+          estAArchiver: false,
+          urlDossier: 'https://milo.com/1234/acces-externe'
         })
         expect(actual).to.deep.equal(success(expected))
       })
@@ -145,7 +147,7 @@ describe('GetDetailJeuneQueryHandler', () => {
           unJeuneDto({
             id: idJeune,
             idConseiller,
-            structure: Core.Structure.PASS_EMPLOI
+            structure: Core.Structure.MILO
           })
         )
         await SituationsMiloSqlModel.create({
@@ -172,7 +174,9 @@ describe('GetDetailJeuneQueryHandler', () => {
               unDetailJeuneQueryModel().creationDate
             ).toISOString()
           },
-          situations: [{ etat: 'EN_COURS', categorie: 'Emploi' }]
+          situations: [{ etat: 'EN_COURS', categorie: 'Emploi' }],
+          estAArchiver: false,
+          urlDossier: 'https://milo.com/1234/acces-externe'
         })
         expect(actual).to.deep.equal(success(expected))
       })
@@ -262,7 +266,7 @@ describe('GetDetailJeuneQueryHandler', () => {
           unJeuneDto({
             id: idJeune,
             idConseiller,
-            structure: Core.Structure.PASS_EMPLOI
+            structure: Core.Structure.MILO
           })
         )
         const dateTransfert = uneAutreDate()
@@ -290,7 +294,9 @@ describe('GetDetailJeuneQueryHandler', () => {
             prenom: conseillerDto.prenom,
             depuis: dateTransfert.toISOString()
           },
-          situations: undefined
+          situations: undefined,
+          estAArchiver: false,
+          urlDossier: 'https://milo.com/1234/acces-externe'
         })
         expect(actual).to.deep.equal(success(expected))
       })
@@ -310,7 +316,7 @@ describe('GetDetailJeuneQueryHandler', () => {
             id: idJeune,
             idConseiller,
             idConseillerInitial: '41',
-            structure: Core.Structure.PASS_EMPLOI
+            structure: Core.Structure.MILO
           })
         )
 
@@ -329,7 +335,9 @@ describe('GetDetailJeuneQueryHandler', () => {
             ).toISOString()
           },
           isReaffectationTemporaire: true,
-          situations: undefined
+          situations: undefined,
+          estAArchiver: false,
+          urlDossier: 'https://milo.com/1234/acces-externe'
         })
         expect(actual).to.deep.equal(success(expected))
       })
@@ -354,7 +362,7 @@ describe('GetDetailJeuneQueryHandler', () => {
           unJeuneDto({
             id: idJeune,
             idConseiller,
-            structure: Core.Structure.PASS_EMPLOI
+            structure: Core.Structure.MILO
           })
         )
         const dateTransfert1 = new Date('2022-04-02T03:24:00')
@@ -394,7 +402,9 @@ describe('GetDetailJeuneQueryHandler', () => {
             prenom: conseillerDto.prenom,
             depuis: dateTransfert2.toISOString()
           },
-          situations: undefined
+          situations: undefined,
+          estAArchiver: false,
+          urlDossier: 'https://milo.com/1234/acces-externe'
         })
         expect(actual).to.deep.equal(success(expected))
       })

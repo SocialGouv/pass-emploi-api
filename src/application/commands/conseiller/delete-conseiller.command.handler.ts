@@ -19,7 +19,7 @@ import {
   Conseiller,
   ConseillerRepositoryToken
 } from '../../../domain/milo/conseiller'
-import { estPoleEmploiBRSA } from '../../../domain/core'
+import { estPoleEmploi } from '../../../domain/core'
 import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 
@@ -52,7 +52,7 @@ export class DeleteConseillerCommandHandler extends CommandHandler<
     return this.conseillerAuthorizer.autoriserLeConseiller(
       command.idConseiller,
       utilisateur,
-      estPoleEmploiBRSA(utilisateur.structure)
+      estPoleEmploi(utilisateur.structure)
     )
   }
 

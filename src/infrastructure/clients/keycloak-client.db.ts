@@ -9,7 +9,7 @@ import { ConfigService } from '@nestjs/config'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import { firstValueFrom } from 'rxjs'
-import { Core, estMilo, estPoleEmploiBRSA } from 'src/domain/core'
+import { Core, estMilo, estPoleEmploi } from 'src/domain/core'
 import { buildError } from 'src/utils/logger.module'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
@@ -88,7 +88,7 @@ export class KeycloakClient {
       if (e.code === 'ECONNABORTED' || e.status >= '500') {
         message = 'token_exchange_error'
       } else {
-        if (estPoleEmploiBRSA(structure)) {
+        if (estPoleEmploi(structure)) {
           message = 'token_pole_emploi_expired'
         } else if (estMilo(structure)) {
           message = 'token_milo_expired'

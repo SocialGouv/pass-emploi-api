@@ -44,7 +44,7 @@ export class SendNotificationsNouveauxMessagesExternesCommandHandler extends Com
     const jeunes =
       await this.jeuneRepository.findAllJeunesByIdsAuthentificationAndStructures(
         command.idsAuthentificationJeunes,
-        Core.structuresPoleEmploiBRSA
+        Core.structuresPoleEmploi
       )
 
     if (!jeunes.length) {

@@ -105,7 +105,7 @@ export class ConseillersController {
       {
         recherche: queryParams.q,
         structureDifferenteRecherchee:
-          queryParams.structure as Core.StructuresPoleEmploiBRSA
+          queryParams.structure as Core.StructuresPoleEmploi
       },
       utilisateur
     )

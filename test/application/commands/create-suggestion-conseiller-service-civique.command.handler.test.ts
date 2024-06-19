@@ -8,7 +8,7 @@ import {
 import { MauvaiseCommandeError } from '../../../src/building-blocks/types/domain-error'
 import { Failure, isFailure } from '../../../src/building-blocks/types/result'
 import { Authentification } from '../../../src/domain/authentification'
-import { estNonBRSA } from '../../../src/domain/core'
+import { aAccesAuxAlternancesEtServicesCiviques } from '../../../src/domain/core'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { Recherche } from '../../../src/domain/offre/recherche/recherche'
@@ -77,7 +77,7 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
       ).to.have.been.calledWithExactly(
         command.idConseiller,
         utilisateur,
-        estNonBRSA(utilisateur.structure)
+        aAccesAuxAlternancesEtServicesCiviques(utilisateur.structure)
       )
     })
   })

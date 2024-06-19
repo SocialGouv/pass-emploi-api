@@ -91,7 +91,7 @@ describe('MailBrevoService', () => {
             }
           ],
           templateId: parseInt(
-            config.get('brevo').templates.conversationsNonLuesBRSA
+            config.get('brevo').templates.conversationsNonLuesPassEmploi
           ),
           params: {
             prenom: conseiller.firstName,

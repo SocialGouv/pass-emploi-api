@@ -1,7 +1,7 @@
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { TypesDemarcheQueryModel } from '../../../src/application/queries/query-models/types-demarche.query-model'
 import { RechercherTypesDemarcheQueryHandler } from '../../../src/application/queries/rechercher-types-demarche.query.handler'
-import { estPoleEmploiBRSA } from '../../../src/domain/core'
+import { estPoleEmploi } from '../../../src/domain/core'
 import { TypeDemarcheDto } from '../../../src/infrastructure/clients/dto/pole-emploi.dto'
 import { PoleEmploiClient } from '../../../src/infrastructure/clients/pole-emploi-client'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
@@ -258,7 +258,7 @@ describe('RechercherTypesDemarcheQueryHandler', () => {
       ).to.have.been.calledOnceWithExactly(
         utilisateur.id,
         utilisateur,
-        estPoleEmploiBRSA(utilisateur.structure)
+        estPoleEmploi(utilisateur.structure)
       )
     })
   })

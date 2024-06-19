@@ -26,7 +26,7 @@ import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/ren
 import { fromSqlToRendezVousJeuneQueryModel } from '../query-mappers/rendez-vous-milo.mappers'
 import { GetSessionsJeuneMiloQueryGetter } from '../query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { buildError } from '../../../utils/logger.module'
-import { estMilo, estMiloPassEmploi } from '../../../domain/core'
+import { estMilo } from '../../../domain/core'
 
 export interface GetMonSuiviMiloQuery extends Query {
   idJeune: string
@@ -53,7 +53,7 @@ export class GetMonSuiviMiloQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
-      estMiloPassEmploi(utilisateur.structure)
+      estMilo(utilisateur.structure)
     )
   }
 
@@ -67,45 +67,38 @@ export class GetMonSuiviMiloQueryHandler extends QueryHandler<
     if (!jeuneSqlModel) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
-    if (estMilo(utilisateur.structure) && !jeuneSqlModel.idPartenaire) {
+    if (!jeuneSqlModel.idPartenaire) {
       return failure(new JeuneMiloSansIdDossier(query.idJeune))
     }
 
     const [actions, rendezVous, sessionsMilo] = await Promise.all([
       this.recupererLesActions(query),
       this.recupererLesRendezVous(query, utilisateur.type),
-      estMilo(utilisateur.structure)
-        ? this.sessionsJeuneQueryGetter
-            .handle(
-              query.idJeune,
-              jeuneSqlModel.idPartenaire!,
-              query.accessToken,
-              {
-                periode: {
-                  debut: query.dateDebut,
-                  fin: query.dateFin
-                },
-                pourConseiller: false,
-                filtrerEstInscrit: true
-              }
-            )
-            .then(result => {
-              if (isFailure(result)) {
-                this.logger.error(`Erreur récupération Sessions Mon Suivi`)
-                return null
-              }
-              return result.data
-            })
-            .catch(error => {
-              if (error instanceof UnauthorizedException) {
-                throw error
-              }
-              this.logger.error(
-                buildError(`Erreur récupération Sessions Mon Suivi`, error)
-              )
-              return null
-            })
-        : null
+      this.sessionsJeuneQueryGetter
+        .handle(query.idJeune, jeuneSqlModel.idPartenaire, query.accessToken, {
+          periode: {
+            debut: query.dateDebut,
+            fin: query.dateFin
+          },
+          pourConseiller: false,
+          filtrerEstInscrit: true
+        })
+        .then(result => {
+          if (isFailure(result)) {
+            this.logger.error(`Erreur récupération Sessions Mon Suivi`)
+            return null
+          }
+          return result.data
+        })
+        .catch(error => {
+          if (error instanceof UnauthorizedException) {
+            throw error
+          }
+          this.logger.error(
+            buildError(`Erreur récupération Sessions Mon Suivi`, error)
+          )
+          return null
+        })
     ])
     return success({ actions, rendezVous, sessionsMilo })
   }
