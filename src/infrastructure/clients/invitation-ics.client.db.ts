@@ -18,14 +18,14 @@ import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class InvitationIcsClient {
-  private passEmploiContactEmail: string
+  private noReplyContactEmail: string
 
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
     private configService: ConfigService
   ) {
-    this.passEmploiContactEmail =
-      this.configService.get('passEmploiContactEmail') ?? ''
+    this.noReplyContactEmail =
+      this.configService.get('noReplyContactEmail') ?? ''
   }
   async getAndIncrementRendezVousIcsSequence(
     idRendezVous: string
@@ -123,7 +123,7 @@ export class InvitationIcsClient {
       duration: { minutes: rendezVous.duree },
       organizer: {
         name: conseiller.lastName + ' ' + conseiller.firstName,
-        email: this.passEmploiContactEmail
+        email: this.noReplyContactEmail
       },
       method:
         operation === RendezVous.Operation.SUPPRESSION ? 'CANCEL' : 'REQUEST',

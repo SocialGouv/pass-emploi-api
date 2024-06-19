@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result, isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Core, estPoleEmploiBRSA } from '../../domain/core'
+import { Core, estPoleEmploi } from '../../domain/core'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { ThematiqueQueryModel } from './query-models/catalogue.query-model'
 import { Query } from 'src/building-blocks/types/query'
@@ -101,7 +101,7 @@ export class GetCatalogueDemarchesQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       utilisateur.id,
       utilisateur,
-      estPoleEmploiBRSA(utilisateur.structure)
+      estPoleEmploi(utilisateur.structure)
     )
   }
 

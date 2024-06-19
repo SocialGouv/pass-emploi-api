@@ -1,5 +1,5 @@
 {"instance_id":"instanceId","update_time":"2020-04-06T12:00:00.000Z","segment_labels":["JEUNES_MILO"]}
 {"instance_id":"instanceId2","update_time":"2020-04-06T12:00:00.000Z","segment_labels":["JEUNES_MILO","CAMPAGNE_NON_REPONDUE"]}
 {"instance_id":"instanceId3","update_time":"2020-04-06T12:00:00.000Z","segment_labels":["JEUNES_POLE_EMPLOI","CAMPAGNE_NON_REPONDUE"]}
-{"instance_id":"instanceId4","update_time":"2020-04-06T12:00:00.000Z","segment_labels":["JEUNES_PASS_EMPLOI","CAMPAGNE_NON_REPONDUE"]}
 {"instance_id":"instanceId5","update_time":"2020-04-06T12:00:00.000Z","segment_labels":["JEUNES_POLE_EMPLOI_BRSA"]}
+{"instance_id":"instanceId6","update_time":"2020-04-06T12:00:00.000Z","segment_labels":["JEUNES_POLE_EMPLOI_AIJ"]}

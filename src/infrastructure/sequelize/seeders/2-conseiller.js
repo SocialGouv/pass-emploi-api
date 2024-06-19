@@ -70,6 +70,14 @@ module.exports = {
         structure: 'POLE_EMPLOI_BRSA',
         id_authentification: 'TNAN0500',
         notifications_sonores: false
+      },
+      {
+        id: '2d29d1e1-52a5-4d2e-aa40-a2435c5e824a',
+        prenom: 'TNAN',
+        nom: '0100',
+        structure: 'POLE_EMPLOI_AIJ',
+        id_authentification: 'TNAN0100',
+        notifications_sonores: false
       }
     ])
   },

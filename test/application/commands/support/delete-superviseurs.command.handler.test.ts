@@ -33,7 +33,7 @@ describe('DeleteSuperviseursCommandHandler', () => {
         const command: DeleteSuperviseursCommand = {
           superviseurs: [
             { email: 'test', structure: Core.Structure.MILO },
-            { email: 'test2', structure: Core.Structure.PASS_EMPLOI }
+            { email: 'test2', structure: Core.Structure.MILO }
           ]
         }
 

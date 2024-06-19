@@ -69,7 +69,7 @@ describe('MajSegmentsJobHandler', () => {
   })
 
   describe('handle', () => {
-    describe('des jeunes MILO/PE/PASS_EMPLOI et pas de campagne active', () => {
+    describe('des jeunes MILO/PE et pas de campagne active', () => {
       let result: SuiviJob
       beforeEach(async () => {
         // Given
@@ -97,16 +97,16 @@ describe('MajSegmentsJobHandler', () => {
         )
         await JeuneSqlModel.creer(
           unJeuneDto({
-            id: 'j4',
-            structure: Core.Structure.PASS_EMPLOI,
-            instanceId: 'instanceId4'
+            id: 'j5',
+            structure: Core.Structure.POLE_EMPLOI_BRSA,
+            instanceId: 'instanceId5'
           })
         )
         await JeuneSqlModel.creer(
           unJeuneDto({
-            id: 'j5',
-            structure: Core.Structure.POLE_EMPLOI_BRSA,
-            instanceId: 'instanceId5'
+            id: 'j6',
+            structure: Core.Structure.POLE_EMPLOI_AIJ,
+            instanceId: 'instanceId6'
           })
         )
 
@@ -175,16 +175,16 @@ describe('MajSegmentsJobHandler', () => {
         )
         await JeuneSqlModel.creer(
           unJeuneDto({
-            id: 'j4',
-            structure: Core.Structure.PASS_EMPLOI,
-            instanceId: 'instanceId4'
+            id: 'j5',
+            structure: Core.Structure.POLE_EMPLOI_BRSA,
+            instanceId: 'instanceId5'
           })
         )
         await JeuneSqlModel.creer(
           unJeuneDto({
-            id: 'j5',
-            structure: Core.Structure.POLE_EMPLOI_BRSA,
-            instanceId: 'instanceId5'
+            id: 'j6',
+            structure: Core.Structure.POLE_EMPLOI_AIJ,
+            instanceId: 'instanceId6'
           })
         )
         await CampagneSqlModel.create(
@@ -201,7 +201,7 @@ describe('MajSegmentsJobHandler', () => {
 
         expect(result.succes).to.equal(true)
         expect(result.resultat).to.deep.equal({
-          nbCampagnesNonRepondues: 3,
+          nbCampagnesNonRepondues: 2,
           nbJeunes: 5
         })
       })

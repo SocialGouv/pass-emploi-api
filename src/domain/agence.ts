@@ -1,4 +1,4 @@
-import { Core } from './core'
+import { Core, estPoleEmploi } from './core'
 
 export const AgenceRepositoryToken = 'Agence.Repository'
 
@@ -17,7 +17,7 @@ export namespace Agence {
   export function getStructureDeReference(
     structure: Core.Structure
   ): Core.Structure {
-    if (structure === Core.Structure.POLE_EMPLOI_BRSA) {
+    if (estPoleEmploi(structure)) {
       return Core.Structure.POLE_EMPLOI
     }
     return structure

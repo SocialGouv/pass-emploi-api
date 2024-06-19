@@ -11,7 +11,7 @@ import {
   success
 } from '../../../src/building-blocks/types/result'
 import { failureApi } from '../../../src/building-blocks/types/result-api'
-import { estPoleEmploiBRSA } from '../../../src/domain/core'
+import { estPoleEmploi } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { DocumentPoleEmploiDto } from '../../../src/infrastructure/clients/dto/pole-emploi.dto'
 import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client.db'
@@ -123,7 +123,7 @@ describe('GetCVPoleEmploiQueryHandler', () => {
         .withArgs(
           query.idJeune,
           utilisateur,
-          estPoleEmploiBRSA(utilisateur.structure)
+          estPoleEmploi(utilisateur.structure)
         )
         .resolves(emptySuccess())
 

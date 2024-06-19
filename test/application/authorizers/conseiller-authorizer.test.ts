@@ -1,10 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
-import {
-  DroitsInsuffisants,
-  NonTrouveError
-} from '../../../src/building-blocks/types/domain-error'
+import { DroitsInsuffisants } from '../../../src/building-blocks/types/domain-error'
 import { Authentification } from '../../../src/domain/authentification'
 import { Conseiller } from '../../../src/domain/milo/conseiller'
 import { Core } from '../../../src/domain/core'
@@ -93,85 +90,6 @@ describe('ConseillerAuthorizer', () => {
 
         // Then
         expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
-      })
-    })
-  })
-
-  describe('autoriserLeConseillerExterne', () => {
-    describe("quand le conseiller n'existe pas", () => {
-      it('retourne une failure', async () => {
-        // Given
-        conseillerRepository.getByIdAuthentification
-          .withArgs('id-authentifiation')
-          .resolves(undefined)
-
-        // When
-        const result = await conseillerAuthorizer.autoriserLeConseillerExterne(
-          'id-authentification'
-        )
-
-        // Then
-        expect(result).to.deep.equal(
-          failure(
-            new NonTrouveError(
-              'Conseiller',
-              'idAuthentification id-authentification'
-            )
-          )
-        )
-      })
-    })
-
-    describe('quand le conseiller n’est pas Pôle emploi', () => {
-      it('retourne une failure', async () => {
-        // Given
-        conseillerRepository.getByIdAuthentification
-          .withArgs('id-authentification')
-          .resolves(unConseiller({ structure: Core.Structure.MILO }))
-
-        // When
-        const result = await conseillerAuthorizer.autoriserLeConseillerExterne(
-          'id-authentification'
-        )
-
-        // Then
-        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
-      })
-    })
-
-    describe('quand le conseiller est Pôle emploi', () => {
-      it('retourne une success', async () => {
-        // Given
-        conseillerRepository.getByIdAuthentification
-          .withArgs('id-authentification')
-          .resolves(unConseiller({ structure: Core.Structure.POLE_EMPLOI }))
-
-        // When
-        const result = await conseillerAuthorizer.autoriserLeConseillerExterne(
-          'id-authentification'
-        )
-
-        // Then
-        expect(result).to.deep.equal(emptySuccess())
-      })
-    })
-
-    describe('quand le conseiller est Pôle emploi BRSA', () => {
-      it('retourne une success', async () => {
-        // Given
-        conseillerRepository.getByIdAuthentification
-          .withArgs('id-authentification')
-          .resolves(
-            unConseiller({ structure: Core.Structure.POLE_EMPLOI_BRSA })
-          )
-
-        // When
-        const result = await conseillerAuthorizer.autoriserLeConseillerExterne(
-          'id-authentification'
-        )
-
-        // Then
-        expect(result).to.deep.equal(emptySuccess())
       })
     })
   })

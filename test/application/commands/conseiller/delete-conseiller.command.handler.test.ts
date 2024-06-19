@@ -9,7 +9,7 @@ import { MauvaiseCommandeError } from '../../../../src/building-blocks/types/dom
 import { failure } from '../../../../src/building-blocks/types/result'
 import { Authentification } from '../../../../src/domain/authentification'
 import { Conseiller } from '../../../../src/domain/milo/conseiller'
-import { Core, estPoleEmploiBRSA } from '../../../../src/domain/core'
+import { Core, estPoleEmploi } from '../../../../src/domain/core'
 import { Evenement, EvenementService } from '../../../../src/domain/evenement'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
 import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
@@ -59,7 +59,7 @@ describe('DeleteConseillerCommandHandler', () => {
       ).to.have.been.calledWithExactly(
         'idConseiller',
         utilisateur,
-        estPoleEmploiBRSA(utilisateur.structure)
+        estPoleEmploi(utilisateur.structure)
       )
     })
   })

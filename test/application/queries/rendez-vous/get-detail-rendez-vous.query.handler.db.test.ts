@@ -444,7 +444,6 @@ describe('GetDetailRendezVousQueryHandler', () => {
         id: 'idConseiller',
         structure: Core.Structure.MILO
       })
-      conseillerAgenceAuthorizer.structureAutoriseeInterAgence.returns(true)
 
       // When
       await getDetailRendezVousQueryHandler.authorize(

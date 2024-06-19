@@ -15,7 +15,7 @@ import {
   SuggestionsPoleEmploiRepositoryToken
 } from '../../domain/offre/recherche/suggestion/suggestion'
 import { SuggestionPoleEmploiService } from '../../domain/offre/recherche/suggestion/pole-emploi.service'
-import { Core, estPoleEmploiBRSA } from '../../domain/core'
+import { Core, estPoleEmploi } from '../../domain/core'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { DiagorienteClient } from 'src/infrastructure/clients/diagoriente-client'
@@ -55,7 +55,7 @@ export class RafraichirSuggestionsCommandHandler extends CommandHandler<
 
     let suggestionsPE: Suggestion[] = []
     let suggestionsDiagoriente: Suggestion[] = []
-    const rafraichirSuggestionsPE = estPoleEmploiBRSA(command.structure)
+    const rafraichirSuggestionsPE = estPoleEmploi(command.structure)
     const rafraichirSuggestionsDiagoriente = command.avecDiagoriente
 
     if (rafraichirSuggestionsPE) {

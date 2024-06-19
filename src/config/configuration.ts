@@ -36,8 +36,8 @@ export default () => {
     logLevel: process.env.LOG_LEVEL,
     nodeEnv: process.env.NODE_ENV ?? 'production',
     frontEndUrl: process.env.FRONTEND_URL,
-    passEmploiContactEmail:
-      process.env.PASS_EMPLOI_CONTACT_EMAIL ??
+    noReplyContactEmail:
+      process.env.NO_REPLY_CONTACT_EMAIL ??
       'no-reply@pass-emploi.beta.gouv.fr',
     baseUrl,
     poleEmploi: {
@@ -125,7 +125,7 @@ export default () => {
       templates: {
         conversationsNonLues:
           process.env.SENDINBLUE_CONVERSATIONS_TEMPLATE_ID ?? '2',
-        conversationsNonLuesBRSA:
+        conversationsNonLuesPassEmploi:
           process.env.SENDINBLUE_CONVERSATIONS_BRSA_TEMPLATE_ID ?? '363',
         nouveauRendezvous:
           process.env.SENDINBLUE_NOUVEAU_RENDEZVOUS_TEMPLATE_ID ?? '3',

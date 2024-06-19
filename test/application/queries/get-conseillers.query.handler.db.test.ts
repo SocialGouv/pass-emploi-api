@@ -58,13 +58,15 @@ describe('GetConseillersQueryHandler', () => {
           id: 'autre-conseiller-pe',
           prenom: 'toto',
           nom: 'tata',
-          email: 'nils.tavernier@pole-emploi.fr'
+          email: 'nils.tavernier@pole-emploi.fr',
+          structure: Core.Structure.POLE_EMPLOI
         }),
         unConseillerDto({
           id: 'autre-conseiller-ft',
           prenom: 'toto',
           nom: 'tata',
-          email: 'new@francetravail.fr'
+          email: 'new@francetravail.fr',
+          structure: Core.Structure.POLE_EMPLOI
         })
       ])
     })
@@ -73,7 +75,7 @@ describe('GetConseillersQueryHandler', () => {
       it('retourne le conseiller seul quand le mail est exacte', async () => {
         // Given
         const utilisateur = unUtilisateurConseiller({
-          structure: Core.Structure.PASS_EMPLOI
+          structure: Core.Structure.MILO
         })
         // When
         const actual = await getConseillersQueryHandler.handle(
@@ -97,7 +99,7 @@ describe('GetConseillersQueryHandler', () => {
       it('retourne le conseiller seul quand le mail est exact PE France Travail', async () => {
         // Given
         const utilisateur = unUtilisateurConseiller({
-          structure: Core.Structure.PASS_EMPLOI
+          structure: Core.Structure.POLE_EMPLOI
         })
         // When
         const actual = await getConseillersQueryHandler.handle(
@@ -121,7 +123,7 @@ describe('GetConseillersQueryHandler', () => {
       it('retourne le conseiller seul quand le mail est exact FT', async () => {
         // Given
         const utilisateur = unUtilisateurConseiller({
-          structure: Core.Structure.PASS_EMPLOI
+          structure: Core.Structure.POLE_EMPLOI
         })
         // When
         const actual = await getConseillersQueryHandler.handle(
@@ -145,7 +147,7 @@ describe('GetConseillersQueryHandler', () => {
       it('retourne le conseiller seul quand le mail est exact PE', async () => {
         // Given
         const utilisateur = unUtilisateurConseiller({
-          structure: Core.Structure.PASS_EMPLOI
+          structure: Core.Structure.POLE_EMPLOI
         })
         // When
         const actual = await getConseillersQueryHandler.handle(
@@ -170,7 +172,7 @@ describe('GetConseillersQueryHandler', () => {
       it('retourne plusieurs conseillers quand le conseiller existe avec email approchant', async () => {
         // Given
         const utilisateur = unUtilisateurConseiller({
-          structure: Core.Structure.PASS_EMPLOI
+          structure: Core.Structure.MILO
         })
         // When
         const actual = await getConseillersQueryHandler.handle(
@@ -189,12 +191,6 @@ describe('GetConseillersQueryHandler', () => {
               email: conseillerDto.email
             },
             {
-              id: 'autre-conseiller-pe',
-              prenom: 'toto',
-              nom: 'tata',
-              email: 'nils.tavernier@pole-emploi.fr'
-            },
-            {
               id: 'autre-conseiller',
               prenom: 'toto',
               nom: 'tata',
@@ -204,10 +200,10 @@ describe('GetConseillersQueryHandler', () => {
         )
       })
 
-      it("retourne un échec quand le conseiller n'existe pas avec cette structure", async () => {
+      it("retourne une liste vide quand le conseiller n'existe pas avec cette structure", async () => {
         // Given
         const utilisateur = unUtilisateurConseiller({
-          structure: Core.Structure.MILO
+          structure: Core.Structure.POLE_EMPLOI_BRSA
         })
         // When
         const actual = await getConseillersQueryHandler.handle(
@@ -223,7 +219,7 @@ describe('GetConseillersQueryHandler', () => {
       it('retourne les conseillers classés par pertinence', async () => {
         // Given
         const utilisateur = unUtilisateurConseiller({
-          structure: Core.Structure.PASS_EMPLOI
+          structure: Core.Structure.MILO
         })
 
         await ConseillerSqlModel.bulkCreate([

@@ -12,7 +12,7 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
-import { estPoleEmploiBRSA } from '../../domain/core'
+import { estPoleEmploi } from '../../domain/core'
 import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import {
   Conseiller,
@@ -88,8 +88,8 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
         utilisateur.structure === conseillerCible.structure
 
       const conseillerSourceEtCibleDansLaMemeStructure =
-        estPoleEmploiBRSA(conseillerSource.structure) &&
-        estPoleEmploiBRSA(conseillerCible.structure) &&
+        estPoleEmploi(conseillerSource.structure) &&
+        estPoleEmploi(conseillerCible.structure) &&
         conseillerSource.structure === conseillerCible.structure
 
       if (Authentification.estSuperviseurPEBRSA(utilisateur)) {
