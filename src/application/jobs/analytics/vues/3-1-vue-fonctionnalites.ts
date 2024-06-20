@@ -49,6 +49,7 @@ export async function chargerLaVueFonctionnalite(
           FROM evenement_engagement
           where structure is not null
             and structure != 'PASS_EMPLOI'
+            and (action != 'Duplication') or (categorie != 'Action')
             and semaine = '${semaine}'
           GROUP BY semaine, structure, categorie, action, nom, type_utilisateur) as table_nom
            INNER JOIN (SELECT COUNT(distinct id_utilisateur) as nb_users_action,
@@ -61,6 +62,7 @@ export async function chargerLaVueFonctionnalite(
                        FROM evenement_engagement
                        where structure is not null
                          and structure != 'PASS_EMPLOI'
+                         and (action != 'Duplication') or (categorie != 'Action')
                          and semaine = '${semaine}'
                        GROUP BY semaine, structure, categorie, action, type_utilisateur) as table_action
                       ON table_nom.semaine = table_action.semaine and
@@ -77,6 +79,7 @@ export async function chargerLaVueFonctionnalite(
                        FROM evenement_engagement
                        where structure is not null
                          and structure != 'PASS_EMPLOI'
+                         and (action != 'Duplication') or (categorie != 'Action')  
                          and semaine = '${semaine}'
                        GROUP BY semaine, structure, categorie, type_utilisateur) as table_cat
                       ON table_nom.semaine = table_cat.semaine and
@@ -91,6 +94,7 @@ export async function chargerLaVueFonctionnalite(
                        FROM evenement_engagement
                        where structure is not null
                          and structure != 'PASS_EMPLOI'
+                         and (action != 'Duplication') or (categorie != 'Action')  
                          and semaine = '${semaine}'
                        GROUP BY semaine, structure, type_utilisateur) as table_tot
                       ON table_nom.semaine = table_tot.semaine and
