@@ -15,6 +15,7 @@ export namespace Core {
   export type StructuresPoleEmploi =
     | Core.Structure.POLE_EMPLOI
     | Core.Structure.POLE_EMPLOI_BRSA
+    | Core.Structure.POLE_EMPLOI_AIJ
 
   export interface Id {
     id: string
@@ -38,6 +39,15 @@ export function estPassEmploi(structure: Core.Structure): boolean {
     Core.Structure.POLE_EMPLOI_BRSA,
     Core.Structure.POLE_EMPLOI_AIJ
   ].includes(structure)
+}
+
+export function getStructureDeReference(
+  structure: Core.Structure
+): Core.Structure {
+  if (estPoleEmploi(structure)) {
+    return Core.Structure.POLE_EMPLOI
+  }
+  return structure
 }
 
 export function aAccesAuxAlternancesEtServicesCiviques(

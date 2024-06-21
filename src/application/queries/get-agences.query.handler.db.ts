@@ -3,9 +3,8 @@ import { Op } from 'sequelize'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result } from '../../building-blocks/types/result'
-import { Agence } from '../../domain/agence'
 import { Authentification } from '../../domain/authentification'
-import { Core } from '../../domain/core'
+import { Core, getStructureDeReference } from '../../domain/core'
 import { AgenceSqlModel } from '../../infrastructure/sequelize/models/agence.sql-model'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import Structure = Core.Structure
@@ -29,7 +28,7 @@ export class GetAgencesQueryHandler extends QueryHandler<
   async handle(query: GetAgenceQuery): Promise<AgenceQueryModel[]> {
     const sqlModels = await AgenceSqlModel.findAll({
       where: {
-        structure: Agence.getStructureDeReference(query.structure),
+        structure: getStructureDeReference(query.structure),
         id: {
           [Op.not]: ID_AGENCE_MILO_JDD
         }

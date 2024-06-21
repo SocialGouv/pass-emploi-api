@@ -89,8 +89,8 @@ describe('AuthentificationSqlRepository', () => {
         expect(utilisateur).to.deep.equal(undefined)
       })
     })
-    describe("quand c'est un conseiller superviseur", () => {
-      const structure = Core.Structure.POLE_EMPLOI
+
+    describe("quand c'est un conseiller superviseur dans une seule structure de la même structure de référence", () => {
       it("retourne l'utilisateur avec le role SUPERVISEUR uniquement", async () => {
         // Given
         await SuperviseurSqlModel.create({
@@ -99,6 +99,13 @@ describe('AuthentificationSqlRepository', () => {
             'francetravail'
           ),
           structure: conseillerDtoPE.structure
+        })
+        await SuperviseurSqlModel.create({
+          email: conseillerDtoPE.email?.replace(
+            /pole-emploi/g,
+            'francetravail'
+          ),
+          structure: Core.Structure.MILO
         })
 
         // When
@@ -112,16 +119,19 @@ describe('AuthentificationSqlRepository', () => {
             id: conseillerDtoPE.id,
             email: conseillerDtoPE.email!,
             idAuthentification: conseillerDtoPE.idAuthentification,
-            structure,
+            structure: Core.Structure.POLE_EMPLOI,
             roles: [Authentification.Role.SUPERVISEUR]
           })
         )
       })
-      it("retourne l'utilisateur avec le role SUPERVISEUR et SUPERVISEUR_PE_BRSA", async () => {
+    })
+
+    describe("quand c'est un conseiller superviseur dans plusieurs structures de la même structure de référence", () => {
+      it("retourne l'utilisateur avec le role SUPERVISEUR et SUPERVISEUR_RESPONSABLE", async () => {
         // Given
         await SuperviseurSqlModel.create({
           email: conseillerDtoPE.email,
-          structure
+          structure: Core.Structure.POLE_EMPLOI
         })
         await SuperviseurSqlModel.create({
           email: conseillerDtoPE.email,
@@ -139,10 +149,10 @@ describe('AuthentificationSqlRepository', () => {
             id: conseillerDtoPE.id,
             email: conseillerDtoPE.email!,
             idAuthentification: conseillerDtoPE.idAuthentification,
-            structure,
+            structure: Core.Structure.POLE_EMPLOI,
             roles: [
               Authentification.Role.SUPERVISEUR,
-              Authentification.Role.SUPERVISEUR_PE_BRSA
+              Authentification.Role.SUPERVISEUR_RESPONSABLE
             ]
           })
         )
