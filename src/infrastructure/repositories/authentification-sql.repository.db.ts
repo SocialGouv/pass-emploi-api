@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
+import { Sequelize } from 'sequelize-typescript'
 import { Authentification } from '../../domain/authentification'
-import { Core, estMilo, estPoleEmploi } from '../../domain/core'
+import { Core, estMilo, getStructureDeReference } from '../../domain/core'
 import { KeycloakClient } from '../clients/keycloak-client.db'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
@@ -43,7 +44,7 @@ export class AuthentificationSqlRepository
       if (estSuperviseur.dansSaStructure)
         roles.push(Authentification.Role.SUPERVISEUR)
       if (estSuperviseur.crossStructures)
-        roles.push(Authentification.Role.SUPERVISEUR_PE_BRSA)
+        roles.push(Authentification.Role.SUPERVISEUR_RESPONSABLE)
 
       return fromConseillerSqlToUtilisateur(conseillerSqlModel, roles)
     }
@@ -180,17 +181,18 @@ export class AuthentificationSqlRepository
     if (!email) return { dansSaStructure: false, crossStructures: false }
 
     const superviseursParEmail = await SuperviseurSqlModel.findAll({
-      where: { email: { [Op.like]: `${email.split('@')[0]}%` } }
+      where: { email: { [Op.like]: `${email.split('@')[0]}%` } },
+      attributes: [
+        [Sequelize.fn('DISTINCT', Sequelize.col('structure')), 'structure']
+      ]
     })
-    const estSuperviseur = checkEstSuperviseur(superviseursParEmail, structure)
-    const estSuperviseurPEBRSA = checkEstSuperviseurPEBRSA(
-      superviseursParEmail,
-      structure,
-      estSuperviseur
-    )
+
     return {
-      dansSaStructure: estSuperviseur,
-      crossStructures: estSuperviseurPEBRSA
+      dansSaStructure: checkEstSuperviseur(superviseursParEmail, structure),
+      crossStructures: checkEstSuperviseurResponsable(
+        superviseursParEmail,
+        structure
+      )
     }
   }
 }
@@ -207,25 +209,16 @@ function checkEstSuperviseur(
   )
 }
 
-function checkEstSuperviseurPEBRSA(
+function checkEstSuperviseurResponsable(
   superviseursParEmail: SuperviseurSqlModel[],
-  structureDuConseiller: Core.Structure,
-  estSuperviseur: boolean
+  structureDuConseiller: Core.Structure
 ): boolean {
+  const structureDeReference = getStructureDeReference(structureDuConseiller)
+
   return (
-    estPoleEmploi(structureDuConseiller) &&
-    estSuperviseur &&
-    Boolean(
-      superviseursParEmail.find(
-        superviseurParEmail =>
-          superviseurParEmail.structure === Core.Structure.POLE_EMPLOI
-      )
-    ) &&
-    Boolean(
-      superviseursParEmail.find(
-        superviseurParEmail =>
-          superviseurParEmail.structure === Core.Structure.POLE_EMPLOI_BRSA
-      )
-    )
+    superviseursParEmail.filter(
+      ({ structure }) =>
+        getStructureDeReference(structure) === structureDeReference
+    ).length > 1
   )
 }

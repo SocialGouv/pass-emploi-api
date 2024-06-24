@@ -116,9 +116,9 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
     const utilisateur = unUtilisateurConseiller({
       structure: Core.Structure.POLE_EMPLOI
     })
-    const utilisateurSuperviseurPEBRSA = unUtilisateurConseiller({
+    const utilisateurSuperviseurResponsable = unUtilisateurConseiller({
       structure: Core.Structure.POLE_EMPLOI,
-      roles: [Authentification.Role.SUPERVISEUR_PE_BRSA]
+      roles: [Authentification.Role.SUPERVISEUR_RESPONSABLE]
     })
 
     describe('succès', () => {
@@ -439,7 +439,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
         // When
         const result = await transfererJeunesConseillerCommandHandler.handle(
           command,
-          utilisateurSuperviseurPEBRSA
+          utilisateurSuperviseurResponsable
         )
 
         // Then
@@ -491,8 +491,8 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
           })
         })
       })
-      describe('en tant que superviseur PE BRSA', () => {
-        describe("quand la structure du conseiller source ou cible n'est pas PE BSRA", () => {
+      describe('en tant que superviseur responsable', () => {
+        describe("quand la structure du conseiller source ou cible n'est pas dans la bonne structure de référence", () => {
           it('retourne une MauvaiseCommandeError', async () => {
             // Given
             const conseillerSource = unConseiller({
@@ -525,13 +525,13 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             const result =
               await transfererJeunesConseillerCommandHandler.handle(
                 command,
-                utilisateurSuperviseurPEBRSA
+                utilisateurSuperviseurResponsable
               )
 
             // Then
             expect(!result._isSuccess && result.error).to.deep.equal(
               new MauvaiseCommandeError(
-                'Les informations de structure des conseillers source et cible ne correspondent pas'
+                'Les informations de structure ne correspondent pas'
               )
             )
           })
@@ -569,7 +569,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             const result =
               await transfererJeunesConseillerCommandHandler.handle(
                 command,
-                utilisateurSuperviseurPEBRSA
+                utilisateurSuperviseurResponsable
               )
 
             // Then

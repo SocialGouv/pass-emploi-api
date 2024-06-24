@@ -12,7 +12,6 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
-import { estPoleEmploi } from '../../domain/core'
 import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import {
   Conseiller,
@@ -82,48 +81,52 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
     }
 
     let typeTransfert: Jeune.TypeTransfert
-    if (command.provenanceUtilisateur === Authentification.Type.CONSEILLER) {
-      const superviseurDansLaMemeStructureQueConseillerSourceEtCible =
-        utilisateur.structure === conseillerSource.structure &&
-        utilisateur.structure === conseillerCible.structure
-
-      const conseillerSourceEtCibleDansLaMemeStructure =
-        estPoleEmploi(conseillerSource.structure) &&
-        estPoleEmploi(conseillerCible.structure) &&
-        conseillerSource.structure === conseillerCible.structure
-
-      if (Authentification.estSuperviseurPEBRSA(utilisateur)) {
-        if (!conseillerSourceEtCibleDansLaMemeStructure)
-          return failure(
-            new MauvaiseCommandeError(
-              'Les informations de structure des conseillers source et cible ne correspondent pas'
-            )
+    switch (command.provenanceUtilisateur) {
+      case Authentification.Type.CONSEILLER:
+        if (
+          Authentification.estSuperviseurResponsable(
+            utilisateur,
+            conseillerSource.structure
           )
-      } else {
-        if (!superviseurDansLaMemeStructureQueConseillerSourceEtCible) {
+        ) {
+          const conseillerSourceEtCibleDansLaMemeStructure =
+            conseillerSource.structure === conseillerCible.structure
+
+          if (!conseillerSourceEtCibleDansLaMemeStructure)
+            return failure(
+              new MauvaiseCommandeError(
+                'Les informations de structure des conseillers source et cible ne correspondent pas'
+              )
+            )
+        } else {
+          const superviseurDansLaMemeStructureQueConseillerSourceEtCible =
+            utilisateur.structure === conseillerSource.structure &&
+            utilisateur.structure === conseillerCible.structure
+
+          if (!superviseurDansLaMemeStructureQueConseillerSourceEtCible) {
+            return failure(
+              new MauvaiseCommandeError(
+                'Les informations de structure ne correspondent pas'
+              )
+            )
+          }
+        }
+        typeTransfert = command.estTemporaire
+          ? Jeune.TypeTransfert.TEMPORAIRE
+          : Jeune.TypeTransfert.DEFINITIF
+        break
+      case Authentification.Type.SUPPORT:
+        if (conseillerSource.structure !== conseillerCible.structure) {
           return failure(
             new MauvaiseCommandeError(
               'Les informations de structure ne correspondent pas'
             )
           )
         }
-      }
-      typeTransfert = command.estTemporaire
-        ? Jeune.TypeTransfert.TEMPORAIRE
-        : Jeune.TypeTransfert.DEFINITIF
-    } else if (
-      command.provenanceUtilisateur === Authentification.Type.SUPPORT
-    ) {
-      if (conseillerSource.structure !== conseillerCible.structure) {
-        return failure(
-          new MauvaiseCommandeError(
-            'Les informations de structure ne correspondent pas'
-          )
-        )
-      }
-      typeTransfert = command.estTemporaire
-        ? Jeune.TypeTransfert.TEMPORAIRE_SUPPORT
-        : Jeune.TypeTransfert.DEFINITIF_SUPPORT
+        typeTransfert = command.estTemporaire
+          ? Jeune.TypeTransfert.TEMPORAIRE_SUPPORT
+          : Jeune.TypeTransfert.DEFINITIF_SUPPORT
+        break
     }
 
     const updatedJeunes: Jeune[] = Jeune.changerDeConseiller(
@@ -138,7 +141,7 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
       command.idConseillerCible,
       command.idConseillerSource,
       utilisateur.id,
-      typeTransfert!
+      typeTransfert
     )
 
     if (
