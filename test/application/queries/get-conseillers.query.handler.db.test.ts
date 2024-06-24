@@ -274,7 +274,7 @@ describe('GetConseillersQueryHandler', () => {
     })
 
     describe('quand une structure différente est demandée', () => {
-      it("failure quand le conseiller n'est pas SUPERVISEUR_PE_BRSA", async () => {
+      it("failure quand le conseiller n'est pas SUPERVISEUR_RESPONSABLE", async () => {
         // Given
         const utilisateur = unUtilisateurConseiller({
           structure: Core.Structure.POLE_EMPLOI
@@ -290,11 +290,11 @@ describe('GetConseillersQueryHandler', () => {
 
         expect(actual).to.deep.equal(failure(new DroitsInsuffisants()))
       })
-      it('retourne les conseillers de la structure demandée uniquement quand le conseiller est SUPERVISEUR_PE_BRSA', async () => {
+      it('retourne les conseillers de la structure demandée uniquement quand le conseiller est SUPERVISEUR_RESPONSABLE', async () => {
         // Given
         const utilisateur = unUtilisateurConseiller({
           structure: Core.Structure.POLE_EMPLOI,
-          roles: [Authentification.Role.SUPERVISEUR_PE_BRSA]
+          roles: [Authentification.Role.SUPERVISEUR_RESPONSABLE]
         })
         await ConseillerSqlModel.bulkCreate([
           unConseillerDto({

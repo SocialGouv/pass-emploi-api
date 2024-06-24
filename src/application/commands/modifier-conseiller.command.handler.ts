@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { getStructureDeReference } from '../../domain/core'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Query } from '../../building-blocks/types/query'
@@ -50,7 +51,7 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
     if (command.agence?.id) {
       const agence = await this.agencesRepository.get(
         command.agence.id,
-        Agence.getStructureDeReference(conseillerActuel.structure)
+        getStructureDeReference(conseillerActuel.structure)
       )
       if (!agence) {
         return failure(new NonTrouveError('Agence', command.agence.id))

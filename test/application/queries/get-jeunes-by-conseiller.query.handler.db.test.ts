@@ -365,13 +365,13 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       })
     })
 
-    describe("quand l'utilisateur est un superviseur PE BRSA", () => {
+    describe("quand l'utilisateur est un superviseur responsable", () => {
       it('retourne les jeunes du conseiller', async () => {
         // Given
         const utilisateur = unUtilisateurConseiller({
           id: 'un-autre-id',
           structure: Core.Structure.POLE_EMPLOI,
-          roles: [Authentification.Role.SUPERVISEUR_PE_BRSA]
+          roles: [Authentification.Role.SUPERVISEUR_RESPONSABLE]
         })
         conseillersRepository.get.withArgs(utilisateur.id).resolves(
           unConseiller({
@@ -397,18 +397,18 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       })
     })
 
-    describe("quand l'utilisateur est un superviseur PE BRSA qui veut récupérer des jeunes d'un conseiller non PE BRSA", () => {
+    describe("quand l'utilisateur est un superviseur responsable qui veut récupérer des jeunes d'un conseiller d’une autre structure de référence", () => {
       it('renvoie un échec DroitsInsuffisants', async () => {
         // Given
         const utilisateur = unUtilisateurConseiller({
           id: 'un-autre-id',
-          structure: Core.Structure.MILO,
-          roles: [Authentification.Role.SUPERVISEUR_PE_BRSA]
+          structure: Core.Structure.POLE_EMPLOI,
+          roles: [Authentification.Role.SUPERVISEUR_RESPONSABLE]
         })
         conseillersRepository.get.withArgs(utilisateur.id).resolves(
           unConseiller({
             id: utilisateur.id,
-            structure: Core.Structure.MILO
+            structure: Core.Structure.POLE_EMPLOI
           })
         )
         conseillersRepository.get.withArgs(query.idConseiller).resolves(

@@ -35,7 +35,10 @@ export class GetConseillersQueryHandler extends QueryHandler<
   ): Promise<Result<ConseillerSimpleQueryModel[]>> {
     if (
       structureDifferenteRecherchee &&
-      !Authentification.estSuperviseurPEBRSA(utilisateur)
+      !Authentification.estSuperviseurResponsable(
+        utilisateur,
+        structureDifferenteRecherchee
+      )
     ) {
       return failure(new DroitsInsuffisants())
     }
