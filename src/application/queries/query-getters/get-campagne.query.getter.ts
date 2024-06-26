@@ -41,9 +41,12 @@ export class GetCampagneQueryGetter {
       }
     })
 
+    const reponses = campagneEnCours?.reponses[0]
     const aReponduAToutesLesQuestions =
-      campagneEnCours?.reponses[0]?.reponse1 &&
-      campagneEnCours?.reponses[0]?.reponse2
+      reponses?.reponse1 &&
+      reponses?.reponse2 &&
+      reponses?.reponse3 &&
+      reponses?.reponse4
 
     if (campagneEnCours && !aReponduAToutesLesQuestions) {
       return {
@@ -52,7 +55,7 @@ export class GetCampagneQueryGetter {
         dateFin: DateService.fromJSDateToISOString(campagneEnCours.dateFin),
         titre: "Votre expérience sur l'application",
         description:
-          "Aidez-nous à améliorer l'application en répondant à 3 questions",
+          "Aidez-nous à améliorer l'application en répondant à 4 questions",
         questions: questionsInMemory()
       }
     }
@@ -89,7 +92,7 @@ export const questionsInMemory = (): QuestionCampagneQueryModel[] => [
   {
     id: 2,
     libelle:
-      "*À votre avis, est-ce que l'application vous aide à avancer dans votre projet professionnel ?",
+      "*À votre avis, est-ce que l'application vous aide à avancer dans la réalisation de votre projet professionnel ?",
     pourquoi: true,
     options: [
       {
@@ -131,6 +134,60 @@ export const questionsInMemory = (): QuestionCampagneQueryModel[] => [
       {
         id: 4,
         libelle: 'Oui, tout à fait'
+      }
+    ]
+  },
+  {
+    id: 4,
+    libelle:
+      'Recommanderiez-vous l’application du CEJ à vos proches ? Sur une échelle de 0 à 10, 0 = pas du tout et 10 = très certainement',
+    pourquoi: true,
+    libellePourquoi:
+      'Que pouvons-nous améliorer pour vous satisfaire davantage ?',
+    options: [
+      {
+        id: 10,
+        libelle: '10'
+      },
+      {
+        id: 9,
+        libelle: '9'
+      },
+      {
+        id: 8,
+        libelle: '8'
+      },
+      {
+        id: 7,
+        libelle: '7'
+      },
+      {
+        id: 6,
+        libelle: '6'
+      },
+      {
+        id: 5,
+        libelle: '5'
+      },
+      {
+        id: 4,
+        libelle: '4'
+      },
+      {
+        id: 3,
+        libelle: '3'
+      },
+      {
+        id: 2,
+        libelle: '2'
+      },
+      {
+        id: 1,
+        libelle: '1'
+      },
+      {
+        id: 0,
+        libelle: '0'
       }
     ]
   }

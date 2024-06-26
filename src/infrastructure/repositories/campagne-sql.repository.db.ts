@@ -53,18 +53,24 @@ export class CampagneSqlRepository implements Campagne.Repository {
       reponse => reponse.idQuestion == 3
     )
 
-    await ReponseCampagneSqlModel.upsert({
+    const reponse4 = evaluation.reponses.find(
+      reponse => reponse.idQuestion == 4
+    )
+
+    await ReponseCampagneSqlModel.inserer({
       idJeune: evaluation.jeune.id,
       structureJeune: evaluation.jeune.structure,
       idCampagne: evaluation.idCampagne,
-      dateReponse: evaluation.date,
-      dateCreationJeune: evaluation.jeune.dateCreation,
-      reponse1: reponse1?.idReponse,
-      pourquoi1: reponse1?.pourquoi || null,
-      reponse2: reponse2?.idReponse || null,
+      dateReponse: evaluation.date.toJSDate(),
+      dateCreationJeune: evaluation.jeune.dateCreation.toJSDate(),
+      reponse1: reponse1!.idReponse.toString(),
+      pourquoi1: reponse1!.pourquoi || null,
+      reponse2: reponse2?.idReponse.toString() || null,
       pourquoi2: reponse2?.pourquoi || null,
-      reponse3: reponse3?.idReponse || null,
-      pourquoi3: reponse3?.pourquoi || null
+      reponse3: reponse3?.idReponse.toString() || null,
+      pourquoi3: reponse3?.pourquoi || null,
+      reponse4: reponse4?.idReponse.toString() || null,
+      pourquoi4: reponse4?.pourquoi || null
     })
   }
 
