@@ -187,6 +187,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
       CREATE TABLE IF NOT EXISTS evenement_engagement_jeune
       (
         id_utilisateur              varchar(255),
+        structure                   varchar,
         nb_action_cree              integer,
         nb_message_envoye           integer,
         nb_consultation_rdv         integer,
@@ -203,11 +204,12 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     this.logger.log('Création vue AE Jeune')
     await connexion.query(`TRUNCATE TABLE evenement_engagement_jeune;`)
     await connexion.query(`
-      INSERT INTO evenement_engagement_jeune (id_utilisateur, nb_action_cree, nb_message_envoye, nb_consultation_rdv, nb_consultation_offre, nb_postuler_offre, nb_consultation_evenement, date_premier_ae, date_dernier_ae)
+      INSERT INTO evenement_engagement_jeune (id_utilisateur, structure, nb_action_cree, nb_message_envoye, nb_consultation_rdv, nb_consultation_offre, nb_postuler_offre, nb_consultation_evenement, date_premier_ae, date_dernier_ae)
       WITH
         evenement_engagement_modif AS (
           SELECT
             id_utilisateur,
+            structure,
             date_evenement,
             CASE
               WHEN categorie = 'Action'
@@ -250,6 +252,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
         )
       SELECT
         id_utilisateur,
+        structure,
         sum(creation_action) AS nb_action_cree,
         sum(envoi_message) AS nb_message_envoye,
         sum(consultation_rdv) AS nb_consultation_rdv,
@@ -261,7 +264,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
       FROM
         evenement_engagement_modif
       GROUP BY
-        id_utilisateur
+        id_utilisateur, structure
       ;
     `)
   }
