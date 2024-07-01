@@ -3,6 +3,7 @@ import { SinonSandbox } from 'sinon'
 import { GetMotifsSuppressionJeuneQueryHandler } from '../../../src/application/queries/get-motifs-suppression-jeune.query.handler'
 import { success } from '../../../src/building-blocks/types/result'
 import {
+  unUtilisateurAIJQueryModel,
   unUtilisateurBRSAQueryModel,
   unUtilisateurQueryModel
 } from '../../fixtures/query-models/authentification.query-model.fixtures'
@@ -92,6 +93,61 @@ describe('GetMotifsSuppressionJeuneQueryHandler', () => {
           { motif: 'Déménagement', description: undefined },
           {
             motif: 'Déménagement dans un territoire hors expérimentation',
+            description: undefined
+          },
+          { motif: 'Autre', description: 'Champ libre' }
+        ])
+      )
+    })
+
+    it('renvoie la liste des motifs pour un conseiller AIJ', async () => {
+      // Given - When
+      const result = await getMotifsSuppressionJeuneQueryHandler.handle(
+        unUtilisateurAIJQueryModel()
+      )
+
+      // Then
+      expect(result).to.deep.equal(
+        success([
+          {
+            motif: 'CDI',
+            description: undefined
+          },
+          {
+            motif: 'CDD/CTT >= 6 mois',
+            description: undefined
+          },
+          {
+            motif: 'Emploi court (moins de 6 mois)',
+            description: undefined
+          },
+          {
+            motif: 'Formation',
+            description: undefined
+          },
+          {
+            motif: 'Service civique',
+            description: undefined
+          },
+          {
+            motif: 'Cessation d’inscription',
+            description: undefined
+          },
+          {
+            motif: 'Changement d’accompagnement (autre modalité ou dispositif)',
+            description: undefined
+          },
+          {
+            motif: 'Non respect des engagements ou abandon',
+            description: undefined
+          },
+          { motif: 'Déménagement', description: undefined },
+          {
+            motif: 'Création d’entreprise',
+            description: undefined
+          },
+          {
+            motif: 'Entrée en ESAT',
             description: undefined
           },
           { motif: 'Autre', description: 'Champ libre' }
