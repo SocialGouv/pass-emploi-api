@@ -27,11 +27,11 @@ export class GetMotifsSuppressionJeuneQueryHandler extends QueryHandler<
     query: GetMotifsSuppressionQuery
   ): Promise<Result<MotifSuppressionJeuneQueryModel[]>> {
     return success(
-      Object.values(ArchiveJeune.motifsSuppression)
-        .filter(motif => motif.structures.includes(query.structure))
-        .map(motif => ({
-          motif: motif.motif,
-          description: motif.description
+      Object.entries(ArchiveJeune.motifsSuppression)
+        .filter(([_, { structures }]) => structures.includes(query.structure))
+        .map(([motif, { description }]) => ({
+          motif,
+          description: description
         }))
     )
   }

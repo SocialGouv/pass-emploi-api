@@ -1,9 +1,8 @@
-import { CodeTypeRendezVous } from './rendez-vous/rendez-vous'
-import { Recherche } from './offre/recherche/recherche'
-import { Offre } from './offre/offre'
-import { Core } from './core'
-import Structure = Core.Structure
 import { Result } from '../building-blocks/types/result'
+import { Core } from './core'
+import { Offre } from './offre/offre'
+import { Recherche } from './offre/recherche/recherche'
+import { CodeTypeRendezVous } from './rendez-vous/rendez-vous'
 
 export const ArchiveJeuneRepositoryToken = 'ArchiveJeune.Repository'
 
@@ -35,24 +34,11 @@ export interface ArchiveJeune {
 }
 
 export namespace ArchiveJeune {
-  export enum CodeMotifSuppression {
-    EMPLOI_DURABLE = 'EMPLOI_DURABLE',
-    EMPLOI_COURT = 'EMPLOI_COURT',
-    CONTRAT_ARRIVE_A_ECHEANCE = 'CONTRAT_ARRIVE_A_ECHEANCE',
-    CESSATION_INSCRIPTION = 'CESSATION_INSCRIPTION',
-    LIMITE_AGE = 'LIMITE_AGE',
-    CHANGEMENT_ACCOMPAGNEMENT = 'CHANGEMENT_ACCOMPAGNEMENT',
-    DEMANDE_DU_JEUNE = 'DEMANDE_DU_JEUNE',
-    DEMANDE_DU_CONSEILLER = 'DEMANDE_DU_CONSEILLER',
-    DEMANDE_DU_BENEFICIAIRE_BRSA = 'DEMANDE_DU_BENEFICIAIRE_BRSA',
-    NON_RESPECT_OU_ABANDON = 'NON_RESPECT_OU_ABANDON',
-    DEMENAGEMENT = 'DEMENAGEMENT',
-    DEMENAGEMENT_TERRITOIRE_HORS_EXPERIMENTATION = 'DEMENAGEMENT_TERRITOIRE_HORS_EXPERIMENTATION',
-    CHANGEMENT_CONSEILLER = 'CHANGEMENT_CONSEILLER',
-    AUTRE = 'AUTRE'
-  }
   export enum MotifSuppression {
     EMPLOI_DURABLE = 'Emploi durable (plus de 6 mois)',
+    FORMATION = 'Formation',
+    CDI = 'CDI',
+    CDD_CTT = 'CDD/CTT >= 6 mois',
     EMPLOI_COURT = 'Emploi court (moins de 6 mois)',
     CONTRAT_ARRIVE_A_ECHEANCE = 'Contrat arrivé à échéance',
     CESSATION_INSCRIPTION = 'Cessation d’inscription',
@@ -65,89 +51,111 @@ export namespace ArchiveJeune {
     DEMENAGEMENT = 'Déménagement',
     DEMENAGEMENT_TERRITOIRE_HORS_EXPERIMENTATION = 'Déménagement dans un territoire hors expérimentation',
     CHANGEMENT_CONSEILLER = 'Changement de conseiller',
+    SERVICE_CIVIQUE = 'Service civique',
+    CREATION_ENTREPRISE = 'Création d’entreprise',
+    ESAT = 'Entrée en ESAT',
     AUTRE = 'Autre'
   }
 
   export type MotifSuppressionSupport = 'Support'
 
   export const motifsSuppression: Record<
-    CodeMotifSuppression,
+    MotifSuppression,
     {
-      motif: MotifSuppression
       structures: Core.Structure[]
       description?: string
     }
   > = {
-    [CodeMotifSuppression.EMPLOI_DURABLE]: {
-      motif: MotifSuppression.EMPLOI_DURABLE,
+    [MotifSuppression.EMPLOI_DURABLE]: {
       structures: [
-        Structure.POLE_EMPLOI,
-        Structure.MILO,
-        Structure.POLE_EMPLOI_BRSA
+        Core.Structure.POLE_EMPLOI,
+        Core.Structure.MILO,
+        Core.Structure.POLE_EMPLOI_BRSA
       ],
       description:
         'CDI, CDD de plus de 6 mois dont alternance, titularisation dans la fonction publique'
     },
-    [CodeMotifSuppression.EMPLOI_COURT]: {
-      motif: MotifSuppression.EMPLOI_COURT,
-      structures: [Structure.POLE_EMPLOI, Structure.MILO]
+    [MotifSuppression.CDI]: {
+      structures: [Core.Structure.POLE_EMPLOI_AIJ]
     },
-    [CodeMotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE]: {
-      motif: MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE,
-      structures: [Structure.POLE_EMPLOI, Structure.MILO]
+    [MotifSuppression.CDD_CTT]: {
+      structures: [Core.Structure.POLE_EMPLOI_AIJ]
     },
-    [CodeMotifSuppression.CESSATION_INSCRIPTION]: {
-      motif: MotifSuppression.CESSATION_INSCRIPTION,
-      structures: [Structure.POLE_EMPLOI_BRSA]
+    [MotifSuppression.EMPLOI_COURT]: {
+      structures: [
+        Core.Structure.POLE_EMPLOI,
+        Core.Structure.MILO,
+        Core.Structure.POLE_EMPLOI_AIJ
+      ]
     },
-    [CodeMotifSuppression.LIMITE_AGE]: {
-      motif: MotifSuppression.LIMITE_AGE,
-      structures: [Structure.POLE_EMPLOI, Structure.MILO],
+    [MotifSuppression.FORMATION]: {
+      structures: [Core.Structure.POLE_EMPLOI_AIJ]
+    },
+    [MotifSuppression.SERVICE_CIVIQUE]: {
+      structures: [Core.Structure.POLE_EMPLOI_AIJ]
+    },
+    [MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE]: {
+      structures: [Core.Structure.POLE_EMPLOI, Core.Structure.MILO]
+    },
+    [MotifSuppression.CESSATION_INSCRIPTION]: {
+      structures: [
+        Core.Structure.POLE_EMPLOI_BRSA,
+        Core.Structure.POLE_EMPLOI_AIJ
+      ]
+    },
+    [MotifSuppression.LIMITE_AGE]: {
+      structures: [Core.Structure.POLE_EMPLOI, Core.Structure.MILO],
       description:
         "Motif valable uniquement à partir de la fin du premier mois des 26 ans. A noter : dans le cas oû le jeune est considéré en tant que travailleur handicapé, l'âge passe à 30 ans."
     },
-    [CodeMotifSuppression.CHANGEMENT_ACCOMPAGNEMENT]: {
-      motif: MotifSuppression.CHANGEMENT_ACCOMPAGNEMENT,
-      structures: [Structure.POLE_EMPLOI_BRSA]
-    },
-    [CodeMotifSuppression.DEMANDE_DU_JEUNE]: {
-      motif: MotifSuppression.DEMANDE_DU_JEUNE,
-      structures: [Structure.POLE_EMPLOI, Structure.MILO]
-    },
-    [CodeMotifSuppression.DEMANDE_DU_CONSEILLER]: {
-      motif: MotifSuppression.DEMANDE_DU_CONSEILLER,
-      structures: [Structure.POLE_EMPLOI_BRSA]
-    },
-    [CodeMotifSuppression.DEMANDE_DU_BENEFICIAIRE_BRSA]: {
-      motif: MotifSuppression.DEMANDE_DU_BENEFICIAIRE_BRSA,
-      structures: [Structure.POLE_EMPLOI_BRSA]
-    },
-    [CodeMotifSuppression.NON_RESPECT_OU_ABANDON]: {
-      motif: MotifSuppression.NON_RESPECT_OU_ABANDON,
-      structures: [Structure.POLE_EMPLOI, Structure.MILO]
-    },
-    [CodeMotifSuppression.DEMENAGEMENT]: {
-      motif: MotifSuppression.DEMENAGEMENT,
+    [MotifSuppression.CHANGEMENT_ACCOMPAGNEMENT]: {
       structures: [
-        Structure.POLE_EMPLOI,
-        Structure.MILO,
-        Structure.POLE_EMPLOI_BRSA
+        Core.Structure.POLE_EMPLOI_BRSA,
+        Core.Structure.POLE_EMPLOI_AIJ
       ]
     },
-    [CodeMotifSuppression.DEMENAGEMENT_TERRITOIRE_HORS_EXPERIMENTATION]: {
-      motif: MotifSuppression.DEMENAGEMENT_TERRITOIRE_HORS_EXPERIMENTATION,
-      structures: [Structure.POLE_EMPLOI_BRSA]
+    [MotifSuppression.DEMANDE_DU_JEUNE]: {
+      structures: [Core.Structure.POLE_EMPLOI, Core.Structure.MILO]
     },
-    [CodeMotifSuppression.CHANGEMENT_CONSEILLER]: {
-      motif: MotifSuppression.CHANGEMENT_CONSEILLER,
-      structures: [Structure.POLE_EMPLOI, Structure.MILO]
+    [MotifSuppression.DEMANDE_DU_CONSEILLER]: {
+      structures: [Core.Structure.POLE_EMPLOI_BRSA]
     },
-    [CodeMotifSuppression.AUTRE]: {
-      motif: MotifSuppression.AUTRE,
+    [MotifSuppression.DEMANDE_DU_BENEFICIAIRE_BRSA]: {
+      structures: [Core.Structure.POLE_EMPLOI_BRSA]
+    },
+    [MotifSuppression.NON_RESPECT_OU_ABANDON]: {
       structures: [
-        Structure.POLE_EMPLOI,
-        Structure.MILO,
-        Structure.POLE_EMPLOI_BRSA
+        Core.Structure.POLE_EMPLOI,
+        Core.Structure.MILO,
+        Core.Structure.POLE_EMPLOI_AIJ
+      ]
+    },
+    [MotifSuppression.DEMENAGEMENT]: {
+      structures: [
+        Core.Structure.POLE_EMPLOI,
+        Core.Structure.MILO,
+        Core.Structure.POLE_EMPLOI_BRSA,
+        Core.Structure.POLE_EMPLOI_AIJ
+      ]
+    },
+    [MotifSuppression.DEMENAGEMENT_TERRITOIRE_HORS_EXPERIMENTATION]: {
+      structures: [Core.Structure.POLE_EMPLOI_BRSA]
+    },
+    [MotifSuppression.CHANGEMENT_CONSEILLER]: {
+      structures: [Core.Structure.POLE_EMPLOI, Core.Structure.MILO]
+    },
+    [MotifSuppression.CREATION_ENTREPRISE]: {
+      structures: [Core.Structure.POLE_EMPLOI_AIJ]
+    },
+    [MotifSuppression.ESAT]: {
+      structures: [Core.Structure.POLE_EMPLOI_AIJ]
+    },
+    [MotifSuppression.AUTRE]: {
+      structures: [
+        Core.Structure.POLE_EMPLOI,
+        Core.Structure.MILO,
+        Core.Structure.POLE_EMPLOI_BRSA,
+        Core.Structure.POLE_EMPLOI_AIJ
       ],
       description: 'Champ libre'
     }

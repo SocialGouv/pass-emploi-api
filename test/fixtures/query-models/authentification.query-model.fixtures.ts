@@ -27,3 +27,8 @@ export const unUtilisateurBRSAQueryModel = (): UtilisateurQueryModel =>
   unUtilisateurQueryModel({
     structure: Core.Structure.POLE_EMPLOI_BRSA
   })
+
+export const unUtilisateurAIJQueryModel = (): UtilisateurQueryModel =>
+  unUtilisateurQueryModel({
+    structure: Core.Structure.POLE_EMPLOI_AIJ
+  })
