@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "engines": {
-    "yarn": "3.8.2",
+    "yarn": "3.8.3",
     "node": "20.11.0"
   },
   "bin": {
@@ -189,5 +189,5 @@
   "lint-staged": {
     "*.ts": "yarn lint:fix"
   },
-  "packageManager": "yarn@4.2.2"
+  "packageManager": "yarn@4.3.1"
 }
