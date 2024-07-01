@@ -58,18 +58,23 @@ export const uneEvaluationComplete = (
   idCampagne: campagne.id,
   reponses: [
     {
-      idReponse: 4,
-      idQuestion: 1
+      idQuestion: 1,
+      idReponse: 4
     },
     {
-      idReponse: 3,
       idQuestion: 2,
+      idReponse: 3,
       pourquoi: 'Voila pourquoi'
     },
     {
-      idReponse: 1,
       idQuestion: 3,
+      idReponse: 1,
       pourquoi: 'Parce que'
+    },
+    {
+      idQuestion: 4,
+      idReponse: 7,
+      pourquoi: 'Imhotep'
     }
   ]
 })
@@ -89,6 +94,8 @@ export const uneEvaluationIncompleteDTO = (
     reponse2: 'reponse2',
     pourquoi2: null,
     reponse3: 'reponse3',
-    pourquoi3: null
+    pourquoi3: null,
+    reponse4: 'reponse4',
+    pourquoi4: null
   }
 }
