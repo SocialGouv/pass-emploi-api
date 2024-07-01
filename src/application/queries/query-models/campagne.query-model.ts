@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 
 export class OptionQuestionCampagneQueryModel {
   @ApiProperty()
@@ -20,6 +20,9 @@ export class QuestionCampagneQueryModel {
 
   @ApiProperty()
   pourquoi: boolean
+
+  @ApiPropertyOptional()
+  libellePourquoi?: string
 }
 
 export class CampagneQueryModel {

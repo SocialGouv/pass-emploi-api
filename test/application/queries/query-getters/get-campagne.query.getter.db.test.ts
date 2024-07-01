@@ -88,7 +88,7 @@ describe('GetCampagneQueryGetter', () => {
           dateFin: campagneEnCours.dateFin.toISO(),
           titre: "Votre expérience sur l'application",
           description:
-            "Aidez-nous à améliorer l'application en répondant à 3 questions",
+            "Aidez-nous à améliorer l'application en répondant à 4 questions",
           questions
         })
       })
@@ -117,12 +117,12 @@ describe('GetCampagneQueryGetter', () => {
           dateFin: campagneEnCours.dateFin.toISO(),
           titre: "Votre expérience sur l'application",
           description:
-            "Aidez-nous à améliorer l'application en répondant à 3 questions",
+            "Aidez-nous à améliorer l'application en répondant à 4 questions",
           questions
         })
       })
     })
-    describe('quand le jeune a répondu aux 2 questions', () => {
+    describe('quand le jeune a répondu à toutes les questions', () => {
       it('retourne undefined', async () => {
         // Given
         await ReponseCampagneSqlModel.create({
@@ -132,7 +132,9 @@ describe('GetCampagneQueryGetter', () => {
           dateReponse: maintenant.minus({ day: 1 }).toJSDate(),
           dateCreationJeune: maintenant.minus({ month: 5 }).toJSDate(),
           reponse1: '3',
-          reponse2: '2'
+          reponse2: '2',
+          reponse3: '1',
+          reponse4: '7'
         })
 
         // When
