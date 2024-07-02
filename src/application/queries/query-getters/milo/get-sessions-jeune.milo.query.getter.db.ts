@@ -79,21 +79,17 @@ export class GetSessionsJeuneMiloQueryGetter {
         options?.filtrerEstInscrit
       )
 
-    const sessionsDuJeuneQueryModel = sessionsDuJeune
-      .map(sessionDuJeune =>
-        mapSessionJeuneDtoToQueryModel(
-          sessionDuJeune,
-          idPartenaire,
-          timezoneDeLaStructureDuJeune
+    return success(
+      sessionsDuJeune
+        .map(sessionDuJeune =>
+          mapSessionJeuneDtoToQueryModel(
+            sessionDuJeune,
+            idPartenaire,
+            timezoneDeLaStructureDuJeune
+          )
         )
-      )
-      .sort(compareSessionsByDebut)
-
-    this.logger.log(
-      `${sessionsDuJeuneQueryModel.length} Sessions query model : 
-        ${JSON.stringify(sessionsDuJeuneQueryModel)}`
+        .sort(compareSessionsByDebut)
     )
-    return success(sessionsDuJeuneQueryModel)
   }
 
   private async getSessionsJeune(
