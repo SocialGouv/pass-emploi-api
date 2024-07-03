@@ -138,7 +138,7 @@ describe('GetMotifsSuppressionJeuneQueryHandler', () => {
             description: undefined
           },
           {
-            motif: 'Non respect des engagements ou abandon',
+            motif: 'Sortie du dispositif à l’origine du conseiller ou abandon',
             description: undefined
           },
           { motif: 'Déménagement', description: undefined },

@@ -47,6 +47,7 @@ export namespace ArchiveJeune {
     DEMANDE_DU_JEUNE = 'Demande du jeune de sortir du dispositif',
     DEMANDE_DU_CONSEILLER = 'Sortie du dispositif à l’origine du conseiller',
     DEMANDE_DU_BENEFICIAIRE_BRSA = 'Sortie du dispositif à l’origine du bénéficiaire',
+    CONSEILLER_OU_ABANDON = 'Sortie du dispositif à l’origine du conseiller ou abandon',
     NON_RESPECT_OU_ABANDON = 'Non respect des engagements ou abandon',
     DEMENAGEMENT = 'Déménagement',
     DEMENAGEMENT_TERRITOIRE_HORS_EXPERIMENTATION = 'Déménagement dans un territoire hors expérimentation',
@@ -124,11 +125,10 @@ export namespace ArchiveJeune {
       structures: [Core.Structure.POLE_EMPLOI_BRSA]
     },
     [MotifSuppression.NON_RESPECT_OU_ABANDON]: {
-      structures: [
-        Core.Structure.POLE_EMPLOI,
-        Core.Structure.MILO,
-        Core.Structure.POLE_EMPLOI_AIJ
-      ]
+      structures: [Core.Structure.POLE_EMPLOI, Core.Structure.MILO]
+    },
+    [MotifSuppression.CONSEILLER_OU_ABANDON]: {
+      structures: [Core.Structure.POLE_EMPLOI_AIJ]
     },
     [MotifSuppression.DEMENAGEMENT]: {
       structures: [
