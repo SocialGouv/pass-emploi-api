@@ -74,8 +74,8 @@
     "release:major:push": "scripts/release_and_push.sh major"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.606.0",
-    "@aws-sdk/s3-request-presigner": "3.606.0",
+    "@aws-sdk/client-s3": "3.609.0",
+    "@aws-sdk/s3-request-presigner": "3.609.0",
     "@google-cloud/bigquery": "7.8.0",
     "@nestjs/axios": "1.0.1",
     "@nestjs/common": "9.4.3",
@@ -158,7 +158,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.7",
-    "mocha": "^10.5.2",
+    "mocha": "^10.6.0",
     "nock": "^13.5.4",
     "nyc": "^15.1.0",
     "prettier": "^2.8.8",
