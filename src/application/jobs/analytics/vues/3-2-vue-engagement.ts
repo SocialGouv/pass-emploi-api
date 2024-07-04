@@ -31,6 +31,7 @@ export async function chargerLaVueEngagement(
             count(distinct id_utilisateur) as nombre_utilisateurs_2_mois
      from evenement_engagement
      where date_evenement between '${semaine}'::timestamp - interval '2 months' and '${semaine}'::timestamp + interval '1 week'
+     and code != 'ACTION_DUPLIQUEE'
      group by structure, type_utilisateur, departement, region
      order by structure, type_utilisateur, region, departement;`
   )
@@ -54,6 +55,7 @@ export async function chargerLaVueEngagement(
                         id_utilisateur
                  FROM evenement_engagement
                  WHERE semaine = '${semaine}'
+                 AND code != 'ACTION_DUPLIQUEE'
                  GROUP BY semaine, id_utilisateur, semaine, departement, region, structure, type_utilisateur) x
            WHERE nb_day_ae >= 2
            GROUP BY x.semaine, x.departement, x.region, x.structure, x.type_utilisateur) as subquery
@@ -87,7 +89,8 @@ export async function chargerLaVueEngagement(
                               COALESCE(departement, 'NON RENSEIGNE') AS departement,
                               id_utilisateur
                        FROM evenement_engagement
-                       WHERE date_evenement between '${semaine}'::timestamp - interval '5 week' and '${semaine}'::timestamp + interval '1 week'
+                       WHERE date_evenement between '${semaine}'::timestamp - interval '5 week' and '${semaine}'::timestamp + interval '1 week
+                       AND code != 'ACTION_DUPLIQUEE'
                        GROUP BY week_ae, id_utilisateur, structure, region, departement, type_utilisateur) ee
                  WHERE nb_day_ae >= 2
                  GROUP BY id_utilisateur, structure, region, departement, type_utilisateur) x
@@ -125,6 +128,7 @@ export async function chargerLaVueEngagement(
                               id_utilisateur
                        FROM evenement_engagement
                        WHERE date_evenement between '${semaine}'::timestamp - interval '5 week' and '${semaine}'::timestamp + interval '1 week'
+                       AND code != 'ACTION_DUPLIQUEE'
                        GROUP BY week_ae, id_utilisateur, structure, region, departement, type_utilisateur) ee
                  WHERE nb_day_ae >= 2
                  GROUP BY id_utilisateur, structure, region, departement, type_utilisateur) x
