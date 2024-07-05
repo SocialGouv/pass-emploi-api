@@ -455,7 +455,8 @@ describe('ActionsController', () => {
         content: "Ceci est un contenu d'action",
         comment: 'Ceci est un commentaire',
         status: Action.Statut.EN_COURS,
-        codeQualification: Code.CITOYENNETE
+        codeQualification: Code.CITOYENNETE,
+        estDuplicata: true
       }
       it("renvoie l'id de l'action créée avec echeance par defaut", async () => {
         // Given
@@ -483,7 +484,8 @@ describe('ActionsController', () => {
             commentaire: 'Ceci est un commentaire',
             dateEcheance: nowJsPlus3Mois,
             rappel: false,
-            codeQualification: Code.CITOYENNETE
+            codeQualification: Code.CITOYENNETE,
+            estDuplicata: true
           },
           unUtilisateurDecode()
         )
@@ -518,7 +520,8 @@ describe('ActionsController', () => {
             commentaire: 'Ceci est un commentaire',
             dateEcheance: nowJsPlus3Mois,
             rappel: false,
-            codeQualification: Code.CITOYENNETE
+            codeQualification: Code.CITOYENNETE,
+            estDuplicata: undefined
           },
           unUtilisateurDecode()
         )
@@ -554,7 +557,8 @@ describe('ActionsController', () => {
             commentaire: 'Ceci est un commentaire',
             dateEcheance: now,
             rappel: false,
-            codeQualification: Code.CITOYENNETE
+            codeQualification: Code.CITOYENNETE,
+            estDuplicata: undefined
           },
           unUtilisateurDecode()
         )
@@ -590,7 +594,8 @@ describe('ActionsController', () => {
             commentaire: 'Ceci est un commentaire',
             dateEcheance: uneDatetimeAvecOffset(),
             rappel: false,
-            codeQualification: Code.CITOYENNETE
+            codeQualification: Code.CITOYENNETE,
+            estDuplicata: true
           },
           unUtilisateurDecode()
         )

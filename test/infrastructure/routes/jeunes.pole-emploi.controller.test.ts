@@ -361,7 +361,8 @@ describe('JeunesPoleEmploiController', () => {
     const idJeune = '1'
     const payload: CreateDemarchePayload = {
       description: 'string',
-      dateFin: uneDatetimeAvecOffset().toISO()
+      dateFin: uneDatetimeAvecOffset().toISO(),
+      estDuplicata: true
     }
     const demarche = uneDemarche()
     describe("quand c'est en succès", () => {
@@ -374,7 +375,8 @@ describe('JeunesPoleEmploiController', () => {
               idJeune,
               accessToken: 'coucou',
               description: payload.description,
-              dateFin: uneDatetimeAvecOffset()
+              dateFin: uneDatetimeAvecOffset(),
+              estDuplicata: true
             },
             unUtilisateurDecode()
           )
@@ -399,7 +401,8 @@ describe('JeunesPoleEmploiController', () => {
               idJeune,
               accessToken: 'coucou',
               description: payload.description,
-              dateFin: uneDatetimeAvecOffset()
+              dateFin: uneDatetimeAvecOffset(),
+              estDuplicata: true
             },
             unUtilisateurDecode()
           )

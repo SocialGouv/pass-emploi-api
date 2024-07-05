@@ -17,6 +17,7 @@ export interface CreateDemarcheCommand extends Command {
   codePourquoi?: string
   codeComment?: string
   dateFin: DateTime
+  estDuplicata?: boolean
 }
 
 @Injectable()
@@ -73,15 +74,27 @@ export class CreateDemarcheCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur,
     command: CreateDemarcheCommand
   ): Promise<void> {
-    if (command.description) {
+    if (command.description && !command.estDuplicata) {
       await this.evenementService.creer(
         Evenement.Code.ACTION_CREEE_HORS_REFERENTIEL,
         utilisateur
       )
     }
-    if (command.codeQuoi && command.codePourquoi) {
+    if (command.description && command.estDuplicata) {
+      await this.evenementService.creer(
+        Evenement.Code.ACTION_DUPLIQUEE_HORS_REFERENTIEL,
+        utilisateur
+      )
+    }
+    if (command.codeQuoi && command.codePourquoi && !command.estDuplicata) {
       await this.evenementService.creer(
         Evenement.Code.ACTION_CREEE_REFERENTIEL,
+        utilisateur
+      )
+    }
+    if (command.codeQuoi && command.codePourquoi && command.estDuplicata) {
+      await this.evenementService.creer(
+        Evenement.Code.ACTION_DUPLIQUEE_REFERENTIEL,
         utilisateur
       )
     }

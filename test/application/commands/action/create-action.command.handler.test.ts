@@ -272,6 +272,7 @@ describe('CreateActionCommandHandler', () => {
         utilisateur
       )
     })
+
     it("créé l'événement idoine si l'action provient du referentiel d'actions prédéfinies Conseiller", () => {
       // Given
       const utilisateur = unUtilisateurConseiller()
@@ -294,6 +295,7 @@ describe('CreateActionCommandHandler', () => {
         utilisateur
       )
     })
+
     it("créé l'événement idoine si l'action provient d'une suggestion Jeune'", () => {
       // Given
       const utilisateur = unUtilisateurJeune()
@@ -317,6 +319,7 @@ describe('CreateActionCommandHandler', () => {
         utilisateur
       )
     })
+
     it("créé l'événement idoine si l'action provient d'un Jeune'", () => {
       // Given
       const utilisateur = unUtilisateurJeune()
@@ -336,6 +339,30 @@ describe('CreateActionCommandHandler', () => {
       // Then
       expect(evenementService.creer).to.have.been.calledWithExactly(
         Evenement.Code.ACTION_CREEE_HORS_SUGGESTION,
+        utilisateur
+      )
+    })
+
+    it("créé l'événement de duplication", () => {
+      // Given
+      const utilisateur = unUtilisateurJeune()
+      const command: CreateActionCommand = {
+        idJeune: action.idJeune,
+        contenu: 'whatever',
+        idCreateur: utilisateur.id,
+        typeCreateur: Action.TypeCreateur.CONSEILLER,
+        statut: action.statut,
+        commentaire: action.description,
+        dateEcheance: action.dateEcheance,
+        estDuplicata: true
+      }
+
+      // When
+      createActionCommandHandler.monitor(utilisateur, command)
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.ACTION_DUPLIQUEE,
         utilisateur
       )
     })
