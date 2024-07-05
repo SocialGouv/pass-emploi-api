@@ -32,6 +32,8 @@ export namespace Evenement {
     ACTION_CREEE_SUGGESTION = 'ACTION_CREEE_SUGGESTION',
     ACTION_DETAIL = 'ACTION_DETAIL',
     ACTION_DUPLIQUEE = 'ACTION_DUPLIQUEE',
+    ACTION_DUPLIQUEE_REFERENTIEL = 'ACTION_DUPLIQUEE_REFERENTIEL',
+    ACTION_DUPLIQUEE_HORS_REFERENTIEL = 'ACTION_DUPLIQUEE_HORS_REFERENTIEL',
     ACTION_LISTE = 'ACTION_LISTE',
     ACTION_CATEGORIE_MODIFIEE = 'ACTION_CATEGORIE_MODIFIEE',
     ACTION_TEXTE_MODIFIE = 'ACTION_TEXTE_MODIFIE',
@@ -201,6 +203,16 @@ const evenements: {
   [Evenement.Code.ACTION_DUPLIQUEE]: {
     categorie: 'Action',
     action: 'Duplication'
+  },
+  [Evenement.Code.ACTION_DUPLIQUEE_REFERENTIEL]: {
+    categorie: 'Action',
+    action: 'Duplication',
+    nom: 'Référentiel'
+  },
+  [Evenement.Code.ACTION_DUPLIQUEE_HORS_REFERENTIEL]: {
+    categorie: 'Action',
+    action: 'Duplication',
+    nom: 'Hors référentiel'
   },
   [Evenement.Code.ACTION_LISTE]: {
     categorie: 'Action',
