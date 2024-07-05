@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
+  IsBoolean,
   IsDateString,
   IsEnum,
   IsNotEmpty,
@@ -45,6 +46,10 @@ export class CreateDemarchePayload {
   @ApiPropertyOptional()
   @IsOptional()
   codeComment?: string
+
+  @IsOptional()
+  @IsBoolean()
+  estDuplicata?: boolean
 }
 
 export class TypesDemarchesQueryParams {

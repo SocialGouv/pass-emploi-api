@@ -300,7 +300,8 @@ export class ActionsController {
       rappel: createActionPayload.dateEcheance
         ? createActionPayload.rappel
         : false,
-      codeQualification: createActionPayload.codeQualification
+      codeQualification: createActionPayload.codeQualification,
+      estDuplicata: createActionPayload.estDuplicata
     }
     const result = await this.createActionCommandHandler.execute(
       command,

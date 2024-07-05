@@ -153,6 +153,7 @@ describe('CreateDemarcheCommandHandler', () => {
         utilisateur
       )
     })
+
     it('crée un événement d’engagement pour une démarche du référentiel pôle emploi', async () => {
       // Given
       const commandPourDemarcheDuReferentiel: CreateDemarcheCommand = {
@@ -171,6 +172,52 @@ describe('CreateDemarcheCommandHandler', () => {
       // Then
       expect(evenementService.creer).to.have.been.calledWithExactly(
         Evenement.Code.ACTION_CREEE_REFERENTIEL,
+        utilisateur
+      )
+    })
+
+    it('crée un événement d’engagement pour une duplication de démarche personnalisée (hors référentiel)', async () => {
+      // Given
+      const commandPourDemarchePersonnalisee: CreateDemarcheCommand = {
+        idJeune: 'idJeune',
+        accessToken: 'accessToken',
+        description: 'demarche personalisée',
+        dateFin: uneDatetime(),
+        estDuplicata: true
+      }
+
+      // When
+      await createDemarcheCommandHandler.monitor(
+        utilisateur,
+        commandPourDemarchePersonnalisee
+      )
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.ACTION_DUPLIQUEE_HORS_REFERENTIEL,
+        utilisateur
+      )
+    })
+
+    it('crée un événement d’engagement pour une duplication de démarche du référentiel pôle emploi', async () => {
+      // Given
+      const commandPourDemarcheDuReferentiel: CreateDemarcheCommand = {
+        idJeune: 'idJeune',
+        accessToken: 'accessToken',
+        codeQuoi: 'codeQuoi',
+        codePourquoi: 'codePourquoi',
+        codeComment: 'codeComment',
+        dateFin: uneDatetime(),
+        estDuplicata: true
+      }
+      // When
+      await createDemarcheCommandHandler.monitor(
+        utilisateur,
+        commandPourDemarcheDuReferentiel
+      )
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.ACTION_DUPLIQUEE_REFERENTIEL,
         utilisateur
       )
     })

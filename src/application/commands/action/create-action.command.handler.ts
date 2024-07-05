@@ -29,6 +29,7 @@ export interface CreateActionCommand extends Command {
   dateEcheance: DateTime
   rappel?: boolean
   codeQualification?: Action.Qualification.Code
+  estDuplicata?: boolean
 }
 
 @Injectable()
@@ -96,12 +97,19 @@ export class CreateActionCommandHandler extends CommandHandler<
     command: CreateActionCommand
   ): Promise<void> {
     if (Authentification.estJeune(utilisateur.type)) {
-      await this.evenementService.creer(
-        command.codeQualification
-          ? Evenement.Code.ACTION_CREEE_SUGGESTION
-          : Evenement.Code.ACTION_CREEE_HORS_SUGGESTION,
-        utilisateur
-      )
+      if (command.estDuplicata) {
+        await this.evenementService.creer(
+          Evenement.Code.ACTION_DUPLIQUEE,
+          utilisateur
+        )
+      } else {
+        await this.evenementService.creer(
+          command.codeQualification
+            ? Evenement.Code.ACTION_CREEE_SUGGESTION
+            : Evenement.Code.ACTION_CREEE_HORS_SUGGESTION,
+          utilisateur
+        )
+      }
     } else {
       const vientDuReferentiel = Action.ACTIONS_PREDEFINIES.some(
         ({ titre }) => titre === command.contenu

@@ -117,4 +117,8 @@ export class CreateActionParLeJeunePayload extends CreateActionPayload {
   @IsOptional()
   @IsBoolean()
   rappel?: boolean
+
+  @IsOptional()
+  @IsBoolean()
+  estDuplicata?: boolean
 }
