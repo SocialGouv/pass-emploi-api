@@ -2,7 +2,8 @@ import { Sequelize } from 'sequelize-typescript'
 
 export async function chargerLaVueFonctionnalite(
   connexion: Sequelize,
-  semaine: string
+  semaine: string,
+  analyticsTableName: string
 ): Promise<void> {
   await connexion.query(
     `DELETE
@@ -46,7 +47,7 @@ export async function chargerLaVueFonctionnalite(
                  nom,
                  structure,
                  type_utilisateur
-          FROM evenement_engagement
+          FROM ${analyticsTableName}
           where structure is not null
             and structure != 'PASS_EMPLOI'
             and semaine = '${semaine}'
@@ -58,7 +59,7 @@ export async function chargerLaVueFonctionnalite(
                               structure,
                               categorie,
                               action
-                       FROM evenement_engagement
+                       FROM ${analyticsTableName}
                        where structure is not null
                          and structure != 'PASS_EMPLOI'
                          and semaine = '${semaine}'
@@ -74,7 +75,7 @@ export async function chargerLaVueFonctionnalite(
                               structure,
                               type_utilisateur,
                               categorie
-                       FROM evenement_engagement
+                       FROM ${analyticsTableName}
                        where structure is not null
                          and structure != 'PASS_EMPLOI'
                          and semaine = '${semaine}'
@@ -88,7 +89,7 @@ export async function chargerLaVueFonctionnalite(
                               semaine,
                               structure,
                               type_utilisateur
-                       FROM evenement_engagement
+                       FROM ${analyticsTableName}
                        where structure is not null
                          and structure != 'PASS_EMPLOI'
                          and semaine = '${semaine}'

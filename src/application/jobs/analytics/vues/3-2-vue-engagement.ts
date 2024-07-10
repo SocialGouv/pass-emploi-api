@@ -4,7 +4,8 @@ import { Logger } from '@nestjs/common'
 export async function chargerLaVueEngagement(
   connexion: Sequelize,
   semaine: string,
-  logger: Logger
+  logger: Logger,
+  analyticsTableName: string
 ): Promise<void> {
   logger.log(
     `Suppression des données de la semaine ${semaine} de la vue analytics_engagement`
@@ -29,7 +30,7 @@ export async function chargerLaVueEngagement(
             COALESCE(region, 'NON RENSEIGNE') AS region,
             COALESCE(departement, 'NON RENSEIGNE') AS departement,
             count(distinct id_utilisateur) as nombre_utilisateurs_2_mois
-     from evenement_engagement
+     from ${analyticsTableName}
      where date_evenement between '${semaine}'::timestamp - interval '2 months' and '${semaine}'::timestamp + interval '1 week'
      group by structure, type_utilisateur, departement, region
      order by structure, type_utilisateur, region, departement;`
@@ -52,7 +53,7 @@ export async function chargerLaVueEngagement(
                         structure,
                         type_utilisateur,
                         id_utilisateur
-                 FROM evenement_engagement
+                 FROM ${analyticsTableName}
                  WHERE semaine = '${semaine}'
                  GROUP BY semaine, id_utilisateur, semaine, departement, region, structure, type_utilisateur) x
            WHERE nb_day_ae >= 2
@@ -86,7 +87,7 @@ export async function chargerLaVueEngagement(
                               COALESCE(region, 'NON RENSEIGNE') AS region,
                               COALESCE(departement, 'NON RENSEIGNE') AS departement,
                               id_utilisateur
-                       FROM evenement_engagement
+                       FROM ${analyticsTableName}
                        WHERE date_evenement between '${semaine}'::timestamp - interval '5 week' and '${semaine}'::timestamp + interval '1 week'
                        GROUP BY week_ae, id_utilisateur, structure, region, departement, type_utilisateur) ee
                  WHERE nb_day_ae >= 2
@@ -123,7 +124,7 @@ export async function chargerLaVueEngagement(
                               COALESCE(region, 'NON RENSEIGNE') AS region,
                               COALESCE(departement, 'NON RENSEIGNE') AS departement,
                               id_utilisateur
-                       FROM evenement_engagement
+                       FROM ${analyticsTableName}
                        WHERE date_evenement between '${semaine}'::timestamp - interval '5 week' and '${semaine}'::timestamp + interval '1 week'
                        GROUP BY week_ae, id_utilisateur, structure, region, departement, type_utilisateur) ee
                  WHERE nb_day_ae >= 2

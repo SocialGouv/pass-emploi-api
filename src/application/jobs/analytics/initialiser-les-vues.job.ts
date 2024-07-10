@@ -8,6 +8,7 @@ import { migrate } from './vues/3-0-migrate-schema'
 import { chargerLaVueFonctionnalite } from './vues/3-1-vue-fonctionnalites'
 import { chargerLaVueEngagement } from './vues/3-2-vue-engagement'
 import { QueryTypes } from 'sequelize'
+import { DateTime } from 'luxon'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.INITIALISER_LES_VUES)
@@ -36,9 +37,15 @@ export class InitialiserLesVuesJobHandler extends JobHandler<Planificateur.Job> 
       this.logger.log(
         'Charger la vue fonctionnalité de la semaine ' + raw.semaine
       )
-      await chargerLaVueFonctionnalite(connexion, raw.semaine)
+      const tableName = getAnalyticsTableName(raw.semaine)
+      await chargerLaVueFonctionnalite(connexion, raw.semaine, tableName)
       this.logger.log('Charger la vue engagement de la semaine ' + raw.semaine)
-      await chargerLaVueEngagement(connexion, raw.semaine, this.logger)
+      await chargerLaVueEngagement(
+        connexion,
+        raw.semaine,
+        this.logger,
+        tableName
+      )
     }
 
     await connexion.close()
@@ -51,5 +58,14 @@ export class InitialiserLesVuesJobHandler extends JobHandler<Planificateur.Job> 
       tempsExecution: DateService.calculerTempsExecution(maintenant),
       resultat: {}
     }
+  }
+}
+
+function getAnalyticsTableName(semaine: string): string {
+  const annee = DateTime.fromFormat(semaine, 'yyyy-MM-dd').year
+  if (annee < 2024) {
+    return `evenement_engagement_${annee}`
+  } else {
+    return 'evenement_engagement'
   }
 }

@@ -165,6 +165,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
         where conseiller.id = dernier_ae_conseiller.id_utilisateur;`)
   }
 
+  // TODO voir comment faire avec une table AE scindée
   private async associerChaqueConseillerASonPremierAE(
     connexion: Sequelize
   ): Promise<void> {
@@ -200,6 +201,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     `)
   }
 
+  // TODO voir comment faire avec table AE scindée
   private async enrichirTableAEJeune(connexion: Sequelize): Promise<void> {
     this.logger.log('Création vue AE Jeune')
     await connexion.query(`TRUNCATE TABLE evenement_engagement_jeune;`)
