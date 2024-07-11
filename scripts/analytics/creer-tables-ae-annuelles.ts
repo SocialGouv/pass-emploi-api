@@ -12,7 +12,7 @@ async function run(): Promise<void> {
     await creerUneTableAnnuelle(connexionTarget.client, '2022')
     await indexerLesColonnes(connexionTarget.client, '2022')
 
-    const filtreEvenements = `WHERE date_evenement between '2022'::timestamp and '2023'::timestamp`
+    const filtreEvenements = `WHERE semaine between '2022-01-01'::timestamp - interval '2 months' and '2022-12-31'::timestamp`
     const compteEvenements = await compteEvenementsAnnuels(
       connexionTarget.client,
       filtreEvenements
