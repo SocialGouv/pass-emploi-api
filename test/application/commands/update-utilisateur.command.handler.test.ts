@@ -3,7 +3,7 @@ import { SinonSandbox, createSandbox } from 'sinon'
 import {
   ConseillerNonValide,
   NonTraitableError,
-  NonTraitableInexistantError
+  NonTraitableReason
 } from 'src/building-blocks/types/domain-error'
 import { Authentification } from 'src/domain/authentification'
 import { DateService } from 'src/utils/date-service'
@@ -119,7 +119,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
                   new NonTraitableError(
                     'Utilisateur',
                     command.idUtilisateurAuth,
-                    NonTraitableError.CODE_UTILISATEUR_CONSEILLER_MAUVAISE_STRUCTURE
+                    NonTraitableReason.UTILISATEUR_CONSEILLER_MAUVAISE_STRUCTURE
                   )
                 )
               )
@@ -310,8 +310,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
                 nom: command.nom || '',
                 email: command.email,
                 username: command.username,
-                type: command.type,
-                structure: command.structure,
+                type: command.type as Authentification.Type,
+                structure: command.structure as Core.Structure,
                 roles: []
               }
               authentificationRepository.save
@@ -388,8 +388,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
                 nom: command.nom || '',
                 email: command.email,
                 username: command.username,
-                type: command.type,
-                structure: command.structure,
+                type: command.type as Authentification.Type,
+                structure: command.structure as Core.Structure,
                 roles: []
               }
               authentificationRepository.save
@@ -536,7 +536,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
                 new NonTraitableError(
                   'Utilisateur',
                   command.idUtilisateurAuth,
-                  'UTILISATEUR_NOUVEAU_PE'
+                  NonTraitableReason.UTILISATEUR_DEJA_PE
                 )
               )
             )
@@ -565,7 +565,11 @@ describe('UpdateUtilisateurCommandHandler', () => {
             // Then
             expect(result).to.deep.equal(
               failure(
-                new NonTraitableInexistantError(command.idUtilisateurAuth)
+                new NonTraitableError(
+                  'Utilisateur',
+                  command.idUtilisateurAuth,
+                  NonTraitableReason.UTILISATEUR_INEXISTANT
+                )
               )
             )
           })
@@ -634,7 +638,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
                 new NonTraitableError(
                   'Utilisateur',
                   command.idUtilisateurAuth,
-                  'UTILISATEUR_NOUVEAU_PE_BRSA'
+                  NonTraitableReason.UTILISATEUR_DEJA_PE_BRSA
                 )
               )
             )
@@ -726,7 +730,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
                 new NonTraitableError(
                   'Utilisateur',
                   command.idUtilisateurAuth,
-                  'UTILISATEUR_NOUVEAU_MILO'
+                  NonTraitableReason.UTILISATEUR_DEJA_MILO
                 )
               )
             )
@@ -754,7 +758,11 @@ describe('UpdateUtilisateurCommandHandler', () => {
             // Then
             expect(result).to.deep.equal(
               failure(
-                new NonTraitableError('Utilisateur', command.idUtilisateurAuth)
+                new NonTraitableError(
+                  'Utilisateur',
+                  command.idUtilisateurAuth,
+                  NonTraitableReason.EMAIL_BENEFICIAIRE_INTROUVABLE
+                )
               )
             )
           })
@@ -782,10 +790,116 @@ describe('UpdateUtilisateurCommandHandler', () => {
             // Then
             expect(result).to.deep.equal(
               failure(
-                new NonTraitableInexistantError(command.idUtilisateurAuth)
+                new NonTraitableError(
+                  'Utilisateur',
+                  command.idUtilisateurAuth,
+                  NonTraitableReason.UTILISATEUR_INEXISTANT
+                )
               )
             )
           })
+        })
+      })
+
+      describe('BENEFICIAIRE FRANCE_TRAVAIL', async () => {
+        describe("benef connu par son id d'authentification", async () => {
+          it('retourne le benef', async () => {
+            // Given
+            const command: UpdateUtilisateurCommand = {
+              idUtilisateurAuth: 'nilstavernier',
+              type: 'BENEFICIAIRE',
+              structure: 'FRANCE_TRAVAIL'
+            }
+
+            const utilisateur = unUtilisateurJeune({
+              structure: Core.Structure.POLE_EMPLOI
+            })
+            authentificationRepository.getJeune
+              .withArgs(command.idUtilisateurAuth)
+              .resolves(utilisateur)
+
+            // When
+            const result = await updateUtilisateurCommandHandler.execute(
+              command
+            )
+
+            // Then
+            expect(result).to.deep.equal(
+              success({
+                email: 'john.doe@plop.io',
+                id: 'ABCDE',
+                nom: 'Doe',
+                prenom: 'John',
+                roles: [],
+                structure: 'POLE_EMPLOI',
+                type: 'JEUNE',
+                username: undefined
+              })
+            )
+          })
+          it('retourne une failure quand la structure du benef trouvé est Milo', async () => {
+            // Given
+            const command: UpdateUtilisateurCommand = {
+              idUtilisateurAuth: 'nilstavernier',
+              type: 'BENEFICIAIRE',
+              structure: 'FRANCE_TRAVAIL'
+            }
+
+            const utilisateur = unUtilisateurJeune({
+              structure: Core.Structure.MILO
+            })
+            authentificationRepository.getJeune
+              .withArgs(command.idUtilisateurAuth)
+              .resolves(utilisateur)
+
+            // When
+            const result = await updateUtilisateurCommandHandler.execute(
+              command
+            )
+
+            // Then
+            expect(result).to.deep.equal(
+              failure(
+                new NonTraitableError(
+                  'Utilisateur',
+                  command.idUtilisateurAuth,
+                  NonTraitableReason.UTILISATEUR_DEJA_MILO
+                )
+              )
+            )
+          })
+        })
+        it('retourne une ok quand la structure du benef trouvé est dans PE', async () => {
+          // Given
+          const command: UpdateUtilisateurCommand = {
+            idUtilisateurAuth: 'nilstavernier',
+            type: 'BENEFICIAIRE',
+            structure: 'FRANCE_TRAVAIL'
+          }
+
+          const utilisateur = unUtilisateurJeune({
+            structure: Core.Structure.POLE_EMPLOI_BRSA
+          })
+          authentificationRepository.getJeune
+            .withArgs(command.idUtilisateurAuth)
+            .resolves(utilisateur)
+
+          // When
+          const result = await updateUtilisateurCommandHandler.execute(command)
+
+          // Then
+          expect(result).to.deep.equal(
+            success({
+              email: 'john.doe@plop.io',
+              id: 'ABCDE',
+              nom: 'Doe',
+              prenom: 'John',
+              roles: [],
+              structure: 'POLE_EMPLOI_BRSA',
+              type: 'JEUNE',
+              username: undefined
+            })
+          )
         })
       })
     })

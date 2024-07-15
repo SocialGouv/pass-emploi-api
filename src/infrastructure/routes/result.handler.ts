@@ -30,7 +30,6 @@ import {
   MauvaiseCommandeError,
   MaxInscritsDepasse,
   NonTraitableError,
-  NonTraitableInexistantError,
   NonTrouveError,
   ReponsesCampagneInvalide,
   RessourceIndisponibleError
@@ -57,16 +56,6 @@ function handleFailure(result: Failure): never {
       }
       throw new RuntimeException(result.error.message)
     case NonTraitableError.CODE:
-    case NonTraitableError.CODE_UTILISATEUR_DEJA_MILO:
-    case NonTraitableError.CODE_UTILISATEUR_NOUVEAU_MILO:
-    case NonTraitableError.CODE_UTILISATEUR_DEJA_PE:
-    case NonTraitableError.CODE_UTILISATEUR_NOUVEAU_PE:
-    case NonTraitableError.CODE_UTILISATEUR_DEJA_PE_BRSA:
-    case NonTraitableError.CODE_UTILISATEUR_NOUVEAU_PE_BRSA:
-    case NonTraitableError.CODE_UTILISATEUR_DEJA_PE_AIJ:
-    case NonTraitableError.CODE_UTILISATEUR_NOUVEAU_PE_AIJ:
-    case NonTraitableError.CODE_UTILISATEUR_CONSEILLER_MAUVAISE_STRUCTURE:
-    case NonTraitableInexistantError.CODE:
       throw new UnprocessableEntityException(result.error)
     case NonTrouveError.CODE:
       throw new NotFoundException(result.error.message)

@@ -1,12 +1,15 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
 import {
+  StructureUtilisateurAuth,
+  TypeUtilisateurAuth,
   UpdateUtilisateurCommand,
   UpdateUtilisateurCommandHandler
 } from '../../../src/application/commands/update-utilisateur.command.handler'
 import {
   ConseillerNonValide,
   NonTraitableError,
+  NonTraitableReason,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
@@ -50,6 +53,38 @@ describe('AuthentificationController', () => {
         type: Authentification.Type.CONSEILLER,
         email: 'nils.tavernier@passemploi.com',
         structure: Core.Structure.MILO,
+        username: 'test'
+      }
+
+      const command: UpdateUtilisateurCommand = {
+        ...body,
+        idUtilisateurAuth: 'nilstavernier'
+      }
+
+      updateUtilisateurCommandHandler.execute.resolves(success(utilisateur))
+
+      // When - Then
+      const result = await request(app.getHttpServer())
+        .put(`/auth/users/${command.idUtilisateurAuth}`)
+        .set({ 'X-API-KEY': 'api-key-keycloak' })
+        .send(body)
+        .expect(HttpStatus.OK)
+
+      expect(
+        updateUtilisateurCommandHandler.execute
+      ).to.have.been.calledOnceWithExactly(command)
+      expect(result.body).to.deep.equal(utilisateur)
+    })
+    it('met à jour et retourne un utilisateur BENEFICIAIRE FT', async () => {
+      // Given
+      const utilisateur = unUtilisateurQueryModel({ username: 'test' })
+
+      const body: PutUtilisateurPayload = {
+        nom: 'Tavernier',
+        prenom: 'Nils',
+        type: 'BENEFICIAIRE',
+        email: 'nils.tavernier@passemploi.com',
+        structure: 'FRANCE_TRAVAIL',
         username: 'test'
       }
 
@@ -155,7 +190,7 @@ describe('AuthentificationController', () => {
             new NonTraitableError(
               'Utilisateur',
               command.idUtilisateurAuth,
-              NonTraitableError.CODE_UTILISATEUR_DEJA_MILO
+              NonTraitableReason.UTILISATEUR_DEJA_MILO
             )
           )
         )
@@ -168,11 +203,67 @@ describe('AuthentificationController', () => {
         .expect(HttpStatus.UNPROCESSABLE_ENTITY)
     })
 
+    it('retourne 400 quand on veut créer un utilisateur mauvaise structure', async () => {
+      // Given
+      const body: PutUtilisateurPayload = {
+        nom: 'Tavernier',
+        prenom: 'Nils',
+        type: Authentification.Type.CONSEILLER,
+        email: 'nils.tavernier@passemploi.com',
+        structure: 'MILOU' as StructureUtilisateurAuth,
+        username: 'test'
+      }
+
+      const command: UpdateUtilisateurCommand = {
+        ...body,
+        idUtilisateurAuth: 'nilstavernier'
+      }
+
+      updateUtilisateurCommandHandler.execute
+        .withArgs(command)
+        .resolves(failure(new ConseillerNonValide()))
+
+      // When - Then
+      await request(app.getHttpServer())
+        .put(`/auth/users/${command.idUtilisateurAuth}`)
+        .set({ 'X-API-KEY': 'api-key-keycloak' })
+        .send(body)
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+
     it('retourne 400 quand on veut créer un utilisateur Milo avec des champs manquants', async () => {
       // Given
       const body: PutUtilisateurPayload = {
         type: Authentification.Type.CONSEILLER,
         structure: Core.Structure.MILO
+      }
+
+      const command: UpdateUtilisateurCommand = {
+        ...body,
+        idUtilisateurAuth: 'nilstavernier'
+      }
+
+      updateUtilisateurCommandHandler.execute
+        .withArgs(command)
+        .resolves(failure(new ConseillerNonValide()))
+
+      // When - Then
+      await request(app.getHttpServer())
+        .put(`/auth/users/${command.idUtilisateurAuth}`)
+        .set({ 'X-API-KEY': 'api-key-keycloak' })
+        .send(body)
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+
+    it('retourne 400 quand on veut créer un utilisateur avec mauvais type', async () => {
+      // Given
+      const body: PutUtilisateurPayload = {
+        nom: 'Tavernier',
+        prenom: 'Nils',
+        type: 'BENEF' as TypeUtilisateurAuth,
+        email: 'nils.tavernier@passemploi.com',
+        structure: Core.Structure.MILO,
+        username: 'test'
       }
 
       const command: UpdateUtilisateurCommand = {

@@ -1,7 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsEnum, IsOptional, IsString, IsEmail, IsIn } from 'class-validator'
+import { IsEmail, IsIn, IsOptional, IsString } from 'class-validator'
 import { Authentification } from '../../../domain/authentification'
 import { Core } from '../../../domain/core'
+import {
+  StructureUtilisateurAuth,
+  TypeUtilisateurAuth
+} from '../../../application/commands/update-utilisateur.command.handler'
 
 export class PutUtilisateurPayload {
   @ApiProperty()
@@ -25,15 +29,25 @@ export class PutUtilisateurPayload {
   @IsOptional()
   username?: string
 
-  @ApiProperty({ enum: Authentification.Type })
+  @ApiProperty()
   @IsString()
-  @IsEnum(Authentification.Type)
-  type: Authentification.Type
+  @IsIn([
+    Authentification.Type.JEUNE,
+    Authentification.Type.CONSEILLER,
+    'BENEFICIAIRE'
+  ])
+  type: TypeUtilisateurAuth
 
-  @ApiProperty({ enum: Core.Structure })
+  @ApiProperty()
   @IsString()
-  @IsEnum(Core.Structure)
-  structure: Core.Structure
+  @IsIn([
+    Core.Structure.MILO,
+    Core.Structure.POLE_EMPLOI,
+    Core.Structure.POLE_EMPLOI_AIJ,
+    Core.Structure.POLE_EMPLOI_BRSA,
+    'FRANCE_TRAVAIL'
+  ])
+  structure: StructureUtilisateurAuth
 }
 
 export class GetUtilisateurQueryParams {
