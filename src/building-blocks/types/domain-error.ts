@@ -1,3 +1,13 @@
+export enum NonTraitableReason {
+  TYPE_STRUCTURE_NON_TRATABLE = 'TYPE_STRUCTURE_NON_TRATABLE',
+  EMAIL_BENEFICIAIRE_INTROUVABLE = 'EMAIL_BENEFICIAIRE_INTROUVABLE',
+  UTILISATEUR_INEXISTANT = 'UTILISATEUR_INEXISTANT',
+  UTILISATEUR_DEJA_MILO = 'UTILISATEUR_DEJA_MILO',
+  UTILISATEUR_DEJA_PE = 'UTILISATEUR_DEJA_PE',
+  UTILISATEUR_DEJA_PE_BRSA = 'UTILISATEUR_DEJA_PE_BRSA',
+  UTILISATEUR_DEJA_PE_AIJ = 'UTILISATEUR_DEJA_PE_AIJ',
+  UTILISATEUR_CONSEILLER_MAUVAISE_STRUCTURE = 'UTILISATEUR_CONSEILLER_MAUVAISE_STRUCTURE'
+}
 export interface DomainError {
   readonly code: string
   readonly message: string
@@ -52,34 +62,16 @@ export class ReponsesCampagneInvalide implements DomainError {
   }
 }
 
-export class NonTraitableInexistantError implements DomainError {
-  static CODE = 'UTILISATEUR_INEXISTANT'
-  readonly code: string = NonTraitableInexistantError.CODE
-  readonly message: string
-
-  constructor(id: string) {
-    this.message = `Utilisateur ${id} non traitable`
-  }
-}
-
 export class NonTraitableError implements DomainError {
   static CODE = 'NON_TRAITABLE'
-  static CODE_UTILISATEUR_DEJA_MILO = 'UTILISATEUR_DEJA_MILO'
-  static CODE_UTILISATEUR_NOUVEAU_MILO = 'UTILISATEUR_NOUVEAU_MILO'
-  static CODE_UTILISATEUR_DEJA_PE = 'UTILISATEUR_DEJA_PE'
-  static CODE_UTILISATEUR_NOUVEAU_PE = 'UTILISATEUR_NOUVEAU_PE'
-  static CODE_UTILISATEUR_DEJA_PE_BRSA = 'UTILISATEUR_DEJA_PE_BRSA'
-  static CODE_UTILISATEUR_NOUVEAU_PE_BRSA = 'UTILISATEUR_NOUVEAU_PE_BRSA'
-  static CODE_UTILISATEUR_DEJA_PE_AIJ = 'UTILISATEUR_DEJA_PE_AIJ'
-  static CODE_UTILISATEUR_NOUVEAU_PE_AIJ = 'UTILISATEUR_NOUVEAU_PE_AIJ'
-  static CODE_UTILISATEUR_CONSEILLER_MAUVAISE_STRUCTURE =
-    'UTILISATEUR_CONSEILLER_MAUVAISE_STRUCTURE'
   readonly code: string
   readonly message: string
+  readonly reason?: NonTraitableReason
 
-  constructor(entityType: string, id: string, code?: string) {
-    this.code = code || NonTraitableError.CODE
+  constructor(entityType: string, id: string, reason?: NonTraitableReason) {
+    this.code = NonTraitableError.CODE
     this.message = `${entityType} ${id} non traitable`
+    this.reason = reason
   }
 }
 

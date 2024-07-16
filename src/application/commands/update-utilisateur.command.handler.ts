@@ -3,7 +3,7 @@ import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
   NonTraitableError,
-  NonTraitableInexistantError
+  NonTraitableReason
 } from '../../building-blocks/types/domain-error'
 import {
   Result,
@@ -25,14 +25,16 @@ import {
   queryModelFromUtilisateur
 } from '../queries/query-models/authentification.query-model'
 
+export type StructureUtilisateurAuth = Core.Structure | 'FRANCE_TRAVAIL'
+export type TypeUtilisateurAuth = Authentification.Type | 'BENEFICIAIRE'
 export interface UpdateUtilisateurCommand extends Command {
   idUtilisateurAuth: string
   nom?: string
   prenom?: string
   email?: string
   username?: string
-  type: Authentification.Type
-  structure: Core.Structure
+  type: TypeUtilisateurAuth
+  structure: StructureUtilisateurAuth
   federatedToken?: string
 }
 
@@ -59,29 +61,37 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       ...command,
       email: command.email?.toLocaleLowerCase()
     }
-    if (commandSanitized.type === Authentification.Type.CONSEILLER) {
-      switch (commandSanitized.structure) {
-        case Core.Structure.MILO:
-        case Core.Structure.POLE_EMPLOI:
-        case Core.Structure.POLE_EMPLOI_BRSA:
-        case Core.Structure.POLE_EMPLOI_AIJ:
-          return this.authentificationConseillerSSO(commandSanitized)
-      }
-    }
-    if (commandSanitized.type === Authentification.Type.JEUNE) {
-      switch (commandSanitized.structure) {
-        case Core.Structure.MILO:
-          return this.authentificationJeuneMilo(commandSanitized)
-        case Core.Structure.POLE_EMPLOI:
-        case Core.Structure.POLE_EMPLOI_BRSA:
-        case Core.Structure.POLE_EMPLOI_AIJ:
-          return this.authentificationJeunePoleEmploi(commandSanitized)
-      }
+    switch (commandSanitized.type) {
+      case Authentification.Type.CONSEILLER:
+        switch (commandSanitized.structure) {
+          case Core.Structure.MILO:
+          case Core.Structure.POLE_EMPLOI:
+          case Core.Structure.POLE_EMPLOI_BRSA:
+          case Core.Structure.POLE_EMPLOI_AIJ:
+            return this.authentificationConseillerSSO(commandSanitized)
+        }
+        break
+      case Authentification.Type.JEUNE:
+        switch (commandSanitized.structure) {
+          case Core.Structure.MILO:
+            return this.authentificationJeuneMilo(commandSanitized)
+          case Core.Structure.POLE_EMPLOI:
+          case Core.Structure.POLE_EMPLOI_BRSA:
+          case Core.Structure.POLE_EMPLOI_AIJ:
+            return this.authentificationBeneficiaireFT(commandSanitized)
+        }
+        break
+      case 'BENEFICIAIRE':
+        if (commandSanitized.structure === 'FRANCE_TRAVAIL') {
+          return this.authentificationBeneficiaireFT(commandSanitized)
+        }
+        break
     }
     return failure(
       new NonTraitableError(
-        "Type et structure de l'utilisateur non pris en charge.",
-        command.idUtilisateurAuth
+        'Utilisateur',
+        command.idUtilisateurAuth,
+        NonTraitableReason.TYPE_STRUCTURE_NON_TRATABLE
       )
     )
   }
@@ -99,7 +109,11 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
   ): Promise<Result<UtilisateurQueryModel>> {
     if (!command.email) {
       return failure(
-        new NonTraitableError('Utilisateur', command.idUtilisateurAuth)
+        new NonTraitableError(
+          'Utilisateur',
+          command.idUtilisateurAuth,
+          NonTraitableReason.EMAIL_BENEFICIAIRE_INTROUVABLE
+        )
       )
     }
 
@@ -107,9 +121,15 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       await this.authentificationRepository.getJeuneByEmail(command.email)
 
     if (!utilisateurInitialTrouve) {
-      return failure(new NonTraitableInexistantError(command.idUtilisateurAuth))
+      return failure(
+        new NonTraitableError(
+          'Utilisateur',
+          command.idUtilisateurAuth,
+          NonTraitableReason.UTILISATEUR_INEXISTANT
+        )
+      )
     }
-    const verificationUtilisateur = verifierStructureUtilisteur(
+    const verificationUtilisateur = verifierStructureBeneficiaire(
       utilisateurInitialTrouve,
       command.idUtilisateurAuth,
       command.structure
@@ -124,7 +144,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       id: utilisateurInitialTrouve.id,
       prenom: command.prenom ?? utilisateurInitialTrouve.prenom,
       nom: command.nom ?? utilisateurInitialTrouve.nom,
-      structure: command.structure,
+      structure: utilisateurInitialTrouve.structure,
       type: Authentification.Type.JEUNE,
       roles: [],
       email: command.email ?? utilisateurInitialTrouve.email,
@@ -141,7 +161,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
   ): Promise<Result<UtilisateurQueryModel>> {
     const estSuperviseur =
       await this.authentificationRepository.estConseillerSuperviseur(
-        command.structure,
+        command.structure as Core.Structure,
         command.email
       )
 
@@ -151,7 +171,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       command.prenom,
       command.email,
       command.username,
-      command.structure,
+      command.structure as Core.Structure,
       estSuperviseur
     )
 
@@ -227,10 +247,14 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     )
     if (!utilisateurTrouve) {
       return failure(
-        new NonTraitableInexistantError(commandSanitized.idUtilisateurAuth)
+        new NonTraitableError(
+          'Utilisateur',
+          commandSanitized.idUtilisateurAuth,
+          NonTraitableReason.UTILISATEUR_INEXISTANT
+        )
       )
     }
-    const verificationStructureUtilisateur = verifierStructureUtilisteur(
+    const verificationStructureUtilisateur = verifierStructureBeneficiaire(
       utilisateurTrouve,
       commandSanitized.idUtilisateurAuth,
       commandSanitized.structure
@@ -245,7 +269,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     return success(queryModelFromUtilisateur(utilisateurMisAJour))
   }
 
-  private async authentificationJeunePoleEmploi(
+  private async authentificationBeneficiaireFT(
     commandSanitized: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
     const utilisateurTrouve = await this.authentificationRepository.getJeune(
@@ -255,7 +279,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     if (!utilisateurTrouve) {
       return this.authentifierJeuneParEmail(commandSanitized)
     }
-    const verificationUtilisateur = verifierStructureUtilisteur(
+    const verificationUtilisateur = verifierStructureBeneficiaire(
       utilisateurTrouve,
       commandSanitized.idUtilisateurAuth,
       commandSanitized.structure
@@ -287,7 +311,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
         new NonTraitableError(
           'Utilisateur',
           commandSanitized.idUtilisateurAuth,
-          NonTraitableError.CODE_UTILISATEUR_CONSEILLER_MAUVAISE_STRUCTURE
+          NonTraitableReason.UTILISATEUR_CONSEILLER_MAUVAISE_STRUCTURE
         )
       )
     }
@@ -300,41 +324,47 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
   }
 }
 
-function verifierStructureUtilisteur(
+function verifierStructureBeneficiaire(
   utilisateurTrouve: Authentification.Utilisateur,
   idUtilisateur: string,
-  structureAttendue: Core.Structure
+  structureAttendue: StructureUtilisateurAuth
 ): Result {
+  // TODO : ne garder que cette partie quand le mobile sera en prod avec bouton unique FT
+  if (structureAttendue === 'FRANCE_TRAVAIL') {
+    switch (utilisateurTrouve.structure) {
+      case Core.Structure.MILO:
+        return failure(
+          new NonTraitableError(
+            'Utilisateur',
+            idUtilisateur,
+            NonTraitableReason.UTILISATEUR_DEJA_MILO
+          )
+        )
+      case Core.Structure.POLE_EMPLOI:
+      case Core.Structure.POLE_EMPLOI_AIJ:
+      case Core.Structure.POLE_EMPLOI_BRSA:
+        return emptySuccess()
+    }
+  }
   if (utilisateurTrouve.structure !== structureAttendue) {
-    const dejaConnecte = Boolean(utilisateurTrouve.datePremiereConnexion)
-    let codeErreur = undefined
+    let reason: NonTraitableReason | undefined
 
     switch (utilisateurTrouve.structure) {
       case Core.Structure.MILO:
-        codeErreur = dejaConnecte
-          ? NonTraitableError.CODE_UTILISATEUR_DEJA_MILO
-          : NonTraitableError.CODE_UTILISATEUR_NOUVEAU_MILO
+        reason = NonTraitableReason.UTILISATEUR_DEJA_MILO
         break
       case Core.Structure.POLE_EMPLOI:
-        codeErreur = dejaConnecte
-          ? NonTraitableError.CODE_UTILISATEUR_DEJA_PE
-          : NonTraitableError.CODE_UTILISATEUR_NOUVEAU_PE
+        reason = NonTraitableReason.UTILISATEUR_DEJA_PE
         break
       case Core.Structure.POLE_EMPLOI_BRSA:
-        codeErreur = dejaConnecte
-          ? NonTraitableError.CODE_UTILISATEUR_DEJA_PE_BRSA
-          : NonTraitableError.CODE_UTILISATEUR_NOUVEAU_PE_BRSA
+        reason = NonTraitableReason.UTILISATEUR_DEJA_PE_BRSA
         break
       case Core.Structure.POLE_EMPLOI_AIJ:
-        codeErreur = dejaConnecte
-          ? NonTraitableError.CODE_UTILISATEUR_DEJA_PE_AIJ
-          : NonTraitableError.CODE_UTILISATEUR_NOUVEAU_PE_AIJ
+        reason = NonTraitableReason.UTILISATEUR_DEJA_PE_AIJ
         break
     }
 
-    return failure(
-      new NonTraitableError('Utilisateur', idUtilisateur, codeErreur)
-    )
+    return failure(new NonTraitableError('Utilisateur', idUtilisateur, reason))
   }
   return emptySuccess()
 }
