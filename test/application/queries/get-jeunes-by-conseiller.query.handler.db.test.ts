@@ -61,7 +61,8 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       await JeuneSqlModel.creer(
         unJeuneDto({
           idConseiller,
-          dateDerniereActualisationToken: dateEvenement
+          dateDerniereActualisationToken: dateEvenement,
+          dateFinCEJ: null
         })
       )
 
@@ -73,7 +74,8 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       expect(actual).to.deep.equal(
         success([
           unDetailJeuneConseillerQueryModel({
-            lastActivity: dateEvenement.toISOString()
+            lastActivity: dateEvenement.toISOString(),
+            dateFinCEJ: undefined
           })
         ])
       )
@@ -83,7 +85,8 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       const dateEvenement = uneDatetime().toJSDate()
       const jeune = unJeuneDto({
         idConseiller,
-        dateDerniereActualisationToken: dateEvenement
+        dateDerniereActualisationToken: dateEvenement,
+        dateFinCEJ: new Date('2022-06-11')
       })
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
       await JeuneSqlModel.creer(jeune)
@@ -108,7 +111,8 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       const dateEvenementRecent = uneDatetime().toJSDate()
       const jeune = unJeuneDto({
         idConseiller,
-        dateDerniereActualisationToken: dateEvenementRecent
+        dateDerniereActualisationToken: dateEvenementRecent,
+        dateFinCEJ: new Date('2022-06-11')
       })
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
       await JeuneSqlModel.creer(jeune)
@@ -147,7 +151,8 @@ describe('GetJeunesByConseillerQueryHandler', () => {
         id: idJeune,
         idConseiller: idConseillerCible,
         idConseillerInitial: idDernierConseillerPrecedent,
-        dateDerniereActualisationToken: dateEvenement
+        dateDerniereActualisationToken: dateEvenement,
+        dateFinCEJ: new Date('2022-06-11')
       })
       await ConseillerSqlModel.creer(
         unConseillerDto({
@@ -207,7 +212,8 @@ describe('GetJeunesByConseillerQueryHandler', () => {
           id: idJeune,
           idConseiller,
           dateDerniereActualisationToken: dateEvenement,
-          idStructureMilo: idStructure
+          idStructureMilo: idStructure,
+          dateFinCEJ: new Date('2022-06-11')
         })
       )
       await SituationsMiloSqlModel.create(situationsDuJeune)

@@ -58,6 +58,9 @@ export function toDetailJeuneConseillerQueryModel(
     lastName: sqlJeune.nom,
     email: sqlJeune.email ?? undefined,
     creationDate: sqlJeune.date_creation.toISOString(),
+    dateFinCEJ: sqlJeune.date_fin_cej
+      ? DateService.fromJSDateToISOString(sqlJeune.date_fin_cej)
+      : undefined,
     isActivated: Boolean(sqlJeune.date_premiere_connexion),
     isReaffectationTemporaire: Boolean(sqlJeune.id_conseiller_initial),
     situationCourante: sqlJeune.situation_courante ?? undefined,
@@ -98,6 +101,7 @@ export interface DetailJeuneRawSql extends JeuneRawSql {
   id_conseiller_initial: string
   email_conseiller_precedent: string
   nom_conseiller_precedent: string
+  date_fin_cej: Date | null
   prenom_conseiller_precedent: string
   situation_courante: Situation
   date_premiere_connexion: Date
