@@ -4537,14 +4537,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chai-exclude@npm:^2.1.1":
-  version: 2.1.1
-  resolution: "chai-exclude@npm:2.1.1"
+"chai-exclude@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "chai-exclude@npm:3.0.0"
   dependencies:
     fclone: "npm:^1.0.11"
   peerDependencies:
-    chai: ">= 4.0.0 < 5"
-  checksum: 10/b9445387d8bec33dfa354c50e291618741d9150b6fbe0efb2ea72ce17560f36a998d6299a5622a10f25928098906c89801424bbfdccd8946eca00de593693027
+    chai: ">= 5"
+  checksum: 10/510e0026fb3efe34e2d8cab043b44c173038be61985a6c914e4a72df940dd319c5e7e5b6c4964719add469d4171902e95fc8dd870f4acf3f98e1cc4a105d2965
   languageName: node
   linkType: hard
 
@@ -9267,7 +9267,7 @@ __metadata:
     bull-repl: "npm:^0.29.1"
     chai: "npm:^4.4.1"
     chai-as-promised: "npm:^7.1.2"
-    chai-exclude: "npm:^2.1.1"
+    chai-exclude: "npm:^3.0.0"
     class-transformer: "npm:0.5.1"
     class-validator: "npm:0.14.1"
     compression: "npm:1.7.4"
