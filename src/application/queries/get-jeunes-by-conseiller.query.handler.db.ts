@@ -81,6 +81,7 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
                  jeune.id_authentification,
                  jeune.id_conseiller_initial,
                  jeune.date_derniere_actualisation_token,
+                 jeune.date_fin_cej,
                  jeune.id_structure_milo,
                  conseiller_initial.email                         as email_conseiller_precedent,
                  conseiller_initial.prenom                        as prenom_conseiller_precedent,

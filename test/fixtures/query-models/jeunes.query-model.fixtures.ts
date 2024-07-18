@@ -65,6 +65,7 @@ export function unDetailJeuneConseillerQueryModel(
     lastName: 'Doe',
     email: 'john.doe@plop.io',
     creationDate: '2021-11-11T08:03:30.000Z',
+    dateFinCEJ: '2022-06-11T00:00:00.000+00:00',
     isActivated: true,
     isReaffectationTemporaire: false,
     situationCourante: undefined,

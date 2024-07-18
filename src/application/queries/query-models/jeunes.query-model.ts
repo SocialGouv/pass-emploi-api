@@ -186,6 +186,9 @@ export class DetailJeuneConseillerQueryModel {
   isReaffectationTemporaire: boolean
 
   @ApiProperty({ required: false })
+  dateFinCEJ?: string
+
+  @ApiProperty({ required: false })
   lastActivity?: string
 
   @ApiProperty({ required: false })
