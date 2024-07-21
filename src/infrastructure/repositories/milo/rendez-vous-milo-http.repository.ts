@@ -49,6 +49,7 @@ export class RendezVousMiloHttpRepository implements RendezVousMilo.Repository {
         titre: rendezVousMilo.data.objet,
         idPartenaireBeneficiaire: rendezVousMilo.data.idDossier.toString(),
         commentaire: rendezVousMilo.data.commentaire,
+        adresse: rendezVousMilo.data.lieu,
         statut: rendezVousMilo.data.statut
       }
     } catch (e) {
