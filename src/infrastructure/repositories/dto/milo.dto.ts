@@ -41,11 +41,14 @@ export interface DossierMiloDto {
 }
 
 export interface EvenementMiloDto {
+  // Identifiant technique de l’évènement
   identifiant: string
   idDossier: number
-  type: 'RDV' | 'SESSION' | string
-  action: 'CREATE' | 'UPDATE' | 'DELETE' | string
-  idType: number
+  // Objet métier
+  type: 'RDV' | 'SESSION' | 'DOSSIER' | string
+  action: 'CREATE' | 'UPDATE' | 'DELETE' | 'ARCHIVE' | string
+  // Identifiant de l'objet métier
+  idType: number | null
   date: string
 }
 

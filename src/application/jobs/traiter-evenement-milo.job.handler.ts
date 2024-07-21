@@ -83,6 +83,9 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
         Traitement.OBJET_EVENEMENT_NON_TRAITABLE
       )
     }
+    if (!evenement.idObjet) {
+      return this.buildSuiviJob(maintenant, Traitement.ID_OBJET_VIDE)
+    }
 
     const resultJeune = await this.jeuneRepository.getByIdDossier(
       evenement.idPartenaireBeneficiaire
@@ -597,5 +600,6 @@ export enum Traitement {
   OBJET_EVENEMENT_NON_TRAITABLE = 'OBJET_EVENEMENT_NON_TRAITABLE',
   TRAITEMENT_CREATE_INCONNU = 'TRAITEMENT_CREATE_INCONNU',
   TRAITEMENT_UPDATE_INCONNU = 'TRAITEMENT_UPDATE_INCONNU',
-  TRAITEMENT_DELETE_INCONNU = 'TRAITEMENT_DELETE_INCONNU'
+  TRAITEMENT_DELETE_INCONNU = 'TRAITEMENT_DELETE_INCONNU',
+  ID_OBJET_VIDE = 'ID_OBJET_VIDE'
 }

@@ -45,7 +45,7 @@ export class EvenementMiloHttpRepository implements EvenementMilo.Repository {
         date: evenement.date,
         action: toActionEvenement(evenement.action),
         objet: toObjetEvenement(evenement.type),
-        idObjet: evenement.idType.toString(),
+        idObjet: evenement.idType?.toString() ?? null,
         idPartenaireBeneficiaire: evenement.idDossier.toString()
       }
     })
