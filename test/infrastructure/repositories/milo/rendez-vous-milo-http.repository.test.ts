@@ -39,7 +39,8 @@ describe('MiloEvenementsHttpRepository', () => {
           idDossier: idPartenaireBeneficiaire,
           commentaire: '',
           type: 'Téléphone',
-          statut: 'Planifié'
+          statut: 'Planifié',
+          lieu: 'new'
         }
         nock('https://milo.com')
           .get(
@@ -60,7 +61,8 @@ describe('MiloEvenementsHttpRepository', () => {
         // Then
         const expected: RendezVousMilo = unRendezVousMilo({
           id: idObjet.toString(),
-          idPartenaireBeneficiaire: idPartenaireBeneficiaire.toString()
+          idPartenaireBeneficiaire: idPartenaireBeneficiaire.toString(),
+          adresse: 'new'
         })
         expect(resultat).to.deep.equal(expected)
       })

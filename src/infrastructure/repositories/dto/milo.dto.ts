@@ -60,6 +60,7 @@ export interface RendezVousMiloDto {
   conseiller: string
   idDossier: number
   commentaire?: string
+  lieu?: string
   type: string
   statut:
     | 'Absent'
