@@ -58,51 +58,112 @@ describe('SuivreEvenementsMiloCronJobHandler', () => {
     })
 
     describe('quand il y a au moins un évènement milo', () => {
-      let eventMilo1: EvenementMilo
-      let eventMilo2: EvenementMilo
+      let eventMilo1RDV: EvenementMilo
+      let eventMilo1RDVIdentique: EvenementMilo
+      let eventMilo2RDV: EvenementMilo
+      let eventMilo1Session: EvenementMilo
+      let eventMilo1SessionIdentique: EvenementMilo
+      let eventMilo2Session: EvenementMilo
 
       beforeEach(() => {
         // Given
-        eventMilo1 = unEvenementMilo({ id: 'un-evenement' })
-        eventMilo2 = unEvenementMilo({ id: 'un-autre-evenement' })
+        eventMilo1RDV = unEvenementMilo({
+          id: 'un-evenement',
+          date: uneDatetime().plus({ minute: 1 }).toISO()
+        })
+        eventMilo1RDVIdentique = unEvenementMilo({
+          id: 'un-evenement-mais-identique',
+          date: uneDatetime().toISO()
+        })
+        eventMilo2RDV = unEvenementMilo({
+          id: 'un-autre-evenement',
+          idObjet: '35'
+        })
+        eventMilo1Session = unEvenementMilo({
+          id: 'un-evenement-session',
+          date: uneDatetime().plus({ minute: 1 }).toISO(),
+          objet: EvenementMilo.ObjetEvenement.SESSION
+        })
+        eventMilo1SessionIdentique = unEvenementMilo({
+          id: 'un-evenement-mais-identique-session',
+          date: uneDatetime().toISO(),
+          objet: EvenementMilo.ObjetEvenement.SESSION
+        })
+        eventMilo2Session = unEvenementMilo({
+          id: 'un-autre-evenement-session',
+          idObjet: '35',
+          objet: EvenementMilo.ObjetEvenement.SESSION
+        })
         evenementMiloRepository.findAllEvenements
           .onFirstCall()
-          .resolves([eventMilo1, eventMilo2])
+          .resolves([
+            eventMilo1RDV,
+            eventMilo2RDV,
+            eventMilo1RDVIdentique,
+            eventMilo1Session,
+            eventMilo1SessionIdentique,
+            eventMilo2Session
+          ])
           .onSecondCall()
           .resolves([])
       })
-      it('crée un job sur redis pour chaque evenement', async () => {
+      it('crée un job sur redis pour chaque evenement non identique', async () => {
         // When
         await suivreEvenementsMiloHandler.handle()
 
         // Then
         expect(
           planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant
-        ).to.have.been.calledWith(eventMilo1)
+        ).to.have.callCount(5)
         expect(
           planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant
-        ).to.have.been.calledWith(eventMilo2)
+        ).to.have.been.calledWith(eventMilo1RDV)
+        expect(
+          planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant
+        ).to.have.been.calledWith(eventMilo1RDVIdentique)
+        expect(
+          planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant
+        ).to.have.been.calledWith(eventMilo2RDV)
+        expect(
+          planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant
+        ).to.have.been.calledWith(eventMilo1Session)
+        expect(
+          planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant
+        ).to.have.been.calledWith(eventMilo2Session)
       })
       it('acquitte chaque évènement', async () => {
         // When
         await suivreEvenementsMiloHandler.handle()
 
         // Then
+        expect(evenementMiloRepository.acquitterEvenement).to.have.callCount(6)
         expect(
           evenementMiloRepository.acquitterEvenement
-        ).to.have.been.calledWith(eventMilo1)
+        ).to.have.been.calledWith(eventMilo1RDV)
         expect(
           evenementMiloRepository.acquitterEvenement
-        ).to.have.been.calledWith(eventMilo2)
+        ).to.have.been.calledWith(eventMilo1RDVIdentique)
+        expect(
+          evenementMiloRepository.acquitterEvenement
+        ).to.have.been.calledWith(eventMilo2RDV)
+        expect(
+          evenementMiloRepository.acquitterEvenement
+        ).to.have.been.calledWith(eventMilo1Session)
+        expect(
+          evenementMiloRepository.acquitterEvenement
+        ).to.have.been.calledWith(eventMilo1SessionIdentique)
+        expect(
+          evenementMiloRepository.acquitterEvenement
+        ).to.have.been.calledWith(eventMilo2Session)
       })
 
       it("s'arrête quand milo ne retourne plus d'évènement", async () => {
         // Given
         evenementMiloRepository.findAllEvenements
           .onFirstCall()
-          .resolves([eventMilo1])
+          .resolves([eventMilo1RDV])
           .onSecondCall()
-          .resolves([eventMilo2])
+          .resolves([eventMilo2RDV])
           .onThirdCall()
           .resolves([])
 
@@ -113,16 +174,16 @@ describe('SuivreEvenementsMiloCronJobHandler', () => {
         expect(evenementMiloRepository.findAllEvenements).to.have.callCount(3)
         expect(
           planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant
-        ).to.have.been.calledWith(eventMilo1)
+        ).to.have.been.calledWith(eventMilo1RDV)
         expect(
           planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant
-        ).to.have.been.calledWith(eventMilo2)
+        ).to.have.been.calledWith(eventMilo2RDV)
         expect(
           evenementMiloRepository.acquitterEvenement
-        ).to.have.been.calledWith(eventMilo1)
+        ).to.have.been.calledWith(eventMilo1RDV)
         expect(
           evenementMiloRepository.acquitterEvenement
-        ).to.have.been.calledWith(eventMilo2)
+        ).to.have.been.calledWith(eventMilo2RDV)
       })
     })
   })

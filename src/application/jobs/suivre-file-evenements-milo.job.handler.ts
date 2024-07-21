@@ -52,10 +52,14 @@ export class SuivreEvenementsMiloCronJobHandler extends JobHandler<Job> {
       do {
         evenementsMilo = await this.evenementMiloRepository.findAllEvenements()
 
-        for (const evenement of evenementsMilo) {
+        const evenementsAPlanifier = trouverEvenementsAPlanifier(evenementsMilo)
+        for (const evenementAPlanifier of evenementsAPlanifier) {
           await this.planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant(
-            evenement
+            evenementAPlanifier
           )
+        }
+
+        for (const evenement of evenementsMilo) {
           await this.evenementMiloRepository.acquitterEvenement(evenement)
         }
         nombreEvenementsTraites += evenementsMilo.length
@@ -82,4 +86,26 @@ export class SuivreEvenementsMiloCronJobHandler extends JobHandler<Job> {
       }
     }
   }
+}
+
+function trouverEvenementsAPlanifier(
+  evenementsMilo: EvenementMilo[]
+): EvenementMilo[] {
+  const evenementsAGarder: EvenementMilo[] = []
+  const sessionsAGarder: { [key: string]: EvenementMilo } = {}
+
+  for (const evenement of evenementsMilo) {
+    if (evenement.objet !== EvenementMilo.ObjetEvenement.SESSION) {
+      evenementsAGarder.push(evenement)
+    } else {
+      const key = `${evenement.idPartenaireBeneficiaire}-${evenement.objet}-${evenement.action}-${evenement.idObjet}`
+      if (
+        !sessionsAGarder[key] ||
+        new Date(evenement.date) > new Date(sessionsAGarder[key].date)
+      ) {
+        sessionsAGarder[key] = evenement
+      }
+    }
+  }
+  return evenementsAGarder.concat(Object.values(sessionsAGarder))
 }
