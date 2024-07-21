@@ -8,11 +8,9 @@ import {
 import { SecuritySchemeObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface'
 
 export enum IDPName {
-  PE_JEUNE = 'pe-jeune',
+  FT_BENEFICIAIRE = 'ft-beneficiaire',
   PE_CONSEILLER = 'pe-conseiller',
-  PE_BRSA_JEUNE = 'pe-brsa-jeune',
   PE_BRSA_CONSEILLER = 'pe-brsa-conseiller',
-  PE_AIJ_JEUNE = 'pe-aij-jeune',
   PE_AIJ_CONSEILLER = 'pe-aij-conseiller',
   SIMILO_JEUNE = 'similo-jeune',
   SIMILO_CONSEILLER = 'similo-conseiller'
@@ -41,24 +39,16 @@ export function useSwagger(
         IDPName.PE_BRSA_CONSEILLER
       )
       .addOAuth2(
-        createSecurityScheme(issuerUrl, IDPName.PE_BRSA_JEUNE),
-        IDPName.PE_BRSA_JEUNE
-      )
-      .addOAuth2(
         createSecurityScheme(issuerUrl, IDPName.PE_AIJ_CONSEILLER),
         IDPName.PE_AIJ_CONSEILLER
-      )
-      .addOAuth2(
-        createSecurityScheme(issuerUrl, IDPName.PE_AIJ_JEUNE),
-        IDPName.PE_AIJ_JEUNE
       )
       .addOAuth2(
         createSecurityScheme(issuerUrl, IDPName.PE_CONSEILLER),
         IDPName.PE_CONSEILLER
       )
       .addOAuth2(
-        createSecurityScheme(issuerUrl, IDPName.PE_JEUNE),
-        IDPName.PE_JEUNE
+        createSecurityScheme(issuerUrl, IDPName.FT_BENEFICIAIRE),
+        IDPName.FT_BENEFICIAIRE
       )
       .addOAuth2(
         createSecurityScheme(issuerUrl, IDPName.SIMILO_CONSEILLER),
