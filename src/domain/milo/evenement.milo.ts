@@ -7,7 +7,7 @@ export interface EvenementMilo {
   idPartenaireBeneficiaire: string
   action: EvenementMilo.ActionEvenement
   objet: EvenementMilo.ObjetEvenement
-  idObjet: string
+  idObjet: string | null
   date: string
 }
 

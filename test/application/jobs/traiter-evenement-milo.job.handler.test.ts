@@ -162,6 +162,34 @@ describe('TraiterEvenementMiloJobHandler', () => {
         expect(rendezVousRepository.save).to.not.have.been.called()
       })
     })
+    describe('quand ID objet vide', () => {
+      it('ne fait rien', async () => {
+        // Given
+        const evenement = unEvenementMilo({
+          idPartenaireBeneficiaire,
+          objet: EvenementMilo.ObjetEvenement.RENDEZ_VOUS,
+          action: EvenementMilo.ActionEvenement.CREATE,
+          idObjet: null
+        })
+        const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> = {
+          dateExecution: uneDate(),
+          type: Planificateur.JobType.TRAITER_EVENEMENT_MILO,
+          contenu: evenement
+        }
+
+        // When
+        const result: SuiviJob = await handler.handle(job)
+
+        // Then
+        expect(result.resultat).to.be.deep.equal({
+          traitement: Traitement.ID_OBJET_VIDE,
+          idJeune: undefined,
+          idObjet: undefined
+        })
+        expect(jeuneRepository.getByIdDossier).to.not.have.been.called()
+        expect(rendezVousRepository.save).to.not.have.been.called()
+      })
+    })
 
     describe('quand traitable et JEUNE existant', () => {
       beforeEach(() => {
