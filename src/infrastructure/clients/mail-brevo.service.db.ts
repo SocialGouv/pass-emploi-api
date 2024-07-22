@@ -172,37 +172,43 @@ export class MailBrevoService implements Mail.Service {
     contacts: Mail.Contact[],
     mailingListId: number
   ): Promise<void> {
-    const contactsDTO: Brevo.Contact[] = contacts.map(contact => ({
-      email: contact.email,
-      attributes: {
-        nom: contact.nom,
-        prenom: contact.prenom
+    if (contacts.length) {
+      const contactsDTO: Brevo.Contact[] = contacts.map(contact => ({
+        email: contact.email,
+        attributes: {
+          nom: contact.nom,
+          prenom: contact.prenom
+        }
+      }))
+      const payload = {
+        listIds: [mailingListId],
+        emailBlacklist: false,
+        smsBlacklist: false,
+        updateExistingContacts: true,
+        emptyContactsAttributes: false,
+        jsonBody: contactsDTO
       }
-    }))
-    const payload = {
-      listIds: [mailingListId],
-      emailBlacklist: false,
-      smsBlacklist: false,
-      updateExistingContacts: true,
-      emptyContactsAttributes: false,
-      jsonBody: contactsDTO
-    }
-    try {
-      await firstValueFrom(
-        this.httpService.post(`${this.brevoUrl}/v3/contacts/import`, payload, {
-          headers: {
-            'api-key': `${this.apiKey}`,
-            accept: 'application/json',
-            'content-type': 'application/json'
-          }
-        })
-      )
-    } catch (e) {
-      if (e.name === 'AxiosError') {
-        e.config.data = 'REDACTED'
-        e.config.headers['api-key'] = 'REDACTED'
+      try {
+        await firstValueFrom(
+          this.httpService.post(
+            `${this.brevoUrl}/v3/contacts/import`,
+            payload,
+            {
+              headers: {
+                'api-key': `${this.apiKey}`,
+                accept: 'application/json',
+                'content-type': 'application/json'
+              }
+            }
+          )
+        )
+      } catch (e) {
+        if (e.name === 'AxiosError') {
+          e.config.data = 'REDACTED'
+          e.config.headers['api-key'] = 'REDACTED'
+        }
+        throw e
       }
-      throw e
     }
   }
 
