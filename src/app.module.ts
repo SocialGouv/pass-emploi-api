@@ -361,6 +361,7 @@ import { QualifierActionsJobHandler } from './application/jobs/qualifier-actions
 import { GetUtilisateurQueryHandler } from './application/queries/get-utilisateur.query.handler'
 import { RechercherMessageQueryHandler } from 'src/application/queries/rechercher-message.query.handler'
 import { RecupererAnalyseAntivirusJobHandler } from './application/jobs/recuperer-analyse-antivirus.job.handler'
+import { CreerTablesAEAnnuellesJobHandler } from './application/jobs/analytics/creer-tables-ae-annuelles'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -819,6 +820,7 @@ export const JobHandlerProviders = [
   EnrichirEvenementsJobHandler,
   ChargerLesVuesJobHandler,
   InitialiserLesVuesJobHandler,
+  CreerTablesAEAnnuellesJobHandler,
   QualifierActionsJobHandler,
   RecupererAnalyseAntivirusJobHandler
 ]

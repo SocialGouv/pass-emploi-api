@@ -26,13 +26,19 @@ export class ChargerLesVuesJobHandler extends JobHandler<Planificateur.Job> {
       .startOf('week')
       .minus({ week: 1 })
       .toFormat('yyyy-MM-dd')
+    const analyticsTableName = 'evenement_engagement'
     const connexion = await createSequelizeForAnalytics()
     this.logger.log('Migrer le schéma des vues analytics')
     await migrate(connexion)
     this.logger.log('Charger la vue fonctionnalité')
-    await chargerLaVueFonctionnalite(connexion, semaine)
+    await chargerLaVueFonctionnalite(connexion, semaine, analyticsTableName)
     this.logger.log('Charger la vue engagement')
-    await chargerLaVueEngagement(connexion, semaine, this.logger)
+    await chargerLaVueEngagement(
+      connexion,
+      semaine,
+      this.logger,
+      analyticsTableName
+    )
     await connexion.close()
 
     return {
