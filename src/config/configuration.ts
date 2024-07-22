@@ -37,8 +37,7 @@ export default () => {
     nodeEnv: process.env.NODE_ENV ?? 'production',
     frontEndUrl: process.env.FRONTEND_URL,
     noReplyContactEmail:
-      process.env.NO_REPLY_CONTACT_EMAIL ??
-      'no-reply@pass-emploi.beta.gouv.fr',
+      process.env.NO_REPLY_CONTACT_EMAIL ?? 'no-reply@pass-emploi.beta.gouv.fr',
     baseUrl,
     poleEmploi: {
       url:
@@ -148,7 +147,9 @@ export default () => {
       },
       mailingLists: {
         poleEmploi: process.env.SENDINBLUE_POLE_EMPLOI_MAILING_LIST_ID ?? 7,
-        milo: process.env.SENDINBLUE_MILO_MAILING_LIST_ID ?? 8
+        milo: process.env.SENDINBLUE_MILO_MAILING_LIST_ID ?? 8,
+        brsa: process.env.SENDINBLUE_BRSA_MAILING_LIST_ID ?? 56,
+        aij: process.env.SENDINBLUE_AIJ_MAILING_LIST_ID ?? 55
       }
     },
     s3: {

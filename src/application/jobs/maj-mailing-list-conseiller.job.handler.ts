@@ -11,7 +11,12 @@ import { DateService } from '../../utils/date-service'
 @Injectable()
 @ProcessJobType(Planificateur.JobType.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS)
 export class MajMailingListConseillerJobHandler extends JobHandler<Job> {
-  private mailingLists: { poleEmploi: string; milo: string }
+  private mailingLists: {
+    poleEmploi: string
+    milo: string
+    brsa: string
+    aij: string
+  }
 
   constructor(
     @Inject(MailServiceToken)
@@ -49,6 +54,14 @@ export class MajMailingListConseillerJobHandler extends JobHandler<Job> {
       await this.mailRepository.findAllContactsConseillerByStructures([
         Core.Structure.POLE_EMPLOI
       ])
+    const contactsBRSA =
+      await this.mailRepository.findAllContactsConseillerByStructures([
+        Core.Structure.POLE_EMPLOI_BRSA
+      ])
+    const contactsAIJ =
+      await this.mailRepository.findAllContactsConseillerByStructures([
+        Core.Structure.POLE_EMPLOI_AIJ
+      ])
     await this.mailService.mettreAJourMailingList(
       contactsMilo,
       parseInt(this.mailingLists.milo)
@@ -57,11 +70,21 @@ export class MajMailingListConseillerJobHandler extends JobHandler<Job> {
       contactsPoleEmploi,
       parseInt(this.mailingLists.poleEmploi)
     )
+    await this.mailService.mettreAJourMailingList(
+      contactsBRSA,
+      parseInt(this.mailingLists.brsa)
+    )
+    await this.mailService.mettreAJourMailingList(
+      contactsAIJ,
+      parseInt(this.mailingLists.aij)
+    )
     const conseillersSansEmail =
       await this.mailRepository.countContactsConseillerSansEmail()
     const stats = {
       conseillersMilo: contactsMilo.length,
       conseillersPoleEmploi: contactsPoleEmploi.length,
+      conseillersBRSA: contactsBRSA.length,
+      conseillersAIJ: contactsAIJ.length,
       conseillersSansEmail
     }
     return {

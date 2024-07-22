@@ -107,7 +107,9 @@ export const configurationSchema = Joi.object({
     }),
     mailingLists: Joi.object({
       poleEmploi: Joi.number().required(),
-      milo: Joi.number().required()
+      milo: Joi.number().required(),
+      brsa: Joi.number().required(),
+      aij: Joi.number().required()
     })
   }),
   s3: Joi.object({
