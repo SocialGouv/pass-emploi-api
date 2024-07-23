@@ -51,6 +51,7 @@ export async function getConnexionToDBSource(): Promise<PgConnexion> {
 export async function getConnexionToDBTarget(): Promise<PgConnexion> {
   // eslint-disable-next-line no-process-env
   const databaseUrl = process.env.DUMP_RESTORE_DB_TARGET as string
+  console.log('>>>', { databaseUrl, env: process.env.ENVIRONMENT })
   return getPGConnexion(databaseUrl)
 }
 
@@ -65,7 +66,8 @@ async function getPGConnexion(databaseUrl: string): Promise<PgConnexion> {
   }
   // eslint-disable-next-line no-process-env
   if (process.env.ENVIRONMENT === 'staging') {
-    options.ssl = true
+    console.log('>>> POUET')
+    options.ssl = { rejectUnauthorized: false }
   }
   const pool = new Pool(options)
   const client = await pool.connect()
