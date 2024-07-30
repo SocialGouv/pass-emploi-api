@@ -103,7 +103,9 @@ export const unAgendaConseillerMiloSessionListItemQueryModel: AgendaConseillerMi
         nom: 'Doe',
         statut: SessionMilo.Inscription.Statut.INSCRIT
       }
-    ]
+    ],
+    nbInscrits: 1,
+    nbPlacesRestantes: undefined
   }
 
 export const uneSessionMilo = (

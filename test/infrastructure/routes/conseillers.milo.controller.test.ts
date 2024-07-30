@@ -361,7 +361,12 @@ describe('ConseillersMiloController', () => {
     it('renvoie une 200 quand tout va bien', async () => {
       // Given
       getAgendaSessionsQueryHandler.execute.resolves(
-        success([unAgendaConseillerMiloSessionListItemQueryModel])
+        success([
+          {
+            ...unAgendaConseillerMiloSessionListItemQueryModel,
+            nbPlacesRestantes: 1
+          }
+        ])
       )
 
       // When - Then
@@ -371,7 +376,12 @@ describe('ConseillersMiloController', () => {
         )
         .set('authorization', unHeaderAuthorization())
         .expect(HttpStatus.OK)
-        .expect([unAgendaConseillerMiloSessionListItemQueryModel])
+        .expect([
+          {
+            ...unAgendaConseillerMiloSessionListItemQueryModel,
+            nbPlacesRestantes: 1
+          }
+        ])
 
       expect(
         getAgendaSessionsQueryHandler.execute
