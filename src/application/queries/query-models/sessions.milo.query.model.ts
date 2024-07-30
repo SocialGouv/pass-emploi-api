@@ -86,6 +86,12 @@ export class AgendaConseillerMiloSessionListItemQueryModel {
 
   @ApiProperty({ type: InscritSessionMiloQueryModel, isArray: true })
   beneficiaires: InscritSessionMiloQueryModel[]
+
+  @ApiProperty()
+  nbInscrits: number
+
+  @ApiPropertyOptional()
+  nbPlacesRestantes?: number
 }
 
 export class SessionJeuneMiloQueryModel {
