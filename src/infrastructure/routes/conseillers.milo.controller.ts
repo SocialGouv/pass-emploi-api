@@ -57,6 +57,9 @@ import {
   QualifierActionsMiloPayload,
   UpdateSessionMiloPayload
 } from './validation/conseillers.milo.inputs'
+import { CompteursBeneficiaireQueryModel } from 'src/application/queries/query-models/conseillers.query-model'
+import { GetPortefeuilleParams } from 'src/infrastructure/routes/validation/jeunes.milo.inputs'
+import { GetCompteursBeneficiaireMiloQueryHandler } from 'src/application/queries/get-compteurs-portefeuille-milo.query.handler.db'
 
 @Controller()
 @CustomSwaggerApiOAuth2()
@@ -72,7 +75,8 @@ export class ConseillersMiloController {
     private readonly getJeuneMiloByDossierQueryHandler: GetJeuneMiloByDossierQueryHandler,
     private readonly creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler,
     private readonly qualifierActionsMiloCommandHandler: QualifierActionsMiloCommandHandler,
-    private readonly getSessionsV2QueryHandler: GetSessionsConseillerMiloV2QueryHandler
+    private readonly getSessionsV2QueryHandler: GetSessionsConseillerMiloV2QueryHandler,
+    private readonly getCompteursBeneficiaireMiloQueryHandler: GetCompteursBeneficiaireMiloQueryHandler
   ) {}
   @ApiOperation({
     summary: "Récupère le dossier Milo d'un jeune",
@@ -334,6 +338,34 @@ export class ConseillersMiloController {
       utilisateur
     )
 
+    return handleResult(result)
+  }
+
+  @ApiOperation({
+    description: 'Compte des trucs des bénéficiaires du conseiller'
+  })
+  @Get('/conseillers/milo/:idConseiller/compteurs-portefeuille')
+  @ApiResponse({
+    type: CompteursBeneficiaireQueryModel,
+    isArray: true
+  })
+  async getCompteursPortefeuille(
+    @Param('idConseiller') idConseiller: string,
+    @Query() queryParams: GetPortefeuilleParams,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<CompteursBeneficiaireQueryModel[]> {
+    const result = await this.getCompteursBeneficiaireMiloQueryHandler.execute(
+      {
+        idConseiller,
+        dateDebut: DateTime.fromISO(queryParams.dateDebut, {
+          setZone: true
+        }),
+        dateFin: DateTime.fromISO(queryParams.dateFin, {
+          setZone: true
+        })
+      },
+      utilisateur
+    )
     return handleResult(result)
   }
 }
