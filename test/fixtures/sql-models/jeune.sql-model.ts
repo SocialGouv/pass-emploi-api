@@ -27,7 +27,8 @@ export function unJeuneDto(
     instanceId: 'abcdef',
     partageFavoris: true,
     timezone: 'Europe/Paris',
-    idStructureMilo: null
+    idStructureMilo: null,
+    dateSignatureCGU: null
   }
 
   return { ...defaults, ...args }

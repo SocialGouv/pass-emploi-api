@@ -45,7 +45,8 @@ export function fromSqlToDetailJeuneQueryModel(
       optionsMilo?.baseUrlDossier && jeuneSqlModel.idPartenaire
         ? `${optionsMilo.baseUrlDossier}/${jeuneSqlModel.idPartenaire}/acces-externe`
         : undefined,
-    estAArchiver: optionsMilo?.estAArchiver
+    estAArchiver: optionsMilo?.estAArchiver,
+    dateSignatureCGU: jeuneSqlModel.dateSignatureCGU?.toISOString()
   }
 }
 

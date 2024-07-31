@@ -75,7 +75,7 @@ import { CreerJeuneMiloCommandHandler } from './application/commands/milo/creer-
 import { QualifierActionCommandHandler } from './application/commands/milo/qualifier-action.command.handler'
 import { QualifierActionsMiloCommandHandler } from './application/commands/milo/qualifier-actions-milo.command.handler'
 import { UpdateSessionMiloCommandHandler } from './application/commands/milo/update-session-milo.command.handler'
-import { ModifierConseillerCommandHandler } from './application/commands/modifier-conseiller.command.handler'
+import { ModifierConseillerCommandHandler } from './application/commands/conseiller/modifier-conseiller.command.handler'
 import { ModifierJeuneDuConseillerCommandHandler } from './application/commands/modifier-jeune-du-conseiller.command.handler'
 import { NotifierNouvellesImmersionsCommandHandler } from './application/commands/notifier-nouvelles-immersions.command.handler'
 import { CreateDemarcheCommandHandler } from './application/commands/pole-emploi/create-demarche.command.handler'
@@ -363,6 +363,7 @@ import { GetUtilisateurQueryHandler } from './application/queries/get-utilisateu
 import { RechercherMessageQueryHandler } from 'src/application/queries/rechercher-message.query.handler'
 import { RecupererAnalyseAntivirusJobHandler } from './application/jobs/recuperer-analyse-antivirus.job.handler'
 import { CreerTablesAEAnnuellesJobHandler } from './application/jobs/analytics/creer-tables-ae-annuelles'
+import { UpdateJeuneCommandHandler } from './application/commands/update-jeune.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -638,6 +639,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetDetailJeuneQueryHandler,
     GetJeunesByEtablissementQueryHandler,
     GetUtilisateurQueryHandler,
+    UpdateJeuneCommandHandler,
     GetJeunesEtablissementV2QueryHandler,
     GetJeunesByStructureMiloQueryHandler,
     GetActionsJeuneQueryHandler,

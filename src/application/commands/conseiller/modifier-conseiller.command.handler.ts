@@ -1,24 +1,24 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { getStructureDeReference } from '../../domain/core'
-import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
-import { Query } from '../../building-blocks/types/query'
+import { DateTime } from 'luxon'
+import { Command } from '../../../building-blocks/types/command'
+import { CommandHandler } from '../../../building-blocks/types/command-handler'
+import { NonTrouveError } from '../../../building-blocks/types/domain-error'
 import {
   Result,
   emptySuccess,
   failure,
   isFailure
-} from '../../building-blocks/types/result'
-import { Agence, AgenceRepositoryToken } from '../../domain/agence'
-import { Authentification } from '../../domain/authentification'
+} from '../../../building-blocks/types/result'
+import { Agence, AgenceRepositoryToken } from '../../../domain/agence'
+import { Authentification } from '../../../domain/authentification'
 import {
   Conseiller,
   ConseillerRepositoryToken
-} from '../../domain/milo/conseiller'
-import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
-import { DateTime } from 'luxon'
+} from '../../../domain/milo/conseiller'
+import { getStructureDeReference } from '../../../domain/core'
+import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 
-export interface ModifierConseillerCommand extends Query {
+export interface ModifierConseillerCommand extends Command {
   idConseiller: string
   agence?: Agence
   dateSignatureCGU?: string

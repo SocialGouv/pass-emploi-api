@@ -16,7 +16,7 @@ import {
   CreateListeDeDiffusionCommand,
   CreateListeDeDiffusionCommandHandler
 } from '../../application/commands/create-liste-de-diffusion.command.handler'
-import { ModifierConseillerCommandHandler } from '../../application/commands/modifier-conseiller.command.handler'
+import { ModifierConseillerCommandHandler } from '../../application/commands/conseiller/modifier-conseiller.command.handler'
 import { ModifierJeuneDuConseillerCommandHandler } from '../../application/commands/modifier-jeune-du-conseiller.command.handler'
 import { RecupererJeunesDuConseillerCommandHandler } from '../../application/commands/recuperer-jeunes-du-conseiller.command.handler'
 import { GetConseillersQueryHandler } from '../../application/queries/get-conseillers.query.handler.db'
