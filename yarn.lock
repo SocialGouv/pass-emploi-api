@@ -4386,9 +4386,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bull@npm:*, bull@npm:4.15.1, bull@npm:^4.12.2":
-  version: 4.15.1
-  resolution: "bull@npm:4.15.1"
+"bull@npm:*, bull@npm:4.16.0, bull@npm:^4.12.2":
+  version: 4.16.0
+  resolution: "bull@npm:4.16.0"
   dependencies:
     cron-parser: "npm:^4.2.1"
     get-port: "npm:^5.1.1"
@@ -4397,7 +4397,7 @@ __metadata:
     msgpackr: "npm:^1.10.1"
     semver: "npm:^7.5.2"
     uuid: "npm:^8.3.0"
-  checksum: 10/83a6e36322ee75f04a82c584fa3eb033d96be78a187327fcc92cdce221224d9226071731562845683ff2f8d92c53e4be6e2782f1dfc4023da77bd53f6a7f200f
+  checksum: 10/246b4a639186db3be145dfa7a0b420983946a8b1ac25321e30bf70f8073a0a373028e32c85b00d98cbc307c4f19f231c6487a5c61ae745933e4a2d0546ef8da2
   languageName: node
   linkType: hard
 
@@ -9256,7 +9256,7 @@ __metadata:
     "@types/yargs": "npm:^17.0.32"
     "@typescript-eslint/eslint-plugin": "npm:^6.21.0"
     "@typescript-eslint/parser": "npm:^6.21.0"
-    bull: "npm:4.15.1"
+    bull: "npm:4.16.0"
     bull-repl: "npm:^0.29.1"
     chai: "npm:^4.4.1"
     chai-as-promised: "npm:^7.1.2"
