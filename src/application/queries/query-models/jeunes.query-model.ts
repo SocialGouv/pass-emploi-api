@@ -161,6 +161,9 @@ export class DetailJeuneQueryModel {
 
   @ApiProperty({ required: false })
   dateFinCEJ?: string
+
+  @ApiProperty({ required: false })
+  dateSignatureCGU?: string
 }
 
 export class DetailJeuneConseillerQueryModel {

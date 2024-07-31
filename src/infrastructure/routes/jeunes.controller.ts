@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Put,
   Query
@@ -50,8 +51,10 @@ import {
   MaintenantQueryParams,
   TransfererConseillerPayload,
   UpdateConfigurationInput,
+  UpdateJeunePayload,
   UpdateJeunePreferencesPayload
 } from './validation/jeunes.inputs'
+import { UpdateJeuneCommandHandler } from '../../application/commands/update-jeune.command.handler'
 
 @Controller('jeunes')
 @CustomSwaggerApiOAuth2()
@@ -60,6 +63,7 @@ export class JeunesController {
   constructor(
     private readonly getDetailJeuneQueryHandler: GetDetailJeuneQueryHandler,
     private readonly updateJeuneConfigurationApplicationCommandHandler: UpdateJeuneConfigurationApplicationCommandHandler,
+    private readonly updateJeuneCommandHandler: UpdateJeuneCommandHandler,
     private readonly getJeuneHomeActionsQueryHandler: GetJeuneHomeActionsQueryHandler,
     private readonly getJeuneHomeSuiviQueryHandler: GetJeuneHomeAgendaQueryHandler,
     private readonly transfererJeunesConseillerCommandHandler: TransfererJeunesConseillerCommandHandler,
@@ -271,6 +275,27 @@ export class JeunesController {
       partageFavoris: updateJeunePreferencesPayload.partageFavoris
     }
     const result = await this.updateJeunePreferencesCommandHandler.execute(
+      command,
+      utilisateur
+    )
+
+    return handleResult(result)
+  }
+
+  @ApiOperation({
+    summary: 'Modifie les infos du jeune'
+  })
+  @Patch(':idJeune')
+  async udpateJeune(
+    @Param('idJeune') idJeune: string,
+    @Body() updateJeunePayload: UpdateJeunePayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command = {
+      idJeune,
+      dateSignatureCGU: updateJeunePayload.dateSignatureCGU
+    }
+    const result = await this.updateJeuneCommandHandler.execute(
       command,
       utilisateur
     )

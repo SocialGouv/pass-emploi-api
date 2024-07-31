@@ -3,7 +3,7 @@ import { DeleteConseillerCommandHandler } from 'src/application/commands/conseil
 import {
   ModifierConseillerCommand,
   ModifierConseillerCommandHandler
-} from 'src/application/commands/modifier-conseiller.command.handler'
+} from 'src/application/commands/conseiller/modifier-conseiller.command.handler'
 import {
   ModifierJeuneDuConseillerCommand,
   ModifierJeuneDuConseillerCommandHandler
