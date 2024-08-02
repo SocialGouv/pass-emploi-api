@@ -79,7 +79,7 @@ export class GetCompteursBeneficiaireMiloQueryHandler extends QueryHandler<
                  COUNT(action.id) as actions
           FROM action
                    RIGHT JOIN jeune ON action.id_jeune = jeune.id
-          WHERE id_conseiller = :idConseiller AND action.date_creation >= :dateDebut AND action.date_creation <= :dateFin 
+          WHERE id_conseiller = :idConseiller AND id_createur = jeune.id AND action.date_creation >= :dateDebut AND action.date_creation <= :dateFin 
           GROUP BY jeune.id
         `,
         {

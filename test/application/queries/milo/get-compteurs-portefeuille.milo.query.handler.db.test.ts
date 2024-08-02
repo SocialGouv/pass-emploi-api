@@ -96,19 +96,22 @@ describe('GetCompteursPortefeuilleMiloQueryHandler', () => {
       await ActionSqlModel.creer(
         uneActionDto({
           idJeune: 'beneficiaire-id',
-          dateCreation: new Date('2024-07-01')
+          dateCreation: new Date('2024-07-01'),
+          idCreateur: 'beneficiaire-id'
         })
       )
       await ActionSqlModel.creer(
         uneActionDto({
           idJeune: 'beneficiaire-id',
-          dateCreation: new Date('2024-07-02')
+          dateCreation: new Date('2024-07-02'),
+          idCreateur: 'beneficiaire-id'
         })
       )
       await ActionSqlModel.creer(
         uneActionDto({
           idJeune: 'beneficiaire-id',
-          dateCreation: new Date('2024-07-03')
+          dateCreation: new Date('2024-07-03'),
+          idCreateur: 'beneficiaire-id'
         })
       )
 
