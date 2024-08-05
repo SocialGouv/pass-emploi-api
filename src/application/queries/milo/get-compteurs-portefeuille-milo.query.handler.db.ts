@@ -1,18 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
+import { QueryTypes, Sequelize } from 'sequelize'
+import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
+import { CompteursBeneficiaireQueryModel } from 'src/application/queries/query-models/conseillers.query-model'
+import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
 import { Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { Query } from 'src/building-blocks/types/query'
-import { QueryTypes, Sequelize } from 'sequelize'
-import { DateTime } from 'luxon'
-import { CompteursBeneficiaireQueryModel } from 'src/application/queries/query-models/conseillers.query-model'
-import { SequelizeInjectionToken } from 'src/infrastructure/sequelize/providers'
-import {
-  Conseiller,
-  ConseillerRepositoryToken
-} from 'src/domain/milo/conseiller'
-import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
 import { estMilo } from 'src/domain/core'
+import { SequelizeInjectionToken } from 'src/infrastructure/sequelize/providers'
 
 export interface GetCompteursBeneficiaireMiloQuery extends Query {
   idConseiller: string
@@ -27,8 +23,6 @@ export class GetCompteursBeneficiaireMiloQueryHandler extends QueryHandler<
 > {
   constructor(
     private conseillerAuthorizer: ConseillerAuthorizer,
-    @Inject(ConseillerRepositoryToken)
-    private readonly conseillersRepository: Conseiller.Milo.Repository,
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
   ) {
     super('GetCompteursBeneficiaireMiloQueryHandler')
@@ -77,17 +71,21 @@ export class GetCompteursBeneficiaireMiloQueryHandler extends QueryHandler<
         `
           SELECT jeune.id as id,
                  COUNT(action.id) as actions
-          FROM action
-                   RIGHT JOIN jeune ON action.id_jeune = jeune.id
-          WHERE id_conseiller = :idConseiller AND id_createur = jeune.id AND action.date_creation >= :dateDebut AND action.date_creation <= :dateFin 
+          FROM action, jeune
+          WHERE 
+            id_conseiller = :idConseiller AND 
+            action.id_jeune = jeune.id AND
+            action.id_createur = jeune.id AND 
+            action.date_creation >= :dateDebut AND 
+            action.date_creation <= :dateFin 
           GROUP BY jeune.id
         `,
         {
           type: QueryTypes.SELECT,
           replacements: {
             idConseiller,
-            dateDebut: dateDebut.toJSDate(),
-            dateFin: dateFin.toJSDate()
+            dateDebut: dateDebut.toUTC().startOf('day').toFormat('yyyy-MM-dd'),
+            dateFin: dateFin.toUTC().startOf('day').toFormat('yyyy-MM-dd')
           }
         }
       )

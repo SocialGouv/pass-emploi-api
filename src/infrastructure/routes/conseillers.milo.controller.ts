@@ -59,7 +59,7 @@ import {
 } from './validation/conseillers.milo.inputs'
 import { CompteursBeneficiaireQueryModel } from 'src/application/queries/query-models/conseillers.query-model'
 import { GetPortefeuilleParams } from 'src/infrastructure/routes/validation/jeunes.milo.inputs'
-import { GetCompteursBeneficiaireMiloQueryHandler } from 'src/application/queries/get-compteurs-portefeuille-milo.query.handler.db'
+import { GetCompteursBeneficiaireMiloQueryHandler } from 'src/application/queries/milo/get-compteurs-portefeuille-milo.query.handler.db'
 
 @Controller()
 @CustomSwaggerApiOAuth2()

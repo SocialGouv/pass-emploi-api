@@ -49,7 +49,7 @@ import { CreerJeuneMiloPayload } from '../../../src/infrastructure/routes/valida
 import { unDossierMilo } from '../../fixtures/milo.fixture'
 import { unJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import { GetSessionsConseillerMiloV2QueryHandler } from '../../../src/application/queries/milo/v2/get-sessions-conseiller.milo.v2.query.handler.db'
-import { GetCompteursBeneficiaireMiloQueryHandler } from 'src/application/queries/get-compteurs-portefeuille-milo.query.handler.db'
+import { GetCompteursBeneficiaireMiloQueryHandler } from 'src/application/queries/milo/get-compteurs-portefeuille-milo.query.handler.db'
 
 describe('ConseillersMiloController', () => {
   let getDossierMiloJeuneQueryHandler: StubbedClass<GetDossierMiloJeuneQueryHandler>

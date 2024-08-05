@@ -1,30 +1,27 @@
+import { DateTime } from 'luxon'
 import { describe } from 'mocha'
 import { createSandbox, SinonSandbox } from 'sinon'
-import { expect, StubbedClass, stubClass } from 'test/utils'
 import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { ConseillerMilo } from 'src/domain/milo/conseiller.milo.db'
-import { GetCompteursBeneficiaireMiloQueryHandler } from 'src/application/queries/get-compteurs-portefeuille-milo.query.handler.db'
+import { GetCompteursBeneficiaireMiloQueryHandler } from 'src/application/queries/milo/get-compteurs-portefeuille-milo.query.handler.db'
+import { success } from 'src/building-blocks/types/result'
+import { Core } from 'src/domain/core'
+import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
+import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
+import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
+import { uneActionDto } from 'test/fixtures/sql-models/action.sql-model'
+import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
+import { expect, StubbedClass, stubClass } from 'test/utils'
 import {
   DatabaseForTesting,
   getDatabase
 } from 'test/utils/database-for-testing'
-import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
-import { DateTime } from 'luxon'
-import { success } from 'src/building-blocks/types/result'
-import { Core } from 'src/domain/core'
-import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
-import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
-import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
-import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import Structure = Core.Structure
-import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
-import { uneActionDto } from 'test/fixtures/sql-models/action.sql-model'
 
 describe('GetCompteursPortefeuilleMiloQueryHandler', () => {
   let getCompteursPortefeuilleMiloQueryHandler: GetCompteursBeneficiaireMiloQueryHandler
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
-  let conseillerRepository: StubbedType<ConseillerMilo.Repository>
   let databaseForTesting: DatabaseForTesting
   let sandbox: SinonSandbox
 
@@ -35,12 +32,10 @@ describe('GetCompteursPortefeuilleMiloQueryHandler', () => {
 
   beforeEach(async () => {
     await databaseForTesting.cleanPG()
-    conseillerRepository = stubInterface(sandbox)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     getCompteursPortefeuilleMiloQueryHandler =
       new GetCompteursBeneficiaireMiloQueryHandler(
         conseillerAuthorizer,
-        conseillerRepository,
         databaseForTesting.sequelize
       )
   })
