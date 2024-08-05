@@ -177,7 +177,7 @@
     "@nestjs/axios/axios": "1.7.3",
     "@nestjs/platform-express/express": "4.19.2",
     "download/got": "11.8.5",
-    "supertest/superagent": "9.0.2"
+    "supertest/superagent": "10.0.0"
   },
   "mocha": {
     "require": [
