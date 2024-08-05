@@ -13,6 +13,8 @@ import {
 } from 'src/domain/milo/conseiller'
 import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
 import { estMilo } from 'src/domain/core'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
+import { MiloClient } from 'src/infrastructure/clients/milo-client'
 
 export interface GetCompteursBeneficiaireMiloQuery extends Query {
   idConseiller: string
@@ -27,6 +29,8 @@ export class GetCompteursBeneficiaireMiloQueryHandler extends QueryHandler<
 > {
   constructor(
     private conseillerAuthorizer: ConseillerAuthorizer,
+    private readonly keycloakClient: KeycloakClient,
+    private readonly miloClient: MiloClient,
     @Inject(ConseillerRepositoryToken)
     private readonly conseillersRepository: Conseiller.Milo.Repository,
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
@@ -38,18 +42,42 @@ export class GetCompteursBeneficiaireMiloQueryHandler extends QueryHandler<
     query: GetCompteursBeneficiaireMiloQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result<CompteursBeneficiaireQueryModel[]>> {
+    const mergeMap: { [key: string]: { actions: number; rdvs: number } } = {}
+
     const compteurActions = await this.getActionsDeLaSemaineByConseiller(
       utilisateur.id,
       query.dateDebut,
       query.dateFin
     )
 
-    const compteurs = compteurActions.map(({ id, actions }) => ({
-      idBeneficiaire: id,
-      actions
+    const compteursRdv = await this.getRdvDeLaSemaineByConseiller(
+      utilisateur.id,
+      query.dateDebut,
+      query.dateFin
+    )
+
+    compteurActions.forEach(({ id, actions }) => {
+      mergeMap[id] = { actions: Number(actions), rdvs: 0 }
+    })
+
+    compteursRdv.forEach(({ id, rdvs }) => {
+      const nbRdvs = Number(rdvs)
+      if (mergeMap[id]) {
+        mergeMap[id].rdvs = nbRdvs
+      } else {
+        mergeMap[id] = { actions: 0, rdvs: nbRdvs }
+      }
+    })
+
+    const mergedCompteurs: CompteursBeneficiaireQueryModel[] = Object.entries(
+      mergeMap
+    ).map(([idBeneficiaire, { actions, rdvs }]) => ({
+      idBeneficiaire,
+      actions,
+      rdvs
     }))
 
-    return success(compteurs)
+    return success(mergedCompteurs)
   }
 
   async authorize(
@@ -72,7 +100,7 @@ export class GetCompteursBeneficiaireMiloQueryHandler extends QueryHandler<
     dateDebut: DateTime,
     dateFin: DateTime
   ): Promise<Array<{ id: string; actions: number }>> {
-    const sqlJeunes: Array<{ id: string; actions: number }> =
+    const sqlActions: Array<{ id: string; actions: number }> =
       await this.sequelize.query(
         `
           SELECT jeune.id as id,
@@ -92,6 +120,37 @@ export class GetCompteursBeneficiaireMiloQueryHandler extends QueryHandler<
         }
       )
 
-    return sqlJeunes
+    return sqlActions
+  }
+
+  private async getRdvDeLaSemaineByConseiller(
+    idConseiller: string,
+    dateDebut: DateTime,
+    dateFin: DateTime
+  ): Promise<Array<{ id: string; rdvs: number }>> {
+    const sqlRdv: Array<{ id: string; rdvs: number }> =
+      await this.sequelize.query(
+        `
+          SELECT jeune.id as id,
+                 COUNT(jeune.id) as rdvs
+          FROM rendez_vous, rendez_vous_jeune_association, jeune
+          WHERE
+              rendez_vous_jeune_association.id_rendez_vous = rendez_vous.id AND
+              rendez_vous_jeune_association.id_jeune = jeune.id AND
+              jeune.id_conseiller = :idConseiller AND 
+              rendez_vous.date >= :dateDebut AND 
+              rendez_vous.date <= :dateFin 
+          GROUP BY jeune.id
+        `,
+        {
+          type: QueryTypes.SELECT,
+          replacements: {
+            idConseiller,
+            dateDebut: dateDebut.toJSDate(),
+            dateFin: dateFin.toJSDate()
+          }
+        }
+      )
+    return sqlRdv
   }
 }

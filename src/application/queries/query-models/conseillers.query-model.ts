@@ -114,4 +114,7 @@ export class CompteursBeneficiaireQueryModel {
 
   @ApiProperty()
   actions: number
+
+  @ApiProperty()
+  rdvs: number
 }

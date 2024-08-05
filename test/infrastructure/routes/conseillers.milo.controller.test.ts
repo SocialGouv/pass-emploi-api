@@ -665,37 +665,38 @@ describe('ConseillersMiloController', () => {
   })
 
   describe('GET /conseiller/milo/:idConseiller/compteurs-portefeuille', () => {
-    describe('quand les jeunes ont des trucs à compter', () => {
-      it('renvoie les trucs à compter par jeune', async () => {
-        // Given
-        const query = {
-          idConseiller: 'id-conseiller',
-          dateDebut: DateTime.fromISO('2024-07-01', {
-            setZone: true
-          }),
-          dateFin: DateTime.fromISO('2024-07-26', {
-            setZone: true
-          })
-        }
-        const queryModel = [{ idBeneficiaire: 'id-beneficiaire', actions: 3 }]
+    it('renvoie les actions et les rdvs par bénéficiaire', async () => {
+      // Given
+      const query = {
+        idConseiller: 'id-conseiller',
+        dateDebut: DateTime.fromISO('2024-07-01', {
+          setZone: true
+        }),
+        dateFin: DateTime.fromISO('2024-07-26', {
+          setZone: true
+        })
+      }
 
-        getCompteursBeneficiaireMiloQueryHandler.execute.resolves(
-          success(queryModel)
+      const queryModel = [
+        { idBeneficiaire: 'id-beneficiaire', actions: 3, rdvs: 0 }
+      ]
+
+      getCompteursBeneficiaireMiloQueryHandler.execute.resolves(
+        success(queryModel)
+      )
+
+      // When - Then
+      await request(app.getHttpServer())
+        .get(
+          '/conseillers/milo/id-conseiller/compteurs-portefeuille?dateDebut=2024-07-01&dateFin=2024-07-26'
         )
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+        .expect(JSON.stringify(queryModel))
 
-        // When - Then
-        await request(app.getHttpServer())
-          .get(
-            '/conseillers/milo/id-conseiller/compteurs-portefeuille?dateDebut=2024-07-01&dateFin=2024-07-26'
-          )
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.OK)
-          .expect(JSON.stringify(queryModel))
-
-        expect(
-          getCompteursBeneficiaireMiloQueryHandler.execute
-        ).to.have.been.calledOnceWithExactly(query, unUtilisateurDecode())
-      })
+      expect(
+        getCompteursBeneficiaireMiloQueryHandler.execute
+      ).to.have.been.calledOnceWithExactly(query, unUtilisateurDecode())
     })
   })
 })

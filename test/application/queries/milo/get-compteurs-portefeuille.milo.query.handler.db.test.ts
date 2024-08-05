@@ -20,11 +20,19 @@ import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import Structure = Core.Structure
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
 import { uneActionDto } from 'test/fixtures/sql-models/action.sql-model'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
+import { MiloClient } from 'src/infrastructure/clients/milo-client'
+import { Authentification } from 'src/domain/authentification'
+import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { unRendezVousDto } from 'test/fixtures/sql-models/rendez-vous.sql-model'
+import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 
 describe('GetCompteursPortefeuilleMiloQueryHandler', () => {
   let getCompteursPortefeuilleMiloQueryHandler: GetCompteursBeneficiaireMiloQueryHandler
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let conseillerRepository: StubbedType<ConseillerMilo.Repository>
+  let keycloakClient: StubbedClass<KeycloakClient>
+  let miloClient: StubbedClass<MiloClient>
   let databaseForTesting: DatabaseForTesting
   let sandbox: SinonSandbox
 
@@ -37,9 +45,13 @@ describe('GetCompteursPortefeuilleMiloQueryHandler', () => {
     await databaseForTesting.cleanPG()
     conseillerRepository = stubInterface(sandbox)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
+    keycloakClient = stubClass(KeycloakClient)
+    miloClient = stubClass(MiloClient)
     getCompteursPortefeuilleMiloQueryHandler =
       new GetCompteursBeneficiaireMiloQueryHandler(
         conseillerAuthorizer,
+        keycloakClient,
+        miloClient,
         conseillerRepository,
         databaseForTesting.sequelize
       )
@@ -81,11 +93,20 @@ describe('GetCompteursPortefeuilleMiloQueryHandler', () => {
   })
 
   describe('handle', () => {
-    it('récupère les compteurs pour le portefeuille Milo', async () => {
-      // Given
+    let query: {
+      idConseiller: string
+      accessToken: string
+      dateDebut: DateTime
+      dateFin: DateTime
+    }
+
+    let user: Authentification.Utilisateur
+
+    beforeEach(async () => {
       await ConseillerSqlModel.creer(
         unConseillerDto({ structure: Structure.MILO })
       )
+
       await JeuneSqlModel.creer(
         unJeuneDto({
           id: 'beneficiaire-id',
@@ -93,51 +114,178 @@ describe('GetCompteursPortefeuilleMiloQueryHandler', () => {
           instanceId: 'instanceId'
         })
       )
-      await ActionSqlModel.creer(
-        uneActionDto({
-          idJeune: 'beneficiaire-id',
-          dateCreation: new Date('2024-07-01'),
-          idCreateur: 'beneficiaire-id'
-        })
-      )
-      await ActionSqlModel.creer(
-        uneActionDto({
-          idJeune: 'beneficiaire-id',
-          dateCreation: new Date('2024-07-02'),
-          idCreateur: 'beneficiaire-id'
-        })
-      )
-      await ActionSqlModel.creer(
-        uneActionDto({
-          idJeune: 'beneficiaire-id',
-          dateCreation: new Date('2024-07-03'),
-          idCreateur: 'beneficiaire-id'
-        })
-      )
 
-      const query = {
+      query = {
         idConseiller: 'idConseiller',
         accessToken: 'bearer un-token',
         dateDebut: DateTime.fromISO('2024-07-01'),
         dateFin: DateTime.fromISO('2024-07-26')
       }
-      const user = unUtilisateurConseiller({ structure: Structure.MILO })
 
-      // When
-      const result = await getCompteursPortefeuilleMiloQueryHandler.handle(
-        query,
-        user
-      )
+      user = unUtilisateurConseiller({ structure: Structure.MILO })
+    })
+    describe('quand le bénéficiaire a des actions', () => {
+      it('les compte et les retourne', async () => {
+        // Given
+        await ActionSqlModel.creer(
+          uneActionDto({
+            idJeune: 'beneficiaire-id',
+            dateCreation: new Date('2024-07-01'),
+            idCreateur: 'beneficiaire-id'
+          })
+        )
+        await ActionSqlModel.creer(
+          uneActionDto({
+            idJeune: 'beneficiaire-id',
+            dateCreation: new Date('2024-07-02'),
+            idCreateur: 'beneficiaire-id'
+          })
+        )
+        await ActionSqlModel.creer(
+          uneActionDto({
+            idJeune: 'beneficiaire-id',
+            dateCreation: new Date('2024-07-03'),
+            idCreateur: 'beneficiaire-id'
+          })
+        )
 
-      // Then
-      expect(result).to.deep.equal(
-        success([
-          {
-            idBeneficiaire: 'beneficiaire-id',
-            actions: '3'
-          }
-        ])
-      )
+        // When
+        const result = await getCompteursPortefeuilleMiloQueryHandler.handle(
+          query,
+          user
+        )
+
+        // Then
+        expect(result).to.deep.equal(
+          success([
+            {
+              idBeneficiaire: 'beneficiaire-id',
+              actions: 3,
+              rdvs: 0
+            }
+          ])
+        )
+      })
+    })
+
+    describe('quand le bénéficiaire a des rdvs', () => {
+      it('les compte et les retourne', async () => {
+        // Given
+        await RendezVousSqlModel.creer(
+          unRendezVousDto({
+            id: '196e32b5-4d66-46cb-8485-77c92bd00553',
+            date: new Date('2024-07-01')
+          })
+        )
+
+        await RendezVousSqlModel.creer(
+          unRendezVousDto({
+            id: '296e32b5-4d66-46cb-8485-77c92bd00554',
+            date: new Date('2024-07-02')
+          })
+        )
+
+        await RendezVousJeuneAssociationSqlModel.create({
+          idJeune: 'beneficiaire-id',
+          idRendezVous: '196e32b5-4d66-46cb-8485-77c92bd00553'
+        })
+
+        await RendezVousJeuneAssociationSqlModel.create({
+          idJeune: 'beneficiaire-id',
+          idRendezVous: '296e32b5-4d66-46cb-8485-77c92bd00554'
+        })
+
+        // When
+        const result = await getCompteursPortefeuilleMiloQueryHandler.handle(
+          query,
+          user
+        )
+
+        // Then
+        expect(result).to.deep.equal(
+          success([
+            {
+              idBeneficiaire: 'beneficiaire-id',
+              actions: 0,
+              rdvs: 2
+            }
+          ])
+        )
+      })
+    })
+
+    describe('quand le bénéficiaire a des actions et des rdvs', () => {
+      it('les compte et les retourne', async () => {
+        // Given
+        await RendezVousSqlModel.creer(
+          unRendezVousDto({
+            id: '196e32b5-4d66-46cb-8485-77c92bd00553',
+            date: new Date('2024-07-01')
+          })
+        )
+
+        await RendezVousSqlModel.creer(
+          unRendezVousDto({
+            id: '296e32b5-4d66-46cb-8485-77c92bd00554',
+            date: new Date('2024-07-02')
+          })
+        )
+
+        await RendezVousJeuneAssociationSqlModel.create({
+          idJeune: 'beneficiaire-id',
+          idRendezVous: '196e32b5-4d66-46cb-8485-77c92bd00553'
+        })
+
+        await RendezVousJeuneAssociationSqlModel.create({
+          idJeune: 'beneficiaire-id',
+          idRendezVous: '296e32b5-4d66-46cb-8485-77c92bd00554'
+        })
+
+        await ActionSqlModel.creer(
+          uneActionDto({
+            idJeune: 'beneficiaire-id',
+            dateCreation: new Date('2024-07-01'),
+            idCreateur: 'beneficiaire-id'
+          })
+        )
+        await ActionSqlModel.creer(
+          uneActionDto({
+            idJeune: 'beneficiaire-id',
+            dateCreation: new Date('2024-07-02'),
+            idCreateur: 'beneficiaire-id'
+          })
+        )
+
+        // When
+        const result = await getCompteursPortefeuilleMiloQueryHandler.handle(
+          query,
+          user
+        )
+
+        // Then
+        expect(result).to.deep.equal(
+          success([
+            {
+              idBeneficiaire: 'beneficiaire-id',
+              actions: 2,
+              rdvs: 2
+            }
+          ])
+        )
+      })
+    })
+
+    describe('quand le bénéficiaire n’a ni actions ni rdvs', () => {
+      it('les compte et les retourne', async () => {
+        // When
+        const result = await getCompteursPortefeuilleMiloQueryHandler.handle(
+          query,
+          user
+        )
+
+        // Then
+        expect(result).to.deep.equal(success([]))
+      })
     })
   })
 })
