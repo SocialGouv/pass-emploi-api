@@ -85,8 +85,10 @@ export const unDetailSessionJeuneMiloQueryModel: DetailSessionJeuneMiloQueryMode
     nbPlacesDisponibles: 10
   }
 
-export const unAgendaConseillerMiloSessionListItemQueryModel: AgendaConseillerMiloSessionListItemQueryModel =
-  {
+export const unAgendaConseillerMiloSessionListItemQueryModel = (
+  args: Partial<AgendaConseillerMiloSessionListItemQueryModel> = {}
+): AgendaConseillerMiloSessionListItemQueryModel => {
+  const defaults: AgendaConseillerMiloSessionListItemQueryModel = {
     id: '1',
     nomSession: 'Une-session',
     nomOffre: 'Une-offre',
@@ -107,6 +109,9 @@ export const unAgendaConseillerMiloSessionListItemQueryModel: AgendaConseillerMi
     nbInscrits: 1,
     nbPlacesRestantes: undefined
   }
+
+  return { ...defaults, ...args }
+}
 
 export const uneSessionMilo = (
   args: Partial<SessionMilo> = {}

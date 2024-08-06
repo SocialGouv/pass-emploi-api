@@ -16,6 +16,7 @@ import { AgenceSqlModel } from './agence.sql-model'
 import { JeuneSqlModel } from './jeune.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from './rendez-vous-jeune-association.sql-model'
 import { LogModificationRendezVousSqlModel } from './log-modification-rendez-vous-sql.model'
+import { AsSql } from 'src/infrastructure/sequelize/types'
 
 export class RendezVousDto extends Model {
   @PrimaryKey
@@ -107,4 +108,8 @@ export class RendezVousSqlModel extends RendezVousDto {
 
   @HasMany(() => LogModificationRendezVousSqlModel)
   logs: LogModificationRendezVousSqlModel[]
+
+  static async creer(rendezVousDto: AsSql<RendezVousDto>): Promise<void> {
+    await RendezVousSqlModel.create(rendezVousDto)
+  }
 }

@@ -352,11 +352,13 @@ export class ConseillersMiloController {
   async getCompteursPortefeuille(
     @Param('idConseiller') idConseiller: string,
     @Query() queryParams: GetPortefeuilleParams,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string
   ): Promise<CompteursBeneficiaireQueryModel[]> {
     const result = await this.getCompteursBeneficiaireMiloQueryHandler.execute(
       {
         idConseiller,
+        accessToken,
         dateDebut: DateTime.fromISO(queryParams.dateDebut, {
           setZone: true
         }),
