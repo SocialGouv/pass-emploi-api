@@ -138,7 +138,7 @@ export class GetCompteursBeneficiaireMiloQueryHandler extends QueryHandler<
           replacements: {
             idConseiller,
             dateDebut: dateDebut.toUTC().startOf('day').toFormat('yyyy-MM-dd'),
-            dateFin: dateFin.toUTC().startOf('day').toFormat('yyyy-MM-dd')
+            dateFin: dateFin.toUTC().endOf('day').toFormat('yyyy-MM-dd')
           }
         }
       )
