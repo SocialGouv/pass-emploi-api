@@ -26,9 +26,9 @@ export class KeycloakClient {
     private httpService: HttpService
   ) {
     this.logger = new Logger('KeycloakClient')
-    this.issuerUrl = this.configService.get('oidc').issuerUrl
-    this.clientId = this.configService.get('oidc').clientId
-    this.clientSecret = this.configService.get('oidc').clientSecret
+    this.issuerUrl = this.configService.get('oidcSSO').issuerUrl
+    this.clientId = this.configService.get('oidcSSO').clientId
+    this.clientSecret = this.configService.get('oidcSSO').clientSecret
   }
 
   public async exchangeTokenConseillerMilo(bearer: string): Promise<string> {
@@ -105,7 +105,7 @@ export class KeycloakClient {
 
   public async deleteUserByIdUser(idUserCEJ: string): Promise<void> {
     const token = await this.getToken()
-    const url = `${this.configService.get('oidc').issuerApiUrl}/users`
+    const url = `${this.configService.get('oidcInternal').issuerApiUrl}/users`
 
     const headers = {
       Authorization: `Bearer ${token}`
@@ -144,9 +144,9 @@ export class KeycloakClient {
       }
     }
   }
-  public async deleteAccountFromNewAuth(idUser: string): Promise<void> {
-    const apiKey = this.configService.get('oidc.apiKey')
-    const url = `${this.configService.get('oidc').issuerNewApiUrl}/accounts`
+  public async deleteAccountFromOIDCSSO(idUser: string): Promise<void> {
+    const apiKey = this.configService.get('oidcSSO.apiKey')
+    const url = `${this.configService.get('oidcSSO').issuerApiUrl}/accounts`
 
     const headers = {
       'X-API-KEY': apiKey

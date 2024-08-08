@@ -189,13 +189,15 @@ export const testConfig = (): ConfigService => {
       recupererStructureMilo: true,
       recupererSessionsMilo: true
     },
-    oidc: {
-      issuerUrl: 'https://keycloak.com',
-      issuerApiUrl: 'https://keycloak-api.com',
-      issuerNewApiUrl: 'https://new-api.com',
+    oidcSSO: {
+      issuerUrl: 'https://pass-emploi-connect.com',
+      issuerApiUrl: 'https://pass-emploi-connect-api.com',
       clientId: 'client',
-      clientSecret: 'chut',
-      useNewAuth: 'false'
+      clientSecret: 'chut'
+    },
+    oidcInternal: {
+      issuerUrl: 'https://keycloak.com',
+      issuerApiUrl: 'https://keycloak-api.com'
     },
     values: {
       maxRechercheConseillers: '5'
