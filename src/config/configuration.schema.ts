@@ -75,7 +75,6 @@ export const configurationSchema = Joi.object({
   oidc: Joi.object({
     issuerUrl: Joi.string().uri().required(),
     issuerApiUrl: Joi.string().uri().required(),
-    issuerNewApiUrl: Joi.string().uri().required(),
     clientId: Joi.string().required(),
     clientSecret: Joi.string().required(),
     apiKey: Joi.string().required()
@@ -190,8 +189,7 @@ export const configurationSchema = Joi.object({
     rendezVousMilo: Joi.boolean(),
     notifierRendezVousMilo: Joi.boolean(),
     recupererStructureMilo: Joi.boolean(),
-    recupererSessionsMilo: Joi.boolean(),
-    useNewAuth: Joi.boolean()
+    recupererSessionsMilo: Joi.boolean()
   }),
   values: Joi.object({
     maxRechercheConseillers: Joi.number()

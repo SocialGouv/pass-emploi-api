@@ -144,9 +144,9 @@ export class KeycloakClient {
       }
     }
   }
-  public async deleteAccountFromNewAuth(idUser: string): Promise<void> {
+  public async deleteAccount(idUser: string): Promise<void> {
     const apiKey = this.configService.get('oidc.apiKey')
-    const url = `${this.configService.get('oidc').issuerNewApiUrl}/accounts`
+    const url = `${this.configService.get('oidc').issuerApiUrl}/accounts`
 
     const headers = {
       'X-API-KEY': apiKey

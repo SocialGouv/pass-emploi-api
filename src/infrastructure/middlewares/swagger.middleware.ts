@@ -13,7 +13,8 @@ export enum IDPName {
   PE_BRSA_CONSEILLER = 'pe-brsa-conseiller',
   PE_AIJ_CONSEILLER = 'pe-aij-conseiller',
   SIMILO_JEUNE = 'similo-jeune',
-  SIMILO_CONSEILLER = 'similo-conseiller'
+  SIMILO_CONSEILLER = 'similo-conseiller',
+  CONSEILLER_DEPT = 'conseiller-dept'
 }
 
 export function useSwagger(
@@ -57,6 +58,10 @@ export function useSwagger(
       .addOAuth2(
         createSecurityScheme(issuerUrl, IDPName.SIMILO_JEUNE),
         IDPName.SIMILO_JEUNE
+      )
+      .addOAuth2(
+        createSecurityScheme(issuerUrl, IDPName.CONSEILLER_DEPT),
+        IDPName.CONSEILLER_DEPT
       )
   }
   const swaggerConfig = swaggerConfigBuilder.build()

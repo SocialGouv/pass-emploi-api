@@ -163,13 +163,9 @@ export class AuthentificationSqlRepository
 
   async deleteUtilisateurIdp(idUserCEJ: string): Promise<void> {
     try {
-      if (this.configService.get('features.useNewAuth')) {
-        await this.keycloakClient.deleteAccountFromNewAuth(idUserCEJ)
-      } else {
-        await this.keycloakClient.deleteUserByIdUser(idUserCEJ)
-      }
+      await this.keycloakClient.deleteAccount(idUserCEJ)
     } catch (_e) {}
-    this.logger.log(`Utilisateur ${idUserCEJ} supprimé de keycloak`)
+    this.logger.log(`Utilisateur ${idUserCEJ} supprimé de OIDC SSO`)
   }
 
   async estConseillerSuperviseur(
