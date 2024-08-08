@@ -13,9 +13,9 @@ import { getDatabase } from '../../utils/database-for-testing'
 describe('KeycloakClient', () => {
   let keycloakClient: KeycloakClient
   const configService = testConfig()
-  const issuerUrl = configService.get('oidc').issuerUrl
-  const clientId = configService.get('oidc').clientId
-  const clientSecret = configService.get('oidc').clientSecret
+  const issuerUrl = configService.get('oidcSSO').issuerUrl
+  const clientId = configService.get('oidcSSO').clientId
+  const clientSecret = configService.get('oidcSSO').clientSecret
 
   beforeEach(async () => {
     const httpService = new HttpService()
@@ -23,7 +23,7 @@ describe('KeycloakClient', () => {
   })
 
   describe('deleteUserByIdUser', () => {
-    const apiUrl = configService.get('oidc').issuerApiUrl
+    const apiUrl = configService.get('oidcInternal').issuerApiUrl
     it('echoue lorsque la récupération du token est en erreur', async () => {
       // Given
       nock(issuerUrl)
@@ -195,7 +195,7 @@ describe('KeycloakClient', () => {
   })
 
   describe('deleteAccountFromNewAuth', () => {
-    const apiUrl = configService.get('oidc').issuerNewApiUrl
+    const apiUrl = configService.get('oidcSSO').issuerApiUrl
     beforeEach(async () => {
       await getDatabase().cleanPG()
     })
@@ -209,7 +209,7 @@ describe('KeycloakClient', () => {
 
       try {
         // When
-        await keycloakClient.deleteAccountFromNewAuth(id)
+        await keycloakClient.deleteAccountFromOIDCSSO(id)
       } catch (e) {
         // Then
         expect.fail(null, null, 'handle test rejected with an error')
@@ -226,7 +226,7 @@ describe('KeycloakClient', () => {
 
       try {
         // When
-        await keycloakClient.deleteAccountFromNewAuth(id)
+        await keycloakClient.deleteAccountFromOIDCSSO(id)
       } catch (e) {
         // Then
         expect.fail(null, null, 'handle test rejected with an error')
@@ -238,7 +238,7 @@ describe('KeycloakClient', () => {
 
       try {
         // When
-        await keycloakClient.deleteAccountFromNewAuth('idAuth')
+        await keycloakClient.deleteAccountFromOIDCSSO('idAuth')
         expect.fail(null, null, 'handle test did not reject with an error')
       } catch (e) {}
     })

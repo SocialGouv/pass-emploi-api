@@ -42,7 +42,7 @@ export class JwtService implements IJwtService {
   private async getJWKS(): Promise<JWTVerifyGetKey> {
     if (!this.cacheJWKS) {
       const issuer = await Issuer.discover(
-        this.configService.get('oidc.issuerUrl')!
+        this.configService.get('oidcSSO.issuerUrl')!
       )
       this.cacheJWKS = createRemoteJWKSet(
         new URL(new URL(issuer.metadata.jwks_uri!))

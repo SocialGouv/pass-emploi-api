@@ -72,13 +72,15 @@ export const configurationSchema = Joi.object({
     key: Joi.string().required(),
     encryptionKey: Joi.string().required()
   },
-  oidc: Joi.object({
+  oidcSSO: Joi.object({
     issuerUrl: Joi.string().uri().required(),
     issuerApiUrl: Joi.string().uri().required(),
-    issuerNewApiUrl: Joi.string().uri().required(),
     clientId: Joi.string().required(),
     clientSecret: Joi.string().required(),
     apiKey: Joi.string().required()
+  }),
+  oidcInternal: Joi.object({
+    issuerUrl: Joi.string().uri().required()
   }),
   apiKeys: Joi.object({
     keycloak: Joi.array().items(Joi.string().required()).min(1).required(),
@@ -190,8 +192,7 @@ export const configurationSchema = Joi.object({
     rendezVousMilo: Joi.boolean(),
     notifierRendezVousMilo: Joi.boolean(),
     recupererStructureMilo: Joi.boolean(),
-    recupererSessionsMilo: Joi.boolean(),
-    useNewAuth: Joi.boolean()
+    recupererSessionsMilo: Joi.boolean()
   }),
   values: Joi.object({
     maxRechercheConseillers: Joi.number()
