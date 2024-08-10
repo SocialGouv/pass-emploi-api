@@ -68,6 +68,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
           case Core.Structure.POLE_EMPLOI:
           case Core.Structure.POLE_EMPLOI_BRSA:
           case Core.Structure.POLE_EMPLOI_AIJ:
+          case Core.Structure.CONSEIL_DEPT:
             return this.authentificationConseillerSSO(commandSanitized)
         }
         break
