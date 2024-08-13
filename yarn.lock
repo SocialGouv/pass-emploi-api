@@ -1522,16 +1522,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/axios@npm:1.0.1":
-  version: 1.0.1
-  resolution: "@nestjs/axios@npm:1.0.1"
-  dependencies:
-    axios: "npm:1.2.1"
+"@nestjs/axios@npm:^3.0.2":
+  version: 3.0.2
+  resolution: "@nestjs/axios@npm:3.0.2"
   peerDependencies:
-    "@nestjs/common": ^7.0.0 || ^8.0.0 || ^9.0.0
-    reflect-metadata: ^0.1.12
+    "@nestjs/common": ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
+    axios: ^1.3.1
     rxjs: ^6.0.0 || ^7.0.0
-  checksum: 10/a471951a8cf405701580cb6fba3e5a17bac71e366e3deede29690890d05f6a5d93c8866cc71fb7f843d4b4aea284b96bd9c210dd04eb380907a7a6471e1d8c73
+  checksum: 10/00866a630596ab6aad4f27dd91aceb600b9db605a5307d359f0898177b020a77764782d8b102a25ed227a0f2d5f0679c5b68967261aec71d445be3f3f028ec84
   languageName: node
   linkType: hard
 
@@ -4030,7 +4028,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.7.3":
+"axios@npm:^1.7.3":
   version: 1.7.3
   resolution: "axios@npm:1.7.3"
   dependencies:
@@ -9227,7 +9225,7 @@ __metadata:
     "@aws-sdk/client-s3": "npm:3.622.0"
     "@aws-sdk/s3-request-presigner": "npm:3.622.0"
     "@google-cloud/bigquery": "npm:7.9.0"
-    "@nestjs/axios": "npm:1.0.1"
+    "@nestjs/axios": "npm:^3.0.2"
     "@nestjs/cli": "npm:^9.5.0"
     "@nestjs/common": "npm:10.3.10"
     "@nestjs/config": "npm:2.3.4"
@@ -9260,6 +9258,7 @@ __metadata:
     "@types/yargs": "npm:^17.0.32"
     "@typescript-eslint/eslint-plugin": "npm:^6.21.0"
     "@typescript-eslint/parser": "npm:^6.21.0"
+    axios: "npm:^1.7.3"
     bull: "npm:4.16.0"
     bull-repl: "npm:^0.29.1"
     chai: "npm:^4.4.1"
