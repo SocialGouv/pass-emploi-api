@@ -190,8 +190,8 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     this.logger.log('Mise à jour de la vue AE Jeune')
     const query_2022 = getQueryTableAEJeune('2022')
     const query_2023 = getQueryTableAEJeune('2023')
-    const query_2024 = getQueryTableAEJeune()
-    let full_query = `INSERT INTO evenement_engagement_jeune (
+    const query_current = getQueryTableAEJeune()
+    const full_query = `INSERT INTO evenement_engagement_jeune (
       id_utilisateur, 
       structure, 
       nb_action_cree, 
@@ -203,9 +203,8 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
       date_premier_ae, 
       date_dernier_ae
     )
-    WITH `
-    full_query += `${query_2022}` + ',' + `${query_2023}` + ',' + `${query_2024}`
-    full_query += ` SELECT
+    WITH ${query_2022}, ${query_2023}, ${query_current}
+    SELECT
         id_utilisateur,
         structure,
         sum(nb_action_cree) AS nb_action_cree,
@@ -221,12 +220,12 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
         UNION ALL
         SELECT * FROM ae_jeune_2023
         UNION ALL
-        SELECT * FROM ae_jeune_2024
+        SELECT * FROM ae_jeune
       ) AS concat_tables
           GROUP BY
             id_utilisateur,
             structure;
-      `
+    `
     await connexion.query(full_query)
   }
 }
@@ -236,8 +235,10 @@ async function updateDateDernierAEConseiller(
   annee?: string
 ): Promise<void> {
   let tableName = 'evenement_engagement'
+  let conditionDate = 'AND EXTRACT(YEAR FROM date_evenement) >= 2024'
   if (annee) {
     tableName += `_${annee}`
+    conditionDate = `AND EXTRACT(YEAR FROM date_evenement) = ${Number(annee)}`
   }
   await connexion.query(`
     update conseiller
@@ -245,7 +246,7 @@ async function updateDateDernierAEConseiller(
     from (
         select id_utilisateur, max(date_evenement) as date_dernier_ae
         from ${tableName}
-        where type_utilisateur = 'CONSEILLER'
+        where type_utilisateur = 'CONSEILLER' ${conditionDate}
         group by id_utilisateur
     ) as dernier_ae_conseiller
     where conseiller.id = dernier_ae_conseiller.id_utilisateur;`)
@@ -255,8 +256,10 @@ async function updateDatePremierAEConseiller(
   annee?: string
 ): Promise<void> {
   let tableName = 'evenement_engagement'
+  let conditionDate = 'AND EXTRACT(YEAR FROM date_evenement) >= 2024'
   if (annee) {
     tableName += `_${annee}`
+    conditionDate = `AND EXTRACT(YEAR FROM date_evenement) = ${Number(annee)}`
   }
   await connexion.query(`
     update conseiller
@@ -264,22 +267,22 @@ async function updateDatePremierAEConseiller(
     from (
         select id_utilisateur, min(date_evenement) as date_premier_ae
         from ${tableName}
-        where type_utilisateur = 'CONSEILLER'
+        where type_utilisateur = 'CONSEILLER' ${conditionDate}
         group by id_utilisateur
     ) as premier_ae_conseiller
     where conseiller.id = premier_ae_conseiller.id_utilisateur;`)
 }
 
-async function getQueryTableAEJeune(
-  annee?: string
-): Promise<string> {
+async function getQueryTableAEJeune(annee?: string): Promise<string> {
   let tableName = 'evenement_engagement'
   let tableAEName = 'ae'
   let groupedTableAEName = 'ae_jeune'
+  let conditionDate = 'AND EXTRACT(YEAR FROM date_evenement) >= 2024'
   if (annee) {
     tableName += `_${annee}`
     tableAEName += `_${annee}`
     groupedTableAEName += `_${annee}`
+    conditionDate = `AND EXTRACT(YEAR FROM date_evenement) = ${Number(annee)}`
   }
   const query = `${tableAEName} AS (
       SELECT
@@ -324,6 +327,7 @@ async function getQueryTableAEJeune(
         ${tableName}
       WHERE
         type_utilisateur = 'JEUNE'
+        ${conditionDate}
     ),
     ${groupedTableAEName} AS (
       SELECT
