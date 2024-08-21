@@ -188,128 +188,46 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
 
   private async enrichirTableAEJeune(connexion: Sequelize): Promise<void> {
     this.logger.log('Mise à jour de la vue AE Jeune')
-    await connexion.query(`
-      WITH
-        ae_dernier_jour AS (
-          SELECT
-            id_utilisateur,
-            structure,
-            date_evenement,
-            CASE
-              WHEN categorie = 'Action'
-              AND ACTION = 'Création'
-              OR code = 'ACTION_CREE' THEN 1
-              ELSE 0
-            END AS creation_action,
-            CASE
-              WHEN categorie = 'Message'
-              AND ACTION = 'Envoi' THEN 1
-              ELSE 0
-            END AS envoi_message,
-            CASE
-              WHEN categorie = 'Rendez-vous'
-              AND ACTION = 'Consultation' THEN 1
-              ELSE 0
-            END AS consultation_rdv,
-            CASE
-              WHEN categorie = 'Offre'
-              AND (
-                ACTION = 'Recherche'
-                OR ACTION = 'Détail'
-                OR ACTION = 'favori'
-              ) THEN 1
-              ELSE 0
-            END AS consultation_offre,
-            CASE
-              WHEN categorie = 'Offre'
-              AND ACTION = 'Postuler' THEN 1
-              ELSE 0
-            END AS postuler_offre,
-            CASE
-              WHEN categorie = 'Evénement' THEN 1
-              ELSE 0
-            END AS consultation_evenement
-          FROM
-            evenement_engagement
-          WHERE
-            type_utilisateur = 'JEUNE'
-            AND date_evenement >= CAST((NOW() + INTERVAL '-1 day') AS date)
-            AND date_evenement < CAST(NOW() AS date)
-        ),
-        concat_tables AS (
-          SELECT
-            id_utilisateur,
-            sum(creation_action) AS nb_action_cree,
-            sum(envoi_message) AS nb_message_envoye,
-            sum(consultation_rdv) AS nb_consultation_rdv,
-            sum(consultation_offre) AS nb_consultation_offre,
-            sum(postuler_offre) AS nb_postuler_offre,
-            sum(consultation_evenement) AS nb_consultation_evenement,
-            min(date_evenement) AS date_premier_ae,
-            max(date_evenement) AS date_dernier_ae,
-            structure
-          FROM
-            ae_dernier_jour
-          GROUP BY
-            id_utilisateur,
-            structure
-          UNION ALL
-          SELECT
-            *
-          FROM
-            evenement_engagement_jeune
-        ),
-        updated_table as (
-          SELECT
-            id_utilisateur,
-            sum(nb_action_cree) AS nb_action_cree,
-            sum(nb_message_envoye) AS nb_message_envoye,
-            sum(nb_consultation_rdv) AS nb_consultation_rdv,
-            sum(nb_consultation_offre) AS nb_consultation_offre,
-            sum(nb_postuler_offre) AS nb_postuler_offre,
-            sum(nb_consultation_evenement) AS nb_consultation_evenement,
-            min(date_premier_ae) AS date_premier_ae,
-            max(date_dernier_ae) AS date_dernier_ae,
-            structure
-          FROM
-            concat_tables
-          GROUP BY
-            id_utilisateur,
-            structure
-        )
-      -- Réécriture de la table
-      BEGIN TRANSACTION;
-
-      -- Truncate table original
-      TRUNCATE TABLE evenement_engagement_jeune;
-
-      -- Insertion nouvelle data
-      INSERT INTO evenement_engagement_jeune (
+    const query_2022 = getQueryTableAEJeune('2022')
+    const query_2023 = getQueryTableAEJeune('2023')
+    const query_2024 = getQueryTableAEJeune()
+    let full_query = `INSERT INTO evenement_engagement_jeune (
+      id_utilisateur, 
+      structure, 
+      nb_action_cree, 
+      nb_message_envoye, 
+      nb_consultation_rdv, 
+      nb_consultation_offre, 
+      nb_postuler_offre, 
+      nb_consultation_evenement, 
+      date_premier_ae, 
+      date_dernier_ae
+    )
+    WITH `
+    full_query += `${query_2022}` + ',' + `${query_2023}` + ',' + `${query_2024}`
+    full_query += ` SELECT
         id_utilisateur,
         structure,
-        nb_action_cree,
-        nb_message_envoye,
-        nb_consultation_rdv,
-        nb_consultation_offre,
-        nb_postuler_offre,
-        nb_consultation_evenement,
-        date_premier_ae,
-        date_dernier_ae
-      )
-      SELECT
-        updated_table.id_utilisateur AS id_utilisateur,
-        updated_table.structure AS structure,
-        updated_table.nb_action_cree AS nb_action_cree,
-        updated_table.nb_message_envoye AS nb_message_envoye,
-        updated_table.nb_consultation_rdv AS nb_consultation_rdv,
-        updated_table.nb_consultation_offre AS nb_consultation_offre,
-        updated_table.nb_postuler_offre AS nb_postuler_offre,
-        updated_table.nb_consultation_evenement AS nb_consultation_evenement,
-        updated_table.date_premier_ae AS date_premier_ae,
-        updated_table.date_dernier_ae AS date_dernier_ae
-      FROM updated_table
-      ;
-    `)
+        sum(nb_action_cree) AS nb_action_cree,
+        sum(nb_message_envoye) AS nb_message_envoye,
+        sum(nb_consultation_rdv) AS nb_consultation_rdv,
+        sum(nb_consultation_offre) AS nb_consultation_offre,
+        sum(nb_postuler_offre) AS nb_postuler_offre,
+        sum(nb_consultation_evenement) AS nb_consultation_evenement,
+        min(date_premier_ae) AS date_premier_ae,
+        max(date_dernier_ae) AS date_dernier_ae
+      FROM (
+        SELECT * FROM ae_jeune_2022
+        UNION ALL
+        SELECT * FROM ae_jeune_2023
+        UNION ALL
+        SELECT * FROM ae_jeune_2024
+      ) AS concat_tables
+          GROUP BY
+            id_utilisateur,
+            structure;
+      `
+    await connexion.query(full_query)
   }
 }
 
@@ -350,4 +268,81 @@ async function updateDatePremierAEConseiller(
         group by id_utilisateur
     ) as premier_ae_conseiller
     where conseiller.id = premier_ae_conseiller.id_utilisateur;`)
+}
+
+async function getQueryTableAEJeune(
+  annee?: string
+): Promise<string> {
+  let tableName = 'evenement_engagement'
+  let tableAEName = 'ae'
+  let groupedTableAEName = 'ae_jeune'
+  if (annee) {
+    tableName += `_${annee}`
+    tableAEName += `_${annee}`
+    groupedTableAEName += `_${annee}`
+  }
+  const query = `${tableAEName} AS (
+      SELECT
+        id_utilisateur,
+        structure,
+        date_evenement,
+        CASE
+          WHEN categorie = 'Action'
+          AND ACTION = 'Création'
+          OR code = 'ACTION_CREE' THEN 1
+          ELSE 0
+        END AS creation_action,
+        CASE
+          WHEN categorie = 'Message'
+          AND ACTION = 'Envoi' THEN 1
+          ELSE 0
+        END AS envoi_message,
+        CASE
+          WHEN categorie = 'Rendez-vous'
+          AND ACTION = 'Consultation' THEN 1
+          ELSE 0
+        END AS consultation_rdv,
+        CASE
+          WHEN categorie = 'Offre'
+          AND (
+            ACTION = 'Recherche'
+            OR ACTION = 'Détail'
+            OR ACTION = 'favori'
+          ) THEN 1
+          ELSE 0
+        END AS consultation_offre,
+        CASE
+          WHEN categorie = 'Offre'
+          AND ACTION = 'Postuler' THEN 1
+          ELSE 0
+        END AS postuler_offre,
+        CASE
+          WHEN categorie = 'Evénement' THEN 1
+          ELSE 0
+        END AS consultation_evenement
+      FROM
+        ${tableName}
+      WHERE
+        type_utilisateur = 'JEUNE'
+    ),
+    ${groupedTableAEName} AS (
+      SELECT
+        id_utilisateur,
+        sum(creation_action) AS nb_action_cree,
+        sum(envoi_message) AS nb_message_envoye,
+        sum(consultation_rdv) AS nb_consultation_rdv,
+        sum(consultation_offre) AS nb_consultation_offre,
+        sum(postuler_offre) AS nb_postuler_offre,
+        sum(consultation_evenement) AS nb_consultation_evenement,
+        min(date_evenement) AS date_premier_ae,
+        max(date_evenement) AS date_dernier_ae,
+        structure
+      FROM
+        ${tableAEName}
+      GROUP BY
+        id_utilisateur,
+        structure
+    )
+  `
+  return query
 }
