@@ -125,7 +125,9 @@ export function mapSessionConseillerDtoToAgendaQueryModel(
       .toUTC()
       .toISO(),
     type: buildSessionTypeQueryModel(sessionDto.offre.type),
-    beneficiaires: inscrits
+    beneficiaires: inscrits,
+    nbPlacesRestantes: sessionDto.session.nbPlacesDisponibles ?? undefined,
+    nbInscrits: inscrits.length
   }
 }
 

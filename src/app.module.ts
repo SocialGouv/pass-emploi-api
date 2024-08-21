@@ -19,6 +19,7 @@ import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/m
 import { GetMonSuiviPoleEmploiQueryHandler } from 'src/application/queries/milo/get-mon-suivi-jeune.pole-emploi.query.handler.db'
 import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-sessions-conseiller.milo.query.handler.db'
 import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
+import { GetCompteursBeneficiaireMiloQueryHandler } from 'src/application/queries/milo/get-compteurs-portefeuille-milo.query.handler.db'
 import { EvenementEmploiCodePostalQueryGetter } from 'src/application/queries/query-getters/evenement-emploi-code-postal.query.getter'
 import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { AntivirusClient } from 'src/infrastructure/clients/antivirus-client'
@@ -74,7 +75,7 @@ import { CreerJeuneMiloCommandHandler } from './application/commands/milo/creer-
 import { QualifierActionCommandHandler } from './application/commands/milo/qualifier-action.command.handler'
 import { QualifierActionsMiloCommandHandler } from './application/commands/milo/qualifier-actions-milo.command.handler'
 import { UpdateSessionMiloCommandHandler } from './application/commands/milo/update-session-milo.command.handler'
-import { ModifierConseillerCommandHandler } from './application/commands/modifier-conseiller.command.handler'
+import { ModifierConseillerCommandHandler } from './application/commands/conseiller/modifier-conseiller.command.handler'
 import { ModifierJeuneDuConseillerCommandHandler } from './application/commands/modifier-jeune-du-conseiller.command.handler'
 import { NotifierNouvellesImmersionsCommandHandler } from './application/commands/notifier-nouvelles-immersions.command.handler'
 import { CreateDemarcheCommandHandler } from './application/commands/pole-emploi/create-demarche.command.handler'
@@ -362,6 +363,7 @@ import { GetUtilisateurQueryHandler } from './application/queries/get-utilisateu
 import { RechercherMessageQueryHandler } from 'src/application/queries/rechercher-message.query.handler'
 import { RecupererAnalyseAntivirusJobHandler } from './application/jobs/recuperer-analyse-antivirus.job.handler'
 import { CreerTablesAEAnnuellesJobHandler } from './application/jobs/analytics/creer-tables-ae-annuelles'
+import { UpdateJeuneCommandHandler } from './application/commands/update-jeune.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -637,6 +639,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetDetailJeuneQueryHandler,
     GetJeunesByEtablissementQueryHandler,
     GetUtilisateurQueryHandler,
+    UpdateJeuneCommandHandler,
     GetJeunesEtablissementV2QueryHandler,
     GetJeunesByStructureMiloQueryHandler,
     GetActionsJeuneQueryHandler,
@@ -786,7 +789,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetCatalogueDemarchesQueryHandler,
     GetMonSuiviMiloQueryHandler,
     GetTokenPoleEmploiQueryHandler,
-    GetMonSuiviPoleEmploiQueryHandler
+    GetMonSuiviPoleEmploiQueryHandler,
+    GetCompteursBeneficiaireMiloQueryHandler
   ]
 }
 

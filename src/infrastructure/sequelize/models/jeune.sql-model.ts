@@ -149,6 +149,12 @@ export class JeuneDto extends Model {
     type: DataType.STRING
   })
   idStructureMilo?: string | null
+
+  @Column({
+    field: 'date_signature_cgu',
+    type: DataType.DATE
+  })
+  dateSignatureCGU: Date | null
 }
 
 @Table({

@@ -1,5 +1,10 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common'
-import { Result, emptySuccess } from '../../building-blocks/types/result'
+import { Inject, Injectable } from '@nestjs/common'
+import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
+import {
+  Result,
+  emptySuccess,
+  failure
+} from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 
@@ -23,11 +28,6 @@ export class JeuneAuthorizer {
       }
     }
 
-    // TODO when app en prod replace with return failure(new DroitsInsuffisants('auth_user_not_found'))
-    throw new UnauthorizedException({
-      statusCode: 401,
-      code: 'Unauthorized',
-      message: 'token_milo_expired'
-    })
+    return failure(new DroitsInsuffisants('auth_user_not_found'))
   }
 }

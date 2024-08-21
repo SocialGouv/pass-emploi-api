@@ -4,12 +4,13 @@ export namespace Core {
     SUPPORT = 'SUPPORT',
     POLE_EMPLOI = 'POLE_EMPLOI',
     POLE_EMPLOI_BRSA = 'POLE_EMPLOI_BRSA',
-    POLE_EMPLOI_AIJ = 'POLE_EMPLOI_AIJ'
+    POLE_EMPLOI_AIJ = 'POLE_EMPLOI_AIJ',
+    CONSEIL_DEPT = 'CONSEIL_DEPT'
   }
 
   export const structuresPoleEmploi = [
     Core.Structure.POLE_EMPLOI,
-    Core.Structure.POLE_EMPLOI_AIJ,
+    Core.Structure.CONSEIL_DEPT,
     Core.Structure.POLE_EMPLOI_BRSA
   ]
   export type StructuresPoleEmploi =

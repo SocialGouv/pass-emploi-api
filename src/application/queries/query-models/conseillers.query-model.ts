@@ -57,7 +57,7 @@ export class DetailConseillerQueryModel {
   @ApiProperty()
   aDesBeneficiairesARecuperer: boolean
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   dateSignatureCGU?: string
 }
 
@@ -106,4 +106,18 @@ export class GetActionsConseillerV2QueryModel {
 
   @ApiProperty({ type: ActionResumeV2QueryModel, isArray: true })
   resultats: ActionResumeV2QueryModel[]
+}
+
+export class CompteursBeneficiaireQueryModel {
+  @ApiProperty()
+  idBeneficiaire: string
+
+  @ApiProperty()
+  actions: number
+
+  @ApiProperty()
+  rdvs: number
+
+  @ApiProperty()
+  sessions: number
 }

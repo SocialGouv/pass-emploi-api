@@ -33,3 +33,13 @@ export class GetMonSuiviQueryParams {
   @IsDateString()
   dateFin: string
 }
+
+export class GetPortefeuilleParams {
+  @IsNotEmpty()
+  @IsDateString()
+  dateDebut: string
+
+  @IsNotEmpty()
+  @IsDateString()
+  dateFin: string
+}

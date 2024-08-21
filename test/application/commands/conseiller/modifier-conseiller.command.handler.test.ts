@@ -1,20 +1,20 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
+import { ConseillerAuthorizer } from '../../../../src/application/authorizers/conseiller-authorizer'
 import {
   ModifierConseillerCommand,
   ModifierConseillerCommandHandler
-} from '../../../src/application/commands/modifier-conseiller.command.handler'
+} from '../../../../src/application/commands/conseiller/modifier-conseiller.command.handler'
 import {
   MauvaiseCommandeError,
   NonTrouveError
-} from '../../../src/building-blocks/types/domain-error'
-import { Failure } from '../../../src/building-blocks/types/result'
-import { Agence } from '../../../src/domain/agence'
-import { Conseiller } from '../../../src/domain/milo/conseiller'
-import { Core } from '../../../src/domain/core'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { StubbedClass, createSandbox, expect, stubClass } from '../../utils'
+} from '../../../../src/building-blocks/types/domain-error'
+import { Failure } from '../../../../src/building-blocks/types/result'
+import { Agence } from '../../../../src/domain/agence'
+import { Conseiller } from '../../../../src/domain/milo/conseiller'
+import { Core } from '../../../../src/domain/core'
+import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
+import { unConseiller } from '../../../fixtures/conseiller.fixture'
+import { StubbedClass, createSandbox, expect, stubClass } from '../../../utils'
 import Structure = Core.Structure
 
 describe('ModifierConseillerCommandHandler', () => {

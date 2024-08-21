@@ -1,7 +1,7 @@
-import { UnauthorizedException } from '@nestjs/common'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { emptySuccess } from 'src/building-blocks/types/result'
+import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
+import { DroitsInsuffisants } from '../../../src/building-blocks/types/domain-error'
 import { Core, estMilo, estPoleEmploi } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import {
@@ -32,27 +32,17 @@ describe('JeuneAuthorizer', () => {
         jeuneRepository.existe.withArgs('jeune-id').resolves(true)
 
         // When
-        try {
-          const _result = await jeuneAuthorizer.autoriserLeJeune(
-            'jeune-id',
-            utilisateur,
-            estMilo(utilisateur.structure)
-          )
-          expect.fail(null, null, 'handle test did not reject with an error')
-        } catch (e) {
-          expect(e).to.deep.equal(
-            new UnauthorizedException({
-              statusCode: 401,
-              code: 'Unauthorized',
-              message: 'token_milo_expired'
-            })
-          )
-        }
+
+        const result = await jeuneAuthorizer.autoriserLeJeune(
+          'jeune-id',
+          utilisateur,
+          estMilo(utilisateur.structure)
+        )
 
         // Then
-        // expect(result).to.deep.equal(
-        //   failure(new DroitsInsuffisants('auth_user_not_found'))
-        // )
+        expect(result).to.deep.equal(
+          failure(new DroitsInsuffisants('auth_user_not_found'))
+        )
       })
     })
     describe("quand l'utilisateur est de la bonne strucutre", () => {
@@ -101,26 +91,15 @@ describe('JeuneAuthorizer', () => {
         jeuneRepository.existe.withArgs('jeune-id').resolves(true)
 
         // When
-        try {
-          const _result = await jeuneAuthorizer.autoriserLeJeune(
-            'jeune-id',
-            utilisateur
-          )
-          expect.fail(null, null, 'handle test did not reject with an error')
-        } catch (e) {
-          expect(e).to.deep.equal(
-            new UnauthorizedException({
-              statusCode: 401,
-              code: 'Unauthorized',
-              message: 'token_milo_expired'
-            })
-          )
-        }
+        const result = await jeuneAuthorizer.autoriserLeJeune(
+          'jeune-id',
+          utilisateur
+        )
 
         // Then
-        // expect(result).to.deep.equal(
-        //   failure(new DroitsInsuffisants('auth_user_not_found'))
-        // )
+        expect(result).to.deep.equal(
+          failure(new DroitsInsuffisants('auth_user_not_found'))
+        )
       })
       describe('quand un conseiller est connecté', () => {
         it('retourne une failure', async () => {
@@ -130,26 +109,15 @@ describe('JeuneAuthorizer', () => {
           jeuneRepository.existe.withArgs('id').resolves(true)
 
           // When
-          try {
-            const _result = await jeuneAuthorizer.autoriserLeJeune(
-              'id',
-              utilisateur
-            )
-            expect.fail(null, null, 'handle test did not reject with an error')
-          } catch (e) {
-            expect(e).to.deep.equal(
-              new UnauthorizedException({
-                statusCode: 401,
-                code: 'Unauthorized',
-                message: 'token_milo_expired'
-              })
-            )
-          }
+          const result = await jeuneAuthorizer.autoriserLeJeune(
+            'id',
+            utilisateur
+          )
 
           // Then
-          // expect(result).to.deep.equal(
-          //   failure(new DroitsInsuffisants('auth_user_not_found'))
-          // )
+          expect(result).to.deep.equal(
+            failure(new DroitsInsuffisants('auth_user_not_found'))
+          )
         })
       })
     })
@@ -162,26 +130,15 @@ describe('JeuneAuthorizer', () => {
         jeuneRepository.existe.withArgs('jeune-id').resolves(false)
 
         // When
-        try {
-          const _result = await jeuneAuthorizer.autoriserLeJeune(
-            'jeune-id',
-            utilisateur
-          )
-          expect.fail(null, null, 'handle test did not reject with an error')
-        } catch (e) {
-          expect(e).to.deep.equal(
-            new UnauthorizedException({
-              statusCode: 401,
-              code: 'Unauthorized',
-              message: 'token_milo_expired'
-            })
-          )
-        }
+        const result = await jeuneAuthorizer.autoriserLeJeune(
+          'jeune-id',
+          utilisateur
+        )
 
         // Then
-        // expect(result).to.deep.equal(
-        //   failure(new DroitsInsuffisants('auth_user_not_found'))
-        // )
+        expect(result).to.deep.equal(
+          failure(new DroitsInsuffisants('auth_user_not_found'))
+        )
       })
     })
   })

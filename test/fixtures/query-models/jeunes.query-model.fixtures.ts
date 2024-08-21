@@ -50,7 +50,8 @@ export function unDetailJeuneQueryModel(
     idPartenaire: '1234',
     structureMilo: undefined,
     dateFinCEJ: undefined,
-    estAArchiver: undefined
+    estAArchiver: undefined,
+    dateSignatureCGU: undefined
   }
 
   return { ...defaults, ...args }

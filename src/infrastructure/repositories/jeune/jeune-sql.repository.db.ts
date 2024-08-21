@@ -166,7 +166,8 @@ export class JeuneSqlRepository implements Jeune.Repository {
         jeune.configuration.dateDerniereActualisationToken,
       installationId: jeune.configuration.installationId ?? null,
       instanceId: jeune.configuration.instanceId ?? null,
-      timezone: jeune.configuration.fuseauHoraire ?? null
+      timezone: jeune.configuration.fuseauHoraire ?? null,
+      dateSignatureCGU: jeune.dateSignatureCGU?.toJSDate() ?? null
     })
   }
 
@@ -222,6 +223,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
         | 'dateDerniereActualisationToken'
         | 'timezone'
         | 'idStructureMilo'
+        | 'dateSignatureCGU'
       > = {
         id: jeune.id,
         nom: jeune.lastName,

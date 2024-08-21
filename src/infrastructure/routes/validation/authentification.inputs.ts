@@ -40,13 +40,7 @@ export class PutUtilisateurPayload {
 
   @ApiProperty()
   @IsString()
-  @IsIn([
-    Core.Structure.MILO,
-    Core.Structure.POLE_EMPLOI,
-    Core.Structure.POLE_EMPLOI_AIJ,
-    Core.Structure.POLE_EMPLOI_BRSA,
-    'FRANCE_TRAVAIL'
-  ])
+  @IsIn([...Object.values(Core.Structure), 'FRANCE_TRAVAIL'])
   structure: StructureUtilisateurAuth
 }
 

@@ -194,8 +194,8 @@ describe('KeycloakClient', () => {
     })
   })
 
-  describe('deleteAccountFromNewAuth', () => {
-    const apiUrl = configService.get('oidc').issuerNewApiUrl
+  describe('deleteAccount', () => {
+    const apiUrl = configService.get('oidc').issuerApiUrl
     beforeEach(async () => {
       await getDatabase().cleanPG()
     })
@@ -209,7 +209,7 @@ describe('KeycloakClient', () => {
 
       try {
         // When
-        await keycloakClient.deleteAccountFromNewAuth(id)
+        await keycloakClient.deleteAccount(id)
       } catch (e) {
         // Then
         expect.fail(null, null, 'handle test rejected with an error')
@@ -226,7 +226,7 @@ describe('KeycloakClient', () => {
 
       try {
         // When
-        await keycloakClient.deleteAccountFromNewAuth(id)
+        await keycloakClient.deleteAccount(id)
       } catch (e) {
         // Then
         expect.fail(null, null, 'handle test rejected with an error')
@@ -238,7 +238,7 @@ describe('KeycloakClient', () => {
 
       try {
         // When
-        await keycloakClient.deleteAccountFromNewAuth('idAuth')
+        await keycloakClient.deleteAccount('idAuth')
         expect.fail(null, null, 'handle test did not reject with an error')
       } catch (e) {}
     })

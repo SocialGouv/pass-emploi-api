@@ -3,6 +3,7 @@ import {
   ArrayNotEmpty,
   IsArray,
   IsBoolean,
+  IsDateString,
   IsEnum,
   IsInt,
   IsISO8601,
@@ -71,6 +72,13 @@ export class TransfererConseillerPayload {
 export class UpdateJeunePreferencesPayload {
   @IsBoolean()
   partageFavoris: boolean
+}
+
+export class UpdateJeunePayload {
+  @IsOptional()
+  @IsDateString()
+  @IsNotEmpty()
+  dateSignatureCGU?: string
 }
 
 export class GetRendezVousJeuneQueryParams {

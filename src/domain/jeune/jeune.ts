@@ -28,6 +28,7 @@ export interface Jeune {
   idPartenaire?: string
   configuration: Jeune.ConfigurationApplication
   preferences: Jeune.Preferences
+  dateSignatureCGU?: DateTime
 }
 
 export namespace Jeune {

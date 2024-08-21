@@ -145,7 +145,12 @@ describe('GetAgendaSessionsConseillerMiloQueryHandler', () => {
 
         // Then
         expect(result).to.deep.equal(
-          success([unAgendaConseillerMiloSessionListItemQueryModel])
+          success([
+            {
+              ...unAgendaConseillerMiloSessionListItemQueryModel(),
+              nbPlacesRestantes: 10
+            }
+          ])
         )
       })
     })

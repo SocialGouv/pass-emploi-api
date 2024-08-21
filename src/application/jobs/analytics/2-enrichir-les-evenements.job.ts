@@ -153,33 +153,18 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     connexion: Sequelize
   ): Promise<void> {
     this.logger.log('Associer chaque conseiller à la date de son dernier AE')
-    await connexion.query(`
-        update conseiller
-        set date_dernier_ae = dernier_ae_conseiller.date_dernier_ae
-        from (
-            select id_utilisateur, max(date_evenement) as date_dernier_ae
-            from evenement_engagement
-            where type_utilisateur = 'CONSEILLER'
-            group by id_utilisateur
-        ) as dernier_ae_conseiller
-        where conseiller.id = dernier_ae_conseiller.id_utilisateur;`)
+    await updateDateDernierAEConseiller(connexion, '2022')
+    await updateDateDernierAEConseiller(connexion, '2023')
+    await updateDateDernierAEConseiller(connexion)
   }
 
-  // TODO voir comment faire avec une table AE scindée
   private async associerChaqueConseillerASonPremierAE(
     connexion: Sequelize
   ): Promise<void> {
     this.logger.log('Associer chaque conseiller à la date de son premier AE')
-    await connexion.query(`
-        update conseiller
-        set date_premier_ae = premier_ae_conseiller.date_premier_ae
-        from (
-            select id_utilisateur, min(date_evenement) as date_premier_ae
-            from evenement_engagement
-            where type_utilisateur = 'CONSEILLER'
-            group by id_utilisateur
-        ) as premier_ae_conseiller
-        where conseiller.id = premier_ae_conseiller.id_utilisateur;`)
+    await updateDatePremierAEConseiller(connexion)
+    await updateDatePremierAEConseiller(connexion, '2023')
+    await updateDatePremierAEConseiller(connexion, '2022')
   }
 
   private async creerTableAEJeune(connexion: Sequelize): Promise<void> {
@@ -201,7 +186,6 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     `)
   }
 
-  // TODO voir comment faire avec table AE scindée
   private async enrichirTableAEJeune(connexion: Sequelize): Promise<void> {
     this.logger.log('Mise à jour de la vue AE Jeune')
     await connexion.query(`
@@ -327,4 +311,43 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
       ;
     `)
   }
+}
+
+async function updateDateDernierAEConseiller(
+  connexion: Sequelize,
+  annee?: string
+): Promise<void> {
+  let tableName = 'evenement_engagement'
+  if (annee) {
+    tableName += `_${annee}`
+  }
+  await connexion.query(`
+    update conseiller
+    set date_dernier_ae = dernier_ae_conseiller.date_dernier_ae
+    from (
+        select id_utilisateur, max(date_evenement) as date_dernier_ae
+        from ${tableName}
+        where type_utilisateur = 'CONSEILLER'
+        group by id_utilisateur
+    ) as dernier_ae_conseiller
+    where conseiller.id = dernier_ae_conseiller.id_utilisateur;`)
+}
+async function updateDatePremierAEConseiller(
+  connexion: Sequelize,
+  annee?: string
+): Promise<void> {
+  let tableName = 'evenement_engagement'
+  if (annee) {
+    tableName += `_${annee}`
+  }
+  await connexion.query(`
+    update conseiller
+    set date_premier_ae = premier_ae_conseiller.date_premier_ae
+    from (
+        select id_utilisateur, min(date_evenement) as date_premier_ae
+        from ${tableName}
+        where type_utilisateur = 'CONSEILLER'
+        group by id_utilisateur
+    ) as premier_ae_conseiller
+    where conseiller.id = premier_ae_conseiller.id_utilisateur;`)
 }

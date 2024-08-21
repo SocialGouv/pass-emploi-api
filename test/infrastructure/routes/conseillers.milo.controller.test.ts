@@ -49,6 +49,7 @@ import { CreerJeuneMiloPayload } from '../../../src/infrastructure/routes/valida
 import { unDossierMilo } from '../../fixtures/milo.fixture'
 import { unJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import { GetSessionsConseillerMiloV2QueryHandler } from '../../../src/application/queries/milo/v2/get-sessions-conseiller.milo.v2.query.handler.db'
+import { GetCompteursBeneficiaireMiloQueryHandler } from 'src/application/queries/milo/get-compteurs-portefeuille-milo.query.handler.db'
 
 describe('ConseillersMiloController', () => {
   let getDossierMiloJeuneQueryHandler: StubbedClass<GetDossierMiloJeuneQueryHandler>
@@ -60,6 +61,7 @@ describe('ConseillersMiloController', () => {
   let updateSessionCommandHandler: StubbedClass<UpdateSessionMiloCommandHandler>
   let qualifierActionsMiloCommandHandler: StubbedClass<QualifierActionsMiloCommandHandler>
   let getSessionsV2QueryHandler: StubbedClass<GetSessionsConseillerMiloV2QueryHandler>
+  let getCompteursBeneficiaireMiloQueryHandler: StubbedClass<GetCompteursBeneficiaireMiloQueryHandler>
 
   let app: INestApplication
 
@@ -83,6 +85,9 @@ describe('ConseillersMiloController', () => {
       QualifierActionsMiloCommandHandler
     )
     getSessionsV2QueryHandler = app.get(GetSessionsConseillerMiloV2QueryHandler)
+    getCompteursBeneficiaireMiloQueryHandler = app.get(
+      GetCompteursBeneficiaireMiloQueryHandler
+    )
   })
 
   describe('GET /conseillers/milo/dossiers/:idDossier', () => {
@@ -104,7 +109,6 @@ describe('ConseillersMiloController', () => {
 
     describe("quand le dossier n'existe pas", () => {
       it('renvoie 404', async () => {
-        // Given
         // Given
         getDossierMiloJeuneQueryHandler.execute
           .withArgs({ idDossier: '2' }, unUtilisateurDecode())
@@ -143,7 +147,6 @@ describe('ConseillersMiloController', () => {
 
     describe("quand le dossier n'existe pas", () => {
       it('renvoie 404', async () => {
-        // Given
         // Given
         getJeuneMiloByDossierQueryHandler.execute
           .withArgs({ idDossier: '2' }, unUtilisateurDecode())
@@ -361,7 +364,12 @@ describe('ConseillersMiloController', () => {
     it('renvoie une 200 quand tout va bien', async () => {
       // Given
       getAgendaSessionsQueryHandler.execute.resolves(
-        success([unAgendaConseillerMiloSessionListItemQueryModel])
+        success([
+          {
+            ...unAgendaConseillerMiloSessionListItemQueryModel(),
+            nbPlacesRestantes: 1
+          }
+        ])
       )
 
       // When - Then
@@ -371,7 +379,12 @@ describe('ConseillersMiloController', () => {
         )
         .set('authorization', unHeaderAuthorization())
         .expect(HttpStatus.OK)
-        .expect([unAgendaConseillerMiloSessionListItemQueryModel])
+        .expect([
+          {
+            ...unAgendaConseillerMiloSessionListItemQueryModel(),
+            nbPlacesRestantes: 1
+          }
+        ])
 
       expect(
         getAgendaSessionsQueryHandler.execute
@@ -649,5 +662,42 @@ describe('ConseillersMiloController', () => {
       'get',
       '/v2/conseillers/milo/1/sessions'
     )
+  })
+
+  describe('GET /conseiller/milo/:idConseiller/compteurs-portefeuille', () => {
+    it('renvoie les actions et les rdvs par bénéficiaire', async () => {
+      // Given
+      const query = {
+        idConseiller: 'id-conseiller',
+        accessToken: 'coucou',
+        dateDebut: DateTime.fromISO('2024-07-01', {
+          setZone: true
+        }),
+        dateFin: DateTime.fromISO('2024-07-26', {
+          setZone: true
+        })
+      }
+
+      const queryModel = [
+        { idBeneficiaire: 'id-beneficiaire', actions: 3, rdvs: 0, sessions: 5 }
+      ]
+
+      getCompteursBeneficiaireMiloQueryHandler.execute.resolves(
+        success(queryModel)
+      )
+
+      // When - Then
+      await request(app.getHttpServer())
+        .get(
+          '/conseillers/milo/id-conseiller/compteurs-portefeuille?dateDebut=2024-07-01&dateFin=2024-07-26'
+        )
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+        .expect(JSON.stringify(queryModel))
+
+      expect(
+        getCompteursBeneficiaireMiloQueryHandler.execute
+      ).to.have.been.calledOnceWithExactly(query, unUtilisateurDecode())
+    })
   })
 })
