@@ -153,33 +153,18 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     connexion: Sequelize
   ): Promise<void> {
     this.logger.log('Associer chaque conseiller à la date de son dernier AE')
-    await connexion.query(`
-        update conseiller
-        set date_dernier_ae = dernier_ae_conseiller.date_dernier_ae
-        from (
-            select id_utilisateur, max(date_evenement) as date_dernier_ae
-            from evenement_engagement
-            where type_utilisateur = 'CONSEILLER'
-            group by id_utilisateur
-        ) as dernier_ae_conseiller
-        where conseiller.id = dernier_ae_conseiller.id_utilisateur;`)
+    await updateDateDernierAEConseiller(connexion, '2022')
+    await updateDateDernierAEConseiller(connexion, '2023')
+    await updateDateDernierAEConseiller(connexion)
   }
 
-  // TODO voir comment faire avec une table AE scindée
   private async associerChaqueConseillerASonPremierAE(
     connexion: Sequelize
   ): Promise<void> {
     this.logger.log('Associer chaque conseiller à la date de son premier AE')
-    await connexion.query(`
-        update conseiller
-        set date_premier_ae = premier_ae_conseiller.date_premier_ae
-        from (
-            select id_utilisateur, min(date_evenement) as date_premier_ae
-            from evenement_engagement
-            where type_utilisateur = 'CONSEILLER'
-            group by id_utilisateur
-        ) as premier_ae_conseiller
-        where conseiller.id = premier_ae_conseiller.id_utilisateur;`)
+    await updateDatePremierAEConseiller(connexion)
+    await updateDatePremierAEConseiller(connexion, '2023')
+    await updateDatePremierAEConseiller(connexion, '2022')
   }
 
   private async creerTableAEJeune(connexion: Sequelize): Promise<void> {
@@ -201,60 +186,152 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     `)
   }
 
-  // TODO voir comment faire avec table AE scindée
   private async enrichirTableAEJeune(connexion: Sequelize): Promise<void> {
-    this.logger.log('Création vue AE Jeune')
-    await connexion.query(`TRUNCATE TABLE evenement_engagement_jeune;`)
-    await connexion.query(`
-      INSERT INTO evenement_engagement_jeune (id_utilisateur, structure, nb_action_cree, nb_message_envoye, nb_consultation_rdv, nb_consultation_offre, nb_postuler_offre, nb_consultation_evenement, date_premier_ae, date_dernier_ae)
-      WITH
-        evenement_engagement_modif AS (
-          SELECT
+    this.logger.log('Mise à jour de la vue AE Jeune')
+    const query_2022 = getQueryTableAEJeune('2022')
+    const query_2023 = getQueryTableAEJeune('2023')
+    const query_current = getQueryTableAEJeune()
+    const full_query = `INSERT INTO evenement_engagement_jeune (
+      id_utilisateur, 
+      structure, 
+      nb_action_cree, 
+      nb_message_envoye, 
+      nb_consultation_rdv, 
+      nb_consultation_offre, 
+      nb_postuler_offre, 
+      nb_consultation_evenement, 
+      date_premier_ae, 
+      date_dernier_ae
+    )
+    WITH ${query_2022}, ${query_2023}, ${query_current}
+    SELECT
+        id_utilisateur,
+        structure,
+        sum(nb_action_cree) AS nb_action_cree,
+        sum(nb_message_envoye) AS nb_message_envoye,
+        sum(nb_consultation_rdv) AS nb_consultation_rdv,
+        sum(nb_consultation_offre) AS nb_consultation_offre,
+        sum(nb_postuler_offre) AS nb_postuler_offre,
+        sum(nb_consultation_evenement) AS nb_consultation_evenement,
+        min(date_premier_ae) AS date_premier_ae,
+        max(date_dernier_ae) AS date_dernier_ae
+      FROM (
+        SELECT * FROM ae_jeune_2022
+        UNION ALL
+        SELECT * FROM ae_jeune_2023
+        UNION ALL
+        SELECT * FROM ae_jeune
+      ) AS concat_tables
+          GROUP BY
             id_utilisateur,
-            structure,
-            date_evenement,
-            CASE
-              WHEN categorie = 'Action'
-              AND ACTION = 'Création'
-              OR code = 'ACTION_CREE' THEN 1
-              ELSE 0
-            END AS creation_action,
-            CASE
-              WHEN categorie = 'Message'
-              AND ACTION = 'Envoi' THEN 1
-              ELSE 0
-            END AS envoi_message,
-            CASE
-              WHEN categorie = 'Rendez-vous'
-              AND ACTION = 'Consultation' THEN 1
-              ELSE 0
-            END AS consultation_rdv,
-            CASE
-              WHEN categorie = 'Offre'
-              AND (
-                ACTION = 'Recherche'
-                OR ACTION = 'Détail'
-                OR ACTION = 'favori'
-              ) THEN 1
-              ELSE 0
-            END AS consultation_offre,
-            CASE
-              WHEN categorie = 'Offre'
-              AND ACTION = 'Postuler' THEN 1
-              ELSE 0
-            END AS postuler_offre,
-            CASE
-              WHEN categorie = 'Evénement' THEN 1
-              ELSE 0
-            END AS consultation_evenement
-          FROM
-            evenement_engagement
-          WHERE
-            type_utilisateur = 'JEUNE'
-        )
+            structure;
+    `
+    await connexion.query(full_query)
+  }
+}
+
+async function updateDateDernierAEConseiller(
+  connexion: Sequelize,
+  annee?: string
+): Promise<void> {
+  let tableName = 'evenement_engagement'
+  let conditionDate = 'AND EXTRACT(YEAR FROM date_evenement) >= 2024'
+  if (annee) {
+    tableName += `_${annee}`
+    conditionDate = `AND EXTRACT(YEAR FROM date_evenement) = ${Number(annee)}`
+  }
+  await connexion.query(`
+    update conseiller
+    set date_dernier_ae = dernier_ae_conseiller.date_dernier_ae
+    from (
+        select id_utilisateur, max(date_evenement) as date_dernier_ae
+        from ${tableName}
+        where type_utilisateur = 'CONSEILLER' ${conditionDate}
+        group by id_utilisateur
+    ) as dernier_ae_conseiller
+    where conseiller.id = dernier_ae_conseiller.id_utilisateur;`)
+}
+async function updateDatePremierAEConseiller(
+  connexion: Sequelize,
+  annee?: string
+): Promise<void> {
+  let tableName = 'evenement_engagement'
+  let conditionDate = 'AND EXTRACT(YEAR FROM date_evenement) >= 2024'
+  if (annee) {
+    tableName += `_${annee}`
+    conditionDate = `AND EXTRACT(YEAR FROM date_evenement) = ${Number(annee)}`
+  }
+  await connexion.query(`
+    update conseiller
+    set date_premier_ae = premier_ae_conseiller.date_premier_ae
+    from (
+        select id_utilisateur, min(date_evenement) as date_premier_ae
+        from ${tableName}
+        where type_utilisateur = 'CONSEILLER' ${conditionDate}
+        group by id_utilisateur
+    ) as premier_ae_conseiller
+    where conseiller.id = premier_ae_conseiller.id_utilisateur;`)
+}
+
+async function getQueryTableAEJeune(annee?: string): Promise<string> {
+  let tableName = 'evenement_engagement'
+  let tableAEName = 'ae'
+  let groupedTableAEName = 'ae_jeune'
+  let conditionDate = 'AND EXTRACT(YEAR FROM date_evenement) >= 2024'
+  if (annee) {
+    tableName += `_${annee}`
+    tableAEName += `_${annee}`
+    groupedTableAEName += `_${annee}`
+    conditionDate = `AND EXTRACT(YEAR FROM date_evenement) = ${Number(annee)}`
+  }
+  const query = `${tableAEName} AS (
       SELECT
         id_utilisateur,
         structure,
+        date_evenement,
+        CASE
+          WHEN categorie = 'Action'
+          AND ACTION = 'Création'
+          OR code = 'ACTION_CREE' THEN 1
+          ELSE 0
+        END AS creation_action,
+        CASE
+          WHEN categorie = 'Message'
+          AND ACTION = 'Envoi' THEN 1
+          ELSE 0
+        END AS envoi_message,
+        CASE
+          WHEN categorie = 'Rendez-vous'
+          AND ACTION = 'Consultation' THEN 1
+          ELSE 0
+        END AS consultation_rdv,
+        CASE
+          WHEN categorie = 'Offre'
+          AND (
+            ACTION = 'Recherche'
+            OR ACTION = 'Détail'
+            OR ACTION = 'favori'
+          ) THEN 1
+          ELSE 0
+        END AS consultation_offre,
+        CASE
+          WHEN categorie = 'Offre'
+          AND ACTION = 'Postuler' THEN 1
+          ELSE 0
+        END AS postuler_offre,
+        CASE
+          WHEN categorie = 'Evénement' THEN 1
+          ELSE 0
+        END AS consultation_evenement
+      FROM
+        ${tableName}
+      WHERE
+        type_utilisateur = 'JEUNE'
+        ${conditionDate}
+    ),
+    ${groupedTableAEName} AS (
+      SELECT
+        id_utilisateur,
         sum(creation_action) AS nb_action_cree,
         sum(envoi_message) AS nb_message_envoye,
         sum(consultation_rdv) AS nb_consultation_rdv,
@@ -262,12 +339,14 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
         sum(postuler_offre) AS nb_postuler_offre,
         sum(consultation_evenement) AS nb_consultation_evenement,
         min(date_evenement) AS date_premier_ae,
-        max(date_evenement) AS date_dernier_ae
+        max(date_evenement) AS date_dernier_ae,
+        structure
       FROM
-        evenement_engagement_modif
+        ${tableAEName}
       GROUP BY
-        id_utilisateur, structure
-      ;
-    `)
-  }
+        id_utilisateur,
+        structure
+    )
+  `
+  return query
 }
