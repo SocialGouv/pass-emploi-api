@@ -29,27 +29,32 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
   async handle(): Promise<SuiviJob> {
     let erreur
     const maintenant = this.dateService.now()
-    const connexion = await createSequelizeForAnalytics()
-    await this.mettreAJourLeSchema(connexion)
-    await this.indexerLesColonnes(connexion)
-    await this.creerTableAEJeune(connexion)
-    await this.ajouterLesAgencesConseiller(connexion)
-    await this.ajouterLesAgencesJeune(connexion)
-    await this.determinerLaSemaineEtLeJourALaFinDuTraitement(connexion)
+    try {
+      const connexion = await createSequelizeForAnalytics()
+      await this.mettreAJourLeSchema(connexion)
+      await this.indexerLesColonnes(connexion)
+      await this.creerTableAEJeune(connexion)
+      await this.ajouterLesAgencesConseiller(connexion)
+      await this.ajouterLesAgencesJeune(connexion)
+      await this.determinerLaSemaineEtLeJourALaFinDuTraitement(connexion)
 
-    await this.enrichirTableAEJeune(connexion)
-    await this.associerChaqueConseillerASonDernierAE(connexion)
-    await this.associerChaqueConseillerASonPremierAE(connexion)
+      await this.enrichirTableAEJeune(connexion)
+      await this.associerChaqueConseillerASonDernierAE(connexion)
+      await this.associerChaqueConseillerASonPremierAE(connexion)
 
-    await connexion.close()
+      await connexion.close()
 
-    if (maintenant.weekday === JOUR_DE_LA_SEMAINE_LUNDI) {
-      const jobCalculerLesVues: Planificateur.Job<void> = {
-        dateExecution: this.dateService.nowJs(),
-        type: Planificateur.JobType.CHARGER_LES_VUES_ANALYTICS,
-        contenu: undefined
+      if (maintenant.weekday === JOUR_DE_LA_SEMAINE_LUNDI) {
+        const jobCalculerLesVues: Planificateur.Job<void> = {
+          dateExecution: this.dateService.nowJs(),
+          type: Planificateur.JobType.CHARGER_LES_VUES_ANALYTICS,
+          contenu: undefined
+        }
+        await this.planificateurRepository.creerJob(jobCalculerLesVues)
       }
-      await this.planificateurRepository.creerJob(jobCalculerLesVues)
+    } catch (e) {
+      erreur = e
+      this.logger.error(e)
     }
 
     return {
@@ -273,7 +278,7 @@ async function updateDatePremierAEConseiller(
     where conseiller.id = premier_ae_conseiller.id_utilisateur;`)
 }
 
-async function getQueryTableAEJeune(annee?: string): Promise<string> {
+function getQueryTableAEJeune(annee?: string): string {
   let tableName = 'evenement_engagement'
   let tableAEName = 'ae'
   let groupedTableAEName = 'ae_jeune'
