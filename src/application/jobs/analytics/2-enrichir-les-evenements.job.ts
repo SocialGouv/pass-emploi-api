@@ -193,6 +193,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
 
   private async enrichirTableAEJeune(connexion: Sequelize): Promise<void> {
     this.logger.log('Mise à jour de la vue AE Jeune')
+    await connexion.query(`TRUNCATE TABLE evenement_engagement_jeune;`)
     const query_2022 = getQueryTableAEJeune('2022')
     const query_2023 = getQueryTableAEJeune('2023')
     const query_current = getQueryTableAEJeune()
