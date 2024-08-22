@@ -80,8 +80,7 @@ export class GetAgendaSessionsConseillerMiloQueryHandler extends QueryHandler<
         periode: {
           dateDebut: query.dateDebut,
           dateFin: query.dateFin
-        },
-        avecInscrits: true
+        }
       }
     )
 

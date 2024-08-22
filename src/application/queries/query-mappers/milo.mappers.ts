@@ -72,33 +72,51 @@ export function mapSessionJeuneDtoToQueryModel(
 }
 
 export function mapSessionConseillerDtoToQueryModel(
-  sessionDto: SessionConseillerDetailDto,
+  { offre, session }: SessionConseillerDetailDto,
   estVisible: boolean,
   timezone: string,
   maintenant: DateTime,
   dateCloture?: DateTime
 ): SessionConseillerMiloQueryModel {
   const dateHeureFin = DateTime.fromFormat(
-    sessionDto.session.dateHeureFin,
+    session.dateHeureFin,
     MILO_DATE_FORMAT,
     { zone: timezone }
   ).toUTC()
-  return {
-    id: sessionDto.session.id.toString(),
-    nomSession: sessionDto.session.nom,
-    nomOffre: sessionDto.offre.nom,
+
+  const nombreParticipants = (session.instances ?? [])
+    .map(({ idDossier, statut }) =>
+      dtoToStatutInscription(statut, session.id, idDossier.toString())
+    )
+    .filter(
+      statut =>
+        statut === SessionMilo.Inscription.Statut.INSCRIT ||
+        statut === SessionMilo.Inscription.Statut.PRESENT
+    ).length
+
+  const queryModel: SessionConseillerMiloQueryModel = {
+    id: session.id.toString(),
+    nomSession: session.nom,
+    nomOffre: offre.nom,
     estVisible: estVisible,
     dateHeureDebut: DateTime.fromFormat(
-      sessionDto.session.dateHeureDebut,
+      session.dateHeureDebut,
       MILO_DATE_FORMAT,
       { zone: timezone }
     )
       .toUTC()
       .toISO(),
     dateHeureFin: dateHeureFin.toISO(),
-    type: buildSessionTypeQueryModel(sessionDto.offre.type),
-    statut: SessionMilo.calculerStatut(maintenant, dateHeureFin, dateCloture)
+    type: buildSessionTypeQueryModel(offre.type),
+    statut: SessionMilo.calculerStatut(maintenant, dateHeureFin, dateCloture),
+    nombreParticipants
   }
+
+  if (session.nbPlacesDisponibles !== null)
+    queryModel.nombreMaxParticipants =
+      session.nbPlacesDisponibles + nombreParticipants
+
+  return queryModel
 }
 
 export function mapSessionConseillerDtoToAgendaQueryModel(

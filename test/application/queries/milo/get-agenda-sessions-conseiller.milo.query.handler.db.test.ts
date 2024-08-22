@@ -216,8 +216,7 @@ function givenSessionsDuConseiller(
         periode: {
           dateDebut: query.dateDebut,
           dateFin: query.dateFin
-        },
-        avecInscrits: true
+        }
       }
     )
     .resolves(

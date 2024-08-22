@@ -109,7 +109,36 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
               }
             }
           )
-          .resolves(success(uneListeSessionsConseillerDto))
+          .resolves(
+            success({
+              page: 1,
+              nbSessions: 1,
+              sessions: [
+                {
+                  offre: uneOffreDto,
+                  session: {
+                    ...uneSessionDto,
+                    instances: [
+                      {
+                        idDossier: 1,
+                        idInstanceSession: 1,
+                        nom: 'Jedusor',
+                        prenom: 'Tom',
+                        statut: 'ONGOING'
+                      },
+                      {
+                        idDossier: 2,
+                        idInstanceSession: 2,
+                        nom: 'Black',
+                        prenom: 'Sirius',
+                        statut: 'REFUSAL'
+                      }
+                    ]
+                  }
+                }
+              ]
+            })
+          )
 
         // When
         const result = await getSessionsQueryGetterV2.handle(
@@ -121,7 +150,14 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
 
         // Then
         expect(result).to.deep.equal(
-          success([{ ...uneSessionConseillerMiloQueryModel, estVisible: true }])
+          success([
+            {
+              ...uneSessionConseillerMiloQueryModel,
+              nombreMaxParticipants: 11,
+              nombreParticipants: 1,
+              estVisible: true
+            }
+          ])
         )
       })
 
@@ -299,6 +335,8 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
           success([
             {
               ...uneSessionConseillerMiloQueryModel,
+              nombreMaxParticipants: 10,
+              nombreParticipants: 0,
               id: '2',
               estVisible: false
             }
@@ -333,7 +371,14 @@ describe('GetSessionsConseillerMiloV2QueryHandler', () => {
 
         // Then
         expect(result).to.deep.equal(
-          success([{ ...uneSessionConseillerMiloQueryModel, estVisible: true }])
+          success([
+            {
+              ...uneSessionConseillerMiloQueryModel,
+              nombreMaxParticipants: 10,
+              nombreParticipants: 0,
+              estVisible: true
+            }
+          ])
         )
       })
 

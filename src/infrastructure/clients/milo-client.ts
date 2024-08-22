@@ -64,12 +64,12 @@ export class MiloClient {
     options: {
       periode?: { dateDebut?: DateTime; dateFin?: DateTime }
       page?: number
-      avecInscrits?: boolean
     }
   ): Promise<Result<ListeSessionsConseillerMiloDto>> {
     const TAILLE_PAGE_LARGE = '150'
     const params = new URLSearchParams()
     params.append('taillePage', TAILLE_PAGE_LARGE)
+    params.append('rechercheInscrits', 'true')
     if (options.periode && options.periode.dateDebut) {
       const debutRecherche = options.periode.dateDebut.setZone(timezone)
       params.append('dateDebutRecherche', debutRecherche.toISODate())
@@ -79,7 +79,6 @@ export class MiloClient {
       params.append('dateFinRecherche', finRecherche.toISODate())
     }
     if (options.page) params.append('page', options.page.toString())
-    if (options.avecInscrits) params.append('rechercheInscrits', 'true')
 
     await this.rateLimiterService.sessionsStructureMiloRateLimiter.attendreLaProchaineDisponibilite()
     // L'api ne renvoie que 50 sessions max par appel au delà, une pagination doit être mise en place. (voir doc 06/23)

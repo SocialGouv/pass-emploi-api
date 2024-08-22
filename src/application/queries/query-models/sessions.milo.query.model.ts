@@ -51,6 +51,12 @@ export class SessionConseillerMiloQueryModel {
 
   @ApiProperty({ enum: SessionMilo.Statut })
   statut: SessionMilo.Statut
+
+  @ApiProperty()
+  nombreParticipants: number
+
+  @ApiPropertyOptional()
+  nombreMaxParticipants?: number
 }
 
 export class SessionsConseillerV2QueryModel {

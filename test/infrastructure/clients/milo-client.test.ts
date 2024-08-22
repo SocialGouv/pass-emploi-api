@@ -68,8 +68,7 @@ describe('MiloClient', () => {
           periode: {
             dateDebut: DateTime.fromISO('2023-06-01T00:00:00'),
             dateFin: DateTime.fromISO('2023-06-30T00:00:00')
-          },
-          avecInscrits: true
+          }
         }
       )
 
@@ -83,7 +82,9 @@ describe('MiloClient', () => {
       const idStructure = '1'
 
       nock(MILO_BASE_URL)
-        .get(`/operateurs/structures/${idStructure}/sessions?taillePage=150`)
+        .get(
+          `/operateurs/structures/${idStructure}/sessions?taillePage=150&rechercheInscrits=true`
+        )
         .reply(200, uneListeSessionsConseillerDto)
         .isDone()
 
