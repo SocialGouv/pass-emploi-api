@@ -177,7 +177,7 @@
   "resolutions": {
     "@nestjs/platform-express/express": "4.19.2",
     "download/got": "11.8.5",
-    "supertest/superagent": "10.0.0"
+    "supertest/superagent": "10.1.0"
   },
   "mocha": {
     "require": [
