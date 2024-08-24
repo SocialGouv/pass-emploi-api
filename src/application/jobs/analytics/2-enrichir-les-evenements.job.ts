@@ -12,6 +12,10 @@ import {
 } from '../../../utils/date-service'
 import { createSequelizeForAnalytics } from '../../../infrastructure/sequelize/connector-analytics'
 import { Sequelize } from 'sequelize-typescript'
+import {
+  infosTablesAEAnnuelles,
+  InfoTableAEAnnuelle
+} from './creer-tables-ae-annuelles'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.ENRICHIR_EVENEMENTS_ANALYTICS)
@@ -158,18 +162,26 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     connexion: Sequelize
   ): Promise<void> {
     this.logger.log('Associer chaque conseiller à la date de son dernier AE')
-    await updateDateDernierAEConseiller(connexion, '2022')
-    await updateDateDernierAEConseiller(connexion, '2023')
-    await updateDateDernierAEConseiller(connexion)
+
+    for (const tableAnnuelle of infosTablesAEAnnuelles) {
+      await updateDateDernierAEConseiller(connexion, tableAnnuelle)
+    }
   }
 
   private async associerChaqueConseillerASonPremierAE(
     connexion: Sequelize
   ): Promise<void> {
     this.logger.log('Associer chaque conseiller à la date de son premier AE')
-    await updateDatePremierAEConseiller(connexion)
-    await updateDatePremierAEConseiller(connexion, '2023')
-    await updateDatePremierAEConseiller(connexion, '2022')
+    for (
+      let indexTable = infosTablesAEAnnuelles.length - 1;
+      indexTable >= 0;
+      indexTable--
+    ) {
+      await updateDatePremierAEConseiller(
+        connexion,
+        infosTablesAEAnnuelles[indexTable]
+      )
+    }
   }
 
   private async creerTableAEJeune(connexion: Sequelize): Promise<void> {
@@ -194,10 +206,12 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
   private async enrichirTableAEJeune(connexion: Sequelize): Promise<void> {
     this.logger.log('Mise à jour de la vue AE Jeune')
     await connexion.query(`TRUNCATE TABLE evenement_engagement_jeune;`)
-    const query_2022 = getQueryTableAEJeune('2022')
-    const query_2023 = getQueryTableAEJeune('2023')
-    const query_current = getQueryTableAEJeune()
-    const full_query = `INSERT INTO evenement_engagement_jeune (
+
+    const withTables = infosTablesAEAnnuelles
+      .map(tableAnnuelle => getQueryTableAEJeune(tableAnnuelle))
+      .join(', ')
+
+    const query = `INSERT INTO evenement_engagement_jeune (
       id_utilisateur, 
       structure, 
       nb_action_cree, 
@@ -209,7 +223,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
       date_premier_ae, 
       date_dernier_ae
     )
-    WITH ${query_2022}, ${query_2023}, ${query_current}
+    WITH ${withTables}
     SELECT
         id_utilisateur,
         structure,
@@ -232,20 +246,17 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
             id_utilisateur,
             structure;
     `
-    await connexion.query(full_query)
+    await connexion.query(query)
   }
 }
 
 async function updateDateDernierAEConseiller(
   connexion: Sequelize,
-  annee?: string
+  tableAE: InfoTableAEAnnuelle
 ): Promise<void> {
-  let tableName = 'evenement_engagement'
-  let conditionDate = 'AND EXTRACT(YEAR FROM date_evenement) >= 2024'
-  if (annee) {
-    tableName += `_${annee}`
-    conditionDate = `AND EXTRACT(YEAR FROM date_evenement) = ${Number(annee)}`
-  }
+  const tableName = `evenement_engagement${tableAE.suffix}`
+  const conditionDate = `AND EXTRACT(YEAR FROM date_evenement) = ${tableAE.depuisAnnee}`
+
   await connexion.query(`
     update conseiller
     set date_dernier_ae = dernier_ae_conseiller.date_dernier_ae
@@ -259,14 +270,11 @@ async function updateDateDernierAEConseiller(
 }
 async function updateDatePremierAEConseiller(
   connexion: Sequelize,
-  annee?: string
+  tableAE: InfoTableAEAnnuelle
 ): Promise<void> {
-  let tableName = 'evenement_engagement'
-  let conditionDate = 'AND EXTRACT(YEAR FROM date_evenement) >= 2024'
-  if (annee) {
-    tableName += `_${annee}`
-    conditionDate = `AND EXTRACT(YEAR FROM date_evenement) = ${Number(annee)}`
-  }
+  const tableName = `evenement_engagement${tableAE.suffix}`
+  const conditionDate = `AND EXTRACT(YEAR FROM date_evenement) = ${tableAE.depuisAnnee}`
+
   await connexion.query(`
     update conseiller
     set date_premier_ae = premier_ae_conseiller.date_premier_ae
@@ -279,18 +287,13 @@ async function updateDatePremierAEConseiller(
     where conseiller.id = premier_ae_conseiller.id_utilisateur;`)
 }
 
-function getQueryTableAEJeune(annee?: string): string {
-  let tableName = 'evenement_engagement'
-  let tableAEName = 'ae'
-  let groupedTableAEName = 'ae_jeune'
-  let conditionDate = 'AND EXTRACT(YEAR FROM date_evenement) >= 2024'
-  if (annee) {
-    tableName += `_${annee}`
-    tableAEName += `_${annee}`
-    groupedTableAEName += `_${annee}`
-    conditionDate = `AND EXTRACT(YEAR FROM date_evenement) = ${Number(annee)}`
-  }
-  const query = `${tableAEName} AS (
+function getQueryTableAEJeune(tableAE: InfoTableAEAnnuelle): string {
+  const tableAEName = `ae${tableAE.suffix}`
+  const groupedTableAEName = `ae_jeune${tableAE.suffix}`
+  const tableName = `evenement_engagement${tableAE.suffix}`
+  const conditionDate = `AND EXTRACT(YEAR FROM date_evenement) = ${tableAE.depuisAnnee}`
+
+  return `${tableAEName} AS (
       SELECT
         id_utilisateur,
         structure,
@@ -354,5 +357,4 @@ function getQueryTableAEJeune(annee?: string): string {
         structure
     )
   `
-  return query
 }

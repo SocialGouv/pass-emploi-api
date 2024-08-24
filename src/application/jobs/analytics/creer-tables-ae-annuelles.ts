@@ -14,6 +14,16 @@ interface PgConnexion {
   close: () => Promise<void>
 }
 
+export interface InfoTableAEAnnuelle {
+  depuisAnnee: number
+  suffix: string
+}
+export const infosTablesAEAnnuelles: InfoTableAEAnnuelle[] = [
+  { depuisAnnee: 2022, suffix: '_2022' },
+  { depuisAnnee: 2023, suffix: '_2023' },
+  { depuisAnnee: 2024, suffix: '' }
+]
+
 @Injectable()
 @ProcessJobType(Planificateur.JobType.CREER_TABLES_AE_ANNUELLES_ANALYTICS)
 export class CreerTablesAEAnnuellesJobHandler extends JobHandler<Planificateur.Job> {
@@ -36,8 +46,11 @@ export class CreerTablesAEAnnuellesJobHandler extends JobHandler<Planificateur.J
     try {
       this.connexionSource = await getConnexionToDBTarget()
       this.connexionTarget = await getConnexionToDBTarget()
-      await this.calculAnnuel('2022')
-      await this.calculAnnuel('2023')
+
+      for (const tableAnnuelle of infosTablesAEAnnuelles) {
+        if (tableAnnuelle.suffix !== '')
+          await this.calculAnnuel(tableAnnuelle.depuisAnnee.toString())
+      }
     } catch (e) {
       erreur = e
     } finally {
