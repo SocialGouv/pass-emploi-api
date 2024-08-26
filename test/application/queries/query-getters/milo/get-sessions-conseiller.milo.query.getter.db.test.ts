@@ -129,7 +129,14 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
 
         // Then
         expect(result).to.deep.equal(
-          success([{ ...uneSessionConseillerMiloQueryModel, estVisible: true }])
+          success([
+            {
+              ...uneSessionConseillerMiloQueryModel,
+              nombreMaxParticipants: 10,
+              nombreParticipants: 0,
+              estVisible: true
+            }
+          ])
         )
       })
 
@@ -158,6 +165,9 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
           success([
             {
               ...uneSessionConseillerMiloQueryModel,
+
+              nombreMaxParticipants: 10,
+              nombreParticipants: 0,
               id: '2',
               estVisible: false
             }
@@ -197,7 +207,14 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
 
         // Then
         expect(result).to.deep.equal(
-          success([{ ...uneSessionConseillerMiloQueryModel, estVisible: true }])
+          success([
+            {
+              ...uneSessionConseillerMiloQueryModel,
+              nombreMaxParticipants: 10,
+              nombreParticipants: 0,
+              estVisible: true
+            }
+          ])
         )
         expect(miloClient.getSessionsConseiller).to.have.been.calledWith(
           idpToken,
