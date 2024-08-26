@@ -3,7 +3,7 @@ import { SinonSandbox } from 'sinon'
 import { Notification } from 'src/domain/notification/notification'
 import { SuiviJob } from 'src/domain/suivi-job'
 import { uneDatetime } from 'test/fixtures/date.fixture'
-import { NotifierCreationActionsDemarchesJobHandler } from '../../../src/application/jobs/notifier-creation-actions-demarches.job.handler.db'
+import { NotifierRappelCreationActionsDemarchesJobHandler } from '../../../src/application/jobs/notifier-rappel-creation-actions-demarches.job.handler.db'
 import { Authentification } from '../../../src/domain/authentification'
 import { Core } from '../../../src/domain/core'
 import { Evenement } from '../../../src/domain/evenement'
@@ -23,7 +23,7 @@ const idJeune5 = 'j5'
 const maintenant = uneDatetime()
 
 describe('NotifierCreationActionsDemarchesJobHandler', () => {
-  let notifierCreationActionsDemarchesJobHandler: NotifierCreationActionsDemarchesJobHandler
+  let notifierCreationActionsDemarchesJobHandler: NotifierRappelCreationActionsDemarchesJobHandler
   let dateService: StubbedClass<DateService>
   let suiviJobService: StubbedType<SuiviJob.Service>
   let notificationService: StubbedClass<Notification.Service>
@@ -39,7 +39,7 @@ describe('NotifierCreationActionsDemarchesJobHandler', () => {
     suiviJobService = stubInterface(sandbox)
 
     notifierCreationActionsDemarchesJobHandler =
-      new NotifierCreationActionsDemarchesJobHandler(
+      new NotifierRappelCreationActionsDemarchesJobHandler(
         databaseForTesting.sequelize,
         notificationService,
         suiviJobService,
@@ -118,7 +118,7 @@ describe('NotifierCreationActionsDemarchesJobHandler', () => {
   describe('handle', () => {
     it('notifie uniquement les jeunes ayant que des AEs hors création action/démarches', async () => {
       // Given
-      notificationService.notifierCreationActionDemarche.resolves()
+      notificationService.notifierRappelCreationActionDemarche.resolves()
 
       // When
       const result = await notifierCreationActionsDemarchesJobHandler.handle()
@@ -127,7 +127,7 @@ describe('NotifierCreationActionsDemarchesJobHandler', () => {
       expect(result.succes).to.be.true()
       expect(result.resultat).to.deep.equal({ nbJeunesNotifiables: 1 })
       expect(
-        notificationService.notifierCreationActionDemarche
+        notificationService.notifierRappelCreationActionDemarche
       ).to.have.been.calledOnceWithExactly({
         id: idJeune,
         structure: Core.Structure.MILO,

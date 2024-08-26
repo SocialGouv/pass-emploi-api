@@ -127,8 +127,8 @@ describe('Notification', () => {
         )
       })
     })
-    describe('notifierCreationActionDemarche', () => {
-      it('notifie les jeunes Milo en choix 1', async () => {
+    describe('notifierRappelCreationActionDemarche', () => {
+      it('notifie les jeunes Milo en choix 4', async () => {
         // Given
         const jeune = {
           id: 'test',
@@ -139,8 +139,8 @@ describe('Notification', () => {
         const expectedNotification = uneNotification({
           token: 'tok',
           notification: {
-            title: `Le saviez-vous ?`,
-            body: `Vous pouvez renseigner vos actions sur l’application`
+            title: 'Le conseil du jeudi 😏',
+            body: 'C’est le moment de renseigner vos actions de la semaine'
           },
           data: {
             type: Notification.Type.RAPPEL_CREATION_ACTION
@@ -148,14 +148,14 @@ describe('Notification', () => {
         })
 
         // When
-        await notificationService.notifierCreationActionDemarche(jeune)
+        await notificationService.notifierRappelCreationActionDemarche(jeune)
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
           expectedNotification
         )
       })
-      it('notifie les jeunes FT en choix 4', async () => {
+      it('notifie les jeunes FT en choix 3', async () => {
         // Given
         const jeune = {
           id: 'test',
@@ -166,8 +166,8 @@ describe('Notification', () => {
         const expectedNotification = uneNotification({
           token: 'tok',
           notification: {
-            title: `Le conseil du jeudi 😏`,
-            body: `C’est le moment de renseigner vos démarches de la semaine`
+            title: 'Plus que qu’un jour avant le week-end !',
+            body: 'Prenez 5 minutes pour renseigner vos démarches'
           },
           data: {
             type: Notification.Type.RAPPEL_CREATION_DEMARCHE
@@ -175,7 +175,7 @@ describe('Notification', () => {
         })
 
         // When
-        await notificationService.notifierCreationActionDemarche(jeune)
+        await notificationService.notifierRappelCreationActionDemarche(jeune)
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(

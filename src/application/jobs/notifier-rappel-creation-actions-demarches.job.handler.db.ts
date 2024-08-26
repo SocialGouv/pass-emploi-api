@@ -17,8 +17,10 @@ interface Stats {
 const PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM = 1000
 
 @Injectable()
-@ProcessJobType(Planificateur.JobType.NOTIFIER_CREATION_ACTIONS_DEMARCHES)
-export class NotifierCreationActionsDemarchesJobHandler extends JobHandler<Job> {
+@ProcessJobType(
+  Planificateur.JobType.NOTIFIER_RAPPEL_CREATION_ACTIONS_DEMARCHES
+)
+export class NotifierRappelCreationActionsDemarchesJobHandler extends JobHandler<Job> {
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
     private notificationService: Notification.Service,
@@ -27,7 +29,7 @@ export class NotifierCreationActionsDemarchesJobHandler extends JobHandler<Job> 
     private dateService: DateService
   ) {
     super(
-      Planificateur.JobType.NOTIFIER_CREATION_ACTIONS_DEMARCHES,
+      Planificateur.JobType.NOTIFIER_RAPPEL_CREATION_ACTIONS_DEMARCHES,
       suiviJobService
     )
   }
@@ -87,7 +89,7 @@ export class NotifierCreationActionsDemarchesJobHandler extends JobHandler<Job> 
 
         stats.nbJeunesNotifiables += jeunesANotifier.length
         for (const jeune of jeunesANotifier) {
-          this.notificationService.notifierCreationActionDemarche(jeune)
+          this.notificationService.notifierRappelCreationActionDemarche(jeune)
         }
         offset += PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM
       } while (jeunesANotifier.length)

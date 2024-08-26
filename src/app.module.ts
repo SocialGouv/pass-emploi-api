@@ -364,7 +364,7 @@ import { RechercherMessageQueryHandler } from 'src/application/queries/recherche
 import { RecupererAnalyseAntivirusJobHandler } from './application/jobs/recuperer-analyse-antivirus.job.handler'
 import { CreerTablesAEAnnuellesJobHandler } from './application/jobs/analytics/creer-tables-ae-annuelles'
 import { UpdateJeuneCommandHandler } from './application/commands/update-jeune.command.handler'
-import { NotifierCreationActionsDemarchesJobHandler } from './application/jobs/notifier-creation-actions-demarches.job.handler.db'
+import { NotifierRappelCreationActionsDemarchesJobHandler } from './application/jobs/notifier-rappel-creation-actions-demarches.job.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -828,7 +828,7 @@ export const JobHandlerProviders = [
   CreerTablesAEAnnuellesJobHandler,
   QualifierActionsJobHandler,
   RecupererAnalyseAntivirusJobHandler,
-  NotifierCreationActionsDemarchesJobHandler
+  NotifierRappelCreationActionsDemarchesJobHandler
 ]
 
 @Module(buildModuleMetadata())

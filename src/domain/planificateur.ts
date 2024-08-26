@@ -74,7 +74,7 @@ export namespace Planificateur {
     CREER_TABLES_AE_ANNUELLES_ANALYTICS = 'CREER_TABLES_AE_ANNUELLES_ANALYTICS',
     QUALIFIER_ACTIONS = 'QUALIFIER_ACTIONS',
     RECUPERER_ANALYSE_ANTIVIRUS = 'RECUPERER_ANALYSE_ANTIVIRUS',
-    NOTIFIER_CREATION_ACTIONS_DEMARCHES = 'NOTIFIER_CREATION_ACTIONS_DEMARCHES'
+    NOTIFIER_RAPPEL_CREATION_ACTIONS_DEMARCHES = 'NOTIFIER_RAPPEL_CREATION_ACTIONS_DEMARCHES'
   }
 
   export interface JobRendezVous {
@@ -176,7 +176,7 @@ export const listeCronJobs: Planificateur.CronJob[] = [
     description: 'Tous les jours à 9h.'
   },
   {
-    type: Planificateur.JobType.NOTIFIER_CREATION_ACTIONS_DEMARCHES,
+    type: Planificateur.JobType.NOTIFIER_RAPPEL_CREATION_ACTIONS_DEMARCHES,
     expression: '0 10 * * *',
     description: 'Tous les jours à 10h.'
   },

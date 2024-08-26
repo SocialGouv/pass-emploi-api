@@ -274,13 +274,13 @@ export namespace Notification {
       )
     }
 
-    async notifierCreationActionDemarche(jeune: {
+    async notifierRappelCreationActionDemarche(jeune: {
       id: string
       structure: Core.Structure
       token: string
     }): Promise<void> {
       try {
-        const notification = creerNotificationCreationActionDemarche(
+        const notification = creerNotificationRappelCreationActionDemarche(
           jeune.token,
           jeune.structure,
           this.dateService
@@ -532,53 +532,41 @@ export namespace Notification {
     }
   }
 
-  function getBodyNotificationCreationActionDemarche(
+  function getBodyNotificationRappelCreationActionDemarche(
     structure: Core.Structure,
     dateService: DateService
   ): { title: string; body: string } {
     const trucs = estPoleEmploi(structure) ? 'démarches' : 'actions'
-    const messages: Record<
-      'choix1' | 'choix2' | 'choix3' | 'choix4',
-      { title: string; body: string }
-    > = {
-      choix1: {
+    const messages: Array<{ title: string; body: string }> = [
+      {
         title: `Le saviez-vous ?`,
         body: `Vous pouvez renseigner vos ${trucs} sur l’application`
       },
-      choix2: {
+      {
         title: `Comment s’est passé votre semaine ?`,
         body: `Prenez 5 min pour renseigner vos ${trucs}`
       },
-      choix3: {
+      {
         title: `Plus que qu’un jour avant le week-end !`,
         body: `Prenez 5 minutes pour renseigner vos ${trucs}`
       },
-      choix4: {
+      {
         title: `Le conseil du jeudi 😏`,
         body: `C’est le moment de renseigner vos ${trucs} de la semaine`
       }
-    }
+    ]
     const now = dateService.now()
-    const FIRST_MESSAGE_UNTIL_DAY = 7
-    const SECOND_MESSAGE_UNTIL_DAY = 14
-    const THIRD_MESSAGE_UNTIL_DAY = 21
-    const FOURTH_MESSAGE_UNTIL_DAY = 28
-
-    if (now.day <= FIRST_MESSAGE_UNTIL_DAY) return messages.choix1
-    if (now.day <= SECOND_MESSAGE_UNTIL_DAY) return messages.choix2
-    if (now.day <= THIRD_MESSAGE_UNTIL_DAY) return messages.choix3
-    if (now.day <= FOURTH_MESSAGE_UNTIL_DAY) return messages.choix4
-    return messages.choix2
+    return messages[now.weekNumber % messages.length]
   }
 
-  function creerNotificationCreationActionDemarche(
+  function creerNotificationRappelCreationActionDemarche(
     token: string,
     structure: Core.Structure,
     dateService: DateService
   ): Notification.Message {
     return {
       token,
-      notification: getBodyNotificationCreationActionDemarche(
+      notification: getBodyNotificationRappelCreationActionDemarche(
         structure,
         dateService
       ),
