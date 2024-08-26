@@ -177,8 +177,8 @@ export const listeCronJobs: Planificateur.CronJob[] = [
   },
   {
     type: Planificateur.JobType.NOTIFIER_RAPPEL_CREATION_ACTIONS_DEMARCHES,
-    expression: '0 10 * * *',
-    description: 'Tous les jours à 10h.'
+    expression: '0 10 * * 4',
+    description: 'Tous les jeudi à 10h.'
   },
   {
     type: Planificateur.JobType.NOUVELLES_OFFRES_SERVICE_CIVIQUE,
