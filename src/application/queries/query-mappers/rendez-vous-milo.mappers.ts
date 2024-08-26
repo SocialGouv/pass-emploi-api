@@ -118,7 +118,8 @@ export function fromSqlToAnimationCollectiveQueryModel(
 ): AnimationCollectiveQueryModel {
   return {
     ...fromSqlToRendezVousConseillerQueryModel(rendezVousSql),
-    statut: construireStatut(rendezVousSql, maintenant)
+    statut: construireStatut(rendezVousSql, maintenant),
+    nombreMaxParticipants: rendezVousSql.nombreMaxParticipants ?? undefined
   }
 }
 

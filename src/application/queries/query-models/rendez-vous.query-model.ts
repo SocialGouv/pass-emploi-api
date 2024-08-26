@@ -205,6 +205,9 @@ export class RendezVousConseillerQueryModel
 export class AnimationCollectiveQueryModel extends RendezVousConseillerQueryModel {
   @ApiPropertyOptional()
   statut: RendezVous.AnimationCollective.Statut
+
+  @ApiPropertyOptional()
+  nombreMaxParticipants?: number
 }
 
 export class AnimationCollectiveResumeQueryModel {
