@@ -6,6 +6,7 @@ import { Jeune } from '../jeune/jeune'
 import { Recherche } from '../offre/recherche/recherche'
 import { RendezVous } from '../rendez-vous/rendez-vous'
 import * as _PoleEmploi from './notification.pole-emploi'
+import { Core, estPoleEmploi } from '../core'
 
 export const NotificationRepositoryToken = 'NotificationRepositoryToken'
 
@@ -27,7 +28,9 @@ export namespace Notification {
     NOUVELLE_OFFRE = 'NOUVELLE_OFFRE',
     DETAIL_ACTION = 'DETAIL_ACTION',
     DETAIL_SESSION_MILO = 'DETAIL_SESSION_MILO',
-    DELETED_SESSION_MILO = 'DELETED_SESSION_MILO'
+    DELETED_SESSION_MILO = 'DELETED_SESSION_MILO',
+    RAPPEL_CREATION_ACTION = 'RAPPEL_CREATION_ACTION',
+    RAPPEL_CREATION_DEMARCHE = 'RAPPEL_CREATION_DEMARCHE'
   }
 
   export type TypeRdv =
@@ -152,7 +155,8 @@ export namespace Notification {
 
     constructor(
       @Inject(NotificationRepositoryToken)
-      private notificationRepository: Notification.Repository
+      private notificationRepository: Notification.Repository,
+      private dateService: DateService
     ) {
       this.logger = new Logger('NotificationService')
     }
@@ -270,6 +274,26 @@ export namespace Notification {
       )
     }
 
+    async notifierCreationActionDemarche(jeune: {
+      id: string
+      structure: Core.Structure
+      token: string
+    }): Promise<void> {
+      try {
+        const notification = creerNotificationCreationActionDemarche(
+          jeune.token,
+          jeune.structure,
+          this.dateService
+        )
+        const promise = this.notificationRepository.send(notification)
+        this.logMessageSucces(jeune.id)
+        return promise
+      } catch (e) {
+        this.logger.error(e)
+        this.logMessageEchec(jeune.id)
+      }
+    }
+
     async notifierNouvelleAction(jeune: Jeune, action: Action): Promise<void> {
       if (jeune.configuration?.pushNotificationToken) {
         const notification = this.creerNotificationNouvelleAction(
@@ -290,7 +314,7 @@ export namespace Notification {
     ): Promise<void> {
       if (configurationApplication) {
         if (configurationApplication.pushNotificationToken) {
-          const notification = this.creerNotificationNouveauCommentaire(
+          const notification = creerNotificationNouveauCommentaire(
             configurationApplication.pushNotificationToken,
             idAction
           )
@@ -506,21 +530,79 @@ export namespace Notification {
         }
       }
     }
+  }
 
-    private creerNotificationNouveauCommentaire(
-      token: string,
-      idAction: string
-    ): Notification.Message {
-      return {
-        token,
-        notification: {
-          title: 'Action mise à jour',
-          body: 'Un commentaire a été ajouté par votre conseiller'
-        },
-        data: {
-          type: Type.DETAIL_ACTION,
-          id: idAction
-        }
+  function getBodyNotificationCreationActionDemarche(
+    structure: Core.Structure,
+    dateService: DateService
+  ): { title: string; body: string } {
+    const trucs = estPoleEmploi(structure) ? 'démarches' : 'actions'
+    const messages: Record<
+      'choix1' | 'choix2' | 'choix3' | 'choix4',
+      { title: string; body: string }
+    > = {
+      choix1: {
+        title: `Le saviez-vous ?`,
+        body: `Vous pouvez renseigner vos ${trucs} sur l’application`
+      },
+      choix2: {
+        title: `Comment s’est passé votre semaine ?`,
+        body: `Prenez 5 min pour renseigner vos ${trucs}`
+      },
+      choix3: {
+        title: `Plus que qu’un jour avant le week-end !`,
+        body: `Prenez 5 minutes pour renseigner vos ${trucs}`
+      },
+      choix4: {
+        title: `Le conseil du jeudi 😏`,
+        body: `C’est le moment de renseigner vos ${trucs} de la semaine`
+      }
+    }
+    const now = dateService.now()
+    const FIRST_MESSAGE_UNTIL_DAY = 7
+    const SECOND_MESSAGE_UNTIL_DAY = 14
+    const THIRD_MESSAGE_UNTIL_DAY = 21
+    const FOURTH_MESSAGE_UNTIL_DAY = 28
+
+    if (now.day <= FIRST_MESSAGE_UNTIL_DAY) return messages.choix1
+    if (now.day <= SECOND_MESSAGE_UNTIL_DAY) return messages.choix2
+    if (now.day <= THIRD_MESSAGE_UNTIL_DAY) return messages.choix3
+    if (now.day <= FOURTH_MESSAGE_UNTIL_DAY) return messages.choix4
+    return messages.choix2
+  }
+
+  function creerNotificationCreationActionDemarche(
+    token: string,
+    structure: Core.Structure,
+    dateService: DateService
+  ): Notification.Message {
+    return {
+      token,
+      notification: getBodyNotificationCreationActionDemarche(
+        structure,
+        dateService
+      ),
+      data: {
+        type: estPoleEmploi(structure)
+          ? Type.RAPPEL_CREATION_DEMARCHE
+          : Type.RAPPEL_CREATION_ACTION
+      }
+    }
+  }
+
+  function creerNotificationNouveauCommentaire(
+    token: string,
+    idAction: string
+  ): Notification.Message {
+    return {
+      token,
+      notification: {
+        title: 'Action mise à jour',
+        body: 'Un commentaire a été ajouté par votre conseiller'
+      },
+      data: {
+        type: Type.DETAIL_ACTION,
+        id: idAction
       }
     }
   }

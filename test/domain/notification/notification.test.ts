@@ -1,4 +1,5 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { DateTime } from 'luxon'
 import { uneAction } from 'test/fixtures/action.fixture'
 import {
   uneConfiguration,
@@ -8,20 +9,26 @@ import {
 import { uneNotification } from 'test/fixtures/notification.fixture'
 import { uneRecherche } from 'test/fixtures/recherche.fixture'
 import { unRendezVous } from 'test/fixtures/rendez-vous.fixture'
-import { Notification } from '../../../src/domain/notification/notification'
-import { createSandbox, expect } from '../../utils'
+import { Core } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune/jeune'
-import { DateTime } from 'luxon'
+import { Notification } from '../../../src/domain/notification/notification'
+import { DateService } from '../../../src/utils/date-service'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('Notification', () => {
   describe('Service', () => {
     let notificationService: Notification.Service
     let notificationRepository: StubbedType<Notification.Repository>
+    let dateService: StubbedClass<DateService>
 
     beforeEach(() => {
+      dateService = stubClass(DateService)
       const sandbox = createSandbox()
       notificationRepository = stubInterface(sandbox)
-      notificationService = new Notification.Service(notificationRepository)
+      notificationService = new Notification.Service(
+        notificationRepository,
+        dateService
+      )
     })
 
     describe('notifierLesJeunesDuRdv', () => {
@@ -113,6 +120,62 @@ describe('Notification', () => {
 
         // When
         await notificationService.notifierLesJeunesDuNouveauMessage(jeunes)
+
+        // Then
+        expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
+          expectedNotification
+        )
+      })
+    })
+    describe('notifierCreationActionDemarche', () => {
+      it('notifie les jeunes Milo en choix 1', async () => {
+        // Given
+        const jeune = {
+          id: 'test',
+          structure: Core.Structure.MILO,
+          token: 'tok'
+        }
+        dateService.now.returns(DateTime.fromISO('2020-04-06T12:00:00.000Z'))
+        const expectedNotification = uneNotification({
+          token: 'tok',
+          notification: {
+            title: `Le saviez-vous ?`,
+            body: `Vous pouvez renseigner vos actions sur l’application`
+          },
+          data: {
+            type: Notification.Type.RAPPEL_CREATION_ACTION
+          }
+        })
+
+        // When
+        await notificationService.notifierCreationActionDemarche(jeune)
+
+        // Then
+        expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
+          expectedNotification
+        )
+      })
+      it('notifie les jeunes FT en choix 4', async () => {
+        // Given
+        const jeune = {
+          id: 'test',
+          structure: Core.Structure.POLE_EMPLOI,
+          token: 'tok'
+        }
+        dateService.now.returns(DateTime.fromISO('2020-04-27T12:00:00.000Z'))
+        const expectedNotification = uneNotification({
+          token: 'tok',
+          notification: {
+            title: `Le conseil du jeudi 😏`,
+            body: `C’est le moment de renseigner vos démarches de la semaine`
+          },
+          data: {
+            type: Notification.Type.RAPPEL_CREATION_DEMARCHE
+          }
+        })
+
+        // When
+        await notificationService.notifierCreationActionDemarche(jeune)
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(

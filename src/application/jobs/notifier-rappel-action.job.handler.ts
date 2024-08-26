@@ -14,7 +14,7 @@ import { JobHandler } from '../../building-blocks/types/job-handler'
 import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
 import { DateService } from '../../utils/date-service'
 
-export interface NotifierRappelActionStats {
+interface NotifierRappelActionStats {
   idAction?: string
   idJeune?: string
   notificationEnvoyee: boolean
