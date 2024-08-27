@@ -30,6 +30,7 @@ export async function migrate(connexion: Sequelize): Promise<void> {
           region                                              varchar,
           departement                                         varchar,
           nombre_utilisateurs_2_mois                          integer,
+          nombre_utilisateurs_1_mois                          integer,
           nombre_utilisateurs_engages_2_jours_dans_la_semaine integer,
           nb_actifs_3_semaines_sur_6                          integer,
           nb_actifs_4_semaines_sur_6                          integer

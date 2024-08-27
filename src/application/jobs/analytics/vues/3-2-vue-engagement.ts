@@ -36,6 +36,26 @@ export async function chargerLaVueEngagement(
      order by structure, type_utilisateur, region, departement;`
   )
 
+  logger.log('Insertion des utilisateurs du dernier mois')
+  await connexion.query(
+    `insert into analytics_engagement(semaine,
+                                      structure,
+                                      type_utilisateur,
+                                      region,
+                                      departement,
+                                      nombre_utilisateurs_1_mois)
+     SELECT '${semaine}',
+            structure,
+            type_utilisateur,
+            COALESCE(region, 'NON RENSEIGNE') AS region,
+            COALESCE(departement, 'NON RENSEIGNE') AS departement,
+            count(distinct id_utilisateur) as nombre_utilisateurs_1_mois
+     from ${analyticsTableName}
+     where date_evenement between '${semaine}'::timestamp - interval '1 months' and '${semaine}'::timestamp + interval '1 week'
+     group by structure, type_utilisateur, departement, region
+     order by structure, type_utilisateur, region, departement;`
+  )
+
   logger.log('Insertion des utilisateurs engagés')
   await connexion.query(
     `update analytics_engagement
