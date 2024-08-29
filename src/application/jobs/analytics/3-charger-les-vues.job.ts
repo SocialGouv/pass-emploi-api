@@ -6,7 +6,10 @@ import { DateService } from '../../../utils/date-service'
 import { createSequelizeForAnalytics } from '../../../infrastructure/sequelize/connector-analytics'
 import { migrate } from './vues/3-0-migrate-schema'
 import { chargerLaVueFonctionnalite } from './vues/3-1-vue-fonctionnalites'
-import { chargerLaVueEngagement } from './vues/3-2-vue-engagement'
+import {
+  chargerLaVueEngagement,
+  chargerLaVueEngagementNational
+} from './vues/3-2-vue-engagement'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.CHARGER_LES_VUES_ANALYTICS)
@@ -34,6 +37,13 @@ export class ChargerLesVuesJobHandler extends JobHandler<Planificateur.Job> {
     await chargerLaVueFonctionnalite(connexion, semaine, analyticsTableName)
     this.logger.log('Charger la vue engagement')
     await chargerLaVueEngagement(
+      connexion,
+      semaine,
+      this.logger,
+      analyticsTableName
+    )
+    this.logger.log('Charger la vue engagement national')
+    await chargerLaVueEngagementNational(
       connexion,
       semaine,
       this.logger,
