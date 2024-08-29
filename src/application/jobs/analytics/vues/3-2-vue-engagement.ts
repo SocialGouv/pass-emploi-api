@@ -260,7 +260,7 @@ export async function chargerLaVueEngagementNational(
            FROM (SELECT count(distinct week_ae) as nb_week,
                         id_utilisateur,
                         structure,
-                        type_utilisateur,
+                        type_utilisateur
                  FROM (SELECT count(distinct jour) as nb_day_ae,
                               semaine              as week_ae,
                               structure,
@@ -272,7 +272,7 @@ export async function chargerLaVueEngagementNational(
                  WHERE nb_day_ae >= 2
                  GROUP BY id_utilisateur, structure, type_utilisateur) x
            WHERE nb_week >= 3
-           GROUP BY structure, type_utilisateur,
+           GROUP BY structure, type_utilisateur
            ORDER BY structure, type_utilisateur) as subquery
      WHERE analytics_engagement_national.semaine = '${semaine}'
        AND analytics_engagement_national.structure = subquery.structure
