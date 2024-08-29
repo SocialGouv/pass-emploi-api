@@ -162,8 +162,8 @@ export async function chargerLaVueEngagement(
   logger.log('Remplacer les null par des 0')
   await connexion.query(
     ` UPDATE analytics_engagement
-      SET nombre_utilisateurs_2_mois = 0
-      WHERE nombre_utilisateurs_2_mois IS NULL;
+      SET nombre_utilisateurs_1_mois = 0
+      WHERE nombre_utilisateurs_1_mois IS NULL;
 
       UPDATE analytics_engagement
       SET nombre_utilisateurs_engages_2_jours_dans_la_semaine = 0

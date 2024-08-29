@@ -54,3 +54,10 @@ Pour cette maille les indicateurs suivants sont calculés :
 - nombre d'utilisateurs ayant au moins 2 événements dans la semaine (**actif**)
 - nombre d'utilisateurs ayant été actifs au moins 3 semaines sur les 6 dernières semaines
 - nombre d'utilisateurs ayant été actifs au moins 4 semaines sur les 6 dernières semaines
+
+**_analytics_engagement_national**
+Détaille l'engagement des utilisateurs aux mailles :
+- structure-type_utilisateur-semaine
+Le retrait des niveaux departement-region permet d'avoir des chiffres exacts à l'échelle nationale.
+
+Les indicateurs sont les mêmes que pour la table analytics_engagement
