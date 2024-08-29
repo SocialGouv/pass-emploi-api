@@ -6,7 +6,10 @@ import { DateService } from '../../../utils/date-service'
 import { createSequelizeForAnalytics } from '../../../infrastructure/sequelize/connector-analytics'
 import { migrate } from './vues/3-0-migrate-schema'
 import { chargerLaVueFonctionnalite } from './vues/3-1-vue-fonctionnalites'
-import { chargerLaVueEngagement, chargerLaVueEngagementNational } from './vues/3-2-vue-engagement'
+import {
+  chargerLaVueEngagement,
+  chargerLaVueEngagementNational
+} from './vues/3-2-vue-engagement'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.CHARGER_LES_VUES_ANALYTICS)

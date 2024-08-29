@@ -8,7 +8,10 @@ import { DateService } from '../../../utils/date-service'
 import { infosTablesAEAnnuelles } from './creer-tables-ae-annuelles'
 import { migrate } from './vues/3-0-migrate-schema'
 import { chargerLaVueFonctionnalite } from './vues/3-1-vue-fonctionnalites'
-import { chargerLaVueEngagement, chargerLaVueEngagementNational } from './vues/3-2-vue-engagement'
+import {
+  chargerLaVueEngagement,
+  chargerLaVueEngagementNational
+} from './vues/3-2-vue-engagement'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.INITIALISER_LES_VUES)
