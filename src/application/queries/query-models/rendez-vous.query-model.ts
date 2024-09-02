@@ -200,14 +200,14 @@ export class RendezVousConseillerQueryModel
 
   @ApiProperty({ required: true, enum: RendezVous.Source })
   source: RendezVous.Source
+
+  @ApiPropertyOptional()
+  nombreMaxParticipants?: number
 }
 
 export class AnimationCollectiveQueryModel extends RendezVousConseillerQueryModel {
   @ApiPropertyOptional()
   statut: RendezVous.AnimationCollective.Statut
-
-  @ApiPropertyOptional()
-  nombreMaxParticipants?: number
 }
 
 export class AnimationCollectiveResumeQueryModel {
@@ -248,9 +248,6 @@ export class RendezVousConseillerDetailQueryModel extends RendezVousConseillerQu
     isArray: true
   })
   historique?: LogModificationRendezVousQueryModel[]
-
-  @ApiPropertyOptional()
-  nombreMaxParticipants?: number
 }
 
 export class RendezVousJeuneDetailQueryModel extends RendezVousJeuneQueryModel {
