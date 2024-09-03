@@ -9278,7 +9278,7 @@ __metadata:
     pg: "npm:8.12.0"
     pg-connection-string: "npm:2.6.4"
     pg-copy-streams: "npm:6.0.6"
-    pino-http: "npm:10.1.0"
+    pino-http: "npm:10.3.0"
     prettier: "npm:^2.8.8"
     redis: "npm:^4.6.15"
     reflect-metadata: "npm:0.2.2"
@@ -10256,15 +10256,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pino-http@npm:10.1.0":
-  version: 10.1.0
-  resolution: "pino-http@npm:10.1.0"
+"pino-http@npm:10.3.0":
+  version: 10.3.0
+  resolution: "pino-http@npm:10.3.0"
   dependencies:
     get-caller-file: "npm:^2.0.5"
     pino: "npm:^9.0.0"
     pino-std-serializers: "npm:^7.0.0"
-    process-warning: "npm:^3.0.0"
-  checksum: 10/419a89113b98df1b80fc140326ff3afc93cd4b46b11af0f79f7b2c2185e365d0092beda86f5a2f62d51d07227f5835803c0e999cffba6b536b3a3495bd081c18
+    process-warning: "npm:^4.0.0"
+  checksum: 10/495e7d4ea66ab47a3dc951def40eaf36c7f67555a590e6abd6a6f65152ad98a1fe74442d70f3ce8fefca53b455861d6ac7a8f918c56075bbbefa47b63d99394e
   languageName: node
   linkType: hard
 
@@ -10455,13 +10455,6 @@ __metadata:
   version: 1.0.0
   resolution: "process-warning@npm:1.0.0"
   checksum: 10/8736d11d8d71c349d176e210305e84d74b13af06efb3c779377b056bfd608257d1e4e32b8fbbf90637c900f0313e40f7c9f583140884f667a21fc10a869b840c
-  languageName: node
-  linkType: hard
-
-"process-warning@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "process-warning@npm:3.0.0"
-  checksum: 10/2d82fa641e50a5789eaf0f2b33453760996e373d4591aac576a22d696186ab7e240a0592db86c264d4f28a46c2abbe9b94689752017db7dadc90f169f12b0924
   languageName: node
   linkType: hard
 
