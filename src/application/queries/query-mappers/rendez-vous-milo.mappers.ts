@@ -98,6 +98,7 @@ export function fromSqlToRendezVousConseillerQueryModel(
       nom: jeune.nom,
       futPresent: getPresence(jeune)
     })),
+    nombreMaxParticipants: rendezVousSql.nombreMaxParticipants ?? undefined,
     type: {
       code: rendezVousSql.type,
       label: mapCodeLabelTypeRendezVous[rendezVousSql.type]
