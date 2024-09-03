@@ -56,11 +56,12 @@ export namespace Chat {
     idsBeneficiaires: string[]
   }
 
-  export enum StatutAnalysePJ {
+  export enum StatutPJ {
     ANALYSE_EN_COURS = 'ANALYSE_EN_COURS',
     ERREUR_ANALYSE = 'ERREUR_ANALYSE',
     FICHIER_SAIN = 'FICHIER_SAIN',
-    FICHIER_MALVEILLANT = 'FICHIER_MALVEILLANT'
+    FICHIER_MALVEILLANT = 'FICHIER_MALVEILLANT',
+    FICHIER_EXPIRE = 'FICHIER_EXPIRE'
   }
 
   export interface Repository {
@@ -107,7 +108,7 @@ export namespace Chat {
     envoyerStatutAnalysePJ(
       idJeune: string,
       idMessage: string,
-      statut: StatutAnalysePJ
+      statut: StatutPJ
     ): Promise<void>
   }
 

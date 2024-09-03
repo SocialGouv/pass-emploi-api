@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { Chat, ChatRepositoryToken } from 'src/domain/chat'
 import { Job } from '../../building-blocks/types/job'
 import { JobHandler } from '../../building-blocks/types/job-handler'
 import { Fichier, FichierRepositoryToken } from '../../domain/fichier'
@@ -15,7 +16,9 @@ export class NettoyerPiecesJointesJobHandler extends JobHandler<Job> {
     private fichierRepository: Fichier.Repository,
     private dateService: DateService,
     @Inject(SuiviJobServiceToken)
-    suiviJobService: SuiviJob.Service
+    suiviJobService: SuiviJob.Service,
+    @Inject(ChatRepositoryToken)
+    private readonly chatRepository: Chat.Repository
   ) {
     super(Planificateur.JobType.NETTOYER_LES_PIECES_JOINTES, suiviJobService)
   }
@@ -29,12 +32,19 @@ export class NettoyerPiecesJointesJobHandler extends JobHandler<Job> {
       .now()
       .minus({ months: 4 })
       .toJSDate()
-    const idsFichiersASupprimer =
-      await this.fichierRepository.getIdsFichiersBefore(quatreMoisPlusTot)
+    const fichiersASupprimer = await this.fichierRepository.getFichiersBefore(
+      quatreMoisPlusTot
+    )
 
-    for (const id of idsFichiersASupprimer) {
+    for (const { id, idCreateur, idMessage } of fichiersASupprimer) {
       try {
         await this.fichierRepository.softDelete(id)
+        await this.chatRepository.envoyerStatutAnalysePJ(
+          idCreateur,
+          idMessage!,
+          Chat.StatutPJ.FICHIER_EXPIRE
+        )
+
         fichiersSupprimes++
       } catch (e) {
         this.logger.error(

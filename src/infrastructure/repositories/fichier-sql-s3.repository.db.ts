@@ -7,9 +7,9 @@ import {
 } from 'src/building-blocks/types/result'
 import { AntivirusClient } from 'src/infrastructure/clients/antivirus-client'
 import { Fichier, FichierMetadata } from '../../domain/fichier'
+import { DateService } from '../../utils/date-service'
 import { ObjectStorageClient } from '../clients/object-storage.client'
 import { FichierSqlModel } from '../sequelize/models/fichier.sql-model'
-import { DateService } from '../../utils/date-service'
 
 @Injectable()
 export class FichierSqlS3Repository implements Fichier.Repository {
@@ -51,9 +51,8 @@ export class FichierSqlS3Repository implements Fichier.Repository {
     )
   }
 
-  async getIdsFichiersBefore(date: Date): Promise<string[]> {
+  async getFichiersBefore(date: Date): Promise<FichierMetadata[]> {
     const fichiersSql = await FichierSqlModel.findAll({
-      attributes: ['id'],
       where: {
         dateSuppression: {
           [Op.is]: null
@@ -63,8 +62,7 @@ export class FichierSqlS3Repository implements Fichier.Repository {
         }
       }
     })
-
-    return fichiersSql.map(fichier => fichier.id)
+    return fichiersSql.map(sqlToFichierMetadata)
   }
 
   async getFichierMetadata(
@@ -73,18 +71,7 @@ export class FichierSqlS3Repository implements Fichier.Repository {
     const fichierSql = await FichierSqlModel.findByPk(idFichier)
 
     if (fichierSql) {
-      return {
-        id: fichierSql.id,
-        mimeType: fichierSql.mimeType,
-        nom: fichierSql.nom,
-        idsJeunes: fichierSql.idsJeunes,
-        dateCreation: fichierSql.dateCreation,
-        idCreateur: fichierSql.idCreateur,
-        typeCreateur: fichierSql.typeCreateur,
-        dateSuppression: fichierSql.dateSuppression ?? undefined,
-        idMessage: fichierSql.idMessage ?? undefined,
-        idAnalyse: fichierSql.idAnalyse ?? undefined
-      }
+      return sqlToFichierMetadata(fichierSql)
     }
     return undefined
   }
@@ -104,4 +91,22 @@ export class FichierSqlS3Repository implements Fichier.Repository {
 
     return result
   }
+}
+
+function sqlToFichierMetadata(fichierSql: FichierSqlModel): FichierMetadata {
+  const metadata: FichierMetadata = {
+    id: fichierSql.id,
+    mimeType: fichierSql.mimeType,
+    nom: fichierSql.nom,
+    idsJeunes: fichierSql.idsJeunes,
+    dateCreation: fichierSql.dateCreation,
+    idCreateur: fichierSql.idCreateur,
+    typeCreateur: fichierSql.typeCreateur
+  }
+  if (fichierSql.dateSuppression)
+    metadata.dateSuppression = fichierSql.dateSuppression
+  if (fichierSql.idMessage) metadata.idMessage = fichierSql.idMessage
+  if (fichierSql.idAnalyse) metadata.idAnalyse = fichierSql.idAnalyse
+
+  return metadata
 }
