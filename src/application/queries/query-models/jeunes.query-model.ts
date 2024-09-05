@@ -227,6 +227,16 @@ export class ResumeActionsDuJeuneQueryModel {
 export class PreferencesJeuneQueryModel {
   @ApiProperty()
   partageFavoris: boolean
+  @ApiProperty()
+  alertesOffres: boolean
+  @ApiProperty()
+  messages: boolean
+  @ApiProperty()
+  creationActionConseiller: boolean
+  @ApiProperty()
+  rendezVousSessions: boolean
+  @ApiProperty()
+  rappelActions: boolean
 }
 
 export class MotifSuppressionJeuneQueryModel {

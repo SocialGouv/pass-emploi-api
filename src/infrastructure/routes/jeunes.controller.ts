@@ -30,7 +30,7 @@ import { GetJeuneHomeAgendaQueryHandler } from 'src/application/queries/get-jeun
 import {
   GetPreferencesJeuneQuery,
   GetPreferencesJeuneQueryHandler
-} from 'src/application/queries/get-preferences-jeune.handler.db'
+} from 'src/application/queries/get-preferences-jeune.query.handler.db'
 import { JeuneHomeAgendaQueryModel } from 'src/application/queries/query-models/home-jeune-suivi.query-model'
 import { JeuneHomeActionQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
 import {

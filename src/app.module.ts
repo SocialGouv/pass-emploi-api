@@ -169,7 +169,7 @@ import { GetMotifsSuppressionJeuneQueryHandler } from './application/queries/get
 import { GetOffresEmploiQueryHandler } from './application/queries/get-offres-emploi.query.handler'
 import { GetOffresImmersionQueryHandler } from './application/queries/get-offres-immersion.query.handler'
 import { GetOffresServicesCiviqueQueryHandler } from './application/queries/get-offres-services-civique.query.handler'
-import { GetPreferencesJeuneQueryHandler } from './application/queries/get-preferences-jeune.handler.db'
+import { GetPreferencesJeuneQueryHandler } from './application/queries/get-preferences-jeune.query.handler.db'
 import { GetRecherchesQueryHandler } from './application/queries/get-recherches.query.handler.db'
 import { GetSuggestionsQueryHandler } from './application/queries/get-suggestions.query.handler.db'
 import { GetSuiviSemainePoleEmploiQueryHandler } from './application/queries/get-suivi-semaine-pole-emploi.query.handler'

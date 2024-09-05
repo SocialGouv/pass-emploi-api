@@ -79,7 +79,12 @@ describe('CreateJeunePoleEmploiCommandHandler', () => {
         structure: Core.Structure.POLE_EMPLOI,
         idPartenaire: undefined,
         preferences: {
-          partageFavoris: true
+          partageFavoris: true,
+          alertesOffres: true,
+          messages: true,
+          creationActionConseiller: true,
+          rendezVousSessions: true,
+          rappelActions: true
         },
         configuration: {
           idJeune: idNouveauJeune

@@ -2,7 +2,7 @@ import { expect, StubbedClass, stubClass } from '../../utils'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { success } from '../../../src/building-blocks/types/result'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import { GetPreferencesJeuneQueryHandler } from '../../../src/application/queries/get-preferences-jeune.handler.db'
+import { GetPreferencesJeuneQueryHandler } from '../../../src/application/queries/get-preferences-jeune.query.handler.db'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository.db'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
@@ -36,11 +36,7 @@ describe('GetPreferencesJeuneQueryHandler', () => {
   })
 
   describe('handle', () => {
-    const jeune = unJeune({
-      preferences: {
-        partageFavoris: true
-      }
-    })
+    const jeune = unJeune()
 
     beforeEach(async () => {
       // Given
@@ -64,7 +60,12 @@ describe('GetPreferencesJeuneQueryHandler', () => {
 
       // Then
       const expected: PreferencesJeuneQueryModel = {
-        partageFavoris: true
+        partageFavoris: true,
+        alertesOffres: true,
+        messages: true,
+        creationActionConseiller: true,
+        rendezVousSessions: true,
+        rappelActions: true
       }
       expect(result).to.deep.equal(success(expected))
     })
