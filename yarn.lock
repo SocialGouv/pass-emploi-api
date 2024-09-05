@@ -1522,7 +1522,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/axios@npm:^3.0.2":
+"@nestjs/axios@npm:^3.0.3":
   version: 3.0.3
   resolution: "@nestjs/axios@npm:3.0.3"
   peerDependencies:
@@ -1663,7 +1663,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/schematics@npm:^10.1.2":
+"@nestjs/schematics@npm:^10.1.4":
   version: 10.1.4
   resolution: "@nestjs/schematics@npm:10.1.4"
   dependencies:
@@ -2048,7 +2048,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@salesforce/ts-sinon@npm:^1.4.22":
+"@salesforce/ts-sinon@npm:^1.4.26":
   version: 1.4.26
   resolution: "@salesforce/ts-sinon@npm:1.4.26"
   dependencies:
@@ -2867,7 +2867,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/chai@npm:*, @types/chai@npm:^4.3.16":
+"@types/chai@npm:*, @types/chai@npm:^4.3.19":
   version: 4.3.19
   resolution: "@types/chai@npm:4.3.19"
   checksum: 10/5ca7a48ec1c792e536bc228911f442c31eb8a24f1c3531f8a5e1e949590a6a045be17a2ec5a3d83f63dae8d59dd93dc5f6ca7355b9c1a9f003c553a733b2e591
@@ -2915,7 +2915,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/dirty-chai@npm:^2.0.4":
+"@types/dirty-chai@npm:^2.0.5":
   version: 2.0.5
   resolution: "@types/dirty-chai@npm:2.0.5"
   dependencies:
@@ -3080,7 +3080,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/multer@npm:^1.4.11":
+"@types/multer@npm:^1.4.12":
   version: 1.4.12
   resolution: "@types/multer@npm:1.4.12"
   dependencies:
@@ -3313,7 +3313,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/yargs@npm:^17.0.32":
+"@types/yargs@npm:^17.0.33":
   version: 17.0.33
   resolution: "@types/yargs@npm:17.0.33"
   dependencies:
@@ -4029,7 +4029,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.7.4":
+"axios@npm:^1.7.7":
   version: 1.7.7
   resolution: "axios@npm:1.7.7"
   dependencies:
@@ -5805,7 +5805,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-chai-friendly@npm:^1.0.0":
+"eslint-plugin-chai-friendly@npm:^1.0.1":
   version: 1.0.1
   resolution: "eslint-plugin-chai-friendly@npm:1.0.1"
   peerDependencies:
@@ -8253,9 +8253,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lint-staged@npm:^15.2.7":
-  version: 15.2.9
-  resolution: "lint-staged@npm:15.2.9"
+"lint-staged@npm:^15.2.10":
+  version: 15.2.10
+  resolution: "lint-staged@npm:15.2.10"
   dependencies:
     chalk: "npm:~5.3.0"
     commander: "npm:~12.1.0"
@@ -8263,13 +8263,13 @@ __metadata:
     execa: "npm:~8.0.1"
     lilconfig: "npm:~3.1.2"
     listr2: "npm:~8.2.4"
-    micromatch: "npm:~4.0.7"
+    micromatch: "npm:~4.0.8"
     pidtree: "npm:~0.6.0"
     string-argv: "npm:~0.3.2"
     yaml: "npm:~2.5.0"
   bin:
     lint-staged: bin/lint-staged.js
-  checksum: 10/2f7342ca3fc7e2a8a0cc3db79ca8d2ad0269b98b13220f3a6745a514aacf1f83487a23a550569081ea962f9a576af7df8d687a8330a9c3c2c27348d5a4d5440e
+  checksum: 10/ab6930cd633dbb5b6ec7c81fc06c65df41e9f80d93dd22e0d79c6e272cdfd8110a0fbdec60303d46a06b30bcd92261153630e2c937531b77ec5ae41e7e9d90d3
   languageName: node
   linkType: hard
 
@@ -8740,7 +8740,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"micromatch@npm:^4.0.0, micromatch@npm:^4.0.4, micromatch@npm:~4.0.7":
+"micromatch@npm:^4.0.0, micromatch@npm:^4.0.4, micromatch@npm:~4.0.8":
   version: 4.0.8
   resolution: "micromatch@npm:4.0.8"
   dependencies:
@@ -9207,29 +9207,29 @@ __metadata:
     "@aws-sdk/client-s3": "npm:3.622.0"
     "@aws-sdk/s3-request-presigner": "npm:3.622.0"
     "@google-cloud/bigquery": "npm:7.9.0"
-    "@nestjs/axios": "npm:^3.0.2"
+    "@nestjs/axios": "npm:^3.0.3"
     "@nestjs/cli": "npm:^9.5.0"
     "@nestjs/common": "npm:10.3.10"
     "@nestjs/config": "npm:2.3.4"
     "@nestjs/core": "npm:10.3.10"
     "@nestjs/platform-express": "npm:10.3.10"
-    "@nestjs/schematics": "npm:^10.1.2"
+    "@nestjs/schematics": "npm:^10.1.4"
     "@nestjs/swagger": "npm:7.4.0"
     "@nestjs/terminus": "npm:10.2.3"
     "@nestjs/testing": "npm:^10.3.10"
-    "@salesforce/ts-sinon": "npm:^1.4.22"
+    "@salesforce/ts-sinon": "npm:^1.4.26"
     "@types/bull": "npm:^4.10.0"
-    "@types/chai": "npm:^4.3.16"
+    "@types/chai": "npm:^4.3.19"
     "@types/chai-as-promised": "npm:^7.1.8"
     "@types/compression": "npm:^1.7.5"
     "@types/crypto-js": "npm:^4.2.2"
-    "@types/dirty-chai": "npm:^2.0.4"
+    "@types/dirty-chai": "npm:^2.0.5"
     "@types/express": "npm:^4.17.21"
     "@types/geojson": "npm:^7946.0.14"
     "@types/lodash.isequal": "npm:^4.5.8"
     "@types/luxon": "npm:^3.4.2"
     "@types/mocha": "npm:^10.0.7"
-    "@types/multer": "npm:^1.4.11"
+    "@types/multer": "npm:^1.4.12"
     "@types/node": "npm:^20.14.9"
     "@types/pg-copy-streams": "npm:^1.2.5"
     "@types/pino-multi-stream": "npm:^5.1.6"
@@ -9237,10 +9237,10 @@ __metadata:
     "@types/sinon-chai": "npm:^3.2.12"
     "@types/supertest": "npm:^2.0.16"
     "@types/uuid": "npm:^9.0.8"
-    "@types/yargs": "npm:^17.0.32"
+    "@types/yargs": "npm:^17.0.33"
     "@typescript-eslint/eslint-plugin": "npm:^6.21.0"
     "@typescript-eslint/parser": "npm:^6.21.0"
-    axios: "npm:^1.7.4"
+    axios: "npm:^1.7.7"
     bull: "npm:4.16.2"
     bull-repl: "npm:^0.29.1"
     chai: "npm:^4.4.1"
@@ -9257,7 +9257,7 @@ __metadata:
     elastic-apm-node: "npm:3.51.0"
     eslint: "npm:^8.57.0"
     eslint-config-prettier: "npm:^9.1.0"
-    eslint-plugin-chai-friendly: "npm:^1.0.0"
+    eslint-plugin-chai-friendly: "npm:^1.0.1"
     eslint-plugin-mocha: "npm:^10.4.3"
     eslint-plugin-prettier: "npm:^4.2.1"
     firebase-admin: "npm:12.4.0"
@@ -9268,12 +9268,12 @@ __metadata:
     ics: "npm:3.7.6"
     joi: "npm:17.13.3"
     jose: "npm:5.7.0"
-    lint-staged: "npm:^15.2.7"
+    lint-staged: "npm:^15.2.10"
     lodash.isequal: "npm:4.5.0"
     luxon: "npm:3.5.0"
     mocha: "npm:^10.6.0"
     nestjs-pino: "npm:4.1.0"
-    nock: "npm:^13.5.4"
+    nock: "npm:^13.5.5"
     nyc: "npm:^17.0.0"
     openid-client: "npm:5.6.5"
     pg: "npm:8.12.0"
@@ -9356,7 +9356,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nock@npm:^13.5.4":
+"nock@npm:^13.5.5":
   version: 13.5.5
   resolution: "nock@npm:13.5.5"
   dependencies:
