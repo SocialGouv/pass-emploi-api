@@ -1565,9 +1565,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/common@npm:10.3.10":
-  version: 10.3.10
-  resolution: "@nestjs/common@npm:10.3.10"
+"@nestjs/common@npm:10.4.1":
+  version: 10.4.1
+  resolution: "@nestjs/common@npm:10.4.1"
   dependencies:
     iterare: "npm:1.2.1"
     tslib: "npm:2.6.3"
@@ -1582,7 +1582,7 @@ __metadata:
       optional: true
     class-validator:
       optional: true
-  checksum: 10/610b761ccecca3b02e5a15f7ad87f2e6fddd979bead104691a56af95bbd5eae532b48e7dfdea79b1bf2d2bfb1341ca25308e9e76bd913d9f39fcc3709be0fbd8
+  checksum: 10/4f8bf42b23341084955834f0c3d437498cc56d548f5bdb29ebd7135b7aecd0387355e6358b97fd46b9145d5a38e274984e7b6324a6deac2b3724563da59555a5
   languageName: node
   linkType: hard
 
@@ -1602,9 +1602,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/core@npm:10.3.10":
-  version: 10.3.10
-  resolution: "@nestjs/core@npm:10.3.10"
+"@nestjs/core@npm:10.4.1":
+  version: 10.4.1
+  resolution: "@nestjs/core@npm:10.4.1"
   dependencies:
     "@nuxtjs/opencollective": "npm:0.3.2"
     fast-safe-stringify: "npm:2.1.1"
@@ -1626,7 +1626,7 @@ __metadata:
       optional: true
     "@nestjs/websockets":
       optional: true
-  checksum: 10/0fd695dab07f9101c1d8e55207dd6ed40bc9632e9f8b5240833a2dbd6cdb5a7e0b75c21b478a7d226618391d9bb35798c25b81fad7a4157bdf8b2505e86a7d7c
+  checksum: 10/514389aa64b37861ebb825a25f946365e4ac208e6b06d903890d05506b81611d0d0d20ed0c55d9f421757faa16d2f455de2436d78ef6d6dbfe79c17043723662
   languageName: node
   linkType: hard
 
@@ -1647,9 +1647,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/platform-express@npm:10.3.10":
-  version: 10.3.10
-  resolution: "@nestjs/platform-express@npm:10.3.10"
+"@nestjs/platform-express@npm:10.4.1":
+  version: 10.4.1
+  resolution: "@nestjs/platform-express@npm:10.4.1"
   dependencies:
     body-parser: "npm:1.20.2"
     cors: "npm:2.8.5"
@@ -1659,7 +1659,7 @@ __metadata:
   peerDependencies:
     "@nestjs/common": ^10.0.0
     "@nestjs/core": ^10.0.0
-  checksum: 10/6d70f7e53acf4ef2aaec0623ed5dc639f91b6a8ad9bc5dc4a3d01bb723eb10f762ed8ca1e6fa76bf035bb260221878c19eff18e5f273ec1dc19d45a7d4675e2c
+  checksum: 10/d8461ff4922e980424b90cf4c88943670ace9c3ca7f974029220920da86951c708a70c89065a770059375e85ccedfbaab3adb06ab8d10ac2229ed7b0cbee8840
   languageName: node
   linkType: hard
 
@@ -9209,10 +9209,10 @@ __metadata:
     "@google-cloud/bigquery": "npm:7.9.0"
     "@nestjs/axios": "npm:^3.0.3"
     "@nestjs/cli": "npm:^9.5.0"
-    "@nestjs/common": "npm:10.3.10"
+    "@nestjs/common": "npm:10.4.1"
     "@nestjs/config": "npm:2.3.4"
-    "@nestjs/core": "npm:10.3.10"
-    "@nestjs/platform-express": "npm:10.3.10"
+    "@nestjs/core": "npm:10.4.1"
+    "@nestjs/platform-express": "npm:10.4.1"
     "@nestjs/schematics": "npm:^10.1.4"
     "@nestjs/swagger": "npm:7.4.0"
     "@nestjs/terminus": "npm:10.2.3"
