@@ -272,7 +272,13 @@ export class JeunesController {
   ): Promise<void> {
     const command = {
       idJeune,
-      partageFavoris: updateJeunePreferencesPayload.partageFavoris
+      partageFavoris: updateJeunePreferencesPayload.partageFavoris,
+      alertesOffres: updateJeunePreferencesPayload.alertesOffres,
+      messages: updateJeunePreferencesPayload.messages,
+      creationActionConseiller:
+        updateJeunePreferencesPayload.creationActionConseiller,
+      rendezVousSessions: updateJeunePreferencesPayload.rendezVousSessions,
+      rappelActions: updateJeunePreferencesPayload.rappelActions
     }
     const result = await this.updateJeunePreferencesCommandHandler.execute(
       command,

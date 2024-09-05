@@ -143,6 +143,36 @@ export class JeuneDto extends Model {
   })
   partageFavoris: boolean
 
+  @Column({
+    field: 'notifications_alertes_offres',
+    type: DataType.BOOLEAN
+  })
+  notificationsAlertesOffres: boolean
+
+  @Column({
+    field: 'notifications_messages',
+    type: DataType.BOOLEAN
+  })
+  notificationsMessages: boolean
+
+  @Column({
+    field: 'notifications_creation_action_conseiller',
+    type: DataType.BOOLEAN
+  })
+  notificationsCreationActionConseiller: boolean
+
+  @Column({
+    field: 'notifications_rendezvous_sessions',
+    type: DataType.BOOLEAN
+  })
+  notificationsRendezVousSessions: boolean
+
+  @Column({
+    field: 'notifications_rappel_actions',
+    type: DataType.BOOLEAN
+  })
+  notificationsRappelActions: boolean
+
   @ForeignKey(() => StructureMiloSqlModel)
   @Column({
     field: 'id_structure_milo',

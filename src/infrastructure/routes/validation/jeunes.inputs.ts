@@ -72,6 +72,16 @@ export class TransfererConseillerPayload {
 export class UpdateJeunePreferencesPayload {
   @IsBoolean()
   partageFavoris: boolean
+  @IsBoolean()
+  alertesOffres: boolean
+  @IsBoolean()
+  messages: boolean
+  @IsBoolean()
+  creationActionConseiller: boolean
+  @IsBoolean()
+  rendezVousSessions: boolean
+  @IsBoolean()
+  rappelActions: boolean
 }
 
 export class UpdateJeunePayload {

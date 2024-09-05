@@ -51,6 +51,11 @@ export namespace Jeune {
 
   export interface Preferences {
     partageFavoris: boolean
+    alertesOffres: boolean
+    messages: boolean
+    creationActionConseiller: boolean
+    rendezVousSessions: boolean
+    rappelActions: boolean
   }
 
   export enum TypeTransfert {
@@ -135,7 +140,12 @@ export namespace Jeune {
         },
         structure: jeuneACreer.structure,
         preferences: {
-          partageFavoris: true
+          partageFavoris: true,
+          alertesOffres: true,
+          messages: true,
+          creationActionConseiller: true,
+          rendezVousSessions: true,
+          rappelActions: true
         },
         idPartenaire: jeuneACreer.idPartenaire,
         configuration: {

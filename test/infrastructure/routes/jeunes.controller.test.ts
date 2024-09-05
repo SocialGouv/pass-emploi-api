@@ -683,21 +683,18 @@ describe('JeunesController', () => {
   describe('PUT /jeunes/:idJeune/preferences', () => {
     const idJeune = '1'
     const payload: UpdateJeunePreferencesPayload = {
-      partageFavoris: false
+      partageFavoris: false,
+      alertesOffres: false,
+      messages: false,
+      creationActionConseiller: false,
+      rendezVousSessions: false,
+      rappelActions: false
     }
 
     describe("quand c'est en succès", () => {
       it('met à jour les préférences', async () => {
         // Given
-        updateJeunePreferencesCommandHandler.execute
-          .withArgs(
-            {
-              idJeune,
-              partageFavoris: false
-            },
-            unUtilisateurDecode()
-          )
-          .resolves(emptySuccess())
+        updateJeunePreferencesCommandHandler.execute.resolves(emptySuccess())
 
         // When
         await request(app.getHttpServer())
@@ -712,7 +709,12 @@ describe('JeunesController', () => {
         ).to.have.been.calledWithExactly(
           {
             idJeune,
-            partageFavoris: false
+            partageFavoris: false,
+            alertesOffres: false,
+            messages: false,
+            creationActionConseiller: false,
+            rendezVousSessions: false,
+            rappelActions: false
           },
           unUtilisateurDecode()
         )
