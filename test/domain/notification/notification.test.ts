@@ -2,6 +2,7 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DateTime } from 'luxon'
 import { uneAction } from 'test/fixtures/action.fixture'
 import {
+  desPreferencesJeune,
   uneConfiguration,
   unJeune,
   unJeuneSansPushNotificationToken
@@ -98,6 +99,38 @@ describe('Notification', () => {
           },
           data: {
             type: typeNotification
+          }
+        })
+
+        // When
+        await notificationService.notifierLesJeunesDuRdv(rdv, typeNotification)
+
+        // Then
+        expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
+          expectedNotification
+        )
+      })
+      it('ne notifie pas les jeunes avec preferences de notification désactivés pour les rdv', async () => {
+        // Given
+        const rdv = unRendezVous({
+          jeunes: [
+            unJeune(),
+            unJeuneSansPushNotificationToken(),
+            unJeune({
+              preferences: desPreferencesJeune({ rendezVousSessions: false })
+            })
+          ]
+        })
+        const typeNotification = Notification.Type.NEW_RENDEZVOUS
+        const expectedNotification = uneNotification({
+          token: rdv.jeunes[0].configuration?.pushNotificationToken,
+          notification: {
+            title: 'Nouveau rendez-vous',
+            body: 'Votre conseiller a programmé un nouveau rendez-vous'
+          },
+          data: {
+            type: typeNotification,
+            id: rdv.id
           }
         })
 

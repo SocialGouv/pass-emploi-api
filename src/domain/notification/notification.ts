@@ -177,7 +177,10 @@ export namespace Notification {
     ): Promise<void[]> {
       return Promise.all(
         rendezVous.jeunes.map(async jeune => {
-          if (jeune.configuration?.pushNotificationToken) {
+          if (
+            jeune.configuration?.pushNotificationToken &&
+            jeune.preferences?.rendezVousSessions
+          ) {
             const notification = this.creerNotificationRendezVous(
               typeNotification,
               rendezVous,
