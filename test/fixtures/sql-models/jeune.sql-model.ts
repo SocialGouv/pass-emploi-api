@@ -26,6 +26,11 @@ export function unJeuneDto(
     installationId: '123456',
     instanceId: 'abcdef',
     partageFavoris: true,
+    notificationsAlertesOffres: true,
+    notificationsMessages: true,
+    notificationsCreationActionConseiller: true,
+    notificationsRendezVousSessions: true,
+    notificationsRappelActions: true,
     timezone: 'Europe/Paris',
     idStructureMilo: null,
     dateSignatureCGU: null

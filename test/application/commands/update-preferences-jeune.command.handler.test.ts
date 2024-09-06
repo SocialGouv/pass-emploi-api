@@ -35,7 +35,12 @@ describe('UpdateJeunePreferencesCommandHandler', () => {
       // Given
       const command: UpdateJeunePreferencesCommand = {
         idJeune: 'idDeJohn',
-        partageFavoris: false
+        partageFavoris: false,
+        alertesOffres: false,
+        messages: false,
+        creationActionConseiller: false,
+        rendezVousSessions: false,
+        rappelActions: false
       }
       const utilisateur = unUtilisateurJeune()
 
@@ -56,7 +61,12 @@ describe('UpdateJeunePreferencesCommandHandler', () => {
       const jeune = unJeune()
       const command: UpdateJeunePreferencesCommand = {
         idJeune: 'idDeJohn',
-        partageFavoris: false
+        partageFavoris: true,
+        alertesOffres: true,
+        messages: true,
+        creationActionConseiller: true,
+        rendezVousSessions: true,
+        rappelActions: true
       }
       jeuneRepository.get.withArgs('idDeJohn').resolves(jeune)
 
@@ -67,7 +77,12 @@ describe('UpdateJeunePreferencesCommandHandler', () => {
       expect(jeuneRepository.save).to.have.been.calledWithExactly({
         ...jeune,
         preferences: {
-          partageFavoris: false
+          partageFavoris: true,
+          alertesOffres: true,
+          messages: true,
+          creationActionConseiller: true,
+          rendezVousSessions: true,
+          rappelActions: true
         }
       })
       expect(result).to.deep.equal(emptySuccess())

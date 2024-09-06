@@ -24,14 +24,27 @@ export class GetPreferencesJeuneQueryHandler extends QueryHandler<
     query: GetPreferencesJeuneQuery
   ): Promise<Result<PreferencesJeuneQueryModel>> {
     const jeuneSqlModel = await JeuneSqlModel.findOne({
-      attributes: ['partageFavoris'],
+      attributes: [
+        'partageFavoris',
+        'notificationsAlertesOffres',
+        'notificationsMessages',
+        'notificationsCreationActionConseiller',
+        'notificationsRendezVousSessions',
+        'notificationsRappelActions'
+      ],
       where: {
         id: query.idJeune
       }
     })
 
     return success({
-      partageFavoris: jeuneSqlModel!.partageFavoris
+      partageFavoris: jeuneSqlModel!.partageFavoris,
+      alertesOffres: jeuneSqlModel!.notificationsAlertesOffres,
+      messages: jeuneSqlModel!.notificationsMessages,
+      rendezVousSessions: jeuneSqlModel!.notificationsRendezVousSessions,
+      rappelActions: jeuneSqlModel!.notificationsRappelActions,
+      creationActionConseiller:
+        jeuneSqlModel!.notificationsCreationActionConseiller
     })
   }
 

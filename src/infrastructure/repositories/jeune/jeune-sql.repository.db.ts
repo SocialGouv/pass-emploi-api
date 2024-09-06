@@ -149,7 +149,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
   }
 
   async save(jeune: Jeune): Promise<void> {
-    await JeuneSqlModel.upsert({
+    const jeuneDto: Partial<AsSql<JeuneDto>> = {
       id: jeune.id,
       nom: jeune.lastName,
       prenom: jeune.firstName,
@@ -160,15 +160,22 @@ export class JeuneSqlRepository implements Jeune.Repository {
       structure: jeune.structure,
       idPartenaire: jeune.idPartenaire ?? null,
       partageFavoris: jeune.preferences.partageFavoris,
+      notificationsAlertesOffres: jeune.preferences.alertesOffres,
+      notificationsMessages: jeune.preferences.messages,
+      notificationsCreationActionConseiller:
+        jeune.preferences.creationActionConseiller,
+      notificationsRendezVousSessions: jeune.preferences.rendezVousSessions,
+      notificationsRappelActions: jeune.preferences.rappelActions,
       appVersion: jeune.configuration.appVersion ?? null,
       pushNotificationToken: jeune.configuration.pushNotificationToken ?? null,
       dateDerniereActualisationToken:
-        jeune.configuration.dateDerniereActualisationToken,
+        jeune.configuration.dateDerniereActualisationToken ?? null,
       installationId: jeune.configuration.installationId ?? null,
       instanceId: jeune.configuration.instanceId ?? null,
       timezone: jeune.configuration.fuseauHoraire ?? null,
       dateSignatureCGU: jeune.dateSignatureCGU?.toJSDate() ?? null
-    })
+    }
+    await JeuneSqlModel.upsert(jeuneDto)
   }
 
   async supprimer(jeune: Jeune.Id): Promise<void> {
@@ -235,7 +242,13 @@ export class JeuneSqlRepository implements Jeune.Repository {
         email: jeune.email ?? null,
         structure: jeune.structure,
         idPartenaire: jeune.idPartenaire ?? null,
-        partageFavoris: jeune.preferences.partageFavoris
+        partageFavoris: jeune.preferences.partageFavoris,
+        notificationsAlertesOffres: jeune.preferences.alertesOffres,
+        notificationsMessages: jeune.preferences.messages,
+        notificationsCreationActionConseiller:
+          jeune.preferences.creationActionConseiller,
+        notificationsRendezVousSessions: jeune.preferences.rendezVousSessions,
+        notificationsRappelActions: jeune.preferences.rappelActions
       }
       await JeuneSqlModel.upsert(jeuneTransfereSQL)
     }

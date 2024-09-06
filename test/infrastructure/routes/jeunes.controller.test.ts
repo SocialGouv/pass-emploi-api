@@ -9,7 +9,7 @@ import { GetConseillersJeuneQueryHandler } from 'src/application/queries/get-con
 import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler.db'
 import { GetJeuneHomeActionsQueryHandler } from 'src/application/queries/get-jeune-home-actions.query.handler'
 import { GetJeuneHomeAgendaQueryHandler } from 'src/application/queries/get-jeune-home-agenda.query.handler.db'
-import { GetPreferencesJeuneQueryHandler } from 'src/application/queries/get-preferences-jeune.handler.db'
+import { GetPreferencesJeuneQueryHandler } from 'src/application/queries/get-preferences-jeune.query.handler.db'
 import { JeuneHomeAgendaQueryModel } from 'src/application/queries/query-models/home-jeune-suivi.query-model'
 import { PreferencesJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-model'
 import {
@@ -683,21 +683,18 @@ describe('JeunesController', () => {
   describe('PUT /jeunes/:idJeune/preferences', () => {
     const idJeune = '1'
     const payload: UpdateJeunePreferencesPayload = {
-      partageFavoris: false
+      partageFavoris: false,
+      alertesOffres: false,
+      messages: false,
+      creationActionConseiller: false,
+      rendezVousSessions: false,
+      rappelActions: false
     }
 
     describe("quand c'est en succès", () => {
       it('met à jour les préférences', async () => {
         // Given
-        updateJeunePreferencesCommandHandler.execute
-          .withArgs(
-            {
-              idJeune,
-              partageFavoris: false
-            },
-            unUtilisateurDecode()
-          )
-          .resolves(emptySuccess())
+        updateJeunePreferencesCommandHandler.execute.resolves(emptySuccess())
 
         // When
         await request(app.getHttpServer())
@@ -712,7 +709,12 @@ describe('JeunesController', () => {
         ).to.have.been.calledWithExactly(
           {
             idJeune,
-            partageFavoris: false
+            partageFavoris: false,
+            alertesOffres: false,
+            messages: false,
+            creationActionConseiller: false,
+            rendezVousSessions: false,
+            rappelActions: false
           },
           unUtilisateurDecode()
         )
@@ -729,7 +731,12 @@ describe('JeunesController', () => {
       it('renvoie les préférences', async () => {
         // Given
         const queryModel: PreferencesJeuneQueryModel = {
-          partageFavoris: true
+          partageFavoris: true,
+          alertesOffres: true,
+          messages: true,
+          creationActionConseiller: true,
+          rendezVousSessions: true,
+          rappelActions: true
         }
         getPreferencesJeuneQueryHandler.execute
           .withArgs(

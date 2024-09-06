@@ -23,7 +23,12 @@ export const unJeune = (
     structure: Core.Structure.MILO,
     configuration: uneConfiguration(),
     preferences: {
-      partageFavoris: true
+      partageFavoris: true,
+      alertesOffres: true,
+      messages: true,
+      creationActionConseiller: true,
+      rendezVousSessions: true,
+      rappelActions: true
     }
   }
 
@@ -46,7 +51,12 @@ export const unJeuneSansPushNotificationToken = (
     idJeune: 'ABCDE'
   },
   preferences: {
-    partageFavoris: true
+    partageFavoris: true,
+    alertesOffres: true,
+    messages: true,
+    creationActionConseiller: true,
+    rendezVousSessions: true,
+    rappelActions: true
   }
 })
 
@@ -64,7 +74,12 @@ export const unJeuneSansConseiller = (
     idPartenaire: '1234',
     structure: Core.Structure.MILO,
     preferences: {
-      partageFavoris: true
+      partageFavoris: true,
+      alertesOffres: true,
+      messages: true,
+      creationActionConseiller: true,
+      rendezVousSessions: true,
+      rappelActions: true
     },
     configuration: uneConfiguration()
   }

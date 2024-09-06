@@ -15,6 +15,11 @@ import { Evenement, EvenementService } from '../../domain/evenement'
 export interface UpdateJeunePreferencesCommand extends Command {
   idJeune: string
   partageFavoris: boolean
+  alertesOffres: boolean
+  messages: boolean
+  creationActionConseiller: boolean
+  rendezVousSessions: boolean
+  rappelActions: boolean
 }
 
 @Injectable()
@@ -39,7 +44,12 @@ export class UpdateJeunePreferencesCommandHandler extends CommandHandler<
     const jeuneAJour: Jeune = {
       ...jeune,
       preferences: {
-        partageFavoris: command.partageFavoris
+        partageFavoris: command.partageFavoris,
+        alertesOffres: command.alertesOffres,
+        messages: command.messages,
+        creationActionConseiller: command.creationActionConseiller,
+        rendezVousSessions: command.rendezVousSessions,
+        rappelActions: command.rappelActions
       }
     }
     await this.jeuneRepository.save(jeuneAJour)

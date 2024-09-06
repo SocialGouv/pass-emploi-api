@@ -30,7 +30,7 @@ import { GetJeuneHomeAgendaQueryHandler } from 'src/application/queries/get-jeun
 import {
   GetPreferencesJeuneQuery,
   GetPreferencesJeuneQueryHandler
-} from 'src/application/queries/get-preferences-jeune.handler.db'
+} from 'src/application/queries/get-preferences-jeune.query.handler.db'
 import { JeuneHomeAgendaQueryModel } from 'src/application/queries/query-models/home-jeune-suivi.query-model'
 import { JeuneHomeActionQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
 import {
@@ -272,7 +272,13 @@ export class JeunesController {
   ): Promise<void> {
     const command = {
       idJeune,
-      partageFavoris: updateJeunePreferencesPayload.partageFavoris
+      partageFavoris: updateJeunePreferencesPayload.partageFavoris,
+      alertesOffres: updateJeunePreferencesPayload.alertesOffres,
+      messages: updateJeunePreferencesPayload.messages,
+      creationActionConseiller:
+        updateJeunePreferencesPayload.creationActionConseiller,
+      rendezVousSessions: updateJeunePreferencesPayload.rendezVousSessions,
+      rappelActions: updateJeunePreferencesPayload.rappelActions
     }
     const result = await this.updateJeunePreferencesCommandHandler.execute(
       command,

@@ -152,7 +152,14 @@ describe('CreerJeuneMiloCommandHandler', () => {
             email: 'nils.tavernier@passemploi.com'
           },
           structure: Core.Structure.MILO,
-          preferences: { partageFavoris: true },
+          preferences: {
+            partageFavoris: true,
+            alertesOffres: true,
+            messages: true,
+            creationActionConseiller: true,
+            rendezVousSessions: true,
+            rappelActions: true
+          },
           idPartenaire,
           configuration: {
             idJeune: 'DFKAL'
@@ -213,7 +220,14 @@ describe('CreerJeuneMiloCommandHandler', () => {
             email: 'nils.tavernier@passemploi.com'
           },
           structure: Core.Structure.MILO,
-          preferences: { partageFavoris: true },
+          preferences: {
+            partageFavoris: true,
+            alertesOffres: true,
+            messages: true,
+            creationActionConseiller: true,
+            rendezVousSessions: true,
+            rappelActions: true
+          },
           idPartenaire,
           configuration: {
             idJeune: 'DFKAL'
