@@ -302,7 +302,10 @@ export namespace Notification {
     }
 
     async notifierNouvelleAction(jeune: Jeune, action: Action): Promise<void> {
-      if (jeune.configuration?.pushNotificationToken) {
+      if (
+        jeune.configuration?.pushNotificationToken &&
+        jeune.preferences?.creationActionConseiller
+      ) {
         const notification = this.creerNotificationNouvelleAction(
           jeune.configuration?.pushNotificationToken,
           action.id

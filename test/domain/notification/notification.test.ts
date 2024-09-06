@@ -159,7 +159,7 @@ describe('Notification', () => {
           expectedNotification
         )
       })
-      it('ne notifie pas les jeunes avec preferences de notification désactivés pour les ', async () => {
+      it('ne notifie pas les jeunes avec preferences de notification désactivés pour les messages', async () => {
         const jeunes: Jeune[] = [
           unJeune(),
           unJeuneSansPushNotificationToken(),
@@ -260,6 +260,20 @@ describe('Notification', () => {
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
           expectedNotification
         )
+      })
+
+      it('ne notifie pas les jeunes avec preferences de notification désactivés pour les actions', async () => {
+        // Given
+        const jeune: Jeune = unJeune({
+          preferences: desPreferencesJeune({ creationActionConseiller: false })
+        })
+        const action = uneAction()
+
+        // When
+        await notificationService.notifierNouvelleAction(jeune, action)
+
+        // Then
+        expect(notificationRepository.send).to.not.have.been.called()
       })
     })
     describe('notifierNouveauCommentaireAction', () => {
