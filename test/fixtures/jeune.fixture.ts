@@ -22,14 +22,7 @@ export const unJeune = (
     idPartenaire: '1234',
     structure: Core.Structure.MILO,
     configuration: uneConfiguration(),
-    preferences: {
-      partageFavoris: true,
-      alertesOffres: true,
-      messages: true,
-      creationActionConseiller: true,
-      rendezVousSessions: true,
-      rappelActions: true
-    }
+    preferences: desPreferencesJeune()
   }
 
   return { ...defaults, ...args }
@@ -66,14 +59,7 @@ export const unJeuneSansConseiller = (
     email: 'john.doe@plop.io',
     idPartenaire: '1234',
     structure: Core.Structure.MILO,
-    preferences: {
-      partageFavoris: true,
-      alertesOffres: true,
-      messages: true,
-      creationActionConseiller: true,
-      rendezVousSessions: true,
-      rappelActions: true
-    },
+    preferences: desPreferencesJeune(),
     configuration: uneConfiguration()
   }
 

@@ -74,17 +74,7 @@ describe('UpdateJeunePreferencesCommandHandler', () => {
       const result = await updateJeunePreferencesCommandHandler.handle(command)
 
       // Then
-      expect(jeuneRepository.save).to.have.been.calledWithExactly({
-        ...jeune,
-        preferences: {
-          partageFavoris: true,
-          alertesOffres: true,
-          messages: true,
-          creationActionConseiller: true,
-          rendezVousSessions: true,
-          rappelActions: true
-        }
-      })
+      expect(jeuneRepository.save).to.have.been.calledWithExactly(jeune)
       expect(result).to.deep.equal(emptySuccess())
     })
   })

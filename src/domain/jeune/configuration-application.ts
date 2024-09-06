@@ -9,9 +9,18 @@ export interface ConfigurationApplication {
   installationId?: string
   instanceId?: string
   fuseauHoraire?: string
+  preferences?: ConfigurationApplication.Preferences
 }
 
 export namespace ConfigurationApplication {
+  export interface Preferences {
+    partageFavoris: boolean
+    alertesOffres: boolean
+    messages: boolean
+    creationActionConseiller: boolean
+    rendezVousSessions: boolean
+    rappelActions: boolean
+  }
   export interface AMettreAJour {
     pushNotificationToken?: string
     dateDerniereActualisationToken?: Date
@@ -23,10 +32,6 @@ export namespace ConfigurationApplication {
 
   export interface Repository {
     get(idJeune: string): Promise<ConfigurationApplication | undefined>
-
-    getByIdPartenaire(
-      idPartenaire: string
-    ): Promise<ConfigurationApplication | undefined>
 
     save(configurationApplication: ConfigurationApplication): Promise<void>
   }

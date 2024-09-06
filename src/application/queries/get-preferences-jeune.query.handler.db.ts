@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common'
-import { Result, success } from '../../building-blocks/types/result'
+import { failure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { PreferencesJeuneQueryModel } from './query-models/jeunes.query-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
 
 export interface GetPreferencesJeuneQuery extends Query {
   idJeune: string
@@ -37,14 +38,18 @@ export class GetPreferencesJeuneQueryHandler extends QueryHandler<
       }
     })
 
+    if (!jeuneSqlModel) {
+      return failure(new NonTrouveError('Jeune', query.idJeune))
+    }
+
     return success({
-      partageFavoris: jeuneSqlModel!.partageFavoris,
-      alertesOffres: jeuneSqlModel!.notificationsAlertesOffres,
-      messages: jeuneSqlModel!.notificationsMessages,
-      rendezVousSessions: jeuneSqlModel!.notificationsRendezVousSessions,
-      rappelActions: jeuneSqlModel!.notificationsRappelActions,
+      partageFavoris: jeuneSqlModel.partageFavoris,
+      alertesOffres: jeuneSqlModel.notificationsAlertesOffres,
+      messages: jeuneSqlModel.notificationsMessages,
+      rendezVousSessions: jeuneSqlModel.notificationsRendezVousSessions,
+      rappelActions: jeuneSqlModel.notificationsRappelActions,
       creationActionConseiller:
-        jeuneSqlModel!.notificationsCreationActionConseiller
+        jeuneSqlModel.notificationsCreationActionConseiller
     })
   }
 

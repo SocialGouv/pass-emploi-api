@@ -63,7 +63,11 @@ export class NotifierRappelActionJobHandler extends JobHandler<
           await this.jeuneConfigurationApplicationRepository.get(action.idJeune)
         stats.idJeune = configuration?.idJeune
 
-        if (configuration && configuration.pushNotificationToken) {
+        if (
+          configuration &&
+          configuration.pushNotificationToken &&
+          configuration.preferences?.rappelActions
+        ) {
           const notification = Notification.creerNotificationRappelAction(
             configuration.pushNotificationToken,
             job.contenu.idAction

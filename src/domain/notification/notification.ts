@@ -178,8 +178,8 @@ export namespace Notification {
       return Promise.all(
         rendezVous.jeunes.map(async jeune => {
           if (
-            jeune.configuration?.pushNotificationToken &&
-            jeune.preferences?.rendezVousSessions
+            jeune.configuration.pushNotificationToken &&
+            jeune.preferences.rendezVousSessions
           ) {
             const notification = this.creerNotificationRendezVous(
               typeNotification,
@@ -265,8 +265,8 @@ export namespace Notification {
       return Promise.all(
         jeunes.map(async jeune => {
           if (
-            jeune.configuration?.pushNotificationToken &&
-            jeune.preferences?.messages
+            jeune.configuration.pushNotificationToken &&
+            jeune.preferences.messages
           ) {
             const notification = this.creerNotificationNouveauMessage(
               jeune.configuration?.pushNotificationToken
@@ -303,8 +303,8 @@ export namespace Notification {
 
     async notifierNouvelleAction(jeune: Jeune, action: Action): Promise<void> {
       if (
-        jeune.configuration?.pushNotificationToken &&
-        jeune.preferences?.creationActionConseiller
+        jeune.configuration.pushNotificationToken &&
+        jeune.preferences.creationActionConseiller
       ) {
         const notification = this.creerNotificationNouvelleAction(
           jeune.configuration?.pushNotificationToken,
@@ -342,7 +342,10 @@ export namespace Notification {
       configurationApplication?: Jeune.ConfigurationApplication
     ): Promise<void> {
       if (configurationApplication) {
-        if (configurationApplication.pushNotificationToken) {
+        if (
+          configurationApplication.pushNotificationToken &&
+          configurationApplication.preferences?.alertesOffres
+        ) {
           const notification = this.creerNotificationNouvelleOffre(
             configurationApplication.pushNotificationToken,
             recherche.id,
@@ -363,7 +366,10 @@ export namespace Notification {
     ): Promise<void[]> {
       return Promise.all(
         jeunes.map(async jeune => {
-          if (jeune.configuration?.pushNotificationToken) {
+          if (
+            jeune.configuration.pushNotificationToken &&
+            jeune.preferences.rendezVousSessions
+          ) {
             const notification = creerNotificationInscriptionSession(
               jeune.configuration?.pushNotificationToken,
               idSsession
@@ -384,7 +390,10 @@ export namespace Notification {
     ): Promise<void[]> {
       return Promise.all(
         jeunes.map(async jeune => {
-          if (jeune.configuration?.pushNotificationToken) {
+          if (
+            jeune.configuration.pushNotificationToken &&
+            jeune.preferences.rendezVousSessions
+          ) {
             const notification = creerNotificationModificationSession(
               jeune.configuration?.pushNotificationToken,
               idSsession
@@ -406,7 +415,10 @@ export namespace Notification {
     ): Promise<void[]> {
       return Promise.all(
         jeunes.map(async jeune => {
-          if (jeune.configuration?.pushNotificationToken) {
+          if (
+            jeune.configuration.pushNotificationToken &&
+            jeune.preferences.rendezVousSessions
+          ) {
             const notification = creerNotificationDesinscriptionSession(
               jeune.configuration?.pushNotificationToken,
               idSsession,

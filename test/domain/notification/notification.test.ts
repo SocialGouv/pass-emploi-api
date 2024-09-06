@@ -329,7 +329,9 @@ describe('Notification', () => {
     describe('notifierNouvellesOffres', () => {
       it('notifie les jeunes avec pushNotificationToken', async () => {
         // Given
-        const configuration = uneConfiguration()
+        const configuration = uneConfiguration({
+          preferences: desPreferencesJeune()
+        })
         const recherche = uneRecherche()
         const expectedNotification = uneNotification({
           token: configuration.pushNotificationToken,
@@ -353,6 +355,22 @@ describe('Notification', () => {
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
           expectedNotification
         )
+      })
+      it('ne notifie pas les jeunes avec alertesOffres false', async () => {
+        // Given
+        const configuration = uneConfiguration({
+          preferences: desPreferencesJeune({ alertesOffres: false })
+        })
+        const recherche = uneRecherche()
+
+        // When
+        await notificationService.notifierNouvellesOffres(
+          recherche,
+          configuration
+        )
+
+        // Then
+        expect(notificationRepository.send).not.to.have.been.called()
       })
     })
     describe('notifierUnRendezVousPoleEmploi', () => {
