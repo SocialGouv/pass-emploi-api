@@ -159,6 +159,26 @@ describe('Notification', () => {
           expectedNotification
         )
       })
+      it('ne notifie pas les jeunes avec preferences de notification désactivés pour les ', async () => {
+        const jeunes: Jeune[] = [
+          unJeune(),
+          unJeuneSansPushNotificationToken(),
+          unJeune({
+            preferences: desPreferencesJeune({ messages: false })
+          })
+        ]
+        const expectedNotification = uneNotification({
+          token: jeunes[0].configuration!.pushNotificationToken
+        })
+
+        // When
+        await notificationService.notifierLesJeunesDuNouveauMessage(jeunes)
+
+        // Then
+        expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
+          expectedNotification
+        )
+      })
     })
     describe('notifierRappelCreationActionDemarche', () => {
       it('notifie les jeunes Milo en choix 4', async () => {

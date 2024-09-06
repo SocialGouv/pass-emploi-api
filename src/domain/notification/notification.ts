@@ -264,7 +264,10 @@ export namespace Notification {
     async notifierLesJeunesDuNouveauMessage(jeunes: Jeune[]): Promise<void[]> {
       return Promise.all(
         jeunes.map(async jeune => {
-          if (jeune.configuration?.pushNotificationToken) {
+          if (
+            jeune.configuration?.pushNotificationToken &&
+            jeune.preferences?.messages
+          ) {
             const notification = this.creerNotificationNouveauMessage(
               jeune.configuration?.pushNotificationToken
             )
