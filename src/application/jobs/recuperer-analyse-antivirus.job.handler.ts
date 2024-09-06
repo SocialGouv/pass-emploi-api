@@ -80,7 +80,7 @@ export class RecupererAnalyseAntivirusJobHandler extends JobHandler<Job> {
     await this.chatRepository.envoyerStatutAnalysePJ(
       idCreateur,
       idMessage!,
-      Chat.StatutAnalysePJ.FICHIER_SAIN
+      Chat.StatutPJ.FICHIER_SAIN
     )
     return this.buildSuiviSucces(debut, 'Fichier sain')
   }
@@ -92,7 +92,7 @@ export class RecupererAnalyseAntivirusJobHandler extends JobHandler<Job> {
     await this.chatRepository.envoyerStatutAnalysePJ(
       idCreateur,
       idMessage!,
-      Chat.StatutAnalysePJ.FICHIER_MALVEILLANT
+      Chat.StatutPJ.FICHIER_MALVEILLANT
     )
     await this.fichierRepository.softDelete(id)
     return this.buildSuiviSucces(debut, 'Fichier malveillant')

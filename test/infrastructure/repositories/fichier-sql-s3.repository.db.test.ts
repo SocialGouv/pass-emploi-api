@@ -91,11 +91,7 @@ describe('FichierSqlS3Repository', () => {
       const result = await fichierSqlS3Repository.getFichierMetadata(fichier.id)
       // Then
       expect(result?.id).to.equal(fichier.id)
-      expect(result).to.deep.equal({
-        ...unFichierMetadata(),
-        idAnalyse: undefined,
-        dateSuppression: undefined
-      })
+      expect(result).to.deep.equal(unFichierMetadata())
     })
 
     it('renvoie undefined quand le fichier est inconnu', async () => {
@@ -138,7 +134,7 @@ describe('FichierSqlS3Repository', () => {
       await FichierSqlModel.create({ ...fichierRecent })
 
       // When
-      const results = await fichierSqlS3Repository.getIdsFichiersBefore(
+      const results = await fichierSqlS3Repository.getFichiersBefore(
         quatreMoisPlusTot.toJSDate()
       )
       // Then
@@ -151,13 +147,11 @@ describe('FichierSqlS3Repository', () => {
       await FichierSqlModel.create({ ...fichierOld2 })
 
       // When
-      const results = await fichierSqlS3Repository.getIdsFichiersBefore(
+      const results = await fichierSqlS3Repository.getFichiersBefore(
         quatreMoisPlusTot.toJSDate()
       )
       // Then
-      expect(results.length).to.equal(2)
-      expect(results[0]).to.equal(fichierOld1.id)
-      expect(results[1]).to.equal(fichierOld2.id)
+      expect(results).to.deep.equal([fichierOld1, fichierOld2])
     })
   })
 

@@ -1,5 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
+import { Chat } from 'src/domain/chat'
 import { Fichier } from 'src/domain/fichier'
 import { SuiviJob } from 'src/domain/suivi-job'
 import { uneDatetime } from 'test/fixtures/date.fixture'
@@ -13,6 +14,7 @@ describe('NettoyerPiecesJointesJobHandler', () => {
   let fichierRepository: StubbedType<Fichier.Repository>
   let dateSevice: StubbedClass<DateService>
   let suiviJobService: StubbedType<SuiviJob.Service>
+  let chatRepository: StubbedType<Chat.Repository>
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
@@ -20,17 +22,19 @@ describe('NettoyerPiecesJointesJobHandler', () => {
     dateSevice = stubClass(DateService)
     dateSevice.now.returns(uneDatetime())
     suiviJobService = stubInterface(sandbox)
+    chatRepository = stubInterface(sandbox)
 
     nettoyerPiecesJointesJobHandler = new NettoyerPiecesJointesJobHandler(
       fichierRepository,
       dateSevice,
-      suiviJobService
+      suiviJobService,
+      chatRepository
     )
   })
 
   it('ne fais rien quand aucun fichier à supprimer', async () => {
     // Given
-    fichierRepository.getIdsFichiersBefore.resolves([])
+    fichierRepository.getFichiersBefore.resolves([])
 
     // When
     const result = await nettoyerPiecesJointesJobHandler.handle()
@@ -46,10 +50,7 @@ describe('NettoyerPiecesJointesJobHandler', () => {
     const fichierOld1 = unFichierMetadata({ id: 'old1' })
     const fichierOld2 = unFichierMetadata({ id: 'old2' })
 
-    fichierRepository.getIdsFichiersBefore.resolves([
-      fichierOld1.id,
-      fichierOld2.id
-    ])
+    fichierRepository.getFichiersBefore.resolves([fichierOld1, fichierOld2])
     fichierRepository.softDelete.withArgs(fichierOld1.id).rejects()
     fichierRepository.softDelete.withArgs(fichierOld2.id).resolves()
 
@@ -58,6 +59,13 @@ describe('NettoyerPiecesJointesJobHandler', () => {
 
     // Then
     expect(fichierRepository.softDelete).to.have.been.calledTwice()
+    expect(
+      chatRepository.envoyerStatutAnalysePJ
+    ).to.have.been.calledOnceWithExactly(
+      fichierOld2.idCreateur,
+      fichierOld2.idMessage,
+      'FICHIER_EXPIRE'
+    )
     expect(result.succes).to.equal(true)
     expect(result.resultat).to.deep.equal({ fichiersSupprimes: 1 })
     expect(result.nbErreurs).to.equal(1)

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common'
 import {
   Chat,
-  ChatIndividuel,
   ChatGroupe,
-  MessageIndividuel,
+  ChatIndividuel,
   MessageGroupe,
+  MessageIndividuel,
   MessageRecherche
 } from '../../domain/chat'
 import { Jeune } from '../../domain/jeune/jeune'
@@ -82,9 +82,9 @@ export class ChatFirebaseRepository implements Chat.Repository {
   envoyerStatutAnalysePJ(
     idJeune: string,
     idMessage: string,
-    _statut: Chat.StatutAnalysePJ
+    statut: Chat.StatutPJ
   ): Promise<void> {
-    const statutFirebase = mapStatutAnalyse(_statut)
+    const statutFirebase = mapStatutAnalyse(statut)
     return this.firebaseClient.envoyerStatutAnalysePJ(
       idJeune,
       idMessage,
@@ -93,15 +93,17 @@ export class ChatFirebaseRepository implements Chat.Repository {
   }
 }
 
-function mapStatutAnalyse(statut: Chat.StatutAnalysePJ): string {
+function mapStatutAnalyse(statut: Chat.StatutPJ): string {
   switch (statut) {
-    case Chat.StatutAnalysePJ.ANALYSE_EN_COURS:
+    case Chat.StatutPJ.ANALYSE_EN_COURS:
       return 'analyse_en_cours'
-    case Chat.StatutAnalysePJ.ERREUR_ANALYSE:
+    case Chat.StatutPJ.ERREUR_ANALYSE:
       return 'erreur_analyse'
-    case Chat.StatutAnalysePJ.FICHIER_SAIN:
+    case Chat.StatutPJ.FICHIER_SAIN:
       return 'valide'
-    case Chat.StatutAnalysePJ.FICHIER_MALVEILLANT:
+    case Chat.StatutPJ.FICHIER_MALVEILLANT:
       return 'non_valide'
+    case Chat.StatutPJ.FICHIER_EXPIRE:
+      return 'expiree'
   }
 }

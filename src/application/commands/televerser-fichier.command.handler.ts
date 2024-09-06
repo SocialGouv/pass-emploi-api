@@ -155,7 +155,7 @@ export class TeleverserFichierCommandHandler extends CommandHandler<
         this.chatRepository.envoyerStatutAnalysePJ(
           idJeune,
           idMessage,
-          Chat.StatutAnalysePJ.ERREUR_ANALYSE
+          Chat.StatutPJ.ERREUR_ANALYSE
         )
         return
       }
@@ -163,7 +163,7 @@ export class TeleverserFichierCommandHandler extends CommandHandler<
       this.chatRepository.envoyerStatutAnalysePJ(
         idJeune,
         idMessage,
-        Chat.StatutAnalysePJ.ANALYSE_EN_COURS
+        Chat.StatutPJ.ANALYSE_EN_COURS
       )
       const intervalleRecuperationResultat = this.configService.get<number>(
         'jecliqueoupas.intervalleAnalyse'
