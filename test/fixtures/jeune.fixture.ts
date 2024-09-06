@@ -50,14 +50,7 @@ export const unJeuneSansPushNotificationToken = (
   configuration: {
     idJeune: 'ABCDE'
   },
-  preferences: {
-    partageFavoris: true,
-    alertesOffres: true,
-    messages: true,
-    creationActionConseiller: true,
-    rendezVousSessions: true,
-    rappelActions: true
-  }
+  preferences: desPreferencesJeune()
 })
 
 export const unJeuneSansConseiller = (
@@ -112,5 +105,20 @@ export const uneConfiguration = (
     appVersion: '1.8.1',
     fuseauHoraire: 'Europe/Paris'
   }
+  return { ...defaults, ...args }
+}
+
+export function desPreferencesJeune(
+  args: Partial<Jeune.Preferences> = {}
+): Jeune.Preferences {
+  const defaults: Jeune.Preferences = {
+    partageFavoris: true,
+    alertesOffres: true,
+    messages: true,
+    creationActionConseiller: true,
+    rendezVousSessions: true,
+    rappelActions: true
+  }
+
   return { ...defaults, ...args }
 }

@@ -6,8 +6,8 @@ import {
   JeuneDuRendezVous,
   RendezVous
 } from '../rendez-vous/rendez-vous'
-import Source = RendezVous.Source
 import { EvenementMilo } from './evenement.milo'
+import Source = RendezVous.Source
 
 const MILO_DATE_FORMAT = 'yyyy-MM-dd HH:mm:ss'
 
@@ -76,7 +76,8 @@ export namespace RendezVousMilo {
             lastName: jeune.lastName,
             email: jeune.email,
             configuration: jeune.configuration,
-            conseiller: jeune.conseiller
+            conseiller: jeune.conseiller,
+            preferences: jeune.preferences
           }
         ],
         type: CodeTypeRendezVous.RENDEZ_VOUS_MILO,

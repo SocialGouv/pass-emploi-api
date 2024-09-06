@@ -22,15 +22,7 @@ export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
     email: jeuneSqlModel.email ?? undefined,
     idPartenaire: jeuneSqlModel.idPartenaire ?? undefined,
     configuration: toConfigurationApplication(jeuneSqlModel),
-    preferences: {
-      partageFavoris: jeuneSqlModel.partageFavoris,
-      alertesOffres: jeuneSqlModel.notificationsAlertesOffres,
-      messages: jeuneSqlModel.notificationsMessages,
-      creationActionConseiller:
-        jeuneSqlModel.notificationsCreationActionConseiller,
-      rendezVousSessions: jeuneSqlModel.notificationsRendezVousSessions,
-      rappelActions: jeuneSqlModel.notificationsRappelActions
-    }
+    preferences: fromSqlToPreferencesJeune(jeuneSqlModel)
   }
   if (jeuneSqlModel.conseiller) {
     jeune.conseiller = {
@@ -47,6 +39,20 @@ export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
     }
   }
   return jeune
+}
+
+export function fromSqlToPreferencesJeune(
+  jeuneSqlModel: JeuneSqlModel
+): Jeune.Preferences {
+  return {
+    partageFavoris: jeuneSqlModel.partageFavoris,
+    alertesOffres: jeuneSqlModel.notificationsAlertesOffres,
+    messages: jeuneSqlModel.notificationsMessages,
+    creationActionConseiller:
+      jeuneSqlModel.notificationsCreationActionConseiller,
+    rendezVousSessions: jeuneSqlModel.notificationsRendezVousSessions,
+    rappelActions: jeuneSqlModel.notificationsRappelActions
+  }
 }
 
 export function fromSqlToJeuneHomeQueryModel(

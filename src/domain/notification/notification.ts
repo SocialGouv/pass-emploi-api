@@ -2,11 +2,11 @@ import { Inject, Injectable, Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { DateService } from '../../utils/date-service'
 import { Action } from '../action/action'
+import { Core, estPoleEmploi } from '../core'
 import { Jeune } from '../jeune/jeune'
 import { Recherche } from '../offre/recherche/recherche'
 import { RendezVous } from '../rendez-vous/rendez-vous'
 import * as _PoleEmploi from './notification.pole-emploi'
-import { Core, estPoleEmploi } from '../core'
 
 export const NotificationRepositoryToken = 'NotificationRepositoryToken'
 

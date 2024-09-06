@@ -14,12 +14,12 @@ import {
   Result,
   success
 } from '../../building-blocks/types/result'
+import { DateService } from '../../utils/date-service'
 import { IdService } from '../../utils/id-service'
-import { Conseiller } from '../milo/conseiller'
 import { Jeune } from '../jeune/jeune'
+import { Conseiller } from '../milo/conseiller'
 import * as _AnimationCollective from './animation-collective'
 import * as _Historique from './historique'
-import { DateService } from '../../utils/date-service'
 
 export const RendezVousRepositoryToken = 'RendezVous.Repository'
 
@@ -101,7 +101,13 @@ export interface Createur {
 
 export type JeuneDuRendezVous = Pick<
   Jeune,
-  'id' | 'firstName' | 'lastName' | 'conseiller' | 'email' | 'configuration'
+  | 'id'
+  | 'firstName'
+  | 'lastName'
+  | 'conseiller'
+  | 'email'
+  | 'configuration'
+  | 'preferences'
 >
 
 export interface RendezVous {
