@@ -230,6 +230,7 @@ export namespace Notification {
       message: string,
       idRendezVous?: string
     ): void {
+      // filtrage de l'existance du push notif token et des preferences de notification est fait en amont
       let notification: Notification.Message | undefined
 
       switch (typeNotification) {
