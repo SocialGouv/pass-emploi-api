@@ -1,15 +1,18 @@
+import {
+  JeuneDuRendezVous,
+  RendezVous
+} from '../../../domain/rendez-vous/rendez-vous'
+import { DateService } from '../../../utils/date-service'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
-import { toConfigurationApplication } from './jeunes.mappers'
 import {
   RendezVousDto,
   RendezVousSqlModel
 } from '../../sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../sequelize/types'
 import {
-  JeuneDuRendezVous,
-  RendezVous
-} from '../../../domain/rendez-vous/rendez-vous'
-import { DateService } from '../../../utils/date-service'
+  fromSqlToPreferencesJeune,
+  toConfigurationApplication
+} from './jeunes.mappers'
 
 export function toRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
   return {
@@ -89,7 +92,8 @@ function fromJeuneSqlToJeuneDuRdv(jeune: JeuneSqlModel): JeuneDuRendezVous {
       email: jeune.conseiller!.email ?? undefined,
       idAgence: jeune.conseiller!.idAgence ?? undefined
     },
-    configuration: toConfigurationApplication(jeune)
+    configuration: toConfigurationApplication(jeune),
+    preferences: fromSqlToPreferencesJeune(jeune)
   }
 }
 

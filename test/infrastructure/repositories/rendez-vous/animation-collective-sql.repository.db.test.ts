@@ -16,11 +16,12 @@ import { RendezVousSqlModel } from '../../../../src/infrastructure/sequelize/mod
 import { DateService } from '../../../../src/utils/date-service'
 import { uneDatetime, uneDatetimeMinuit } from '../../../fixtures/date.fixture'
 import {
+  desPreferencesJeune,
   unConseillerDuJeune,
   uneConfiguration
 } from '../../../fixtures/jeune.fixture'
-import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { uneAgenceDto } from '../../../fixtures/sql-models/agence.sql-model'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
 import { expect, stubClass } from '../../../utils'
@@ -161,7 +162,8 @@ describe('AnimationsCollectivesSqlRepository', () => {
             email: 'john.doe@plop.io',
             firstName: 'John',
             id: 'ABCDE',
-            lastName: 'Doe'
+            lastName: 'Doe',
+            preferences: desPreferencesJeune()
           }
         ],
         type: CodeTypeRendezVous.INFORMATION_COLLECTIVE,
@@ -266,7 +268,8 @@ describe('AnimationsCollectivesSqlRepository', () => {
             email: 'john.doe@plop.io',
             firstName: 'John',
             id: 'ABCDE',
-            lastName: 'Doe'
+            lastName: 'Doe',
+            preferences: desPreferencesJeune()
           }
         ],
         type: CodeTypeRendezVous.INFORMATION_COLLECTIVE,

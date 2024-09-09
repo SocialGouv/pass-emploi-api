@@ -8,7 +8,10 @@ import { Planificateur } from '../../../src/domain/planificateur'
 import { Action } from '../../../src/domain/action/action'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { uneAction } from '../../fixtures/action.fixture'
-import { uneConfiguration } from '../../fixtures/jeune.fixture'
+import {
+  desPreferencesJeune,
+  uneConfiguration
+} from '../../fixtures/jeune.fixture'
 import {
   emptySuccess,
   failure
@@ -58,7 +61,7 @@ describe('NotifierRappelActionJobHandler', () => {
 
     describe('quand il faut envoyer un rappel', () => {
       describe('quand le jeune a un push token', () => {
-        it('envoie un rappel', async () => {
+        it('envoie un rappel quand activé', async () => {
           // Given
           actionRepository.get.withArgs(action.id).resolves(action)
           actionFactory.doitEnvoyerUneNotificationDeRappel
@@ -66,7 +69,7 @@ describe('NotifierRappelActionJobHandler', () => {
             .returns(emptySuccess())
           jeuneConfigurationApplicationRepository.get
             .withArgs(action.idJeune)
-            .resolves(uneConfiguration())
+            .resolves(uneConfiguration({ preferences: desPreferencesJeune() }))
 
           // When
           const result = await notifierRappelActionJobHandler.handle(job)
@@ -90,6 +93,33 @@ describe('NotifierRappelActionJobHandler', () => {
               id: action.id
             }
           })
+        })
+        it('pas de rappel quand desactivé', async () => {
+          // Given
+          actionRepository.get.withArgs(action.id).resolves(action)
+          actionFactory.doitEnvoyerUneNotificationDeRappel
+            .withArgs(action)
+            .returns(emptySuccess())
+          jeuneConfigurationApplicationRepository.get
+            .withArgs(action.idJeune)
+            .resolves(
+              uneConfiguration({
+                preferences: desPreferencesJeune({ rappelActions: false })
+              })
+            )
+
+          // When
+          const result = await notifierRappelActionJobHandler.handle(job)
+
+          // Then
+          expect(result.succes).to.equal(true)
+          expect(result.resultat).to.deep.equal({
+            idAction: action.id,
+            idJeune: action.idJeune,
+            notificationEnvoyee: false
+          })
+
+          expect(notificationRepository.send).not.to.have.been.called()
         })
       })
       describe("quand le jeune n'a pas de push token", () => {

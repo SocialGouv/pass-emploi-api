@@ -2,6 +2,7 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DateTime } from 'luxon'
 import { uneAction } from 'test/fixtures/action.fixture'
 import {
+  desPreferencesJeune,
   uneConfiguration,
   unJeune,
   unJeuneSansPushNotificationToken
@@ -109,11 +110,63 @@ describe('Notification', () => {
           expectedNotification
         )
       })
+      it('ne notifie pas les jeunes avec preferences de notification désactivés pour les rdv', async () => {
+        // Given
+        const rdv = unRendezVous({
+          jeunes: [
+            unJeune(),
+            unJeuneSansPushNotificationToken(),
+            unJeune({
+              preferences: desPreferencesJeune({ rendezVousSessions: false })
+            })
+          ]
+        })
+        const typeNotification = Notification.Type.NEW_RENDEZVOUS
+        const expectedNotification = uneNotification({
+          token: rdv.jeunes[0].configuration?.pushNotificationToken,
+          notification: {
+            title: 'Nouveau rendez-vous',
+            body: 'Votre conseiller a programmé un nouveau rendez-vous'
+          },
+          data: {
+            type: typeNotification,
+            id: rdv.id
+          }
+        })
+
+        // When
+        await notificationService.notifierLesJeunesDuRdv(rdv, typeNotification)
+
+        // Then
+        expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
+          expectedNotification
+        )
+      })
     })
     describe('notifierLesJeunesDuNouveauMessage', () => {
       it('notifie les jeunes avec pushNotificationToken', async () => {
         // Given
         const jeunes: Jeune[] = [unJeune(), unJeuneSansPushNotificationToken()]
+        const expectedNotification = uneNotification({
+          token: jeunes[0].configuration!.pushNotificationToken
+        })
+
+        // When
+        await notificationService.notifierLesJeunesDuNouveauMessage(jeunes)
+
+        // Then
+        expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
+          expectedNotification
+        )
+      })
+      it('ne notifie pas les jeunes avec preferences de notification désactivés pour les messages', async () => {
+        const jeunes: Jeune[] = [
+          unJeune(),
+          unJeuneSansPushNotificationToken(),
+          unJeune({
+            preferences: desPreferencesJeune({ messages: false })
+          })
+        ]
         const expectedNotification = uneNotification({
           token: jeunes[0].configuration!.pushNotificationToken
         })
@@ -208,6 +261,20 @@ describe('Notification', () => {
           expectedNotification
         )
       })
+
+      it('ne notifie pas les jeunes avec preferences de notification désactivés pour les actions', async () => {
+        // Given
+        const jeune: Jeune = unJeune({
+          preferences: desPreferencesJeune({ creationActionConseiller: false })
+        })
+        const action = uneAction()
+
+        // When
+        await notificationService.notifierNouvelleAction(jeune, action)
+
+        // Then
+        expect(notificationRepository.send).to.not.have.been.called()
+      })
     })
     describe('notifierNouveauCommentaireAction', () => {
       describe('quand le jeune a un token', () => {
@@ -262,7 +329,9 @@ describe('Notification', () => {
     describe('notifierNouvellesOffres', () => {
       it('notifie les jeunes avec pushNotificationToken', async () => {
         // Given
-        const configuration = uneConfiguration()
+        const configuration = uneConfiguration({
+          preferences: desPreferencesJeune()
+        })
         const recherche = uneRecherche()
         const expectedNotification = uneNotification({
           token: configuration.pushNotificationToken,
@@ -286,6 +355,22 @@ describe('Notification', () => {
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
           expectedNotification
         )
+      })
+      it('ne notifie pas les jeunes avec alertesOffres false', async () => {
+        // Given
+        const configuration = uneConfiguration({
+          preferences: desPreferencesJeune({ alertesOffres: false })
+        })
+        const recherche = uneRecherche()
+
+        // When
+        await notificationService.notifierNouvellesOffres(
+          recherche,
+          configuration
+        )
+
+        // Then
+        expect(notificationRepository.send).not.to.have.been.called()
       })
     })
     describe('notifierUnRendezVousPoleEmploi', () => {

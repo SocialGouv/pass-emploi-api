@@ -35,6 +35,8 @@ export namespace Jeune {
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   export import ConfigurationApplication = _ConfigurationApplication.ConfigurationApplication
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  export import Preferences = _ConfigurationApplication.ConfigurationApplication.Preferences
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   export import PoleEmploi = _PoleEmploi.JeunePoleEmploi
 
   export interface Conseiller {
@@ -47,15 +49,6 @@ export namespace Jeune {
 
   export interface ConseillerInitial {
     id: string
-  }
-
-  export interface Preferences {
-    partageFavoris: boolean
-    alertesOffres: boolean
-    messages: boolean
-    creationActionConseiller: boolean
-    rendezVousSessions: boolean
-    rappelActions: boolean
   }
 
   export enum TypeTransfert {

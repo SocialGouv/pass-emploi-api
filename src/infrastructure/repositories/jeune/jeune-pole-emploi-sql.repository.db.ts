@@ -1,7 +1,7 @@
+import { Op } from 'sequelize'
+import { Core } from '../../../domain/core'
 import { Jeune } from '../../../domain/jeune/jeune'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
-import { Core } from '../../../domain/core'
-import { Op } from 'sequelize'
 
 export class JeunePoleEmploiSqlRepository
   implements Jeune.PoleEmploi.Repository
@@ -13,6 +13,7 @@ export class JeunePoleEmploiSqlRepository
           [Op.in]: Core.structuresPoleEmploi
         },
         pushNotificationToken: { [Op.ne]: null },
+        notificationsRendezVousSessions: true,
         idAuthentification: { [Op.ne]: null }
       },
       order: [['id', 'ASC']],

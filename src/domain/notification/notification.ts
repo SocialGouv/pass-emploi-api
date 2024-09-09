@@ -2,11 +2,11 @@ import { Inject, Injectable, Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { DateService } from '../../utils/date-service'
 import { Action } from '../action/action'
+import { Core, estPoleEmploi } from '../core'
 import { Jeune } from '../jeune/jeune'
 import { Recherche } from '../offre/recherche/recherche'
 import { RendezVous } from '../rendez-vous/rendez-vous'
 import * as _PoleEmploi from './notification.pole-emploi'
-import { Core, estPoleEmploi } from '../core'
 
 export const NotificationRepositoryToken = 'NotificationRepositoryToken'
 
@@ -177,7 +177,10 @@ export namespace Notification {
     ): Promise<void[]> {
       return Promise.all(
         rendezVous.jeunes.map(async jeune => {
-          if (jeune.configuration?.pushNotificationToken) {
+          if (
+            jeune.configuration.pushNotificationToken &&
+            jeune.preferences.rendezVousSessions
+          ) {
             const notification = this.creerNotificationRendezVous(
               typeNotification,
               rendezVous,
@@ -227,6 +230,7 @@ export namespace Notification {
       message: string,
       idRendezVous?: string
     ): void {
+      // filtrage de l'existance du push notif token et des preferences de notification est fait en amont
       let notification: Notification.Message | undefined
 
       switch (typeNotification) {
@@ -260,7 +264,10 @@ export namespace Notification {
     async notifierLesJeunesDuNouveauMessage(jeunes: Jeune[]): Promise<void[]> {
       return Promise.all(
         jeunes.map(async jeune => {
-          if (jeune.configuration?.pushNotificationToken) {
+          if (
+            jeune.configuration.pushNotificationToken &&
+            jeune.preferences.messages
+          ) {
             const notification = this.creerNotificationNouveauMessage(
               jeune.configuration?.pushNotificationToken
             )
@@ -295,7 +302,10 @@ export namespace Notification {
     }
 
     async notifierNouvelleAction(jeune: Jeune, action: Action): Promise<void> {
-      if (jeune.configuration?.pushNotificationToken) {
+      if (
+        jeune.configuration.pushNotificationToken &&
+        jeune.preferences.creationActionConseiller
+      ) {
         const notification = this.creerNotificationNouvelleAction(
           jeune.configuration?.pushNotificationToken,
           action.id
@@ -332,7 +342,10 @@ export namespace Notification {
       configurationApplication?: Jeune.ConfigurationApplication
     ): Promise<void> {
       if (configurationApplication) {
-        if (configurationApplication.pushNotificationToken) {
+        if (
+          configurationApplication.pushNotificationToken &&
+          configurationApplication.preferences?.alertesOffres
+        ) {
           const notification = this.creerNotificationNouvelleOffre(
             configurationApplication.pushNotificationToken,
             recherche.id,
@@ -353,7 +366,10 @@ export namespace Notification {
     ): Promise<void[]> {
       return Promise.all(
         jeunes.map(async jeune => {
-          if (jeune.configuration?.pushNotificationToken) {
+          if (
+            jeune.configuration.pushNotificationToken &&
+            jeune.preferences.rendezVousSessions
+          ) {
             const notification = creerNotificationInscriptionSession(
               jeune.configuration?.pushNotificationToken,
               idSsession
@@ -374,7 +390,10 @@ export namespace Notification {
     ): Promise<void[]> {
       return Promise.all(
         jeunes.map(async jeune => {
-          if (jeune.configuration?.pushNotificationToken) {
+          if (
+            jeune.configuration.pushNotificationToken &&
+            jeune.preferences.rendezVousSessions
+          ) {
             const notification = creerNotificationModificationSession(
               jeune.configuration?.pushNotificationToken,
               idSsession
@@ -396,7 +415,10 @@ export namespace Notification {
     ): Promise<void[]> {
       return Promise.all(
         jeunes.map(async jeune => {
-          if (jeune.configuration?.pushNotificationToken) {
+          if (
+            jeune.configuration.pushNotificationToken &&
+            jeune.preferences.rendezVousSessions
+          ) {
             const notification = creerNotificationDesinscriptionSession(
               jeune.configuration?.pushNotificationToken,
               idSsession,
