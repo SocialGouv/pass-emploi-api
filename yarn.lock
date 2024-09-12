@@ -4331,9 +4331,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bull@npm:*, bull@npm:4.16.2, bull@npm:^4.12.2":
-  version: 4.16.2
-  resolution: "bull@npm:4.16.2"
+"bull@npm:*, bull@npm:4.16.3, bull@npm:^4.12.2":
+  version: 4.16.3
+  resolution: "bull@npm:4.16.3"
   dependencies:
     cron-parser: "npm:^4.2.1"
     get-port: "npm:^5.1.1"
@@ -4342,7 +4342,7 @@ __metadata:
     msgpackr: "npm:^1.10.1"
     semver: "npm:^7.5.2"
     uuid: "npm:^8.3.0"
-  checksum: 10/e60bfa4623fa3443e503bbfd7851129bd499c0aa20c87f7538a7e70d3a5044dd3e8b7dca2a41f74d35bb2dfde333782dbea9e2a80917bc17733086112f9d83ac
+  checksum: 10/04f93aabfe2dbdd21f60cd95d87add04a5e7f60902bbad273127d6845de8711521188f3b36d617334314600b11ad37394cc81665b371b374e539932254f4bdf5
   languageName: node
   linkType: hard
 
@@ -9230,7 +9230,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^6.21.0"
     "@typescript-eslint/parser": "npm:^6.21.0"
     axios: "npm:^1.7.7"
-    bull: "npm:4.16.2"
+    bull: "npm:4.16.3"
     bull-repl: "npm:^0.29.1"
     chai: "npm:^4.5.0"
     chai-as-promised: "npm:^7.1.2"
