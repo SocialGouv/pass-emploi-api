@@ -146,12 +146,18 @@ export class TeleverserFichierCommandHandler extends CommandHandler<
     idJeune: string,
     idMessage: string
   ): Promise<void> {
+    const MAX_TRY = 2
     try {
-      const resultAnalyse =
-        await this.fichierRepository.declencherAnalyseAsynchrone(fichier)
+      let tryCount = 0,
+        declenchementAnalyse: Result
+      do {
+        declenchementAnalyse =
+          await this.fichierRepository.declencherAnalyseAsynchrone(fichier)
+        tryCount++
+      } while (isFailure(declenchementAnalyse) && tryCount < MAX_TRY)
 
-      if (isFailure(resultAnalyse)) {
-        // TODO softDelete ou job pour ressayer l'analyse ?
+      if (isFailure(declenchementAnalyse)) {
+        this.fichierRepository.softDelete(fichier.id)
         this.chatRepository.envoyerStatutAnalysePJ(
           idJeune,
           idMessage,
