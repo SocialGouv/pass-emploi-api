@@ -48,19 +48,25 @@ describe('GetCatalogueQueryHandler', () => {
                 code: 'C11.01',
                 libelle:
                   "En participant à un atelier, une prestation, une réunion d'information",
-                droitCreation: false
+                droitCreation: true
               },
               {
                 type: 'MoyenRetourEmploiReferentielPartenaire',
                 code: 'C11.05',
                 libelle: "Avec l'aide d'une personne ou d'une structure",
-                droitCreation: false
+                droitCreation: true
               },
               {
                 type: 'MoyenRetourEmploiReferentielPartenaire',
                 code: 'C11.07',
                 libelle: 'Moyen à définir',
                 droitCreation: true
+              },
+              {
+                type: 'LoyenRetourEmploiReferentielPartenaire',
+                code: 'C11.09',
+                libelle: "Avec l'aide d'une personne ou d'une structure",
+                droitCreation: false
               }
             ]
           },

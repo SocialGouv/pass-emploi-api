@@ -66,7 +66,9 @@ export class GetCatalogueDemarchesQueryHandler extends QueryHandler<
       pourquoi.typesDemarcheRetourEmploi.forEach(quoi => {
         if (!codeQuoiDemarchesCachees.has(quoi.code)) {
           const listeDemarchesVisible = quoi.moyensRetourEmploi.filter(
-            comment => !codeCommentDemarchesCachees.has(comment.code)
+            comment =>
+              !codeCommentDemarchesCachees.has(comment.code) &&
+              comment.droitCreation
           )
           if (listeDemarchesVisible.length > 0) {
             listeDemarches.push({
