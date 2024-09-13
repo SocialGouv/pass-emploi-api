@@ -687,8 +687,7 @@ describe('JeunesController', () => {
       alertesOffres: false,
       messages: false,
       creationActionConseiller: false,
-      rendezVousSessions: false,
-      rappelActions: false
+      rendezVousSessions: false
     }
 
     describe("quand c'est en succès", () => {
@@ -714,7 +713,7 @@ describe('JeunesController', () => {
             messages: false,
             creationActionConseiller: false,
             rendezVousSessions: false,
-            rappelActions: false
+            rappelActions: undefined
           },
           unUtilisateurDecode()
         )

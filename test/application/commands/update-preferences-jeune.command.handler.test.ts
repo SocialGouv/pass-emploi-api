@@ -8,7 +8,7 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { createSandbox } from 'sinon'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import { unJeune } from '../../fixtures/jeune.fixture'
+import { desPreferencesJeune, unJeune } from '../../fixtures/jeune.fixture'
 import { emptySuccess } from '../../../src/building-blocks/types/result'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 
@@ -75,6 +75,25 @@ describe('UpdateJeunePreferencesCommandHandler', () => {
 
       // Then
       expect(jeuneRepository.save).to.have.been.calledWithExactly(jeune)
+      expect(result).to.deep.equal(emptySuccess())
+    })
+    it('met à jour les préférences du jeune avec champs vide', async () => {
+      // Given
+      const jeune = unJeune()
+      const jeuneModifie = unJeune({
+        preferences: desPreferencesJeune({ partageFavoris: false })
+      })
+      const command: UpdateJeunePreferencesCommand = {
+        idJeune: 'idDeJohn',
+        partageFavoris: false
+      }
+      jeuneRepository.get.withArgs('idDeJohn').resolves(jeune)
+
+      // When
+      const result = await updateJeunePreferencesCommandHandler.handle(command)
+
+      // Then
+      expect(jeuneRepository.save).to.have.been.calledWithExactly(jeuneModifie)
       expect(result).to.deep.equal(emptySuccess())
     })
   })
