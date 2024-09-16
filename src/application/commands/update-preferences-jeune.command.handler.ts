@@ -14,12 +14,12 @@ import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface UpdateJeunePreferencesCommand extends Command {
   idJeune: string
-  partageFavoris: boolean
-  alertesOffres: boolean
-  messages: boolean
-  creationActionConseiller: boolean
-  rendezVousSessions: boolean
-  rappelActions: boolean
+  partageFavoris?: boolean
+  alertesOffres?: boolean
+  messages?: boolean
+  creationActionConseiller?: boolean
+  rendezVousSessions?: boolean
+  rappelActions?: boolean
 }
 
 @Injectable()
@@ -44,12 +44,16 @@ export class UpdateJeunePreferencesCommandHandler extends CommandHandler<
     const jeuneAJour: Jeune = {
       ...jeune,
       preferences: {
-        partageFavoris: command.partageFavoris,
-        alertesOffres: command.alertesOffres,
-        messages: command.messages,
-        creationActionConseiller: command.creationActionConseiller,
-        rendezVousSessions: command.rendezVousSessions,
-        rappelActions: command.rappelActions
+        partageFavoris:
+          command.partageFavoris ?? jeune.preferences.partageFavoris,
+        alertesOffres: command.alertesOffres ?? jeune.preferences.alertesOffres,
+        messages: command.messages ?? jeune.preferences.messages,
+        creationActionConseiller:
+          command.creationActionConseiller ??
+          jeune.preferences.creationActionConseiller,
+        rendezVousSessions:
+          command.rendezVousSessions ?? jeune.preferences.rendezVousSessions,
+        rappelActions: command.rappelActions ?? jeune.preferences.rappelActions
       }
     }
     await this.jeuneRepository.save(jeuneAJour)
