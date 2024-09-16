@@ -9,6 +9,7 @@ import {
   IsEmail,
   IsEnum,
   IsIn,
+  IsISO8601,
   IsNotEmpty,
   IsNotEmptyObject,
   IsNumber,
@@ -271,4 +272,11 @@ export class GetIdentitesJeunesQueryParams {
   @IsNotEmpty({ each: true })
   @Transform(params => transformStringToArray(params, 'ids'))
   ids: string[]
+}
+
+export class GetDemarchesConseillerQueryParams {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsISO8601({ strict: true })
+  dateDebut?: string
 }

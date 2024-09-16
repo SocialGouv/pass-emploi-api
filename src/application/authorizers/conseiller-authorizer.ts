@@ -42,9 +42,13 @@ export class ConseillerAuthorizer {
   async autoriserLeConseillerPourSonJeune(
     idConseiller: string,
     idJeune: string,
-    utilisateur: Authentification.Utilisateur
+    utilisateur: Authentification.Utilisateur,
+    structureAutorisee = true
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (
+      structureAutorisee &&
+      utilisateur.type === Authentification.Type.CONSEILLER
+    ) {
       const conseiller = await this.conseillerRepository.get(idConseiller)
       const jeune = await this.jeuneRepository.get(idJeune)
 

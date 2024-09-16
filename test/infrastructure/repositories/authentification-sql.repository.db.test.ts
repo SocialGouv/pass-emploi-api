@@ -242,6 +242,45 @@ describe('AuthentificationSqlRepository', () => {
     })
   })
 
+  describe('getJeuneById', () => {
+    const conseillerDto = unConseillerDto({
+      idAuthentification: 'id-authentification-conseiller',
+      structure: Core.Structure.MILO
+    })
+
+    it("retourne l'utilisateur quand il existe", async () => {
+      // Given
+      await ConseillerSqlModel.creer(conseillerDto)
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: 'ABCDE',
+          idAuthentification: 'id-authentification-jeune',
+          structure: Core.Structure.MILO,
+          datePremiereConnexion: uneDate()
+        })
+      )
+      // When
+      const utilisateur = await authentificationSqlRepository.getJeuneById(
+        'ABCDE'
+      )
+
+      // Then
+      expect(utilisateur).to.deep.equal(
+        unUtilisateurJeune({ datePremiereConnexion: uneDate() })
+      )
+    })
+
+    it("retourne undefined quand il n'existe pas", async () => {
+      // When
+      const utilisateur = await authentificationSqlRepository.getJeuneById(
+        'plop'
+      )
+
+      // Then
+      expect(utilisateur).to.deep.equal(undefined)
+    })
+  })
+
   describe('getJeuneByEmail', () => {
     beforeEach(async () => {
       // Given

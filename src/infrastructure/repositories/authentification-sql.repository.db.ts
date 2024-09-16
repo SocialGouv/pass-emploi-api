@@ -86,6 +86,18 @@ export class AuthentificationSqlRepository
     return undefined
   }
 
+  async getJeuneById(
+    id: string
+  ): Promise<Authentification.Utilisateur | undefined> {
+    const jeuneSqlModel = await JeuneSqlModel.findByPk(id)
+
+    if (jeuneSqlModel) {
+      return fromJeuneSqlToUtilisateur(jeuneSqlModel)
+    }
+
+    return undefined
+  }
+
   async getJeuneByEmail(
     email: string
   ): Promise<Authentification.Utilisateur | undefined> {
