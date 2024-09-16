@@ -9304,7 +9304,7 @@ __metadata:
     sequelize-cli: "npm:6.6.2"
     sequelize-typescript: "npm:2.1.6"
     sinon: "npm:^19.0.0"
-    sinon-chai: "npm:^3.7.0"
+    sinon-chai: "npm:^4.0.0"
     source-map-support: "npm:^0.5.21"
     supertest: "npm:^7.0.0"
     swagger-ui-express: "npm:5.0.1"
@@ -11366,13 +11366,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sinon-chai@npm:^3.7.0":
-  version: 3.7.0
-  resolution: "sinon-chai@npm:3.7.0"
+"sinon-chai@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "sinon-chai@npm:4.0.0"
   peerDependencies:
-    chai: ^4.0.0
+    chai: ^5.0.0
     sinon: ">=4.0.0"
-  checksum: 10/028853eb8a545ca613c6863014a40f07d1e6b81467e20939fefcd13f170206d24165b91099fb297aeb4d137745e321da25daa8e2d665cc0a78f90d5b877e8bbe
+  checksum: 10/6eb3e6f9da8d71496359b89e30eefba82b2fee3602dd16b9c36e8cd5f43c23cf7dcc6ce47666d0ef16a9ba28e825e299d0d8ef317360dd4ed342cbc3838f9912
   languageName: node
   linkType: hard
 
