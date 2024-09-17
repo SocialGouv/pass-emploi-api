@@ -38,22 +38,25 @@ export async function chargerLaVueEngagement(
 
   logger.log('Insertion des utilisateurs du dernier mois')
   await connexion.query(
-    `insert into analytics_engagement(semaine,
-                                      structure,
-                                      type_utilisateur,
-                                      region,
-                                      departement,
-                                      nombre_utilisateurs_1_mois)
-     SELECT '${semaine}',
-            structure,
-            type_utilisateur,
-            COALESCE(region, 'NON RENSEIGNE') AS region,
-            COALESCE(departement, 'NON RENSEIGNE') AS departement,
-            count(distinct id_utilisateur) as nombre_utilisateurs_1_mois
+    `update analytics_engagement
+     SET nombre_utilisateurs_1_mois = subquery.nombre_utilisateurs_1_mois
+     FROM (
+      SELECT 
+        '${semaine}',
+        structure,
+        type_utilisateur,
+        COALESCE(region, 'NON RENSEIGNE') AS region,
+        COALESCE(departement, 'NON RENSEIGNE') AS departement,
+        count(distinct id_utilisateur) as nombre_utilisateurs_1_mois
      from ${analyticsTableName}
      where date_evenement between '${semaine}'::timestamp - interval '1 months' and '${semaine}'::timestamp + interval '1 week'
      group by structure, type_utilisateur, departement, region
-     order by structure, type_utilisateur, region, departement;`
+     order by structure, type_utilisateur, region, departement) as subquery
+     WHERE analytics_engagement.semaine = '${semaine}'
+       AND analytics_engagement.departement = subquery.departement
+       AND analytics_engagement.region = subquery.region
+       AND analytics_engagement.structure = subquery.structure
+       AND analytics_engagement.type_utilisateur = subquery.type_utilisateur;`
   )
 
   logger.log('Insertion des utilisateurs engagés')
@@ -213,18 +216,21 @@ export async function chargerLaVueEngagementNational(
 
   logger.log('Insertion des utilisateurs du dernier mois')
   await connexion.query(
-    `insert into analytics_engagement_national(semaine,
-                                      structure,
-                                      type_utilisateur,
-                                      nombre_utilisateurs_1_mois)
-     SELECT '${semaine}',
-            structure,
-            type_utilisateur,
-            count(distinct id_utilisateur) as nombre_utilisateurs_1_mois
+    `update analytics_engagement_national
+     SET nombre_utilisateurs_1_mois = subquery.nombre_utilisateurs_1_mois
+     FROM (
+      SELECT 
+        '${semaine}',
+        structure,
+        type_utilisateur,
+        count(distinct id_utilisateur) as nombre_utilisateurs_1_mois
      from ${analyticsTableName}
      where date_evenement between '${semaine}'::timestamp - interval '1 months' and '${semaine}'::timestamp + interval '1 week'
      group by structure, type_utilisateur
-     order by structure, type_utilisateur;`
+     order by structure, type_utilisateur) as subquery
+     WHERE analytics_engagement_national.semaine = '${semaine}'
+       AND analytics_engagement_national.structure = subquery.structure
+       AND analytics_engagement_national.type_utilisateur = subquery.type_utilisateur;`
   )
 
   logger.log('Insertion des utilisateurs engagés')
