@@ -70,7 +70,7 @@ export class AuthentificationSqlRepository
     return undefined
   }
 
-  async getJeune(
+  async getJeuneByIdAuthentification(
     idUtilisateurAuth: string
   ): Promise<Authentification.Utilisateur | undefined> {
     const jeuneSqlModel = await JeuneSqlModel.findOne({

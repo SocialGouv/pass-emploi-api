@@ -89,7 +89,9 @@ export namespace Authentification {
       structure: Core.Structure
     ): Promise<Utilisateur | undefined>
 
-    getJeune(idAuthentification: string): Promise<Utilisateur | undefined>
+    getJeuneByIdAuthentification(
+      idAuthentification: string
+    ): Promise<Utilisateur | undefined>
 
     getJeuneById(id: string): Promise<Utilisateur | undefined>
 

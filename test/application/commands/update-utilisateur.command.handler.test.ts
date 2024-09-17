@@ -455,7 +455,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             const utilisateur = unUtilisateurJeune({
               structure: Core.Structure.MILO
             })
-            authentificationRepository.getJeune
+            authentificationRepository.getJeuneByIdAuthentification
               .withArgs(command.idUtilisateurAuth)
               .resolves(utilisateur)
 
@@ -492,7 +492,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             const utilisateur = unUtilisateurJeune({
               idAuthentification: command.idUtilisateurAuth
             })
-            authentificationRepository.getJeune
+            authentificationRepository.getJeuneByIdAuthentification
               .withArgs(command.idUtilisateurAuth)
               .resolves(utilisateur)
 
@@ -521,7 +521,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
               idAuthentification: command.idUtilisateurAuth,
               structure: Core.Structure.POLE_EMPLOI
             })
-            authentificationRepository.getJeune
+            authentificationRepository.getJeuneByIdAuthentification
               .withArgs(command.idUtilisateurAuth)
               .resolves(utilisateurPasMilo)
 
@@ -553,7 +553,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
               structure: Core.Structure.MILO
             }
 
-            authentificationRepository.getJeune
+            authentificationRepository.getJeuneByIdAuthentification
               .withArgs(command.idUtilisateurAuth)
               .resolves(undefined)
 
@@ -589,7 +589,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             const utilisateur = unUtilisateurJeune({
               structure: Core.Structure.POLE_EMPLOI
             })
-            authentificationRepository.getJeune
+            authentificationRepository.getJeuneByIdAuthentification
               .withArgs(command.idUtilisateurAuth)
               .resolves(utilisateur)
 
@@ -623,7 +623,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             const utilisateur = unUtilisateurJeune({
               structure: Core.Structure.POLE_EMPLOI_BRSA
             })
-            authentificationRepository.getJeune
+            authentificationRepository.getJeuneByIdAuthentification
               .withArgs(command.idUtilisateurAuth)
               .resolves(utilisateur)
 
@@ -660,7 +660,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
               structure: Core.Structure.POLE_EMPLOI
             }
 
-            authentificationRepository.getJeune
+            authentificationRepository.getJeuneByIdAuthentification
               .withArgs(command.idUtilisateurAuth)
               .resolves(undefined)
             authentificationRepository.getJeuneByEmail
@@ -712,7 +712,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
               structure: Core.Structure.POLE_EMPLOI
             }
 
-            authentificationRepository.getJeune
+            authentificationRepository.getJeuneByIdAuthentification
               .withArgs(command.idUtilisateurAuth)
               .resolves(undefined)
             authentificationRepository.getJeuneByEmail
@@ -746,7 +746,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
               email: undefined
             }
 
-            authentificationRepository.getJeune
+            authentificationRepository.getJeuneByIdAuthentification
               .withArgs(command.idUtilisateurAuth)
               .resolves(undefined)
 
@@ -775,7 +775,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
               structure: Core.Structure.POLE_EMPLOI_BRSA
             }
 
-            authentificationRepository.getJeune
+            authentificationRepository.getJeuneByIdAuthentification
               .withArgs(command.idUtilisateurAuth)
               .resolves(undefined)
             authentificationRepository.getJeuneByEmail
@@ -814,7 +814,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             const utilisateur = unUtilisateurJeune({
               structure: Core.Structure.POLE_EMPLOI
             })
-            authentificationRepository.getJeune
+            authentificationRepository.getJeuneByIdAuthentification
               .withArgs(command.idUtilisateurAuth)
               .resolves(utilisateur)
 
@@ -848,7 +848,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             const utilisateur = unUtilisateurJeune({
               structure: Core.Structure.MILO
             })
-            authentificationRepository.getJeune
+            authentificationRepository.getJeuneByIdAuthentification
               .withArgs(command.idUtilisateurAuth)
               .resolves(utilisateur)
 
@@ -880,7 +880,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
           const utilisateur = unUtilisateurJeune({
             structure: Core.Structure.POLE_EMPLOI_BRSA
           })
-          authentificationRepository.getJeune
+          authentificationRepository.getJeuneByIdAuthentification
             .withArgs(command.idUtilisateurAuth)
             .resolves(utilisateur)
 

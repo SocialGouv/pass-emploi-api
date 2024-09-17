@@ -223,9 +223,10 @@ describe('AuthentificationSqlRepository', () => {
     })
     it("retourne l'utilisateur quand il existe", async () => {
       // When
-      const utilisateur = await authentificationSqlRepository.getJeune(
-        'id-authentification-jeune'
-      )
+      const utilisateur =
+        await authentificationSqlRepository.getJeuneByIdAuthentification(
+          'id-authentification-jeune'
+        )
 
       // Then
       expect(utilisateur).to.deep.equal(
@@ -235,7 +236,8 @@ describe('AuthentificationSqlRepository', () => {
 
     it("retourne undefined quand il n'existe pas", async () => {
       // When
-      const utilisateur = await authentificationSqlRepository.getJeune('plop')
+      const utilisateur =
+        await authentificationSqlRepository.getJeuneByIdAuthentification('plop')
 
       // Then
       expect(utilisateur).to.deep.equal(undefined)

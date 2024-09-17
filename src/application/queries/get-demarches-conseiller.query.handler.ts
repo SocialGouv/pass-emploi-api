@@ -48,12 +48,12 @@ export class GetDemarchesConseillerQueryHandler extends QueryHandler<
       query.idJeune
     )
 
-    if (!jeuneUtilisateur || !jeuneUtilisateur.idAuthentification) {
+    if (!jeuneUtilisateur?.idAuthentification) {
       return failure(new NonTrouveError('Jeune'))
     }
     const idpTokenJeune = await this.authClient.exchangeTokenConseillerJeune(
       query.accessToken,
-      jeuneUtilisateur?.idAuthentification
+      jeuneUtilisateur.idAuthentification
     )
     const demarches = await this.getDemarchesQueryGetter.handle({
       idJeune: query.idJeune,

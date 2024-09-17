@@ -243,9 +243,10 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
   private async authentificationJeuneMilo(
     commandSanitized: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
-    const utilisateurTrouve = await this.authentificationRepository.getJeune(
-      commandSanitized.idUtilisateurAuth
-    )
+    const utilisateurTrouve =
+      await this.authentificationRepository.getJeuneByIdAuthentification(
+        commandSanitized.idUtilisateurAuth
+      )
     if (!utilisateurTrouve) {
       return failure(
         new NonTraitableError(
@@ -273,9 +274,10 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
   private async authentificationBeneficiaireFT(
     commandSanitized: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
-    const utilisateurTrouve = await this.authentificationRepository.getJeune(
-      commandSanitized.idUtilisateurAuth
-    )
+    const utilisateurTrouve =
+      await this.authentificationRepository.getJeuneByIdAuthentification(
+        commandSanitized.idUtilisateurAuth
+      )
 
     if (!utilisateurTrouve) {
       return this.authentifierJeuneParEmail(commandSanitized)
