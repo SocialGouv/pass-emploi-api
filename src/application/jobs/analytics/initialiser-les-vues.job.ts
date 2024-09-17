@@ -34,7 +34,7 @@ export class InitialiserLesVuesJobHandler extends JobHandler<Planificateur.Job> 
     for (const tableAnnuelle of infosTablesAEAnnuelles) {
       const tableName = `evenement_engagement${tableAnnuelle.suffix}`
       const semaines = (await connexion.query(
-        `SELECT distinct(semaine) from ${tableName} ORDER BY semaine;`,
+        `SELECT distinct(semaine) from ${tableName} WHERE EXTRACT(YEAR FROM semaine) >= ${tableAnnuelle.depuisAnnee} ORDER BY semaine;`,
         { raw: true, type: QueryTypes.SELECT }
       )) as Array<{ semaine: string }>
 

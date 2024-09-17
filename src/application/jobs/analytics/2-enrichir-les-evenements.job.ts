@@ -255,7 +255,7 @@ async function updateDateDernierAEConseiller(
   tableAE: InfoTableAEAnnuelle
 ): Promise<void> {
   const tableName = `evenement_engagement${tableAE.suffix}`
-  const conditionDate = `AND EXTRACT(YEAR FROM date_evenement) = ${tableAE.depuisAnnee}`
+  const conditionDate = `AND EXTRACT(YEAR FROM date_evenement) >= ${tableAE.depuisAnnee}`
 
   await connexion.query(`
     update conseiller
@@ -273,7 +273,7 @@ async function updateDatePremierAEConseiller(
   tableAE: InfoTableAEAnnuelle
 ): Promise<void> {
   const tableName = `evenement_engagement${tableAE.suffix}`
-  const conditionDate = `AND EXTRACT(YEAR FROM date_evenement) = ${tableAE.depuisAnnee}`
+  const conditionDate = `AND EXTRACT(YEAR FROM date_evenement) >= ${tableAE.depuisAnnee}`
 
   await connexion.query(`
     update conseiller
@@ -291,7 +291,7 @@ function getQueryTableAEJeune(tableAE: InfoTableAEAnnuelle): string {
   const tableAEName = `ae${tableAE.suffix}`
   const groupedTableAEName = `ae_jeune${tableAE.suffix}`
   const tableName = `evenement_engagement${tableAE.suffix}`
-  const conditionDate = `AND EXTRACT(YEAR FROM date_evenement) = ${tableAE.depuisAnnee}`
+  const conditionDate = `AND EXTRACT(YEAR FROM date_evenement) >= ${tableAE.depuisAnnee}`
 
   return `${tableAEName} AS (
       SELECT
