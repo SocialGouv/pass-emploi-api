@@ -12,14 +12,15 @@ import {
 } from '@nestjs/common'
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { DeleteConseillerCommandHandler } from '../../application/commands/conseiller/delete-conseiller.command.handler'
+import { ModifierConseillerCommandHandler } from '../../application/commands/conseiller/modifier-conseiller.command.handler'
 import {
   CreateListeDeDiffusionCommand,
   CreateListeDeDiffusionCommandHandler
 } from '../../application/commands/create-liste-de-diffusion.command.handler'
-import { ModifierConseillerCommandHandler } from '../../application/commands/conseiller/modifier-conseiller.command.handler'
 import { ModifierJeuneDuConseillerCommandHandler } from '../../application/commands/modifier-jeune-du-conseiller.command.handler'
 import { RecupererJeunesDuConseillerCommandHandler } from '../../application/commands/recuperer-jeunes-du-conseiller.command.handler'
 import { GetConseillersQueryHandler } from '../../application/queries/get-conseillers.query.handler.db'
+import { GetDemarchesConseillerQueryHandler } from '../../application/queries/get-demarches-conseiller.query.handler'
 import { GetDetailConseillerQueryHandler } from '../../application/queries/get-detail-conseiller.query.handler.db'
 import {
   GetIndicateursPourConseillerExclusionQuery,
@@ -45,10 +46,14 @@ import {
   CreateListeDeDiffusionPayload,
   DetailConseillerPayload,
   GetConseillersQueryParams,
+  GetDemarchesConseillerQueryParams,
   GetIdentitesJeunesQueryParams,
   GetIndicateursPourConseillerQueryParams,
   PutJeuneDuConseillerPayload
 } from './validation/conseillers.inputs'
+import { Cached } from '../../building-blocks/types/query'
+import { DemarcheQueryModel } from '../../application/queries/query-models/actions.query-model'
+import { DateTime } from 'luxon'
 
 @Controller('conseillers')
 @CustomSwaggerApiOAuth2()
@@ -64,7 +69,8 @@ export class ConseillersController {
     private readonly getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler,
     private readonly createListeDeDiffusionCommandHandler: CreateListeDeDiffusionCommandHandler,
     private readonly getIdentitesJeunesQueryHandler: GetJeunesIdentitesQueryHandler,
-    private readonly deleteConseillerCommandHandler: DeleteConseillerCommandHandler
+    private readonly deleteConseillerCommandHandler: DeleteConseillerCommandHandler,
+    private readonly getDemarchesConseillerQueryHandler: GetDemarchesConseillerQueryHandler
   ) {}
 
   @ApiOperation({
@@ -318,6 +324,34 @@ export class ConseillersController {
       utilisateur
     )
 
+    return handleResult(result)
+  }
+
+  @ApiOperation({
+    summary: "Récupère les démarches d'un jeune",
+    description: 'Autorisé pour un conseiller FT et CD'
+  })
+  @Get(':idConseiller/jeunes/:idJeune/demarches')
+  async getDemarches(
+    @Param('idConseiller') idConseiller: string,
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string,
+    @Query() queryParams: GetDemarchesConseillerQueryParams
+  ): Promise<Cached<DemarcheQueryModel[]>> {
+    const result = await this.getDemarchesConseillerQueryHandler.execute(
+      {
+        idJeune,
+        idConseiller,
+        accessToken,
+        dateDebut: queryParams.dateDebut
+          ? DateTime.fromISO(queryParams.dateDebut, {
+              setZone: true
+            })
+          : undefined
+      },
+      utilisateur
+    )
     return handleResult(result)
   }
 }

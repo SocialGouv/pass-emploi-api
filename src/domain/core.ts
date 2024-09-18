@@ -42,6 +42,10 @@ export function estPassEmploi(structure: Core.Structure): boolean {
   ].includes(structure)
 }
 
+export function estConseilDept(structure: Core.Structure): boolean {
+  return [Core.Structure.CONSEIL_DEPT].includes(structure)
+}
+
 export function getStructureDeReference(
   structure: Core.Structure
 ): Core.Structure {

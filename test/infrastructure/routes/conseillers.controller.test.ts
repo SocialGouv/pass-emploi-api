@@ -38,6 +38,8 @@ import { detailConseillerQueryModel } from 'test/fixtures/query-models/conseille
 import { StubbedClass, expect } from 'test/utils'
 import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
+import { GetDemarchesConseillerQueryHandler } from '../../../src/application/queries/get-demarches-conseiller.query.handler'
+import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
 
 describe('ConseillersController', () => {
   let getDetailConseillerQueryHandler: StubbedClass<GetDetailConseillerQueryHandler>
@@ -50,6 +52,7 @@ describe('ConseillersController', () => {
   let modifierJeuneDuConseillerCommandHandler: StubbedClass<ModifierJeuneDuConseillerCommandHandler>
   let getIndicateursJeunePourConseillerQueryHandler: StubbedClass<GetIndicateursPourConseillerQueryHandler>
   let getIdentitesJeunesQueryHandler: StubbedClass<GetJeunesIdentitesQueryHandler>
+  let getDemarchesConseillerQueryHandler: StubbedClass<GetDemarchesConseillerQueryHandler>
 
   let app: INestApplication
 
@@ -75,6 +78,9 @@ describe('ConseillersController', () => {
       GetIndicateursPourConseillerQueryHandler
     )
     getIdentitesJeunesQueryHandler = app.get(GetJeunesIdentitesQueryHandler)
+    getDemarchesConseillerQueryHandler = app.get(
+      GetDemarchesConseillerQueryHandler
+    )
   })
 
   describe('DELETE /conseillers/:idConseiller', () => {
@@ -578,7 +584,7 @@ describe('ConseillersController', () => {
     )
   })
 
-  describe('GET /conseillers/{idConseiller}/jeunes/identites&ids', () => {
+  describe('GET /conseillers/{idConseiller}/jeunes/identites', () => {
     it("récupère l'identité des jeunes du conseiller", async () => {
       // Given
       const idConseiller = 'idConseiller'
@@ -619,6 +625,39 @@ describe('ConseillersController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       '/conseillers/1/jeunes/identites'
+    )
+  })
+
+  describe('GET /conseillers/{idConseiller}/jeunes/i{idJeune}/demarches', () => {
+    it('récupère les demarches du jeune pour un conseiller', async () => {
+      // Given
+      const idConseiller = 'idConseiller'
+      const idJeune = 'id-jeune'
+      getDemarchesConseillerQueryHandler.execute.resolves(
+        success({ queryModel: [uneDemarcheQueryModel()] })
+      )
+
+      // When
+      await request(app.getHttpServer())
+        .get(`/conseillers/${idConseiller}/jeunes/${idJeune}/demarches`)
+        .query({ idConseiller, idJeune })
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+        .expect({ queryModel: [uneDemarcheQueryModel()] })
+
+      expect(
+        getDemarchesConseillerQueryHandler.execute
+      ).to.have.been.calledOnceWith({
+        idConseiller,
+        idJeune,
+        accessToken: 'coucou',
+        dateDebut: undefined
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/conseillers/1/jeunes/2/demarches'
     )
   })
 })

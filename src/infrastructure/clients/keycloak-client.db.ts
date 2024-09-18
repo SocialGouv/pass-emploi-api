@@ -56,10 +56,18 @@ export class KeycloakClient {
     })
   }
 
+  public async exchangeTokenConseillerJeune(
+    bearer: string,
+    subJeune: string
+  ): Promise<string> {
+    return this.exchangeToken(bearer, undefined, undefined, subJeune)
+  }
+
   private async exchangeToken(
     bearer: string,
-    provider: string,
-    structure: Core.Structure
+    provider?: string,
+    structure?: Core.Structure,
+    requestedTokenSub?: string
   ): Promise<string> {
     const url = `${this.issuerUrl}/protocol/openid-connect/token`
     const payload = {
@@ -67,8 +75,17 @@ export class KeycloakClient {
       subject_token_type: 'urn:ietf:params:oauth:token-type:access_token',
       grant_type: 'urn:ietf:params:oauth:grant-type:token-exchange',
       client_id: this.clientId,
-      client_secret: this.clientSecret,
-      requested_issuer: provider
+      client_secret: this.clientSecret
+    }
+    if (provider) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      payload.requested_issuer = provider
+    }
+    if (requestedTokenSub) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      payload.requested_token_sub = requestedTokenSub
     }
     const headers = { 'Content-Type': 'application/x-www-form-urlencoded' }
     try {
@@ -88,7 +105,9 @@ export class KeycloakClient {
       if (e.code === 'ECONNABORTED' || e.status >= '500') {
         message = 'token_exchange_error'
       } else {
-        if (estPoleEmploi(structure)) {
+        if (!structure) {
+          message = 'token_expired'
+        } else if (estPoleEmploi(structure)) {
           message = 'token_pole_emploi_expired'
         } else if (estMilo(structure)) {
           message = 'token_milo_expired'

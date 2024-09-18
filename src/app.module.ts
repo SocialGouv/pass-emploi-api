@@ -365,6 +365,7 @@ import { RecupererAnalyseAntivirusJobHandler } from './application/jobs/recupere
 import { CreerTablesAEAnnuellesJobHandler } from './application/jobs/analytics/creer-tables-ae-annuelles'
 import { UpdateJeuneCommandHandler } from './application/commands/update-jeune.command.handler'
 import { NotifierRappelCreationActionsDemarchesJobHandler } from './application/jobs/notifier-rappel-creation-actions-demarches.job.handler.db'
+import { GetDemarchesConseillerQueryHandler } from './application/queries/get-demarches-conseiller.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -791,7 +792,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetMonSuiviMiloQueryHandler,
     GetTokenPoleEmploiQueryHandler,
     GetMonSuiviPoleEmploiQueryHandler,
-    GetCompteursBeneficiaireMiloQueryHandler
+    GetCompteursBeneficiaireMiloQueryHandler,
+    GetDemarchesConseillerQueryHandler
   ]
 }
 

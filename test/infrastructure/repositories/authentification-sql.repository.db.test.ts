@@ -223,8 +223,47 @@ describe('AuthentificationSqlRepository', () => {
     })
     it("retourne l'utilisateur quand il existe", async () => {
       // When
-      const utilisateur = await authentificationSqlRepository.getJeune(
-        'id-authentification-jeune'
+      const utilisateur =
+        await authentificationSqlRepository.getJeuneByIdAuthentification(
+          'id-authentification-jeune'
+        )
+
+      // Then
+      expect(utilisateur).to.deep.equal(
+        unUtilisateurJeune({ datePremiereConnexion: uneDate() })
+      )
+    })
+
+    it("retourne undefined quand il n'existe pas", async () => {
+      // When
+      const utilisateur =
+        await authentificationSqlRepository.getJeuneByIdAuthentification('plop')
+
+      // Then
+      expect(utilisateur).to.deep.equal(undefined)
+    })
+  })
+
+  describe('getJeuneById', () => {
+    const conseillerDto = unConseillerDto({
+      idAuthentification: 'id-authentification-conseiller',
+      structure: Core.Structure.MILO
+    })
+
+    it("retourne l'utilisateur quand il existe", async () => {
+      // Given
+      await ConseillerSqlModel.creer(conseillerDto)
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: 'ABCDE',
+          idAuthentification: 'id-authentification-jeune',
+          structure: Core.Structure.MILO,
+          datePremiereConnexion: uneDate()
+        })
+      )
+      // When
+      const utilisateur = await authentificationSqlRepository.getJeuneById(
+        'ABCDE'
       )
 
       // Then
@@ -235,7 +274,9 @@ describe('AuthentificationSqlRepository', () => {
 
     it("retourne undefined quand il n'existe pas", async () => {
       // When
-      const utilisateur = await authentificationSqlRepository.getJeune('plop')
+      const utilisateur = await authentificationSqlRepository.getJeuneById(
+        'plop'
+      )
 
       // Then
       expect(utilisateur).to.deep.equal(undefined)
