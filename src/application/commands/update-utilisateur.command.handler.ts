@@ -346,9 +346,11 @@ function verifierStructureBeneficiaire(
       case Core.Structure.POLE_EMPLOI:
       case Core.Structure.POLE_EMPLOI_AIJ:
       case Core.Structure.POLE_EMPLOI_BRSA:
+      case Core.Structure.CONSEIL_DEPT:
         return emptySuccess()
     }
   }
+  // Legacy
   if (utilisateurTrouve.structure !== structureAttendue) {
     let reason: NonTraitableReason | undefined
 
