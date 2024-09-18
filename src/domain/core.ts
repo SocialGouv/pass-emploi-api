@@ -8,10 +8,11 @@ export namespace Core {
     CONSEIL_DEPT = 'CONSEIL_DEPT'
   }
 
-  export const structuresPoleEmploi = [
+  export const structuresBeneficiaireFranceTravail = [
     Core.Structure.POLE_EMPLOI,
     Core.Structure.CONSEIL_DEPT,
-    Core.Structure.POLE_EMPLOI_BRSA
+    Core.Structure.POLE_EMPLOI_BRSA,
+    Core.Structure.POLE_EMPLOI_AIJ
   ]
   export type StructuresPoleEmploi =
     | Core.Structure.POLE_EMPLOI
@@ -25,6 +26,10 @@ export namespace Core {
 
 export function estMilo(structure: Core.Structure): boolean {
   return structure === Core.Structure.MILO
+}
+
+export function estPoleEmploiOuCD(structure: Core.Structure): boolean {
+  return estPoleEmploi(structure) || structure === Core.Structure.CONSEIL_DEPT
 }
 
 export function estPoleEmploi(structure: Core.Structure): boolean {

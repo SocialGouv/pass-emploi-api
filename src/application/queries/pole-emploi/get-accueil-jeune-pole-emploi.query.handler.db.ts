@@ -11,17 +11,17 @@ import {
   success
 } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
-import { estPassEmploi, estPoleEmploi } from '../../../domain/core'
+import { estPassEmploi, estPoleEmploiOuCD } from '../../../domain/core'
 import { Demarche } from '../../../domain/demarche'
 import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client.db'
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { GetFavorisAccueilQueryGetter } from '../query-getters/accueil/get-favoris.query.getter.db'
 import { GetRecherchesSauvegardeesQueryGetter } from '../query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
+import { GetCampagneQueryGetter } from '../query-getters/get-campagne.query.getter'
 import { GetDemarchesQueryGetter } from '../query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { AccueilJeunePoleEmploiQueryModel } from '../query-models/jeunes.pole-emploi.query-model'
-import { GetCampagneQueryGetter } from '../query-getters/get-campagne.query.getter'
 
 export interface GetAccueilJeunePoleEmploiQuery extends Query {
   idJeune: string
@@ -169,7 +169,7 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
-      estPoleEmploi(utilisateur.structure)
+      estPoleEmploiOuCD(utilisateur.structure)
     )
   }
 

@@ -2,7 +2,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { DateService } from '../../utils/date-service'
 import { Action } from '../action/action'
-import { Core, estPoleEmploi } from '../core'
+import { Core, estPoleEmploiOuCD } from '../core'
 import { Jeune } from '../jeune/jeune'
 import { Recherche } from '../offre/recherche/recherche'
 import { RendezVous } from '../rendez-vous/rendez-vous'
@@ -558,7 +558,7 @@ export namespace Notification {
     structure: Core.Structure,
     dateService: DateService
   ): { title: string; body: string } {
-    const trucs = estPoleEmploi(structure) ? 'démarches' : 'actions'
+    const trucs = estPoleEmploiOuCD(structure) ? 'démarches' : 'actions'
     const messages: Array<{ title: string; body: string }> = [
       {
         title: `Le saviez-vous ?`,
@@ -593,7 +593,7 @@ export namespace Notification {
         dateService
       ),
       data: {
-        type: estPoleEmploi(structure)
+        type: estPoleEmploiOuCD(structure)
           ? Type.RAPPEL_CREATION_DEMARCHE
           : Type.RAPPEL_CREATION_ACTION
       }

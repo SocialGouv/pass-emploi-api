@@ -1,10 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Result, isFailure } from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
-import { Core, estPoleEmploi } from '../../domain/core'
-import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
-import { ThematiqueQueryModel } from './query-models/catalogue.query-model'
 import { Query } from 'src/building-blocks/types/query'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
 import {
@@ -12,12 +6,18 @@ import {
   PoleEmploiPartenaireClientToken
 } from 'src/infrastructure/clients/pole-emploi-partenaire-client.db'
 import { buildError } from 'src/utils/logger.module'
+import { QueryHandler } from '../../building-blocks/types/query-handler'
+import { Result, isFailure } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { Core, estPoleEmploiOuCD } from '../../domain/core'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
+import { ThematiqueQueryModel } from './query-models/catalogue.query-model'
 
-import { TypesDemarcheQueryModel } from './query-models/types-demarche.query-model'
 import {
   codeCommentDemarchesCachees,
   codeQuoiDemarchesCachees
 } from 'src/infrastructure/clients/utils/demarche-liste-visible'
+import { TypesDemarcheQueryModel } from './query-models/types-demarche.query-model'
 
 export interface GetCatalogueDemarchesQuery extends Query {
   accessToken: string
@@ -103,7 +103,7 @@ export class GetCatalogueDemarchesQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       utilisateur.id,
       utilisateur,
-      estPoleEmploi(utilisateur.structure)
+      estPoleEmploiOuCD(utilisateur.structure)
     )
   }
 

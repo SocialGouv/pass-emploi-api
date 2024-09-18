@@ -1,4 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Cached, Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import {
@@ -11,13 +13,11 @@ import {
   Authentification,
   AuthentificationRepositoryToken
 } from '../../domain/authentification'
-import { estConseilDept, estPoleEmploi } from '../../domain/core'
+import { estPoleEmploiOuCD } from '../../domain/core'
+import { KeycloakClient } from '../../infrastructure/clients/keycloak-client.db'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
 import { DemarcheQueryModel } from './query-models/actions.query-model'
-import { KeycloakClient } from '../../infrastructure/clients/keycloak-client.db'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
-import { DateTime } from 'luxon'
 
 export interface GetDemarchesConseillerQuery extends Query {
   idConseiller: string
@@ -82,8 +82,7 @@ export class GetDemarchesConseillerQueryHandler extends QueryHandler<
       query.idConseiller,
       query.idJeune,
       utilisateur,
-      estPoleEmploi(utilisateur.structure) ||
-        estConseilDept(utilisateur.structure)
+      estPoleEmploiOuCD(utilisateur.structure)
     )
   }
 

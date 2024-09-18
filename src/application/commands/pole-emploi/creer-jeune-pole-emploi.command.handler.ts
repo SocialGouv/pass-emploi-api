@@ -8,12 +8,12 @@ import {
 import { Result, failure, success } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../../domain/chat'
+import { estPoleEmploiOuCD } from '../../../domain/core'
+import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import {
   Conseiller,
   ConseillerRepositoryToken
 } from '../../../domain/milo/conseiller'
-import { estPoleEmploi } from '../../../domain/core'
-import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 
 export interface CreateJeuneCommand extends Command {
@@ -81,7 +81,7 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
     return this.conseillerAuthorizer.autoriserLeConseiller(
       command.idConseiller,
       utilisateur,
-      estPoleEmploi(utilisateur.structure)
+      estPoleEmploiOuCD(utilisateur.structure)
     )
   }
 

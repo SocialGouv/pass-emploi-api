@@ -1,5 +1,8 @@
+import { Inject, Injectable } from '@nestjs/common'
+import { DiagorienteClient } from 'src/infrastructure/clients/diagoriente-client'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
@@ -7,19 +10,16 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Inject, Injectable } from '@nestjs/common'
-import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
-import { KeycloakClient } from '../../infrastructure/clients/keycloak-client.db'
+import { Core, estPoleEmploiOuCD } from '../../domain/core'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
+import { SuggestionPoleEmploiService } from '../../domain/offre/recherche/suggestion/pole-emploi.service'
 import {
   Suggestion,
   SuggestionsPoleEmploiRepositoryToken
 } from '../../domain/offre/recherche/suggestion/suggestion'
-import { SuggestionPoleEmploiService } from '../../domain/offre/recherche/suggestion/pole-emploi.service'
-import { Core, estPoleEmploi } from '../../domain/core'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
-import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
-import { DiagorienteClient } from 'src/infrastructure/clients/diagoriente-client'
+import { KeycloakClient } from '../../infrastructure/clients/keycloak-client.db'
 import { buildError } from '../../utils/logger.module'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 
 export interface RafraichirSuggestionsCommand extends Command {
   idJeune: string
@@ -55,7 +55,7 @@ export class RafraichirSuggestionsCommandHandler extends CommandHandler<
 
     let suggestionsPE: Suggestion[] = []
     let suggestionsDiagoriente: Suggestion[] = []
-    const rafraichirSuggestionsPE = estPoleEmploi(command.structure)
+    const rafraichirSuggestionsPE = estPoleEmploiOuCD(command.structure)
     const rafraichirSuggestionsDiagoriente = command.avecDiagoriente
 
     if (rafraichirSuggestionsPE) {
