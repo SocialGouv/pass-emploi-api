@@ -216,7 +216,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
     return fromSqlToJeuneHomeQueryModel(jeuneSqlModel, rdvJeuneSqlModel)
   }
 
-  private async saveAllJeuneTransferes(jeunes: Jeune[]): Promise<void> {
+  async saveAllJeuneTransferes(jeunes: Jeune[]): Promise<void> {
     for (const jeune of jeunes) {
       const jeuneTransfereSQL: Omit<
         AsSql<JeuneDto>,

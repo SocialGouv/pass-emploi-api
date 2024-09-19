@@ -107,6 +107,8 @@ export namespace Jeune {
       idConseillerQuiTransfert: string,
       typeTransfert: Jeune.TypeTransfert
     ): Promise<void>
+
+    saveAllJeuneTransferes(jeunes: Jeune[]): Promise<void>
   }
 
   @Injectable()

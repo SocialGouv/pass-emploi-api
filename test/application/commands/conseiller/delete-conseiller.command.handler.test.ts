@@ -97,11 +97,19 @@ describe('DeleteConseillerCommandHandler', () => {
         jeuneRepository.findAllJeunesByConseiller
           .withArgs(command.idConseiller)
           .resolves([])
+        jeuneRepository.findAllJeunesByConseillerInitial
+          .withArgs(command.idConseiller)
+          .resolves([unJeune({ conseillerInitial: unConseiller() })])
 
         // When
         await deleteConseillerCommandHandler.handle(command)
 
         //Then
+        expect(
+          jeuneRepository.saveAllJeuneTransferes
+        ).to.have.been.calledOnceWithExactly([
+          unJeune({ conseillerInitial: undefined })
+        ])
         expect(
           authentificationRepository.deleteUtilisateurIdp
         ).to.have.been.calledOnceWithExactly(command.idConseiller)

@@ -73,6 +73,20 @@ export class DeleteConseillerCommandHandler extends CommandHandler<
       )
     }
 
+    const jeunesAvecConseillerInitial =
+      await this.jeuneRepository.findAllJeunesByConseillerInitial(
+        command.idConseiller
+      )
+    const jeunesSansConseillerInitial = jeunesAvecConseillerInitial.map(
+      jeune => ({
+        ...jeune,
+        conseillerInitial: undefined
+      })
+    )
+    await this.jeuneRepository.saveAllJeuneTransferes(
+      jeunesSansConseillerInitial
+    )
+
     await this.authentificationRepository.deleteUtilisateurIdp(idConseiller)
     await this.conseillerRepository.delete(idConseiller)
 
