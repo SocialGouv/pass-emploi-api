@@ -109,7 +109,7 @@ describe('MiloClient', () => {
 
       nock(MILO_BASE_URL)
         .get(
-          `/operateurs/sessions?idDossier=${idDossier}&taillePage=250&dateFinRecherche=2020-07-06`
+          `/operateurs/sessions?idDossier=${idDossier}&taillePage=150&dateFinRecherche=2020-07-06`
         )
         .reply(200, uneListeSessionsJeuneDto)
         .isDone()
@@ -128,7 +128,7 @@ describe('MiloClient', () => {
 
       nock(MILO_BASE_URL)
         .get(
-          `/operateurs/sessions?idDossier=${idDossier}&dateDebutRecherche=2023-07-21&dateFinRecherche=2023-07-26&taillePage=250`
+          `/operateurs/sessions?idDossier=${idDossier}&dateDebutRecherche=2023-07-21&dateFinRecherche=2023-07-26&taillePage=150`
         )
         .reply(200, uneListeSessionsJeuneDto)
         .isDone()
@@ -152,7 +152,7 @@ describe('MiloClient', () => {
 
       nock(MILO_BASE_URL)
         .get(
-          `/operateurs/sessions?idDossier=${idDossier}&taillePage=250&dateFinRecherche=2020-07-06`
+          `/operateurs/sessions?idDossier=${idDossier}&taillePage=150&dateFinRecherche=2020-07-06`
         )
         .reply(200, uneListeSessionsJeuneDto)
         .isDone()
@@ -174,7 +174,7 @@ describe('MiloClient', () => {
 
       nock(MILO_BASE_URL)
         .get(
-          `/operateurs/sessions?idDossier=${idDossier}&dateDebutRecherche=2023-07-21&dateFinRecherche=2023-07-26&taillePage=250`
+          `/operateurs/sessions?idDossier=${idDossier}&dateDebutRecherche=2023-07-21&dateFinRecherche=2023-07-26&taillePage=150`
         )
         .reply(200, uneListeSessionsJeuneDto)
         .isDone()
