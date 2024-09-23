@@ -7948,10 +7948,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jose@npm:5.9.2":
-  version: 5.9.2
-  resolution: "jose@npm:5.9.2"
-  checksum: 10/bbcad3bb2681424ee257f3eb561d70b69a082ceef628926ac20f8c1d3471fccfc039bc8d7b7507fa818f695fdafa2cfaab53c46dfd8e56d9b89262f7c83b8a25
+"jose@npm:5.9.3":
+  version: 5.9.3
+  resolution: "jose@npm:5.9.3"
+  checksum: 10/9daf5511b8bfa184f1d6c265cdaf0a2b19e46f251d90703c6a5229ba76e5ac5fbd34626f263819569eb69a3f2cd2c37dab3b4fab9604258f468d343a784a9385
   languageName: node
   linkType: hard
 
@@ -9268,7 +9268,7 @@ __metadata:
     husky: "npm:^9.1.5"
     ics: "npm:3.8.0"
     joi: "npm:17.13.3"
-    jose: "npm:5.9.2"
+    jose: "npm:5.9.3"
     lint-staged: "npm:^15.2.10"
     lodash.isequal: "npm:4.5.0"
     luxon: "npm:3.5.0"
