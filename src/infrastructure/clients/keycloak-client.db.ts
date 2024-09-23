@@ -40,6 +40,8 @@ export class KeycloakClient {
     structure: Core.Structure
   ): Promise<string> {
     switch (structure) {
+      case Core.Structure.CONSEIL_DEPT:
+        return this.exchangeToken(bearer)
       case Core.Structure.POLE_EMPLOI:
         return this.exchangeToken(bearer, 'pe-jeune', structure)
       case Core.Structure.POLE_EMPLOI_BRSA:
