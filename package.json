@@ -76,7 +76,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "3.657.0",
     "@aws-sdk/s3-request-presigner": "3.657.0",
-    "@google-cloud/bigquery": "7.9.0",
+    "@google-cloud/bigquery": "7.9.1",
     "@nestjs/axios": "^3.0.3",
     "@nestjs/common": "10.4.4",
     "@nestjs/config": "2.3.4",
