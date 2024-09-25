@@ -43,7 +43,8 @@ export function estPoleEmploi(structure: Core.Structure): boolean {
 export function estPassEmploi(structure: Core.Structure): boolean {
   return [
     Core.Structure.POLE_EMPLOI_BRSA,
-    Core.Structure.POLE_EMPLOI_AIJ
+    Core.Structure.POLE_EMPLOI_AIJ,
+    Core.Structure.CONSEIL_DEPT
   ].includes(structure)
 }
 

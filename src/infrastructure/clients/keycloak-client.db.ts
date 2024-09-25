@@ -37,25 +37,9 @@ export class KeycloakClient {
 
   public async exchangeTokenJeune(
     bearer: string,
-    structure: Core.Structure
+    _structure: Core.Structure
   ): Promise<string> {
-    switch (structure) {
-      case Core.Structure.CONSEIL_DEPT:
-        return this.exchangeToken(bearer)
-      case Core.Structure.POLE_EMPLOI:
-        return this.exchangeToken(bearer, 'pe-jeune', structure)
-      case Core.Structure.POLE_EMPLOI_BRSA:
-        return this.exchangeToken(bearer, 'pe-brsa-jeune', structure)
-      case Core.Structure.POLE_EMPLOI_AIJ:
-        return this.exchangeToken(bearer, 'pe-aij-jeune', structure)
-      case Core.Structure.MILO:
-        return this.exchangeToken(bearer, 'similo-jeune', structure)
-    }
-    throw new UnauthorizedException({
-      statusCode: 401,
-      code: 'Unauthorized',
-      message: 'token exchange jeune failed'
-    })
+    return this.exchangeToken(bearer)
   }
 
   public async exchangeTokenConseillerJeune(

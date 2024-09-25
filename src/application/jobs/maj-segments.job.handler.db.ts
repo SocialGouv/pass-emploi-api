@@ -26,7 +26,8 @@ enum SEGMENTS {
   JEUNES_MILO = 'JEUNES_MILO',
   JEUNES_POLE_EMPLOI = 'JEUNES_POLE_EMPLOI',
   JEUNES_POLE_EMPLOI_BRSA = 'JEUNES_POLE_EMPLOI_BRSA',
-  JEUNES_POLE_EMPLOI_AIJ = 'JEUNES_POLE_EMPLOI_AIJ'
+  JEUNES_POLE_EMPLOI_AIJ = 'JEUNES_POLE_EMPLOI_AIJ',
+  JEUNES_POLE_EMPLOI_CD = 'JEUNES_POLE_EMPLOI_CD'
 }
 
 @Injectable()
@@ -144,6 +145,10 @@ export class MajSegmentsJobHandler extends JobHandler<Job> {
       {
         segment_label: SEGMENTS.JEUNES_POLE_EMPLOI_AIJ,
         display_name: 'Jeunes POLE EMPLOI AIJ'
+      },
+      {
+        segment_label: SEGMENTS.JEUNES_POLE_EMPLOI_CD,
+        display_name: 'Jeunes POLE EMPLOI CD'
       }
     ]
     metadatas.forEach(metadata => {
@@ -188,6 +193,8 @@ export class MajSegmentsJobHandler extends JobHandler<Job> {
         return SEGMENTS.JEUNES_POLE_EMPLOI_BRSA
       case Core.Structure.POLE_EMPLOI_AIJ:
         return SEGMENTS.JEUNES_POLE_EMPLOI_AIJ
+      case Core.Structure.CONSEIL_DEPT:
+        return SEGMENTS.JEUNES_POLE_EMPLOI_CD
       default:
         throw new Error(`Unknown structure ${structure}`)
     }

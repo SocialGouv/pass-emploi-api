@@ -148,7 +148,8 @@ export default () => {
         poleEmploi: process.env.SENDINBLUE_POLE_EMPLOI_MAILING_LIST_ID ?? 7,
         milo: process.env.SENDINBLUE_MILO_MAILING_LIST_ID ?? 8,
         brsa: process.env.SENDINBLUE_BRSA_MAILING_LIST_ID ?? 56,
-        aij: process.env.SENDINBLUE_AIJ_MAILING_LIST_ID ?? 55
+        aij: process.env.SENDINBLUE_AIJ_MAILING_LIST_ID ?? 55,
+        cd: process.env.SENDINBLUE_CD_MAILING_LIST_ID ?? 59
       }
     },
     s3: {

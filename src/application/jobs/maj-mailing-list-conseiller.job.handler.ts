@@ -16,6 +16,7 @@ export class MajMailingListConseillerJobHandler extends JobHandler<Job> {
     milo: string
     brsa: string
     aij: string
+    cd: string
   }
 
   constructor(
@@ -62,6 +63,10 @@ export class MajMailingListConseillerJobHandler extends JobHandler<Job> {
       await this.mailRepository.findAllContactsConseillerByStructures([
         Core.Structure.POLE_EMPLOI_AIJ
       ])
+    const contactsCD =
+      await this.mailRepository.findAllContactsConseillerByStructures([
+        Core.Structure.CONSEIL_DEPT
+      ])
     await this.mailService.mettreAJourMailingList(
       contactsMilo,
       parseInt(this.mailingLists.milo)
@@ -75,8 +80,8 @@ export class MajMailingListConseillerJobHandler extends JobHandler<Job> {
       parseInt(this.mailingLists.brsa)
     )
     await this.mailService.mettreAJourMailingList(
-      contactsAIJ,
-      parseInt(this.mailingLists.aij)
+      contactsCD,
+      parseInt(this.mailingLists.cd)
     )
     const conseillersSansEmail =
       await this.mailRepository.countContactsConseillerSansEmail()

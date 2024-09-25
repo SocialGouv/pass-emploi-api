@@ -332,7 +332,7 @@ function verifierStructureBeneficiaire(
   idUtilisateur: string,
   structureAttendue: StructureUtilisateurAuth
 ): Result {
-  // TODO : ne garder que cette partie quand le mobile sera en prod avec bouton unique FT
+  // TODO : ne garder que cette partie pour FT quand le mobile sera en prod avec bouton unique FT
   if (structureAttendue === 'FRANCE_TRAVAIL') {
     switch (utilisateurTrouve.structure) {
       case Core.Structure.MILO:
@@ -350,7 +350,6 @@ function verifierStructureBeneficiaire(
         return emptySuccess()
     }
   }
-  // Legacy
   if (utilisateurTrouve.structure !== structureAttendue) {
     let reason: NonTraitableReason | undefined
 
@@ -367,6 +366,8 @@ function verifierStructureBeneficiaire(
       case Core.Structure.POLE_EMPLOI_AIJ:
         reason = NonTraitableReason.UTILISATEUR_DEJA_PE_AIJ
         break
+      case Core.Structure.CONSEIL_DEPT:
+        reason = NonTraitableReason.UTILISATEUR_DEJA_CONSEIL_DEPT
     }
 
     return failure(new NonTraitableError('Utilisateur', idUtilisateur, reason))
