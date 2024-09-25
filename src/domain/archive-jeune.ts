@@ -71,7 +71,8 @@ export namespace ArchiveJeune {
       structures: [
         Core.Structure.POLE_EMPLOI,
         Core.Structure.MILO,
-        Core.Structure.POLE_EMPLOI_BRSA
+        Core.Structure.POLE_EMPLOI_BRSA,
+        Core.Structure.CONSEIL_DEPT
       ],
       description:
         'CDI, CDD de plus de 6 mois dont alternance, titularisation dans la fonction publique'
@@ -101,7 +102,8 @@ export namespace ArchiveJeune {
     [MotifSuppression.CESSATION_INSCRIPTION]: {
       structures: [
         Core.Structure.POLE_EMPLOI_BRSA,
-        Core.Structure.POLE_EMPLOI_AIJ
+        Core.Structure.POLE_EMPLOI_AIJ,
+        Core.Structure.CONSEIL_DEPT
       ]
     },
     [MotifSuppression.LIMITE_AGE]: {
@@ -112,17 +114,18 @@ export namespace ArchiveJeune {
     [MotifSuppression.CHANGEMENT_ACCOMPAGNEMENT]: {
       structures: [
         Core.Structure.POLE_EMPLOI_BRSA,
-        Core.Structure.POLE_EMPLOI_AIJ
+        Core.Structure.POLE_EMPLOI_AIJ,
+        Core.Structure.CONSEIL_DEPT
       ]
     },
     [MotifSuppression.DEMANDE_DU_JEUNE]: {
       structures: [Core.Structure.POLE_EMPLOI, Core.Structure.MILO]
     },
     [MotifSuppression.DEMANDE_DU_CONSEILLER]: {
-      structures: [Core.Structure.POLE_EMPLOI_BRSA]
+      structures: [Core.Structure.POLE_EMPLOI_BRSA, Core.Structure.CONSEIL_DEPT]
     },
     [MotifSuppression.DEMANDE_DU_BENEFICIAIRE_BRSA]: {
-      structures: [Core.Structure.POLE_EMPLOI_BRSA]
+      structures: [Core.Structure.POLE_EMPLOI_BRSA, Core.Structure.CONSEIL_DEPT]
     },
     [MotifSuppression.NON_RESPECT_OU_ABANDON]: {
       structures: [Core.Structure.POLE_EMPLOI, Core.Structure.MILO]
@@ -135,11 +138,12 @@ export namespace ArchiveJeune {
         Core.Structure.POLE_EMPLOI,
         Core.Structure.MILO,
         Core.Structure.POLE_EMPLOI_BRSA,
-        Core.Structure.POLE_EMPLOI_AIJ
+        Core.Structure.POLE_EMPLOI_AIJ,
+        Core.Structure.CONSEIL_DEPT
       ]
     },
     [MotifSuppression.DEMENAGEMENT_TERRITOIRE_HORS_EXPERIMENTATION]: {
-      structures: [Core.Structure.POLE_EMPLOI_BRSA]
+      structures: [Core.Structure.POLE_EMPLOI_BRSA, Core.Structure.CONSEIL_DEPT]
     },
     [MotifSuppression.CHANGEMENT_CONSEILLER]: {
       structures: [Core.Structure.POLE_EMPLOI, Core.Structure.MILO]
@@ -155,7 +159,8 @@ export namespace ArchiveJeune {
         Core.Structure.POLE_EMPLOI,
         Core.Structure.MILO,
         Core.Structure.POLE_EMPLOI_BRSA,
-        Core.Structure.POLE_EMPLOI_AIJ
+        Core.Structure.POLE_EMPLOI_AIJ,
+        Core.Structure.CONSEIL_DEPT
       ],
       description: 'Champ libre'
     }

@@ -145,6 +145,7 @@ export class MailBrevoService implements Mail.Service {
         templateId = parseInt(this.templates.compteJeuneArchivePECEJ)
         break
       case Core.Structure.POLE_EMPLOI_BRSA:
+      case Core.Structure.CONSEIL_DEPT:
         templateId = parseInt(this.templates.compteJeuneArchivePEBRSA)
         break
       default:
