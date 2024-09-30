@@ -2,6 +2,7 @@ import { HttpService } from '@nestjs/axios'
 import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
+import { DateTime } from 'luxon'
 import { firstValueFrom } from 'rxjs'
 import { Op } from 'sequelize'
 import { JeuneMiloAArchiverSqlModel } from 'src/infrastructure/sequelize/models/jeune-milo-a-archiver.sql-model'
@@ -16,10 +17,9 @@ import { DateService } from '../../../utils/date-service'
 import { RateLimiterService } from '../../../utils/rate-limiter.service'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
 import { SituationsMiloSqlModel } from '../../sequelize/models/situations-milo.sql-model'
+import { StructureMiloSqlModel } from '../../sequelize/models/structure-milo.sql-model'
 import { DossierMiloDto } from '../dto/milo.dto'
 import { fromSqlToJeune } from '../mappers/jeunes.mappers'
-import { StructureMiloSqlModel } from '../../sequelize/models/structure-milo.sql-model'
-import { DateTime } from 'luxon'
 
 @Injectable()
 export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
@@ -111,17 +111,24 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
   }
 
   async creerJeune(
-    idDossier: string
+    idDossier: string,
+    surcharge?: boolean
   ): Promise<
     Result<{ idAuthentification?: string; existeDejaChezMilo: boolean }>
   > {
     try {
       const response = await firstValueFrom(
-        this.httpService.post<string>(
-          `${this.apiUrl}/sue/compte-jeune/${idDossier}`,
-          {},
-          { headers: { 'X-Gravitee-Api-Key': `${this.apiKeyCreerJeune}` } }
-        )
+        surcharge
+          ? this.httpService.put<string>(
+              `${this.apiUrl}/sue/compte-jeune/surcharge/${idDossier}`,
+              {},
+              { headers: { 'X-Gravitee-Api-Key': `${this.apiKeyCreerJeune}` } }
+            )
+          : this.httpService.post<string>(
+              `${this.apiUrl}/sue/compte-jeune/${idDossier}`,
+              {},
+              { headers: { 'X-Gravitee-Api-Key': `${this.apiKeyCreerJeune}` } }
+            )
       )
       return success({
         idAuthentification: response.data || undefined,
@@ -130,6 +137,10 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
     } catch (e) {
       this.logger.error(e)
       this.logger.error(e.response?.data)
+
+      if (e.response.data?.code === 'SUE_ACCOUNT_EXISTING_OTHER_ML') {
+        return failure(new ErreurHttp(e.response.data?.message, 409))
+      }
 
       if (e.response?.status >= 400 && e.response?.status <= 404) {
         if (

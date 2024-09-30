@@ -93,6 +93,11 @@ export class CreerJeuneMiloPayload {
   @IsString()
   @IsNotEmpty()
   idConseiller: string
+
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
+  surcharge?: boolean
 }
 
 export class EnvoyerNotificationsPayload {

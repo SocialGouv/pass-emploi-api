@@ -38,6 +38,7 @@ export interface CreerJeuneMiloCommand extends Command {
   prenom: string
   email: string
   idConseiller: string
+  surcharge?: boolean
 }
 
 @Injectable()
@@ -81,7 +82,8 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     }
 
     const result = await this.miloJeuneRepository.creerJeune(
-      command.idPartenaire
+      command.idPartenaire,
+      command.surcharge
     )
 
     if (isFailure(result)) {

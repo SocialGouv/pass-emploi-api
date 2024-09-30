@@ -175,7 +175,8 @@ describe('ConseillersMiloController', () => {
           nom: 'nom',
           prenom: 'prenom',
           email: 'email',
-          idConseiller: 'idConseiller'
+          idConseiller: 'idConseiller',
+          surcharge: undefined
         }
 
         const payload: CreerJeuneMiloPayload = {
@@ -186,9 +187,9 @@ describe('ConseillersMiloController', () => {
           idConseiller: 'idConseiller'
         }
 
-        creerJeuneMiloCommandHandler.execute
-          .withArgs(command, unUtilisateurDecode())
-          .resolves(success({ id: 'idJeune', prenom: 'prenom', nom: 'nom' }))
+        creerJeuneMiloCommandHandler.execute.resolves(
+          success({ id: 'idJeune', prenom: 'prenom', nom: 'nom' })
+        )
 
         // When - Then
         await request(app.getHttpServer())
@@ -197,6 +198,10 @@ describe('ConseillersMiloController', () => {
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.CREATED)
           .expect({ id: 'idJeune', prenom: 'prenom', nom: 'nom' })
+
+        expect(
+          creerJeuneMiloCommandHandler.execute
+        ).to.have.been.calledOnceWithExactly(command, unUtilisateurDecode())
       })
     })
 

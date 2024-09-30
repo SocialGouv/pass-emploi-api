@@ -278,6 +278,24 @@ describe('JeuneMiloHttpRepository', () => {
           )
         })
       })
+      it("surcharge chez Milo et retourne l'id", async () => {
+        // Given
+        nock('https://milo.com')
+          .put('/sue/compte-jeune/surcharge/1')
+          .reply(201, 'un-id-keycloak', { 'content-type': 'text/plain' })
+          .isDone()
+
+        // When
+        const dossier = await miloHttpSqlRepository.creerJeune('1', true)
+
+        // Then
+        expect(dossier).to.deep.equal(
+          success({
+            idAuthentification: 'un-id-keycloak',
+            existeDejaChezMilo: false
+          })
+        )
+      })
     })
     describe('quand il y a un bad request', () => {
       describe("quand c'est SUE_RECORD_ALREADY_ATTACHED_TO_ACCOUNT", () => {
@@ -301,6 +319,26 @@ describe('JeuneMiloHttpRepository', () => {
                 idAuthentification: 'mon-sub',
                 existeDejaChezMilo: true
               })
+            )
+          })
+        })
+        describe('quand le jeune existe déjà dans une autre ML', () => {
+          it('renvoie un succès avec le sub', async () => {
+            // Given
+            nock('https://milo.com')
+              .post('/sue/compte-jeune/1')
+              .reply(400, {
+                code: 'SUE_ACCOUNT_EXISTING_OTHER_ML',
+                message: 'le jeune est suivi par john'
+              })
+              .isDone()
+
+            // When
+            const dossier = await miloHttpSqlRepository.creerJeune('1')
+
+            // Then
+            expect(dossier).to.deep.equal(
+              failure(new ErreurHttp('le jeune est suivi par john', 409))
             )
           })
         })
