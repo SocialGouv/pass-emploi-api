@@ -3,7 +3,7 @@ import { Cached, Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { isFailure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { estPassEmploi, estPoleEmploiOuCD } from '../../domain/core'
+import { estPoleEmploiOuCD, peutVoirLesCampagnes } from '../../domain/core'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { GetCampagneQueryGetter } from './query-getters/get-campagne.query.getter'
 import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
@@ -33,9 +33,9 @@ export class GetJeuneHomeDemarchesQueryHandler extends QueryHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<Result<Cached<JeuneHomeDemarcheQueryModel>>> {
     const getCampagne = (): Promise<CampagneQueryModel | undefined> =>
-      estPassEmploi(utilisateur.structure)
-        ? Promise.resolve(undefined)
-        : this.getCampagneQueryGetter.handle({ idJeune: query.idJeune })
+      peutVoirLesCampagnes(utilisateur.structure)
+        ? this.getCampagneQueryGetter.handle({ idJeune: query.idJeune })
+        : Promise.resolve(undefined)
 
     const [demarches, campagne] = await Promise.all([
       this.getActionsJeunePoleEmploiQueryGetter.handle({

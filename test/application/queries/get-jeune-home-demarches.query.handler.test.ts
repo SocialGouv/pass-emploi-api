@@ -100,14 +100,14 @@ describe('GetJeuneHomeDemarchesQueryHandler', () => {
         expect(home).to.deep.equal(success(data))
       })
 
-      it('ne récupère pas la campagne pour un bénéficiaire BRSA', async () => {
+      it('ne récupère pas la campagne pour un bénéficiaire AIJ', async () => {
         // When
         const home = await getJeuneHomeDemarchesQueryHandler.handle(
           {
             idJeune: 'idJeune',
             accessToken: 'token'
           },
-          unUtilisateurJeune({ structure: Structure.POLE_EMPLOI_BRSA })
+          unUtilisateurJeune({ structure: Structure.POLE_EMPLOI_AIJ })
         )
 
         // Then

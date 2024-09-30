@@ -11,7 +11,7 @@ import {
   success
 } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
-import { estPassEmploi, estPoleEmploiOuCD } from '../../../domain/core'
+import { estPoleEmploiOuCD, peutVoirLesCampagnes } from '../../../domain/core'
 import { Demarche } from '../../../domain/demarche'
 import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client.db'
@@ -90,9 +90,9 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
       this.getFavorisQueryGetter.handle({
         idJeune: query.idJeune
       }),
-      estPassEmploi(jeune.structure)
-        ? Promise.resolve(undefined)
-        : this.getCampagneQueryGetter.handle({ idJeune: query.idJeune })
+      peutVoirLesCampagnes(jeune.structure)
+        ? this.getCampagneQueryGetter.handle({ idJeune: query.idJeune })
+        : Promise.resolve(undefined)
     ])
 
     if (isFailure(resultDemarches)) {

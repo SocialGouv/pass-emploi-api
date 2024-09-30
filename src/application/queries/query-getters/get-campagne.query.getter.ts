@@ -68,7 +68,7 @@ export const questionsInMemory = (): QuestionCampagneQueryModel[] => [
   {
     id: 1,
     libelle:
-      '*Est-ce que l’application du CEJ vous aide à vous sentir mieux accompagné par votre conseiller ?',
+      '*Est-ce que l’application vous aide à vous sentir mieux accompagné par votre conseiller ?',
     pourquoi: true,
     options: [
       {
@@ -140,7 +140,7 @@ export const questionsInMemory = (): QuestionCampagneQueryModel[] => [
   {
     id: 4,
     libelle:
-      'Recommanderiez-vous l’application du CEJ à vos proches ? Sur une échelle de 0 à 10, 0 = pas du tout et 10 = très certainement',
+      'Recommanderiez-vous l’application à vos proches ? Sur une échelle de 0 à 10, 0 = pas du tout et 10 = très certainement',
     pourquoi: true,
     libellePourquoi:
       'Que pouvons-nous améliorer pour vous satisfaire davantage ?',

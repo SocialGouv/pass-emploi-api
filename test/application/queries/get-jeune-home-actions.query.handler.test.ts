@@ -77,13 +77,13 @@ describe('GetJeuneHomeActionsQueryHandler', () => {
       })
     })
 
-    it('ne récupère pas la campagne en cours pour un bénéficiaire BRSA', async () => {
+    it('ne récupère pas la campagne en cours pour un bénéficiaire AIJ', async () => {
       // When
       const home = await getJeuneHomeActionsQueryHandler.handle(
         {
           idJeune: 'idJeune'
         },
-        unUtilisateurJeune({ structure: Structure.POLE_EMPLOI_BRSA })
+        unUtilisateurJeune({ structure: Structure.POLE_EMPLOI_AIJ })
       )
 
       // Then

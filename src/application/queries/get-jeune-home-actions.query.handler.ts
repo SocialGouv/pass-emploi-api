@@ -3,7 +3,7 @@ import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { isSuccess, Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { estPassEmploi } from '../../domain/core'
+import { peutVoirLesCampagnes } from '../../domain/core'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { GetActionsJeuneQueryHandler } from './action/get-actions-jeune.query.handler.db'
 import { GetCampagneQueryGetter } from './query-getters/get-campagne.query.getter'
@@ -32,9 +32,9 @@ export class GetJeuneHomeActionsQueryHandler extends QueryHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<JeuneHomeActionQueryModel> {
     const getCampagne = (): Promise<CampagneQueryModel | undefined> =>
-      estPassEmploi(utilisateur.structure)
-        ? Promise.resolve(undefined)
-        : this.getCampagneQueryGetter.handle(query)
+      peutVoirLesCampagnes(utilisateur.structure)
+        ? this.getCampagneQueryGetter.handle(query)
+        : Promise.resolve(undefined)
 
     const [actionsJeuneResult, campagne] = await Promise.all([
       this.getActionsByJeuneQueryHandler.handle(query),

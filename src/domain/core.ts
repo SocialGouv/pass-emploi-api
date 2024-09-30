@@ -70,3 +70,11 @@ export function aAccesAuxAlternancesEtServicesCiviques(
     Core.Structure.POLE_EMPLOI_AIJ
   ].includes(structure)
 }
+
+export function peutVoirLesCampagnes(structure: Core.Structure): boolean {
+  return [
+    Core.Structure.MILO,
+    Core.Structure.POLE_EMPLOI,
+    Core.Structure.POLE_EMPLOI_BRSA
+  ].includes(structure)
+}
