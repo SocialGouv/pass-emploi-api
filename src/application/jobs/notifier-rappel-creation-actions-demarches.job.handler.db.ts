@@ -48,23 +48,17 @@ export class NotifierRappelCreationActionsDemarchesJobHandler extends JobHandler
       ]
 
       let offset = 0
-      let jeunesANotifier: Array<{
-        id: string
-        structure: Core.Structure
-        token: string
-      }> = []
+      let idsJeunesANotifier: Array<{ id_utilisateur: string }> = []
 
       do {
-        jeunesANotifier = await this.sequelize.query(
-          `SELECT DISTINCT jeune.id as id, jeune.structure as structure, jeune.push_notification_token as token 
-        FROM jeune, evenement_engagement_hebdo
-        WHERE jeune.structure IN (:structuresConcernees)
-        AND push_notification_token IS NOT NULL
-        AND jeune.id = evenement_engagement_hebdo.id_utilisateur
-        GROUP BY jeune.id, evenement_engagement_hebdo.id_utilisateur
-        HAVING COUNT(*) > 0
-        AND SUM(CASE WHEN evenement_engagement_hebdo.code IN (:codesAECreationActionsDemarches) THEN 1 ELSE 0 END) = 0
-        ORDER BY jeune.id ASC
+        idsJeunesANotifier = await this.sequelize.query(
+          `SELECT DISTINCT id_utilisateur 
+        FROM evenement_engagement_hebdo
+        WHERE structure IN (:structuresConcernees)
+        AND type_utilisateur = 'JEUNE'
+        GROUP BY id_utilisateur
+        HAVING SUM(CASE WHEN code IN (:codesAECreationActionsDemarches) THEN 1 ELSE 0 END) = 0
+        ORDER BY id_utilisateur ASC
         LIMIT :maxJeunes
         OFFSET :offset`,
           {
@@ -87,12 +81,35 @@ export class NotifierRappelCreationActionsDemarchesJobHandler extends JobHandler
           }
         )
 
-        stats.nbJeunesNotifiables += jeunesANotifier.length
-        for (const jeune of jeunesANotifier) {
-          this.notificationService.notifierRappelCreationActionDemarche(jeune)
+        this.logger.log(`${idsJeunesANotifier.length} ids jeunes à notifier`)
+
+        if (idsJeunesANotifier.length) {
+          const jeunesANotifier: Array<{
+            id: string
+            structure: Core.Structure
+            token: string
+          }> = await this.sequelize.query(
+            `SELECT id, structure, push_notification_token as token from jeune where id in (:idsJeunesANotifier) AND push_notification_token IS NOT NULL`,
+            {
+              type: QueryTypes.SELECT,
+              replacements: {
+                idsJeunesANotifier: idsJeunesANotifier.map(
+                  id => id.id_utilisateur
+                )
+              }
+            }
+          )
+
+          this.logger.log(`${jeunesANotifier.length} jeunes notifiables`)
+          stats.nbJeunesNotifiables += jeunesANotifier.length
+          for (const jeune of jeunesANotifier) {
+            this.notificationService.notifierRappelCreationActionDemarche(jeune)
+          }
         }
         offset += PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM
-      } while (jeunesANotifier.length)
+      } while (
+        idsJeunesANotifier.length === PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM
+      )
     } catch (e) {
       this.logger.error(e)
       succes = false
