@@ -132,7 +132,8 @@ export class ConseillersMiloController {
       email: creerJeuneMiloPayload.email,
       nom: creerJeuneMiloPayload.nom,
       prenom: creerJeuneMiloPayload.prenom,
-      idPartenaire: creerJeuneMiloPayload.idDossier
+      idPartenaire: creerJeuneMiloPayload.idDossier,
+      surcharge: creerJeuneMiloPayload.surcharge
     }
     const result = await this.creerJeuneMiloCommandHandler.execute(
       command,

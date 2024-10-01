@@ -64,7 +64,8 @@ export namespace JeuneMilo {
     ): Promise<JeuneMilo[]>
     getSituationsByJeune(idJeune: string): Promise<Situations | undefined>
     creerJeune(
-      idDossier: string
+      idDossier: string,
+      surcharge?: boolean
     ): Promise<
       Result<{ idAuthentification?: string; existeDejaChezMilo: boolean }>
     >
