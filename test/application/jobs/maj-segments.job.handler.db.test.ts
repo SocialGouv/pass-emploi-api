@@ -201,7 +201,7 @@ describe('MajSegmentsJobHandler', () => {
 
         expect(result.succes).to.equal(true)
         expect(result.resultat).to.deep.equal({
-          nbCampagnesNonRepondues: 2,
+          nbCampagnesNonRepondues: 3,
           nbJeunes: 5
         })
       })

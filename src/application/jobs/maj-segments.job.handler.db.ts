@@ -104,7 +104,7 @@ export class MajSegmentsJobHandler extends JobHandler<Job> {
     const sql = `select instance_id, structure
                      from jeune
                      where instance_id is not null
-                       and (structure = 'POLE_EMPLOI' OR structure = 'MILO') 
+                       and (structure = 'POLE_EMPLOI' OR structure = 'MILO' OR structure = 'POLE_EMPLOI_BRSA') 
                        and id not in (select id_jeune
                                       from reponse_campagne
                                       where id_campagne in
