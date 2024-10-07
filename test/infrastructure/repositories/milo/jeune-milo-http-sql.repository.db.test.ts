@@ -296,6 +296,31 @@ describe('JeuneMiloHttpRepository', () => {
           })
         )
       })
+      it("surcharge chez Milo et retourne l'id quand pas de sub retourné", async () => {
+        // Given
+        nock('https://milo.com')
+          .put('/sue/compte-jeune/surcharge/1')
+          .reply(201, '', { 'content-type': 'text/plain' })
+          .isDone()
+        nock('https://milo.com')
+          .post('/sue/compte-jeune/1')
+          .reply(400, {
+            code: 'SUE_RECORD_ALREADY_ATTACHED_TO_ACCOUNT',
+            'id-keycloak': 'un-id-keycloak'
+          })
+          .isDone()
+
+        // When
+        const dossier = await miloHttpSqlRepository.creerJeune('1', true)
+
+        // Then
+        expect(dossier).to.deep.equal(
+          success({
+            idAuthentification: 'un-id-keycloak',
+            existeDejaChezMilo: true
+          })
+        )
+      })
     })
     describe('quand il y a un bad request', () => {
       describe("quand c'est SUE_RECORD_ALREADY_ATTACHED_TO_ACCOUNT", () => {

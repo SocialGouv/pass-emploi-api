@@ -116,8 +116,9 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
   ): Promise<
     Result<{ idAuthentification?: string; existeDejaChezMilo: boolean }>
   > {
+    let response
     try {
-      const response = await firstValueFrom(
+      response = await firstValueFrom(
         surcharge
           ? this.httpService.put<string>(
               `${this.apiUrl}/sue/compte-jeune/surcharge/${idDossier}`,
@@ -130,6 +131,15 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
               { headers: { 'X-Gravitee-Api-Key': `${this.apiKeyCreerJeune}` } }
             )
       )
+      if (surcharge && !response.data) {
+        response = await firstValueFrom(
+          this.httpService.post<string>(
+            `${this.apiUrl}/sue/compte-jeune/${idDossier}`,
+            {},
+            { headers: { 'X-Gravitee-Api-Key': `${this.apiKeyCreerJeune}` } }
+          )
+        )
+      }
       return success({
         idAuthentification: response.data || undefined,
         existeDejaChezMilo: false
