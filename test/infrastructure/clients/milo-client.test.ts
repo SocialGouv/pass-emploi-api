@@ -60,7 +60,7 @@ describe('MiloClient', () => {
         .isDone()
 
       // When
-      const result = await miloClient.getSessionsConseiller(
+      const result = await miloClient.getSessionsConseillerParStructure(
         idpToken,
         idStructure,
         'America/Cayenne',
@@ -73,7 +73,9 @@ describe('MiloClient', () => {
       )
 
       // Then
-      expect(result).to.deep.equal(success(uneListeSessionsConseillerDto))
+      expect(result).to.deep.equal(
+        success(uneListeSessionsConseillerDto.sessions)
+      )
     })
 
     it('recupere la liste des sessions milo de la structure du conseiller', async () => {
@@ -89,7 +91,7 @@ describe('MiloClient', () => {
         .isDone()
 
       // When
-      const result = await miloClient.getSessionsConseiller(
+      const result = await miloClient.getSessionsConseillerParStructure(
         idpToken,
         idStructure,
         'America/Cayenne',
@@ -97,7 +99,9 @@ describe('MiloClient', () => {
       )
 
       // Then
-      expect(result).to.deep.equal(success(uneListeSessionsConseillerDto))
+      expect(result).to.deep.equal(
+        success(uneListeSessionsConseillerDto.sessions)
+      )
     })
   })
 
@@ -115,10 +119,13 @@ describe('MiloClient', () => {
         .isDone()
 
       // When
-      const result = await miloClient.getSessionsJeune(idpToken, idDossier)
+      const result = await miloClient.getSessionsParDossierJeune(
+        idpToken,
+        idDossier
+      )
 
       // Then
-      expect(result).to.deep.equal(success(uneListeSessionsJeuneDto))
+      expect(result).to.deep.equal(success(uneListeSessionsJeuneDto.sessions))
     })
 
     it('permet de ne récuperer la liste des sessions que sur une période donnée', async () => {
@@ -134,13 +141,17 @@ describe('MiloClient', () => {
         .isDone()
 
       // When
-      const result = await miloClient.getSessionsJeune(idpToken, idDossier, {
-        debut: DateTime.fromISO('2023-07-21T17:53:42'),
-        fin: DateTime.fromISO('2023-07-26T22:11:10')
-      })
+      const result = await miloClient.getSessionsParDossierJeune(
+        idpToken,
+        idDossier,
+        {
+          debut: DateTime.fromISO('2023-07-21T17:53:42'),
+          fin: DateTime.fromISO('2023-07-26T22:11:10')
+        }
+      )
 
       // Then
-      expect(result).to.deep.equal(success(uneListeSessionsJeuneDto))
+      expect(result).to.deep.equal(success(uneListeSessionsJeuneDto.sessions))
     })
   })
 
@@ -158,13 +169,13 @@ describe('MiloClient', () => {
         .isDone()
 
       // When
-      const result = await miloClient.getSessionsJeunePourConseiller(
+      const result = await miloClient.getSessionsParDossierJeunePourConseiller(
         idpToken,
         idDossier
       )
 
       // Then
-      expect(result).to.deep.equal(success(uneListeSessionsJeuneDto))
+      expect(result).to.deep.equal(success(uneListeSessionsJeuneDto.sessions))
     })
 
     it('permet de ne récuperer la liste des sessions que sur une période donnée', async () => {
@@ -180,7 +191,7 @@ describe('MiloClient', () => {
         .isDone()
 
       // When
-      const result = await miloClient.getSessionsJeunePourConseiller(
+      const result = await miloClient.getSessionsParDossierJeunePourConseiller(
         idpToken,
         idDossier,
         {
@@ -190,7 +201,7 @@ describe('MiloClient', () => {
       )
 
       // Then
-      expect(result).to.deep.equal(success(uneListeSessionsJeuneDto))
+      expect(result).to.deep.equal(success(uneListeSessionsJeuneDto.sessions))
     })
   })
 

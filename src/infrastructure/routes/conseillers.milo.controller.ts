@@ -14,15 +14,17 @@ import {
   UpdateSessionMiloCommandHandler
 } from 'src/application/commands/milo/update-session-milo.command.handler'
 import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
+import { GetCompteursBeneficiaireMiloQueryHandler } from 'src/application/queries/milo/get-compteurs-portefeuille-milo.query.handler.db'
 import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-conseiller.milo.query.handler.db'
 import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-sessions-conseiller.milo.query.handler.db'
+import { CompteursBeneficiaireQueryModel } from 'src/application/queries/query-models/conseillers.query-model'
 import {
   AgendaConseillerMiloSessionListItemQueryModel,
   DetailSessionConseillerMiloQueryModel,
-  SessionConseillerMiloQueryModel,
-  SessionsConseillerV2QueryModel
+  SessionConseillerMiloQueryModel
 } from 'src/application/queries/query-models/sessions.milo.query.model'
 import { Authentification } from 'src/domain/authentification'
+import { GetPortefeuilleParams } from 'src/infrastructure/routes/validation/jeunes.milo.inputs'
 import { DateService } from 'src/utils/date-service'
 import {
   CreerJeuneMiloCommand,
@@ -39,7 +41,6 @@ import {
 } from '../../application/commands/milo/qualifier-actions-milo.command.handler'
 import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
 import { GetJeuneMiloByDossierQueryHandler } from '../../application/queries/get-jeune-milo-by-dossier.query.handler.db'
-import { GetSessionsConseillerMiloV2QueryHandler } from '../../application/queries/milo/v2/get-sessions-conseiller.milo.v2.query.handler.db'
 import {
   IdentiteJeuneQueryModel,
   JeuneQueryModel
@@ -53,13 +54,9 @@ import {
   EmargementsSessionMiloPayload,
   GetAgendaSessionsQueryParams,
   GetSessionsQueryParams,
-  GetSessionsV2QueryParams,
   QualifierActionsMiloPayload,
   UpdateSessionMiloPayload
 } from './validation/conseillers.milo.inputs'
-import { CompteursBeneficiaireQueryModel } from 'src/application/queries/query-models/conseillers.query-model'
-import { GetPortefeuilleParams } from 'src/infrastructure/routes/validation/jeunes.milo.inputs'
-import { GetCompteursBeneficiaireMiloQueryHandler } from 'src/application/queries/milo/get-compteurs-portefeuille-milo.query.handler.db'
 
 @Controller()
 @CustomSwaggerApiOAuth2()
@@ -75,7 +72,6 @@ export class ConseillersMiloController {
     private readonly getJeuneMiloByDossierQueryHandler: GetJeuneMiloByDossierQueryHandler,
     private readonly creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler,
     private readonly qualifierActionsMiloCommandHandler: QualifierActionsMiloCommandHandler,
-    private readonly getSessionsV2QueryHandler: GetSessionsConseillerMiloV2QueryHandler,
     private readonly getCompteursBeneficiaireMiloQueryHandler: GetCompteursBeneficiaireMiloQueryHandler
   ) {}
   @ApiOperation({
@@ -307,35 +303,6 @@ export class ConseillersMiloController {
 
     const result = await this.qualifierActionsMiloCommandHandler.execute(
       command,
-      utilisateur
-    )
-
-    return handleResult(result)
-  }
-
-  @ApiOperation({
-    summary:
-      'Récupère la liste des sessions avec pagination de sa structure MILO',
-    description: 'Autorisé pour le conseiller Milo'
-  })
-  @Get('v2/conseillers/milo/:idConseiller/sessions')
-  @ApiResponse({
-    type: SessionConseillerMiloQueryModel,
-    isArray: true
-  })
-  async getSessionsV2(
-    @Param('idConseiller') idConseiller: string,
-    @Utilisateur() utilisateur: Authentification.Utilisateur,
-    @AccessToken() accessToken: string,
-    @Query() getSessionsACloreQueryParams: GetSessionsV2QueryParams
-  ): Promise<SessionsConseillerV2QueryModel> {
-    const result = await this.getSessionsV2QueryHandler.execute(
-      {
-        idConseiller,
-        accessToken: accessToken,
-        page: getSessionsACloreQueryParams.page,
-        filtrerAClore: getSessionsACloreQueryParams.filtrerAClore
-      },
       utilisateur
     )
 

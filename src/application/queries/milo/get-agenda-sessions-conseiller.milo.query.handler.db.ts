@@ -72,31 +72,32 @@ export class GetAgendaSessionsConseillerMiloQueryHandler extends QueryHandler<
 
     const { id: idStructureMilo, timezone: timezoneStructure } =
       conseiller.structure
-    const resultSessionMiloClient = await this.miloClient.getSessionsConseiller(
-      idpToken,
-      idStructureMilo,
-      timezoneStructure,
-      {
-        periode: {
-          dateDebut: query.dateDebut,
-          dateFin: query.dateFin
+    const resultSessions =
+      await this.miloClient.getSessionsConseillerParStructure(
+        idpToken,
+        idStructureMilo,
+        timezoneStructure,
+        {
+          periode: {
+            dateDebut: query.dateDebut,
+            dateFin: query.dateFin
+          }
         }
-      }
-    )
+      )
 
-    if (isFailure(resultSessionMiloClient)) {
-      return resultSessionMiloClient
+    if (isFailure(resultSessions)) {
+      return resultSessions
     }
 
-    const sessionsDto = resultSessionMiloClient.data.sessions
-    if (!sessionsDto.length) return success([])
+    const sessions = resultSessions.data
+    if (!sessions.length) return success([])
 
     const jeunesByIdPartenaire = await this.mapJeunesConseillerByIdPartenaire(
       conseiller.id
     )
 
     const resultData: AgendaConseillerMiloSessionListItemQueryModel[] = []
-    for (const sessionDto of sessionsDto) {
+    for (const sessionDto of sessions) {
       const listeInscritsQueryModels =
         this.extractJeunesDuConseillerParticipants(
           sessionDto.session.instances ?? [],

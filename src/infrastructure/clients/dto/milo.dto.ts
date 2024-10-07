@@ -35,7 +35,7 @@ export interface SessionConseillerDetailDto {
   offre: OffreDto
 }
 
-export interface SessionJeuneListeDto {
+export interface SessionParDossierJeuneDto {
   session: SessionDto
   offre: OffreDto
   sessionInstance?: { statut: string }
@@ -55,7 +55,7 @@ export interface ListeSessionsConseillerMiloDto {
 export interface ListeSessionsJeuneMiloDto {
   page: number
   nbSessions: number
-  sessions: SessionJeuneListeDto[]
+  sessions: SessionParDossierJeuneDto[]
 }
 
 export interface StructureConseillerMiloDto {

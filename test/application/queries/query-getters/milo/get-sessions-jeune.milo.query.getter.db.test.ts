@@ -109,9 +109,9 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
         keycloakClient.exchangeTokenConseillerMilo
           .withArgs(accessToken)
           .resolves(idpToken)
-        miloClient.getSessionsJeunePourConseiller
+        miloClient.getSessionsParDossierJeunePourConseiller
           .withArgs(idpToken, jeuneParis.idPartenaire)
-          .resolves(success({ page: 1, nbSessions: 0, sessions: [] }))
+          .resolves(success([]))
 
         // When
         const result = await getSessionsQueryGetter.handle(
@@ -156,28 +156,24 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
         keycloakClient.exchangeTokenJeune
           .withArgs(accessToken)
           .resolves(idpToken)
-        miloClient.getSessionsJeune
+        miloClient.getSessionsParDossierJeune
           .withArgs(idpToken, jeuneParis.idPartenaire)
           .resolves(
-            success({
-              page: 1,
-              nbSessions: 3,
-              sessions: [
-                {
-                  session: sessionNonVisible,
-                  offre: uneOffreDto
-                },
-                {
-                  session: sessionVisible1,
-                  offre: uneOffreDto,
-                  sessionInstance: { statut: MILO_INSCRIT }
-                },
-                {
-                  session: sessionVisible2,
-                  offre: uneOffreDto
-                }
-              ]
-            })
+            success([
+              {
+                session: sessionNonVisible,
+                offre: uneOffreDto
+              },
+              {
+                session: sessionVisible1,
+                offre: uneOffreDto,
+                sessionInstance: { statut: MILO_INSCRIT }
+              },
+              {
+                session: sessionVisible2,
+                offre: uneOffreDto
+              }
+            ])
           )
         // When
         const result = await getSessionsQueryGetter.handle(
@@ -202,28 +198,24 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
         keycloakClient.exchangeTokenJeune
           .withArgs(accessToken)
           .resolves(idpToken)
-        miloClient.getSessionsJeune
+        miloClient.getSessionsParDossierJeune
           .withArgs(idpToken, jeuneCayenne.idPartenaire)
           .resolves(
-            success({
-              page: 1,
-              nbSessions: 3,
-              sessions: [
-                {
-                  session: sessionNonVisible,
-                  offre: uneOffreDto
-                },
-                {
-                  session: sessionVisible1,
-                  offre: uneOffreDto,
-                  sessionInstance: { statut: MILO_INSCRIT }
-                },
-                {
-                  session: sessionVisible2,
-                  offre: uneOffreDto
-                }
-              ]
-            })
+            success([
+              {
+                session: sessionNonVisible,
+                offre: uneOffreDto
+              },
+              {
+                session: sessionVisible1,
+                offre: uneOffreDto,
+                sessionInstance: { statut: MILO_INSCRIT }
+              },
+              {
+                session: sessionVisible2,
+                offre: uneOffreDto
+              }
+            ])
           )
         // When
         const result = await getSessionsQueryGetter.handle(
@@ -251,29 +243,25 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
         keycloakClient.exchangeTokenJeune
           .withArgs(accessToken)
           .resolves(idpToken)
-        miloClient.getSessionsJeune
+        miloClient.getSessionsParDossierJeune
           .withArgs(idpToken, jeuneParis.idPartenaire)
           .resolves(
-            success({
-              page: 1,
-              nbSessions: 3,
-              sessions: [
-                {
-                  session: sessionNonVisible,
-                  offre: uneOffreDto,
-                  sessionInstance: { statut: MILO_INSCRIT }
-                },
-                {
-                  session: sessionVisible1,
-                  offre: uneOffreDto,
-                  sessionInstance: { statut: MILO_INSCRIT }
-                },
-                {
-                  session: sessionVisible2,
-                  offre: uneOffreDto
-                }
-              ]
-            })
+            success([
+              {
+                session: sessionNonVisible,
+                offre: uneOffreDto,
+                sessionInstance: { statut: MILO_INSCRIT }
+              },
+              {
+                session: sessionVisible1,
+                offre: uneOffreDto,
+                sessionInstance: { statut: MILO_INSCRIT }
+              },
+              {
+                session: sessionVisible2,
+                offre: uneOffreDto
+              }
+            ])
           )
         // When
         const result = await getSessionsQueryGetter.handle(
@@ -307,29 +295,25 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
         keycloakClient.exchangeTokenJeune
           .withArgs(accessToken)
           .resolves(idpToken)
-        miloClient.getSessionsJeune
+        miloClient.getSessionsParDossierJeune
           .withArgs(idpToken, jeuneParis.idPartenaire)
           .resolves(
-            success({
-              page: 1,
-              nbSessions: 3,
-              sessions: [
-                {
-                  session: sessionNonVisible,
-                  offre: uneOffreDto,
-                  sessionInstance: { statut: MILO_INSCRIT }
-                },
-                {
-                  session: sessionVisible1,
-                  offre: uneOffreDto,
-                  sessionInstance: { statut: MILO_INSCRIT }
-                },
-                {
-                  session: sessionVisible2,
-                  offre: uneOffreDto
-                }
-              ]
-            })
+            success([
+              {
+                session: sessionNonVisible,
+                offre: uneOffreDto,
+                sessionInstance: { statut: MILO_INSCRIT }
+              },
+              {
+                session: sessionVisible1,
+                offre: uneOffreDto,
+                sessionInstance: { statut: MILO_INSCRIT }
+              },
+              {
+                session: sessionVisible2,
+                offre: uneOffreDto
+              }
+            ])
           )
         // When
         const result = await getSessionsQueryGetter.handle(

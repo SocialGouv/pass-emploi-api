@@ -8,6 +8,7 @@ import {
   emptySuccess,
   failure,
   isFailure,
+  isSuccess,
   Result,
   success
 } from 'src/building-blocks/types/result'
@@ -18,6 +19,7 @@ import {
   ListeSessionsJeuneMiloDto,
   SessionConseillerDetailDto,
   SessionJeuneDetailDto,
+  SessionParDossierJeuneDto,
   StructureConseillerMiloDto
 } from './dto/milo.dto'
 import { handleAxiosError } from './utils/axios-error-handler'
@@ -25,6 +27,8 @@ import * as APM from 'elastic-apm-node'
 import { getAPMInstance } from '../monitoring/apm.init'
 import { RateLimiterService } from '../../utils/rate-limiter.service'
 import { DateService } from '../../utils/date-service'
+
+export const TAILLE_PAGE_MAX_APIS_MILO: number = 150
 
 @Injectable()
 export class MiloClient {
@@ -57,18 +61,16 @@ export class MiloClient {
     this.apiKeyUtilisateurs = this.configService.get('milo').apiKeyUtilisateurs
   }
 
-  async getSessionsConseiller(
+  async getSessionsConseillerParStructure(
     idpToken: string,
     idStructure: string,
     timezone: string,
     options: {
       periode?: { dateDebut?: DateTime; dateFin?: DateTime }
-      page?: number
     }
-  ): Promise<Result<ListeSessionsConseillerMiloDto>> {
-    const TAILLE_PAGE_LARGE = '150'
+  ): Promise<Result<SessionConseillerDetailDto[]>> {
     const params = new URLSearchParams()
-    params.append('taillePage', TAILLE_PAGE_LARGE)
+    params.append('taillePage', TAILLE_PAGE_MAX_APIS_MILO.toString())
     params.append('rechercheInscrits', 'true')
     if (options.periode && options.periode.dateDebut) {
       const debutRecherche = options.periode.dateDebut.setZone(timezone)
@@ -78,11 +80,12 @@ export class MiloClient {
       const finRecherche = options.periode.dateFin.setZone(timezone)
       params.append('dateFinRecherche', finRecherche.toISODate())
     }
-    if (options.page) params.append('page', options.page.toString())
 
     await this.rateLimiterService.sessionsStructureMiloRateLimiter.attendreLaProchaineDisponibilite()
-    // L'api ne renvoie que 50 sessions max par appel au delà, une pagination doit être mise en place. (voir doc 06/23)
-    return this.get<ListeSessionsConseillerMiloDto>(
+
+    // On assure jusqu'à 300 résultats
+    const sessions: SessionConseillerDetailDto[] = []
+    const dtoResult = await this.get<ListeSessionsConseillerMiloDto>(
       `structures/${idStructure}/sessions`,
       {
         apiKey: this.apiKeySessionsListeConseiller,
@@ -90,15 +93,34 @@ export class MiloClient {
       },
       params
     )
+    if (isFailure(dtoResult)) {
+      return dtoResult
+    }
+    sessions.push(...dtoResult.data.sessions)
+    if (dtoResult.data.sessions.length >= TAILLE_PAGE_MAX_APIS_MILO) {
+      params.append('page', '2')
+      const dtoPage2Result = await this.get<ListeSessionsConseillerMiloDto>(
+        `structures/${idStructure}/sessions`,
+        {
+          apiKey: this.apiKeySessionsListeConseiller,
+          idpToken
+        },
+        params
+      )
+      if (isSuccess(dtoPage2Result)) {
+        sessions.push(...dtoPage2Result.data.sessions)
+      }
+    }
+    return success(sessions)
   }
 
-  async getSessionsJeune(
+  async getSessionsParDossierJeune(
     idpToken: string,
     idDossier: string,
     periode?: { debut?: DateTime; fin?: DateTime }
-  ): Promise<Result<ListeSessionsJeuneMiloDto>> {
+  ): Promise<Result<SessionParDossierJeuneDto[]>> {
     await this.rateLimiterService.sessionsJeuneMiloRateLimiter.attendreLaProchaineDisponibilite()
-    return this.recupererSessionsParDossier(
+    return this.recupererSessionsParDossierJeune(
       idpToken,
       idDossier,
       this.apiKeySessionsDetailEtListeJeune,
@@ -106,13 +128,13 @@ export class MiloClient {
     )
   }
 
-  async getSessionsJeunePourConseiller(
+  async getSessionsParDossierJeunePourConseiller(
     idpToken: string,
     idDossier: string,
     periode?: { debut?: DateTime; fin?: DateTime }
-  ): Promise<Result<ListeSessionsJeuneMiloDto>> {
+  ): Promise<Result<SessionParDossierJeuneDto[]>> {
     await this.rateLimiterService.sessionsConseillerMiloRateLimiter.attendreLaProchaineDisponibilite()
-    return this.recupererSessionsParDossier(
+    return this.recupererSessionsParDossierJeune(
       idpToken,
       idDossier,
       this.apiKeySessionDetailConseiller,
@@ -246,16 +268,15 @@ export class MiloClient {
     return emptySuccess()
   }
 
-  private recupererSessionsParDossier(
+  private async recupererSessionsParDossierJeune(
     idpToken: string,
     idDossier: string,
     apiKey: string,
     periode?: { debut?: DateTime; fin?: DateTime }
-  ): Promise<Result<ListeSessionsJeuneMiloDto>> {
-    const TAILLE_PAGE_LARGE = '150'
+  ): Promise<Result<SessionParDossierJeuneDto[]>> {
     const params = new URLSearchParams()
     params.append('idDossier', idDossier)
-    params.append('taillePage', TAILLE_PAGE_LARGE)
+    params.append('taillePage', TAILLE_PAGE_MAX_APIS_MILO.toString())
     if (periode?.debut) {
       params.append('dateDebutRecherche', periode.debut.toFormat('yyyy-MM-dd'))
     }
@@ -267,8 +288,9 @@ export class MiloClient {
     }
     params.append('dateFinRecherche', fin.toFormat('yyyy-MM-dd'))
 
-    // L'api ne renvoie que 50 sessions max par appel au delà, une pagination doit être mise en place. (voir doc 06/23)
-    return this.get<ListeSessionsJeuneMiloDto>(
+    // On assure jusqu'à 300 résultats
+    const sessions: SessionParDossierJeuneDto[] = []
+    const dtoResult = await this.get<ListeSessionsJeuneMiloDto>(
       `sessions`,
       {
         apiKey,
@@ -276,6 +298,25 @@ export class MiloClient {
       },
       params
     )
+    if (isFailure(dtoResult)) {
+      return dtoResult
+    }
+    sessions.push(...dtoResult.data.sessions)
+    if (dtoResult.data.sessions.length >= TAILLE_PAGE_MAX_APIS_MILO) {
+      params.append('page', '2')
+      const dtoPage2Result = await this.get<ListeSessionsJeuneMiloDto>(
+        `sessions`,
+        {
+          apiKey,
+          idpToken
+        },
+        params
+      )
+      if (isSuccess(dtoPage2Result)) {
+        sessions.push(...dtoPage2Result.data.sessions)
+      }
+    }
+    return success(sessions)
   }
 
   private async get<T>(

@@ -9,7 +9,7 @@ import {
   OffreTypeCode,
   SessionConseillerDetailDto,
   SessionJeuneDetailDto,
-  SessionJeuneListeDto
+  SessionParDossierJeuneDto
 } from 'src/infrastructure/clients/dto/milo.dto'
 import {
   AgendaConseillerMiloSessionListItemQueryModel,
@@ -36,7 +36,7 @@ function buildSessionTypeQueryModel(
 }
 
 export function mapSessionJeuneDtoToQueryModel(
-  sessionDto: SessionJeuneListeDto,
+  sessionDto: SessionParDossierJeuneDto,
   idDossier: string,
   timezone: string
 ): SessionJeuneMiloQueryModel {

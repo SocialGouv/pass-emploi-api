@@ -46,7 +46,7 @@ export class NotifierRappelCreationActionsDemarchesJobHandler extends JobHandler
   ): Promise<SuiviJob> {
     let succes = true
     const stats: Stats = {
-      nbJeunesNotifies: job?.contenu.nbJeunesNotifies || 0,
+      nbJeunesNotifies: job?.contenu?.nbJeunesNotifies || 0,
       estLaDerniereExecution: false
     }
     const maintenant = this.dateService.now()
@@ -57,7 +57,7 @@ export class NotifierRappelCreationActionsDemarchesJobHandler extends JobHandler
         Core.Structure.POLE_EMPLOI
       ]
 
-      const offset = job?.contenu.offset || 0
+      const offset = job?.contenu?.offset || 0
       let idsJeunesANotifier: Array<{ id_utilisateur: string }> = []
 
       idsJeunesANotifier = await this.sequelize.query(

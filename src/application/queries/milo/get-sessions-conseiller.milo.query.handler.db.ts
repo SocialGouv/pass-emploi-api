@@ -27,7 +27,7 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
   Result<SessionConseillerMiloQueryModel[]>
 > {
   constructor(
-    private getSessionsConsseillerMiloQueryGetter: GetSessionsConseillerMiloQueryGetter,
+    private getSessionsConseillerMiloQueryGetter: GetSessionsConseillerMiloQueryGetter,
     @Inject(ConseillerMiloRepositoryToken)
     private conseillerMiloRepository: Conseiller.Milo.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer,
@@ -57,7 +57,7 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
     if (query.dateDebut || query.dateFin)
       periode = { debut: query.dateDebut, fin: query.dateFin }
     const resultSessionsMiloFromQueryGetter =
-      await this.getSessionsConsseillerMiloQueryGetter.handle(
+      await this.getSessionsConseillerMiloQueryGetter.handle(
         query.accessToken,
         idStructureMilo,
         timezoneStructure,

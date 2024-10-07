@@ -1,20 +1,19 @@
 import { Injectable } from '@nestjs/common'
-import { KeycloakClient } from '../../../../infrastructure/clients/keycloak-client.db'
-import { MiloClient } from '../../../../infrastructure/clients/milo-client'
 import { DateTime } from 'luxon'
 import {
   isFailure,
   Result,
   success
 } from '../../../../building-blocks/types/result'
-import { ListeSessionsConseillerMiloDto } from '../../../../infrastructure/clients/dto/milo.dto'
-import { SessionMiloSqlModel } from '../../../../infrastructure/sequelize/models/session-milo.sql-model'
-import { mapSessionConseillerDtoToQueryModel } from '../../query-mappers/milo.mappers'
-import { DateService } from '../../../../utils/date-service'
-import { SessionConseillerMiloQueryModel } from '../../query-models/sessions.milo.query.model'
 import { SessionMilo } from '../../../../domain/milo/session.milo'
+import { KeycloakClient } from '../../../../infrastructure/clients/keycloak-client.db'
+import { MiloClient } from '../../../../infrastructure/clients/milo-client'
+import { SessionMiloSqlModel } from '../../../../infrastructure/sequelize/models/session-milo.sql-model'
+import { DateService } from '../../../../utils/date-service'
+import { mapSessionConseillerDtoToQueryModel } from '../../query-mappers/milo.mappers'
+import { SessionConseillerMiloQueryModel } from '../../query-models/sessions.milo.query.model'
 
-export const DATE_DEBUT_SESSIONS_A_CLORE = '2023-10-01T00:00:00Z'
+export const NB_MOIS_PASSES_SESSIONS_A_CLORE = 3
 
 @Injectable()
 export class GetSessionsConseillerMiloQueryGetter {
@@ -40,8 +39,9 @@ export class GetSessionsConseillerMiloQueryGetter {
     let periode
     if (options && options.filtrerAClore) {
       periode = {
-        dateDebut: DateTime.fromISO(DATE_DEBUT_SESSIONS_A_CLORE),
-        dateFin: undefined
+        dateDebut: this.dateService
+          .now()
+          .minus({ months: NB_MOIS_PASSES_SESSIONS_A_CLORE })
       }
     }
     if (
@@ -54,37 +54,35 @@ export class GetSessionsConseillerMiloQueryGetter {
         dateFin: options.periode.fin
       }
 
-    const resultSessionMiloClient: Result<ListeSessionsConseillerMiloDto> =
-      await this.miloClient.getSessionsConseiller(
+    const resultSessionsMilo =
+      await this.miloClient.getSessionsConseillerParStructure(
         idpToken,
         idStructureMilo,
         timezoneStructure,
         { periode }
       )
 
-    if (isFailure(resultSessionMiloClient)) {
-      return resultSessionMiloClient
+    if (isFailure(resultSessionsMilo)) {
+      return resultSessionsMilo
     }
 
     const sessionsSqlModels = await SessionMiloSqlModel.findAll({
       where: { idStructureMilo }
     })
 
-    const sessionsQueryModels = resultSessionMiloClient.data.sessions.map(
-      sessionMilo => {
-        const sessionSqlModel = sessionsSqlModels.find(
-          ({ id }) => id === sessionMilo.session.id.toString()
-        )
-        const dateCloture = sessionSqlModel?.dateCloture
-        return mapSessionConseillerDtoToQueryModel(
-          sessionMilo,
-          sessionSqlModel?.estVisible ?? false,
-          timezoneStructure,
-          this.dateService.now(),
-          dateCloture ? DateTime.fromJSDate(dateCloture) : undefined
-        )
-      }
-    )
+    const sessionsQueryModels = resultSessionsMilo.data.map(sessionMilo => {
+      const sessionSqlModel = sessionsSqlModels.find(
+        ({ id }) => id === sessionMilo.session.id.toString()
+      )
+      const dateCloture = sessionSqlModel?.dateCloture
+      return mapSessionConseillerDtoToQueryModel(
+        sessionMilo,
+        sessionSqlModel?.estVisible ?? false,
+        timezoneStructure,
+        this.dateService.now(),
+        dateCloture ? DateTime.fromJSDate(dateCloture) : undefined
+      )
+    })
 
     if (options?.filtrerAClore)
       return success(sessionsQueryModels.filter(filtrerSessionAClore))

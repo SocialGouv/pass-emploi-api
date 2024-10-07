@@ -207,7 +207,7 @@ function givenSessionsDuConseiller(
   query: GetAgendaSessionsConseillerMiloQuery,
   sessionsDto: SessionConseillerDetailDto[]
 ): void {
-  miloClient.getSessionsConseiller
+  miloClient.getSessionsConseillerParStructure
     .withArgs(
       'idpToken',
       conseiller.structure.id,
@@ -219,11 +219,5 @@ function givenSessionsDuConseiller(
         }
       }
     )
-    .resolves(
-      success({
-        page: 1,
-        nbSessions: 2,
-        sessions: sessionsDto
-      })
-    )
+    .resolves(success(sessionsDto))
 }

@@ -5,10 +5,9 @@ import { SessionJeuneMiloQueryModel } from 'src/application/queries/query-models
 import { isFailure, Result, success } from 'src/building-blocks/types/result'
 import { Core } from 'src/domain/core'
 import {
-  ListeSessionsJeuneMiloDto,
   MILO_INSCRIT,
   MILO_PRESENT,
-  SessionJeuneListeDto
+  SessionParDossierJeuneDto
 } from 'src/infrastructure/clients/dto/milo.dto'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
@@ -47,7 +46,7 @@ export class GetSessionsJeuneMiloQueryGetter {
       return success([])
     }
 
-    let resultSessionMiloClient: Result<ListeSessionsJeuneMiloDto>
+    let resultSessionMiloClient: Result<SessionParDossierJeuneDto[]>
 
     if (options?.pourConseiller) {
       resultSessionMiloClient = await this.getSessionsJeunePourConseiller(
@@ -70,12 +69,12 @@ export class GetSessionsJeuneMiloQueryGetter {
     }
 
     this.logger.log(
-      `${resultSessionMiloClient.data.sessions.length} Sessions venant de l'API`
+      `${resultSessionMiloClient.data.length} Sessions venant de l'API`
     )
 
-    const sessionsDuJeune: SessionJeuneListeDto[] =
+    const sessionsDuJeune: SessionParDossierJeuneDto[] =
       await recupererSessionsDuJeuneSelonFiltre(
-        resultSessionMiloClient.data.sessions,
+        resultSessionMiloClient.data,
         options?.filtrerEstInscrit
       )
 
@@ -96,25 +95,29 @@ export class GetSessionsJeuneMiloQueryGetter {
     accessToken: string,
     idPartenaire: string,
     periode?: { debut?: DateTime; fin?: DateTime }
-  ): Promise<Result<ListeSessionsJeuneMiloDto>> {
+  ): Promise<Result<SessionParDossierJeuneDto[]>> {
     const idpToken = await this.keycloakClient.exchangeTokenJeune(
       accessToken,
       Core.Structure.MILO
     )
 
-    return this.miloClient.getSessionsJeune(idpToken, idPartenaire, periode)
+    return this.miloClient.getSessionsParDossierJeune(
+      idpToken,
+      idPartenaire,
+      periode
+    )
   }
 
   private async getSessionsJeunePourConseiller(
     accessToken: string,
     idPartenaire: string,
     periode?: { debut?: DateTime; fin?: DateTime }
-  ): Promise<Result<ListeSessionsJeuneMiloDto>> {
+  ): Promise<Result<SessionParDossierJeuneDto[]>> {
     const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
       accessToken
     )
 
-    return this.miloClient.getSessionsJeunePourConseiller(
+    return this.miloClient.getSessionsParDossierJeunePourConseiller(
       idpToken,
       idPartenaire,
       periode
@@ -123,9 +126,9 @@ export class GetSessionsJeuneMiloQueryGetter {
 }
 
 async function recupererSessionsDuJeuneSelonFiltre(
-  sessionsDuJeuneVenantDeLAPI: SessionJeuneListeDto[],
+  sessionsDuJeuneVenantDeLAPI: SessionParDossierJeuneDto[],
   filtreInscription?: boolean
-): Promise<SessionJeuneListeDto[]> {
+): Promise<SessionParDossierJeuneDto[]> {
   switch (filtreInscription) {
     case false: {
       return (
@@ -157,8 +160,8 @@ async function recupererSessionsDuJeuneSelonFiltre(
 }
 
 function recupererSessionsAuxquellesLeJeuneEstInscrit(
-  sessions: SessionJeuneListeDto[]
-): SessionJeuneListeDto[] {
+  sessions: SessionParDossierJeuneDto[]
+): SessionParDossierJeuneDto[] {
   return sessions.filter(
     session =>
       session.sessionInstance?.statut === MILO_INSCRIT ||
@@ -167,8 +170,8 @@ function recupererSessionsAuxquellesLeJeuneEstInscrit(
 }
 
 async function recupererSessionsVisiblesPourLeJeune(
-  sessions: SessionJeuneListeDto[]
-): Promise<SessionJeuneListeDto[]> {
+  sessions: SessionParDossierJeuneDto[]
+): Promise<SessionParDossierJeuneDto[]> {
   const idsSessionsVisibles = (
     await SessionMiloSqlModel.findAll({
       where: {
@@ -184,9 +187,9 @@ async function recupererSessionsVisiblesPourLeJeune(
 }
 
 function recupererSessionsVisiblesPourLeJeuneSansDoublons(
-  sessionsVisiblesPourLeJeune: SessionJeuneListeDto[],
-  sessionsAuxquellesLeJeuneEstInscrit: SessionJeuneListeDto[]
-): SessionJeuneListeDto[] {
+  sessionsVisiblesPourLeJeune: SessionParDossierJeuneDto[],
+  sessionsAuxquellesLeJeuneEstInscrit: SessionParDossierJeuneDto[]
+): SessionParDossierJeuneDto[] {
   return sessionsVisiblesPourLeJeune.filter(
     sessionVisible =>
       sessionsAuxquellesLeJeuneEstInscrit.find(

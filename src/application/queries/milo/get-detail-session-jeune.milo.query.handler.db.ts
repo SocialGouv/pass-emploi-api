@@ -77,17 +77,18 @@ export class GetDetailSessionJeuneMiloQueryHandler extends QueryHandler<
       MILO_DATE_FORMAT,
       { zone: timezoneDeLaStructureDuJeune }
     )
-    const resultListeSessions = await this.miloClient.getSessionsJeune(
-      idpToken,
-      jeune.idPartenaire,
-      { debut: dateSession, fin: dateSession }
-    )
+    const resultSessionsParDossier =
+      await this.miloClient.getSessionsParDossierJeune(
+        idpToken,
+        jeune.idPartenaire,
+        { debut: dateSession, fin: dateSession }
+      )
 
-    if (isFailure(resultListeSessions)) {
-      return resultListeSessions
+    if (isFailure(resultSessionsParDossier)) {
+      return resultSessionsParDossier
     }
 
-    const detailInscription = resultListeSessions.data.sessions.find(
+    const detailInscription = resultSessionsParDossier.data.find(
       session => session.session.id.toString() === query.idSession
     )
     const inscription = detailInscription?.sessionInstance

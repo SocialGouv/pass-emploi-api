@@ -171,23 +171,19 @@ describe('GetDetailSessionJeuneMiloQueryHandler', () => {
             zone: 'America/Cayenne'
           }
         )
-        miloClient.getSessionsJeune
+        miloClient.getSessionsParDossierJeune
           .withArgs(idpToken, jeune.idPartenaire, {
             debut: dateSession,
             fin: dateSession
           })
           .resolves(
-            success({
-              page: 1,
-              nbSessions: 1,
-              sessions: [
-                {
-                  session: uneSessionDto,
-                  offre: uneOffreDto,
-                  sessionInstance: { statut: MILO_REFUS_JEUNE }
-                }
-              ]
-            })
+            success([
+              {
+                session: uneSessionDto,
+                offre: uneOffreDto,
+                sessionInstance: { statut: MILO_REFUS_JEUNE }
+              }
+            ])
           )
 
         // When

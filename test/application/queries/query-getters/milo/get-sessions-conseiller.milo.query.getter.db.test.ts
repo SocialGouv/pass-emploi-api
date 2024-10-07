@@ -20,7 +20,7 @@ import { DateService } from 'src/utils/date-service'
 import { SessionMilo } from 'src/domain/milo/session.milo'
 import { SessionConseillerDetailDto } from 'src/infrastructure/clients/dto/milo.dto'
 import {
-  DATE_DEBUT_SESSIONS_A_CLORE,
+  NB_MOIS_PASSES_SESSIONS_A_CLORE,
   GetSessionsConseillerMiloQueryGetter
 } from '../../../../../src/application/queries/query-getters/milo/get-sessions-conseiller.milo.query.getter.db'
 
@@ -100,7 +100,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
 
       it('récupère la liste des sessions de sa structure Milo avec une visibilité', async () => {
         // Given
-        miloClient.getSessionsConseiller
+        miloClient.getSessionsConseillerParStructure
           .withArgs(
             idpToken,
             conseiller.structure.id,
@@ -112,7 +112,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
               }
             }
           )
-          .resolves(success(uneListeSessionsConseillerDto))
+          .resolves(success(uneListeSessionsConseillerDto.sessions))
 
         // When
         const result = await getSessionsQueryGetter.handle(
@@ -177,19 +177,20 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
 
       it('retourne uniquement la liste des sessions a clore lorsque le query param est a TRUE', async () => {
         // Given
-        miloClient.getSessionsConseiller
+        miloClient.getSessionsConseillerParStructure
           .withArgs(
             idpToken,
             conseiller.structure.id,
             conseiller.structure.timezone,
             {
               periode: {
-                dateDebut: DateTime.fromISO(DATE_DEBUT_SESSIONS_A_CLORE),
-                dateFin: undefined
+                dateDebut: maintenantEn2023.minus({
+                  months: NB_MOIS_PASSES_SESSIONS_A_CLORE
+                })
               }
             }
           )
-          .resolves(success(uneListeSessionsConseillerDto))
+          .resolves(success(uneListeSessionsConseillerDto.sessions))
 
         // When
         const result = await getSessionsQueryGetter.handle(
@@ -216,14 +217,17 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
             }
           ])
         )
-        expect(miloClient.getSessionsConseiller).to.have.been.calledWith(
+        expect(
+          miloClient.getSessionsConseillerParStructure
+        ).to.have.been.calledWith(
           idpToken,
           conseiller.structure.id,
           conseiller.structure.timezone,
           {
             periode: {
-              dateDebut: DateTime.fromISO(DATE_DEBUT_SESSIONS_A_CLORE),
-              dateFin: undefined
+              dateDebut: maintenantEn2023.minus({
+                months: NB_MOIS_PASSES_SESSIONS_A_CLORE
+              })
             }
           }
         )
@@ -323,7 +327,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
       function retourneUnDetailSessionDto(
         unDetailSession: SessionConseillerDetailDto
       ): void {
-        miloClient.getSessionsConseiller
+        miloClient.getSessionsConseillerParStructure
           .withArgs(
             idpToken,
             conseiller.structure.id,
@@ -335,13 +339,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
               }
             }
           )
-          .resolves(
-            success({
-              page: 1,
-              nbSessions: 1,
-              sessions: [unDetailSession]
-            })
-          )
+          .resolves(success([unDetailSession]))
       }
     })
   })

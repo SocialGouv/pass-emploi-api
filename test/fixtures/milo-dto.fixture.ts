@@ -8,7 +8,7 @@ import {
   SessionConseillerDetailDto,
   SessionDto,
   SessionJeuneDetailDto,
-  SessionJeuneListeDto,
+  SessionParDossierJeuneDto,
   StructureConseillerMiloDto
 } from 'src/infrastructure/clients/dto/milo.dto'
 
@@ -39,7 +39,7 @@ export const unDetailSessionConseillerDto: SessionConseillerDetailDto = {
   offre: uneOffreDto
 }
 
-export const uneSessionListeJeuneDto: SessionJeuneListeDto = {
+export const uneSessionListeJeuneDto: SessionParDossierJeuneDto = {
   session: uneSessionDto,
   offre: uneOffreDto,
   sessionInstance: { statut: MILO_INSCRIT }
