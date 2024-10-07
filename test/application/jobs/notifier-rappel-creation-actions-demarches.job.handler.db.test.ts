@@ -14,6 +14,7 @@ import { unEvenementEngagementDto } from '../../fixtures/sql-models/evenement-en
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
+import { Planificateur } from '../../../src/domain/planificateur'
 
 const idJeune = 'j'
 const idJeune2 = 'j2'
@@ -27,6 +28,7 @@ describe('NotifierCreationActionsDemarchesJobHandler', () => {
   let dateService: StubbedClass<DateService>
   let suiviJobService: StubbedType<SuiviJob.Service>
   let notificationService: StubbedClass<Notification.Service>
+  let planificateurRepository: StubbedType<Planificateur.Repository>
 
   before(async () => {
     const databaseForTesting = getDatabase()
@@ -37,13 +39,15 @@ describe('NotifierCreationActionsDemarchesJobHandler', () => {
     dateService = stubClass(DateService)
     dateService.now.returns(maintenant)
     suiviJobService = stubInterface(sandbox)
+    planificateurRepository = stubInterface(sandbox)
 
     notifierCreationActionsDemarchesJobHandler =
       new NotifierRappelCreationActionsDemarchesJobHandler(
         databaseForTesting.sequelize,
         notificationService,
         suiviJobService,
-        dateService
+        dateService,
+        planificateurRepository
       )
 
     // Given - Jeunes
@@ -125,7 +129,10 @@ describe('NotifierCreationActionsDemarchesJobHandler', () => {
 
       // Then
       expect(result.succes).to.be.true()
-      expect(result.resultat).to.deep.equal({ nbJeunesNotifiables: 1 })
+      expect(result.resultat).to.deep.equal({
+        nbJeunesNotifies: 1,
+        estLaDerniereExecution: true
+      })
       expect(
         notificationService.notifierRappelCreationActionDemarche
       ).to.have.been.calledOnceWithExactly({
@@ -133,6 +140,7 @@ describe('NotifierCreationActionsDemarchesJobHandler', () => {
         structure: Core.Structure.MILO,
         token: 'push1'
       })
+      expect(planificateurRepository.creerJob).not.to.have.been.called()
     })
   })
 })

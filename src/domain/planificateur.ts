@@ -87,6 +87,11 @@ export namespace Planificateur {
     idSession: string
   }
 
+  export interface JobRappelCreationActionsDemarches {
+    offset?: number
+    nbJeunesNotifies?: number
+  }
+
   export interface JobRappelAction {
     idAction: string
   }
