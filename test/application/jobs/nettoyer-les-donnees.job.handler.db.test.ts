@@ -28,6 +28,10 @@ import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
 import Source = RendezVous.Source
+import { Chat } from '../../../src/domain/chat'
+import { Authentification } from '../../../src/domain/authentification'
+
+let stats: SuiviJob
 
 const idJeune1 = 'push1'
 const idJeune2 = 'push2'
@@ -46,6 +50,8 @@ describe('NettoyerLesDonneesJobHandler', () => {
   let rendezVousAvantNettoyage: RendezVousSqlModel | null
   let animationsCollectivesFutureSansInscrit: AsSql<RendezVousDto>
   let animationsCollectivesPasseesAvecInscrits: AsSql<RendezVousDto>
+  let authentificationRepository: StubbedType<Authentification.Repository>
+  let chatRepository: StubbedType<Chat.Repository>
 
   before(async () => {
     const databaseForTesting = getDatabase()
@@ -53,18 +59,42 @@ describe('NettoyerLesDonneesJobHandler', () => {
 
     const sandbox: SinonSandbox = createSandbox()
     dateService = stubClass(DateService)
+    dateService = stubClass(DateService)
     dateService.now.returns(maintenant)
     suiviJobService = stubInterface(sandbox)
+    authentificationRepository = stubInterface(sandbox)
+    chatRepository = stubInterface(sandbox)
 
     nettoyerLesDonneesJobHandler = new NettoyerLesDonneesJobHandler(
       dateService,
       suiviJobService,
-      databaseForTesting.sequelize
+      databaseForTesting.sequelize,
+      authentificationRepository,
+      chatRepository
     )
 
+    // Given - Jeunes
+    await JeuneSqlModel.bulkCreate([
+      unJeuneDto({
+        id: 'idJeuneASupprimer',
+        idConseiller: undefined,
+        dateDerniereConnexion: maintenant.minus({ years: 2, day: 2 }).toJSDate()
+      }),
+      unJeuneDto({ id: idJeune1, idConseiller: undefined }),
+      unJeuneDto({
+        id: idJeune2,
+        dateDerniereConnexion: maintenant.minus({ days: 59 }).toJSDate(),
+        idConseiller: undefined
+      }),
+      unJeuneDto({
+        id: idJeune3,
+        dateDerniereConnexion: maintenant.minus({ days: 62 }).toJSDate(),
+        idConseiller: undefined
+      })
+    ])
     // Given - Archive
     await ArchiveJeuneSqlModel.create({
-      idJeune: 'idJeuneASupprimer',
+      idJeune: 'idJeuneAArchiver',
       prenom: 'prenom',
       nom: 'nom',
       motif: 'motif',
@@ -149,21 +179,6 @@ describe('NettoyerLesDonneesJobHandler', () => {
       rendezVousDtoMiloASupprimer.id
     )
 
-    // Given - Jeunes
-    await JeuneSqlModel.bulkCreate([
-      unJeuneDto({ id: idJeune1, idConseiller: undefined }),
-      unJeuneDto({
-        id: idJeune2,
-        dateDerniereConnexion: maintenant.minus({ days: 59 }).toJSDate(),
-        idConseiller: undefined
-      }),
-      unJeuneDto({
-        id: idJeune3,
-        dateDerniereConnexion: maintenant.minus({ days: 62 }).toJSDate(),
-        idConseiller: undefined
-      })
-    ])
-
     // Given - Actions
     await ActionSqlModel.bulkCreate([
       uneActionDto({
@@ -203,7 +218,22 @@ describe('NettoyerLesDonneesJobHandler', () => {
     })
 
     // When
-    await nettoyerLesDonneesJobHandler.handle()
+    stats = await nettoyerLesDonneesJobHandler.handle()
+  })
+
+  describe('jeunes', () => {
+    it('supprime les jeunes de plus de 2 ans', async () => {
+      // Then
+      const jeunes = await JeuneSqlModel.findAll()
+      expect(
+        (stats.resultat as { nombreJeunesSupprimes: number })
+          .nombreJeunesSupprimes
+      ).to.equal(1)
+      expect(jeunes).to.have.length(3)
+      expect(jeunes[0].id).to.equal(idJeune1)
+      expect(jeunes[1].id).to.equal(idJeune2)
+      expect(jeunes[2].id).to.equal(idJeune3)
+    })
   })
 
   describe('archives', () => {

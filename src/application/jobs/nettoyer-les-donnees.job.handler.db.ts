@@ -18,6 +18,11 @@ import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez
 import { SuiviJobSqlModel } from '../../infrastructure/sequelize/models/suivi-job.sql-model'
 import { DateService } from '../../utils/date-service'
 import Source = RendezVous.Source
+import {
+  Authentification,
+  AuthentificationRepositoryToken
+} from '../../domain/authentification'
+import { Chat, ChatRepositoryToken } from '../../domain/chat'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.NETTOYER_LES_DONNEES)
@@ -26,7 +31,11 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
     private dateService: DateService,
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service,
-    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
+    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
+    @Inject(AuthentificationRepositoryToken)
+    private readonly authentificationRepository: Authentification.Repository,
+    @Inject(ChatRepositoryToken)
+    private readonly chatRepository: Chat.Repository
   ) {
     super(Planificateur.JobType.NETTOYER_LES_DONNEES, suiviJobService)
   }
@@ -34,6 +43,8 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
   async handle(): Promise<SuiviJob> {
     const maintenant = this.dateService.now()
     let nbErreurs = 0
+    let nombreJeunesSupprimes = -1
+    const nombreConseillersSupprimes = -1
     let nombreArchivesSupprimees = -1
     let nombreLogsApiSupprimes = -1
     let nombreSuiviJobsSupprimes = -1
@@ -44,10 +55,28 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
     let nombreAnimationsCollectivesCloses = -1
 
     try {
+      const jeunes = await JeuneSqlModel.findAll({
+        where: dateDerniereConnexionSuperieureADeuxAns(maintenant),
+        attributes: ['id']
+      })
+      for (const jeune of jeunes) {
+        await this.authentificationRepository.deleteUtilisateurIdp(jeune.id)
+        this.chatRepository.supprimerChat(jeune.id)
+      }
+      nombreJeunesSupprimes = await JeuneSqlModel.destroy({
+        where: dateDerniereConnexionSuperieureADeuxAns(maintenant)
+      })
+    } catch (e) {
+      this.logger.warn(e)
+      nbErreurs++
+    }
+
+    try {
       nombreArchivesSupprimees = await ArchiveJeuneSqlModel.destroy({
         where: dateArchivageSuperieureADeuxAns(maintenant)
       })
-    } catch (_e) {
+    } catch (e) {
+      this.logger.warn(e)
       nbErreurs++
     }
 
@@ -55,7 +84,8 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
       nombreLogsApiSupprimes = await LogApiPartenaireSqlModel.destroy({
         where: dateSuperieureADeuxSemaines(maintenant)
       })
-    } catch (_e) {
+    } catch (e) {
+      this.logger.warn(e)
       nbErreurs++
     }
 
@@ -63,7 +93,8 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
       nombreSuiviJobsSupprimes = await SuiviJobSqlModel.destroy({
         where: dateExecutionSuperieureADeuxJours(maintenant)
       })
-    } catch (_e) {
+    } catch (e) {
+      this.logger.warn(e)
       nbErreurs++
     }
 
@@ -71,7 +102,8 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
       nombreRdvMiloSupprimes = await RendezVousSqlModel.destroy({
         where: dateSuperieureATroisMoisEtVenantDeMilo(maintenant)
       })
-    } catch (_e) {
+    } catch (e) {
+      this.logger.warn(e)
       nbErreurs++
     }
 
@@ -79,7 +111,8 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
       nombreRdvSupprimes = await RendezVousSqlModel.destroy({
         where: dateSuppressionSuperieureATroisMois(maintenant)
       })
-    } catch (_e) {
+    } catch (e) {
+      this.logger.warn(e)
       nbErreurs++
     }
 
@@ -94,7 +127,8 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
           }
         )
       )[0]
-    } catch (_e) {
+    } catch (e) {
+      this.logger.warn(e)
       nbErreurs++
     }
 
@@ -102,7 +136,8 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
       nombreActionsSupprimees = await ActionSqlModel.destroy({
         where: dateEcheanceSuperieureADeuxAns(maintenant)
       })
-    } catch (_e) {
+    } catch (e) {
+      this.logger.warn(e)
       nbErreurs++
     }
 
@@ -127,19 +162,22 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
           }
         )
 
-      ;[nombreAnimationsCollectivesCloses] = await RendezVousSqlModel.update(
-        { dateCloture: maintenant.toJSDate() },
-        {
-          where: {
-            id: {
-              [Op.in]: animationsCollectivesPasseesSansInscrit.map(
-                ({ id }) => id
-              )
+      nombreAnimationsCollectivesCloses = (
+        await RendezVousSqlModel.update(
+          { dateCloture: maintenant.toJSDate() },
+          {
+            where: {
+              id: {
+                [Op.in]: animationsCollectivesPasseesSansInscrit.map(
+                  ({ id }) => id
+                )
+              }
             }
           }
-        }
-      )
-    } catch (_e) {
+        )
+      )[0]
+    } catch (e) {
+      this.logger.warn(e)
       nbErreurs++
     }
 
@@ -150,6 +188,8 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
       dateExecution: maintenant,
       tempsExecution: DateService.calculerTempsExecution(maintenant),
       resultat: {
+        nombreJeunesSupprimes,
+        nombreConseillersSupprimes,
         nombreArchivesSupprimees,
         nombreLogsApiSupprimees: nombreLogsApiSupprimes,
         nombreSuiviJobsSupprimes,
@@ -159,6 +199,16 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
         nombreActionsSupprimees,
         nombreAnimationsCollectivesCloses
       }
+    }
+  }
+}
+
+function dateDerniereConnexionSuperieureADeuxAns(
+  maintenant: DateTime
+): WhereOptions {
+  return {
+    dateDerniereConnexion: {
+      [Op.lt]: maintenant.minus({ years: 2 }).toJSDate()
     }
   }
 }
