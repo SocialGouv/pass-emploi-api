@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   HttpCode,
   HttpStatus,
   Param,
@@ -11,6 +12,7 @@ import {
   Query
 } from '@nestjs/common'
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { DateTime } from 'luxon'
 import { DeleteConseillerCommandHandler } from '../../application/commands/conseiller/delete-conseiller.command.handler'
 import { ModifierConseillerCommandHandler } from '../../application/commands/conseiller/modifier-conseiller.command.handler'
 import {
@@ -28,6 +30,7 @@ import {
 } from '../../application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { GetJeunesByConseillerQueryHandler } from '../../application/queries/get-jeunes-by-conseiller.query.handler.db'
 import { GetJeunesIdentitesQueryHandler } from '../../application/queries/get-jeunes-identites.query.handler.db'
+import { DemarcheQueryModel } from '../../application/queries/query-models/actions.query-model'
 import {
   ConseillerSimpleQueryModel,
   DetailConseillerQueryModel
@@ -37,6 +40,7 @@ import {
   DetailJeuneConseillerQueryModel,
   IdentiteJeuneQueryModel
 } from '../../application/queries/query-models/jeunes.query-model'
+import { Cached } from '../../building-blocks/types/query'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
@@ -51,9 +55,6 @@ import {
   GetIndicateursPourConseillerQueryParams,
   PutJeuneDuConseillerPayload
 } from './validation/conseillers.inputs'
-import { Cached } from '../../building-blocks/types/query'
-import { DemarcheQueryModel } from '../../application/queries/query-models/actions.query-model'
-import { DateTime } from 'luxon'
 
 @Controller('conseillers')
 @CustomSwaggerApiOAuth2()
@@ -332,6 +333,7 @@ export class ConseillersController {
     description: 'Autorisé pour un conseiller FT et CD'
   })
   @Get(':idConseiller/jeunes/:idJeune/demarches')
+  @Header('Cache-Control', 'max-age=1200')
   async getDemarches(
     @Param('idConseiller') idConseiller: string,
     @Param('idJeune') idJeune: string,
