@@ -363,7 +363,7 @@ describe('JeuneMiloHttpRepository', () => {
 
             // Then
             expect(dossier).to.deep.equal(
-              failure(new ErreurHttp('le jeune est suivi par john', 409))
+              failure(new ErreurHttp('le jeune est suivi par john', 422))
             )
           })
         })

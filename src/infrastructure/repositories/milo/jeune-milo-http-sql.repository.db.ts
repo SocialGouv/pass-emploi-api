@@ -149,7 +149,7 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
       this.logger.error(e.response?.data)
 
       if (e.response.data?.code === 'SUE_ACCOUNT_EXISTING_OTHER_ML') {
-        return failure(new ErreurHttp(e.response.data?.message, 409))
+        return failure(new ErreurHttp(e.response.data?.message, 422))
       }
 
       if (e.response?.status >= 400 && e.response?.status <= 404) {
