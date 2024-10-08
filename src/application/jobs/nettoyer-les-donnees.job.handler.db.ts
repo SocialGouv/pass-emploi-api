@@ -4,6 +4,11 @@ import { DateTime } from 'luxon'
 import { Op, QueryTypes, Sequelize, WhereOptions } from 'sequelize'
 import { SequelizeInjectionToken } from 'src/infrastructure/sequelize/providers'
 import { JobHandler } from '../../building-blocks/types/job-handler'
+import {
+  Authentification,
+  AuthentificationRepositoryToken
+} from '../../domain/authentification'
+import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { Planificateur, ProcessJobType } from '../../domain/planificateur'
 import {
   RendezVous,
@@ -12,17 +17,13 @@ import {
 import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
 import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
 import { ArchiveJeuneSqlModel } from '../../infrastructure/sequelize/models/archive-jeune.sql-model'
+import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { LogApiPartenaireSqlModel } from '../../infrastructure/sequelize/models/log-api-partenaire.sql-model'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { SuiviJobSqlModel } from '../../infrastructure/sequelize/models/suivi-job.sql-model'
 import { DateService } from '../../utils/date-service'
 import Source = RendezVous.Source
-import {
-  Authentification,
-  AuthentificationRepositoryToken
-} from '../../domain/authentification'
-import { Chat, ChatRepositoryToken } from '../../domain/chat'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.NETTOYER_LES_DONNEES)
@@ -44,7 +45,8 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
     const maintenant = this.dateService.now()
     let nbErreurs = 0
     let nombreJeunesSupprimes = -1
-    const nombreConseillersSupprimes = -1
+    let nombreJeunesSupprimesConseillerInactif = -1
+    let nombreConseillersSupprimes = -1
     let nombreArchivesSupprimees = -1
     let nombreLogsApiSupprimes = -1
     let nombreSuiviJobsSupprimes = -1
@@ -59,11 +61,47 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
         where: dateDerniereConnexionSuperieureADeuxAns(maintenant),
         attributes: ['id']
       })
-      for (const jeune of jeunes) {
-        await this.authentificationRepository.deleteUtilisateurIdp(jeune.id)
-        this.chatRepository.supprimerChat(jeune.id)
-      }
+      this.nettoyerJeunes(jeunes)
       nombreJeunesSupprimes = await JeuneSqlModel.destroy({
+        where: dateDerniereConnexionSuperieureADeuxAns(maintenant)
+      })
+    } catch (e) {
+      this.logger.warn(e)
+      nbErreurs++
+    }
+
+    try {
+      const idsConseillers = (
+        await ConseillerSqlModel.findAll({
+          where: dateDerniereConnexionSuperieureADeuxAns(maintenant),
+          attributes: ['id']
+        })
+      ).map(conseiller => conseiller.id)
+
+      const jeunesDuConseiller = await JeuneSqlModel.findAll({
+        where: {
+          idConseiller: { [Op.in]: idsConseillers }
+        },
+        attributes: ['id']
+      })
+      this.nettoyerJeunes(jeunesDuConseiller)
+      nombreJeunesSupprimesConseillerInactif = await JeuneSqlModel.destroy({
+        where: { id: { [Op.in]: jeunesDuConseiller.map(jeune => jeune.id) } }
+      })
+
+      await JeuneSqlModel.update(
+        { idConseillerInitial: null },
+        {
+          where: {
+            idConseillerInitial: { [Op.in]: idsConseillers }
+          }
+        }
+      )
+
+      for (const idConseiller of idsConseillers) {
+        await this.authentificationRepository.deleteUtilisateurIdp(idConseiller)
+      }
+      nombreConseillersSupprimes = await ConseillerSqlModel.destroy({
         where: dateDerniereConnexionSuperieureADeuxAns(maintenant)
       })
     } catch (e) {
@@ -189,6 +227,7 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
       tempsExecution: DateService.calculerTempsExecution(maintenant),
       resultat: {
         nombreJeunesSupprimes,
+        nombreJeunesSupprimesConseillerInactif,
         nombreConseillersSupprimes,
         nombreArchivesSupprimees,
         nombreLogsApiSupprimees: nombreLogsApiSupprimes,
@@ -199,6 +238,15 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
         nombreActionsSupprimees,
         nombreAnimationsCollectivesCloses
       }
+    }
+  }
+
+  private async nettoyerJeunes(
+    jeunes: Array<Pick<JeuneSqlModel, 'id'>>
+  ): Promise<void> {
+    for (const jeune of jeunes) {
+      await this.authentificationRepository.deleteUtilisateurIdp(jeune.id)
+      this.chatRepository.supprimerChat(jeune.id)
     }
   }
 }

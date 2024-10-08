@@ -30,10 +30,12 @@ import { getDatabase } from '../../utils/database-for-testing'
 import Source = RendezVous.Source
 import { Chat } from '../../../src/domain/chat'
 import { Authentification } from '../../../src/domain/authentification'
+import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 
 let stats: SuiviJob
 
-const idJeune1 = 'push1'
+const idJeuneAUpdateSonConseillerInitial = 'push1'
 const idJeune2 = 'push2'
 const idJeune3 = 'push3'
 const maintenant = uneDatetime()
@@ -73,14 +75,35 @@ describe('NettoyerLesDonneesJobHandler', () => {
       chatRepository
     )
 
+    // Given - Conseillers
+    await ConseillerSqlModel.bulkCreate([
+      unConseillerDto({
+        id: 'con1',
+        dateDerniereConnexion: maintenant.minus({ years: 2, day: 2 }).toJSDate()
+      }),
+      unConseillerDto({
+        id: 'con2',
+        dateDerniereConnexion: maintenant.minus({ days: 10 }).toJSDate()
+      })
+    ])
     // Given - Jeunes
     await JeuneSqlModel.bulkCreate([
       unJeuneDto({
         id: 'idJeuneASupprimer',
-        idConseiller: undefined,
+        idConseiller: 'con1',
         dateDerniereConnexion: maintenant.minus({ years: 2, day: 2 }).toJSDate()
       }),
-      unJeuneDto({ id: idJeune1, idConseiller: undefined }),
+      unJeuneDto({
+        id: 'idJeuneASupprimerConseillerEstInactif',
+        dateDerniereConnexion: maintenant.minus({ days: 10 }).toJSDate(),
+        idConseiller: 'con1'
+      }),
+      unJeuneDto({
+        id: idJeuneAUpdateSonConseillerInitial,
+        dateDerniereConnexion: maintenant.minus({ days: 10 }).toJSDate(),
+        idConseiller: 'con2',
+        idConseillerInitial: 'con1'
+      }),
       unJeuneDto({
         id: idJeune2,
         dateDerniereConnexion: maintenant.minus({ days: 59 }).toJSDate(),
@@ -182,11 +205,11 @@ describe('NettoyerLesDonneesJobHandler', () => {
     // Given - Actions
     await ActionSqlModel.bulkCreate([
       uneActionDto({
-        idJeune: idJeune1,
+        idJeune: idJeuneAUpdateSonConseillerInitial,
         dateEcheance: maintenant.minus({ years: 2, days: 1 }).toJSDate()
       }),
       uneActionDto({
-        idJeune: idJeune1,
+        idJeune: idJeuneAUpdateSonConseillerInitial,
         dateEcheance: maintenant
           .minus({ years: 2 })
           .plus({ days: 1 })
@@ -213,7 +236,7 @@ describe('NettoyerLesDonneesJobHandler', () => {
       animationsCollectivesPasseesAvecInscrits
     ])
     await RendezVousJeuneAssociationSqlModel.create({
-      idJeune: idJeune1,
+      idJeune: idJeuneAUpdateSonConseillerInitial,
       idRendezVous: animationsCollectivesPasseesAvecInscrits.id
     })
 
@@ -230,9 +253,36 @@ describe('NettoyerLesDonneesJobHandler', () => {
           .nombreJeunesSupprimes
       ).to.equal(1)
       expect(jeunes).to.have.length(3)
-      expect(jeunes[0].id).to.equal(idJeune1)
-      expect(jeunes[1].id).to.equal(idJeune2)
+      expect(jeunes[1].id).to.equal(idJeuneAUpdateSonConseillerInitial)
+      expect(jeunes[0].id).to.equal(idJeune2)
       expect(jeunes[2].id).to.equal(idJeune3)
+    })
+  })
+
+  describe('conseillers', () => {
+    it('supprime les conseillers de plus de 2 ans', async () => {
+      // Then
+      const conseillers = await ConseillerSqlModel.findAll()
+      const jeune = await JeuneSqlModel.findByPk(
+        idJeuneAUpdateSonConseillerInitial
+      )
+      expect(
+        (
+          stats.resultat as {
+            nombreConseillersSupprimes: number
+          }
+        ).nombreConseillersSupprimes
+      ).to.equal(1)
+      expect(
+        (
+          stats.resultat as {
+            nombreJeunesSupprimesConseillerInactif: number
+          }
+        ).nombreJeunesSupprimesConseillerInactif
+      ).to.equal(1)
+      expect(conseillers.length).to.equal(1)
+      expect(conseillers[0].id).to.equal('con2')
+      expect(jeune?.idConseillerInitial).to.be.null()
     })
   })
 
@@ -294,10 +344,10 @@ describe('NettoyerLesDonneesJobHandler', () => {
       // Then
       const jeunes = await JeuneSqlModel.findAll()
       expect(jeunes).to.have.length(3)
-      expect(jeunes[0].id).to.equal(idJeune1)
-      expect(jeunes[0].pushNotificationToken).to.equal('token')
-      expect(jeunes[1].id).to.equal(idJeune2)
+      expect(jeunes[1].id).to.equal(idJeuneAUpdateSonConseillerInitial)
       expect(jeunes[1].pushNotificationToken).to.equal('token')
+      expect(jeunes[0].id).to.equal(idJeune2)
+      expect(jeunes[0].pushNotificationToken).to.equal('token')
       expect(jeunes[2].id).to.equal(idJeune3)
       expect(jeunes[2].pushNotificationToken).to.equal(null)
     })
