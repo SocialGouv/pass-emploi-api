@@ -32,26 +32,25 @@ export class KeycloakClient {
   }
 
   public async exchangeTokenConseillerMilo(bearer: string): Promise<string> {
-    return this.exchangeToken(bearer, 'similo-conseiller', Core.Structure.MILO)
+    return this.exchangeToken(bearer, Core.Structure.MILO)
   }
 
   public async exchangeTokenJeune(
     bearer: string,
-    _structure: Core.Structure
+    structure: Core.Structure
   ): Promise<string> {
-    return this.exchangeToken(bearer)
+    return this.exchangeToken(bearer, structure)
   }
 
   public async exchangeTokenConseillerJeune(
     bearer: string,
     subJeune: string
   ): Promise<string> {
-    return this.exchangeToken(bearer, undefined, undefined, subJeune)
+    return this.exchangeToken(bearer, undefined, subJeune)
   }
 
   private async exchangeToken(
     bearer: string,
-    provider?: string,
     structure?: Core.Structure,
     requestedTokenSub?: string
   ): Promise<string> {
@@ -62,11 +61,6 @@ export class KeycloakClient {
       grant_type: 'urn:ietf:params:oauth:grant-type:token-exchange',
       client_id: this.clientId,
       client_secret: this.clientSecret
-    }
-    if (provider) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      payload.requested_issuer = provider
     }
     if (requestedTokenSub) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
