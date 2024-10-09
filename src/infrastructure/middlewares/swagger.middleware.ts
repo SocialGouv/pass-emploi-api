@@ -14,7 +14,7 @@ export enum IDPName {
   PE_AIJ_CONSEILLER = 'pe-aij-conseiller',
   SIMILO_JEUNE = 'similo-jeune',
   SIMILO_CONSEILLER = 'similo-conseiller',
-  CONSEILLER_DEPT = 'conseiller-dept'
+  CONSEILLER_DEPT = 'conseildepartemental-conseiller'
 }
 
 export function useSwagger(
