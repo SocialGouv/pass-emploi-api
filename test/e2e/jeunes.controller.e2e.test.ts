@@ -2,6 +2,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DateTime } from 'luxon'
 import { createSandbox } from 'sinon'
+import { Authentification } from 'src/domain/authentification'
 import { DateService } from 'src/utils/date-service'
 import * as request from 'supertest'
 import { JeuneAuthorizer } from '../../src/application/authorizers/jeune-authorizer'
@@ -21,7 +22,8 @@ import { PoleEmploiPartenaireClient } from '../../src/infrastructure/clients/pol
 import { IdService } from '../../src/utils/id-service'
 import {
   unHeaderAuthorization,
-  unJwtPayloadValide
+  unJwtPayloadValide,
+  unUtilisateurJeune
 } from '../fixtures/authentification.fixture'
 import { unJeune } from '../fixtures/jeune.fixture'
 import {
@@ -35,6 +37,7 @@ describe('JeunesControllerE2E', () => {
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let keycloakClient: StubbedClass<KeycloakClient>
   let jeuneRepository: StubbedType<Jeune.Repository>
+  let authRepository: StubbedType<Authentification.Repository>
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
   let jwtService: StubbedClass<JwtService>
   let app: INestApplication
@@ -55,10 +58,11 @@ describe('JeunesControllerE2E', () => {
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     keycloakClient = stubClass(KeycloakClient)
     jeuneRepository = stubInterface(createSandbox())
+    authRepository = stubInterface(createSandbox())
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
 
     const getDemarchesQueryGetter = new GetDemarchesQueryGetter(
-      jeuneRepository,
+      authRepository,
       poleEmploiPartenaireClient,
       dateService,
       keycloakClient
@@ -111,6 +115,7 @@ describe('JeunesControllerE2E', () => {
       jeuneAuthorizer.autoriserLeJeune.resolves(emptySuccess())
       keycloakClient.exchangeTokenJeune.resolves('idpToken')
       jeuneRepository.get.resolves(jeune)
+      authRepository.getJeuneById.resolves(unUtilisateurJeune())
 
       poleEmploiPartenaireClient.getDemarches.resolves(
         success(demarchesPoleEmploi)

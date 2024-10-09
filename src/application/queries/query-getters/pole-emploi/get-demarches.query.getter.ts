@@ -1,5 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Inject, Injectable, Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
+import { ResultApi } from '../../../../building-blocks/types/result-api'
+import {
+  Authentification,
+  AuthentificationRepositoryToken
+} from '../../../../domain/authentification'
+import { DemarcheDto } from 'src/infrastructure/clients/dto/pole-emploi.dto'
 import { NonTrouveError } from '../../../../building-blocks/types/domain-error'
 import { Cached } from '../../../../building-blocks/types/query'
 import {
@@ -9,7 +15,6 @@ import {
   success
 } from '../../../../building-blocks/types/result'
 import { Demarche } from '../../../../domain/demarche'
-import { Jeune, JeuneRepositoryToken } from '../../../../domain/jeune/jeune'
 import { KeycloakClient } from '../../../../infrastructure/clients/keycloak-client.db'
 import {
   PoleEmploiPartenaireClient,
@@ -24,37 +29,39 @@ export interface Query {
   idJeune: string
   tri: GetDemarchesQueryGetter.TriQuery
   accessToken: string
+  pourConseiller?: boolean
   dateDebut?: DateTime
   idpToken?: string
 }
 
 @Injectable()
 export class GetDemarchesQueryGetter {
+  private logger: Logger
   constructor(
-    @Inject(JeuneRepositoryToken)
-    private jeuneRepository: Jeune.Repository,
+    @Inject(AuthentificationRepositoryToken)
+    private readonly authentificationRepository: Authentification.Repository,
     @Inject(PoleEmploiPartenaireClientToken)
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,
     private dateService: DateService,
-    private keycloakClient: KeycloakClient
-  ) {}
+    private authClient: KeycloakClient
+  ) {
+    this.logger = new Logger('GetDemarchesQueryGetter')
+  }
 
   async handle(query: Query): Promise<Result<Cached<DemarcheQueryModel[]>>> {
-    const jeune = await this.jeuneRepository.get(query.idJeune)
-    if (!jeune) {
+    const jeuneUtilisateur = await this.authentificationRepository.getJeuneById(
+      query.idJeune
+    )
+    if (!jeuneUtilisateur?.idAuthentification) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
-    const idpToken =
-      query.idpToken ??
-      (await this.keycloakClient.exchangeTokenJeune(
-        query.accessToken,
-        jeune.structure
-      ))
 
-    const demarchesDto = await this.poleEmploiPartenaireClient.getDemarches(
-      idpToken
-    )
-
+    const demarchesDto: ResultApi<DemarcheDto[]> = query.pourConseiller
+      ? await this.fetchDemarchesOuCachePourConseiller(
+          query,
+          jeuneUtilisateur.idAuthentification
+        )
+      : await this.fetchDemarchesPourJeune(query, jeuneUtilisateur)
     if (isFailure(demarchesDto)) {
       return demarchesDto
     }
@@ -77,6 +84,42 @@ export class GetDemarchesQueryGetter {
       dateDuCache: demarchesDto.dateCache
     }
     return success(data)
+  }
+
+  private async fetchDemarchesOuCachePourConseiller(
+    query: Query,
+    idAuthentificationJeune: string
+  ): Promise<ResultApi<DemarcheDto[]>> {
+    try {
+      const idpToken = await this.authClient.exchangeTokenConseillerJeune(
+        query.accessToken,
+        idAuthentificationJeune
+      )
+
+      return this.poleEmploiPartenaireClient.getDemarches(
+        idpToken,
+        query.idJeune
+      )
+    } catch (e) {
+      this.logger.warn(
+        'Utilisation du cache pour récupérer les démarches du jeune pour son conseiller'
+      )
+      return this.poleEmploiPartenaireClient.getDemarchesEnCache(query.idJeune)
+    }
+  }
+
+  private async fetchDemarchesPourJeune(
+    query: Query,
+    jeuneUtilisateur: Authentification.Utilisateur
+  ): Promise<ResultApi<DemarcheDto[]>> {
+    const idpToken =
+      query.idpToken ??
+      (await this.authClient.exchangeTokenJeune(
+        query.accessToken,
+        jeuneUtilisateur.structure
+      ))
+
+    return this.poleEmploiPartenaireClient.getDemarches(idpToken)
   }
 }
 

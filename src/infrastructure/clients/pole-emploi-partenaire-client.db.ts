@@ -40,7 +40,11 @@ const DEMARCHES_URL = 'peconnect-demarches/v1/demarches'
 export const PoleEmploiPartenaireClientToken = 'PoleEmploiPartenaireClientToken'
 
 interface PoleEmploiPartenaireClientI {
-  getDemarches(tokenDuJeune: string): Promise<ResultApi<DemarcheDto[]>>
+  getDemarches(
+    tokenDuJeune: string,
+    idJeune?: string
+  ): Promise<ResultApi<DemarcheDto[]>>
+  getDemarchesEnCache(idJeune: string): Promise<ResultApi<DemarcheDto[]>>
 
   getRendezVous(
     tokenDuJeune: string,
@@ -88,12 +92,18 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     this.apiUrl = this.configService.get('poleEmploi').url
   }
 
-  async getDemarches(tokenDuJeune: string): Promise<ResultApi<DemarcheDto[]>> {
+  async getDemarches(
+    tokenDuJeune: string,
+    idJeune?: string
+  ): Promise<ResultApi<DemarcheDto[]>> {
     this.logger.log('recuperation des demarches du jeune')
 
     const response = await this.getWithCache<DemarcheDto[]>(
       DEMARCHES_URL,
-      tokenDuJeune
+      tokenDuJeune,
+      undefined,
+      undefined,
+      idJeune
     )
 
     if (isSuccessApi(response) && !response.data) {
@@ -101,6 +111,21 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     }
 
     return response
+  }
+
+  async getDemarchesEnCache(
+    idJeune: string
+  ): Promise<ResultApi<DemarcheDto[]>> {
+    const cache = await this.recupererLesDernieresDonnees(
+      appendCacheParam(DEMARCHES_URL, idJeune)
+    )
+    if (!cache)
+      return failureApi(new ErreurHttp('Aucune démarche en cache', 404))
+
+    return successApi(
+      cache.resultatPartenaire as DemarcheDto[],
+      DateTime.fromJSDate(cache.date)
+    )
   }
 
   async getRendezVous(
@@ -316,7 +341,8 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     suffixUrl: string,
     tokenDuJeune: string,
     params?: URLSearchParams,
-    retry?: boolean
+    retry?: boolean,
+    cacheParam?: string
   ): Promise<ResultApi<T>> {
     try {
       let res
@@ -325,7 +351,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
       } else {
         res = await this.get<T>(suffixUrl, tokenDuJeune, params)
       }
-      this.ajouterLeRetourAuContexteNode(res)
+      this.ajouterLeRetourAuContexteNode(res, cacheParam)
       return success(res.data)
     } catch (e) {
       if (!e.response || e.response.status === 500) {
@@ -387,16 +413,20 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     )
   }
 
-  private ajouterLeRetourAuContexteNode<T>(res: AxiosResponse<T>): void {
+  private ajouterLeRetourAuContexteNode<T>(
+    res: AxiosResponse<T>,
+    cacheParam?: string
+  ): void {
     let resultatsAppelPartenaire: AppelPartenaireResultat[] = this.context.get<
       AppelPartenaireResultat[]
     >(ContextKey.RESULTATS_APPEL_PARTENAIRE)
     if (!resultatsAppelPartenaire) {
       resultatsAppelPartenaire = []
     }
+
     resultatsAppelPartenaire.push({
       resultat: res.data,
-      path: res.request.path
+      path: appendCacheParam(res.request.path, cacheParam)
     } as AppelPartenaireResultat)
     this.context.set(
       ContextKey.RESULTATS_APPEL_PARTENAIRE,
@@ -429,4 +459,8 @@ export class PoleEmploiPartenaireInMemoryClient extends PoleEmploiPartenaireClie
   ): Promise<ResultApi<SuggestionDto[]>> {
     return success(suggestionsPEInMemory)
   }
+}
+
+function appendCacheParam(path: string, cacheParam?: string): string {
+  return path + (cacheParam ? '?cacheParam=' + cacheParam : '')
 }

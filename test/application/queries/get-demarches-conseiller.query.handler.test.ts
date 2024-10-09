@@ -1,13 +1,9 @@
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { GetDemarchesConseillerQueryHandler } from 'src/application/queries/get-demarches-conseiller.query.handler'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import { GetDemarchesQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
-import { Authentification } from '../../../src/domain/authentification'
 import { estPoleEmploi } from '../../../src/domain/core'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import { StubbedClass, createSandbox, expect, stubClass } from '../../utils'
-import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client.db'
-import { SinonSandbox } from 'sinon'
+import { StubbedClass, expect, stubClass } from '../../utils'
 import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
 import { success } from '../../../src/building-blocks/types/result'
 
@@ -15,34 +11,23 @@ describe('GetDemarchesConseillerQueryHandler', () => {
   let authorizer: StubbedClass<ConseillerAuthorizer>
   let getDemarchesQueryGetter: StubbedClass<GetDemarchesQueryGetter>
   let getDemarchesConseillerQueryHandler: GetDemarchesConseillerQueryHandler
-  let authRepo: StubbedType<Authentification.Repository>
-  let keycloakClient: StubbedClass<KeycloakClient>
 
   before(() => {
-    const sandbox: SinonSandbox = createSandbox()
     getDemarchesQueryGetter = stubClass(GetDemarchesQueryGetter)
     authorizer = stubClass(ConseillerAuthorizer)
-    keycloakClient = stubClass(KeycloakClient)
-    authRepo = stubInterface(sandbox)
 
     getDemarchesConseillerQueryHandler = new GetDemarchesConseillerQueryHandler(
       getDemarchesQueryGetter,
-      authorizer,
-      keycloakClient,
-      authRepo
+      authorizer
     )
   })
 
   describe('handle', () => {
     it('retourne le résultat du DemarcheQueryGetter', async () => {
       // Given
-      const utilisateurJeune = unUtilisateurJeune()
-      authRepo.getJeuneById.resolves(utilisateurJeune)
-      const unTokenJeune = 'unTokenJeune'
-      keycloakClient.exchangeTokenConseillerJeune.resolves(unTokenJeune)
       const query = {
         idConseiller: 'idConseiller',
-        idJeune: utilisateurJeune.id,
+        idJeune: 'id-jeune',
         accessToken: 'token'
       }
 
@@ -56,26 +41,16 @@ describe('GetDemarchesConseillerQueryHandler', () => {
       // Then
       expect(result).to.deep.equal(
         success({
-          queryModel: [uneDemarcheQueryModel()],
-          dateDuCache: undefined
+          queryModel: [uneDemarcheQueryModel()]
         })
-      )
-      expect(authRepo.getJeuneById).to.have.been.calledOnceWithExactly(
-        utilisateurJeune.id
-      )
-      expect(
-        keycloakClient.exchangeTokenConseillerJeune
-      ).to.have.been.calledOnceWithExactly(
-        'token',
-        utilisateurJeune.idAuthentification
       )
       expect(getDemarchesQueryGetter.handle).to.have.been.calledOnceWithExactly(
         {
-          idJeune: utilisateurJeune.id,
+          idJeune: 'id-jeune',
           accessToken: 'token',
           tri: GetDemarchesQueryGetter.Tri.parSatutEtDateFin,
-          idpToken: unTokenJeune,
-          dateDebut: undefined
+          dateDebut: undefined,
+          pourConseiller: true
         }
       )
     })
