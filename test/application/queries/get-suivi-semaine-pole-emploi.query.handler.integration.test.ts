@@ -2,11 +2,13 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DateTime } from 'luxon'
 import { describe } from 'mocha'
 import { createSandbox, SinonSandbox } from 'sinon'
+import { Authentification } from 'src/domain/authentification'
 import { Jeune } from 'src/domain/jeune/jeune'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
 import { PoleEmploiPartenaireClient } from 'src/infrastructure/clients/pole-emploi-partenaire-client.db'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
+import { unUtilisateurJeune } from 'test/fixtures/authentification.fixture'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import {
@@ -23,6 +25,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
 
   let sandbox: SinonSandbox
   let jeunesRepository: StubbedType<Jeune.Repository>
+  let authRepository: StubbedType<Authentification.Repository>
   let dateService: StubbedClass<DateService>
   let idService: StubbedClass<IdService>
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
@@ -40,6 +43,8 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
     sandbox = createSandbox()
     jeunesRepository = stubInterface(sandbox)
     jeunesRepository.get.resolves(unJeune())
+    authRepository = stubInterface(sandbox)
+    authRepository.getJeuneById.resolves(unUtilisateurJeune())
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
     poleEmploiPartenaireClient.getDemarches.resolves(success([]))
 
@@ -56,7 +61,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
     keycloakClient.exchangeTokenJeune.resolves(idpToken)
 
     getDemarchesQueryGetter = new GetDemarchesQueryGetter(
-      jeunesRepository,
+      authRepository,
       poleEmploiPartenaireClient,
       dateService,
       keycloakClient

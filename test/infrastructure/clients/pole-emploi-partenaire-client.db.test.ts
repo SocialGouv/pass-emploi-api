@@ -20,7 +20,10 @@ import {
 } from '../../../src/infrastructure/sequelize/models/log-api-partenaire.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { unePrestationDto } from '../../fixtures/pole-emploi-partenaire.fixture'
-import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../fixtures/authentification.fixture'
 import { Core } from '../../../src/domain/core'
 import {
   failureApi,
@@ -336,6 +339,41 @@ describe('PoleEmploiPartenaireClient', () => {
 
         // Then
         expect(demarcheDtos).to.deep.equal(success([uneDemarcheDto()]))
+        expect(context.set).to.have.been.calledOnceWithExactly(
+          'RESULTATS_APPEL_PARTENAIRE',
+          [
+            {
+              resultat: [uneDemarcheDto()],
+              path: '/partenaire/peconnect-demarches/v1/demarches'
+            }
+          ]
+        )
+      })
+
+      it('stock en cache', async () => {
+        // Given
+        nock(PARTENAIRE_BASE_URL)
+          .get('/peconnect-demarches/v1/demarches')
+          .reply(200, [uneDemarcheDto()])
+          .isDone()
+
+        // When
+        const demarcheDtos = await poleEmploiPartenaireClient.getDemarches(
+          tokenJeune,
+          'hermione'
+        )
+
+        // Then
+        expect(demarcheDtos).to.deep.equal(success([uneDemarcheDto()]))
+        expect(context.set).to.have.been.calledOnceWithExactly(
+          'RESULTATS_APPEL_PARTENAIRE',
+          [
+            {
+              resultat: [uneDemarcheDto()],
+              path: '/partenaire/peconnect-demarches/v1/demarches?cacheParam=hermione'
+            }
+          ]
+        )
       })
     })
     describe('quand il y a no content', () => {
@@ -353,6 +391,64 @@ describe('PoleEmploiPartenaireClient', () => {
 
         // Then
         expect(demarcheDtos).to.deep.equal(successApi([]))
+      })
+    })
+  })
+
+  describe('getDemarchesEnCache', () => {
+    describe('quand il y a un cache', () => {
+      it('renvoie les démarches du cache', async () => {
+        // Given
+        const conseiller = unUtilisateurConseiller()
+        context.get.withArgs(ContextKey.UTILISATEUR).returns(conseiller)
+        const logApiDto: AsSql<LogApiPartenaireDto> = {
+          id: 'd90e397a-dcb3-4a7b-8eac-3dec0aa55dfa',
+          idUtilisateur: conseiller.id,
+          typeUtilisateur: 'CONSEILLER',
+          date: uneDatetime().toJSDate(),
+          pathPartenaire:
+            'peconnect-demarches/v1/demarches?cacheParam=hermione',
+          resultatPartenaire: [uneDemarcheDto()],
+          resultat: [],
+          transactionId: 'transactionId'
+        }
+        await LogApiPartenaireSqlModel.create(logApiDto)
+
+        // When
+        const response = await poleEmploiPartenaireClient.getDemarchesEnCache(
+          'hermione'
+        )
+
+        // Then
+        expect(response).to.deep.equal(
+          successApi([uneDemarcheDto()], uneDatetime())
+        )
+      })
+    })
+    describe("quand il n'y a pas de cache", () => {
+      it('remonte une 404', async () => {
+        // Given
+        const logApiDto: AsSql<LogApiPartenaireDto> = {
+          id: 'd90e397a-dcb3-4a7b-8eac-3dec0aa55dfa',
+          idUtilisateur: 'hermione',
+          typeUtilisateur: 'JEUNE',
+          date: uneDatetime().toJSDate(),
+          pathPartenaire: '/peconnect-demarches/v1/demarches',
+          resultatPartenaire: [uneDemarcheDto()],
+          resultat: [],
+          transactionId: 'transactionId'
+        }
+        await LogApiPartenaireSqlModel.create(logApiDto)
+
+        // When
+        const response = await poleEmploiPartenaireClient.getDemarchesEnCache(
+          'hermione'
+        )
+
+        // Then
+        expect(response).to.deep.equal(
+          failureApi(new ErreurHttp('Aucune démarche en cache', 404))
+        )
       })
     })
   })

@@ -1,4 +1,5 @@
-import { unJeune } from '../../../../fixtures/jeune.fixture'
+import { unUtilisateurJeune } from 'test/fixtures/authentification.fixture'
+import { Authentification } from '../../../../../src/domain/authentification'
 import {
   DemarcheDto,
   DemarcheDtoEtat
@@ -25,7 +26,6 @@ import { PoleEmploiPartenaireClient } from '../../../../../src/infrastructure/cl
 import { DateService } from '../../../../../src/utils/date-service'
 import { DateTime } from 'luxon'
 import { KeycloakClient } from '../../../../../src/infrastructure/clients/keycloak-client.db'
-import { Jeune } from '../../../../../src/domain/jeune/jeune'
 import { SinonSandbox } from 'sinon'
 import { GetDemarchesQueryGetter } from '../../../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { failureApi } from '../../../../../src/building-blocks/types/result-api'
@@ -34,7 +34,7 @@ import { DemarcheQueryModel } from '../../../../../src/application/queries/query
 import { Demarche } from '../../../../../src/domain/demarche'
 
 describe('GetDemarchesQueryGetter', () => {
-  let jeunesRepository: StubbedType<Jeune.Repository>
+  let authRepository: StubbedType<Authentification.Repository>
   let dateService: StubbedClass<DateService>
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
   let getDemarchesQueryGetter: GetDemarchesQueryGetter
@@ -47,7 +47,7 @@ describe('GetDemarchesQueryGetter', () => {
 
   before(() => {
     sandbox = createSandbox()
-    jeunesRepository = stubInterface(sandbox)
+    authRepository = stubInterface(sandbox)
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
     dateService = stubClass(DateService)
     dateService.now.returns(maintenant)
@@ -55,7 +55,7 @@ describe('GetDemarchesQueryGetter', () => {
     keycloakClient.exchangeTokenJeune.resolves(idpToken)
 
     getDemarchesQueryGetter = new GetDemarchesQueryGetter(
-      jeunesRepository,
+      authRepository,
       poleEmploiPartenaireClient,
       dateService,
       keycloakClient
@@ -63,7 +63,7 @@ describe('GetDemarchesQueryGetter', () => {
   })
 
   describe('quand le jeune existe', () => {
-    const jeune = unJeune()
+    const jeune = unUtilisateurJeune()
 
     const demarcheDtoRetard: DemarcheDto = {
       idDemarche: 'id-demarche',
@@ -146,7 +146,7 @@ describe('GetDemarchesQueryGetter', () => {
           accessToken: 'token',
           tri: GetDemarchesQueryGetter.Tri.parSatutEtDateFin
         }
-        jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
+        authRepository.getJeuneById.withArgs(query.idJeune).resolves(jeune)
         poleEmploiPartenaireClient.getDemarches
           .withArgs(idpToken)
           .resolves(success([demarcheDtoEnCoursProche]))
@@ -196,7 +196,7 @@ describe('GetDemarchesQueryGetter', () => {
           accessToken: 'token',
           tri: GetDemarchesQueryGetter.Tri.parSatutEtDateFin
         }
-        jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
+        authRepository.getJeuneById.withArgs(query.idJeune).resolves(jeune)
         poleEmploiPartenaireClient.getDemarches
           .withArgs(idpToken)
           .resolves(
@@ -232,7 +232,7 @@ describe('GetDemarchesQueryGetter', () => {
           accessToken: 'token',
           tri: GetDemarchesQueryGetter.Tri.parDateFin
         }
-        jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
+        authRepository.getJeuneById.withArgs(query.idJeune).resolves(jeune)
         poleEmploiPartenaireClient.getDemarches
           .withArgs(idpToken)
           .resolves(
@@ -268,9 +268,87 @@ describe('GetDemarchesQueryGetter', () => {
           tri: GetDemarchesQueryGetter.Tri.parDateFin,
           dateDebut: DateTime.fromISO('2020-04-03')
         }
-        jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
+        authRepository.getJeuneById.withArgs(query.idJeune).resolves(jeune)
         poleEmploiPartenaireClient.getDemarches
           .withArgs(idpToken)
+          .resolves(
+            success([
+              demarcheDtoAnnulee,
+              demarcheDtoEnCours,
+              demarcheDtoRetard,
+              demarcheDtoRealisee,
+              demarcheDtoAFaireAuMilieu,
+              demarcheDtoEnCoursProche
+            ])
+          )
+
+        // When
+        const result = await getDemarchesQueryGetter.handle(query)
+        // Then
+        expect(isSuccess(result)).to.be.true()
+        if (isSuccess(result)) {
+          const demarches = result.data.queryModel
+          expect(demarches.length).to.equal(4)
+          expect(demarches[0].id).to.equal(demarcheDtoAnnulee.idDemarche)
+          expect(demarches[1].id).to.equal(demarcheDtoEnCoursProche.idDemarche)
+          expect(demarches[2].id).to.equal(demarcheDtoEnCours.idDemarche)
+          expect(demarches[3].id).to.equal(demarcheDtoRealisee.idDemarche)
+        }
+      })
+
+      it('récupères les démarches Pole Emploi du jeune pour son conseiller', async () => {
+        const query = {
+          idJeune: '1',
+          accessToken: 'token',
+          tri: GetDemarchesQueryGetter.Tri.parDateFin,
+          dateDebut: DateTime.fromISO('2020-04-03'),
+          pourConseiller: true
+        }
+        authRepository.getJeuneById.withArgs(query.idJeune).resolves(jeune)
+        keycloakClient.exchangeTokenConseillerJeune
+          .withArgs(query.accessToken, jeune.idAuthentification!)
+          .resolves(idpToken)
+        poleEmploiPartenaireClient.getDemarches
+          .withArgs(idpToken, query.idJeune)
+          .resolves(
+            success([
+              demarcheDtoAnnulee,
+              demarcheDtoEnCours,
+              demarcheDtoRetard,
+              demarcheDtoRealisee,
+              demarcheDtoAFaireAuMilieu,
+              demarcheDtoEnCoursProche
+            ])
+          )
+
+        // When
+        const result = await getDemarchesQueryGetter.handle(query)
+        // Then
+        expect(isSuccess(result)).to.be.true()
+        if (isSuccess(result)) {
+          const demarches = result.data.queryModel
+          expect(demarches.length).to.equal(4)
+          expect(demarches[0].id).to.equal(demarcheDtoAnnulee.idDemarche)
+          expect(demarches[1].id).to.equal(demarcheDtoEnCoursProche.idDemarche)
+          expect(demarches[2].id).to.equal(demarcheDtoEnCours.idDemarche)
+          expect(demarches[3].id).to.equal(demarcheDtoRealisee.idDemarche)
+        }
+      })
+
+      it('récupères les démarches en cache', async () => {
+        const query = {
+          idJeune: '1',
+          accessToken: 'token',
+          tri: GetDemarchesQueryGetter.Tri.parDateFin,
+          dateDebut: DateTime.fromISO('2020-04-03'),
+          pourConseiller: true
+        }
+        authRepository.getJeuneById.withArgs(query.idJeune).resolves(jeune)
+        keycloakClient.exchangeTokenConseillerJeune
+          .withArgs(query.accessToken, jeune.idAuthentification!)
+          .rejects(new Error())
+        poleEmploiPartenaireClient.getDemarchesEnCache
+          .withArgs(query.idJeune)
           .resolves(
             success([
               demarcheDtoAnnulee,
@@ -305,7 +383,7 @@ describe('GetDemarchesQueryGetter', () => {
           accessToken: 'token',
           tri: GetDemarchesQueryGetter.Tri.parSatutEtDateFin
         }
-        jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
+        authRepository.getJeuneById.withArgs(query.idJeune).resolves(jeune)
         poleEmploiPartenaireClient.getDemarches
           .withArgs(idpToken)
           .resolves(failureApi(new ErreurHttp('erreur', 400)))
@@ -327,7 +405,7 @@ describe('GetDemarchesQueryGetter', () => {
         tri: GetDemarchesQueryGetter.Tri.parSatutEtDateFin
       }
 
-      jeunesRepository.get.withArgs(query.idJeune).resolves(undefined)
+      authRepository.getJeuneById.withArgs(query.idJeune).resolves(undefined)
 
       // When
       const result = await getDemarchesQueryGetter.handle(query)
