@@ -14,10 +14,12 @@ export default () => {
 
   const databaseUrl = process.env.DATABASE_URL as string
   const { host, port, database, user, password } = parse(databaseUrl)
+
+  const isWorker = process.env.IS_WORKER === 'true'
   const configuration = {
     environment: process.env.ENVIRONMENT,
     isWeb: process.env.IS_WEB !== 'false',
-    isWorker: process.env.IS_WORKER === 'true',
+    isWorker,
     isInMemory: process.env.IS_IN_MEMORY === 'true',
     port: process.env.PORT ? parseInt(process.env.PORT, 10) : 5000,
     database: {
@@ -29,7 +31,9 @@ export default () => {
       acquireConnections: process.env.DATABASE_ACQUIRE_CONNECTIONS || 10000,
       evictConnections: process.env.DATABASE_EVICT_CONNECTIONS || 10000,
       idleConnections: process.env.DATABASE_IDLE_CONNECTIONS || 10000,
-      maxConnections: process.env.DATABASE_MAX_CONNECTIONS || 10,
+      maxConnections: isWorker
+        ? process.env.DATABASE_MAX_CONNECTIONS_WORKER
+        : process.env.DATABASE_MAX_CONNECTIONS_WEB,
       minConnections: process.env.DATABASE_MIN_CONNECTIONS || 1
     },
     debug: process.env.DEBUG,
