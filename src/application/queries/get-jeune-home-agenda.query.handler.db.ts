@@ -36,6 +36,7 @@ import { JeuneHomeAgendaQueryModel } from './query-models/home-jeune-suivi.query
 import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
 import { SessionJeuneMiloQueryModel } from './query-models/sessions.milo.query.model'
 import estConseiller = Authentification.estConseiller
+import { RendezVousJeuneAssociationSqlModel } from '../../infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 
 export interface GetJeuneHomeAgendaQuery extends Query {
   idJeune: string
@@ -64,7 +65,7 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
     const jeuneSqlModel = await JeuneSqlModel.findByPk(query.idJeune, {
       include: [{ model: ConseillerSqlModel, required: true }]
     })
-    if (!jeuneSqlModel) {
+    if (!jeuneSqlModel || !jeuneSqlModel.conseiller) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
 
@@ -79,7 +80,8 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
         query,
         lundiDernier,
         dimancheEnHuit,
-        utilisateur.type
+        utilisateur.type,
+        jeuneSqlModel
       ),
       this.recupererLeNombreDactionsEnRetard(query, maintenant)
     ])
@@ -171,18 +173,25 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
     query: GetJeuneHomeAgendaQuery,
     dateDebut: DateTime,
     dateFin: DateTime,
-    typeUtilisateur: Authentification.Type
+    typeUtilisateur: Authentification.Type,
+    jeuneSqlModel: JeuneSqlModel
   ): Promise<RendezVousJeuneQueryModel[]> {
+    const rdvsDuJeune = await RendezVousJeuneAssociationSqlModel.findAll({
+      where: {
+        idJeune: query.idJeune
+      }
+    })
     const rendezVousSqlModel = await RendezVousSqlModel.findAll({
-      include: [
-        {
-          model: JeuneSqlModel,
-          where: { id: query.idJeune },
-          include: [ConseillerSqlModel]
-        }
-      ],
+      // include: [
+      //   {
+      //     model: JeuneSqlModel,
+      //     where: { id: query.idJeune }
+      //     include: [ConseillerSqlModel]
+      //   }
+      // ],
       where: {
         ...generateSourceRendezVousCondition(this.configuration),
+        id: rdvsDuJeune.map(rdvAssoc => rdvAssoc.idRendezVous),
         date: {
           [Op.gte]: dateDebut.toJSDate(),
           [Op.lte]: dateFin.toJSDate()
@@ -192,7 +201,12 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
     })
 
     return rendezVousSqlModel.map(rdvSql =>
-      fromSqlToRendezVousJeuneQueryModel(rdvSql, typeUtilisateur)
+      fromSqlToRendezVousJeuneQueryModel(
+        rdvSql,
+        typeUtilisateur,
+        query.idJeune,
+        jeuneSqlModel
+      )
     )
   }
 

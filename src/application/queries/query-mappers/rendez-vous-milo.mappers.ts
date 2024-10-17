@@ -18,9 +18,11 @@ import {
 export function fromSqlToRendezVousJeuneQueryModel(
   rendezVousSql: RendezVousSqlModel,
   typeUtilisateur: Authentification.Type,
-  idJeune?: string
+  idJeune?: string,
+  jeuneSqlModel?: JeuneSqlModel
 ): RendezVousJeuneQueryModel {
-  const jeuneSql = rendezVousSql.jeunes.find(jeune => jeune.id === idJeune)
+  const jeuneSql =
+    jeuneSqlModel ?? rendezVousSql.jeunes.find(jeune => jeune.id === idJeune)
 
   return {
     id: rendezVousSql.id,
@@ -40,11 +42,17 @@ export function fromSqlToRendezVousJeuneQueryModel(
     presenceConseiller: rendezVousSql.presenceConseiller,
     invitation: Boolean(rendezVousSql.invitation),
     createur: rendezVousSql.createur,
-    conseiller: {
-      id: rendezVousSql.jeunes[0].conseiller!.id,
-      nom: rendezVousSql.jeunes[0].conseiller!.nom,
-      prenom: rendezVousSql.jeunes[0].conseiller!.prenom
-    },
+    conseiller: jeuneSqlModel?.conseiller
+      ? {
+          id: jeuneSqlModel?.conseiller.id,
+          nom: jeuneSqlModel?.conseiller.nom,
+          prenom: jeuneSqlModel?.conseiller.prenom
+        }
+      : {
+          id: rendezVousSql.jeunes[0].conseiller!.id,
+          nom: rendezVousSql.jeunes[0].conseiller!.nom,
+          prenom: rendezVousSql.jeunes[0].conseiller!.prenom
+        },
     source: rendezVousSql.source,
     futPresent: jeuneSql ? getPresence(jeuneSql) : undefined
   }
