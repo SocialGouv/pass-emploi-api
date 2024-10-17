@@ -42,7 +42,6 @@ import {
   GetDetailActionQuery,
   GetDetailActionQueryHandler
 } from '../../application/queries/action/get-detail-action.query.handler.db'
-import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from '../../application/queries/action/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
 import { toCommentaireQueryModel } from '../../application/queries/query-mappers/commentaire.mapper'
 import {
   ActionQueryModel,
@@ -52,7 +51,6 @@ import {
 } from '../../application/queries/query-models/actions.query-model'
 import { IdQueryModel } from '../../application/queries/query-models/common.query-models'
 import { GetActionsConseillerV2QueryModel } from '../../application/queries/query-models/conseillers.query-model'
-import { ResumeActionsDuJeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
 import { Result } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
@@ -82,7 +80,6 @@ export class ActionsController {
     private readonly addCommentaireActionCommandHandler: AddCommentaireActionCommandHandler,
     private readonly getCommentairesActionQueryHandler: GetCommentairesActionQueryHandler,
     private readonly qualifierActionCommandHandler: QualifierActionCommandHandler,
-    private readonly getResumeActionsDesJeunesDuConseillerQueryHandler: GetResumeActionsDesJeunesDuConseillerQueryHandlerDb,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly getActionsDuConseillerQueryHandler: GetActionsConseillerV2QueryHandler,
     private readonly getActionsByJeuneQueryHandler: GetActionsJeuneQueryHandler
@@ -309,23 +306,6 @@ export class ActionsController {
     )
 
     return handleResult(result, id => ({ id }))
-  }
-
-  @ApiOperation({
-    summary: "Récupère les actions d'un conseiller",
-    description: 'Autorisé pour un conseiller'
-  })
-  @Get('conseillers/:idConseiller/actions')
-  async getActionsConseiller(
-    @Param('idConseiller') idConseiller: string,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<ResumeActionsDuJeuneQueryModel[]> {
-    return this.getResumeActionsDesJeunesDuConseillerQueryHandler.execute(
-      {
-        idConseiller
-      },
-      utilisateur
-    )
   }
 
   @ApiOperation({

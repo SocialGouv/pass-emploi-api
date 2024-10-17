@@ -278,12 +278,3 @@ export class JeuneSqlRepository implements Jeune.Repository {
     )
   }
 }
-
-export interface ResumeActionsJeuneDto {
-  id_jeune: string
-  prenom_jeune: string
-  nom_jeune: string
-  todo_actions_count: string
-  done_actions_count: string
-  in_progress_actions_count: string
-}

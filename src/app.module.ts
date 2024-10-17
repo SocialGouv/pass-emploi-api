@@ -133,7 +133,6 @@ import { GetActionsJeuneQueryHandler } from './application/queries/action/get-ac
 import { GetActionsPredefiniesQueryHandler } from './application/queries/action/get-actions-predefinies.query.handler'
 import { GetCommentairesActionQueryHandler } from './application/queries/action/get-commentaires-action.query.handler.db'
 import { GetDetailActionQueryHandler } from './application/queries/action/get-detail-action.query.handler.db'
-import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from './application/queries/action/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
 import { GetTypesQualificationsQueryHandler } from './application/queries/action/get-types-qualifications.query.handler'
 import { GetFavorisJeuneQueryHandler } from './application/queries/favoris/get-favoris-jeune.query.handler.db'
 import { GetMetadonneesFavorisJeuneQueryHandler } from './application/queries/favoris/get-metadonnees-favoris-jeune.query.handler.db'
@@ -201,7 +200,6 @@ import { GetAnimationsCollectivesQueryHandler } from './application/queries/rend
 import { GetDetailRendezVousJeuneQueryHandler } from './application/queries/rendez-vous/get-detail-rendez-vous-jeune.query.handler.db'
 import { GetDetailRendezVousQueryHandler } from './application/queries/rendez-vous/get-detail-rendez-vous.query.handler.db'
 import { GetRendezVousConseillerPaginesQueryHandler } from './application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
-import { GetAllRendezVousConseillerQueryHandler } from './application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from './application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { GetRendezVousJeuneQueryHandler } from './application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
 import { GetTypesRendezVousQueryHandler } from './application/queries/rendez-vous/get-types-rendez-vous.query.handler'
@@ -658,12 +656,10 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetDetailOffreEmploiQueryHandler,
     GetDetailConseillerQueryHandler,
     GetJeunesByConseillerQueryHandler,
-    GetResumeActionsDesJeunesDuConseillerQueryHandlerDb,
     UpdateJeuneConfigurationApplicationCommandHandler,
     UpdateActionCommandHandler,
     CreateRendezVousCommandHandler,
     DeleteRendezVousCommandHandler,
-    GetAllRendezVousConseillerQueryHandler,
     GetRendezVousJeuneQueryHandler,
     GetRendezVousJeunePoleEmploiQueryHandler,
     SendNotificationsNouveauxMessagesCommandHandler,

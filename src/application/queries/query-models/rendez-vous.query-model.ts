@@ -255,20 +255,6 @@ export class RendezVousJeuneDetailQueryModel extends RendezVousJeuneQueryModel {
   estInscrit: boolean
 }
 
-export class RendezVousConseillerFutursEtPassesQueryModel {
-  @ApiProperty({
-    type: RendezVousConseillerQueryModel,
-    isArray: true
-  })
-  futurs: RendezVousConseillerQueryModel[]
-
-  @ApiProperty({
-    type: RendezVousConseillerQueryModel,
-    isArray: true
-  })
-  passes: RendezVousConseillerQueryModel[]
-}
-
 export class TypeRendezVousQueryModel implements TypeRendezVous {
   @ApiProperty()
   code: CodeTypeRendezVous
