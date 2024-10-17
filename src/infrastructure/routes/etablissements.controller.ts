@@ -1,7 +1,6 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
+import { Controller, Get, Param, Query } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { handleResult } from 'src/infrastructure/routes/result.handler'
-import { CloturerAnimationCollectiveCommandHandler } from '../../application/commands/cloturer-animation-collective.command.handler'
 import { GetJeunesByEtablissementQueryHandler } from '../../application/queries/get-jeunes-by-etablissement.query.handler.db'
 import { GetJeunesEtablissementV2QueryHandler } from '../../application/queries/get-jeunes-etablissement-v2.query.handler.db'
 import { GetJeunesEtablissementV2QueryModel } from '../../application/queries/query-models/agence.query-model'
@@ -22,14 +21,12 @@ import {
   GetAnimationsCollectivesV2QueryParams,
   GetJeunesEtablissementV2QueryParams
 } from './validation/etablissements.inputs'
-import { ClotureAnimationCollectivePayload } from './validation/structures.milo.inputs'
 
 @Controller()
 @CustomSwaggerApiOAuth2()
 @ApiTags('Etablissements / Agences Milo')
 export class EtablissementsController {
   constructor(
-    private readonly cloturerAnimationCollectiveCommandHandler: CloturerAnimationCollectiveCommandHandler,
     private readonly getAnimationsCollectivesQueryHandler: GetAnimationsCollectivesQueryHandler,
     private readonly getJeunesEtablissementQueryHandler: GetJeunesByEtablissementQueryHandler,
     private readonly getAnimationsCollectivesV2QueryHandler: GetAnimationsCollectivesV2QueryHandler,
@@ -61,28 +58,6 @@ export class EtablissementsController {
         dateFin: DateService.fromStringToLocaleDateTime(
           getAnimationsCollectivesQueryParams.dateFin
         )
-      },
-      utilisateur
-    )
-
-    return handleResult(result)
-  }
-
-  @ApiOperation({
-    summary: 'Clot une animation collective et inscrit les jeunes',
-    description:
-      "Autorisé pour un conseiller appartenant à l'établissement de l'animation collective"
-  })
-  @Post('etablissements/animations-collectives/:idAnimationCollective/cloturer')
-  async postCloture(
-    @Param('idAnimationCollective') idAnimationCollective: string,
-    @Body() payload: ClotureAnimationCollectivePayload,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    const result = await this.cloturerAnimationCollectiveCommandHandler.execute(
-      {
-        idAnimationCollective,
-        idsJeunes: payload.idsJeunes
       },
       utilisateur
     )

@@ -2,23 +2,8 @@ import {
   ConseillerJeuneQueryModel,
   DetailJeuneConseillerQueryModel,
   DetailJeuneQueryModel,
-  JeuneQueryModel,
-  ResumeActionsDuJeuneQueryModel
+  JeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-model'
-
-export function unResumeActionDUnJeune(
-  args: Partial<ResumeActionsDuJeuneQueryModel> = {}
-): ResumeActionsDuJeuneQueryModel {
-  const defaults: ResumeActionsDuJeuneQueryModel = {
-    jeuneId: 'ABCDE',
-    jeuneFirstName: 'John',
-    jeuneLastName: 'Doe',
-    todoActionsCount: 2,
-    doneActionsCount: 0,
-    inProgressActionsCount: 0
-  }
-  return { ...defaults, ...args }
-}
 
 export function unConseillerJeuneQueryModel(
   args: Partial<ConseillerJeuneQueryModel> = {}

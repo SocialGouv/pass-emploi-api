@@ -1,6 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { JeuneMilo } from '../../../domain/milo/jeune.milo'
-import { Jeune } from '../../../domain/jeune/jeune'
 
 class SituationQueryModel {
   @ApiProperty()
@@ -202,26 +201,6 @@ export class DetailJeuneConseillerQueryModel {
 
   @ApiProperty({ required: false })
   structureMilo?: StructureMiloDuJeuneQueryModel
-}
-
-export class ResumeActionsDuJeuneQueryModel {
-  @ApiProperty()
-  jeuneId: Jeune.Id
-
-  @ApiProperty()
-  jeuneFirstName: string
-
-  @ApiProperty()
-  jeuneLastName: string
-
-  @ApiProperty()
-  todoActionsCount: number
-
-  @ApiProperty()
-  doneActionsCount: number
-
-  @ApiProperty()
-  inProgressActionsCount: number
 }
 
 export class PreferencesJeuneQueryModel {

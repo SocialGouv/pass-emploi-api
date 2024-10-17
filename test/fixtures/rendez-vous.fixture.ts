@@ -1,7 +1,4 @@
-import {
-  RendezVousConseillerFutursEtPassesQueryModel,
-  RendezVousConseillerQueryModel
-} from 'src/application/queries/query-models/rendez-vous.query-model'
+import { RendezVousConseillerQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
 import {
   CodeTypeRendezVous,
   JeuneDuRendezVous,
@@ -127,9 +124,3 @@ export const unRendezVousConseillerQueryModel = (
   }
   return { ...defaults, ...args }
 }
-
-export const unRendezVousConseillerFutursEtPassesQueryModel =
-  (): RendezVousConseillerFutursEtPassesQueryModel => ({
-    futurs: [unRendezVousConseillerQueryModel()],
-    passes: [unRendezVousConseillerQueryModel()]
-  })

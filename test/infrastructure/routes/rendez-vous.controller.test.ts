@@ -1,32 +1,4 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
-import { expect, StubbedClass } from '../../utils'
-import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import {
-  unHeaderAuthorization,
-  unJwtPayloadValide,
-  unJwtPayloadValideJeunePE,
-  unUtilisateurDecode
-} from '../../fixtures/authentification.fixture'
-import * as request from 'supertest'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import {
-  emptySuccess,
-  failure,
-  success
-} from '../../../src/building-blocks/types/result'
-import {
-  JeuneNonLieAuConseillerError,
-  MauvaiseCommandeError,
-  NonTrouveError
-} from '../../../src/building-blocks/types/domain-error'
-import {
-  DeleteRendezVousCommand,
-  DeleteRendezVousCommandHandler
-} from '../../../src/application/commands/delete-rendez-vous.command.handler.db'
-import {
-  unRendezVous,
-  unRendezVousConseillerFutursEtPassesQueryModel
-} from '../../fixtures/rendez-vous.fixture'
 import {
   UpdateRendezVousCommand,
   UpdateRendezVousCommandHandler
@@ -35,30 +7,53 @@ import {
   CreateRendezVousPayload,
   UpdateRendezVousPayload
 } from 'src/infrastructure/routes/validation/rendez-vous.inputs'
+import * as request from 'supertest'
+import { CreateRendezVousCommandHandler } from '../../../src/application/commands/create-rendez-vous.command.handler'
+import {
+  DeleteRendezVousCommand,
+  DeleteRendezVousCommandHandler
+} from '../../../src/application/commands/delete-rendez-vous.command.handler.db'
+import { RendezVousJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
+import { GetAnimationsCollectivesJeuneQueryHandler } from '../../../src/application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
+import { GetDetailRendezVousJeuneQueryHandler } from '../../../src/application/queries/rendez-vous/get-detail-rendez-vous-jeune.query.handler.db'
 import { GetDetailRendezVousQueryHandler } from '../../../src/application/queries/rendez-vous/get-detail-rendez-vous.query.handler.db'
-import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
+import { GetRendezVousConseillerPaginesQueryHandler } from '../../../src/application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
+import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../src/application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
+import { GetRendezVousJeuneQueryHandler } from '../../../src/application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
+import {
+  JeuneNonLieAuConseillerError,
+  MauvaiseCommandeError,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
+import { Cached } from '../../../src/building-blocks/types/query'
+import {
+  emptySuccess,
+  failure,
+  success
+} from '../../../src/building-blocks/types/result'
 import {
   CodeTypeRendezVous,
   RendezVous
 } from '../../../src/domain/rendez-vous/rendez-vous'
-import { uneDatetime } from '../../fixtures/date.fixture'
-import { CreateRendezVousCommandHandler } from '../../../src/application/commands/create-rendez-vous.command.handler'
-import { GetAllRendezVousConseillerQueryHandler } from '../../../src/application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
-import { GetRendezVousConseillerPaginesQueryHandler } from '../../../src/application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
-import { GetRendezVousJeuneQueryHandler } from '../../../src/application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
-import { RendezVousJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
-import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../src/application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
-import { Cached } from '../../../src/building-blocks/types/query'
 import { JwtService } from '../../../src/infrastructure/auth/jwt.service'
-import { GetDetailRendezVousJeuneQueryHandler } from '../../../src/application/queries/rendez-vous/get-detail-rendez-vous-jeune.query.handler.db'
+import {
+  unHeaderAuthorization,
+  unJwtPayloadValide,
+  unJwtPayloadValideJeunePE,
+  unUtilisateurDecode
+} from '../../fixtures/authentification.fixture'
+import { uneDatetime } from '../../fixtures/date.fixture'
+import { unJeune } from '../../fixtures/jeune.fixture'
 import { unRendezVousJeuneDetailQueryModel } from '../../fixtures/query-models/rendez-vous.query-model.fixtures'
-import { GetAnimationsCollectivesJeuneQueryHandler } from '../../../src/application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
+import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
+import { expect, StubbedClass } from '../../utils'
+import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
 describe('RendezvousController', () => {
   let getDetailRendezVousQueryHandler: StubbedClass<GetDetailRendezVousQueryHandler>
   let deleteRendezVousCommandHandler: StubbedClass<DeleteRendezVousCommandHandler>
   let updateRendezVousCommandHandler: StubbedClass<UpdateRendezVousCommandHandler>
-  let getAllRendezVousConseillerQueryHandler: StubbedClass<GetAllRendezVousConseillerQueryHandler>
   let createRendezVousCommandHandler: StubbedClass<CreateRendezVousCommandHandler>
   let getRendezVousConseillerPaginesQueryHandler: StubbedClass<GetRendezVousConseillerPaginesQueryHandler>
   let getRendezVousJeunePoleEmploiQueryHandler: StubbedClass<GetRendezVousJeunePoleEmploiQueryHandler>
@@ -73,9 +68,6 @@ describe('RendezvousController', () => {
     getDetailRendezVousQueryHandler = app.get(GetDetailRendezVousQueryHandler)
     deleteRendezVousCommandHandler = app.get(DeleteRendezVousCommandHandler)
     updateRendezVousCommandHandler = app.get(UpdateRendezVousCommandHandler)
-    getAllRendezVousConseillerQueryHandler = app.get(
-      GetAllRendezVousConseillerQueryHandler
-    )
     getRendezVousConseillerPaginesQueryHandler = app.get(
       GetRendezVousConseillerPaginesQueryHandler
     )
@@ -279,28 +271,6 @@ describe('RendezvousController', () => {
         .expect(HttpStatus.BAD_REQUEST)
     })
     ensureUserAuthenticationFailsIfInvalid('put', '/rendezvous/123')
-  })
-  describe('GET /conseillers/:idConseiller/rendezvous', () => {
-    describe('quand le rendez-vous existe', () => {
-      it('renvoie le rendezvous', async () => {
-        // Given
-        getAllRendezVousConseillerQueryHandler.execute
-          .withArgs(
-            { idConseiller: '41', presenceConseiller: undefined },
-            unUtilisateurDecode()
-          )
-          .resolves(unRendezVousConseillerFutursEtPassesQueryModel())
-
-        // When - Then
-        await request(app.getHttpServer())
-          .get('/conseillers/41/rendezvous')
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.OK)
-          .expect(
-            JSON.stringify(unRendezVousConseillerFutursEtPassesQueryModel())
-          )
-      })
-    })
   })
 
   describe('GET /v2/conseillers/:idConseiller/rendezvous', () => {

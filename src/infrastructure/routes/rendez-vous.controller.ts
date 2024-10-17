@@ -33,7 +33,6 @@ import {
 } from '../../application/commands/update-rendez-vous.command.handler'
 import {
   RendezVousConseillerDetailQueryModel,
-  RendezVousConseillerFutursEtPassesQueryModel,
   RendezVousConseillerQueryModel,
   RendezVousJeuneDetailQueryModel,
   RendezVousJeuneQueryModel,
@@ -49,7 +48,6 @@ import {
   GetRendezVousConseillerPaginesQuery,
   GetRendezVousConseillerPaginesQueryHandler
 } from '../../application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
-import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { GetRendezVousJeuneQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
 import { Result } from '../../building-blocks/types/result'
@@ -59,7 +57,6 @@ import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import {
   EnvoyerNotificationsPayload,
-  GetRendezVousConseillerQueryParams,
   GetRendezVousConseillerV2QueryParams
 } from './validation/conseillers.inputs'
 import {
@@ -82,7 +79,6 @@ export class RendezVousController {
     private readonly deleteRendezVousCommandHandler: DeleteRendezVousCommandHandler,
     private readonly updateRendezVousCommandHandler: UpdateRendezVousCommandHandler,
     private readonly sendNotificationsNouveauxMessages: SendNotificationsNouveauxMessagesCommandHandler,
-    private readonly getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler,
     private readonly createRendezVousCommandHandler: CreateRendezVousCommandHandler,
     private readonly getRendezVousConseillerPaginesQueryHandler: GetRendezVousConseillerPaginesQueryHandler,
     private readonly getRendezVousJeuneQueryHandler: GetRendezVousJeuneQueryHandler,
@@ -152,28 +148,6 @@ export class RendezVousController {
     )
 
     return handleResult(result)
-  }
-
-  @ApiOperation({
-    summary: "Récupère les rendez-vous d'un conseiller",
-    description: 'Autorisé pour un conseiller'
-  })
-  @Get('conseillers/:idConseiller/rendezvous')
-  @ApiResponse({
-    type: RendezVousConseillerFutursEtPassesQueryModel
-  })
-  async getRendezVous(
-    @Query() getRendezVousConseillerQuery: GetRendezVousConseillerQueryParams,
-    @Param('idConseiller') idConseiller: string,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<RendezVousConseillerFutursEtPassesQueryModel> {
-    return this.getAllRendezVousConseillerQueryHandler.execute(
-      {
-        idConseiller,
-        presenceConseiller: getRendezVousConseillerQuery.presenceConseiller
-      },
-      utilisateur
-    )
   }
 
   @ApiOperation({
