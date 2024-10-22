@@ -28,6 +28,7 @@ export class UpdateActionPayload {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @MaxLength(1024)
   contenu?: string
 
   @ApiPropertyOptional()
@@ -87,6 +88,7 @@ export class CreateActionPayload {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  @MaxLength(1024)
   content: string
 
   @ApiProperty()
