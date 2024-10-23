@@ -11,6 +11,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  MaxLength,
   ValidateIf
 } from 'class-validator'
 import {
@@ -22,6 +23,7 @@ export class CreateRendezVousPayload {
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
+  @MaxLength(1024)
   comment?: string
 
   @ApiProperty()
@@ -39,6 +41,7 @@ export class CreateRendezVousPayload {
   @IsOptional()
   @IsString()
   @IsNotEmpty()
+  @MaxLength(1024)
   modality?: string
 
   @ApiPropertyOptional({ enum: CodeTypeRendezVous })
@@ -67,18 +70,21 @@ export class CreateRendezVousPayload {
   @ValidateIf(payload => payload.type === CodeTypeRendezVous.AUTRE)
   @IsString()
   @IsNotEmpty()
+  @MaxLength(250)
   precision?: string
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   @IsNotEmpty()
+  @MaxLength(250)
   adresse?: string
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   @IsNotEmpty()
+  @MaxLength(250)
   organisme?: string
 
   @ApiPropertyOptional()
@@ -118,6 +124,7 @@ export class UpdateRendezVousPayload {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @MaxLength(1024)
   comment?: string
 
   @ApiProperty()
@@ -134,16 +141,19 @@ export class UpdateRendezVousPayload {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @MaxLength(1024)
   modality?: string
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @MaxLength(250)
   adresse?: string
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @MaxLength(250)
   organisme?: string
 
   @ApiProperty()

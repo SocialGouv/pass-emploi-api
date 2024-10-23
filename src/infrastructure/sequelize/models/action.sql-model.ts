@@ -16,14 +16,14 @@ import { CommentaireSqlModel } from './commentaire.sql-model'
 export class ActionDto extends Model {
   @PrimaryKey
   @Column({ field: 'id', type: DataType.UUID })
-  id!: string
+  id: string
 
   @ForeignKey(() => JeuneSqlModel)
   @Column({ field: 'id_jeune', type: DataType.STRING })
-  idJeune!: string
+  idJeune: string
 
   @Column({ field: 'id_createur', type: DataType.STRING })
-  idCreateur!: string
+  idCreateur: string
 
   @Column({ field: 'createur', type: DataType.JSONB })
   createur: {
@@ -33,25 +33,25 @@ export class ActionDto extends Model {
   }
 
   @Column({ field: 'type_createur', type: DataType.STRING })
-  typeCreateur!: Action.TypeCreateur
+  typeCreateur: Action.TypeCreateur
 
   @Column({ field: 'contenu', type: DataType.STRING(1024) })
-  contenu!: string
+  contenu: string
 
   @Column({ field: 'description', type: DataType.STRING(2048) })
-  description!: string
+  description: string
 
   @Column({ field: 'statut', type: DataType.STRING })
-  statut!: Action.Statut
+  statut: Action.Statut
 
   @Column({ field: 'est_visible_par_conseiller', type: DataType.BOOLEAN })
-  estVisibleParConseiller!: boolean
+  estVisibleParConseiller: boolean
 
   @Column({ field: 'date_creation', type: DataType.DATE })
-  dateCreation!: Date
+  dateCreation: Date
 
   @Column({ field: 'date_derniere_actualisation', type: DataType.DATE })
-  dateDerniereActualisation!: Date
+  dateDerniereActualisation: Date
 
   @Column({ field: 'date_echeance', type: DataType.DATE })
   dateEcheance: Date
@@ -78,10 +78,10 @@ export class ActionDto extends Model {
 @Table({ timestamps: false, tableName: 'action' })
 export class ActionSqlModel extends ActionDto {
   @BelongsTo(() => JeuneSqlModel)
-  jeune!: JeuneSqlModel
+  jeune: JeuneSqlModel
 
   @HasMany(() => CommentaireSqlModel)
-  commentaires!: CommentaireSqlModel[]
+  commentaires: CommentaireSqlModel[]
 
   static async creer(actionDto: AsSql<ActionDto>): Promise<void> {
     await ActionSqlModel.create(actionDto)

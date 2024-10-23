@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { Transform, Type } from 'class-transformer'
 import {
   ArrayNotEmpty,
   IsArray,
@@ -11,14 +12,14 @@ import {
   IsOptional,
   IsString,
   IsTimeZone,
+  MaxLength,
   Min,
   ValidateIf
 } from 'class-validator'
-import { RendezVous } from '../../../domain/rendez-vous/rendez-vous'
 import { Action } from '../../../domain/action/action'
-import { Transform, Type } from 'class-transformer'
-import { transformStringToArray } from './utils/transformers'
 import { ArchiveJeune } from '../../../domain/archive-jeune'
+import { RendezVous } from '../../../domain/rendez-vous/rendez-vous'
+import { transformStringToArray } from './utils/transformers'
 
 export class UpdateConfigurationInput {
   @ApiProperty()
@@ -44,6 +45,7 @@ export class ArchiverJeunePayload {
   @ValidateIf(payload => payload.motif === ArchiveJeune.MotifSuppression.AUTRE)
   @IsNotEmpty()
   @IsString()
+  @MaxLength(250)
   commentaire?: string
 }
 

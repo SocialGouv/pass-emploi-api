@@ -90,9 +90,7 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     const [
       rendezVousSqlModelsCount,
       rendezVousSqlModelsProchainRdv,
-      actionSqlModelsARealiser,
-      actionSqlModelsEnRetard,
-      actionSqlModelsAFaireSemaineCalendaire,
+      countActions,
       evenementSqlModelAVenir,
       recherchesQueryModels,
       favorisQueryModels,
@@ -101,14 +99,9 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     ] = await Promise.all([
       this.countRendezVousSemaine(maintenant, dateFinDeSemaine, idJeune),
       this.prochainRendezVous(maintenant, idJeune),
-      this.countActionsDeLaSemaineARealiser(
+      this.countActions(
         idJeune,
         maintenant,
-        dateFinDeSemaine
-      ),
-      this.countActionsEnRetard(idJeune, maintenant),
-      this.countActionsAFaireCetteSemaine(
-        idJeune,
         dateDebutDeSemaine,
         dateFinDeSemaine
       ),
@@ -132,10 +125,9 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
         nombreRendezVous:
           rendezVousSqlModelsCount +
           resultatSessionsMilo.sessionsInscritCetteSemaine.length,
-        nombreActionsDemarchesEnRetard: actionSqlModelsEnRetard,
-        nombreActionsDemarchesARealiser: actionSqlModelsARealiser,
-        nombreActionsDemarchesAFaireSemaineCalendaire:
-          actionSqlModelsAFaireSemaineCalendaire
+        nombreActionsDemarchesEnRetard: countActions.enRetard,
+        nombreActionsDemarchesARealiser: countActions.aRealiser,
+        nombreActionsDemarchesAFaireSemaineCalendaire: countActions.aFaire
       },
       prochainRendezVous: rendezVousSqlModelsProchainRdv
         ? fromSqlToRendezVousJeuneQueryModel(
@@ -174,56 +166,68 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     return
   }
 
-  private countActionsEnRetard(
-    idJeune: string,
-    maintenant: DateTime
-  ): Promise<number> {
-    return ActionSqlModel.count({
-      where: {
-        id_jeune: idJeune,
-        dateEcheance: { [Op.lt]: maintenant.startOf('day').toJSDate() },
-        statut: {
-          [Op.in]: [Action.Statut.EN_COURS, Action.Statut.PAS_COMMENCEE]
-        }
-      }
-    })
-  }
-
-  private countActionsDeLaSemaineARealiser(
+  private async countActions(
     idJeune: string,
     maintenant: DateTime,
-    dateFinDeSemaine: DateTime
-  ): Promise<number> {
-    return ActionSqlModel.count({
-      where: {
-        id_jeune: idJeune,
-        dateEcheance: {
-          [Op.between]: [maintenant.toJSDate(), dateFinDeSemaine.toJSDate()]
-        },
-        statut: {
-          [Op.in]: [Action.Statut.EN_COURS, Action.Statut.PAS_COMMENCEE]
-        }
-      }
-    })
-  }
-
-  private countActionsAFaireCetteSemaine(
-    idJeune: string,
     dateDebutDeSemaine: DateTime,
     dateFinDeSemaine: DateTime
-  ): Promise<number> {
-    return ActionSqlModel.count({
+  ): Promise<{ enRetard: number; aRealiser: number; aFaire: number }> {
+    return ActionSqlModel.findOne({
       where: {
-        id_jeune: idJeune,
-        dateEcheance: {
-          [Op.between]: [
-            dateDebutDeSemaine.toJSDate(),
-            dateFinDeSemaine.toJSDate()
-          ]
-        },
+        idJeune,
         statut: {
           [Op.in]: [Action.Statut.EN_COURS, Action.Statut.PAS_COMMENCEE]
         }
+      },
+      attributes: [
+        [
+          Sequelize.fn(
+            'COUNT',
+            Sequelize.literal(`
+            CASE 
+              WHEN "date_echeance" < :dateDebutDuJour
+              THEN 1 
+            END
+          `)
+          ),
+          'enRetard'
+        ],
+        [
+          Sequelize.fn(
+            'COUNT',
+            Sequelize.literal(`
+            CASE 
+              WHEN "date_echeance" BETWEEN :maintenant AND :dateFinDeSemaine
+              THEN 1 
+            END
+          `)
+          ),
+          'aRealiser'
+        ],
+        [
+          Sequelize.fn(
+            'COUNT',
+            Sequelize.literal(`
+            CASE 
+              WHEN "date_echeance" BETWEEN :dateDebutDeSemaine AND :dateFinDeSemaine 
+              THEN 1 
+            END
+          `)
+          ),
+          'aFaire'
+        ]
+      ],
+      replacements: {
+        maintenant: maintenant.toUTC().toISO(),
+        dateDebutDuJour: maintenant.startOf('day').toUTC().toISO(),
+        dateDebutDeSemaine: dateDebutDeSemaine.toUTC().toISO(),
+        dateFinDeSemaine: dateFinDeSemaine.toUTC().toISO()
+      }
+    }).then(result => {
+      return {
+        enRetard: Number(result?.get('enRetard')) || 0,
+        aRealiser: Number(result?.get('aRealiser')) || 0,
+        aFaire: Number(result?.get('aFaire')) || 0
       }
     })
   }

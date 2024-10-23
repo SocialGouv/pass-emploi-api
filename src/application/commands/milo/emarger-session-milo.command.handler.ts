@@ -62,7 +62,7 @@ export class EmargerSessionMiloCommandHandler extends CommandHandler<
 
     const session = resultSession.data
 
-    const resultEmargement = await SessionMilo.emarger(
+    const resultEmargement = SessionMilo.emarger(
       session,
       command.emargements,
       this.dateService.now()
