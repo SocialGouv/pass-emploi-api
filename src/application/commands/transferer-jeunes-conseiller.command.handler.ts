@@ -6,9 +6,10 @@ import {
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
 import {
-  Result,
   emptySuccess,
-  failure
+  failure,
+  isFailure,
+  Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
@@ -55,7 +56,7 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
     command: TransfererJeunesConseillerCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    const [conseillerSource, conseillerCible, jeunes] = await Promise.all([
+    const entites = await Promise.all([
       this.conseillerRepository.get(command.idConseillerSource),
       this.conseillerRepository.get(command.idConseillerCible),
       this.jeuneRepository.findAllJeunesByIdsAndConseiller(
@@ -64,70 +65,21 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
       )
     ])
 
-    if (!conseillerSource) {
-      return failure(
-        new NonTrouveError('Conseiller', command.idConseillerSource)
-      )
-    }
-    if (!conseillerCible) {
-      return failure(
-        new NonTrouveError('Conseiller', command.idConseillerCible)
-      )
-    }
-    if (jeunes?.length !== command.idsJeunes.length) {
-      return failure(
-        new MauvaiseCommandeError('Liste des jeunes à transférer invalide')
-      )
-    }
+    const verificationEntites = verifierEntites(entites, command)
+    if (isFailure(verificationEntites)) return verificationEntites
+    const [conseillerSource, conseillerCible, jeunes] = entites as [
+      Conseiller,
+      Conseiller,
+      Jeune[]
+    ]
 
-    let typeTransfert: Jeune.TypeTransfert
-    switch (command.provenanceUtilisateur) {
-      case Authentification.Type.CONSEILLER:
-        if (
-          Authentification.estSuperviseurResponsable(
-            utilisateur,
-            conseillerSource.structure
-          )
-        ) {
-          const conseillerSourceEtCibleDansLaMemeStructure =
-            conseillerSource.structure === conseillerCible.structure
-
-          if (!conseillerSourceEtCibleDansLaMemeStructure)
-            return failure(
-              new MauvaiseCommandeError(
-                'Les informations de structure des conseillers source et cible ne correspondent pas'
-              )
-            )
-        } else {
-          const superviseurDansLaMemeStructureQueConseillerSourceEtCible =
-            utilisateur.structure === conseillerSource.structure &&
-            utilisateur.structure === conseillerCible.structure
-
-          if (!superviseurDansLaMemeStructureQueConseillerSourceEtCible) {
-            return failure(
-              new MauvaiseCommandeError(
-                'Les informations de structure ne correspondent pas'
-              )
-            )
-          }
-        }
-        typeTransfert = command.estTemporaire
-          ? Jeune.TypeTransfert.TEMPORAIRE
-          : Jeune.TypeTransfert.DEFINITIF
-        break
-      case Authentification.Type.SUPPORT:
-        if (conseillerSource.structure !== conseillerCible.structure) {
-          return failure(
-            new MauvaiseCommandeError(
-              'Les informations de structure ne correspondent pas'
-            )
-          )
-        }
-        typeTransfert = command.estTemporaire
-          ? Jeune.TypeTransfert.TEMPORAIRE_SUPPORT
-          : Jeune.TypeTransfert.DEFINITIF_SUPPORT
-        break
-    }
+    const verificationStructures = verifierStructures(
+      command,
+      utilisateur,
+      conseillerSource,
+      conseillerCible
+    )
+    if (isFailure(verificationStructures)) return verificationStructures
 
     const updatedJeunes: Jeune[] = Jeune.changerDeConseiller(
       jeunes,
@@ -141,7 +93,7 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
       command.idConseillerCible,
       command.idConseillerSource,
       utilisateur.id,
-      typeTransfert
+      getTypeTransfert(command)
     )
 
     if (
@@ -185,5 +137,112 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
 
   async monitor(): Promise<void> {
     return
+  }
+}
+
+function verifierEntites(
+  [conseillerSource, conseillerCible, jeunes]: [
+    Conseiller | undefined,
+    Conseiller | undefined,
+    Jeune[]
+  ],
+  command: TransfererJeunesConseillerCommand
+): Result {
+  if (!conseillerSource) {
+    return failure(new NonTrouveError('Conseiller', command.idConseillerSource))
+  }
+  if (!conseillerCible) {
+    return failure(new NonTrouveError('Conseiller', command.idConseillerCible))
+  }
+  if (jeunes?.length !== command.idsJeunes.length) {
+    return failure(
+      new MauvaiseCommandeError('Liste des jeunes à transférer invalide')
+    )
+  }
+  return emptySuccess()
+}
+
+function verifierStructures(
+  command: TransfererJeunesConseillerCommand,
+  utilisateur: Authentification.Utilisateur,
+  conseillerSource: Conseiller,
+  conseillerCible: Conseiller
+): Result {
+  switch (command.provenanceUtilisateur) {
+    case Authentification.Type.CONSEILLER:
+      return verifierStructuresPourConseiller(
+        utilisateur,
+        conseillerSource,
+        conseillerCible
+      )
+    case Authentification.Type.SUPPORT:
+      return verifierStructuresPourSupport(conseillerSource, conseillerCible)
+  }
+}
+
+function verifierStructuresPourConseiller(
+  utilisateur: Authentification.Utilisateur,
+  conseillerSource: Conseiller,
+  conseillerCible: Conseiller
+): Result {
+  if (
+    Authentification.estSuperviseurResponsable(
+      utilisateur,
+      conseillerSource.structure
+    )
+  ) {
+    const conseillerSourceEtCibleDansLaMemeStructure =
+      conseillerSource.structure === conseillerCible.structure
+
+    if (!conseillerSourceEtCibleDansLaMemeStructure)
+      return failure(
+        new MauvaiseCommandeError(
+          'Les informations de structure des conseillers source et cible ne correspondent pas'
+        )
+      )
+  } else {
+    const superviseurDansLaMemeStructureQueConseillerSourceEtCible =
+      utilisateur.structure === conseillerSource.structure &&
+      utilisateur.structure === conseillerCible.structure
+
+    if (!superviseurDansLaMemeStructureQueConseillerSourceEtCible) {
+      return failure(
+        new MauvaiseCommandeError(
+          'Les informations de structure ne correspondent pas'
+        )
+      )
+    }
+  }
+
+  return emptySuccess()
+}
+
+function verifierStructuresPourSupport(
+  conseillerSource: Conseiller,
+  conseillerCible: Conseiller
+): Result {
+  if (conseillerSource.structure !== conseillerCible.structure) {
+    return failure(
+      new MauvaiseCommandeError(
+        'Les informations de structure ne correspondent pas'
+      )
+    )
+  }
+
+  return emptySuccess()
+}
+
+function getTypeTransfert(
+  command: TransfererJeunesConseillerCommand
+): Jeune.TypeTransfert {
+  switch (command.provenanceUtilisateur) {
+    case Authentification.Type.CONSEILLER:
+      return command.estTemporaire
+        ? Jeune.TypeTransfert.TEMPORAIRE
+        : Jeune.TypeTransfert.DEFINITIF
+    case Authentification.Type.SUPPORT:
+      return command.estTemporaire
+        ? Jeune.TypeTransfert.TEMPORAIRE_SUPPORT
+        : Jeune.TypeTransfert.DEFINITIF_SUPPORT
   }
 }
