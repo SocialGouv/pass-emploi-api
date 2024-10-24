@@ -417,9 +417,9 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     res: AxiosResponse<T>,
     cacheParam?: string
   ): void {
-    let resultatsAppelPartenaire: AppelPartenaireResultat[] = this.context.get<
-      AppelPartenaireResultat[]
-    >(ContextKey.RESULTATS_APPEL_PARTENAIRE)
+    let resultatsAppelPartenaire = this.context.get<AppelPartenaireResultat[]>(
+      ContextKey.RESULTATS_APPEL_PARTENAIRE
+    )
     if (!resultatsAppelPartenaire) {
       resultatsAppelPartenaire = []
     }
@@ -439,7 +439,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
   ): Promise<LogApiPartenaireSqlModel | null> {
     const utilisateur = this.context.get<Authentification.Utilisateur>(
       ContextKey.UTILISATEUR
-    )
+    )!
     return LogApiPartenaireSqlModel.findOne({
       where: {
         pathPartenaire: {

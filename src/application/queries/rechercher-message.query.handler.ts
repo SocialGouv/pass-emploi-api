@@ -56,7 +56,7 @@ export class RechercherMessageQueryHandler extends QueryHandler<
     command: RechercherMessageQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return await this.conseillerAuthorizer.autoriserConseillerPourSonJeune(
+    return this.conseillerAuthorizer.autoriserConseillerPourSonJeune(
       command.idBeneficiaire,
       utilisateur
     )

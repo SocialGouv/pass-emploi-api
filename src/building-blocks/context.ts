@@ -25,7 +25,7 @@ export class Context {
     this.asyncLocalStorage.enterWith(new Map<ContextKey, unknown>())
   }
 
-  get<T>(key: ContextKey): T {
+  get<T>(key: ContextKey): T | undefined {
     return this.asyncLocalStorage.getStore()?.get(key) as T
   }
 

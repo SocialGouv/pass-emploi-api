@@ -71,9 +71,6 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
         }
         await this.planificateurRepository.creerJob(jobNettoyerLesEvenements)
       }
-    } catch (e) {
-      erreur = e
-      throw e
     } finally {
       await connexionSource.close()
       await connexionTarget.close()

@@ -17,6 +17,11 @@ import { aAccesAuxAlternancesEtServicesCiviques, Core } from '../../../core'
 import { Diagoriente } from './diagoriente'
 import { DiagorienteInformationsPayload } from 'src/infrastructure/routes/validation/suggestions-inputs'
 
+type CriteresSuggestion =
+  | Recherche.Emploi
+  | Recherche.Immersion
+  | Recherche.ServiceCivique
+
 export interface Suggestion {
   id: string
   idFonctionnel?: Suggestion.IdFonctionnel
@@ -27,7 +32,7 @@ export interface Suggestion {
     metier?: string
     localisation?: string
   }
-  criteres?: Recherche.Emploi | Recherche.Immersion | Recherche.ServiceCivique
+  criteres?: CriteresSuggestion
   dateCreation: DateTime
   dateRafraichissement: DateTime
   source: Suggestion.Source
@@ -380,7 +385,7 @@ export namespace Suggestion {
     private construireCriteresSuggestionsPoleEmploi(
       suggestionPoleEmploi: Suggestion.PoleEmploi,
       type: Recherche.Type
-    ): Recherche.Emploi | Recherche.Immersion | Recherche.ServiceCivique {
+    ): CriteresSuggestion {
       switch (type) {
         case Recherche.Type.OFFRES_EMPLOI:
         case Recherche.Type.OFFRES_ALTERNANCE:
