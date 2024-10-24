@@ -1115,7 +1115,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@firebase/database-compat@npm:^1.0.2":
+"@firebase/database-compat@npm:1.0.8":
   version: 1.0.8
   resolution: "@firebase/database-compat@npm:1.0.8"
   dependencies:
@@ -1129,7 +1129,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@firebase/database-types@npm:1.0.5, @firebase/database-types@npm:^1.0.0":
+"@firebase/database-types@npm:1.0.5":
   version: 1.0.5
   resolution: "@firebase/database-types@npm:1.0.5"
   dependencies:
@@ -6471,13 +6471,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-admin@npm:12.6.0":
-  version: 12.6.0
-  resolution: "firebase-admin@npm:12.6.0"
+"firebase-admin@npm:12.7.0":
+  version: 12.7.0
+  resolution: "firebase-admin@npm:12.7.0"
   dependencies:
     "@fastify/busboy": "npm:^3.0.0"
-    "@firebase/database-compat": "npm:^1.0.2"
-    "@firebase/database-types": "npm:^1.0.0"
+    "@firebase/database-compat": "npm:1.0.8"
+    "@firebase/database-types": "npm:1.0.5"
     "@google-cloud/firestore": "npm:^7.7.0"
     "@google-cloud/storage": "npm:^7.7.0"
     "@types/node": "npm:^22.0.1"
@@ -6491,7 +6491,7 @@ __metadata:
       optional: true
     "@google-cloud/storage":
       optional: true
-  checksum: 10/57a8e9d0c973ae1462c729abedfb3432384db4d3716a78e20b0cf164213d4d1609107d26ff7a6560f8e282199a6867626e0aebef72e1282c56336ee42d066034
+  checksum: 10/e80995f413f6cd917312346809f499a7ea4a981d38a9dfb27ebda1ba0727c247525ecd9455eb259b6b357c8a48bdafb513d45a8d58e6c63c8e23124e5e16a8ac
   languageName: node
   linkType: hard
 
@@ -9299,7 +9299,7 @@ __metadata:
     eslint-plugin-chai-friendly: "npm:^1.0.1"
     eslint-plugin-mocha: "npm:^10.5.0"
     eslint-plugin-prettier: "npm:^4.2.1"
-    firebase-admin: "npm:12.6.0"
+    firebase-admin: "npm:12.7.0"
     fuse.js: "npm:7.0.0"
     geojson: "npm:0.5.0"
     helmet: "npm:8.0.0"
