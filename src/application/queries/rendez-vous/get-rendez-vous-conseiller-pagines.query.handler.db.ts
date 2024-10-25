@@ -61,9 +61,6 @@ export class GetRendezVousConseillerPaginesQueryHandler extends QueryHandler<
               AND jeune.id_conseiller = :id_conseiller
             )`)
         },
-        dateSuppression: {
-          [Op.is]: null
-        },
         ...generateSourceRendezVousCondition(this.configuration),
         ...generateDateCondition(query.dateDebut, query.dateFin),
         ...presenceConseillerCondition

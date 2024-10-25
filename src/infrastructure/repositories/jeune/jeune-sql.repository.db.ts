@@ -206,12 +206,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
           model: JeuneSqlModel,
           where: { id: idJeune }
         }
-      ],
-      where: {
-        dateSuppression: {
-          [Op.is]: null
-        }
-      }
+      ]
     })
     return fromSqlToJeuneHomeQueryModel(jeuneSqlModel, rdvJeuneSqlModel)
   }

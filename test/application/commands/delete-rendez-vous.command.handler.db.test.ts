@@ -1,45 +1,45 @@
-import { RendezVousAuthorizer } from '../../../src/application/authorizers/rendezvous-authorizer'
-import {
-  unUtilisateurConseiller,
-  unUtilisateurJeune
-} from '../../fixtures/authentification.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import {
-  emptySuccess,
-  failure
-} from '../../../src/building-blocks/types/result'
-import {
-  CodeTypeRendezVous,
-  RendezVous
-} from '../../../src/domain/rendez-vous/rendez-vous'
-import { Notification } from '../../../src/domain/notification/notification'
+import { uneDatetime } from 'test/fixtures/date.fixture'
+import { stubClassSandbox } from 'test/utils/types'
+import { RendezVousAuthorizer } from '../../../src/application/authorizers/rendezvous-authorizer'
 import {
   DeleteRendezVousCommand,
   DeleteRendezVousCommandHandler
 } from '../../../src/application/commands/delete-rendez-vous.command.handler.db'
-import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
+import {
+  MauvaiseCommandeError,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
+import {
+  emptySuccess,
+  failure
+} from '../../../src/building-blocks/types/result'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
+import { Mail } from '../../../src/domain/mail'
+import { Conseiller } from '../../../src/domain/milo/conseiller'
+import { Notification } from '../../../src/domain/notification/notification'
+import { PlanificateurService } from '../../../src/domain/planificateur'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from '../../../src/domain/rendez-vous/rendez-vous'
+import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../fixtures/authentification.fixture'
+import { unConseiller } from '../../fixtures/conseiller.fixture'
 import {
   unConseillerDuJeune,
   uneConfiguration,
   unJeune
 } from '../../fixtures/jeune.fixture'
-import {
-  MauvaiseCommandeError,
-  NonTrouveError
-} from '../../../src/building-blocks/types/domain-error'
-import { Evenement, EvenementService } from '../../../src/domain/evenement'
-import { PlanificateurService } from '../../../src/domain/planificateur'
-import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { Mail } from '../../../src/domain/mail'
-import { Conseiller } from '../../../src/domain/milo/conseiller'
-import { stubClassSandbox } from 'test/utils/types'
-import { uneDate, uneDatetime } from 'test/fixtures/date.fixture'
-import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
 
 describe('DeleteRendezVousCommandHandler', () => {
@@ -256,7 +256,6 @@ describe('DeleteRendezVousCommandHandler', () => {
     const conseillerDto = unConseillerDto()
     const unAtelier = unRendezVousDto({
       type: CodeTypeRendezVous.ATELIER,
-      dateSuppression: uneDate(),
       createur: {
         id: conseillerDto.id,
         nom: conseillerDto.nom,
@@ -265,7 +264,6 @@ describe('DeleteRendezVousCommandHandler', () => {
     })
     const unRendezVous = unRendezVousDto({
       type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
-      dateSuppression: uneDate(),
       createur: {
         id: conseillerDto.id,
         nom: conseillerDto.nom,

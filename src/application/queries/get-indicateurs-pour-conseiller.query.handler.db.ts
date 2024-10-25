@@ -288,7 +288,6 @@ function findAllRendezVous(
 ): Promise<RendezVousSqlModel[]> {
   return RendezVousSqlModel.findAll({
     where: {
-      dateSuppression: { [Op.is]: null },
       date: { [Op.between]: [query.dateDebut, query.dateFin] }
     },
     include: [

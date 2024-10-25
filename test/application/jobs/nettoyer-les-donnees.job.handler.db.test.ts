@@ -45,7 +45,7 @@ describe('NettoyerLesDonneesJobHandler', () => {
   let dateService: StubbedClass<DateService>
   let suiviJobService: StubbedType<SuiviJob.Service>
   let rendezVousDto: AsSql<RendezVousDto>
-  let rendezVousDtoSansDateSuppression: AsSql<RendezVousDto>
+  let rendezVousDtoAGarder: AsSql<RendezVousDto>
   let rendezVousDtoMiloASupprimer: AsSql<RendezVousDto>
   let rendezVousDtoAvecUneDateRecente: AsSql<RendezVousDto>
   let rendezVousMiloAvantNettoyage: RendezVousSqlModel | null
@@ -177,13 +177,13 @@ describe('NettoyerLesDonneesJobHandler', () => {
 
     // Given - Rendez-vous
     rendezVousDto = unRendezVousDto({
-      dateSuppression: maintenant.minus({ months: 4 }).toJSDate()
+      date: maintenant.minus({ years: 2 }).toJSDate()
     })
-    rendezVousDtoSansDateSuppression = unRendezVousDto({
-      dateSuppression: null
+    rendezVousDtoAGarder = unRendezVousDto({
+      date: maintenant.minus({ years: 2 }).plus({ days: 1 }).toJSDate()
     })
     await RendezVousSqlModel.create(rendezVousDto)
-    await RendezVousSqlModel.create(rendezVousDtoSansDateSuppression)
+    await RendezVousSqlModel.create(rendezVousDtoAGarder)
     rendezVousAvantNettoyage = await RendezVousSqlModel.findByPk(
       rendezVousDto.id
     )
@@ -332,7 +332,7 @@ describe('NettoyerLesDonneesJobHandler', () => {
         rendezVousDto.id
       )
       const rendezVousSansDateSuppressionApresNettoyage =
-        await RendezVousSqlModel.findByPk(rendezVousDtoSansDateSuppression.id)
+        await RendezVousSqlModel.findByPk(rendezVousDtoAGarder.id)
       expect(rendezVousAvantNettoyage).not.to.be.null()
       expect(rendezVousSansDateSuppressionApresNettoyage).not.to.be.null()
       expect(rendezVousApresNettoyage).to.be.null()

@@ -39,9 +39,6 @@ export class GetAnimationsCollectivesQueryHandler extends QueryHandler<
     const animationsCollectivesSql = await RendezVousSqlModel.findAll({
       where: {
         idAgence: query.idEtablissement,
-        dateSuppression: {
-          [Op.is]: null
-        },
         type: {
           [Op.in]: TYPES_ANIMATIONS_COLLECTIVES
         },

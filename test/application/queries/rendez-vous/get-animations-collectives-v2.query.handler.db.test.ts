@@ -1,30 +1,30 @@
+import {
+  AnimationCollectiveResumeQueryModel,
+  GetAnimationCollectiveV2QueryModel
+} from 'src/application/queries/query-models/rendez-vous.query-model'
+import { Core } from 'src/domain/core'
+import { AsSql } from 'src/infrastructure/sequelize/types'
 import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
-import { expect, StubbedClass, stubClass } from '../../../utils'
-import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
-import { uneAgenceDto } from '../../../fixtures/sql-models/agence.sql-model'
+import { GetAnimationsCollectivesV2QueryHandler } from '../../../../src/application/queries/rendez-vous/get-animations-collectives-v2.query.handler.db'
+import { CodeTypeRendezVous } from '../../../../src/domain/rendez-vous/rendez-vous'
 import {
   AgenceDto,
   AgenceSqlModel
 } from '../../../../src/infrastructure/sequelize/models/agence.sql-model'
-import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
-import { uneDate, uneDatetime } from '../../../fixtures/date.fixture'
-import { CodeTypeRendezVous } from '../../../../src/domain/rendez-vous/rendez-vous'
 import {
   RendezVousDto,
   RendezVousSqlModel
 } from '../../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { DateService } from '../../../../src/utils/date-service'
+import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
+import { uneDate, uneDatetime } from '../../../fixtures/date.fixture'
+import { uneAgenceDto } from '../../../fixtures/sql-models/agence.sql-model'
+import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
+import { expect, StubbedClass, stubClass } from '../../../utils'
 import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
-import { Core } from 'src/domain/core'
-import { AsSql } from 'src/infrastructure/sequelize/types'
-import {
-  AnimationCollectiveResumeQueryModel,
-  GetAnimationCollectiveV2QueryModel
-} from 'src/application/queries/query-models/rendez-vous.query-model'
-import { GetAnimationsCollectivesV2QueryHandler } from '../../../../src/application/queries/rendez-vous/get-animations-collectives-v2.query.handler.db'
 
 describe('GetAnimationsCollectivesACloreQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
@@ -41,7 +41,6 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
   let evenementCollectifAClore3Dto: AsSql<RendezVousDto>
   let evenementIndividuel1Dto: AsSql<RendezVousDto>
   let evenementCollectifANePasClore1Dto: AsSql<RendezVousDto>
-  let evenementCollectifANePasClore2Dto: AsSql<RendezVousDto>
   let evenementCollectifANePasClore3Dto: AsSql<RendezVousDto>
 
   before(() => {
@@ -94,7 +93,6 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
         id: '196e32b5-4d66-46cb-8485-77c92bd00553',
         titre: 'Rendez-vous collectif établissement 1',
         date: datetimeDeBase.minus({ days: 2 }).toJSDate(),
-        dateSuppression: null,
         type: CodeTypeRendezVous.ATELIER,
         dateCloture: null,
         idAgence: '1'
@@ -104,7 +102,6 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
         id: '296e32b5-4d66-46cb-8485-77c92bd00554',
         titre: 'Rendez-vous collectif établissement 1',
         date: datetimeDeBase.minus({ days: 1 }).toJSDate(),
-        dateSuppression: null,
         type: CodeTypeRendezVous.ATELIER,
         dateCloture: null,
         idAgence: '1'
@@ -114,7 +111,6 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
         id: '896e32b5-4d66-46cb-8485-77c92bd00552',
         titre: 'Rendez-vous individuel',
         date: datetimeDeBase.minus({ days: 1 }).toJSDate(),
-        dateSuppression: null,
         type: CodeTypeRendezVous.ATELIER,
         dateCloture: null
       })
@@ -123,17 +119,6 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
         id: '596e32b5-4d66-46cb-8482-77c92bd00754',
         titre: 'Rendez-vous collectif établissement 1 à ne pas clore',
         date: datetimeDeBase.plus({ days: 3 }).toJSDate(),
-        dateSuppression: null,
-        type: CodeTypeRendezVous.ATELIER,
-        dateCloture: null,
-        idAgence: '1'
-      })
-
-      evenementCollectifANePasClore2Dto = unRendezVousDto({
-        id: '896e32b5-4d66-46cb-8382-77c92bd01754',
-        titre: 'Rendez-vous collectif établissement 1 à ne pas clore',
-        date: datetimeDeBase.minus({ days: 1 }).toJSDate(),
-        dateSuppression: uneDate(),
         type: CodeTypeRendezVous.ATELIER,
         dateCloture: null,
         idAgence: '1'
@@ -143,7 +128,6 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
         id: '996e32b5-4d66-26cb-8482-76c92bd00754',
         titre: 'Rendez-vous collectif établissement 1 à ne pas clore',
         date: datetimeDeBase.plus({ days: 4 }).toJSDate(),
-        dateSuppression: null,
         type: CodeTypeRendezVous.ATELIER,
         dateCloture: uneDate(),
         idAgence: '1'
@@ -153,7 +137,6 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
         id: '396e32b5-4d66-46cb-8485-77c92bd00559',
         titre: 'Rendez-vous collectif établissement 2',
         date: datetimeDeBase.minus({ days: 1 }).toJSDate(),
-        dateSuppression: null,
         type: CodeTypeRendezVous.ATELIER,
         dateCloture: null,
         idAgence: '2'
@@ -165,7 +148,6 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
         evenementCollectifAClore2Dto,
         evenementCollectifAClore3Dto,
         evenementCollectifANePasClore1Dto,
-        evenementCollectifANePasClore2Dto,
         evenementCollectifANePasClore3Dto,
         evenementIndividuel1Dto
       ])

@@ -44,9 +44,6 @@ export class RendezVousDto extends Model {
   @Column({ field: 'duree', type: DataType.INTEGER })
   duree: number
 
-  @Column({ field: 'date_suppression', type: DataType.DATE })
-  dateSuppression: Date | null
-
   @Column({ field: 'date_cloture', type: DataType.DATE })
   dateCloture: Date | null
 

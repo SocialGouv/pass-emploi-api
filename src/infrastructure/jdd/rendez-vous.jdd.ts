@@ -19,7 +19,6 @@ export function unRendezVousJDD(
     date: DateTime.now().plus({ day: 5 }).toJSDate(),
     commentaire: 'commentaire',
     sousTitre: 'sous titre',
-    dateSuppression: null,
     type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
     precision: null,
     adresse: null,

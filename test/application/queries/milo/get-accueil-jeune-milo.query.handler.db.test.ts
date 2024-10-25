@@ -189,7 +189,6 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
 
         rendezVousCetteSemaine = await RendezVousSqlModel.create(
           unRendezVousDto({
-            dateSuppression: null,
             date: maintenant.plus({ days: 2 }).toJSDate()
           })
         )
@@ -323,7 +322,6 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
         // Given
         prochainRendezVousDans2Semaines = await RendezVousSqlModel.create(
           unRendezVousDto({
-            dateSuppression: null,
             date: dansDeuxSemainesDateJS
           })
         )

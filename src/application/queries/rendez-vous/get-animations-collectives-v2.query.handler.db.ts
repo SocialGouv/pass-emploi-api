@@ -50,7 +50,6 @@ export class GetAnimationsCollectivesV2QueryHandler extends QueryHandler<
             type: {
               [Op.in]: TYPES_ANIMATIONS_COLLECTIVES
             },
-            dateSuppression: null,
             dateCloture: null,
             date: {
               [Op.lt]: maintenant
@@ -65,7 +64,6 @@ export class GetAnimationsCollectivesV2QueryHandler extends QueryHandler<
             type: {
               [Op.in]: TYPES_ANIMATIONS_COLLECTIVES
             },
-            dateSuppression: null,
             [Op.or]: {
               dateCloture: { [Op.ne]: null },
               date: {
@@ -81,8 +79,7 @@ export class GetAnimationsCollectivesV2QueryHandler extends QueryHandler<
             idAgence: query.idEtablissement,
             type: {
               [Op.in]: TYPES_ANIMATIONS_COLLECTIVES
-            },
-            dateSuppression: null
+            }
           }
         }
     }
