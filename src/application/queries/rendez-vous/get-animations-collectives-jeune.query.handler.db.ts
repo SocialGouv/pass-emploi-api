@@ -53,9 +53,6 @@ export class GetAnimationsCollectivesJeuneQueryHandler extends QueryHandler<
         type: {
           [Op.in]: TYPES_ANIMATIONS_COLLECTIVES
         },
-        dateSuppression: {
-          [Op.is]: null
-        },
         date: {
           [Op.gte]: query.maintenant.toJSDate()
         }

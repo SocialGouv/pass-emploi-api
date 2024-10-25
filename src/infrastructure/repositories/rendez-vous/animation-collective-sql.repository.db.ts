@@ -36,9 +36,6 @@ export class AnimationCollectiveSqlRepository
         idAgence: idEtablissement,
         type: {
           [Op.in]: TYPES_ANIMATIONS_COLLECTIVES
-        },
-        dateSuppression: {
-          [Op.is]: null
         }
       }
     })
@@ -74,9 +71,6 @@ export class AnimationCollectiveSqlRepository
         id: idEtablissement,
         type: {
           [Op.in]: TYPES_ANIMATIONS_COLLECTIVES
-        },
-        dateSuppression: {
-          [Op.is]: null
         }
       }
     })

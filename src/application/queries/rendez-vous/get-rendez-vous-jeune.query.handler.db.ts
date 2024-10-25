@@ -108,9 +108,6 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
         ...generateSourceRendezVousCondition(this.configuration),
         date: {
           [Op.lt]: maintenant
-        },
-        dateSuppression: {
-          [Op.is]: null
         }
       },
       order: [['date', 'DESC']],
@@ -134,9 +131,6 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
         ...generateSourceRendezVousCondition(this.configuration),
         date: {
           [Op.gte]: maintenant
-        },
-        dateSuppression: {
-          [Op.is]: null
         }
       },
       order: [['date', 'ASC']]
@@ -154,12 +148,7 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
           include: [ConseillerSqlModel]
         }
       ],
-      where: {
-        ...generateSourceRendezVousCondition(this.configuration),
-        dateSuppression: {
-          [Op.is]: null
-        }
-      },
+      where: generateSourceRendezVousCondition(this.configuration),
       order: [['date', 'ASC']]
     })
   }

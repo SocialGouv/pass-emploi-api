@@ -270,7 +270,7 @@ describe('RendezVousRepositorySql', () => {
 
   describe('delete', () => {
     describe('quand le rdv existe', () => {
-      it("met une date de suppression et supprime l'association", async () => {
+      it("supprime l'association et le rdv", async () => {
         // Given
         const idRdv = '6c242fa0-804f-11ec-a8a3-0242ac120002'
         const rendezVousDto = unRendezVousDto({
@@ -288,10 +288,7 @@ describe('RendezVousRepositorySql', () => {
         const associations = await RendezVousJeuneAssociationSqlModel.findAll({
           where: { idRendezVous: rendezVousDto.id }
         })
-        expect(rdvSupprime?.id).to.equal(rendezVousDto.id)
-        expect(rdvSupprime?.dateSuppression).to.deep.equal(
-          maintenant.toJSDate()
-        )
+        expect(rdvSupprime).to.equal(null)
         expect(associations.length).to.equal(0)
       })
     })

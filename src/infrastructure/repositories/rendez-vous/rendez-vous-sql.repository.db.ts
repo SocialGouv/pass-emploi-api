@@ -46,16 +46,11 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
   }
 
   async delete(idRendezVous: string): Promise<void> {
-    await RendezVousSqlModel.update(
-      {
-        dateSuppression: this.dateService.nowJs()
-      },
-      {
-        where: {
-          id: idRendezVous
-        }
+    await RendezVousSqlModel.destroy({
+      where: {
+        id: idRendezVous
       }
-    )
+    })
     await RendezVousJeuneAssociationSqlModel.destroy({
       where: { idRendezVous: idRendezVous }
     })
@@ -66,7 +61,7 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
       include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }]
     })
 
-    if (!rendezVousSql || rendezVousSql.dateSuppression) {
+    if (!rendezVousSql) {
       return undefined
     }
     return toRendezVous(rendezVousSql)
@@ -84,7 +79,7 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
       include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }]
     })
 
-    if (!rendezVousSql || rendezVousSql.dateSuppression) {
+    if (!rendezVousSql) {
       return undefined
     }
     return toRendezVous(rendezVousSql)
@@ -98,9 +93,6 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
       where: {
         date: {
           [Op.gte]: maintenant
-        },
-        dateSuppression: {
-          [Op.is]: null
         }
       }
     })

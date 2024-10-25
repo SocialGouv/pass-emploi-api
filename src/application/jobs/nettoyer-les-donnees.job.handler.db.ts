@@ -147,7 +147,7 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
 
     try {
       nombreRdvSupprimes = await RendezVousSqlModel.destroy({
-        where: dateSuppressionSuperieureATroisMois(maintenant)
+        where: dateSuperieureADeuxAns(maintenant)
       })
     } catch (e) {
       this.logger.warn(e)
@@ -288,11 +288,9 @@ function dateSuperieureATroisMoisEtVenantDeMilo(
   }
 }
 
-function dateSuppressionSuperieureATroisMois(
-  maintenant: DateTime
-): WhereOptions {
+function dateSuperieureADeuxAns(maintenant: DateTime): WhereOptions {
   return {
-    dateSuppression: { [Op.lt]: maintenant.minus({ months: 3 }).toJSDate() }
+    date: { [Op.lte]: maintenant.minus({ years: 2 }).toJSDate() }
   }
 }
 

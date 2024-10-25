@@ -19,7 +19,6 @@ export function unRendezVousDto(
     date: new Date('2021-11-11T08:03:30.000Z'),
     commentaire: 'commentaire',
     sousTitre: 'sous titre',
-    dateSuppression: null,
     type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
     precision: null,
     adresse: null,

@@ -113,12 +113,7 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
           where: { id: idJeune },
           include: [ConseillerSqlModel]
         }
-      ],
-      where: {
-        dateSuppression: {
-          [Op.is]: null
-        }
-      }
+      ]
     })
     const actions = await ActionSqlModel.findAll({
       include: [

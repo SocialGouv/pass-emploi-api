@@ -238,7 +238,6 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
   ): Promise<RendezVousSqlModel | null> {
     return RendezVousSqlModel.findOne({
       where: {
-        dateSuppression: null,
         date: { [Op.gte]: maintenant.toJSDate() }
       },
       order: [['date', 'ASC']],
@@ -261,7 +260,6 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
   ): Promise<number> {
     return RendezVousSqlModel.count({
       where: {
-        dateSuppression: null,
         date: {
           [Op.between]: [maintenant.toJSDate(), dateFinDeSemaine.toJSDate()]
         }
@@ -284,7 +282,6 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     return RendezVousSqlModel.findAll({
       where: {
         idAgence: jeuneSqlModel.conseiller?.idAgence,
-        dateSuppression: null,
         date: { [Op.gte]: maintenant.toJSDate() },
         type: {
           [Op.in]: TYPES_ANIMATIONS_COLLECTIVES
