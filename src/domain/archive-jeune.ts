@@ -175,6 +175,7 @@ export namespace ArchiveJeune {
     idPartenaire?: string
     dateCreation: Date
     datePremiereConnexion?: Date
+    dateFinAccompagnement?: Date
     motif: MotifSuppression | MotifSuppressionSupport
     commentaire?: string
     dateArchivage: Date

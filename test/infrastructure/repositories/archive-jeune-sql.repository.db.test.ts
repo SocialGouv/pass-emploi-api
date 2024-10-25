@@ -174,6 +174,7 @@ describe('ArchiveJeuneSqlRepository', () => {
         email: jeuneDto.email!,
         dateCreation: new Date('2022-01-05T09:23:00Z'),
         datePremiereConnexion: new Date('2022-01-06T09:23:00Z'),
+        dateFinAccompagnement: new Date('2022-07-01T09:23:00Z'),
         dateArchivage: new Date('2022-07-05T09:23:00Z')
       }
       await archiveJeuneSqlRepository.archiver(metadonnees)

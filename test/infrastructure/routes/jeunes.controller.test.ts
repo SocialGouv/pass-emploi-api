@@ -1,4 +1,5 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
+import { DateTime } from 'luxon'
 import { ArchiverJeuneCommandHandler } from 'src/application/commands/archiver-jeune.command.handler'
 import { DeleteJeuneInactifCommandHandler } from 'src/application/commands/delete-jeune-inactif.command.handler'
 import { DeleteJeuneCommandHandler } from 'src/application/commands/delete-jeune.command.handler'
@@ -407,6 +408,9 @@ describe('JeunesController', () => {
         .withArgs({
           idJeune: 'id-jeune',
           motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE,
+          dateFinAccompagnement: DateTime.fromISO('2024-10-25T11:42:16.238Z', {
+            setZone: true
+          }),
           commentaire: undefined
         })
         .resolves(emptySuccess())
@@ -416,7 +420,8 @@ describe('JeunesController', () => {
         .post(`/jeunes/id-jeune/archiver`)
         .set('authorization', unHeaderAuthorization())
         .send({
-          motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE
+          motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE,
+          dateFinAccompagnement: '2024-10-25T11:42:16.238Z'
         })
         //Then
         .expect(HttpStatus.NO_CONTENT)

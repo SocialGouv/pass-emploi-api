@@ -53,6 +53,6 @@ module.exports = {
   },
 
   down: async queryInterface => {
-    await queryInterface.dropTable('archivage_jeune')
+    await queryInterface.dropTable('archive_jeune')
   }
 }
