@@ -81,6 +81,10 @@ export default () => {
         'https://immersion-facile.beta.gouv.fr/api',
       apiKey: process.env.IMMERSION_API_KEY ?? ''
     },
+    cje: {
+      apiUrl: process.env.CJE_API_URL,
+      apiKey: process.env.CJE_API_KEY
+    },
     diagoriente: {
       url:
         process.env.DIAGORIENTE_API_URL ??

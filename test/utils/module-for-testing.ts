@@ -141,6 +141,10 @@ export const testConfig = (): ConfigService => {
       url: 'https://api.api-immersion.beta.gouv.op',
       apiKey: 'apiKey'
     },
+    cje: {
+      apiUrl: 'https://cje.com/api',
+      apiKey: 'cjekey'
+    },
     diagoriente: {
       url: 'https://api-dev.diagoriente.fr',
       clientId: 'diagoriente-client-id',
