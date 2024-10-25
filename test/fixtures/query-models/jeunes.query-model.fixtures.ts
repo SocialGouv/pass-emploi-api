@@ -28,6 +28,7 @@ export function unDetailJeuneQueryModel(
     email: 'john.doe@plop.io',
     creationDate: '2021-11-11T08:03:30.000Z',
     datePremiereConnexion: '2021-11-11T08:03:30.000Z',
+    lastActivity: '2022-03-01T03:24:00.000+00:00',
     isActivated: true,
     isReaffectationTemporaire: false,
     conseiller: unConseillerJeuneQueryModel(),

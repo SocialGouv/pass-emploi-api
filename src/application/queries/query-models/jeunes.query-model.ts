@@ -137,6 +137,9 @@ export class DetailJeuneQueryModel {
   @ApiProperty()
   isActivated: boolean
 
+  @ApiProperty({ required: false })
+  lastActivity?: string
+
   @ApiProperty()
   isReaffectationTemporaire: boolean
 
