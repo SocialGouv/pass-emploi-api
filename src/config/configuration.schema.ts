@@ -52,6 +52,10 @@ export const configurationSchema = Joi.object({
     url: Joi.string().uri().required(),
     apiKey: Joi.string().required()
   },
+  cje: {
+    apiUrl: Joi.string().uri().required(),
+    apiKey: Joi.string().required()
+  },
   diagoriente: {
     url: Joi.string().uri().required(),
     clientId: Joi.string().required(),

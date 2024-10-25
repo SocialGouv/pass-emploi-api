@@ -362,6 +362,8 @@ import { DateService } from './utils/date-service'
 import { IdService } from './utils/id-service'
 import { configureLoggerModule } from './utils/logger.module'
 import { RateLimiterService } from './utils/rate-limiter.service'
+import { CJEController } from './infrastructure/routes/cje.controller'
+import { GetCJETokenQueryHandler } from './application/queries/get-cje-token.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -408,6 +410,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     // Campagnes
     CampagnesController,
     // Autre
+    CJEController,
     AuthentificationController,
     SupportController,
     HealthController
@@ -762,6 +765,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     UpdateAgenceConseillerCommandHandler,
     GetActionsConseillerV2QueryHandler,
     GetDiagorienteUrlsQueryHandler,
+    GetCJETokenQueryHandler,
     ArchiverJeuneSupportCommandHandler,
     GetDiagorienteMetiersFavorisQueryHandler,
     GetJeunesIdentitesQueryHandler,
