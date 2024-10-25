@@ -31,7 +31,7 @@ describe('DiagorienteClient', () => {
       // Given
       const type = TypeUrlDiagoriente.CHATBOT
       const expectedBody =
-        '{"query":"mutation PartnerAuthURL(\\n  $clientId: String!\\n  $clientSecret: String!\\n  $userInfo: PartnerAuthUserInfo!\\n  $redirectUri: String\\n) {\\n  partnerAuthURL(\\n    clientId: $clientId\\n    clientSecret: $clientSecret\\n    userInfo: $userInfo\\n    redirectUri: $redirectUri\\n  )\\n}","variables":{"clientId":"diagoriente-client-id","clientSecret":"diagoriente-client-secret","userInfo":{"userId":"ABCDE","email":"john.doe@plop.io","firstName":"John","lastName":"Doe"},"redirectUri":"/centres_interet/chat"}}'
+        '{"query":"mutation PartnerAuthURL(\\n  $clientId: String!\\n  $clientSecret: String!\\n  $userInfo: PartnerAuthUserInfo!\\n  $redirectUri: String\\n) {\\n  partnerAuthURL(\\n    clientId: $clientId\\n    clientSecret: $clientSecret\\n    userInfo: $userInfo\\n    redirectUri: $redirectUri\\n  )\\n}","variables":{"clientId":"diagoriente-client-id","clientSecret":"diagoriente-client-secret","userInfo":{"userId":"ABCDE","email":"2ecdde3959051d913f61b14579ea136d@pass-emploi.beta.gouv.fr","firstName":"Utilisateur","lastName":"Pass Emploi"},"redirectUri":"/centres_interet/chat"}}'
       const expectedUrl =
         'https://dev-cej.diagoriente.fr/whatever?redirectUri=/centres_interet/chat'
 
@@ -42,9 +42,7 @@ describe('DiagorienteClient', () => {
       // When
       const result = await diagorienteClient.getUrl(type, {
         id: jeune.id,
-        email: jeune.email,
-        prenom: jeune.firstName,
-        nom: jeune.lastName
+        email: jeune.email
       })
 
       // Then
@@ -54,16 +52,14 @@ describe('DiagorienteClient', () => {
       // Given
       const type = TypeUrlDiagoriente.CHATBOT
       const expectedBody =
-        '{"query":"mutation PartnerAuthURL(\\n  $clientId: String!\\n  $clientSecret: String!\\n  $userInfo: PartnerAuthUserInfo!\\n  $redirectUri: String\\n) {\\n  partnerAuthURL(\\n    clientId: $clientId\\n    clientSecret: $clientSecret\\n    userInfo: $userInfo\\n    redirectUri: $redirectUri\\n  )\\n}","variables":{"clientId":"diagoriente-client-id","clientSecret":"diagoriente-client-secret","userInfo":{"userId":"ABCDE","email":"john.doe@plop.io","firstName":"John","lastName":"Doe"},"redirectUri":"/centres_interet/chat"}}'
+        '{"query":"mutation PartnerAuthURL(\\n  $clientId: String!\\n  $clientSecret: String!\\n  $userInfo: PartnerAuthUserInfo!\\n  $redirectUri: String\\n) {\\n  partnerAuthURL(\\n    clientId: $clientId\\n    clientSecret: $clientSecret\\n    userInfo: $userInfo\\n    redirectUri: $redirectUri\\n  )\\n}","variables":{"clientId":"diagoriente-client-id","clientSecret":"diagoriente-client-secret","userInfo":{"userId":"ABCDE","email":"2ecdde3959051d913f61b14579ea136d@pass-emploi.beta.gouv.fr","firstName":"Utilisateur","lastName":"Pass Emploi"},"redirectUri":"/centres_interet/chat"}}'
 
       nock(apiUrl).post('/graphql', expectedBody).reply(429)
 
       // When
       const result = await diagorienteClient.getUrl(type, {
         id: jeune.id,
-        email: jeune.email,
-        prenom: jeune.firstName,
-        nom: jeune.lastName
+        email: jeune.email
       })
 
       // Then
@@ -79,16 +75,14 @@ describe('DiagorienteClient', () => {
     it('renvoie un success', async () => {
       // Given
       const expectedBody =
-        '{"query":"mutation ($clientId: String!, $clientSecret: String!, $userInfo: PartnerAuthUserInfo!) {\\r\\n  registerByPartner(clientId: $clientId, clientSecret: $clientSecret, userInfo: $userInfo) {\\r\\n    status\\r\\n  }\\r\\n}","variables":{"clientId":"diagoriente-client-id","clientSecret":"diagoriente-client-secret","userInfo":{"userId":"ABCDE","email":"john.doe@plop.io","firstName":"John","lastName":"Doe"}}}'
+        '{"query":"mutation ($clientId: String!, $clientSecret: String!, $userInfo: PartnerAuthUserInfo!) {\\r\\n  registerByPartner(clientId: $clientId, clientSecret: $clientSecret, userInfo: $userInfo) {\\r\\n    status\\r\\n  }\\r\\n}","variables":{"clientId":"diagoriente-client-id","clientSecret":"diagoriente-client-secret","userInfo":{"userId":"ABCDE","email":"2ecdde3959051d913f61b14579ea136d@pass-emploi.beta.gouv.fr","firstName":"Utilisateur","lastName":"Pass Emploi"}}}'
 
       nock(apiUrl).post('/graphql', expectedBody).reply(200, { data: {} })
 
       // When
       const result = await diagorienteClient.register({
         id: jeune.id,
-        email: jeune.email,
-        prenom: jeune.firstName,
-        nom: jeune.lastName
+        email: jeune.email
       })
 
       // Then
@@ -97,7 +91,7 @@ describe('DiagorienteClient', () => {
     it("renvoie une failure quand l'id et email est déjà associé à un autre compte", async () => {
       // Given
       const expectedBody =
-        '{"query":"mutation ($clientId: String!, $clientSecret: String!, $userInfo: PartnerAuthUserInfo!) {\\r\\n  registerByPartner(clientId: $clientId, clientSecret: $clientSecret, userInfo: $userInfo) {\\r\\n    status\\r\\n  }\\r\\n}","variables":{"clientId":"diagoriente-client-id","clientSecret":"diagoriente-client-secret","userInfo":{"userId":"ABCDE","email":"john.doe@plop.io","firstName":"John","lastName":"Doe"}}}'
+        '{"query":"mutation ($clientId: String!, $clientSecret: String!, $userInfo: PartnerAuthUserInfo!) {\\r\\n  registerByPartner(clientId: $clientId, clientSecret: $clientSecret, userInfo: $userInfo) {\\r\\n    status\\r\\n  }\\r\\n}","variables":{"clientId":"diagoriente-client-id","clientSecret":"diagoriente-client-secret","userInfo":{"userId":"ABCDE","email":"2ecdde3959051d913f61b14579ea136d@pass-emploi.beta.gouv.fr","firstName":"Utilisateur","lastName":"Pass Emploi"}}}'
 
       nock(apiUrl)
         .post('/graphql', expectedBody)
@@ -106,9 +100,7 @@ describe('DiagorienteClient', () => {
       // When
       const result = await diagorienteClient.register({
         id: jeune.id,
-        email: jeune.email,
-        prenom: jeune.firstName,
-        nom: jeune.lastName
+        email: jeune.email
       })
 
       // Then
