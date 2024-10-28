@@ -15,6 +15,7 @@ export interface Conseiller {
   email?: string
   dateVerificationMessages?: DateTime
   dateSignatureCGU?: DateTime
+  dateVisionnageActus?: DateTime
   agence?: Agence
   notificationsSonores: boolean
 }
@@ -94,13 +95,15 @@ export namespace Conseiller {
       ...conseiller,
       agence: infosDeMiseAJour.agence,
       notificationsSonores: Boolean(infosDeMiseAJour.notificationsSonores),
-      dateSignatureCGU: infosDeMiseAJour.dateSignatureCGU
+      dateSignatureCGU: infosDeMiseAJour.dateSignatureCGU,
+      dateVisionnageActus: infosDeMiseAJour.dateVisionnageActus
     })
   }
 
   export interface InfosDeMiseAJour {
     agence?: Agence
     dateSignatureCGU?: DateTime
+    dateVisionnageActus?: DateTime
     notificationsSonores?: boolean
   }
 }

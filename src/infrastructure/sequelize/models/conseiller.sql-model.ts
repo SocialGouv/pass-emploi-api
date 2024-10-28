@@ -87,7 +87,7 @@ export class ConseillerDto extends Model {
     field: 'id_agence',
     type: DataType.STRING
   })
-  idAgence?: string | null
+  idAgence: string | null
 
   @Column({
     field: 'date_signature_cgu',
@@ -96,17 +96,23 @@ export class ConseillerDto extends Model {
   dateSignatureCGU: Date | null
 
   @Column({
+    field: 'date_visionnage_actus',
+    type: DataType.DATE
+  })
+  dateVisionnageActus: Date | null
+
+  @Column({
     field: 'nom_manuel_agence',
     type: DataType.STRING
   })
-  nomManuelAgence?: string
+  nomManuelAgence: string | null
 
   @ForeignKey(() => StructureMiloSqlModel)
   @Column({
     field: 'id_structure_milo',
     type: DataType.STRING
   })
-  idStructureMilo?: string | null
+  idStructureMilo: string | null
 
   @Column({
     field: 'notifications_sonores',

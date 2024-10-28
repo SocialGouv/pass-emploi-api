@@ -30,6 +30,7 @@ describe('ModifierConseillerCommandHandler', () => {
     structure: Structure.MILO,
     email: 'mail@mail.mail',
     dateVerificationMessages: undefined,
+    dateVisionnageActus: undefined,
     agence: undefined,
     notificationsSonores: false
   }

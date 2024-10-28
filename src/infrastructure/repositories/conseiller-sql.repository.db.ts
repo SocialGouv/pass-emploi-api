@@ -102,6 +102,7 @@ export class ConseillerSqlRepository implements Conseiller.Repository {
       dateVerificationMessages:
         conseiller.dateVerificationMessages ?? undefined,
       dateSignatureCGU: conseiller.dateSignatureCGU?.toJSDate() ?? null,
+      dateVisionnageActus: conseiller.dateVisionnageActus?.toJSDate() ?? null,
       idAgence: conseiller.agence?.id ?? null,
       nomManuelAgence:
         !conseiller.agence?.id && conseiller.agence?.nom

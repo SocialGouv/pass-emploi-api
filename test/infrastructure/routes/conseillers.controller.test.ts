@@ -398,6 +398,7 @@ describe('ConseillersController', () => {
     const conseiller = unConseiller()
     const agence = uneAgence()
     const nouvelleDateSignatureCGU = '2020-04-12T12:00:00.000Z'
+    const nouvellesDateVisionnageActus = '2020-04-12T12:00:00.000Z'
 
     describe('quand le payload est valide', () => {
       it('met à jour le conseiller', async () => {
@@ -406,7 +407,8 @@ describe('ConseillersController', () => {
           notificationsSonores: true,
           agence: agence,
           idConseiller: conseiller.id,
-          dateSignatureCGU: nouvelleDateSignatureCGU
+          dateSignatureCGU: nouvelleDateSignatureCGU,
+          dateVisionnageActus: nouvellesDateVisionnageActus
         }
 
         modifierConseillerCommandHandler.execute
@@ -419,7 +421,8 @@ describe('ConseillersController', () => {
           .send({
             notificationsSonores: true,
             agence: agence,
-            dateSignatureCGU: nouvelleDateSignatureCGU
+            dateSignatureCGU: nouvelleDateSignatureCGU,
+            dateVisionnageActus: nouvellesDateVisionnageActus
           })
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.OK)
@@ -448,7 +451,8 @@ describe('ConseillersController', () => {
           notificationsSonores: true,
           agence: agence,
           idConseiller: conseiller.id,
-          dateSignatureCGU: nouvelleDateSignatureCGU
+          dateSignatureCGU: nouvelleDateSignatureCGU,
+          dateVisionnageActus: nouvellesDateVisionnageActus
         }
 
         modifierConseillerCommandHandler.execute
@@ -461,7 +465,8 @@ describe('ConseillersController', () => {
           .send({
             notificationsSonores: true,
             agence: uneAgence(),
-            dateSignatureCGU: nouvelleDateSignatureCGU
+            dateSignatureCGU: nouvelleDateSignatureCGU,
+            dateVisionnageActus: nouvellesDateVisionnageActus
           })
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.NOT_FOUND)

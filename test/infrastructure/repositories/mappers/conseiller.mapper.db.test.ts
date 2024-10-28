@@ -32,6 +32,7 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
         email: 'nils.tavernier@passemploi.com',
         agence: undefined,
         dateSignatureCGU: undefined,
+        dateVisionnageActus: undefined,
         notificationsSonores: false,
         aDesBeneficiairesARecuperer: false
       }
@@ -62,6 +63,7 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
           nom: "nom d'agence"
         },
         dateSignatureCGU: undefined,
+        dateVisionnageActus: undefined,
         notificationsSonores: false,
         aDesBeneficiairesARecuperer: false
       }
@@ -105,6 +107,7 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
           nom: 'Bonjour je suis une agence'
         },
         dateSignatureCGU: undefined,
+        dateVisionnageActus: undefined,
         notificationsSonores: false,
         aDesBeneficiairesARecuperer: false
       }

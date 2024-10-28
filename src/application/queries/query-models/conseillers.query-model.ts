@@ -59,6 +59,9 @@ export class DetailConseillerQueryModel {
 
   @ApiProperty({ required: false })
   dateSignatureCGU?: string
+
+  @ApiProperty({ required: false })
+  dateVisionnageActus?: string
 }
 
 class JeuneDuConseillerQueryModel {
