@@ -62,9 +62,7 @@ describe('GetDiagorienteUrlsQueryHandler', () => {
         const jeune = unJeune()
         const infosJeune = {
           id: jeune.id,
-          email: jeune.email,
-          prenom: jeune.firstName,
-          nom: jeune.lastName
+          email: jeune.email
         }
         const query: GetDiagorienteUrlsQuery = {
           idJeune: 'test'

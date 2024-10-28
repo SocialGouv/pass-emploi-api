@@ -70,9 +70,7 @@ describe('GetDiagorienteMetiersFavorisQueryHandler', () => {
       const jeune = unJeune()
       const infosJeune = {
         id: jeune.id,
-        email: jeune.email,
-        prenom: jeune.firstName,
-        nom: jeune.lastName
+        email: jeune.email
       }
       const query: GetDiagorienteMetiersFavorisQuery = {
         idJeune: jeune.id
@@ -98,9 +96,7 @@ describe('GetDiagorienteMetiersFavorisQueryHandler', () => {
           const jeune = unJeune()
           const infosJeune = {
             id: jeune.id,
-            email: jeune.email,
-            prenom: jeune.firstName,
-            nom: jeune.lastName
+            email: jeune.email
           }
           const query: GetDiagorienteMetiersFavorisQuery = {
             idJeune: jeune.id
@@ -152,9 +148,7 @@ describe('GetDiagorienteMetiersFavorisQueryHandler', () => {
           const jeune = unJeune()
           const infosJeune = {
             id: jeune.id,
-            email: jeune.email,
-            prenom: jeune.firstName,
-            nom: jeune.lastName
+            email: jeune.email
           }
           const query: GetDiagorienteMetiersFavorisQuery = {
             idJeune: jeune.id
@@ -201,9 +195,7 @@ describe('GetDiagorienteMetiersFavorisQueryHandler', () => {
           const jeune = unJeune()
           const infosJeune = {
             id: jeune.id,
-            email: jeune.email,
-            prenom: jeune.firstName,
-            nom: jeune.lastName
+            email: jeune.email
           }
           const query: GetDiagorienteMetiersFavorisQuery = {
             idJeune: jeune.id,
@@ -253,9 +245,7 @@ describe('GetDiagorienteMetiersFavorisQueryHandler', () => {
           const jeune = unJeune()
           const infosJeune = {
             id: jeune.id,
-            email: jeune.email,
-            prenom: jeune.firstName,
-            nom: jeune.lastName
+            email: jeune.email
           }
           const query: GetDiagorienteMetiersFavorisQuery = {
             idJeune: jeune.id

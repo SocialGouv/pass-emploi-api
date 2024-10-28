@@ -2,6 +2,7 @@ import { HttpService } from '@nestjs/axios'
 import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
+import * as CryptoJS from 'crypto-js'
 import { firstValueFrom } from 'rxjs'
 import { TypeUrlDiagoriente } from '../../application/queries/get-diagoriente-urls.query.handler'
 import { CompteDiagorienteInvalideError } from '../../building-blocks/types/domain-error'
@@ -21,8 +22,6 @@ const mapTypeUrlToRedirect: Record<TypeUrlDiagoriente, string> = {
 type UserInfo = {
   id: string
   email: string
-  prenom: string
-  nom: string
 }
 
 @Injectable()
@@ -54,12 +53,7 @@ export class DiagorienteClient {
         variables: {
           clientId: this.diagorienteClientId,
           clientSecret: this.diagorienteClientSecret,
-          userInfo: {
-            userId: userInfo.id,
-            email: userInfo.email,
-            firstName: userInfo.prenom,
-            lastName: userInfo.nom
-          },
+          userInfo: anonymiserUserInfo(userInfo),
           redirectUri: mapTypeUrlToRedirect[typeUrl]
         }
       })
@@ -83,12 +77,7 @@ export class DiagorienteClient {
         variables: {
           clientId: this.diagorienteClientId,
           clientSecret: this.diagorienteClientSecret,
-          userInfo: {
-            userId: userInfo.id,
-            email: userInfo.email,
-            firstName: userInfo.prenom,
-            lastName: userInfo.nom
-          }
+          userInfo: anonymiserUserInfo(userInfo)
         }
       })
 
@@ -151,5 +140,19 @@ interface MetiersFavorisDiagorienteDto {
         favorited: boolean
       }>
     }
+  }
+}
+
+function anonymiserUserInfo(userInfo: UserInfo): {
+  userId: string
+  email: string
+  firstName: string
+  lastName: string
+} {
+  return {
+    userId: userInfo.id,
+    email: CryptoJS.MD5(userInfo.id) + '@pass-emploi.beta.gouv.fr',
+    firstName: 'Utilisateur',
+    lastName: 'Pass Emploi'
   }
 }

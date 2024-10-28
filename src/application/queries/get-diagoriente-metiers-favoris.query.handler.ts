@@ -11,7 +11,7 @@ import {
   success
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { JeuneRepositoryToken, Jeune } from '../../domain/jeune/jeune'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { DiagorienteClient } from '../../infrastructure/clients/diagoriente-client'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 
@@ -61,13 +61,10 @@ export class GetDiagorienteMetiersFavorisQueryHandler extends QueryHandler<
       return failure(new MauvaiseCommandeError('Jeune sans email'))
     }
 
-    const infosJeune = {
+    const resultRegister = await this.diagorienteClient.register({
       id: jeune.id,
-      email: jeune.email,
-      prenom: jeune.firstName,
-      nom: jeune.lastName
-    }
-    const resultRegister = await this.diagorienteClient.register(infosJeune)
+      email: jeune.email
+    })
 
     if (isFailure(resultRegister)) {
       return resultRegister
