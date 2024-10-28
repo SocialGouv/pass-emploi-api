@@ -10,7 +10,8 @@ export const unConseiller = (args: Partial<Conseiller> = {}): Conseiller => {
     structure: Core.Structure.POLE_EMPLOI,
     email: 'nils.tavernier@passemploi.com',
     notificationsSonores: false,
-    dateSignatureCGU: DateTime.fromISO('2023-10-03T12:00:00.000Z')
+    dateSignatureCGU: DateTime.fromISO('2023-10-03T12:00:00.000Z'),
+    dateVisionnageActus: DateTime.fromISO('2023-10-03T12:00:00.000Z')
   }
   return { ...defaults, ...args }
 }

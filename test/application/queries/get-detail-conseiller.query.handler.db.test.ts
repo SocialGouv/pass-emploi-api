@@ -82,7 +82,8 @@ describe('GetDetailConseillerQueryHandler', () => {
               email: 'nils.tavernier@passemploi.com',
               agence: { id: agenceSql.id, nom: agenceSql.nomAgence },
               notificationsSonores: false,
-              dateSignatureCGU: undefined
+              dateSignatureCGU: undefined,
+              dateVisionnageActus: undefined
             })
           )
         )
@@ -116,7 +117,8 @@ describe('GetDetailConseillerQueryHandler', () => {
               agence: undefined,
               notificationsSonores: false,
               aDesBeneficiairesARecuperer: true,
-              dateSignatureCGU: undefined
+              dateSignatureCGU: undefined,
+              dateVisionnageActus: undefined
             })
           )
         )
@@ -173,7 +175,8 @@ describe('GetDetailConseillerQueryHandler', () => {
               },
               dateSignatureCGU: undefined,
               notificationsSonores: false,
-              agence: undefined
+              agence: undefined,
+              dateVisionnageActus: undefined
             })
           )
         )

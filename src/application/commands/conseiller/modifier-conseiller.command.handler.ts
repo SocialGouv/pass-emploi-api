@@ -22,6 +22,7 @@ export interface ModifierConseillerCommand extends Command {
   idConseiller: string
   agence?: Agence
   dateSignatureCGU?: string
+  dateVisionnageActus?: string
   notificationsSonores?: boolean
 }
 
@@ -64,7 +65,10 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
       agence: command.agence ?? conseillerActuel.agence,
       dateSignatureCGU: command.dateSignatureCGU
         ? DateTime.fromISO(command.dateSignatureCGU)
-        : conseillerActuel.dateSignatureCGU
+        : conseillerActuel.dateSignatureCGU,
+      dateVisionnageActus: command.dateVisionnageActus
+        ? DateTime.fromISO(command.dateVisionnageActus)
+        : conseillerActuel.dateVisionnageActus
     }
 
     const conseillerResult = Conseiller.mettreAJour(

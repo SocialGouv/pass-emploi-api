@@ -31,7 +31,8 @@ describe('ConseillerSqlRepository', () => {
         agence: {
           id: 'id'
         },
-        dateSignatureCGU: undefined
+        dateSignatureCGU: undefined,
+        dateVisionnageActus: undefined
       }
       await AgenceSqlModel.create({
         id: 'id',
@@ -76,7 +77,8 @@ describe('ConseillerSqlRepository', () => {
         agence: {
           id: 'id'
         },
-        dateSignatureCGU: undefined
+        dateSignatureCGU: undefined,
+        dateVisionnageActus: undefined
       }
       await AgenceSqlModel.create({
         id: 'id',

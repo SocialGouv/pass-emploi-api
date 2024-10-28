@@ -181,6 +181,11 @@ export class DetailConseillerPayload {
   @IsNotEmpty()
   dateSignatureCGU?: string
 
+  @IsOptional()
+  @IsDateString()
+  @IsNotEmpty()
+  dateVisionnageActus?: string
+
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
