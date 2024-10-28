@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
   Result,
@@ -18,7 +19,10 @@ import { Evenement, EvenementService } from '../../domain/evenement'
 
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import {
+  MauvaiseCommandeError,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
 import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { Mail, MailServiceToken } from '../../domain/mail'
 import { DateService } from '../../utils/date-service'
@@ -27,6 +31,7 @@ import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 export interface ArchiverJeuneCommand {
   idJeune: Jeune.Id
   motif: ArchiveJeune.MotifSuppression
+  dateFinAccompagnement?: DateTime
   commentaire?: string
 }
 
@@ -65,10 +70,12 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
 
   async handle(command: ArchiverJeuneCommand): Promise<Result> {
     const jeune = await this.jeuneRepository.get(command.idJeune)
-
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', command.idJeune))
     }
+
+    const verificationDate = this.verifierDateFinAccompagnement(command, jeune)
+    if (isFailure(verificationDate)) return verificationDate
 
     await this.authentificationRepository.deleteUtilisateurIdp(command.idJeune)
 
@@ -80,6 +87,7 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
       structure: jeune.structure,
       dateCreation: jeune.creationDate.toJSDate(),
       datePremiereConnexion: jeune.datePremiereConnexion?.toJSDate(),
+      dateFinAccompagnement: command.dateFinAccompagnement?.toJSDate(),
       motif: command.motif,
       commentaire: command.commentaire,
       dateArchivage: this.dateService.nowJs(),
@@ -114,5 +122,33 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
       Evenement.Code.COMPTE_ARCHIVE,
       utilisateur
     )
+  }
+
+  private verifierDateFinAccompagnement(
+    command: ArchiverJeuneCommand,
+    jeune: Jeune
+  ): Result {
+    if (
+      command.dateFinAccompagnement &&
+      command.dateFinAccompagnement < jeune.creationDate
+    ) {
+      return failure(
+        new MauvaiseCommandeError(
+          'Le date de fin d’accompagnement doit être postérieure à la date de création du bénéficiaire'
+        )
+      )
+    }
+    if (
+      command.dateFinAccompagnement &&
+      command.dateFinAccompagnement > this.dateService.now()
+    ) {
+      return failure(
+        new MauvaiseCommandeError(
+          'Le date de fin d’accompagnement ne peut pas être dans le futur'
+        )
+      )
+    }
+
+    return emptySuccess()
   }
 }

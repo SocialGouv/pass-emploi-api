@@ -47,6 +47,11 @@ export class ArchiverJeunePayload {
   @IsString()
   @MaxLength(250)
   commentaire?: string
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsDateString()
+  dateFinAccompagnement?: string
 }
 
 export class TransfererConseillerPayload {

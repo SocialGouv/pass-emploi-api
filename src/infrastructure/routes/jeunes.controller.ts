@@ -14,7 +14,11 @@ import {
   Query
 } from '@nestjs/common'
 import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { ArchiverJeuneCommandHandler } from 'src/application/commands/archiver-jeune.command.handler'
+import { DateTime } from 'luxon'
+import {
+  ArchiverJeuneCommand,
+  ArchiverJeuneCommandHandler
+} from 'src/application/commands/archiver-jeune.command.handler'
 import { DeleteJeuneInactifCommandHandler } from 'src/application/commands/delete-jeune-inactif.command.handler'
 import { DeleteJeuneCommandHandler } from 'src/application/commands/delete-jeune.command.handler'
 import {
@@ -249,12 +253,20 @@ export class JeunesController {
     @Body() archiverJeunePayload: ArchiverJeunePayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
+    const command: ArchiverJeuneCommand = {
+      idJeune,
+      motif: archiverJeunePayload.motif,
+      commentaire: archiverJeunePayload.commentaire
+    }
+    if (archiverJeunePayload.dateFinAccompagnement) {
+      command.dateFinAccompagnement = DateTime.fromISO(
+        archiverJeunePayload.dateFinAccompagnement,
+        { setZone: true }
+      )
+    }
+
     const result = await this.archiverJeuneCommandHandler.execute(
-      {
-        idJeune,
-        motif: archiverJeunePayload.motif,
-        commentaire: archiverJeunePayload.commentaire
-      },
+      command,
       utilisateur
     )
 

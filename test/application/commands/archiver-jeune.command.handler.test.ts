@@ -1,10 +1,12 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { DateTime } from 'luxon'
 import { createSandbox } from 'sinon'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import {
   ArchiverJeuneCommand,
   ArchiverJeuneCommandHandler
 } from '../../../src/application/commands/archiver-jeune.command.handler'
+import { MauvaiseCommandeError } from '../../../src/building-blocks/types/domain-error'
 import { ArchiveJeune } from '../../../src/domain/archive-jeune'
 import { Authentification } from '../../../src/domain/authentification'
 import { Chat } from '../../../src/domain/chat'
@@ -14,10 +16,14 @@ import { Jeune } from '../../../src/domain/jeune/jeune'
 import { Mail } from '../../../src/domain/mail'
 import { DateService } from '../../../src/utils/date-service'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import { uneDatetime } from '../../fixtures/date.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { StubbedClass, expect, stubClass } from '../../utils'
 import Structure = Core.Structure
-import { emptySuccess } from '../../../src/building-blocks/types/result'
+import {
+  emptySuccess,
+  failure
+} from '../../../src/building-blocks/types/result'
 
 describe('ArchiverJeuneCommandHandler', () => {
   let archiverJeuneCommandHandler: ArchiverJeuneCommandHandler
@@ -42,6 +48,7 @@ describe('ArchiverJeuneCommandHandler', () => {
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     dateService = stubClass(DateService)
     dateService.nowJs.returns(maintenant)
+    dateService.now.returns(DateTime.fromJSDate(maintenant))
     mailService = stubInterface(sandbox)
     archiverJeuneCommandHandler = new ArchiverJeuneCommandHandler(
       jeuneRepository,
@@ -73,19 +80,23 @@ describe('ArchiverJeuneCommandHandler', () => {
   })
 
   describe('handle', () => {
-    describe('quand le jeune existe', () => {
+    const jeune = unJeune()
+
+    beforeEach(async () => {
+      // Given
+      archivageJeuneRepository.archiver.resolves(emptySuccess())
+      jeuneRepository.get.withArgs('idJeune').resolves(jeune)
+    })
+
+    describe('quand l’archivage est correct', () => {
       const command: ArchiverJeuneCommand = {
         idJeune: 'idJeune',
         motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE,
+        dateFinAccompagnement: uneDatetime(),
         commentaire: 'un commentaire'
       }
-      const jeune = unJeune()
 
       beforeEach(async () => {
-        // Given
-        archivageJeuneRepository.archiver.resolves(emptySuccess())
-        jeuneRepository.get.withArgs('idJeune').resolves(jeune)
-
         // When
         await archiverJeuneCommandHandler.handle(command)
       })
@@ -101,6 +112,7 @@ describe('ArchiverJeuneCommandHandler', () => {
           idPartenaire: jeune.idPartenaire,
           dateCreation: jeune.creationDate.toJSDate(),
           datePremiereConnexion: jeune.creationDate.plus({ day: 1 }).toJSDate(),
+          dateFinAccompagnement: new Date('2020-04-06T12:00:00.000Z'),
           motif: command.motif,
           commentaire: command.commentaire,
           dateArchivage: maintenant
@@ -133,6 +145,48 @@ describe('ArchiverJeuneCommandHandler', () => {
           jeune,
           command.motif,
           command.commentaire
+        )
+      })
+    })
+
+    describe('contrôle la date de fin d’accompagnement', () => {
+      it('doit être après la création du bénéficiaire', async () => {
+        // When
+        const result = await archiverJeuneCommandHandler.handle({
+          idJeune: 'idJeune',
+          motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE,
+          dateFinAccompagnement: jeune.creationDate.minus({ day: 1 }),
+          commentaire: 'un commentaire'
+        })
+
+        // Then
+        expect(result).to.deep.equal(
+          failure(
+            new MauvaiseCommandeError(
+              'Le date de fin d’accompagnement doit être postérieure à la date de création du bénéficiaire'
+            )
+          )
+        )
+      })
+
+      it('ne doit pas être dans le futur', async () => {
+        // When
+        const result = await archiverJeuneCommandHandler.handle({
+          idJeune: 'idJeune',
+          motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE,
+          dateFinAccompagnement: DateTime.fromJSDate(maintenant).plus({
+            day: 1
+          }),
+          commentaire: 'un commentaire'
+        })
+
+        // Then
+        expect(result).to.deep.equal(
+          failure(
+            new MauvaiseCommandeError(
+              'Le date de fin d’accompagnement ne peut pas être dans le futur'
+            )
+          )
         )
       })
     })

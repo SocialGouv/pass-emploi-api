@@ -44,6 +44,7 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
       idPartenaire: metadonnees.idPartenaire ?? null,
       dateCreation: metadonnees.dateCreation,
       datePremiereConnexion: metadonnees.datePremiereConnexion ?? null,
+      dateFinAccompagnement: metadonnees.dateFinAccompagnement ?? null,
       motif: metadonnees.motif,
       commentaire: metadonnees.commentaire ?? null,
       dateArchivage: metadonnees.dateArchivage,
