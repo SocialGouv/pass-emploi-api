@@ -4367,18 +4367,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bull@npm:*, bull@npm:4.16.3, bull@npm:^4.12.2":
-  version: 4.16.3
-  resolution: "bull@npm:4.16.3"
+"bull@npm:*, bull@npm:4.16.4, bull@npm:^4.12.2":
+  version: 4.16.4
+  resolution: "bull@npm:4.16.4"
   dependencies:
     cron-parser: "npm:^4.2.1"
     get-port: "npm:^5.1.1"
     ioredis: "npm:^5.3.2"
     lodash: "npm:^4.17.21"
-    msgpackr: "npm:^1.10.1"
+    msgpackr: "npm:^1.11.2"
     semver: "npm:^7.5.2"
     uuid: "npm:^8.3.0"
-  checksum: 10/04f93aabfe2dbdd21f60cd95d87add04a5e7f60902bbad273127d6845de8711521188f3b36d617334314600b11ad37394cc81665b371b374e539932254f4bdf5
+  checksum: 10/f53484dab9ff307d2645531954e708eea8911f75154b108db50e501845fdb189edf18cbcfcb91709160ee22f38d0402e9e14e5a08a9224a1061d41939fecbd72
   languageName: node
   linkType: hard
 
@@ -9175,15 +9175,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"msgpackr@npm:^1.10.1":
-  version: 1.11.0
-  resolution: "msgpackr@npm:1.11.0"
+"msgpackr@npm:^1.11.2":
+  version: 1.11.2
+  resolution: "msgpackr@npm:1.11.2"
   dependencies:
     msgpackr-extract: "npm:^3.0.2"
   dependenciesMeta:
     msgpackr-extract:
       optional: true
-  checksum: 10/e95edf511ab269b34e312a7bd058c203e1ef4dc0656df8ccf1a10e9cdb40fac4c4b62b42ea0b2d199f85a1a53704f7f47e28ed5af5311f66097c591eafbbf8f3
+  checksum: 10/7602f1e91e5ba13f4289ec9cab0d3f3db87d4ed323bebcb40a0c43ba2f6153192bffb63a5bb4755faacb6e0985f307c35084f40eaba1c325b7035da91381f01a
   languageName: node
   linkType: hard
 
@@ -9280,7 +9280,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^6.21.0"
     "@typescript-eslint/parser": "npm:^6.21.0"
     axios: "npm:^1.7.7"
-    bull: "npm:4.16.3"
+    bull: "npm:4.16.4"
     bull-repl: "npm:^0.29.1"
     chai: "npm:^4.5.0"
     chai-as-promised: "npm:^7.1.2"
