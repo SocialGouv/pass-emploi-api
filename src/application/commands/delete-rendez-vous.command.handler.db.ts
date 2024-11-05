@@ -11,12 +11,12 @@ import {
   failure
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
+import { Evenement, EvenementService } from '../../domain/evenement'
+import { Mail, MailServiceToken } from '../../domain/mail'
 import {
   Conseiller,
   ConseillerRepositoryToken
 } from '../../domain/milo/conseiller'
-import { Evenement, EvenementService } from '../../domain/evenement'
-import { Mail, MailServiceToken } from '../../domain/mail'
 import { Notification } from '../../domain/notification/notification'
 import {
   PlanificateurService,
@@ -65,6 +65,10 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
         )
       )
     }
+    const icsSequence =
+      await this.rendezVousRepository.getAndIncrementRendezVousIcsSequence(
+        rendezVous.id
+      )
     await this.rendezVousRepository.delete(command.idRendezVous)
 
     this.notificationService.notifierLesJeunesDuRdv(
@@ -94,7 +98,8 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
       this.mailService.envoyerMailRendezVous(
         createur,
         rendezVous,
-        RendezVous.Operation.SUPPRESSION
+        RendezVous.Operation.SUPPRESSION,
+        icsSequence
       )
     }
     return emptySuccess()

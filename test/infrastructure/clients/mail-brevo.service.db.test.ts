@@ -1,45 +1,48 @@
-import { MailBrevoService } from '../../../src/infrastructure/clients/mail-brevo.service.db'
 import { HttpService } from '@nestjs/axios'
-import { testConfig } from '../../utils/module-for-testing'
-import { unConseiller } from '../../fixtures/conseiller.fixture'
-import * as nock from 'nock'
-import { expect } from '../../utils'
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import * as fs from 'fs'
+import * as nock from 'nock'
 import * as path from 'path'
-import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
-import { InvitationIcsClient } from '../../../src/infrastructure/clients/invitation-ics.client.db'
+import { SinonSandbox } from 'sinon'
+import { ArchiveJeune } from '../../../src/domain/archive-jeune'
+import { Core } from '../../../src/domain/core'
 import { MailDataDto } from '../../../src/domain/mail'
 import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
+import { InvitationIcsClient } from '../../../src/infrastructure/clients/invitation-ics.client'
+import { MailBrevoService } from '../../../src/infrastructure/clients/mail-brevo.service.db'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { ArchiveJeune } from '../../../src/domain/archive-jeune'
+import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
+import { createSandbox, expect } from '../../utils'
 import {
   DatabaseForTesting,
   getDatabase
 } from '../../utils/database-for-testing'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import { Core } from '../../../src/domain/core'
+import { testConfig } from '../../utils/module-for-testing'
 
 describe('MailBrevoService', () => {
   let databaseForTesting: DatabaseForTesting
   let mailBrevoService: MailBrevoService
   let invitationIcsClient: InvitationIcsClient
   const config = testConfig()
+  let rendezVousRepository: StubbedType<RendezVous.Repository>
 
   before(() => {
     databaseForTesting = getDatabase()
   })
 
   beforeEach(async () => {
+    const sandbox: SinonSandbox = createSandbox()
+    rendezVousRepository = stubInterface(sandbox)
     await databaseForTesting.cleanPG()
     const httpService = new HttpService()
-    invitationIcsClient = new InvitationIcsClient(
-      databaseForTesting.sequelize,
-      config
-    )
+    invitationIcsClient = new InvitationIcsClient(config)
     mailBrevoService = new MailBrevoService(
       invitationIcsClient,
       httpService,
-      config
+      config,
+      rendezVousRepository
     )
   })
 

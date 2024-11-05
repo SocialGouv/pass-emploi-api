@@ -1,18 +1,19 @@
 import { HttpService } from '@nestjs/axios'
-import { Injectable, Logger } from '@nestjs/common'
+import { Inject, Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
-import { Conseiller } from '../../domain/milo/conseiller'
-import { Mail, MailDataDto } from '../../domain/mail'
-import {
-  mapCodeLabelTypeRendezVous,
-  RendezVous
-} from '../../domain/rendez-vous/rendez-vous'
-import { InvitationIcsClient } from './invitation-ics.client.db'
-import { Jeune } from '../../domain/jeune/jeune'
 import { ArchiveJeune } from '../../domain/archive-jeune'
 import { Authentification } from '../../domain/authentification'
 import { Core, estPassEmploi } from '../../domain/core'
+import { Jeune } from '../../domain/jeune/jeune'
+import { Mail, MailDataDto } from '../../domain/mail'
+import { Conseiller } from '../../domain/milo/conseiller'
+import {
+  mapCodeLabelTypeRendezVous,
+  RendezVous,
+  RendezVousRepositoryToken
+} from '../../domain/rendez-vous/rendez-vous'
+import { InvitationIcsClient } from './invitation-ics.client'
 
 export type ICS = string
 
@@ -37,7 +38,9 @@ export class MailBrevoService implements Mail.Service {
   constructor(
     private invitationIcsClient: InvitationIcsClient,
     private httpService: HttpService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    @Inject(RendezVousRepositoryToken)
+    private readonly rendezVousRepository: RendezVous.Repository
   ) {
     this.brevoUrl = this.configService.get('brevo').url
     this.apiKey = this.configService.get('brevo').apiKey
@@ -109,26 +112,31 @@ export class MailBrevoService implements Mail.Service {
   async envoyerMailRendezVous(
     conseiller: Conseiller,
     rendezVous: RendezVous,
-    operation: RendezVous.Operation
+    operation: RendezVous.Operation,
+    icsSequence?: number
   ): Promise<void> {
     const rendezVousIcsSequence =
-      await this.invitationIcsClient.getAndIncrementRendezVousIcsSequence(
+      icsSequence ??
+      (await this.rendezVousRepository.getAndIncrementRendezVousIcsSequence(
         rendezVous.id
-      )
-    const fichierInvitation =
-      this.invitationIcsClient.creerFichierInvitationRendezVous(
+      ))
+
+    if (rendezVousIcsSequence) {
+      const fichierInvitation =
+        this.invitationIcsClient.creerFichierInvitationRendezVous(
+          conseiller,
+          rendezVous,
+          rendezVousIcsSequence,
+          operation
+        )
+      const mailDatadto = this.creerContenuMailRendezVous(
         conseiller,
         rendezVous,
-        rendezVousIcsSequence,
+        fichierInvitation,
         operation
       )
-    const mailDatadto = this.creerContenuMailRendezVous(
-      conseiller,
-      rendezVous,
-      fichierInvitation,
-      operation
-    )
-    await this.envoyer(mailDatadto)
+      await this.envoyer(mailDatadto)
+    }
   }
 
   async envoyerEmailJeuneArchive(

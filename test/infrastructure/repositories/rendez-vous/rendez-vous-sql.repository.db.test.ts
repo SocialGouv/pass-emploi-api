@@ -333,4 +333,42 @@ describe('RendezVousRepositorySql', () => {
       })
     })
   })
+
+  describe('getAndIncrementRendezVousIcsSequence', () => {
+    describe('quand le rdv a une séquence ics qui est nulle', () => {
+      it('initialise la séquence ics à 0', async () => {
+        // Given
+        const idRdv = '6c242fa0-804f-11ec-a8a3-0242ac120002'
+        const unRendezVous = unRendezVousDto({
+          id: idRdv
+        })
+        await RendezVousSqlModel.create(unRendezVous)
+        // When
+        const rendezVousIcsSequence =
+          await rendezVousRepositorySql.getAndIncrementRendezVousIcsSequence(
+            idRdv
+          )
+        // Then
+        expect(rendezVousIcsSequence).to.equal(0)
+      })
+    })
+    describe('quand le rdv a une séquence ics non nulle', () => {
+      it('incrémente la séquence ics', async () => {
+        // Given
+        const idRdv = '6c242fa0-804f-11ec-a8a3-0242ac120002'
+        const unRendezVous = unRendezVousDto({
+          id: idRdv,
+          icsSequence: 0
+        })
+        await RendezVousSqlModel.create(unRendezVous)
+        // When
+        const rendezVousIcsSequence =
+          await rendezVousRepositorySql.getAndIncrementRendezVousIcsSequence(
+            idRdv
+          )
+        // Then
+        expect(rendezVousIcsSequence).to.equal(1)
+      })
+    })
+  })
 })

@@ -1,48 +1,26 @@
-import { Inject, Injectable } from '@nestjs/common'
-import { QueryTypes, Sequelize } from 'sequelize'
-import { SequelizeInjectionToken } from '../sequelize/providers'
+import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import * as icsService from 'ics'
+import { Attendee, EventAttributes } from 'ics'
 import { Conseiller } from '../../domain/milo/conseiller'
 import {
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous,
   RendezVous
 } from '../../domain/rendez-vous/rendez-vous'
-import * as icsService from 'ics'
 import {
   formaterDateRendezVous,
   formaterHeureRendezVous,
   ICS
 } from './mail-brevo.service.db'
-import { Attendee, EventAttributes } from 'ics'
-import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class InvitationIcsClient {
   private noReplyContactEmail: string
 
-  constructor(
-    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
-    private configService: ConfigService
-  ) {
+  constructor(private configService: ConfigService) {
     this.noReplyContactEmail =
       this.configService.get('noReplyContactEmail') ?? ''
-  }
-  async getAndIncrementRendezVousIcsSequence(
-    idRendezVous: string
-  ): Promise<number> {
-    const rendezVousIcsSequence = await this.sequelize.query(
-      ` UPDATE rendez_vous SET ics_sequence = CASE 
-            WHEN ics_sequence IS NOT NULL THEN ics_sequence + 1 ELSE 0 END 
-            WHERE id = :idRendezVous
-            RETURNING ics_sequence;`,
-      {
-        type: QueryTypes.UPDATE,
-        replacements: { idRendezVous }
-      }
-    )
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    return rendezVousIcsSequence[0][0]['ics_sequence']
   }
 
   creerFichierInvitationRendezVous(

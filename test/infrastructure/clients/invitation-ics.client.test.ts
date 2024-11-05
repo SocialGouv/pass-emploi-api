@@ -1,78 +1,24 @@
-import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
-import { expect } from '../../utils'
-import { InvitationIcsClient } from '../../../src/infrastructure/clients/invitation-ics.client.db'
-import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
-import { testConfig } from '../../utils/module-for-testing'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import {
   CodeTypeRendezVous,
   RendezVous
 } from '../../../src/domain/rendez-vous/rendez-vous'
-import {
-  DatabaseForTesting,
-  getDatabase
-} from '../../utils/database-for-testing'
+import { InvitationIcsClient } from '../../../src/infrastructure/clients/invitation-ics.client'
+import { unConseiller } from '../../fixtures/conseiller.fixture'
+import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
+import { expect } from '../../utils'
+import { testConfig } from '../../utils/module-for-testing'
 
 describe('InvitationIcsClient', () => {
-  let databaseForTesting: DatabaseForTesting
   let invitationIcsClient: InvitationIcsClient
   const config = testConfig()
 
-  before(() => {
-    databaseForTesting = getDatabase()
-  })
+  before(() => {})
 
   beforeEach(async () => {
-    await databaseForTesting.cleanPG()
-    invitationIcsClient = new InvitationIcsClient(
-      databaseForTesting.sequelize,
-      config
-    )
-
-    // Given
-    await ConseillerSqlModel.creer(unConseillerDto())
-    await JeuneSqlModel.creer(unJeuneDto())
+    invitationIcsClient = new InvitationIcsClient(config)
   })
 
-  describe('getAndIncrementRendezVousIcsSequence', () => {
-    describe('quand le rdv a une séquence ics qui est nulle', () => {
-      it('initialise la séquence ics à 0', async () => {
-        // Given
-        const idRdv = '6c242fa0-804f-11ec-a8a3-0242ac120002'
-        const unRendezVous = unRendezVousDto({
-          id: idRdv
-        })
-        await RendezVousSqlModel.create(unRendezVous)
-        // When
-        const rendezVousIcsSequence =
-          await invitationIcsClient.getAndIncrementRendezVousIcsSequence(idRdv)
-        // Then
-        expect(rendezVousIcsSequence).to.equal(0)
-      })
-    })
-    describe('quand le rdv a une séquence ics non nulle', () => {
-      it('incrémente la séquence ics', async () => {
-        // Given
-        const idRdv = '6c242fa0-804f-11ec-a8a3-0242ac120002'
-        const unRendezVous = unRendezVousDto({
-          id: idRdv,
-          icsSequence: 0
-        })
-        await RendezVousSqlModel.create(unRendezVous)
-        // When
-        const rendezVousIcsSequence =
-          await invitationIcsClient.getAndIncrementRendezVousIcsSequence(idRdv)
-        // Then
-        expect(rendezVousIcsSequence).to.equal(1)
-      })
-    })
-  })
   describe('creerEvenementRendezVous', () => {
     it('renvoie le bon évènement du rendez-vous en excluant un jeune sans email', async () => {
       // Given

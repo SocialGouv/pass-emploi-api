@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Op, Sequelize } from 'sequelize'
+import { Op, QueryTypes, Sequelize } from 'sequelize'
 import { RendezVous } from '../../../domain/rendez-vous/rendez-vous'
 import { DateService } from '../../../utils/date-service'
 import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
@@ -97,5 +97,23 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
       }
     })
     return rendezVousSql.map(toRendezVous)
+  }
+
+  async getAndIncrementRendezVousIcsSequence(
+    idRendezVous: string
+  ): Promise<number | undefined> {
+    const rendezVousIcsSequence = await this.sequelize.query(
+      ` UPDATE rendez_vous SET ics_sequence = CASE 
+            WHEN ics_sequence IS NOT NULL THEN ics_sequence + 1 ELSE 0 END 
+            WHERE id = :idRendezVous
+            RETURNING ics_sequence;`,
+      {
+        type: QueryTypes.UPDATE,
+        replacements: { idRendezVous }
+      }
+    )
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return rendezVousIcsSequence[0][0]?.['ics_sequence']
   }
 }

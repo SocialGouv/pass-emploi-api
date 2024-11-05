@@ -132,6 +132,9 @@ describe('DeleteRendezVousCommandHandler', () => {
               .withArgs(conseillerCreateur.id)
               .resolves(conseillerCreateur)
             planificateurService.supprimerRappelsParId.resolves()
+            rendezVousRepository.getAndIncrementRendezVousIcsSequence.resolves(
+              1
+            )
 
             // When
             await deleteRendezVousCommandHandler.handle(command)
@@ -140,7 +143,8 @@ describe('DeleteRendezVousCommandHandler', () => {
             expect(mailService.envoyerMailRendezVous).to.have.been.calledWith(
               conseillerCreateur,
               rendezVous,
-              RendezVous.Operation.SUPPRESSION
+              RendezVous.Operation.SUPPRESSION,
+              1
             )
           })
         })

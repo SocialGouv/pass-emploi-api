@@ -45,7 +45,8 @@ export namespace Mail {
     envoyerMailRendezVous(
       conseiller: Conseiller,
       rendezVous: RendezVous,
-      operation: RendezVous.Operation
+      operation: RendezVous.Operation,
+      icsSequence?: number
     ): Promise<void>
 
     envoyerEmailJeuneArchive(

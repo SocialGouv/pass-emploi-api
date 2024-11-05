@@ -183,6 +183,10 @@ export namespace RendezVous {
     delete(idRendezVous: string): Promise<void>
 
     getAllAVenir(): Promise<RendezVous[]>
+
+    getAndIncrementRendezVousIcsSequence(
+      idRendezVous: string
+    ): Promise<number | undefined>
   }
 
   export enum Periode {
