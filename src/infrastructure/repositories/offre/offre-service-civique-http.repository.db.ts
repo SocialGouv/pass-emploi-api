@@ -79,7 +79,7 @@ export interface DetailOffreEngagementDto {
 }
 
 export interface OffreEngagementDto {
-  id: string
+  _id: string
   title: string
   domain: string
   publisherId?: string
@@ -103,7 +103,7 @@ export interface OffreEngagementDto {
   postedAt?: string
   priority?: string
   metadata?: string
-  adresse?: string
+  address?: string
   postalCode?: string
   departmentName?: string
   departmentCode?: string
@@ -117,7 +117,7 @@ export interface OffreEngagementDto {
     lat: number
   }
   remote?: string
-  deleted?: string
+  deleted?: boolean
   createdAt?: string
   updatedAt?: string
 }

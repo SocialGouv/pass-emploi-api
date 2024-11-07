@@ -13,7 +13,9 @@ export function toOffresServicesCivique(servicesCiviqueDto: EngagementDto): {
 } {
   return {
     total: servicesCiviqueDto.total,
-    results: servicesCiviqueDto.hits.map(toOffreEngagement)
+    results: servicesCiviqueDto.hits
+      .filter(offre => !offre.deleted)
+      .map(toOffreEngagement)
   }
 }
 
@@ -21,7 +23,7 @@ export function toOffreEngagement(
   serviceCiviqueDto: OffreEngagementDto
 ): Offre.Favori.ServiceCivique {
   return {
-    id: serviceCiviqueDto.id,
+    id: serviceCiviqueDto._id,
     titre: serviceCiviqueDto.title,
     dateDeDebut: serviceCiviqueDto.startAt,
     dateDeFin: serviceCiviqueDto.endAt,
@@ -30,7 +32,7 @@ export function toOffreEngagement(
     organisation: serviceCiviqueDto.organizationName,
     lienAnnonce: serviceCiviqueDto.applicationUrl,
     urlOrganisation: serviceCiviqueDto.organizationUrl,
-    adresseMission: serviceCiviqueDto.adresse,
+    adresseMission: serviceCiviqueDto.address,
     adresseOrganisation: serviceCiviqueDto.organizationFullAddress,
     codeDepartement: serviceCiviqueDto.departmentCode,
     description: serviceCiviqueDto.description,

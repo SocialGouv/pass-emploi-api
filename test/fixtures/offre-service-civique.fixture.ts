@@ -24,7 +24,7 @@ export const uneOffreServiceCivique = (): Offre.Favori.ServiceCivique => ({
 })
 
 export const uneOffreServiceCiviqueDto = (): OffreEngagementDto => ({
-  id: 'unId',
+  _id: 'unId',
   title: 'unTitre',
   domain: 'Informatique',
   startAt: '2022-02-17T10:00:00.000Z',
@@ -33,7 +33,7 @@ export const uneOffreServiceCiviqueDto = (): OffreEngagementDto => ({
   organizationName: 'orga de ouf',
   applicationUrl: 'lienoffre.com',
   organizationUrl: 'lienorganisation.com',
-  adresse: 'adresse mission',
+  address: 'adresse mission',
   organizationFullAddress: 'adresse organistation',
   postalCode: '75018',
   description: 'offre très intéressante',
