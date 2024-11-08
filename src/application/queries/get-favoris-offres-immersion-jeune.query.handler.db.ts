@@ -57,7 +57,8 @@ export class GetFavorisOffresImmersionJeuneQueryHandler extends QueryHandler<
       attributes: ['idOffre'],
       where: {
         idJeune
-      }
+      },
+      order: [['date_creation', 'DESC']]
     })
 
     return fromSqlToFavorisOffresImmersionIdsQueryModels(favorisIdsSql)

@@ -34,7 +34,8 @@ export class GetFavorisServiceCiviqueJeuneQueryHandler extends QueryHandler<
     const favorisSql = await FavoriOffreEngagementSqlModel.findAll({
       where: {
         idJeune: query.idJeune
-      }
+      },
+      order: [['date_creation', 'DESC']]
     })
 
     if (query.detail) {
