@@ -121,7 +121,7 @@ export class MailBrevoService implements Mail.Service {
         rendezVous.id
       ))
 
-    if (rendezVousIcsSequence) {
+    if (rendezVousIcsSequence !== undefined) {
       const fichierInvitation =
         this.invitationIcsClient.creerFichierInvitationRendezVous(
           conseiller,
