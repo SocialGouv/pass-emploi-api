@@ -44,6 +44,7 @@ export const uneOffreEmploiDto = (
       urlPostulation: 'url/postulation'
     },
     origineOffre: {
+      origine: '1',
       urlOrigine: 'url/offre',
       partenaires: []
     },

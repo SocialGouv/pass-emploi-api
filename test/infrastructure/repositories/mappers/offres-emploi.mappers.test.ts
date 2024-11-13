@@ -20,7 +20,7 @@ describe('OffresEmploiMappers', () => {
         // Given
         const offresEmploiDto = [offreEmploi]
         // When
-        const result = await toOffresEmploiQueryModel(
+        const result = toOffresEmploiQueryModel(
           page,
           limit,
           total,
@@ -35,7 +35,7 @@ describe('OffresEmploiMappers', () => {
         offreEmploi.lieuTravail = undefined
         const offresEmploiDto = [offreEmploi]
         // When
-        const result = await toOffresEmploiQueryModel(
+        const result = toOffresEmploiQueryModel(
           page,
           limit,
           total,
@@ -55,7 +55,10 @@ describe('OffresEmploiMappers', () => {
               alternance: false,
               duree: 'Temps plein',
               nomEntreprise: 'RH TT INTERIM',
-              localisation: undefined
+              localisation: undefined,
+              origine: {
+                nom: 'France Travail'
+              }
             }
           ]
         }
@@ -69,7 +72,7 @@ describe('OffresEmploiMappers', () => {
         offreEmploi.lieuTravail = undefined
         const offresEmploiDto: OffreEmploiDto[] = []
         // When
-        const result = await toOffresEmploiQueryModel(
+        const result = toOffresEmploiQueryModel(
           page,
           limit,
           total,

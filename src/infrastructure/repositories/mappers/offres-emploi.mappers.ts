@@ -18,21 +18,35 @@ export function toOffresEmploiQueryModel(
       limit,
       total
     },
-    results: offresEmploiDto.map((result: OffreEmploiDto) => {
+    results: offresEmploiDto.map((offre: OffreEmploiDto) => {
+      let origine: { nom: string; logo?: string } | undefined
+      if (offre.origineOffre.origine === '1') {
+        origine = { nom: 'France Travail' }
+      } else if (
+        offre.origineOffre.partenaires?.length &&
+        offre.origineOffre.partenaires[0]?.logo &&
+        offre.origineOffre.partenaires[0]?.nom
+      ) {
+        origine = {
+          nom: capitalize(offre.origineOffre.partenaires[0].nom),
+          logo: offre.origineOffre.partenaires[0].logo
+        }
+      }
       return {
-        id: result.id,
-        titre: result.intitule,
-        typeContrat: result.typeContrat,
-        alternance: result.alternance,
-        duree: result.dureeTravailLibelleConverti,
-        nomEntreprise: result.entreprise?.nom,
-        localisation: result.lieuTravail
+        id: offre.id,
+        titre: offre.intitule,
+        typeContrat: offre.typeContrat,
+        alternance: offre.alternance,
+        duree: offre.dureeTravailLibelleConverti,
+        nomEntreprise: offre.entreprise?.nom,
+        localisation: offre.lieuTravail
           ? {
-              nom: result.lieuTravail.libelle,
-              codePostal: result.lieuTravail.codePostal,
-              commune: result.lieuTravail.commune
+              nom: offre.lieuTravail.libelle,
+              codePostal: offre.lieuTravail.codePostal,
+              commune: offre.lieuTravail.commune
             }
-          : undefined
+          : undefined,
+        origine
       }
     })
   }
@@ -105,4 +119,16 @@ export function toPoleEmploiContrat(
   return contratsList.map(
     (contrat: Offre.Emploi.Contrat) => contratPoleEmploi[contrat]
   )
+}
+
+export function capitalize(input: string): string {
+  return input
+    .trim()
+    .replace('_', ' ')
+    .split(' ')
+    .map(word => {
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    })
+    .join(' ')
+    .trim()
 }

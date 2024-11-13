@@ -18,6 +18,9 @@ export const desOffresEmploiQueryModel = (): OffresEmploiQueryModel => ({
         nom: 'libelle',
         codePostal: '57000',
         commune: '57463'
+      },
+      origine: {
+        nom: 'France Travail'
       }
     }
   ]
