@@ -24,6 +24,9 @@ import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez
 import { SuiviJobSqlModel } from '../../infrastructure/sequelize/models/suivi-job.sql-model'
 import { DateService } from '../../utils/date-service'
 import Source = RendezVous.Source
+import { FavoriOffreEmploiSqlModel } from '../../infrastructure/sequelize/models/favori-offre-emploi.sql-model'
+import { FavoriOffreEngagementSqlModel } from '../../infrastructure/sequelize/models/favori-offre-engagement.sql-model'
+import { FavoriOffreImmersionSqlModel } from '../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.NETTOYER_LES_DONNEES)
@@ -55,6 +58,9 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
     let nombreJeunesPasConnectesDepuis60Jours = -1
     let nombreActionsSupprimees = -1
     let nombreAnimationsCollectivesCloses = -1
+    let nombreFavrisEmploiSupprimes = -1
+    let nombreFavrisImmersionSupprimes = -1
+    let nombreFavrisEngagementSupprimes = -1
 
     try {
       const jeunes = await JeuneSqlModel.findAll({
@@ -179,6 +185,34 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
       nbErreurs++
     }
 
+    // Favoris
+    try {
+      nombreFavrisEmploiSupprimes = await FavoriOffreEmploiSqlModel.destroy({
+        where: dateCreationSuperieureASixMois(maintenant)
+      })
+    } catch (e) {
+      this.logger.warn(e)
+      nbErreurs++
+    }
+    try {
+      nombreFavrisEngagementSupprimes =
+        await FavoriOffreEngagementSqlModel.destroy({
+          where: dateCreationSuperieureASixMois(maintenant)
+        })
+    } catch (e) {
+      this.logger.warn(e)
+      nbErreurs++
+    }
+    try {
+      nombreFavrisImmersionSupprimes =
+        await FavoriOffreImmersionSqlModel.destroy({
+          where: dateCreationSuperieureASixMois(maintenant)
+        })
+    } catch (e) {
+      this.logger.warn(e)
+      nbErreurs++
+    }
+
     try {
       const animationsCollectivesPasseesSansInscrit: Array<{ id: string }> =
         await this.sequelize.query(
@@ -236,7 +270,10 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
         nombreRdvMiloSupprimes,
         nombreJeunesPasConnectesDepuis60Jours,
         nombreActionsSupprimees,
-        nombreAnimationsCollectivesCloses
+        nombreAnimationsCollectivesCloses,
+        nombreFavrisEmploiSupprimes,
+        nombreFavrisEngagementSupprimes,
+        nombreFavrisImmersionSupprimes
       }
     }
   }
@@ -285,6 +322,12 @@ function dateSuperieureATroisMoisEtVenantDeMilo(
   return {
     date: { [Op.lt]: maintenant.minus({ months: 3 }).toJSDate() },
     source: Source.MILO
+  }
+}
+
+function dateCreationSuperieureASixMois(maintenant: DateTime): WhereOptions {
+  return {
+    dateCreation: { [Op.lte]: maintenant.minus({ months: 6 }).toJSDate() }
   }
 }
 

@@ -32,6 +32,14 @@ import { Chat } from '../../../src/domain/chat'
 import { Authentification } from '../../../src/domain/authentification'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
+import { FavoriOffreEmploiSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-emploi.sql-model'
+import { FavoriOffreEngagementSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-engagement.sql-model'
+import { FavoriOffreImmersionSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
+import {
+  unFavoriOffreEmploi,
+  unFavoriOffreEngagement,
+  unFavoriOffreImmersion
+} from '../../fixtures/sql-models/favoris.sql-model'
 
 let stats: SuiviJob
 
@@ -239,6 +247,39 @@ describe('NettoyerLesDonneesJobHandler', () => {
       idJeune: idJeuneAUpdateSonConseillerInitial,
       idRendezVous: animationsCollectivesPasseesAvecInscrits.id
     })
+    await FavoriOffreEmploiSqlModel.bulkCreate([
+      unFavoriOffreEmploi({
+        idJeune: idJeune2,
+        dateCreation: maintenant.minus({ month: 3 }).toJSDate()
+      }),
+      unFavoriOffreEmploi({
+        id: 2,
+        idJeune: idJeune2,
+        dateCreation: maintenant.minus({ month: 6 }).toJSDate()
+      })
+    ])
+    await FavoriOffreEngagementSqlModel.bulkCreate([
+      unFavoriOffreEngagement({
+        idJeune: idJeune2,
+        id: 2,
+        dateCreation: maintenant.minus({ month: 3 }).toJSDate()
+      }),
+      unFavoriOffreEngagement({
+        idJeune: idJeune2,
+        dateCreation: maintenant.minus({ month: 6 }).toJSDate()
+      })
+    ])
+    await FavoriOffreImmersionSqlModel.bulkCreate([
+      unFavoriOffreImmersion({
+        idJeune: idJeune2,
+        id: 2,
+        dateCreation: maintenant.minus({ month: 3 }).toJSDate()
+      }),
+      unFavoriOffreImmersion({
+        idJeune: idJeune2,
+        dateCreation: maintenant.minus({ month: 6 }).toJSDate()
+      })
+    ])
 
     // When
     stats = await nettoyerLesDonneesJobHandler.handle()
@@ -358,6 +399,45 @@ describe('NettoyerLesDonneesJobHandler', () => {
       // Then
       const actionsApresNettoyage = await ActionSqlModel.findAll()
       expect(actionsApresNettoyage.length).to.equal(1)
+    })
+  })
+
+  describe('favoris emploi', () => {
+    it('supprime les favoris emploi de plus de 6 mois', async () => {
+      // Then
+      const favorisEmploiApresNettoyage =
+        await FavoriOffreEmploiSqlModel.findAll()
+      expect(favorisEmploiApresNettoyage.length).to.equal(1)
+      expect(
+        (stats.resultat as { nombreFavrisEmploiSupprimes: number })
+          .nombreFavrisEmploiSupprimes
+      ).to.equal(1)
+    })
+  })
+
+  describe('favoris Engagement', () => {
+    it('supprime les favoris Engagement de plus de 6 mois', async () => {
+      // Then
+      const favorisEngagementApresNettoyage =
+        await FavoriOffreEngagementSqlModel.findAll()
+      expect(favorisEngagementApresNettoyage.length).to.equal(1)
+      expect(
+        (stats.resultat as { nombreFavrisEngagementSupprimes: number })
+          .nombreFavrisEngagementSupprimes
+      ).to.equal(1)
+    })
+  })
+
+  describe('favoris Immersion', () => {
+    it('supprime les favoris Immersion de plus de 6 mois', async () => {
+      // Then
+      const favorisImmersionApresNettoyage =
+        await FavoriOffreImmersionSqlModel.findAll()
+      expect(favorisImmersionApresNettoyage.length).to.equal(1)
+      expect(
+        (stats.resultat as { nombreFavrisImmersionSupprimes: number })
+          .nombreFavrisImmersionSupprimes
+      ).to.equal(1)
     })
   })
 
