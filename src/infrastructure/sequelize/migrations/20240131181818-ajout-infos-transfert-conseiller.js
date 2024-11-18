@@ -15,7 +15,9 @@ module.exports = {
         references: {
           model: 'conseiller',
           key: 'id'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       }
     )
     await queryInterface.addColumn('transfert_conseiller', 'type_transfert', {
