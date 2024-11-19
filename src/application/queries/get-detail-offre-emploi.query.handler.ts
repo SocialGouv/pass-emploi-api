@@ -14,6 +14,7 @@ import { OffreEmploiQueryModel } from './query-models/offres-emploi.query-model'
 import { Authentification } from '../../domain/authentification'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import { mapOrigine } from '../../infrastructure/repositories/mappers/offres-emploi.mappers'
 
 export interface GetDetailOffreEmploiQuery extends Query {
   idOffreEmploi: string
@@ -80,6 +81,7 @@ function toOffreEmploiQueryModel(
       offreEmploiDto.contact?.urlPostulation ||
       offreEmploiDto.origineOffre?.partenaires?.at(0)?.url ||
       offreEmploiDto.origineOffre?.urlOrigine,
-    data: offreEmploiDto
+    data: offreEmploiDto,
+    origine: mapOrigine(offreEmploiDto)
   }
 }

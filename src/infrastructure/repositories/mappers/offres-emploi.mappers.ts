@@ -19,19 +19,6 @@ export function toOffresEmploiQueryModel(
       total
     },
     results: offresEmploiDto.map((offre: OffreEmploiDto) => {
-      let origine: { nom: string; logo?: string } | undefined
-      if (offre.origineOffre.origine === '1') {
-        origine = { nom: 'France Travail' }
-      } else if (
-        offre.origineOffre.partenaires?.length &&
-        offre.origineOffre.partenaires[0]?.logo &&
-        offre.origineOffre.partenaires[0]?.nom
-      ) {
-        origine = {
-          nom: capitalize(offre.origineOffre.partenaires[0].nom),
-          logo: offre.origineOffre.partenaires[0].logo
-        }
-      }
       return {
         id: offre.id,
         titre: offre.intitule,
@@ -46,7 +33,7 @@ export function toOffresEmploiQueryModel(
               commune: offre.lieuTravail.commune
             }
           : undefined,
-        origine
+        origine: mapOrigine(offre)
       }
     })
   }
@@ -121,7 +108,7 @@ export function toPoleEmploiContrat(
   )
 }
 
-export function capitalize(input: string): string {
+function capitalize(input: string): string {
   return input
     .trim()
     .replace('_', ' ')
@@ -131,4 +118,23 @@ export function capitalize(input: string): string {
     })
     .join(' ')
     .trim()
+}
+
+export function mapOrigine(
+  offreEmploiDto: OffreEmploiDto
+): { nom: string; logo?: string } | undefined {
+  let origine: { nom: string; logo?: string } | undefined
+  if (offreEmploiDto.origineOffre.origine === '1') {
+    origine = { nom: 'France Travail' }
+  } else if (
+    offreEmploiDto.origineOffre.partenaires?.length &&
+    offreEmploiDto.origineOffre.partenaires[0]?.logo &&
+    offreEmploiDto.origineOffre.partenaires[0]?.nom
+  ) {
+    origine = {
+      nom: capitalize(offreEmploiDto.origineOffre.partenaires[0].nom),
+      logo: offreEmploiDto.origineOffre.partenaires[0].logo
+    }
+  }
+  return origine
 }

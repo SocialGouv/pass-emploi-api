@@ -32,6 +32,9 @@ export class OffreEmploiQueryModel {
     nullable: true
   })
   urlRedirectPourPostulation: string | null
+
+  @ApiProperty({ required: false })
+  origine?: OrigineOffreEmploiQueryModel
 }
 
 export class OffreEmploiResumeQueryModel {

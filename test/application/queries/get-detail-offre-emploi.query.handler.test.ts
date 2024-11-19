@@ -49,7 +49,11 @@ describe('GetDetailOffreEmploiQueryHandler', () => {
         const expectedQueryModel: Result<OffreEmploiQueryModel> = success({
           id: uneOffreEmploiDto().id,
           data: uneOffreEmploiDto(),
-          urlRedirectPourPostulation: uneOffreEmploiDto().contact.urlPostulation
+          urlRedirectPourPostulation:
+            uneOffreEmploiDto().contact.urlPostulation,
+          origine: {
+            nom: 'France Travail'
+          }
         })
         expect(queryModel).to.deep.equal(expectedQueryModel)
       })
