@@ -76,6 +76,7 @@ export namespace Evenement {
     MESSAGE_MODIFIE = 'MESSAGE_MODIFIE',
     MESSAGE_SUPPRIME = 'MESSAGE_SUPPRIME',
     MESSAGE_OFFRE_PARTAGEE = 'MESSAGE_OFFRE_PARTAGEE',
+    MESSAGE_ACTION_COMMENTEE = 'MESSAGE_ACTION_COMMENTEE',
     MESSAGE_IMPORTANT_MODIFIE = 'MESSAGE_IMPORTANT_MODIFIE',
     OFFRE_ALTERNANCE_AFFICHEE = 'OFFRE_ALTERNANCE_AFFICHEE',
     OFFRE_ALTERNANCE_PARTAGEE = 'OFFRE_ALTERNANCE_PARTAGEE',
@@ -505,6 +506,10 @@ const evenements: {
     categorie: 'Message',
     action: 'Partage',
     nom: 'Offre'
+  },
+  [Evenement.Code.MESSAGE_ACTION_COMMENTEE]: {
+    categorie: 'Message',
+    action: 'Envoi commentaire'
   },
   [Evenement.Code.MESSAGE_MODIFIE]: {
     categorie: 'Message',
