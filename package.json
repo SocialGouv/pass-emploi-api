@@ -175,9 +175,10 @@
     "yargs": "^17.7.2"
   },
   "resolutions": {
-    "@nestjs/platform-express/express": "4.21.1",
     "download/got": "11.8.5",
-    "supertest/superagent": "10.1.1"
+    "elastic-apm-node/cookie": "0.7.0",
+    "cross-spawn": "7.0.5",
+    "@nestjs/cli/webpack": "5.94.0"
   },
   "mocha": {
     "require": [
