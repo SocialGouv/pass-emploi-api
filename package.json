@@ -135,7 +135,7 @@
     "@types/luxon": "^3.4.2",
     "@types/mocha": "^10.0.9",
     "@types/multer": "^1.4.12",
-    "@types/node": "^20.17.6",
+    "@types/node": "^22.0.0",
     "@types/pg-copy-streams": "^1.2.5",
     "@types/pino-multi-stream": "^5.1.6",
     "@types/sinon": "^17.0.3",

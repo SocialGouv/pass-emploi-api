@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@types/json2csv": "^5",
-    "@types/node": "^20.0.0",
+    "@types/node": "^22.0.0",
     "dotvault": "^0.0.9"
   }
 }
