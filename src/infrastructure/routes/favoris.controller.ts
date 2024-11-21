@@ -195,7 +195,13 @@ export class FavorisController {
         titre: addFavoriPayload.titre,
         alternance: addFavoriPayload.alternance,
         typeContrat: addFavoriPayload.typeContrat,
-        localisation: addFavoriPayload.localisation
+        localisation: addFavoriPayload.localisation,
+        origine: addFavoriPayload.origineNom
+          ? {
+              nom: addFavoriPayload.origineNom,
+              logo: addFavoriPayload.origineLogo
+            }
+          : undefined
       }
     }
     const result = await this.addFavoriOffreEmploiCommandHandler.execute(

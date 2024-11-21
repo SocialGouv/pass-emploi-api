@@ -23,7 +23,13 @@ export function fromOffreEmploiSqlToFavorisQueryModel(
     dateCreation: offre.dateCreation
       ? DateService.fromJSDateToISOString(offre.dateCreation)
       : undefined,
-    tags
+    tags,
+    origine: offre.origineNom
+      ? {
+          nom: offre.origineNom,
+          logo: offre.origineLogoUrl ?? undefined
+        }
+      : undefined
   }
 }
 

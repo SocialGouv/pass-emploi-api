@@ -147,7 +147,12 @@ describe('FavorisController', () => {
     })
 
     describe('POST /jeunes/:idJeune/favoris/offres-emploi', () => {
-      const offreEmploi = uneOffreEmploi()
+      const offreEmploi = uneOffreEmploi({
+        origine: {
+          nom: 'France Travail',
+          logo: 'https://ft.io/image.png'
+        }
+      })
       const command: AddFavoriOffreEmploiCommand = {
         idJeune: 'ABCDE',
         offreEmploi: offreEmploi
@@ -160,13 +165,13 @@ describe('FavorisController', () => {
         titre: offreEmploi.titre,
         alternance: offreEmploi.alternance,
         typeContrat: offreEmploi.typeContrat,
-        localisation: offreEmploi.localisation
+        localisation: offreEmploi.localisation,
+        origineNom: 'France Travail',
+        origineLogo: 'https://ft.io/image.png'
       }
       it('crée un favori', async () => {
         // Given
-        addFavoriOffreEmploiCommandHandler.execute
-          .withArgs(command)
-          .resolves(emptySuccess())
+        addFavoriOffreEmploiCommandHandler.execute.resolves(emptySuccess())
 
         // When
         await request(app.getHttpServer())

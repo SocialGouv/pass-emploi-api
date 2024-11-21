@@ -18,7 +18,9 @@ export function unFavoriOffreEmploi(
     nomLocalisation: null,
     codePostalLocalisation: null,
     communeLocalisation: null,
-    dateCreation: null
+    dateCreation: null,
+    origineNom: null,
+    origineLogoUrl: null
   }
 
   return { ...defaults, ...args }

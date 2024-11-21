@@ -55,7 +55,9 @@ export function toFavoriOffreEmploiSqlModel(
     codePostalLocalisation: offreEmploi.localisation?.codePostal || null,
     communeLocalisation: offreEmploi.localisation?.commune || null,
     isAlternance: offreEmploi.alternance,
-    dateCreation
+    dateCreation,
+    origineNom: offreEmploi.origine?.nom || null,
+    origineLogoUrl: offreEmploi.origine?.logo || null
   }
 }
 
@@ -72,7 +74,13 @@ export function toOffreEmploi(
     localisation: buildLocalisation(favoriOffreEmploiSqlModel),
     typeContrat: favoriOffreEmploiSqlModel.typeContrat,
     nomEntreprise: favoriOffreEmploiSqlModel.nomEntreprise ?? undefined,
-    titre: favoriOffreEmploiSqlModel.titre
+    titre: favoriOffreEmploiSqlModel.titre,
+    origine: favoriOffreEmploiSqlModel.origineNom
+      ? {
+          nom: favoriOffreEmploiSqlModel.origineNom,
+          logo: favoriOffreEmploiSqlModel.origineLogoUrl ?? undefined
+        }
+      : undefined
   }
 }
 
