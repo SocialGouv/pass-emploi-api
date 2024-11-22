@@ -176,7 +176,7 @@
   },
   "resolutions": {
     "download/got": "11.8.5",
-    "elastic-apm-node/cookie": "0.7.0",
+    "elastic-apm-node/cookie": "1.0.2",
     "cross-spawn": "7.0.5",
     "@nestjs/cli/webpack": "5.94.0"
   },
