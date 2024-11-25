@@ -6,6 +6,10 @@ export interface Emploi {
   localisation?: Emploi.Localisation
   alternance?: boolean
   duree?: string
+  origine?: {
+    nom: string
+    logo?: string
+  }
 }
 
 export const OffresEmploiRepositoryToken = 'OffresEmploi.Repository'

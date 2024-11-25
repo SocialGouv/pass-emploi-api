@@ -18,7 +18,8 @@ export const uneOffreEmploi = (args: Partial<Emploi> = {}): Emploi => {
       codePostal: '77185',
       commune: '77258'
     },
-    alternance: false
+    alternance: false,
+    origine: undefined
   }
 
   return { ...defaults, ...args }
@@ -65,7 +66,8 @@ export const uneOffreEmploiResumeQueryModel =
       codePostal: '77185',
       commune: '77258'
     },
-    alternance: false
+    alternance: false,
+    origine: undefined
   })
 
 export const notificationsRDVPEDto = (): NotificationsPartenairesDto => ({

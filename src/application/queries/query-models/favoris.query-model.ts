@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { Offre } from '../../../domain/offre/offre'
+import { OrigineOffreEmploiQueryModel } from './offres-emploi.query-model'
 
 export class FavorisQueryModel {
   @ApiProperty()
@@ -28,6 +29,9 @@ export class FavorisQueryModel {
     isArray: true
   })
   tags: string[]
+
+  @ApiProperty({ required: false })
+  origine?: OrigineOffreEmploiQueryModel
 }
 
 class MetadonneesFavorisOffresJeuneQueryModel {

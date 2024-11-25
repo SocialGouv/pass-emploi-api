@@ -97,7 +97,8 @@ describe('GetFavorisAccueilQueryGetter', () => {
         organisation: 'entreprise',
         localisation: undefined,
         dateCreation: dateInitiale.minus({ days: 1 }).toISO(),
-        tags: ['aa', '2 ans']
+        tags: ['aa', '2 ans'],
+        origine: undefined
       }
       const favoriAncienDe4jours: FavorisQueryModel = {
         idOffre: 'poi-id-offre',
@@ -115,7 +116,8 @@ describe('GetFavorisAccueilQueryGetter', () => {
         organisation: 'entreprise',
         localisation: undefined,
         dateCreation: undefined,
-        tags: ['aa', '2 ans']
+        tags: ['aa', '2 ans'],
+        origine: undefined
       }
       const listeAttendue = [
         favoriAncienDe1jour,

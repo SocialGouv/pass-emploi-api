@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { PaginationQueryModel } from './common/pagination.query-model'
 
-class OrigineOffreEmploiQueryModel {
+export class OrigineOffreEmploiQueryModel {
   @ApiProperty()
   nom: string
 

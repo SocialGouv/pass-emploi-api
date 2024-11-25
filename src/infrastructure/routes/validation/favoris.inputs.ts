@@ -69,6 +69,18 @@ export class AddFavoriOffresEmploiPayload {
   @IsOptional()
   @IsNotEmpty()
   duree?: string
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  @IsNotEmpty()
+  origineNom?: string
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  @IsNotEmpty()
+  origineLogo?: string
 }
 
 export class AddFavoriImmersionPayload {

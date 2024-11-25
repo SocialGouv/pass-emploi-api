@@ -97,7 +97,8 @@ describe('GetFavorisJeuneQueryHandler', () => {
         organisation: 'poi-entreprise',
         localisation: undefined,
         tags: ['aa', '2 ans'],
-        dateCreation: undefined
+        dateCreation: undefined,
+        origine: undefined
       }
       const favoriOffreAlternance: FavorisQueryModel = {
         idOffre: 'poi-id-offre-2',
@@ -106,7 +107,8 @@ describe('GetFavorisJeuneQueryHandler', () => {
         organisation: 'poi-entreprise',
         localisation: undefined,
         tags: ['aa', '2 ans'],
-        dateCreation: undefined
+        dateCreation: undefined,
+        origine: undefined
       }
       const listeAttendue = [favoriOffreEmploi, favoriOffreAlternance]
 

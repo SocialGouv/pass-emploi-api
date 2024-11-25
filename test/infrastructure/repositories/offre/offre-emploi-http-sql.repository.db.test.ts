@@ -70,7 +70,9 @@ describe('OffresEmploiHttpSqlRepository', () => {
           idConseiller: 'ZIDANE'
         })
       )
-      offreEmploi = uneOffreEmploi()
+      offreEmploi = uneOffreEmploi({
+        origine: undefined
+      })
       await offresEmploiHttpSqlRepository.save('ABCDE', offreEmploi)
     })
 
