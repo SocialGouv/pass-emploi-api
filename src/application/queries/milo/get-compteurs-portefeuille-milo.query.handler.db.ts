@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { QueryTypes, Sequelize } from 'sequelize'
 import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
+import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
 import { CompteursBeneficiaireQueryModel } from 'src/application/queries/query-models/conseillers.query-model'
 import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
@@ -9,9 +10,6 @@ import { isFailure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { estMilo } from 'src/domain/core'
 import { SequelizeInjectionToken } from 'src/infrastructure/sequelize/providers'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
-import { MiloClient } from 'src/infrastructure/clients/milo-client'
-import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
 
 export interface GetCompteursBeneficiaireMiloQuery extends Query {
   accessToken: string
@@ -28,8 +26,6 @@ export class GetCompteursBeneficiaireMiloQueryHandler extends QueryHandler<
   constructor(
     private getAgendaSessionsConseillerMiloQueryHandler: GetAgendaSessionsConseillerMiloQueryHandler,
     private conseillerAuthorizer: ConseillerAuthorizer,
-    private readonly keycloakClient: KeycloakClient,
-    private readonly miloClient: MiloClient,
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
   ) {
     super('GetCompteursBeneficiaireMiloQueryHandler')

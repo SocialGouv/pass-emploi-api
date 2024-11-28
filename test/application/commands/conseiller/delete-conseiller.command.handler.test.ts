@@ -8,10 +8,10 @@ import {
 import { MauvaiseCommandeError } from '../../../../src/building-blocks/types/domain-error'
 import { failure } from '../../../../src/building-blocks/types/result'
 import { Authentification } from '../../../../src/domain/authentification'
-import { Conseiller } from '../../../../src/domain/milo/conseiller'
-import { Core, estPoleEmploi } from '../../../../src/domain/core'
+import { Core } from '../../../../src/domain/core'
 import { Evenement, EvenementService } from '../../../../src/domain/evenement'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
+import { Conseiller } from '../../../../src/domain/milo/conseiller'
 import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
 import { unConseiller } from '../../../fixtures/conseiller.fixture'
 import { unJeune } from '../../../fixtures/jeune.fixture'
@@ -56,11 +56,7 @@ describe('DeleteConseillerCommandHandler', () => {
       // Then
       expect(
         conseillerAuthorizer.autoriserLeConseiller
-      ).to.have.been.calledWithExactly(
-        'idConseiller',
-        utilisateur,
-        estPoleEmploi(utilisateur.structure)
-      )
+      ).to.have.been.calledWithExactly('idConseiller', utilisateur)
     })
   })
 

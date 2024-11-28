@@ -29,7 +29,7 @@ export class GetDetailSessionConseillerMiloQueryHandler extends QueryHandler<
 > {
   constructor(
     @Inject(ConseillerMiloRepositoryToken)
-    private conseillerRepository: Conseiller.Milo.Repository,
+    private conseillerMiloRepository: Conseiller.Milo.Repository,
     @Inject(SessionMiloRepositoryToken)
     private sessionRepository: SessionMilo.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer,
@@ -42,7 +42,7 @@ export class GetDetailSessionConseillerMiloQueryHandler extends QueryHandler<
   async handle(
     query: GetDetailSessionConseillerMiloQuery
   ): Promise<Result<DetailSessionConseillerMiloQueryModel>> {
-    const resultConseiller = await this.conseillerRepository.get(
+    const resultConseiller = await this.conseillerMiloRepository.get(
       query.idConseiller
     )
     if (isFailure(resultConseiller)) {

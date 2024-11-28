@@ -8,8 +8,6 @@ import { success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Core } from 'src/domain/core'
 import { SessionMilo } from 'src/domain/milo/session.milo'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
-import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
@@ -33,8 +31,6 @@ describe('GetCompteursPortefeuilleMiloQueryHandler', () => {
   let getCompteursPortefeuilleMiloQueryHandler: GetCompteursBeneficiaireMiloQueryHandler
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let getAgendaSessionsConseillerMiloQueryHandler: StubbedClass<GetAgendaSessionsConseillerMiloQueryHandler>
-  let keycloakClient: StubbedClass<KeycloakClient>
-  let miloClient: StubbedClass<MiloClient>
   let databaseForTesting: DatabaseForTesting
   let sandbox: SinonSandbox
 
@@ -46,8 +42,6 @@ describe('GetCompteursPortefeuilleMiloQueryHandler', () => {
   beforeEach(async () => {
     await databaseForTesting.cleanPG()
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
-    keycloakClient = stubClass(KeycloakClient)
-    miloClient = stubClass(MiloClient)
     getAgendaSessionsConseillerMiloQueryHandler = stubClass(
       GetAgendaSessionsConseillerMiloQueryHandler
     )
@@ -55,8 +49,6 @@ describe('GetCompteursPortefeuilleMiloQueryHandler', () => {
       new GetCompteursBeneficiaireMiloQueryHandler(
         getAgendaSessionsConseillerMiloQueryHandler,
         conseillerAuthorizer,
-        keycloakClient,
-        miloClient,
         databaseForTesting.sequelize
       )
   })
@@ -125,10 +117,6 @@ describe('GetCompteursPortefeuilleMiloQueryHandler', () => {
         dateDebut: DateTime.fromISO('2024-07-01'),
         dateFin: DateTime.fromISO('2024-07-26')
       }
-
-      keycloakClient.exchangeTokenConseillerMilo
-        .withArgs(query.accessToken)
-        .resolves('idpToken')
 
       user = unUtilisateurConseiller({ structure: Structure.MILO })
     })

@@ -15,12 +15,11 @@ import {
 } from '../../../domain/authentification'
 import { Evenement, EvenementService } from '../../../domain/evenement'
 
+import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import {
   Conseiller,
   ConseillerRepositoryToken
 } from '../../../domain/milo/conseiller'
-import { estPoleEmploi } from '../../../domain/core'
-import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 
 export interface DeleteConseillerCommand {
@@ -51,8 +50,7 @@ export class DeleteConseillerCommandHandler extends CommandHandler<
   ): Promise<Result> {
     return this.conseillerAuthorizer.autoriserLeConseiller(
       command.idConseiller,
-      utilisateur,
-      estPoleEmploi(utilisateur.structure)
+      utilisateur
     )
   }
 
