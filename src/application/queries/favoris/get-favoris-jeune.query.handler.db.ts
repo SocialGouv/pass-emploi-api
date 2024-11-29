@@ -77,7 +77,7 @@ export class GetFavorisJeuneQueryHandler extends QueryHandler<
           fromOffreServiceCiviqueSqlToFavorisQueryModel
         )
       )
-      .sort(comparerTitreDeFavoris)
+      .sort(comparerDateDeFavoris)
   }
 
   async monitor(): Promise<void> {
@@ -85,13 +85,26 @@ export class GetFavorisJeuneQueryHandler extends QueryHandler<
   }
 }
 
-function comparerTitreDeFavoris(
+function _comparerTitreDeFavoris(
   favori1: FavorisQueryModel,
   favori2: FavorisQueryModel
 ): number {
-  if (favori1.titre >= favori2.titre) {
-    return 1
-  } else {
+  if (favori1.titre < favori2.titre) {
     return 0
+  } else {
+    return 1
+  }
+}
+
+function comparerDateDeFavoris(
+  favori1: FavorisQueryModel,
+  favori2: FavorisQueryModel
+): number {
+  if (!favori1.dateCreation) return 1
+  if (!favori2.dateCreation) return 0
+  if (favori1.dateCreation > favori2.dateCreation) {
+    return 0
+  } else {
+    return 1
   }
 }
