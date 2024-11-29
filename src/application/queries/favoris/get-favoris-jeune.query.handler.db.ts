@@ -13,6 +13,7 @@ import {
   fromOffreServiceCiviqueSqlToFavorisQueryModel
 } from '../query-mappers/favoris.mappers'
 import { FavorisQueryModel } from '../query-models/favoris.query-model'
+import { comparerFavorisParDateCreationOuTitre } from '../query-getters/accueil/get-favoris.query.getter.db'
 
 interface GetFavorisJeuneQuery {
   idJeune: string
@@ -65,6 +66,7 @@ export class GetFavorisJeuneQueryHandler extends QueryHandler<
         }
       })
     ])
+
     return listeFavorisOffresEmploi
       .map(fromOffreEmploiSqlToFavorisQueryModel)
       .concat(
@@ -77,21 +79,10 @@ export class GetFavorisJeuneQueryHandler extends QueryHandler<
           fromOffreServiceCiviqueSqlToFavorisQueryModel
         )
       )
-      .sort(comparerTitreDeFavoris)
+      .sort(comparerFavorisParDateCreationOuTitre)
   }
 
   async monitor(): Promise<void> {
     return
-  }
-}
-
-function comparerTitreDeFavoris(
-  favori1: FavorisQueryModel,
-  favori2: FavorisQueryModel
-): number {
-  if (favori1.titre >= favori2.titre) {
-    return 1
-  } else {
-    return 0
   }
 }

@@ -83,8 +83,8 @@ function comparerDateCreationDeFavoris(
   favori2: FavorisQueryModel
 ): number {
   if (
-    DateTime.fromISO(favori1.dateCreation!) >=
-    DateTime.fromISO(favori2.dateCreation!)
+    (favori1.dateCreation ? DateTime.fromISO(favori1.dateCreation!) : 0) >=
+    (favori2.dateCreation ? DateTime.fromISO(favori2.dateCreation!) : 0)
   ) {
     return -1
   } else {
@@ -92,7 +92,7 @@ function comparerDateCreationDeFavoris(
   }
 }
 
-function comparerFavorisParDateCreationOuTitre(
+export function comparerFavorisParDateCreationOuTitre(
   favori1: FavorisQueryModel,
   favori2: FavorisQueryModel
 ): number {
