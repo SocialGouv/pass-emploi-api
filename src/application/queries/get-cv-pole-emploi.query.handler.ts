@@ -9,7 +9,7 @@ import {
   success
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { estPoleEmploiOuCD } from '../../domain/core'
+import { estPoleEmploiOuCDOuAvenirPro } from '../../domain/core'
 import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { DocumentPoleEmploiDto } from '../../infrastructure/clients/dto/pole-emploi.dto'
 import { KeycloakClient } from '../../infrastructure/clients/keycloak-client.db'
@@ -47,7 +47,7 @@ export class GetCVPoleEmploiQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
-      estPoleEmploiOuCD(utilisateur.structure)
+      estPoleEmploiOuCDOuAvenirPro(utilisateur.structure)
     )
   }
 
