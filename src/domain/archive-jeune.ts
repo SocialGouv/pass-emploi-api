@@ -78,23 +78,24 @@ export namespace ArchiveJeune {
         'CDI, CDD de plus de 6 mois dont alternance, titularisation dans la fonction publique'
     },
     [MotifSuppression.CDI]: {
-      structures: [Core.Structure.POLE_EMPLOI_AIJ]
+      structures: [Core.Structure.POLE_EMPLOI_AIJ, Core.Structure.AVENIR_PRO]
     },
     [MotifSuppression.CDD_CTT]: {
-      structures: [Core.Structure.POLE_EMPLOI_AIJ]
+      structures: [Core.Structure.POLE_EMPLOI_AIJ, Core.Structure.AVENIR_PRO]
     },
     [MotifSuppression.EMPLOI_COURT]: {
       structures: [
         Core.Structure.POLE_EMPLOI,
         Core.Structure.MILO,
-        Core.Structure.POLE_EMPLOI_AIJ
+        Core.Structure.POLE_EMPLOI_AIJ,
+        Core.Structure.AVENIR_PRO
       ]
     },
     [MotifSuppression.FORMATION]: {
-      structures: [Core.Structure.POLE_EMPLOI_AIJ]
+      structures: [Core.Structure.POLE_EMPLOI_AIJ, Core.Structure.AVENIR_PRO]
     },
     [MotifSuppression.SERVICE_CIVIQUE]: {
-      structures: [Core.Structure.POLE_EMPLOI_AIJ]
+      structures: [Core.Structure.POLE_EMPLOI_AIJ, Core.Structure.AVENIR_PRO]
     },
     [MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE]: {
       structures: [Core.Structure.POLE_EMPLOI, Core.Structure.MILO]
@@ -115,7 +116,8 @@ export namespace ArchiveJeune {
       structures: [
         Core.Structure.POLE_EMPLOI_BRSA,
         Core.Structure.POLE_EMPLOI_AIJ,
-        Core.Structure.CONSEIL_DEPT
+        Core.Structure.CONSEIL_DEPT,
+        Core.Structure.AVENIR_PRO
       ]
     },
     [MotifSuppression.DEMANDE_DU_JEUNE]: {
@@ -139,7 +141,8 @@ export namespace ArchiveJeune {
         Core.Structure.MILO,
         Core.Structure.POLE_EMPLOI_BRSA,
         Core.Structure.POLE_EMPLOI_AIJ,
-        Core.Structure.CONSEIL_DEPT
+        Core.Structure.CONSEIL_DEPT,
+        Core.Structure.AVENIR_PRO
       ]
     },
     [MotifSuppression.DEMENAGEMENT_TERRITOIRE_HORS_EXPERIMENTATION]: {
@@ -149,7 +152,7 @@ export namespace ArchiveJeune {
       structures: [Core.Structure.POLE_EMPLOI, Core.Structure.MILO]
     },
     [MotifSuppression.CREATION_ENTREPRISE]: {
-      structures: [Core.Structure.POLE_EMPLOI_AIJ]
+      structures: [Core.Structure.POLE_EMPLOI_AIJ, Core.Structure.AVENIR_PRO]
     },
     [MotifSuppression.ESAT]: {
       structures: [Core.Structure.POLE_EMPLOI_AIJ]
@@ -160,7 +163,8 @@ export namespace ArchiveJeune {
         Core.Structure.MILO,
         Core.Structure.POLE_EMPLOI_BRSA,
         Core.Structure.POLE_EMPLOI_AIJ,
-        Core.Structure.CONSEIL_DEPT
+        Core.Structure.CONSEIL_DEPT,
+        Core.Structure.AVENIR_PRO
       ],
       description: 'Champ libre'
     }

@@ -69,6 +69,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
           case Core.Structure.POLE_EMPLOI_BRSA:
           case Core.Structure.POLE_EMPLOI_AIJ:
           case Core.Structure.CONSEIL_DEPT:
+          case Core.Structure.AVENIR_PRO:
             return this.authentificationConseillerSSO(commandSanitized)
         }
         break
@@ -347,6 +348,7 @@ function verifierStructureBeneficiaire(
       case Core.Structure.POLE_EMPLOI_AIJ:
       case Core.Structure.POLE_EMPLOI_BRSA:
       case Core.Structure.CONSEIL_DEPT:
+      case Core.Structure.AVENIR_PRO:
         return emptySuccess()
     }
   }
@@ -368,6 +370,9 @@ function verifierStructureBeneficiaire(
         break
       case Core.Structure.CONSEIL_DEPT:
         reason = NonTraitableReason.UTILISATEUR_DEJA_CONSEIL_DEPT
+        break
+      case Core.Structure.AVENIR_PRO:
+        reason = NonTraitableReason.UTILISATEUR_DEJA_AVENIR_PRO
     }
 
     return failure(new NonTraitableError('Utilisateur', idUtilisateur, reason))

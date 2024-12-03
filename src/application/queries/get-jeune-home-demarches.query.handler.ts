@@ -3,7 +3,10 @@ import { Cached, Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { isFailure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { estPoleEmploiOuCD, peutVoirLesCampagnes } from '../../domain/core'
+import {
+  estPoleEmploiOuCDOuAvenirPro,
+  peutVoirLesCampagnes
+} from '../../domain/core'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { GetCampagneQueryGetter } from './query-getters/get-campagne.query.getter'
 import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
@@ -66,7 +69,7 @@ export class GetJeuneHomeDemarchesQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
-      estPoleEmploiOuCD(utilisateur.structure)
+      estPoleEmploiOuCDOuAvenirPro(utilisateur.structure)
     )
   }
 
