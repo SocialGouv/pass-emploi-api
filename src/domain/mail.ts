@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { ArchiveJeune } from './archive-jeune'
-import { Core, estPoleEmploiOuCD } from './core'
+import { Core, estPoleEmploiOuCDOuAvenirPro } from './core'
 import { Jeune } from './jeune/jeune'
 import { Conseiller } from './milo/conseiller'
 import { RendezVous } from './rendez-vous/rendez-vous'
@@ -92,7 +92,7 @@ export namespace Mail {
         throw new Error(`Le jeune ${jeune.id} n'a pas de conseiller`)
       }
 
-      if (estPoleEmploiOuCD(jeune.structure)) {
+      if (estPoleEmploiOuCDOuAvenirPro(jeune.structure)) {
         templateId = parseInt(this.templates.suppressionJeunePE)
       } else {
         templateId = parseInt(this.templates.suppressionJeuneMilo)

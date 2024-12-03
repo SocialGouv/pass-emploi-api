@@ -147,6 +147,9 @@ export class MailBrevoService implements Mail.Service {
     let templateId
     switch (jeune.structure) {
       case Core.Structure.MILO:
+      case Core.Structure.POLE_EMPLOI_AIJ:
+      case Core.Structure.AVENIR_PRO:
+      case Core.Structure.SUPPORT:
         templateId = parseInt(this.templates.compteJeuneArchiveMILO)
         break
       case Core.Structure.POLE_EMPLOI:
@@ -156,8 +159,6 @@ export class MailBrevoService implements Mail.Service {
       case Core.Structure.CONSEIL_DEPT:
         templateId = parseInt(this.templates.compteJeuneArchivePEBRSA)
         break
-      default:
-        templateId = parseInt(this.templates.compteJeuneArchiveMILO)
     }
     const mailDataDto: MailDataDto = {
       to: [

@@ -11,7 +11,10 @@ import {
   success
 } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
-import { estPoleEmploiOuCD, peutVoirLesCampagnes } from '../../../domain/core'
+import {
+  estPoleEmploiOuCDOuAvenirPro,
+  peutVoirLesCampagnes
+} from '../../../domain/core'
 import { Demarche } from '../../../domain/demarche'
 import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client.db'
@@ -169,7 +172,7 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
-      estPoleEmploiOuCD(utilisateur.structure)
+      estPoleEmploiOuCDOuAvenirPro(utilisateur.structure)
     )
   }
 

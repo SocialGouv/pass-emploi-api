@@ -4,7 +4,7 @@ import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import { Result, isFailure } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
-import { estPoleEmploiOuCD } from '../../../domain/core'
+import { estPoleEmploiOuCDOuAvenirPro } from '../../../domain/core'
 import { Demarche, DemarcheRepositoryToken } from '../../../domain/demarche'
 import { Evenement, EvenementService } from '../../../domain/evenement'
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
@@ -42,7 +42,7 @@ export class CreateDemarcheCommandHandler extends CommandHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       command.idJeune,
       utilisateur,
-      estPoleEmploiOuCD(utilisateur.structure)
+      estPoleEmploiOuCDOuAvenirPro(utilisateur.structure)
     )
   }
 

@@ -933,6 +933,38 @@ describe('UpdateUtilisateurCommandHandler', () => {
             })
           )
         })
+        it('retourne une ok pour un benef de AVENIR PRO', async () => {
+          // Given
+          const command: UpdateUtilisateurCommand = {
+            idUtilisateurAuth: 'nilstavernier',
+            type: 'BENEFICIAIRE',
+            structure: 'FRANCE_TRAVAIL'
+          }
+
+          const utilisateur = unUtilisateurJeune({
+            structure: Core.Structure.AVENIR_PRO
+          })
+          authentificationRepository.getJeuneByIdAuthentification
+            .withArgs(command.idUtilisateurAuth)
+            .resolves(utilisateur)
+
+          // When
+          const result = await updateUtilisateurCommandHandler.execute(command)
+
+          // Then
+          expect(result).to.deep.equal(
+            success({
+              email: 'john.doe@plop.io',
+              id: 'ABCDE',
+              nom: 'Doe',
+              prenom: 'John',
+              roles: [],
+              structure: 'AVENIR_PRO',
+              type: 'JEUNE',
+              username: undefined
+            })
+          )
+        })
       })
     })
   })
