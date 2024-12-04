@@ -8,7 +8,8 @@ export function detailConseillerQueryModel(
     firstName: 'Nils',
     lastName: 'Tavernier',
     notificationsSonores: false,
-    aDesBeneficiairesARecuperer: false
+    aDesBeneficiairesARecuperer: false,
+    beneficiairesAArchiver: 2
   }
 
   return { ...defaults, ...args }

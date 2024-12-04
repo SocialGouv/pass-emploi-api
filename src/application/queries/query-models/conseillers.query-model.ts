@@ -57,6 +57,9 @@ export class DetailConseillerQueryModel {
   @ApiProperty()
   aDesBeneficiairesARecuperer: boolean
 
+  @ApiProperty()
+  beneficiairesAArchiver: number
+
   @ApiProperty({ required: false })
   dateSignatureCGU?: string
 

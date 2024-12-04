@@ -1,4 +1,5 @@
 import { SinonSandbox } from 'sinon'
+import { GetBeneficiairesAArchiverQueryGetter } from '../../../src/application/queries/query-getters/get-beneficiaires-a-archiver.query.getter.db'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import {
   GetDetailConseillerQuery,
@@ -28,17 +29,23 @@ describe('GetDetailConseillerQueryHandler', () => {
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let conseillerMiloService: StubbedClass<Conseiller.Milo.Service>
   let getDetailConseillerQueryHandler: GetDetailConseillerQueryHandler
+  let getBeneficiairesAArchiverQueryGetter: StubbedClass<GetBeneficiairesAArchiverQueryGetter>
   let sandbox: SinonSandbox
 
   before(() => {
     sandbox = createSandbox()
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     conseillerMiloService = stubClass(Conseiller.Milo.Service)
+    getBeneficiairesAArchiverQueryGetter = stubClass(
+      GetBeneficiairesAArchiverQueryGetter
+    )
+    getBeneficiairesAArchiverQueryGetter.count.resolves(2)
 
     getDetailConseillerQueryHandler = new GetDetailConseillerQueryHandler(
       conseillerAuthorizer,
       conseillerMiloService,
-      testConfig()
+      testConfig(),
+      getBeneficiairesAArchiverQueryGetter
     )
   })
 

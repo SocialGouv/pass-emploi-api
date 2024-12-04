@@ -22,6 +22,7 @@ import { GetMonSuiviPoleEmploiQueryHandler } from 'src/application/queries/milo/
 import { GetSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-sessions-conseiller.milo.query.handler.db'
 import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
 import { EvenementEmploiCodePostalQueryGetter } from 'src/application/queries/query-getters/evenement-emploi-code-postal.query.getter'
+import { GetBeneficiairesAArchiverQueryGetter } from 'src/application/queries/query-getters/get-beneficiaires-a-archiver.query.getter.db'
 import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { RechercherMessageQueryHandler } from 'src/application/queries/rechercher-message.query.handler'
 import { AntivirusClient } from 'src/infrastructure/clients/antivirus-client'
@@ -791,7 +792,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetMonSuiviPoleEmploiQueryHandler,
     GetCompteursBeneficiaireMiloQueryHandler,
     GetDemarchesConseillerQueryHandler,
-    GetBeneficiairesAArchiverQueryHandler
+    GetBeneficiairesAArchiverQueryHandler,
+    GetBeneficiairesAArchiverQueryGetter
   ]
 }
 

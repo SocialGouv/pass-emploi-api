@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { GetBeneficiairesAArchiverQueryGetter } from 'src/application/queries/query-getters/get-beneficiaires-a-archiver.query.getter.db'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
@@ -30,7 +31,8 @@ export class GetDetailConseillerQueryHandler extends QueryHandler<
   constructor(
     private conseillerAuthorizer: ConseillerAuthorizer,
     private conseillerMiloService: Conseiller.Milo.Service,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private readonly getBeneficiairesAArchiverQueryGetter: GetBeneficiairesAArchiverQueryGetter
   ) {
     super('GetDetailConseillerQueryHandler')
   }
@@ -70,10 +72,16 @@ export class GetDetailConseillerQueryHandler extends QueryHandler<
       attributes: ['id']
     })
 
+    const nombreBeneficiairesAArchiver =
+      await this.getBeneficiairesAArchiverQueryGetter.count(
+        conseillerSqlModel.id
+      )
+
     return success(
       fromSqlToDetailConseillerQueryModel(
         conseillerSqlModel,
-        Boolean(jeuneARecuperer)
+        Boolean(jeuneARecuperer),
+        nombreBeneficiairesAArchiver
       )
     )
   }

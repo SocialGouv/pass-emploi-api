@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
 import { GetBeneficiairesAArchiverQueryHandler } from 'src/application/queries/get-beneficiaires-a-archiver.query.handler.db'
+import { GetBeneficiairesAArchiverQueryGetter } from 'src/application/queries/query-getters/get-beneficiaires-a-archiver.query.getter.db'
 import { success } from 'src/building-blocks/types/result'
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneMiloAArchiverSqlModel } from 'src/infrastructure/sequelize/models/jeune-milo-a-archiver.sql-model'
@@ -26,8 +27,7 @@ describe('GetBeneficiaireAArchiverQueryHandler', () => {
     dateService = stubClass(DateService)
     queryHandler = new GetBeneficiairesAArchiverQueryHandler(
       conseillerAuthorizer,
-      dateService,
-      database.sequelize
+      new GetBeneficiairesAArchiverQueryGetter(dateService, database.sequelize)
     )
   })
 
