@@ -74,7 +74,9 @@ export namespace Planificateur {
     CREER_TABLES_AE_ANNUELLES_ANALYTICS = 'CREER_TABLES_AE_ANNUELLES_ANALYTICS',
     QUALIFIER_ACTIONS = 'QUALIFIER_ACTIONS',
     RECUPERER_ANALYSE_ANTIVIRUS = 'RECUPERER_ANALYSE_ANTIVIRUS',
-    NOTIFIER_RAPPEL_CREATION_ACTIONS_DEMARCHES = 'NOTIFIER_RAPPEL_CREATION_ACTIONS_DEMARCHES'
+    NOTIFIER_RAPPEL_CREATION_ACTIONS_DEMARCHES = 'NOTIFIER_RAPPEL_CREATION_ACTIONS_DEMARCHES',
+    NOTIFIER_BONNE_ALTERNANCE = 'NOTIFIER_BONNE_ALTERNANCE',
+    NOTIFIER_CJE = 'NOTIFIER_CJE'
   }
 
   export interface JobRendezVous {
@@ -90,6 +92,11 @@ export namespace Planificateur {
   export interface JobRappelCreationActionsDemarches {
     offset?: number
     nbJeunesNotifies?: number
+  }
+
+  export interface JobNotifierParGroupe {
+    offset: number
+    nbPersonnesNotifies: number
   }
 
   export interface JobRappelAction {

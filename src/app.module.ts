@@ -366,6 +366,8 @@ import { configureLoggerModule } from './utils/logger.module'
 import { RateLimiterService } from './utils/rate-limiter.service'
 import { CJEController } from './infrastructure/routes/cje.controller'
 import { GetCJETokenQueryHandler } from './application/queries/get-cje-token.query.handler'
+import { NotifierBonneAlternanceJobHandler } from './application/jobs/notifier-bonne-alternance.job.handler.db'
+import { NotifierCJEJobHandler } from './application/jobs/notifier-cje.job.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -830,7 +832,9 @@ export const JobHandlerProviders = [
   CreerTablesAEAnnuellesJobHandler,
   QualifierActionsJobHandler,
   RecupererAnalyseAntivirusJobHandler,
-  NotifierRappelCreationActionsDemarchesJobHandler
+  NotifierRappelCreationActionsDemarchesJobHandler,
+  NotifierBonneAlternanceJobHandler,
+  NotifierCJEJobHandler
 ]
 
 @Module(buildModuleMetadata())
