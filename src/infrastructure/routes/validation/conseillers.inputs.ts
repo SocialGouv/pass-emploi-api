@@ -196,7 +196,7 @@ export class PutJeuneDuConseillerPayload {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  @Length(1, 10)
+  @Length(1, 11)
   idPartenaire: string
 }
 
