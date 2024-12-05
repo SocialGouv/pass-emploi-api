@@ -5,7 +5,8 @@ import { ListeDeDiffusionSqlModel } from '../../sequelize/models/liste-de-diffus
 
 export function fromSqlToDetailConseillerQueryModel(
   conseillerSqlModel: ConseillerSqlModel,
-  aDesBeneficiairesARecuperer: boolean
+  aDesBeneficiairesARecuperer: boolean,
+  beneficiairesAArchiver: number
 ): DetailConseillerQueryModel {
   const conseiller: DetailConseillerQueryModel = {
     id: conseillerSqlModel.id,
@@ -16,7 +17,8 @@ export function fromSqlToDetailConseillerQueryModel(
     dateVisionnageActus: conseillerSqlModel.dateVisionnageActus?.toISOString(),
     agence: undefined,
     notificationsSonores: conseillerSqlModel.notificationsSonores,
-    aDesBeneficiairesARecuperer: aDesBeneficiairesARecuperer
+    aDesBeneficiairesARecuperer,
+    beneficiairesAArchiver
   }
   if (conseillerSqlModel.agence) {
     conseiller.agence = {

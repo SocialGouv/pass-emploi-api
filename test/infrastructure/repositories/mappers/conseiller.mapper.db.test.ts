@@ -22,7 +22,7 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
       const sql = await ConseillerSqlModel.create(unConseillerDto())
 
       // When
-      const result = fromSqlToDetailConseillerQueryModel(sql, false)
+      const result = fromSqlToDetailConseillerQueryModel(sql, false, 2)
 
       // Then
       const expected: DetailConseillerQueryModel = {
@@ -34,7 +34,8 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
         dateSignatureCGU: undefined,
         dateVisionnageActus: undefined,
         notificationsSonores: false,
-        aDesBeneficiairesARecuperer: false
+        aDesBeneficiairesARecuperer: false,
+        beneficiairesAArchiver: 2
       }
       expect(result).to.deep.equal(expected)
     })
@@ -50,7 +51,7 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
       )
 
       // When
-      const result = fromSqlToDetailConseillerQueryModel(sql, false)
+      const result = fromSqlToDetailConseillerQueryModel(sql, false, 2)
 
       // Then
       const expected: DetailConseillerQueryModel = {
@@ -65,7 +66,8 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
         dateSignatureCGU: undefined,
         dateVisionnageActus: undefined,
         notificationsSonores: false,
-        aDesBeneficiairesARecuperer: false
+        aDesBeneficiairesARecuperer: false,
+        beneficiairesAArchiver: 2
       }
       expect(result).to.deep.equal(expected)
     })
@@ -94,7 +96,7 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
       })
 
       // When
-      const result = fromSqlToDetailConseillerQueryModel(sql!, false)
+      const result = fromSqlToDetailConseillerQueryModel(sql!, false, 2)
 
       // Then
       const expected: DetailConseillerQueryModel = {
@@ -109,7 +111,8 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
         dateSignatureCGU: undefined,
         dateVisionnageActus: undefined,
         notificationsSonores: false,
-        aDesBeneficiairesARecuperer: false
+        aDesBeneficiairesARecuperer: false,
+        beneficiairesAArchiver: 2
       }
       expect(result).to.deep.equal(expected)
     })

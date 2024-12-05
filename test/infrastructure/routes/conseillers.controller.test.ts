@@ -10,6 +10,7 @@ import {
 } from 'src/application/commands/modifier-jeune-du-conseiller.command.handler'
 import { RecupererJeunesDuConseillerCommandHandler } from 'src/application/commands/recuperer-jeunes-du-conseiller.command.handler'
 import { SendNotificationsNouveauxMessagesCommandHandler } from 'src/application/commands/send-notifications-nouveaux-messages.command.handler'
+import { GetBeneficiairesAArchiverQueryHandler } from 'src/application/queries/get-beneficiaires-a-archiver.query.handler'
 import { GetConseillersQueryHandler } from 'src/application/queries/get-conseillers.query.handler.db'
 import { GetDetailConseillerQueryHandler } from 'src/application/queries/get-detail-conseiller.query.handler.db'
 import { GetIndicateursPourConseillerQueryHandler } from 'src/application/queries/get-indicateurs-pour-conseiller.query.handler.db'
@@ -52,6 +53,7 @@ describe('ConseillersController', () => {
   let modifierJeuneDuConseillerCommandHandler: StubbedClass<ModifierJeuneDuConseillerCommandHandler>
   let getIndicateursJeunePourConseillerQueryHandler: StubbedClass<GetIndicateursPourConseillerQueryHandler>
   let getIdentitesJeunesQueryHandler: StubbedClass<GetJeunesIdentitesQueryHandler>
+  let getBeneficiairesAArchiverQueryHandler: StubbedClass<GetBeneficiairesAArchiverQueryHandler>
   let getDemarchesConseillerQueryHandler: StubbedClass<GetDemarchesConseillerQueryHandler>
 
   let app: INestApplication
@@ -80,6 +82,9 @@ describe('ConseillersController', () => {
     getIdentitesJeunesQueryHandler = app.get(GetJeunesIdentitesQueryHandler)
     getDemarchesConseillerQueryHandler = app.get(
       GetDemarchesConseillerQueryHandler
+    )
+    getBeneficiairesAArchiverQueryHandler = app.get(
+      GetBeneficiairesAArchiverQueryHandler
     )
   })
 
@@ -633,7 +638,7 @@ describe('ConseillersController', () => {
     )
   })
 
-  describe('GET /conseillers/{idConseiller}/jeunes/i{idJeune}/demarches', () => {
+  describe('GET /conseillers/{idConseiller}/jeunes/{idJeune}/demarches', () => {
     it('récupère les demarches du jeune pour un conseiller', async () => {
       // Given
       const idConseiller = 'idConseiller'
@@ -645,7 +650,7 @@ describe('ConseillersController', () => {
       // When
       await request(app.getHttpServer())
         .get(`/conseillers/${idConseiller}/jeunes/${idJeune}/demarches`)
-        .query({ idConseiller, idJeune })
+        .query({ idJeune })
         .set('authorization', unHeaderAuthorization())
         .expect(HttpStatus.OK)
         .expect({ queryModel: [uneDemarcheQueryModel()] })
@@ -663,6 +668,36 @@ describe('ConseillersController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       '/conseillers/1/jeunes/2/demarches'
+    )
+  })
+
+  describe('GET /conseillers/{idConseillers}/beneficiaires-a-archiver', () => {
+    it('récupère l’identités des bénéficaires à archiver du conseiller', async () => {
+      // Given
+      const idConseiller = 'idConseiller'
+      getBeneficiairesAArchiverQueryHandler.execute
+        .withArgs({ idConseiller })
+        .resolves(
+          success([
+            { id: 'id-jeune-1', nom: 'Curie', prenom: 'Marie' },
+            { id: 'id-jeune-2', nom: 'Lovelace', prenom: 'Ada' }
+          ])
+        )
+
+      // When
+      await request(app.getHttpServer())
+        .get(`/conseillers/${idConseiller}/beneficiaires-a-archiver`)
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+        .expect([
+          { id: 'id-jeune-1', nom: 'Curie', prenom: 'Marie' },
+          { id: 'id-jeune-2', nom: 'Lovelace', prenom: 'Ada' }
+        ])
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/conseillers/1/beneficiaires-a-archiver'
     )
   })
 })

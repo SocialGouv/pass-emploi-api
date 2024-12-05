@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { GetBeneficiairesAArchiverQueryGetter } from 'src/application/queries/query-getters/get-beneficiaires-a-archiver.query.getter.db'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
@@ -30,7 +31,8 @@ export class GetDetailConseillerQueryHandler extends QueryHandler<
   constructor(
     private conseillerAuthorizer: ConseillerAuthorizer,
     private conseillerMiloService: Conseiller.Milo.Service,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private readonly getBeneficiairesAArchiverQueryGetter: GetBeneficiairesAArchiverQueryGetter
   ) {
     super('GetDetailConseillerQueryHandler')
   }
@@ -65,15 +67,27 @@ export class GetDetailConseillerQueryHandler extends QueryHandler<
       return failure(new NonTrouveError('Conseiller', query.idConseiller))
     }
 
-    const jeuneARecuperer = await JeuneSqlModel.findOne({
-      where: { idConseillerInitial: conseillerSqlModel.id },
-      attributes: ['id']
-    })
+    let jeuneARecuperer: JeuneSqlModel | null = null
+    try {
+      jeuneARecuperer = await JeuneSqlModel.findOne({
+        where: { idConseillerInitial: conseillerSqlModel.id },
+        attributes: ['id']
+      })
+    } catch {}
+
+    let nombreBeneficiairesAArchiver = 0
+    try {
+      nombreBeneficiairesAArchiver =
+        await this.getBeneficiairesAArchiverQueryGetter.count(
+          conseillerSqlModel.id
+        )
+    } catch {}
 
     return success(
       fromSqlToDetailConseillerQueryModel(
         conseillerSqlModel,
-        Boolean(jeuneARecuperer)
+        Boolean(jeuneARecuperer),
+        nombreBeneficiairesAArchiver
       )
     )
   }
