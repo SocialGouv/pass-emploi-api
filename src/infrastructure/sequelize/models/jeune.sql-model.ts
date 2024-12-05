@@ -10,7 +10,6 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
-import { JeuneMiloAArchiverSqlModel } from 'src/infrastructure/sequelize/models/jeune-milo-a-archiver.sql-model'
 import { Core } from '../../../domain/core'
 import { AsSql } from '../types'
 import { ActionSqlModel } from './action.sql-model'
@@ -213,9 +212,6 @@ export class JeuneSqlModel extends JeuneDto {
 
   @BelongsTo(() => StructureMiloSqlModel)
   structureMilo?: StructureMiloSqlModel
-
-  @HasOne(() => JeuneMiloAArchiverSqlModel)
-  aArchiver?: JeuneMiloAArchiverSqlModel
 
   static async creer(jeuneDto: AsSql<JeuneDto>): Promise<JeuneSqlModel> {
     return JeuneSqlModel.create(jeuneDto)

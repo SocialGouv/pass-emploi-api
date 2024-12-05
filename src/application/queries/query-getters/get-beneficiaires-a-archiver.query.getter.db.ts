@@ -1,9 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Op, Sequelize } from 'sequelize'
-import { WhereOptions } from 'sequelize/types/model'
+import { QueryTypes, Sequelize } from 'sequelize'
 import { IdentiteJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-model'
 import { Result, success } from 'src/building-blocks/types/result'
-import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { SequelizeInjectionToken } from 'src/infrastructure/sequelize/providers'
 import { DateService } from 'src/utils/date-service'
 
@@ -17,36 +15,43 @@ export class GetBeneficiairesAArchiverQueryGetter {
   async handle(
     idConseiller: string
   ): Promise<Result<IdentiteJeuneQueryModel[]>> {
-    const models = await JeuneSqlModel.findAll({
-      attributes: ['id', 'nom', 'prenom'],
-      where: this.getWhere(idConseiller)
-    })
-
-    return success(models.map(({ id, nom, prenom }) => ({ id, nom, prenom })))
+    const models =
+      await this.queryBeneficiairesAArchiver<IdentiteJeuneQueryModel>(
+        'id, nom, prenom',
+        idConseiller
+      )
+    return success(models)
   }
 
   async count(idConseiller: string): Promise<number> {
-    return JeuneSqlModel.count({ where: this.getWhere(idConseiller) })
+    const rows = await this.queryBeneficiairesAArchiver<{ count: string }>(
+      'COUNT(id)',
+      idConseiller
+    )
+
+    return Number.parseInt(rows[0].count)
   }
 
-  private getWhere(idConseiller: string): WhereOptions {
-    const ilYa6mois = this.dateService
-      .now()
-      .minus({ month: 6 })
-      .startOf('day')
-      .toJSDate()
+  private async queryBeneficiairesAArchiver<T extends object>(
+    query: string,
+    idConseiller: string
+  ): Promise<T[]> {
+    const ilYa6mois = this.dateService.now().minus({ month: 6 }).startOf('day')
 
-    return [
-      { id_conseiller: idConseiller },
+    return this.sequelize.query<T>(
+      `
+        SELECT ${query} FROM jeune
+        WHERE id_conseiller = :idConseiller
+        AND (
+          date_fin_cej < :date
+          OR date_derniere_actualisation_token < :date
+          OR (EXISTS (SELECT 1 FROM jeune_milo_a_archiver WHERE jeune_milo_a_archiver.id_jeune = jeune.id)) IS true
+        )
+    `,
       {
-        [Op.or]: [
-          { date_fin_cej: { [Op.lt]: ilYa6mois } },
-          { date_derniere_actualisation_token: { [Op.lt]: ilYa6mois } },
-          this.sequelize.literal(
-            '(exists (select 1 from jeune_milo_a_archiver where jeune_milo_a_archiver.id_jeune = "JeuneSqlModel".id)) is true'
-          )
-        ]
+        type: QueryTypes.SELECT,
+        replacements: { idConseiller, date: ilYa6mois.toJSDate() }
       }
-    ]
+    )
   }
 }

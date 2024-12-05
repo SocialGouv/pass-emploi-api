@@ -10,7 +10,7 @@ import {
 } from 'src/application/commands/modifier-jeune-du-conseiller.command.handler'
 import { RecupererJeunesDuConseillerCommandHandler } from 'src/application/commands/recuperer-jeunes-du-conseiller.command.handler'
 import { SendNotificationsNouveauxMessagesCommandHandler } from 'src/application/commands/send-notifications-nouveaux-messages.command.handler'
-import { GetBeneficiairesAArchiverQueryHandler } from 'src/application/queries/get-beneficiaires-a-archiver.query.handler.db'
+import { GetBeneficiairesAArchiverQueryHandler } from 'src/application/queries/get-beneficiaires-a-archiver.query.handler'
 import { GetConseillersQueryHandler } from 'src/application/queries/get-conseillers.query.handler.db'
 import { GetDetailConseillerQueryHandler } from 'src/application/queries/get-detail-conseiller.query.handler.db'
 import { GetIndicateursPourConseillerQueryHandler } from 'src/application/queries/get-indicateurs-pour-conseiller.query.handler.db'
