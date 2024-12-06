@@ -96,7 +96,7 @@ export namespace Planificateur {
 
   export interface JobNotifierParGroupe {
     offset: number
-    nbPersonnesNotifies: number
+    nbPersonnesNotifiees: number
   }
 
   export interface JobRappelAction {

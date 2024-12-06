@@ -17,7 +17,7 @@ import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-m
 import { DateService } from '../../utils/date-service'
 
 interface Stats {
-  nbPersonnesNotifies: number
+  nbPersonnesNotifiees: number
   estLaDerniereExecution: boolean
 }
 
@@ -43,7 +43,7 @@ export class NotifierBonneAlternanceJobHandler extends JobHandler<Job> {
   ): Promise<SuiviJob> {
     let succes = true
     const stats: Stats = {
-      nbPersonnesNotifies: job?.contenu?.nbPersonnesNotifies || 0,
+      nbPersonnesNotifiees: job?.contenu?.nbPersonnesNotifiees || 0,
       estLaDerniereExecution: false
     }
     const maintenant = this.dateService.now()
@@ -66,12 +66,15 @@ export class NotifierBonneAlternanceJobHandler extends JobHandler<Job> {
             [Op.ne]: null
           }
         },
-        attributes: ['id', 'pushNotificationToken']
+        attributes: ['id', 'pushNotificationToken'],
+        offset,
+        limit: PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM,
+        order: [['id', 'ASC']]
       })
 
       this.logger.log(`${idsJeunesANotifier.length} ids jeunes à notifier`)
 
-      stats.nbPersonnesNotifies += idsJeunesANotifier.length
+      stats.nbPersonnesNotifiees += idsJeunesANotifier.length
       for (const jeune of idsJeunesANotifier) {
         try {
           const notification: Notification.Message = {
@@ -99,7 +102,7 @@ export class NotifierBonneAlternanceJobHandler extends JobHandler<Job> {
           type: Planificateur.JobType.NOTIFIER_BONNE_ALTERNANCE,
           contenu: {
             offset: offset + PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM,
-            nbPersonnesNotifies: stats.nbPersonnesNotifies
+            nbPersonnesNotifiees: stats.nbPersonnesNotifiees
           }
         })
       } else {
