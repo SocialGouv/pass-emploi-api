@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { Situation } from '../../../infrastructure/sequelize/models/situations-milo.sql-model'
 import { DateService } from '../../../utils/date-service'
@@ -56,7 +57,8 @@ export function fromSqlToDetailJeuneQueryModel(
 }
 
 export function toDetailJeuneConseillerQueryModel(
-  sqlJeune: DetailJeuneRawSql
+  sqlJeune: DetailJeuneRawSql,
+  maintenant: DateTime
 ): DetailJeuneConseillerQueryModel {
   const jeuneQueryModel: DetailJeuneConseillerQueryModel = {
     id: sqlJeune.id,
@@ -72,7 +74,8 @@ export function toDetailJeuneConseillerQueryModel(
     situationCourante: sqlJeune.situation_courante ?? undefined,
     structureMilo: sqlJeune.id_structure_milo
       ? { id: sqlJeune.id_structure_milo }
-      : undefined
+      : undefined,
+    estAArchiver: estAArchiver(sqlJeune, maintenant)
   }
   if (sqlJeune.date_derniere_actualisation_token) {
     jeuneQueryModel.lastActivity =
@@ -90,7 +93,33 @@ export function toDetailJeuneConseillerQueryModel(
       email: sqlJeune.email_conseiller_precedent ?? undefined
     }
   }
+
   return jeuneQueryModel
+}
+
+function estAArchiver(
+  sqlJeune: DetailJeuneRawSql,
+  maintenant: DateTime
+): boolean {
+  if (sqlJeune.est_a_archiver) {
+    return true
+  }
+  const ilYa6mois = maintenant.minus({ months: 6, days: 1 })
+  if (sqlJeune.date_fin_cej) {
+    const dateFinCEJ = DateTime.fromJSDate(sqlJeune.date_fin_cej)
+    if (DateService.isGreater(ilYa6mois, dateFinCEJ)) {
+      return true
+    }
+  }
+  if (sqlJeune.date_derniere_actualisation_token) {
+    const dateToken = DateTime.fromJSDate(
+      sqlJeune.date_derniere_actualisation_token
+    )
+    if (DateService.isGreater(ilYa6mois, dateToken)) {
+      return true
+    }
+  }
+  return false
 }
 
 export interface JeuneRawSql {
@@ -112,4 +141,5 @@ export interface DetailJeuneRawSql extends JeuneRawSql {
   situation_courante: Situation
   date_premiere_connexion: Date
   id_structure_milo: string | null
+  est_a_archiver: boolean
 }

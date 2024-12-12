@@ -20,27 +20,33 @@ import { Conseiller } from '../../../src/domain/milo/conseiller'
 import { Core } from '../../../src/domain/core'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { createSandbox, expect } from '../../utils'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import {
   DatabaseForTesting,
   getDatabase
 } from '../../utils/database-for-testing'
 import { StructureMiloSqlModel } from '../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
+import { DateService } from '../../../src/utils/date-service'
 
 describe('GetJeunesByConseillerQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
   let conseillersRepository: StubbedType<Conseiller.Repository>
   let getJeunesByConseillerQueryHandler: GetJeunesByConseillerQueryHandler
   let sandbox: SinonSandbox
+  let dateService: StubbedClass<DateService>
+  const maintenant = uneDatetime()
 
   before(async () => {
     databaseForTesting = getDatabase()
     sandbox = createSandbox()
     conseillersRepository = stubInterface(sandbox)
+    dateService = stubClass(DateService)
+    dateService.now.returns(maintenant)
 
     getJeunesByConseillerQueryHandler = new GetJeunesByConseillerQueryHandler(
       databaseForTesting.sequelize,
-      conseillersRepository
+      conseillersRepository,
+      dateService
     )
   })
 
@@ -54,9 +60,9 @@ describe('GetJeunesByConseillerQueryHandler', () => {
 
   describe('handle', () => {
     const idConseiller = '1'
-    it("retourne les jeunes d'un conseiller", async () => {
+    it("retourne les jeunes d'un conseiller dont 1 est à archiver", async () => {
       // Given
-      const dateEvenement = uneDatetime().toJSDate()
+      const dateEvenement = maintenant.minus({ months: 7 }).toJSDate()
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
       await JeuneSqlModel.creer(
         unJeuneDto({
@@ -75,7 +81,8 @@ describe('GetJeunesByConseillerQueryHandler', () => {
         success([
           unDetailJeuneConseillerQueryModel({
             lastActivity: dateEvenement.toISOString(),
-            dateFinCEJ: undefined
+            dateFinCEJ: undefined,
+            estAArchiver: true
           })
         ])
       )

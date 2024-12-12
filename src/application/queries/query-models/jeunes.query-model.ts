@@ -204,6 +204,9 @@ export class DetailJeuneConseillerQueryModel {
 
   @ApiProperty({ required: false })
   structureMilo?: StructureMiloDuJeuneQueryModel
+
+  @ApiProperty()
+  estAArchiver: boolean
 }
 
 export class PreferencesJeuneQueryModel {

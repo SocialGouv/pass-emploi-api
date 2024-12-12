@@ -15,8 +15,12 @@ import {
   Conseiller,
   ConseillerRepositoryToken
 } from '../../domain/milo/conseiller'
-import { toDetailJeuneConseillerQueryModel } from './query-mappers/jeune.mappers'
+import {
+  DetailJeuneRawSql,
+  toDetailJeuneConseillerQueryModel
+} from './query-mappers/jeune.mappers'
 import { DetailJeuneConseillerQueryModel } from './query-models/jeunes.query-model'
+import { DateService } from '../../utils/date-service'
 
 export interface GetJeunesByConseillerQuery extends Query {
   idConseiller: string
@@ -30,7 +34,8 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
     @Inject(ConseillerRepositoryToken)
-    private readonly conseillersRepository: Conseiller.Repository
+    private readonly conseillersRepository: Conseiller.Repository,
+    private readonly dateService: DateService
   ) {
     super('GetJeunesByConseillerQueryHandler')
   }
@@ -70,7 +75,7 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
   private async getAllQueryModelsByConseiller(
     idConseiller: string
   ): Promise<DetailJeuneConseillerQueryModel[]> {
-    const sqlJeunes = await this.sequelize.query(
+    const sqlJeunes = await this.sequelize.query<DetailJeuneRawSql>(
       `
           SELECT jeune.id,
                  jeune.prenom,
@@ -86,7 +91,8 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
                  conseiller_initial.email                         as email_conseiller_precedent,
                  conseiller_initial.prenom                        as prenom_conseiller_precedent,
                  conseiller_initial.nom                           as nom_conseiller_precedent,
-                 situations_milo.situation_courante       as situation_courante
+                 situations_milo.situation_courante       as situation_courante,
+                 (EXISTS (SELECT 1 FROM jeune_milo_a_archiver WHERE jeune_milo_a_archiver.id_jeune = jeune.id)) as est_a_archiver
           FROM jeune
                    LEFT JOIN conseiller as conseiller_initial ON conseiller_initial.id = jeune.id_conseiller_initial
                    LEFT JOIN situations_milo ON situations_milo.id_jeune = jeune.id
@@ -100,7 +106,11 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
       }
     )
 
-    return sqlJeunes.map(toDetailJeuneConseillerQueryModel)
+    const maintenant = this.dateService.now()
+
+    return sqlJeunes.map(sql =>
+      toDetailJeuneConseillerQueryModel(sql, maintenant)
+    )
   }
 }
 
