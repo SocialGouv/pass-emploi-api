@@ -13,7 +13,6 @@ import {
 } from '@nestjs/common'
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { DateTime } from 'luxon'
-import { GetBeneficiairesAArchiverQueryHandler } from 'src/application/queries/get-beneficiaires-a-archiver.query.handler'
 import { DeleteConseillerCommandHandler } from '../../application/commands/conseiller/delete-conseiller.command.handler'
 import { ModifierConseillerCommandHandler } from '../../application/commands/conseiller/modifier-conseiller.command.handler'
 import {
@@ -72,8 +71,7 @@ export class ConseillersController {
     private readonly createListeDeDiffusionCommandHandler: CreateListeDeDiffusionCommandHandler,
     private readonly getIdentitesJeunesQueryHandler: GetJeunesIdentitesQueryHandler,
     private readonly deleteConseillerCommandHandler: DeleteConseillerCommandHandler,
-    private readonly getDemarchesConseillerQueryHandler: GetDemarchesConseillerQueryHandler,
-    private readonly getBeneficiairesAArchiverQueryHandler: GetBeneficiairesAArchiverQueryHandler
+    private readonly getDemarchesConseillerQueryHandler: GetDemarchesConseillerQueryHandler
   ) {}
 
   @ApiOperation({
@@ -358,22 +356,5 @@ export class ConseillersController {
       utilisateur
     )
     return handleResult(result)
-  }
-
-  @ApiOperation({
-    summary: 'Récupères l’identité des bénéficiaire à archiver du conseiller',
-    description: 'Autorisé pour tous les conseillers'
-  })
-  @Get(':idConseiller/beneficiaires-a-archiver')
-  async getBeneficiairesAArchiver(
-    @Param('idConseiller') idConseiller: string,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<IdentiteJeuneQueryModel[]> {
-    return handleResult(
-      await this.getBeneficiairesAArchiverQueryHandler.execute(
-        { idConseiller },
-        utilisateur
-      )
-    )
   }
 }

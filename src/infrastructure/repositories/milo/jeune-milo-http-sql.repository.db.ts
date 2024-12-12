@@ -251,6 +251,11 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
       : undefined
   }
 
+  async estAArchiver(id: string): Promise<boolean> {
+    const estAArchiver = await JeuneMiloAArchiverSqlModel.findByPk(id)
+    return Boolean(estAArchiver)
+  }
+
   async marquerAARchiver(id: string, aArchiver: boolean): Promise<void> {
     if (aArchiver) await JeuneMiloAArchiverSqlModel.upsert({ idJeune: id })
     else await JeuneMiloAArchiverSqlModel.destroy({ where: { idJeune: id } })
