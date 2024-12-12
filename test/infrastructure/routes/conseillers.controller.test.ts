@@ -633,7 +633,7 @@ describe('ConseillersController', () => {
     )
   })
 
-  describe('GET /conseillers/{idConseiller}/jeunes/i{idJeune}/demarches', () => {
+  describe('GET /conseillers/{idConseiller}/jeunes/{idJeune}/demarches', () => {
     it('récupère les demarches du jeune pour un conseiller', async () => {
       // Given
       const idConseiller = 'idConseiller'
@@ -645,7 +645,6 @@ describe('ConseillersController', () => {
       // When
       await request(app.getHttpServer())
         .get(`/conseillers/${idConseiller}/jeunes/${idJeune}/demarches`)
-        .query({ idConseiller, idJeune })
         .set('authorization', unHeaderAuthorization())
         .expect(HttpStatus.OK)
         .expect({ queryModel: [uneDemarcheQueryModel()] })

@@ -65,10 +65,13 @@ export class GetDetailConseillerQueryHandler extends QueryHandler<
       return failure(new NonTrouveError('Conseiller', query.idConseiller))
     }
 
-    const jeuneARecuperer = await JeuneSqlModel.findOne({
-      where: { idConseillerInitial: conseillerSqlModel.id },
-      attributes: ['id']
-    })
+    let jeuneARecuperer: JeuneSqlModel | null = null
+    try {
+      jeuneARecuperer = await JeuneSqlModel.findOne({
+        where: { idConseillerInitial: conseillerSqlModel.id },
+        attributes: ['id']
+      })
+    } catch {}
 
     return success(
       fromSqlToDetailConseillerQueryModel(

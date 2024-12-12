@@ -71,7 +71,6 @@ export namespace JeuneMilo {
     >
 
     marquerAARchiver(id: string, aArchiver: boolean): Promise<void>
-    estAArchiver(id: string): Promise<boolean>
   }
 
   export function trierSituations(situations: Situation[]): Situation[] {
