@@ -33,6 +33,7 @@ import {
   toEtat
 } from './dto/pole-emploi.dto'
 import { handleAxiosError } from './utils/axios-error-handler'
+import { buildError } from '../../utils/logger.module'
 
 const ORIGINE = 'INDIVIDU'
 const DEMARCHES_URL = 'peconnect-demarches/v1/demarches'
@@ -98,19 +99,24 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
   ): Promise<ResultApi<DemarcheDto[]>> {
     this.logger.log('recuperation des demarches du jeune')
 
-    const response = await this.getWithCache<DemarcheDto[]>(
-      DEMARCHES_URL,
-      tokenDuJeune,
-      undefined,
-      undefined,
-      idJeune
-    )
+    try {
+      const response = await this.getWithCache<DemarcheDto[]>(
+        DEMARCHES_URL,
+        tokenDuJeune,
+        undefined,
+        undefined,
+        idJeune
+      )
 
-    if (isSuccessApi(response) && !response.data) {
+      if (isSuccessApi(response) && !response.data) {
+        return successApi([])
+      }
+
+      return response
+    } catch (e) {
+      this.logger.error(e)
       return successApi([])
     }
-
-    return response
   }
 
   async getDemarchesEnCache(
@@ -370,6 +376,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
       if (e.response) {
         return failureApi(new ErreurHttp(e.response.data, e.response.status))
       }
+      this.logger.error(buildError('Erreur GET WITH CACHE FT', e))
       throw e
     }
   }
