@@ -15,7 +15,7 @@ export namespace Notification {
   export import PoleEmploi = _PoleEmploi.NotificationPoleEmploi
 
   export interface Repository {
-    send(message: Notification.Message): Promise<void>
+    send(message: Notification.Message, idJeune: string): Promise<void>
   }
 
   export enum Type {
@@ -187,7 +187,7 @@ export namespace Notification {
               jeune.configuration.pushNotificationToken
             )
             if (notification) {
-              return this.notificationRepository.send(notification)
+              return this.notificationRepository.send(notification, jeune.id)
             }
           } else {
             this.logMessageEchec(jeune.id)
@@ -228,6 +228,7 @@ export namespace Notification {
       typeNotification: Notification.Type,
       token: string,
       message: string,
+      idJeune: string,
       idRendezVous?: string
     ): void {
       // filtrage de l'existance du push notif token et des preferences de notification est fait en amont
@@ -257,7 +258,7 @@ export namespace Notification {
       }
 
       if (notification) {
-        this.notificationRepository.send(notification)
+        this.notificationRepository.send(notification, idJeune)
       }
     }
 
@@ -271,7 +272,10 @@ export namespace Notification {
             const notification = this.creerNotificationNouveauMessage(
               jeune.configuration?.pushNotificationToken
             )
-            const promise = this.notificationRepository.send(notification)
+            const promise = this.notificationRepository.send(
+              notification,
+              jeune.id
+            )
             this.logMessageSucces(jeune.id)
             return promise
           } else {
@@ -292,7 +296,7 @@ export namespace Notification {
           jeune.structure,
           this.dateService
         )
-        const promise = this.notificationRepository.send(notification)
+        const promise = this.notificationRepository.send(notification, jeune.id)
         this.logMessageSucces(jeune.id)
         return promise
       } catch (e) {
@@ -310,7 +314,7 @@ export namespace Notification {
           jeune.configuration?.pushNotificationToken,
           action.id
         )
-        const promise = this.notificationRepository.send(notification)
+        const promise = this.notificationRepository.send(notification, jeune.id)
         this.logMessageSucces(jeune.id)
         return promise
       } else {
@@ -328,7 +332,10 @@ export namespace Notification {
             configurationApplication.pushNotificationToken,
             idAction
           )
-          const promise = this.notificationRepository.send(notification)
+          const promise = this.notificationRepository.send(
+            notification,
+            configurationApplication.idJeune
+          )
           this.logMessageSucces(configurationApplication.idJeune)
           return promise
         } else {
@@ -351,7 +358,10 @@ export namespace Notification {
             recherche.id,
             recherche.titre
           )
-          const promise = this.notificationRepository.send(notification)
+          const promise = this.notificationRepository.send(
+            notification,
+            configurationApplication.idJeune
+          )
           this.logMessageSucces(configurationApplication.idJeune)
           return promise
         } else {
@@ -375,7 +385,7 @@ export namespace Notification {
               idSsession
             )
             if (notification) {
-              return this.notificationRepository.send(notification)
+              return this.notificationRepository.send(notification, jeune.id)
             }
           } else {
             this.logMessageEchec(jeune.id)
@@ -399,7 +409,7 @@ export namespace Notification {
               idSsession
             )
             if (notification) {
-              return this.notificationRepository.send(notification)
+              return this.notificationRepository.send(notification, jeune.id)
             }
           } else {
             this.logMessageEchec(jeune.id)
@@ -425,7 +435,7 @@ export namespace Notification {
               dateSession
             )
             if (notification) {
-              return this.notificationRepository.send(notification)
+              return this.notificationRepository.send(notification, jeune.id)
             }
           } else {
             this.logMessageEchec(jeune.id)

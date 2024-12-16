@@ -102,7 +102,7 @@ export class NotifierCJEJobHandler extends JobHandler<Job> {
               type: 'CJE'
             }
           }
-          await this.notificationRepository.send(notification)
+          await this.notificationRepository.send(notification, jeune.id)
           this.logger.log(`Notification envoyée pour le jeune ${jeune.id}`)
         } catch (e) {
           this.logger.error(e)

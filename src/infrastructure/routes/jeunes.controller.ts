@@ -59,6 +59,10 @@ import {
   UpdateJeunePreferencesPayload
 } from './validation/jeunes.inputs'
 import { UpdateJeuneCommandHandler } from '../../application/commands/update-jeune.command.handler'
+import {
+  GetNotificationsJeuneQueryHandler,
+  NotificationJeuneQueryModel
+} from '../../application/queries/get-notifications-jeunes.query.handler.db'
 
 @Controller('jeunes')
 @CustomSwaggerApiOAuth2()
@@ -77,7 +81,8 @@ export class JeunesController {
     private readonly getConseillersJeuneQueryHandler: GetConseillersJeuneQueryHandler,
     private readonly updateJeunePreferencesCommandHandler: UpdateJeunePreferencesCommandHandler,
     private readonly getPreferencesJeuneQueryHandler: GetPreferencesJeuneQueryHandler,
-    private rechercherMessageCommandHandler: RechercherMessageQueryHandler
+    private rechercherMessageCommandHandler: RechercherMessageQueryHandler,
+    private getNotificationsJeuneQueryHandler: GetNotificationsJeuneQueryHandler
   ) {}
 
   @Get(':idJeune')
@@ -89,6 +94,25 @@ export class JeunesController {
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<DetailJeuneQueryModel | undefined> {
     const result = await this.getDetailJeuneQueryHandler.execute(
+      {
+        idJeune
+      },
+      utilisateur
+    )
+
+    return handleResult(result)
+  }
+
+  @Get(':idJeune/notifications')
+  @ApiResponse({
+    type: NotificationJeuneQueryModel,
+    isArray: true
+  })
+  async getNotificationsJeune(
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<NotificationJeuneQueryModel[]> {
+    const result = await this.getNotificationsJeuneQueryHandler.execute(
       {
         idJeune
       },

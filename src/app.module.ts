@@ -366,6 +366,7 @@ import { CJEController } from './infrastructure/routes/cje.controller'
 import { GetCJETokenQueryHandler } from './application/queries/get-cje-token.query.handler'
 import { NotifierBonneAlternanceJobHandler } from './application/jobs/notifier-bonne-alternance.job.handler.db'
 import { NotifierCJEJobHandler } from './application/jobs/notifier-cje.job.handler.db'
+import { GetNotificationsJeuneQueryHandler } from './application/queries/get-notifications-jeunes.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -791,7 +792,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetTokenPoleEmploiQueryHandler,
     GetMonSuiviPoleEmploiQueryHandler,
     GetCompteursBeneficiaireMiloQueryHandler,
-    GetDemarchesConseillerQueryHandler
+    GetDemarchesConseillerQueryHandler,
+    GetNotificationsJeuneQueryHandler
   ]
 }
 

@@ -73,7 +73,10 @@ export class NotifierRappelActionJobHandler extends JobHandler<
             job.contenu.idAction
           )
           if (notification) {
-            await this.notificationRepository.send(notification)
+            await this.notificationRepository.send(
+              notification,
+              configuration.idJeune
+            )
           }
           stats.notificationEnvoyee = true
         }

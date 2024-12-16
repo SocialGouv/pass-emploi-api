@@ -87,7 +87,7 @@ export class NotifierBonneAlternanceJobHandler extends JobHandler<Job> {
               type: 'BONNE_ALTERNANCE'
             }
           }
-          await this.notificationRepository.send(notification)
+          await this.notificationRepository.send(notification, jeune.id)
           this.logger.log(`Notification envoyée pour le jeune ${jeune.id}`)
         } catch (e) {
           this.logger.error(e)

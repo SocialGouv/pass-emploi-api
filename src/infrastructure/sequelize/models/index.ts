@@ -30,6 +30,7 @@ import { SuiviPeCejSqlModel } from './suivi-pe-cej.sql-model'
 import { EvenementEngagementHebdoSqlModel } from './evenement-engagement-hebdo.sql-model'
 import { StructureMiloSqlModel } from './structure-milo.sql-model'
 import { SessionMiloSqlModel } from './session-milo.sql-model'
+import { NotificationJeuneSqlModel } from './notification-jeune.sql-model'
 
 export const sqlModels = [
   ConseillerSqlModel,
@@ -63,5 +64,6 @@ export const sqlModels = [
   SuiviPeCejSqlModel,
   StructureMiloSqlModel,
   SessionMiloSqlModel,
-  JeuneMiloAArchiverSqlModel
+  JeuneMiloAArchiverSqlModel,
+  NotificationJeuneSqlModel
 ]
