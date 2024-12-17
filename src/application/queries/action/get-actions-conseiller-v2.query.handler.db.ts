@@ -16,7 +16,9 @@ const DEFAULT_LIMIT = 10
 
 export enum TriActionsConseillerV2 {
   BENEFICIAIRE_ALPHABETIQUE = 'BENEFICIAIRE_ALPHABETIQUE',
-  BENEFICIAIRE_INVERSE = 'BENEFICIAIRE_INVERSE'
+  BENEFICIAIRE_INVERSE = 'BENEFICIAIRE_INVERSE',
+  REALISATION_CHRONOLOGIQUE = 'REALISATION_CHRONOLOGIQUE',
+  REALISATION_ANTICHRONOLOGIQUE = 'REALISATION_ANTICHRONOLOGIQUE'
 }
 export interface GetActionsConseillerV2Query extends Query {
   idConseiller: string
@@ -93,6 +95,12 @@ export class GetActionsConseillerV2QueryHandler extends QueryHandler<
           ['jeune', 'prenom', 'DESC'],
           ...(order ?? [])
         ]
+        break
+      case TriActionsConseillerV2.REALISATION_CHRONOLOGIQUE:
+        order = [['date_fin_reelle', 'ASC']]
+        break
+      case TriActionsConseillerV2.REALISATION_ANTICHRONOLOGIQUE:
+        order = [['date_fin_reelle', 'DESC']]
         break
     }
 

@@ -591,5 +591,106 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
         )
       })
     })
+
+    describe('quand trié par date de réalisation', () => {
+      it('récupère toutes les actions triées par réalisation chronologique', async () => {
+        // Given
+        const query: GetActionsConseillerV2Query = {
+          idConseiller,
+          page: 1,
+          limit: 2,
+          tri: TriActionsConseillerV2.REALISATION_CHRONOLOGIQUE
+        }
+
+        // When
+        const result = await queryHandler.handle(query)
+
+        // Then
+        const queryModelAttendu: GetActionsConseillerV2QueryModel = {
+          pagination: { page: query.page!, limit: query.limit!, total: 5 },
+          resultats: [
+            {
+              id: actionAQualifier1Dto.id,
+              titre: actionAQualifier1Dto.contenu,
+              jeune: {
+                id: idJeune,
+                nom: jeuneDto.nom,
+                prenom: jeuneDto.prenom
+              },
+              dateFinReelle: actionAQualifier1Dto.dateFinReelle!.toISOString(),
+              categorie: {
+                code: Action.Qualification.Code.CITOYENNETE,
+                libelle: 'Citoyenneté'
+              }
+            },
+            {
+              id: actionAQualifier2Dto.id,
+              titre: actionAQualifier2Dto.contenu,
+              jeune: {
+                id: idJeune,
+                nom: jeuneDto.nom,
+                prenom: jeuneDto.prenom
+              },
+              dateFinReelle: actionAQualifier2Dto.dateFinReelle!.toISOString(),
+              categorie: {
+                code: Action.Qualification.Code.SANTE,
+                libelle: 'Santé'
+              }
+            }
+          ]
+        }
+        expect(result._isSuccess && result.data).to.deep.equal(
+          queryModelAttendu
+        )
+      })
+
+      it('récupère toutes les actions triées par réalisation antichronologique', async () => {
+        // Given
+        const query: GetActionsConseillerV2Query = {
+          idConseiller,
+          page: 1,
+          limit: 2,
+          tri: TriActionsConseillerV2.REALISATION_ANTICHRONOLOGIQUE
+        }
+
+        // When
+        const result = await queryHandler.handle(query)
+
+        // Then
+        const queryModelAttendu: GetActionsConseillerV2QueryModel = {
+          pagination: { page: query.page!, limit: query.limit!, total: 5 },
+          resultats: [
+            {
+              categorie: undefined,
+              dateFinReelle: undefined,
+              id: actionNonTermineeDto.id,
+              jeune: {
+                id: idJeune,
+                nom: jeuneDto.nom,
+                prenom: jeuneDto.prenom
+              },
+              titre: actionNonTermineeDto.contenu
+            },
+            {
+              id: actionQualifieeDto.id,
+              titre: actionQualifieeDto.contenu,
+              jeune: {
+                id: idJeune2,
+                nom: jeune2Dto.nom,
+                prenom: jeune2Dto.prenom
+              },
+              dateFinReelle: actionQualifieeDto.dateFinReelle!.toISOString(),
+              categorie: {
+                code: Action.Qualification.Code.SANTE,
+                libelle: 'Santé'
+              }
+            }
+          ]
+        }
+        expect(result._isSuccess && result.data).to.deep.equal(
+          queryModelAttendu
+        )
+      })
+    })
   })
 })
