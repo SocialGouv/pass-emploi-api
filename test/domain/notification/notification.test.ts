@@ -56,7 +56,8 @@ describe('Notification', () => {
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
-          expectedNotification
+          expectedNotification,
+          rdv.jeunes[0].id
         )
       })
       it('notifie les jeunes avec pushNotificationToken du rdv modifié', async () => {
@@ -82,7 +83,8 @@ describe('Notification', () => {
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
-          expectedNotification
+          expectedNotification,
+          rdv.jeunes[0].id
         )
       })
       it('notifie les jeunes avec pushNotificationToken du rdv supprimé', async () => {
@@ -107,7 +109,8 @@ describe('Notification', () => {
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
-          expectedNotification
+          expectedNotification,
+          rdv.jeunes[0].id
         )
       })
       it('ne notifie pas les jeunes avec preferences de notification désactivés pour les rdv', async () => {
@@ -139,7 +142,8 @@ describe('Notification', () => {
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
-          expectedNotification
+          expectedNotification,
+          rdv.jeunes[0].id
         )
       })
     })
@@ -156,7 +160,8 @@ describe('Notification', () => {
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
-          expectedNotification
+          expectedNotification,
+          jeunes[0].id
         )
       })
       it('ne notifie pas les jeunes avec preferences de notification désactivés pour les messages', async () => {
@@ -176,7 +181,8 @@ describe('Notification', () => {
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
-          expectedNotification
+          expectedNotification,
+          jeunes[0].id
         )
       })
     })
@@ -205,7 +211,8 @@ describe('Notification', () => {
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
-          expectedNotification
+          expectedNotification,
+          jeune.id
         )
       })
       it('notifie les jeunes FT en choix 3', async () => {
@@ -232,7 +239,8 @@ describe('Notification', () => {
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
-          expectedNotification
+          expectedNotification,
+          jeune.id
         )
       })
     })
@@ -258,7 +266,8 @@ describe('Notification', () => {
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
-          expectedNotification
+          expectedNotification,
+          jeune.id
         )
       })
 
@@ -303,7 +312,10 @@ describe('Notification', () => {
           // Then
           expect(
             notificationRepository.send
-          ).to.have.been.calledOnceWithExactly(expectedNotification)
+          ).to.have.been.calledOnceWithExactly(
+            expectedNotification,
+            configurationApplication.idJeune
+          )
         })
       })
 
@@ -353,7 +365,8 @@ describe('Notification', () => {
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
-          expectedNotification
+          expectedNotification,
+          configuration.idJeune
         )
       })
       it('ne notifie pas les jeunes avec alertesOffres false', async () => {
@@ -382,10 +395,11 @@ describe('Notification', () => {
         const idRendezVous = 'poi-id-rdv'
 
         // When
-        await notificationService.notifierUnRendezVousPoleEmploi(
+        notificationService.notifierUnRendezVousPoleEmploi(
           typeNotification,
           token,
           message,
+          'test',
           idRendezVous
         )
 
@@ -402,7 +416,8 @@ describe('Notification', () => {
           }
         })
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
-          expectedNotification
+          expectedNotification,
+          'test'
         )
       })
     })
@@ -428,7 +443,8 @@ describe('Notification', () => {
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
-          expectedNotification
+          expectedNotification,
+          jeune.id
         )
       })
     })
@@ -456,7 +472,8 @@ describe('Notification', () => {
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
-          expectedNotification
+          expectedNotification,
+          jeune.id
         )
       })
     })
@@ -489,7 +506,8 @@ describe('Notification', () => {
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
-          expectedNotification
+          expectedNotification,
+          jeune.id
         )
       })
     })

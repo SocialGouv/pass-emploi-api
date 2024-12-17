@@ -62,7 +62,7 @@ import { UpdateJeuneCommandHandler } from '../../application/commands/update-jeu
 import {
   GetNotificationsJeuneQueryHandler,
   NotificationJeuneQueryModel
-} from '../../application/queries/get-notifications-jeunes.query.handler.db'
+} from '../../application/queries/get-notifications-jeune.query.handler.db'
 
 @Controller('jeunes')
 @CustomSwaggerApiOAuth2()

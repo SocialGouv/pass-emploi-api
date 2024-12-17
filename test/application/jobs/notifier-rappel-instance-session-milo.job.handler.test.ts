@@ -146,17 +146,20 @@ describe('handler', () => {
       await handler.handle(job)
 
       // Then
-      expect(notificationRepository.send).to.have.been.calledWithExactly({
-        token: 'token',
-        notification: {
-          title: 'Rappel session',
-          body: 'Vous avez une session dans une semaine'
+      expect(notificationRepository.send).to.have.been.calledWithExactly(
+        {
+          token: 'token',
+          notification: {
+            title: 'Rappel session',
+            body: 'Vous avez une session dans une semaine'
+          },
+          data: {
+            type: 'DETAIL_SESSION_MILO',
+            id: job.contenu.idSession
+          }
         },
-        data: {
-          type: 'DETAIL_SESSION_MILO',
-          id: job.contenu.idSession
-        }
-      })
+        jeuneAvecToken.id
+      )
     })
   })
   describe("l'instance de session est dans moins d'une semaine et plus d'un jour", () => {

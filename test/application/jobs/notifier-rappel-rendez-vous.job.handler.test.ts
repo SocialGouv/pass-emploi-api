@@ -91,17 +91,20 @@ describe('HandlerJobRendezVousCommandHandler', () => {
       await handlerJobRendezVousCommandHandler.handle(job)
 
       // Then
-      expect(notificationRepository.send).to.have.been.calledWith({
-        token: 'token',
-        notification: {
-          title: 'Rappel rendez-vous',
-          body: 'Vous avez un rendez-vous demain'
+      expect(notificationRepository.send).to.have.been.calledWith(
+        {
+          token: 'token',
+          notification: {
+            title: 'Rappel rendez-vous',
+            body: 'Vous avez un rendez-vous demain'
+          },
+          data: {
+            type: 'RAPPEL_RENDEZVOUS',
+            id: 'idRendezVous'
+          }
         },
-        data: {
-          type: 'RAPPEL_RENDEZVOUS',
-          id: 'idRendezVous'
-        }
-      })
+        rendezVous.jeunes[0].id
+      )
     })
   })
   describe('quand le rendez-vous est dans 7 jours', () => {
@@ -119,17 +122,20 @@ describe('HandlerJobRendezVousCommandHandler', () => {
       await handlerJobRendezVousCommandHandler.handle(job)
 
       // Then
-      expect(notificationRepository.send).to.have.been.calledWithExactly({
-        token: 'token',
-        notification: {
-          title: 'Rappel rendez-vous',
-          body: 'Vous avez un rendez-vous dans une semaine'
+      expect(notificationRepository.send).to.have.been.calledWithExactly(
+        {
+          token: 'token',
+          notification: {
+            title: 'Rappel rendez-vous',
+            body: 'Vous avez un rendez-vous dans une semaine'
+          },
+          data: {
+            type: 'RAPPEL_RENDEZVOUS',
+            id: 'idRendezVous'
+          }
         },
-        data: {
-          type: 'RAPPEL_RENDEZVOUS',
-          id: 'idRendezVous'
-        }
-      })
+        rendezVous.jeunes[0].id
+      )
     })
   })
   describe("le rendez-vous est dans moins d'une semaine et plus d'un jour", () => {

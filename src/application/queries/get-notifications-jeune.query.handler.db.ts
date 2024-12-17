@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result, success } from '../../building-blocks/types/result'
@@ -22,6 +22,9 @@ export class NotificationJeuneQueryModel {
 
   @ApiProperty()
   description: string
+
+  @ApiPropertyOptional({ required: false })
+  idObjet?: string
 }
 
 export interface GetNotificationsJeuneQuery extends Query {
@@ -50,7 +53,8 @@ export class GetNotificationsJeuneQueryHandler extends QueryHandler<
         date: sqlNotif.dateNotif.toISOString(),
         type: sqlNotif.type,
         titre: sqlNotif.titre,
-        description: sqlNotif.description
+        description: sqlNotif.description,
+        idObjet: sqlNotif.idObjet || undefined
       }))
     )
   }

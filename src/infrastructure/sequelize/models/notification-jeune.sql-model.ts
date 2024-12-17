@@ -44,6 +44,12 @@ export class NotificationJeuneDto extends Model {
     type: DataType.STRING
   })
   description: string
+
+  @Column({
+    field: 'id_objet',
+    type: DataType.STRING
+  })
+  idObjet: string | null
 }
 
 @Table({ timestamps: false, tableName: 'notification_jeune' })

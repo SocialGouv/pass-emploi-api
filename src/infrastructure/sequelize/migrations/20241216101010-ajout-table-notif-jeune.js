@@ -14,7 +14,9 @@ module.exports = {
         references: {
           model: 'jeune',
           key: 'id'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
       date_notif: {
         field: 'date_notif',
@@ -35,6 +37,11 @@ module.exports = {
         field: 'description',
         type: Sequelize.STRING(1024),
         allowNull: false
+      },
+      idObjet: {
+        field: 'id_objet',
+        type: Sequelize.STRING,
+        allowNull: true
       }
     })
   },

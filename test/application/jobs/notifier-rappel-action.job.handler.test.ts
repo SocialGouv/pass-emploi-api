@@ -82,17 +82,20 @@ describe('NotifierRappelActionJobHandler', () => {
             notificationEnvoyee: true
           })
 
-          expect(notificationRepository.send).to.have.been.calledWithExactly({
-            token: uneConfiguration().pushNotificationToken,
-            notification: {
-              title: 'Rappel action',
-              body: 'Une action arrive à échéance dans 3 jours'
+          expect(notificationRepository.send).to.have.been.calledWithExactly(
+            {
+              token: uneConfiguration().pushNotificationToken,
+              notification: {
+                title: 'Rappel action',
+                body: 'Une action arrive à échéance dans 3 jours'
+              },
+              data: {
+                type: 'DETAIL_ACTION',
+                id: action.id
+              }
             },
-            data: {
-              type: 'DETAIL_ACTION',
-              id: action.id
-            }
-          })
+            action.idJeune
+          )
         })
         it('pas de rappel quand desactivé', async () => {
           // Given
