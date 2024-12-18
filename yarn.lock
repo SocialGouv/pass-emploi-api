@@ -4342,18 +4342,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bull@npm:*, bull@npm:4.16.4, bull@npm:^4.12.2":
-  version: 4.16.4
-  resolution: "bull@npm:4.16.4"
+"bull@npm:*, bull@npm:4.16.5, bull@npm:^4.12.2":
+  version: 4.16.5
+  resolution: "bull@npm:4.16.5"
   dependencies:
-    cron-parser: "npm:^4.2.1"
+    cron-parser: "npm:^4.9.0"
     get-port: "npm:^5.1.1"
     ioredis: "npm:^5.3.2"
     lodash: "npm:^4.17.21"
     msgpackr: "npm:^1.11.2"
     semver: "npm:^7.5.2"
     uuid: "npm:^8.3.0"
-  checksum: 10/f53484dab9ff307d2645531954e708eea8911f75154b108db50e501845fdb189edf18cbcfcb91709160ee22f38d0402e9e14e5a08a9224a1061d41939fecbd72
+  checksum: 10/3250486db79a99d3cf77f078694b134a4ae66e930e070d05dd099d7f975ab4d70163858641ad1873617ae0b9c0aab0ca5da6cb69e688b9ab91a779997b3b51e3
   languageName: node
   linkType: hard
 
@@ -5071,7 +5071,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cron-parser@npm:4.9.0, cron-parser@npm:^4.2.1":
+"cron-parser@npm:4.9.0, cron-parser@npm:^4.9.0":
   version: 4.9.0
   resolution: "cron-parser@npm:4.9.0"
   dependencies:
@@ -9233,7 +9233,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^6.21.0"
     "@typescript-eslint/parser": "npm:^6.21.0"
     axios: "npm:^1.7.7"
-    bull: "npm:4.16.4"
+    bull: "npm:4.16.5"
     bull-repl: "npm:^0.29.1"
     chai: "npm:^4.5.0"
     chai-as-promised: "npm:^7.1.2"
