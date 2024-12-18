@@ -59,7 +59,7 @@ export class NotifierRappelRendezVousJobHandler extends JobHandler<
               this.dateService
             )
             if (notification) {
-              await this.notificationRepository.send(notification)
+              await this.notificationRepository.send(notification, jeune.id)
             }
             stats.push({ idJeune: jeune.id, notificationEnvoyee: true })
           }

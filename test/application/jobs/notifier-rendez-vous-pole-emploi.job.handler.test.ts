@@ -115,6 +115,7 @@ describe('NotifierRendezVousPEJobHandler', () => {
         Notification.Type.NEW_RENDEZVOUS,
         jeunePoleEmploi.pushNotificationToken,
         'Prochain RDV le 14/02/2022 à 14:30. Voir mon rendez-vous.',
+        jeunePoleEmploi.id,
         'idMetier1'
       )
 
@@ -205,6 +206,7 @@ describe('NotifierRendezVousPEJobHandler', () => {
         Notification.Type.NEW_RENDEZVOUS,
         jeunePoleEmploi.pushNotificationToken,
         'Prochain RDV le 14/02/2022 à 14:30. Voir mon rendez-vous.',
+        jeunePoleEmploi.id,
         'idMetier1'
       ])
       expect(
@@ -213,6 +215,7 @@ describe('NotifierRendezVousPEJobHandler', () => {
         Notification.Type.DELETED_RENDEZVOUS,
         jeunePoleEmploi.pushNotificationToken,
         'Le rendez-vous du 06/09/2022 11:30 a été supprimé',
+        jeunePoleEmploi.id,
         undefined
       ])
 
@@ -319,6 +322,7 @@ describe('NotifierRendezVousPEJobHandler', () => {
             notificationNouveauRendezVous.typeMouvementRDV,
             jeunePoleEmploi.pushNotificationToken,
             notificationRendezVousMisAJour.message,
+            jeunePoleEmploi.id,
             notificationNouveauRendezVous.idMetier
           )
         })
@@ -396,6 +400,7 @@ describe('NotifierRendezVousPEJobHandler', () => {
             notificationRendezVousMisAJour.typeMouvementRDV,
             jeunePoleEmploi.pushNotificationToken,
             notificationRendezVousMisAJour.message,
+            jeunePoleEmploi.id,
             notificationRendezVousMisAJour.idMetier
           )
         })
@@ -426,6 +431,7 @@ describe('NotifierRendezVousPEJobHandler', () => {
             notificationRendezVousMisAJour.typeMouvementRDV,
             jeunePoleEmploi.pushNotificationToken,
             notificationRendezVousMisAJour.message,
+            jeunePoleEmploi.id,
             notificationRendezVousMisAJour.idMetier
           )
         })
@@ -453,6 +459,7 @@ describe('NotifierRendezVousPEJobHandler', () => {
             notificationRendezVousSupprime.typeMouvementRDV,
             jeunePoleEmploi.pushNotificationToken,
             notificationRendezVousSupprime.message,
+            jeunePoleEmploi.id,
             notificationRendezVousSupprime.idMetier
           )
         })

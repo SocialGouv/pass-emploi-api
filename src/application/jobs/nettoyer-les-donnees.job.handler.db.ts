@@ -27,6 +27,7 @@ import Source = RendezVous.Source
 import { FavoriOffreEmploiSqlModel } from '../../infrastructure/sequelize/models/favori-offre-emploi.sql-model'
 import { FavoriOffreEngagementSqlModel } from '../../infrastructure/sequelize/models/favori-offre-engagement.sql-model'
 import { FavoriOffreImmersionSqlModel } from '../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
+import { NotificationJeuneSqlModel } from '../../infrastructure/sequelize/models/notification-jeune.sql-model'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.NETTOYER_LES_DONNEES)
@@ -61,6 +62,7 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
     let nombreFavrisEmploiSupprimes = -1
     let nombreFavrisImmersionSupprimes = -1
     let nombreFavrisEngagementSupprimes = -1
+    let nombreNotificationsJeuneSupprimes = -1
 
     try {
       const jeunes = await JeuneSqlModel.findAll({
@@ -212,6 +214,17 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
       this.logger.warn(e)
       nbErreurs++
     }
+    try {
+      nombreNotificationsJeuneSupprimes =
+        await NotificationJeuneSqlModel.destroy({
+          where: {
+            dateNotif: { [Op.lte]: maintenant.minus({ days: 10 }).toJSDate() }
+          }
+        })
+    } catch (e) {
+      this.logger.warn(e)
+      nbErreurs++
+    }
 
     try {
       const animationsCollectivesPasseesSansInscrit: Array<{ id: string }> =
@@ -273,7 +286,8 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
         nombreAnimationsCollectivesCloses,
         nombreFavrisEmploiSupprimes,
         nombreFavrisEngagementSupprimes,
-        nombreFavrisImmersionSupprimes
+        nombreFavrisImmersionSupprimes,
+        nombreNotificationsJeuneSupprimes
       }
     }
   }

@@ -40,6 +40,7 @@ import {
   unFavoriOffreEngagement,
   unFavoriOffreImmersion
 } from '../../fixtures/sql-models/favoris.sql-model'
+import { NotificationJeuneSqlModel } from '../../../src/infrastructure/sequelize/models/notification-jeune.sql-model'
 
 let stats: SuiviJob
 
@@ -181,6 +182,24 @@ describe('NettoyerLesDonneesJobHandler', () => {
       resultat: {},
       nbErreurs: 10,
       tempsExecution: 10
+    })
+    await NotificationJeuneSqlModel.create({
+      id: 'notifAGarder',
+      idJeune: idJeune2,
+      dateNotif: maintenant.minus({ days: 1 }).toJSDate(),
+      type: 'TEST',
+      titre: 'test',
+      description: 'test',
+      idObjet: null
+    })
+    await NotificationJeuneSqlModel.create({
+      id: 'notifASupprimer',
+      idJeune: idJeune2,
+      dateNotif: maintenant.minus({ days: 10 }).toJSDate(),
+      type: 'TEST',
+      titre: 'test',
+      description: 'test',
+      idObjet: null
     })
 
     // Given - Rendez-vous
@@ -437,6 +456,18 @@ describe('NettoyerLesDonneesJobHandler', () => {
       expect(
         (stats.resultat as { nombreFavrisImmersionSupprimes: number })
           .nombreFavrisImmersionSupprimes
+      ).to.equal(1)
+    })
+  })
+
+  describe('notifs', () => {
+    it('supprime les notifs de plus de 8 jours', async () => {
+      // Then
+      const notifsApresNettoyage = await NotificationJeuneSqlModel.findAll()
+      expect(notifsApresNettoyage.length).to.equal(1)
+      expect(
+        (stats.resultat as { nombreNotificationsJeuneSupprimes: number })
+          .nombreNotificationsJeuneSupprimes
       ).to.equal(1)
     })
   })

@@ -77,7 +77,10 @@ export class NotifierRappelInstanceSessionMiloJobHandler extends JobHandler<
                 this.dateService
               )
             if (notification) {
-              await this.notificationRepository.send(notification)
+              await this.notificationRepository.send(
+                notification,
+                resultJeune.data.id
+              )
               stats.notificationEnvoyee = true
             }
           }

@@ -317,7 +317,7 @@ import { EvenementMiloHttpRepository } from './infrastructure/repositories/milo/
 import { MiloJeuneHttpSqlRepository } from './infrastructure/repositories/milo/jeune-milo-http-sql.repository.db'
 import { RendezVousMiloHttpRepository } from './infrastructure/repositories/milo/rendez-vous-milo-http.repository'
 import { SessionMiloHttpSqlRepository } from './infrastructure/repositories/milo/session-milo-http-sql.repository.db'
-import { NotificationFirebaseRepository } from './infrastructure/repositories/notification-firebase.repository'
+import { NotificationFirebaseSqlRepository } from './infrastructure/repositories/notification-firebase.repository'
 import { OffresEmploiHttpSqlRepository } from './infrastructure/repositories/offre/offre-emploi-http-sql.repository.db'
 import { FavorisOffresImmersionSqlRepository } from './infrastructure/repositories/offre/offre-immersion-http-sql.repository.db'
 import { OffreServiceCiviqueHttpSqlRepository } from './infrastructure/repositories/offre/offre-service-civique-http.repository.db'
@@ -366,6 +366,7 @@ import { CJEController } from './infrastructure/routes/cje.controller'
 import { GetCJETokenQueryHandler } from './application/queries/get-cje-token.query.handler'
 import { NotifierBonneAlternanceJobHandler } from './application/jobs/notifier-bonne-alternance.job.handler.db'
 import { NotifierCJEJobHandler } from './application/jobs/notifier-cje.job.handler.db'
+import { GetNotificationsJeuneQueryHandler } from './application/queries/get-notifications-jeune.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -492,7 +493,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     },
     {
       provide: NotificationRepositoryToken,
-      useClass: NotificationFirebaseRepository
+      useClass: NotificationFirebaseSqlRepository
     },
     {
       provide: ChatRepositoryToken,
@@ -791,7 +792,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetTokenPoleEmploiQueryHandler,
     GetMonSuiviPoleEmploiQueryHandler,
     GetCompteursBeneficiaireMiloQueryHandler,
-    GetDemarchesConseillerQueryHandler
+    GetDemarchesConseillerQueryHandler,
+    GetNotificationsJeuneQueryHandler
   ]
 }
 

@@ -92,6 +92,7 @@ export class NotifierRendezVousPEJobHandler extends JobHandler<Job> {
                 notificationAEnvoyer.typeMouvementRDV,
                 jeuneANotifier.pushNotificationToken,
                 notificationAEnvoyer.message,
+                jeuneANotifier.id,
                 notificationAEnvoyer.idMetier
               )
               stats.nombreNotificationsEnvoyees++
