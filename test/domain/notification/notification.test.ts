@@ -160,8 +160,7 @@ describe('Notification', () => {
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
-          expectedNotification,
-          jeunes[0].id
+          expectedNotification
         )
       })
       it('ne notifie pas les jeunes avec preferences de notification désactivés pour les messages', async () => {
@@ -181,8 +180,7 @@ describe('Notification', () => {
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
-          expectedNotification,
-          jeunes[0].id
+          expectedNotification
         )
       })
     })

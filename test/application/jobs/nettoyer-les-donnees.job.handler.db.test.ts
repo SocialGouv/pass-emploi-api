@@ -195,7 +195,7 @@ describe('NettoyerLesDonneesJobHandler', () => {
     await NotificationJeuneSqlModel.create({
       id: 'notifASupprimer',
       idJeune: idJeune2,
-      dateNotif: maintenant.minus({ days: 8 }).toJSDate(),
+      dateNotif: maintenant.minus({ days: 10 }).toJSDate(),
       type: 'TEST',
       titre: 'test',
       description: 'test',

@@ -1,5 +1,4 @@
 import {
-  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -53,7 +52,4 @@ export class NotificationJeuneDto extends Model {
 }
 
 @Table({ timestamps: false, tableName: 'notification_jeune' })
-export class NotificationJeuneSqlModel extends NotificationJeuneDto {
-  @BelongsTo(() => JeuneSqlModel)
-  jeune?: JeuneSqlModel
-}
+export class NotificationJeuneSqlModel extends NotificationJeuneDto {}

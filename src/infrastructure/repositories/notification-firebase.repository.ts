@@ -11,7 +11,9 @@ import {
 import { AsSql } from '../sequelize/types'
 
 @Injectable()
-export class NotificationFirebaseRepository implements Notification.Repository {
+export class NotificationFirebaseSqlRepository
+  implements Notification.Repository
+{
   constructor(
     private firebaseClient: FirebaseClient,
     private matomoClient: MatomoClient,
@@ -19,18 +21,20 @@ export class NotificationFirebaseRepository implements Notification.Repository {
     private dateService: DateService
   ) {}
 
-  async send(message: Notification.Message, idJeune: string): Promise<void> {
+  async send(message: Notification.Message, idJeune?: string): Promise<void> {
     this.firebaseClient.send(message)
     this.matomoClient.trackEventPushNotificationEnvoyee(message)
-    const notifSql: AsSql<NotificationJeuneDto> = {
-      id: this.idService.uuid(),
-      idJeune,
-      dateNotif: this.dateService.now().toJSDate(),
-      type: message.data.type,
-      titre: message.notification.title,
-      description: message.notification.body,
-      idObjet: message.data.id || null
+    if (idJeune) {
+      const notifSql: AsSql<NotificationJeuneDto> = {
+        id: this.idService.uuid(),
+        idJeune,
+        dateNotif: this.dateService.now().toJSDate(),
+        type: message.data.type,
+        titre: message.notification.title,
+        description: message.notification.body,
+        idObjet: message.data.id || null
+      }
+      NotificationJeuneSqlModel.create(notifSql)
     }
-    NotificationJeuneSqlModel.create(notifSql)
   }
 }

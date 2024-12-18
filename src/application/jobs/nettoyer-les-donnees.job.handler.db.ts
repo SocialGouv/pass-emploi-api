@@ -218,7 +218,7 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
       nombreNotificationsJeuneSupprimes =
         await NotificationJeuneSqlModel.destroy({
           where: {
-            dateNotif: { [Op.lte]: maintenant.minus({ days: 8 }).toJSDate() }
+            dateNotif: { [Op.lte]: maintenant.minus({ days: 10 }).toJSDate() }
           }
         })
     } catch (e) {
