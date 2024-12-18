@@ -91,7 +91,8 @@ describe('GetConseillersQueryHandler', () => {
               id: conseillerDto.id,
               nom: conseillerDto.nom,
               prenom: conseillerDto.prenom,
-              email: conseillerDto.email
+              email: conseillerDto.email,
+              idStructureMilo: undefined
             }
           ])
         )
@@ -115,7 +116,8 @@ describe('GetConseillersQueryHandler', () => {
               id: 'autre-conseiller-pe',
               prenom: 'toto',
               nom: 'tata',
-              email: 'nils.tavernier@pole-emploi.fr'
+              email: 'nils.tavernier@pole-emploi.fr',
+              idStructureMilo: undefined
             }
           ])
         )
@@ -139,7 +141,8 @@ describe('GetConseillersQueryHandler', () => {
               id: 'autre-conseiller-ft',
               prenom: 'toto',
               nom: 'tata',
-              email: 'new@francetravail.fr'
+              email: 'new@francetravail.fr',
+              idStructureMilo: undefined
             }
           ])
         )
@@ -163,7 +166,8 @@ describe('GetConseillersQueryHandler', () => {
               id: 'autre-conseiller-ft',
               prenom: 'toto',
               nom: 'tata',
-              email: 'new@francetravail.fr'
+              email: 'new@francetravail.fr',
+              idStructureMilo: undefined
             }
           ])
         )
@@ -188,13 +192,15 @@ describe('GetConseillersQueryHandler', () => {
               id: conseillerDto.id,
               prenom: conseillerDto.prenom,
               nom: conseillerDto.nom,
-              email: conseillerDto.email
+              email: conseillerDto.email,
+              idStructureMilo: undefined
             },
             {
               id: 'autre-conseiller',
               prenom: 'toto',
               nom: 'tata',
-              email: 'conseiller@passemploi.com'
+              email: 'conseiller@passemploi.com',
+              idStructureMilo: undefined
             }
           ])
         )
@@ -254,19 +260,22 @@ describe('GetConseillersQueryHandler', () => {
               id: '4',
               prenom: 'Dudu',
               nom: 'Labiche',
-              email: 'nils.tavernier@passemploi.com'
+              email: 'nils.tavernier@passemploi.com',
+              idStructureMilo: undefined
             },
             {
               id: '2',
               prenom: 'Jean',
               nom: 'Dupont',
-              email: 'nils.tavernier@passemploi.com'
+              email: 'nils.tavernier@passemploi.com',
+              idStructureMilo: undefined
             },
             {
               id: '3',
               prenom: 'Bruno',
               nom: 'Dumont',
-              email: 'nils.tavernier@passemploi.com'
+              email: 'nils.tavernier@passemploi.com',
+              idStructureMilo: undefined
             }
           ])
         )
@@ -333,7 +342,8 @@ describe('GetConseillersQueryHandler', () => {
               id: '4',
               prenom: 'Dudu',
               nom: 'Labiche',
-              email: 'nils.tavernier@passemploi.com'
+              email: 'nils.tavernier@passemploi.com',
+              idStructureMilo: undefined
             }
           ])
         )

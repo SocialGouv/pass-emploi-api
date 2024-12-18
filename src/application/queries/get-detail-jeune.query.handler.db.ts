@@ -53,6 +53,7 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
 
     if (estMilo(jeuneSqlModel.structure)) {
       const baseUrlDossier = this.configService.get('milo.urlWeb')
+      // TODO estAArchiver -> prendre en compte date dernière activité et date fin cej OU renommer
       const estAArchiver = await JeuneMiloAArchiverSqlModel.findByPk(
         jeuneSqlModel.id
       )

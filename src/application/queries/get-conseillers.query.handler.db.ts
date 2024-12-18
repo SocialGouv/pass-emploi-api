@@ -50,6 +50,7 @@ export class GetConseillersQueryHandler extends QueryHandler<
       nom: string
       prenom: string
       email: string
+      idstructuremilo: string | null
       greatestscore: number
     }>(
       `SELECT
@@ -57,6 +58,7 @@ export class GetConseillersQueryHandler extends QueryHandler<
             conseiller.nom as nom,
             conseiller.prenom as prenom,
             conseiller.email as email,
+            conseiller.id_structure_milo as idstructuremilo,
             GREATEST(SIMILARITY(CONCAT(conseiller.nom, ' ', conseiller.prenom), :query), SIMILARITY(conseiller.email, :queryPE), SIMILARITY(conseiller.email, :queryFT)) as greatestscore
       FROM conseiller
       WHERE structure = :structure
@@ -97,11 +99,13 @@ function sqlToQueryModel(conseillerRawSql: {
   nom: string
   prenom: string
   email: string
+  idstructuremilo: string | null
 }): ConseillerSimpleQueryModel {
   return {
     id: conseillerRawSql.id,
     prenom: conseillerRawSql.prenom,
     nom: conseillerRawSql.nom,
-    email: conseillerRawSql.email ?? undefined
+    email: conseillerRawSql.email ?? undefined,
+    idStructureMilo: conseillerRawSql.idstructuremilo ?? undefined
   }
 }

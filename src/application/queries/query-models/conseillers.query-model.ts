@@ -30,6 +30,9 @@ export class ConseillerSimpleQueryModel {
 
   @ApiProperty({ required: false })
   email?: string
+
+  @ApiProperty({ required: false })
+  idStructureMilo?: string
 }
 
 export class DetailConseillerQueryModel {
