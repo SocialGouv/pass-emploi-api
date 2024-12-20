@@ -152,7 +152,7 @@
     "chai-as-promised": "^7.1.2",
     "chai-exclude": "^2.1.1",
     "dirty-chai": "^2.0.1",
-    "dotenv-cli": "^7.4.2",
+    "dotenv-cli": "^8.0.0",
     "dotvault": "^0.0.9",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
