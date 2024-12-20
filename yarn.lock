@@ -5385,17 +5385,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv-cli@npm:^7.4.2":
-  version: 7.4.2
-  resolution: "dotenv-cli@npm:7.4.2"
+"dotenv-cli@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "dotenv-cli@npm:8.0.0"
   dependencies:
-    cross-spawn: "npm:^7.0.3"
+    cross-spawn: "npm:^7.0.6"
     dotenv: "npm:^16.3.0"
     dotenv-expand: "npm:^10.0.0"
     minimist: "npm:^1.2.6"
   bin:
     dotenv: cli.js
-  checksum: 10/48d887ea9be08f7453dc87d6c938311989e951d0b43028eadcbaff3be1ca56180f8c38b8f932fc2e59f0210e59f4b5c59cf8a34da3e6c92f63fe6d7ce4f09f65
+  checksum: 10/3acbc2712f97de5a7b916e2e611682377b5f62efb7ebe63ede314800bedd9c63e9ae1e8b1f819efe0e87f9d813842695cfed991a276290a79cac63d48c60df05
   languageName: node
   linkType: hard
 
@@ -9244,7 +9244,7 @@ __metadata:
     cron-parser: "npm:4.9.0"
     crypto-js: "npm:4.2.0"
     dirty-chai: "npm:^2.0.1"
-    dotenv-cli: "npm:^7.4.2"
+    dotenv-cli: "npm:^8.0.0"
     dotvault: "npm:^0.0.9"
     elastic-apm-node: "npm:3.52.2"
     eslint: "npm:^8.57.1"
