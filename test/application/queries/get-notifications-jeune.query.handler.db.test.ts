@@ -45,7 +45,7 @@ describe('GetNotificationsJeuneQueryHandler', () => {
         {
           id: '5cd8e86b-175a-4980-bad8-c5ce01dc049b',
           idJeune: jeune.id,
-          dateNotif: uneDatetime().toJSDate(),
+          dateNotif: uneDatetime().plus({ days: 1 }).toJSDate(),
           type: 'test',
           titre: 'test',
           description: 'test',
@@ -70,7 +70,7 @@ describe('GetNotificationsJeuneQueryHandler', () => {
       // Then
       const attendu: NotificationJeuneQueryModel[] = [
         {
-          date: '2020-04-06T12:00:00.000Z',
+          date: '2020-04-07T12:00:00.000Z',
           description: 'test',
           id: '5cd8e86b-175a-4980-bad8-c5ce01dc049b',
           idObjet: undefined,

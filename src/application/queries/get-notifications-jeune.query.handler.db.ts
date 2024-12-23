@@ -44,7 +44,8 @@ export class GetNotificationsJeuneQueryHandler extends QueryHandler<
     query: GetNotificationsJeuneQuery
   ): Promise<Result<NotificationJeuneQueryModel[]>> {
     const sqlNotifs = await NotificationJeuneSqlModel.findAll({
-      where: { idJeune: query.idJeune }
+      where: { idJeune: query.idJeune },
+      order: [['dateNotif', 'DESC']]
     })
 
     return success(
