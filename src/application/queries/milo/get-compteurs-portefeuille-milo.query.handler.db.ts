@@ -51,7 +51,7 @@ export class GetCompteursBeneficiaireMiloQueryHandler extends QueryHandler<
       query.dateFin
     )
 
-    const compteursSessions: Result<Array<{ id: string; sessions: number }>> =
+    let compteursSessions: Result<Array<{ id: string; sessions: number }>> =
       await this.sessionsRecupereesToCompteursSessions(
         utilisateur.id,
         query.accessToken,
@@ -59,7 +59,9 @@ export class GetCompteursBeneficiaireMiloQueryHandler extends QueryHandler<
         query.dateFin.toUTC().endOf('day')
       )
 
-    if (isFailure(compteursSessions)) return compteursSessions
+    if (isFailure(compteursSessions)) {
+      compteursSessions = success([])
+    }
 
     compteurActions.forEach(({ id, actions }) => {
       mergeMap[id] = { actions: Number(actions), rdvs: 0, sessions: 0 }
