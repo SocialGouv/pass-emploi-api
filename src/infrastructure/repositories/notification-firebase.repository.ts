@@ -34,7 +34,7 @@ export class NotificationFirebaseSqlRepository
         description: message.notification.body,
         idObjet: message.data.id || null
       }
-      NotificationJeuneSqlModel.create(notifSql)
+      NotificationJeuneSqlModel.create(notifSql).catch(_e => {})
     }
   }
 }
