@@ -60,7 +60,7 @@ export class AntivirusClient {
       this.logger.error(analyseAntivirusEchouee)
       return failure(analyseAntivirusEchouee)
     } catch (e) {
-      e.config.data = 'REDACTED'
+      if (e.config) e.config.data = 'REDACTED'
       return handleAxiosError(
         e,
         this.logger,
@@ -83,7 +83,7 @@ export class AntivirusClient {
       if (!data.is_malware) return emptySuccess()
       return failure(new FichierMalveillant())
     } catch (e) {
-      e.config.data = 'REDACTED'
+      if (e.config) e.config.data = 'REDACTED'
       return handleAxiosError(
         e,
         this.logger,

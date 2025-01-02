@@ -185,6 +185,12 @@ export class TeleverserFichierCommandHandler extends CommandHandler<
       })
     } catch (e) {
       this.logger.error(buildError('Erreur Analyse PJ', e))
+      this.fichierRepository.softDelete(fichier.id)
+      this.chatRepository.envoyerStatutAnalysePJ(
+        idJeune,
+        idMessage,
+        Chat.StatutPJ.ERREUR_ANALYSE
+      )
     }
   }
 }

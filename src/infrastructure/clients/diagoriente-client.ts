@@ -60,7 +60,7 @@ export class DiagorienteClient {
 
       return success(response.data.data.partnerAuthURL)
     } catch (e) {
-      e.config.data = 'REDACTED'
+      if (e.config) e.config.data = 'REDACTED'
       return handleAxiosError(
         e,
         this.logger,
@@ -86,7 +86,7 @@ export class DiagorienteClient {
       }
       return emptySuccess()
     } catch (e) {
-      e.config.data = 'REDACTED'
+      if (e.config) e.config.data = 'REDACTED'
       return handleAxiosError(
         e,
         this.logger,
@@ -111,7 +111,7 @@ export class DiagorienteClient {
 
       return success(response.data)
     } catch (e) {
-      e.config.data = 'REDACTED'
+      if (e.config) e.config.data = 'REDACTED'
       return handleAxiosError(
         e,
         this.logger,

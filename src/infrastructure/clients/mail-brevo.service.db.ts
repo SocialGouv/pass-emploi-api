@@ -214,8 +214,10 @@ export class MailBrevoService implements Mail.Service {
         )
       } catch (e) {
         if (e.name === 'AxiosError') {
-          e.config.data = 'REDACTED'
-          e.config.headers['api-key'] = 'REDACTED'
+          if (e.config) {
+            e.config.data = 'REDACTED'
+            e.config.headers['api-key'] = 'REDACTED'
+          }
         }
         throw e
       }
