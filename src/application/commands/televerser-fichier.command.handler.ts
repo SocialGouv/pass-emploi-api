@@ -154,6 +154,8 @@ export class TeleverserFichierCommandHandler extends CommandHandler<
         declenchementAnalyse =
           await this.fichierRepository.declencherAnalyseAsynchrone(fichier)
         tryCount++
+        if (isFailure(declenchementAnalyse) && tryCount < MAX_TRY)
+          await new Promise(resolve => setTimeout(resolve, 1000))
       } while (isFailure(declenchementAnalyse) && tryCount < MAX_TRY)
 
       if (isFailure(declenchementAnalyse)) {

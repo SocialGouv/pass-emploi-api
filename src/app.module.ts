@@ -377,7 +377,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     }),
     configureLoggerModule(),
     HttpModule.register({
-      timeout: 5000
+      timeout: 6000
     }),
     TerminusModule
   ],
