@@ -129,6 +129,12 @@ export namespace SessionMilo {
 
       const inscription = inscriptionsExistantes.get(emargement.idJeune)!
 
+      if (
+        emargement.statut === Inscription.Statut.PRESENT &&
+        inscription.statut === Inscription.Statut.PRESENT
+      )
+        continue
+
       const statutInscription =
         emargement.statut === Inscription.Statut.INSCRIT
           ? SessionMilo.Inscription.Statut.REFUS_JEUNE
