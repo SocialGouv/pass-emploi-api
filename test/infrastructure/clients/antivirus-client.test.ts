@@ -77,10 +77,7 @@ describe('AntivirusClient', () => {
       // Then
       expect(result).to.deep.equal(
         failure(
-          new ErreurHttp(
-            "L'analyse du fichier par l'antivirus a échoué : message d’erreur",
-            400
-          )
+          new ErreurHttp("L'analyse du fichier par l'antivirus a échoué", 400)
         )
       )
     })
@@ -147,7 +144,7 @@ describe('AntivirusClient', () => {
       expect(result).to.deep.equal(
         failure(
           new ErreurHttp(
-            'La récupération de l’analyse du fichier a échoué : message d’erreur',
+            'La récupération de l’analyse du fichier a échoué',
             400
           )
         )

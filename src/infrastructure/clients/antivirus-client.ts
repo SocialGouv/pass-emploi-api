@@ -64,8 +64,7 @@ export class AntivirusClient {
       return handleAxiosError(
         e,
         this.logger,
-        "L'analyse du fichier par l'antivirus a échoué : " +
-          e.response.data.error
+        "L'analyse du fichier par l'antivirus a échoué"
       )
     }
   }
@@ -87,8 +86,7 @@ export class AntivirusClient {
       return handleAxiosError(
         e,
         this.logger,
-        'La récupération de l’analyse du fichier a échoué : ' +
-          e.response.data.error
+        'La récupération de l’analyse du fichier a échoué'
       )
     }
   }

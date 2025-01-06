@@ -19,7 +19,7 @@ export function handleAxiosError(
     error.response?.status < MAX_STATUS
   ) {
     const erreurHttp = new ErreurHttp(
-      error.response.data?.message ?? message,
+      error.response?.data?.message ?? message,
       error.response.status
     )
     return failure(erreurHttp)
