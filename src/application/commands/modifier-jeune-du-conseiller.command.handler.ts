@@ -10,6 +10,7 @@ import {
 import { Authentification } from '../../domain/authentification'
 import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
+import { estPoleEmploiOuCDOuAvenirPro } from '../../domain/core'
 
 export interface ModifierJeuneDuConseillerCommand extends Command {
   idPartenaire?: string
@@ -38,7 +39,7 @@ export class ModifierJeuneDuConseillerCommandHandler extends CommandHandler<
     }
 
     let jeuneMisAJour = jeune
-    if (command.idPartenaire) {
+    if (command.idPartenaire && estPoleEmploiOuCDOuAvenirPro(jeune.structure)) {
       jeuneMisAJour = Jeune.mettreAJourIdPartenaire(jeune, command.idPartenaire)
     }
     if (command.dispositif) {

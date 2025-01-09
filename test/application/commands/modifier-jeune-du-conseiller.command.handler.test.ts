@@ -21,7 +21,7 @@ describe('ModifierJeuneDuConseillerCommandHandler', () => {
   let conseillerForJeuneAuthorizer: StubbedClass<ConseillerAuthorizer>
   let jeuneRepository: StubbedType<Jeune.Repository>
 
-  const jeune = unJeune()
+  const jeune = unJeune({ structure: Core.Structure.POLE_EMPLOI })
   const command: ModifierJeuneDuConseillerCommand = {
     idJeune: jeune.id,
     idPartenaire: 'id-nouveau'

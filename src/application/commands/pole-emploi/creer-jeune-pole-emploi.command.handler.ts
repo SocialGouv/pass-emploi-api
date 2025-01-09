@@ -8,12 +8,8 @@ import {
 import { Result, failure, success } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../../domain/chat'
-import { estPoleEmploiOuCDOuAvenirPro } from '../../../domain/core'
-import {
-  fromStructureToDispositif,
-  Jeune,
-  JeuneRepositoryToken
-} from '../../../domain/jeune/jeune'
+import { Core, estPoleEmploiOuCDOuAvenirPro } from '../../../domain/core'
+import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import {
   Conseiller,
   ConseillerRepositoryToken
@@ -92,5 +88,24 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
 
   async monitor(): Promise<void> {
     return
+  }
+}
+
+function fromStructureToDispositif(
+  structure: Core.Structure
+): Jeune.Dispositif {
+  switch (structure) {
+    case Core.Structure.POLE_EMPLOI:
+      return Jeune.Dispositif.CEJ
+    case Core.Structure.POLE_EMPLOI_AIJ:
+      return Jeune.Dispositif.AIJ
+    case Core.Structure.POLE_EMPLOI_BRSA:
+      return Jeune.Dispositif.BRSA
+    case Core.Structure.CONSEIL_DEPT:
+      return Jeune.Dispositif.CONSEIL_DEPT
+    case Core.Structure.AVENIR_PRO:
+      return Jeune.Dispositif.AVENIR_PRO
+    default:
+      return Jeune.Dispositif.CEJ
   }
 }

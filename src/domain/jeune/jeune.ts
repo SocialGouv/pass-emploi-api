@@ -254,23 +254,3 @@ function mapConseillerInitial(
   }
   return undefined
 }
-
-export function fromStructureToDispositif(
-  structure: Core.Structure
-): Jeune.Dispositif {
-  switch (structure) {
-    case Core.Structure.MILO:
-    case Core.Structure.POLE_EMPLOI:
-      return Jeune.Dispositif.CEJ
-    case Core.Structure.POLE_EMPLOI_AIJ:
-      return Jeune.Dispositif.AIJ
-    case Core.Structure.POLE_EMPLOI_BRSA:
-      return Jeune.Dispositif.BRSA
-    case Core.Structure.CONSEIL_DEPT:
-      return Jeune.Dispositif.CONSEIL_DEPT
-    case Core.Structure.AVENIR_PRO:
-      return Jeune.Dispositif.AVENIR_PRO
-    default:
-      return Jeune.Dispositif.CEJ
-  }
-}

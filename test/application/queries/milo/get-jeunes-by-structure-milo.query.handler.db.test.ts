@@ -183,8 +183,8 @@ describe('GetJeunesByStructureMiloQueryHandler', () => {
             total: 2
           },
           resultats: [
-            mapJeuneMiloResume(jeune1Dto, situationJeune1Dto, conseiller1Dto),
-            mapJeuneMiloResume(jeune2Dto, situationJeune2Dto, conseiller1Dto)
+            mapJeuneMiloResume(jeune2Dto, situationJeune2Dto, conseiller1Dto),
+            mapJeuneMiloResume(jeune1Dto, situationJeune1Dto, conseiller1Dto)
           ]
         }
         expect(result._isSuccess && result.data).to.deep.equal(
