@@ -28,6 +28,7 @@ import {
   transformStringToArray,
   transformStringToBoolean
 } from './utils/transformers'
+import { Jeune } from '../../../domain/jeune/jeune'
 
 export class GetConseillersQueryParams {
   @ApiProperty()
@@ -192,12 +193,19 @@ export class DetailConseillerPayload {
   notificationsSonores?: boolean
 }
 
-export class PutJeuneDuConseillerPayload {
+export class UpdateJeuneDuConseillerPayload {
   @ApiProperty()
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
   @Length(1, 11)
-  idPartenaire: string
+  idPartenaire?: string
+
+  @ApiProperty({ enum: Jeune.Dispositif })
+  @IsOptional()
+  @IsString()
+  @IsEnum(Jeune.Dispositif)
+  dispositif?: Jeune.Dispositif
 }
 
 export class GetIndicateursPourConseillerQueryParams {

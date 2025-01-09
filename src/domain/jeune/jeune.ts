@@ -29,6 +29,7 @@ export interface Jeune {
   configuration: Jeune.ConfigurationApplication
   preferences: Jeune.Preferences
   dateSignatureCGU?: DateTime
+  dispositif: Jeune.Dispositif
 }
 
 export namespace Jeune {
@@ -59,6 +60,15 @@ export namespace Jeune {
     RECUPERATION = 'RECUPERATION'
   }
 
+  export enum Dispositif {
+    CEJ = 'CEJ',
+    PACEA = 'PACEA',
+    BRSA = 'BRSA',
+    AIJ = 'AIJ',
+    CONSEIL_DEPT = 'CONSEIL_DEPT',
+    AVENIR_PRO = 'AVENIR_PRO'
+  }
+
   export type Id = Brand<string, 'JeuneId'>
 
   export function mettreAJourIdPartenaire(
@@ -68,6 +78,16 @@ export namespace Jeune {
     return {
       ...jeune,
       idPartenaire
+    }
+  }
+
+  export function mettreAJourDispositif(
+    jeune: Jeune,
+    dispositif: Dispositif
+  ): Jeune {
+    return {
+      ...jeune,
+      dispositif
     }
   }
 
@@ -145,7 +165,8 @@ export namespace Jeune {
         idPartenaire: jeuneACreer.idPartenaire,
         configuration: {
           idJeune: id
-        }
+        },
+        dispositif: jeuneACreer.dispositif
       }
     }
   }
@@ -158,6 +179,7 @@ export namespace Jeune {
       conseiller: Conseiller
       structure: Core.Structure
       idPartenaire?: string
+      dispositif: Jeune.Dispositif
     }
   }
 

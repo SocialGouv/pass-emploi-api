@@ -4,6 +4,7 @@ import {
   DetailJeuneQueryModel,
   JeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-model'
+import { Jeune } from '../../../src/domain/jeune/jeune'
 
 export function unConseillerJeuneQueryModel(
   args: Partial<ConseillerJeuneQueryModel> = {}
@@ -37,7 +38,8 @@ export function unDetailJeuneQueryModel(
     structureMilo: undefined,
     dateFinCEJ: undefined,
     estAArchiver: undefined,
-    dateSignatureCGU: undefined
+    dateSignatureCGU: undefined,
+    dispositif: Jeune.Dispositif.CEJ
   }
 
   return { ...defaults, ...args }
@@ -58,7 +60,8 @@ export function unDetailJeuneConseillerQueryModel(
     situationCourante: undefined,
     structureMilo: undefined,
     lastActivity: '2022-03-01T02:24:00.000Z',
-    estAArchiver: false
+    estAArchiver: false,
+    dispositif: Jeune.Dispositif.CEJ
   }
 
   return { ...defaults, ...args }

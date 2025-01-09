@@ -173,7 +173,8 @@ export class JeuneSqlRepository implements Jeune.Repository {
       installationId: jeune.configuration.installationId ?? null,
       instanceId: jeune.configuration.instanceId ?? null,
       timezone: jeune.configuration.fuseauHoraire ?? null,
-      dateSignatureCGU: jeune.dateSignatureCGU?.toJSDate() ?? null
+      dateSignatureCGU: jeune.dateSignatureCGU?.toJSDate() ?? null,
+      dispositif: jeune.dispositif
     }
     await JeuneSqlModel.upsert(jeuneDto)
   }
@@ -243,7 +244,8 @@ export class JeuneSqlRepository implements Jeune.Repository {
         notificationsCreationActionConseiller:
           jeune.preferences.creationActionConseiller,
         notificationsRendezVousSessions: jeune.preferences.rendezVousSessions,
-        notificationsRappelActions: jeune.preferences.rappelActions
+        notificationsRappelActions: jeune.preferences.rappelActions,
+        dispositif: jeune.dispositif
       }
       await JeuneSqlModel.upsert(jeuneTransfereSQL)
     }

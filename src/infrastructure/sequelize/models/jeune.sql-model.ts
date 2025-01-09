@@ -19,6 +19,7 @@ import { RendezVousSqlModel } from './rendez-vous.sql-model'
 import { SituationsMiloSqlModel } from './situations-milo.sql-model'
 import { TransfertConseillerSqlModel } from './transfert-conseiller.sql-model'
 import { StructureMiloSqlModel } from './structure-milo.sql-model'
+import { Jeune } from '../../../domain/jeune/jeune'
 
 export class JeuneDto extends Model {
   @PrimaryKey
@@ -185,6 +186,12 @@ export class JeuneDto extends Model {
     type: DataType.DATE
   })
   dateSignatureCGU: Date | null
+
+  @Column({
+    field: 'dispositif',
+    type: DataType.STRING
+  })
+  dispositif: Jeune.Dispositif
 }
 
 @Table({

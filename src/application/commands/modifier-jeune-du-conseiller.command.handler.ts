@@ -8,12 +8,13 @@ import {
   failure
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { estPoleEmploiOuCDOuAvenirPro } from '../../domain/core'
 import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
+import { estPoleEmploiOuCDOuAvenirPro } from '../../domain/core'
 
 export interface ModifierJeuneDuConseillerCommand extends Command {
-  idPartenaire: string
+  idPartenaire?: string
+  dispositif?: Jeune.Dispositif
   idJeune: string
 }
 
@@ -37,11 +38,13 @@ export class ModifierJeuneDuConseillerCommandHandler extends CommandHandler<
       return failure(new NonTrouveError('Jeune', command.idJeune))
     }
 
-    const jeuneMisAJour = Jeune.mettreAJourIdPartenaire(
-      jeune,
-      command.idPartenaire
-    )
-
+    let jeuneMisAJour = jeune
+    if (command.idPartenaire && estPoleEmploiOuCDOuAvenirPro(jeune.structure)) {
+      jeuneMisAJour = Jeune.mettreAJourIdPartenaire(jeune, command.idPartenaire)
+    }
+    if (command.dispositif) {
+      jeuneMisAJour = Jeune.mettreAJourDispositif(jeune, command.dispositif)
+    }
     await this.jeuneRepository.save(jeuneMisAJour)
 
     return emptySuccess()
@@ -53,8 +56,7 @@ export class ModifierJeuneDuConseillerCommandHandler extends CommandHandler<
   ): Promise<Result> {
     return this.conseillerAuthorizer.autoriserConseillerPourSonJeune(
       command.idJeune,
-      utilisateur,
-      estPoleEmploiOuCDOuAvenirPro(utilisateur.structure)
+      utilisateur
     )
   }
 

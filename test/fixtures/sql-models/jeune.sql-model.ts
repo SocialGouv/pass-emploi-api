@@ -1,4 +1,5 @@
 import { Core } from '../../../src/domain/core'
+import { Jeune } from '../../../src/domain/jeune/jeune'
 import { JeuneDto } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { uneDate } from '../date.fixture'
@@ -33,7 +34,8 @@ export function unJeuneDto(
     notificationsRappelActions: true,
     timezone: 'Europe/Paris',
     idStructureMilo: null,
-    dateSignatureCGU: null
+    dateSignatureCGU: null,
+    dispositif: Jeune.Dispositif.CEJ
   }
 
   return { ...defaults, ...args }

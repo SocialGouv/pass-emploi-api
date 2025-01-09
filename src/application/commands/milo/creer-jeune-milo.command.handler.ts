@@ -39,6 +39,7 @@ export interface CreerJeuneMiloCommand extends Command {
   email: string
   idConseiller: string
   surcharge?: boolean
+  dispositif?: Jeune.Dispositif
 }
 
 @Injectable()
@@ -154,7 +155,8 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
       email: lowerCaseEmail,
       structure: Core.Structure.MILO,
       conseiller,
-      idPartenaire: command.idPartenaire
+      idPartenaire: command.idPartenaire,
+      dispositif: command.dispositif || Jeune.Dispositif.CEJ
     }
     const nouveauJeune = this.jeuneFactory.creer(jeuneACreer)
     await this.jeuneRepository.save(nouveauJeune)
