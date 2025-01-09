@@ -13,13 +13,6 @@ module.exports = {
         { transaction }
       )
       await queryInterface.sequelize.query(
-        `UPDATE jeune SET dispositif = 'CEJ' WHERE structure = 'MILO' OR structure = 'POLE_EMPLOI' OR structure = 'PASS_EMPLOI' OR structure = 'SUPPORT'`,
-        {
-          type: Sequelize.QueryTypes.UPDATE,
-          transaction
-        }
-      )
-      await queryInterface.sequelize.query(
         `UPDATE jeune SET dispositif = 'BRSA' WHERE structure = 'POLE_EMPLOI_BRSA'`,
         {
           type: Sequelize.QueryTypes.UPDATE,
@@ -34,14 +27,21 @@ module.exports = {
         }
       )
       await queryInterface.sequelize.query(
-        `UPDATE jeune SET dispositif = 'Conseil Départemental' WHERE structure = 'CONSEIL_DEPT'`,
+        `UPDATE jeune SET dispositif = 'CONSEIL_DEPT' WHERE structure = 'CONSEIL_DEPT'`,
         {
           type: Sequelize.QueryTypes.UPDATE,
           transaction
         }
       )
       await queryInterface.sequelize.query(
-        `UPDATE jeune SET dispositif = 'Avenir Pro' WHERE structure = 'AVENIR_PRO'`,
+        `UPDATE jeune SET dispositif = 'AVENIR_PRO' WHERE structure = 'AVENIR_PRO'`,
+        {
+          type: Sequelize.QueryTypes.UPDATE,
+          transaction
+        }
+      )
+      await queryInterface.sequelize.query(
+        `UPDATE jeune SET dispositif = 'CEJ' WHERE dispositif IS NULL`,
         {
           type: Sequelize.QueryTypes.UPDATE,
           transaction

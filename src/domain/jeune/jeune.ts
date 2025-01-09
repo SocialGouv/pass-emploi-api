@@ -65,8 +65,8 @@ export namespace Jeune {
     PACEA = 'PACEA',
     BRSA = 'BRSA',
     AIJ = 'AIJ',
-    CONSEIL_DEPT = 'Conseil Départemental',
-    AVENIR_PRO = 'Avenir Pro'
+    CONSEIL_DEPT = 'CONSEIL_DEPT',
+    AVENIR_PRO = 'AVENIR_PRO'
   }
 
   export type Id = Brand<string, 'JeuneId'>
