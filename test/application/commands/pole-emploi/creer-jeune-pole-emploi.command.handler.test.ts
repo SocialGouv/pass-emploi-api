@@ -88,7 +88,8 @@ describe('CreateJeunePoleEmploiCommandHandler', () => {
         },
         configuration: {
           idJeune: idNouveauJeune
-        }
+        },
+        dispositif: Jeune.Dispositif.CEJ
       }
       expect(result).to.deep.equal(success(expectedJeune))
       expect(chatRepository.initializeChatIfNotExists).to.have.been.calledWith(

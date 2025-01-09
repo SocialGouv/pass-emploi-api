@@ -163,7 +163,8 @@ describe('CreerJeuneMiloCommandHandler', () => {
           idPartenaire,
           configuration: {
             idJeune: 'DFKAL'
-          }
+          },
+          dispositif: Jeune.Dispositif.CEJ
         }
         expect(jeuneRepository.save).to.have.been.calledWithExactly(
           expectedJeune
@@ -231,7 +232,8 @@ describe('CreerJeuneMiloCommandHandler', () => {
           idPartenaire,
           configuration: {
             idJeune: 'DFKAL'
-          }
+          },
+          dispositif: Jeune.Dispositif.CEJ
         }
         expect(jeuneRepository.save).to.have.been.calledWithExactly(expected)
       })

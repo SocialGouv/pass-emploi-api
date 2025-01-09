@@ -22,7 +22,8 @@ export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
     email: jeuneSqlModel.email ?? undefined,
     idPartenaire: jeuneSqlModel.idPartenaire ?? undefined,
     configuration: toConfigurationApplication(jeuneSqlModel),
-    preferences: fromSqlToPreferencesJeune(jeuneSqlModel)
+    preferences: fromSqlToPreferencesJeune(jeuneSqlModel),
+    dispositif: jeuneSqlModel.dispositif
   }
   if (jeuneSqlModel.conseiller) {
     jeune.conseiller = {

@@ -29,6 +29,7 @@ export interface Jeune {
   configuration: Jeune.ConfigurationApplication
   preferences: Jeune.Preferences
   dateSignatureCGU?: DateTime
+  dispositif: Jeune.Dispositif
 }
 
 export namespace Jeune {
@@ -57,6 +58,15 @@ export namespace Jeune {
     DEFINITIF_SUPPORT = 'DEFINITIF_SUPPORT',
     TEMPORAIRE_SUPPORT = 'TEMPORAIRE_SUPPORT',
     RECUPERATION = 'RECUPERATION'
+  }
+
+  export enum Dispositif {
+    CEJ = 'CEJ',
+    PACEA = 'PACEA',
+    BRSA = 'BRSA',
+    AIJ = 'AIJ',
+    CONSEIL_DEPT = 'Conseil Départemental',
+    AVENIR_PRO = 'Avenir Pro'
   }
 
   export type Id = Brand<string, 'JeuneId'>
@@ -145,7 +155,8 @@ export namespace Jeune {
         idPartenaire: jeuneACreer.idPartenaire,
         configuration: {
           idJeune: id
-        }
+        },
+        dispositif: jeuneACreer.dispositif
       }
     }
   }
@@ -158,6 +169,7 @@ export namespace Jeune {
       conseiller: Conseiller
       structure: Core.Structure
       idPartenaire?: string
+      dispositif: Jeune.Dispositif
     }
   }
 
@@ -231,4 +243,24 @@ function mapConseillerInitial(
     return jeune.conseillerInitial ?? { id: idConseillerSource }
   }
   return undefined
+}
+
+export function fromStructureToDispositif(
+  structure: Core.Structure
+): Jeune.Dispositif {
+  switch (structure) {
+    case Core.Structure.MILO:
+    case Core.Structure.POLE_EMPLOI:
+      return Jeune.Dispositif.CEJ
+    case Core.Structure.POLE_EMPLOI_AIJ:
+      return Jeune.Dispositif.AIJ
+    case Core.Structure.POLE_EMPLOI_BRSA:
+      return Jeune.Dispositif.BRSA
+    case Core.Structure.CONSEIL_DEPT:
+      return Jeune.Dispositif.CONSEIL_DEPT
+    case Core.Structure.AVENIR_PRO:
+      return Jeune.Dispositif.AVENIR_PRO
+    default:
+      return Jeune.Dispositif.CEJ
+  }
 }

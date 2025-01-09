@@ -22,7 +22,8 @@ export const unJeune = (
     idPartenaire: '1234',
     structure: Core.Structure.MILO,
     configuration: uneConfiguration(),
-    preferences: desPreferencesJeune()
+    preferences: desPreferencesJeune(),
+    dispositif: Jeune.Dispositif.CEJ
   }
 
   return { ...defaults, ...args }
@@ -43,7 +44,8 @@ export const unJeuneSansPushNotificationToken = (
   configuration: {
     idJeune: 'ABCDE'
   },
-  preferences: desPreferencesJeune()
+  preferences: desPreferencesJeune(),
+  dispositif: Jeune.Dispositif.CEJ
 })
 
 export const unJeuneSansConseiller = (
@@ -60,7 +62,8 @@ export const unJeuneSansConseiller = (
     idPartenaire: '1234',
     structure: Core.Structure.MILO,
     preferences: desPreferencesJeune(),
-    configuration: uneConfiguration()
+    configuration: uneConfiguration(),
+    dispositif: Jeune.Dispositif.CEJ
   }
 
   return { ...defaults, ...args }
