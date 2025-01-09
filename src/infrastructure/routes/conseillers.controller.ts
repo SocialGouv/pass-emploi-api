@@ -7,6 +7,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Put,
   Query
@@ -53,7 +54,7 @@ import {
   GetDemarchesConseillerQueryParams,
   GetIdentitesJeunesQueryParams,
   GetIndicateursPourConseillerQueryParams,
-  PutJeuneDuConseillerPayload
+  UpdateJeuneDuConseillerPayload
 } from './validation/conseillers.inputs'
 
 @Controller('conseillers')
@@ -220,22 +221,23 @@ export class ConseillersController {
   }
 
   @ApiOperation({
-    summary: "Permet de modifier l'idPartenaire d'un jeune PE",
-    description: 'Autorisé pour un conseiller Pole Emploi et Pass emploi'
+    summary: "Permet de modifier certains champs d'un jeune d'un conseiller",
+    description: 'Autorisé pour le conseiller'
   })
-  @Put(':idConseiller/jeunes/:idJeune')
+  @Patch(':idConseiller/jeunes/:idJeune')
   @ApiBody({
-    type: PutJeuneDuConseillerPayload
+    type: UpdateJeuneDuConseillerPayload
   })
   async modiferJeuneDuConseiller(
     @Param('idConseiller') _idConseiller: string,
     @Param('idJeune') idJeune: string,
-    @Body() putJeuneDuConseillerPayload: PutJeuneDuConseillerPayload,
+    @Body() updateJeuneDuConseillerPayload: UpdateJeuneDuConseillerPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     const result = await this.modifierJeuneDuConseillerCommandHandler.execute(
       {
-        idPartenaire: putJeuneDuConseillerPayload.idPartenaire,
+        idPartenaire: updateJeuneDuConseillerPayload.idPartenaire,
+        dispositif: updateJeuneDuConseillerPayload.dispositif,
         idJeune
       },
       utilisateur
