@@ -6,6 +6,7 @@ import {
   DetailJeuneConseillerQueryModel,
   DetailJeuneQueryModel
 } from '../query-models/jeunes.query-model'
+import { Jeune } from '../../../domain/jeune/jeune'
 
 export function fromSqlToDetailJeuneQueryModel(
   jeuneSqlModel: JeuneSqlModel,
@@ -52,7 +53,8 @@ export function fromSqlToDetailJeuneQueryModel(
         ? `${optionsMilo.baseUrlDossier}/${jeuneSqlModel.idPartenaire}/acces-externe`
         : undefined,
     estAArchiver: optionsMilo?.estAArchiver,
-    dateSignatureCGU: jeuneSqlModel.dateSignatureCGU?.toISOString()
+    dateSignatureCGU: jeuneSqlModel.dateSignatureCGU?.toISOString(),
+    dispositif: jeuneSqlModel.dispositif
   }
 }
 
@@ -75,7 +77,8 @@ export function toDetailJeuneConseillerQueryModel(
     structureMilo: sqlJeune.id_structure_milo
       ? { id: sqlJeune.id_structure_milo }
       : undefined,
-    estAArchiver: estAArchiver(sqlJeune, maintenant)
+    estAArchiver: estAArchiver(sqlJeune, maintenant),
+    dispositif: sqlJeune.dispositif
   }
   if (sqlJeune.date_derniere_actualisation_token) {
     jeuneQueryModel.lastActivity =
@@ -130,6 +133,7 @@ export interface JeuneRawSql {
 
 export interface DetailJeuneRawSql extends JeuneRawSql {
   email: string
+  dispositif: Jeune.Dispositif
   date_creation: Date
   id_authentification: string
   date_derniere_actualisation_token: Date | null

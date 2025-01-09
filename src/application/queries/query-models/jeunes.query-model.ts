@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { JeuneMilo } from '../../../domain/milo/jeune.milo'
+import { Jeune } from '../../../domain/jeune/jeune'
 
 class SituationQueryModel {
   @ApiProperty()
@@ -166,6 +167,9 @@ export class DetailJeuneQueryModel {
 
   @ApiProperty({ required: false })
   dateSignatureCGU?: string
+
+  @ApiProperty()
+  dispositif: Jeune.Dispositif
 }
 
 export class DetailJeuneConseillerQueryModel {
@@ -207,6 +211,9 @@ export class DetailJeuneConseillerQueryModel {
 
   @ApiProperty()
   estAArchiver: boolean
+
+  @ApiProperty()
+  dispositif: Jeune.Dispositif
 }
 
 export class PreferencesJeuneQueryModel {
