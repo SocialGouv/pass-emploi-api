@@ -10,7 +10,7 @@ import {
   emptySuccess,
   failure
 } from '../../../src/building-blocks/types/result'
-import { Core, estPoleEmploi } from '../../../src/domain/core'
+import { Core } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
@@ -56,11 +56,7 @@ describe('ModifierJeuneDuConseillerCommandHandler', () => {
       // Then
       expect(
         conseillerForJeuneAuthorizer.autoriserConseillerPourSonJeune
-      ).to.have.been.calledOnceWithExactly(
-        command.idJeune,
-        conseillerPE,
-        estPoleEmploi(conseillerPE.structure)
-      )
+      ).to.have.been.calledOnceWithExactly(command.idJeune, conseillerPE)
     })
   })
 

@@ -81,6 +81,16 @@ export namespace Jeune {
     }
   }
 
+  export function mettreAJourDispositif(
+    jeune: Jeune,
+    dispositif: Dispositif
+  ): Jeune {
+    return {
+      ...jeune,
+      dispositif
+    }
+  }
+
   export interface Repository {
     get(id: string): Promise<Jeune | undefined>
 

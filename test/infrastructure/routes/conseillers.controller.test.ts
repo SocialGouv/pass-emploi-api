@@ -287,7 +287,7 @@ describe('ConseillersController', () => {
     ensureUserAuthenticationFailsIfInvalid('get', '/conseillers/1/jeunes')
   })
 
-  describe('PUT /conseillers/{idConseiller}/jeunes/{idJeune}', () => {
+  describe('PATCH /conseillers/{idConseiller}/jeunes/{idJeune}', () => {
     const conseiller = unConseiller()
     const jeune = unJeune()
 
@@ -296,7 +296,8 @@ describe('ConseillersController', () => {
         // Given
         const command: ModifierJeuneDuConseillerCommand = {
           idJeune: jeune.id,
-          idPartenaire: 'le-id-part'
+          idPartenaire: 'le-id-part',
+          dispositif: undefined
         }
 
         modifierJeuneDuConseillerCommandHandler.execute
@@ -305,7 +306,7 @@ describe('ConseillersController', () => {
 
         // When - Then
         await request(app.getHttpServer())
-          .put(`/conseillers/${conseiller.id}/jeunes/${jeune.id}`)
+          .patch(`/conseillers/${conseiller.id}/jeunes/${jeune.id}`)
           .send({
             idPartenaire: 'le-id-part'
           })
@@ -319,7 +320,7 @@ describe('ConseillersController', () => {
         // Given
         // When - Then
         await request(app.getHttpServer())
-          .put(`/conseillers/${conseiller.id}/jeunes/${jeune.id}`)
+          .patch(`/conseillers/${conseiller.id}/jeunes/${jeune.id}`)
           .send({
             idPartenaire: 'le-id-part-trop-long'
           })
@@ -333,7 +334,8 @@ describe('ConseillersController', () => {
         // Given
         const command: ModifierJeuneDuConseillerCommand = {
           idJeune: jeune.id,
-          idPartenaire: 'le-id-part'
+          idPartenaire: 'le-id-part',
+          dispositif: undefined
         }
 
         modifierJeuneDuConseillerCommandHandler.execute
@@ -342,7 +344,7 @@ describe('ConseillersController', () => {
 
         // When - Then
         await request(app.getHttpServer())
-          .put(`/conseillers/${conseiller.id}/jeunes/${jeune.id}`)
+          .patch(`/conseillers/${conseiller.id}/jeunes/${jeune.id}`)
           .send({
             idPartenaire: 'le-id-part'
           })
@@ -351,7 +353,7 @@ describe('ConseillersController', () => {
       })
     })
 
-    ensureUserAuthenticationFailsIfInvalid('put', '/conseillers/2/jeunes/21')
+    ensureUserAuthenticationFailsIfInvalid('patch', '/conseillers/2/jeunes/21')
   })
 
   describe('POST /conseillers/:idConseiller/jeunes/notify-messages', () => {
