@@ -8,6 +8,11 @@ import { Authentification } from '../../../domain/authentification'
 import { Campagne, CampagneRepositoryToken } from '../../../domain/campagne'
 import { Core } from '../../../domain/core'
 import { SupportAuthorizer } from '../../authorizers/support-authorizer'
+import {
+  Planificateur,
+  PlanificateurRepositoryToken
+} from '../../../domain/planificateur'
+import { DateService } from '../../../utils/date-service'
 
 export interface CreateCampagneCommand extends Command {
   nom: string
@@ -23,7 +28,10 @@ export class CreateCampagneCommandHandler extends CommandHandler<
     @Inject(CampagneRepositoryToken)
     private campagneRepository: Campagne.Repository,
     private campagneFactory: Campagne.Factory,
-    private supportAuthorizer: SupportAuthorizer
+    private supportAuthorizer: SupportAuthorizer,
+    @Inject(PlanificateurRepositoryToken)
+    private planificateurRepository: Planificateur.Repository,
+    private dateService: DateService
   ) {
     super('CreateCampagneCommandHandler')
   }
@@ -49,6 +57,36 @@ export class CreateCampagneCommandHandler extends CommandHandler<
 
     const campagne = this.campagneFactory.creer(command)
     await this.campagneRepository.save(campagne)
+
+    const maintenant = this.dateService.now()
+
+    await this.planificateurRepository.creerJob({
+      dateExecution: maintenant
+        .plus({ days: 1 })
+        .set({ hour: 11, minute: 40, second: 0, millisecond: 0 })
+        .toJSDate(),
+      type: Planificateur.JobType.NOTIFIER_CAMPAGNE,
+      contenu: {
+        offset: 0,
+        idCampagne: campagne.id,
+        nbNotifsEnvoyees: 0
+      }
+    })
+
+    if (command.dateFin.diff(this.dateService.now()).as('days') > 7) {
+      await this.planificateurRepository.creerJob({
+        dateExecution: maintenant
+          .plus({ days: 7 })
+          .set({ hour: 11, minute: 40, second: 0, millisecond: 0 })
+          .toJSDate(),
+        type: Planificateur.JobType.NOTIFIER_CAMPAGNE,
+        contenu: {
+          offset: 0,
+          idCampagne: campagne.id,
+          nbNotifsEnvoyees: 0
+        }
+      })
+    }
 
     return success({ id: campagne.id })
   }

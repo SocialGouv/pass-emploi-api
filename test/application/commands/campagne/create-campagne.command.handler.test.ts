@@ -12,22 +12,31 @@ import { unUtilisateurSupport } from '../../../fixtures/authentification.fixture
 import { uneCampagne } from '../../../fixtures/campagne.fixture'
 import { uneDatetime } from '../../../fixtures/date.fixture'
 import { StubbedClass, createSandbox, expect, stubClass } from '../../../utils'
+import { Planificateur } from '../../../../src/domain/planificateur'
+import { DateService } from '../../../../src/utils/date-service'
 
 describe('CreateCampagneCommandHandler', () => {
   let campagneRepository: StubbedType<Campagne.Repository>
   let campagneFactory: StubbedClass<Campagne.Factory>
   let supportAuthorizer: StubbedClass<SupportAuthorizer>
   let createCampagneCommandeHandler: CreateCampagneCommandHandler
+  let planificateurRepository: Planificateur.Repository
+  let dateService: StubbedClass<DateService>
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     campagneRepository = stubInterface(sandbox)
     campagneFactory = stubClass(Campagne.Factory)
     supportAuthorizer = stubClass(SupportAuthorizer)
+    planificateurRepository = stubInterface(sandbox)
+    dateService = stubClass(DateService)
+    dateService.now.returns(uneDatetime())
     createCampagneCommandeHandler = new CreateCampagneCommandHandler(
       campagneRepository,
       campagneFactory,
-      supportAuthorizer
+      supportAuthorizer,
+      planificateurRepository,
+      dateService
     )
   })
 
@@ -66,6 +75,7 @@ describe('CreateCampagneCommandHandler', () => {
         // Then
         expect(result).to.deep.equal(success({ id: campagne.id }))
         expect(campagneRepository.save).to.have.been.calledWithExactly(campagne)
+        expect(planificateurRepository.creerJob).to.have.been.calledTwice()
       })
     })
   })

@@ -77,13 +77,29 @@ describe('GetJeuneHomeActionsQueryHandler', () => {
       })
     })
 
-    it('ne récupère pas la campagne en cours pour un bénéficiaire AIJ', async () => {
+    it('récupère la campagne en cours pour un bénéficiaire AIJ', async () => {
       // When
       const home = await getJeuneHomeActionsQueryHandler.handle(
         {
           idJeune: 'idJeune'
         },
         unUtilisateurJeune({ structure: Structure.POLE_EMPLOI_AIJ })
+      )
+
+      // Then
+      expect(home).to.deep.equal({
+        actions: actionsQueryModel,
+        campagne: campagneQueryModel
+      })
+    })
+
+    it('ne récupère pas la campagne en cours pour un bénéficiaire CD', async () => {
+      // When
+      const home = await getJeuneHomeActionsQueryHandler.handle(
+        {
+          idJeune: 'idJeune'
+        },
+        unUtilisateurJeune({ structure: Structure.CONSEIL_DEPT })
       )
 
       // Then
