@@ -13,6 +13,7 @@ import {
 import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
 import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
 import { DateService } from '../../utils/date-service'
+import { Jeune } from '../../domain/jeune/jeune'
 
 interface Stats {
   nbJeunesNotifies: number
@@ -98,13 +99,14 @@ export class NotifierRappelCreationActionsDemarchesJobHandler extends JobHandler
           structure: Core.Structure
           token: string
         }> = await this.sequelize.query(
-          `SELECT id, structure, push_notification_token as token from jeune where id in (:idsJeunesANotifier) AND push_notification_token IS NOT NULL`,
+          `SELECT id, structure, push_notification_token as token from jeune where id in (:idsJeunesANotifier) AND push_notification_token IS NOT NULL AND dispositif != :dispositifExclu`,
           {
             type: QueryTypes.SELECT,
             replacements: {
               idsJeunesANotifier: idsJeunesANotifier.map(
                 id => id.id_utilisateur
-              )
+              ),
+              dispositifExclu: Jeune.Dispositif.PACEA
             }
           }
         )
