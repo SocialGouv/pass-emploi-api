@@ -65,7 +65,6 @@
     "tasks:initialiser-les-vues": "IS_WEB=false TASK_NAME=INITIALISER_LES_VUES node dist/main",
     "tasks:creer-tables-ae-annuelles": "IS_WEB=false TASK_NAME=CREER_TABLES_AE_ANNUELLES_ANALYTICS node dist/main",
     "tasks:notifier-bonne-alternance": "IS_WEB=false TASK_NAME=NOTIFIER_BONNE_ALTERNANCE node dist/main",
-    "tasks:notifier-cje": "IS_WEB=false TASK_NAME=NOTIFIER_CJE node dist/main",
     "dump-restore-db": "scripts/analytics/0_db_dump_restore.sh 2>&1",
     "dump-restore-db:local": "dotenv -e .environment yarn dump-restore-db",
     "release:patch": "scripts/release_version_only.sh patch",
