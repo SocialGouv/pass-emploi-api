@@ -59,12 +59,27 @@ export class CreateCampagneCommandHandler extends CommandHandler<
     await this.campagneRepository.save(campagne)
 
     const maintenant = this.dateService.now()
+    const heure = maintenant.hour
+    const jour = maintenant.weekday
+    let dateExecution = maintenant
+    const jeudi = 4
+    const heureDExecution = 11
+    const heureMinuteExecution = {
+      hour: heureDExecution,
+      minute: 40,
+      second: 0,
+      millisecond: 0
+    }
+
+    if (heure <= heureDExecution) {
+      dateExecution = maintenant.set(heureMinuteExecution)
+    }
+    if (heure > heureDExecution || jour === jeudi) {
+      dateExecution = dateExecution.plus({ days: 1 }).set(heureMinuteExecution)
+    }
 
     await this.planificateurRepository.creerJob({
-      dateExecution: maintenant
-        .plus({ days: 1 })
-        .set({ hour: 11, minute: 40, second: 0, millisecond: 0 })
-        .toJSDate(),
+      dateExecution: dateExecution.toJSDate(),
       type: Planificateur.JobType.NOTIFIER_CAMPAGNE,
       contenu: {
         offset: 0,
@@ -77,7 +92,7 @@ export class CreateCampagneCommandHandler extends CommandHandler<
       await this.planificateurRepository.creerJob({
         dateExecution: maintenant
           .plus({ days: 7 })
-          .set({ hour: 11, minute: 40, second: 0, millisecond: 0 })
+          .set(heureMinuteExecution)
           .toJSDate(),
         type: Planificateur.JobType.NOTIFIER_CAMPAGNE,
         contenu: {

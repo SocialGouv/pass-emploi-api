@@ -41,14 +41,14 @@ describe('CreateCampagneCommandHandler', () => {
   })
 
   describe('handle', () => {
-    const command: CreateCampagneCommand = {
-      nom: 'unNom',
-      dateDebut: uneDatetime(),
-      dateFin: uneDatetime().plus({ week: 2 })
-    }
     describe('quand il y a une campagne existante sur ces dates ou ce nom', () => {
       it('rejette', async () => {
         // Given
+        const command: CreateCampagneCommand = {
+          nom: 'unNom',
+          dateDebut: uneDatetime(),
+          dateFin: uneDatetime().plus({ week: 2 })
+        }
         campagneRepository.getByIntervalOrName.resolves(uneCampagne())
 
         // When
@@ -62,6 +62,11 @@ describe('CreateCampagneCommandHandler', () => {
     describe("quand c'est une brand new campagne", () => {
       it('la créer', async () => {
         // Given
+        const command: CreateCampagneCommand = {
+          nom: 'unNom',
+          dateDebut: uneDatetime(),
+          dateFin: uneDatetime().plus({ week: 2 })
+        }
         const campagne = uneCampagne()
         campagneRepository.getByIntervalOrName
           .withArgs(command.dateDebut, command.dateFin, command.nom)
@@ -76,6 +81,46 @@ describe('CreateCampagneCommandHandler', () => {
         expect(result).to.deep.equal(success({ id: campagne.id }))
         expect(campagneRepository.save).to.have.been.calledWithExactly(campagne)
         expect(planificateurRepository.creerJob).to.have.been.calledTwice()
+      })
+      it('la créer et planifie une seule notif', async () => {
+        // Given
+        const command: CreateCampagneCommand = {
+          nom: 'unNom',
+          dateDebut: uneDatetime(),
+          dateFin: uneDatetime().plus({ days: 7 })
+        }
+        const campagne = uneCampagne()
+        campagneRepository.getByIntervalOrName
+          .withArgs(command.dateDebut, command.dateFin, command.nom)
+          .resolves(undefined)
+
+        campagneFactory.creer.withArgs(command).returns(campagne)
+
+        // When
+        const result = await createCampagneCommandeHandler.handle(command)
+
+        // Then
+        expect(result).to.deep.equal(success({ id: campagne.id }))
+        expect(campagneRepository.save).to.have.been.calledWithExactly(campagne)
+        expect(
+          planificateurRepository.creerJob
+        ).to.have.been.calledOnceWithExactly({
+          dateExecution: uneDatetime()
+            .plus({ days: 1 })
+            .set({
+              hour: 11,
+              minute: 40,
+              second: 0,
+              millisecond: 0
+            })
+            .toJSDate(),
+          type: Planificateur.JobType.NOTIFIER_CAMPAGNE,
+          contenu: {
+            offset: 0,
+            idCampagne: campagne.id,
+            nbNotifsEnvoyees: 0
+          }
+        })
       })
     })
   })
