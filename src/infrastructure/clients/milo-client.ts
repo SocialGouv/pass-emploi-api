@@ -220,6 +220,7 @@ export class MiloClient {
       if (result.data) {
         dto.push(result.data)
       }
+      await new Promise(resolve => setTimeout(resolve, 50))
     }
 
     return success(dto)
@@ -236,6 +237,7 @@ export class MiloClient {
         idpToken
       )
       if (isFailure(result)) return result
+      await new Promise(resolve => setTimeout(resolve, 50))
     }
 
     return emptySuccess()
@@ -263,6 +265,7 @@ export class MiloClient {
         idpToken
       )
       if (isFailure(result)) return result
+      await new Promise(resolve => setTimeout(resolve, 50))
     }
 
     return emptySuccess()

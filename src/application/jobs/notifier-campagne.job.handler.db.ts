@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Op } from 'sequelize'
 import { Job } from '../../building-blocks/types/job'
 import { JobHandler } from '../../building-blocks/types/job-handler'
-import { Core } from '../../domain/core'
+import { structuresCampagnes } from '../../domain/core'
 import {
   Notification,
   NotificationRepositoryToken
@@ -14,18 +14,19 @@ import {
 } from '../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
+import { ReponseCampagneSqlModel } from '../../infrastructure/sequelize/models/reponse-campagne.sql-model'
 import { DateService } from '../../utils/date-service'
 
 interface Stats {
-  nbPersonnesNotifiees: number
+  nbNotifsEnvoyees: number
   estLaDerniereExecution: boolean
 }
 
 const PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM = 17000
 
 @Injectable()
-@ProcessJobType(Planificateur.JobType.NOTIFIER_CJE)
-export class NotifierCJEJobHandler extends JobHandler<Job> {
+@ProcessJobType(Planificateur.JobType.NOTIFIER_CAMPAGNE)
+export class NotifierCampagneJobHandler extends JobHandler<Job> {
   constructor(
     @Inject(NotificationRepositoryToken)
     private notificationRepository: Notification.Repository,
@@ -35,34 +36,43 @@ export class NotifierCJEJobHandler extends JobHandler<Job> {
     @Inject(PlanificateurRepositoryToken)
     private planificateurRepository: Planificateur.Repository
   ) {
-    super(Planificateur.JobType.NOTIFIER_CJE, suiviJobService)
+    super(Planificateur.JobType.NOTIFIER_CAMPAGNE, suiviJobService)
   }
 
   async handle(
-    job?: Planificateur.Job<Planificateur.JobNotifierParGroupe>
+    job: Planificateur.Job<{
+      offset: number
+      idCampagne: string
+      nbNotifsEnvoyees: number
+    }>
   ): Promise<SuiviJob> {
     let succes = true
     const stats: Stats = {
-      nbPersonnesNotifiees: job?.contenu?.nbPersonnesNotifiees || 0,
+      nbNotifsEnvoyees: job.contenu.nbNotifsEnvoyees,
       estLaDerniereExecution: false
     }
     const maintenant = this.dateService.now()
 
     try {
-      const structuresConcernees = [
-        Core.Structure.MILO,
-        Core.Structure.POLE_EMPLOI
-      ]
+      const offset = job.contenu.offset
 
-      const offset = job?.contenu?.offset || 0
+      const idsJeunesQuiOntReponduALaCampagne = (
+        await ReponseCampagneSqlModel.findAll({
+          where: { idCampagne: job.contenu.idCampagne },
+          attributes: ['idJeune']
+        })
+      ).map(campagneSql => campagneSql.idJeune)
 
       const idsJeunesANotifier = await JeuneSqlModel.findAll({
         where: {
           structure: {
-            [Op.in]: structuresConcernees
+            [Op.in]: structuresCampagnes
           },
           pushNotificationToken: {
             [Op.ne]: null
+          },
+          id: {
+            [Op.notIn]: idsJeunesQuiOntReponduALaCampagne
           }
         },
         attributes: ['id', 'pushNotificationToken'],
@@ -73,33 +83,16 @@ export class NotifierCJEJobHandler extends JobHandler<Job> {
 
       this.logger.log(`${idsJeunesANotifier.length} ids jeunes à notifier`)
 
-      stats.nbPersonnesNotifiees += idsJeunesANotifier.length
-      if (idsJeunesANotifier.length === PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM) {
-        this.planificateurRepository.creerJob({
-          dateExecution: maintenant
-            .plus({ days: 1 })
-            .set({ hour: 15, minute: 30, second: 0, millisecond: 0 })
-            .toJSDate(),
-          type: Planificateur.JobType.NOTIFIER_CJE,
-          contenu: {
-            offset: offset + PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM,
-            nbPersonnesNotifiees: stats.nbPersonnesNotifiees
-          }
-        })
-      } else {
-        stats.estLaDerniereExecution = true
-      }
-
       for (const jeune of idsJeunesANotifier) {
         try {
           const notification: Notification.Message = {
             token: jeune.pushNotificationToken!,
             notification: {
-              title: `👋 Retrouvez vos avantages du CEJ`,
-              body: `+ de 65 réductions disponibles grâce à la carte "Jeune Engagé"`
+              title: `Que pensez-vous de l'application du CEJ 😀 ?`,
+              body: `Donnez-nous votre avis !`
             },
             data: {
-              type: 'CJE'
+              type: 'CAMPAGNE'
             }
           }
           await this.notificationRepository.send(notification, jeune.id)
@@ -108,7 +101,22 @@ export class NotifierCJEJobHandler extends JobHandler<Job> {
           this.logger.error(e)
           this.logger.log(`Echec envoi notif pour le jeune ${jeune.id}`)
         }
-        await new Promise(resolve => setTimeout(resolve, 250))
+        await new Promise(resolve => setTimeout(resolve, 150))
+      }
+
+      stats.nbNotifsEnvoyees += idsJeunesANotifier.length
+      if (idsJeunesANotifier.length === PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM) {
+        this.planificateurRepository.creerJob({
+          dateExecution: maintenant.plus({ seconds: 15 }).toJSDate(),
+          type: Planificateur.JobType.NOTIFIER_CAMPAGNE,
+          contenu: {
+            offset: offset + PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM,
+            idCampagne: job.contenu.idCampagne,
+            nbNotifsEnvoyees: stats.nbNotifsEnvoyees
+          }
+        })
+      } else {
+        stats.estLaDerniereExecution = true
       }
     } catch (e) {
       this.logger.error(e)

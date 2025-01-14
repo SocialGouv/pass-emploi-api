@@ -76,10 +76,12 @@ export function aAccesAuxAlternancesEtServicesCiviques(
   ].includes(structure)
 }
 
+export const structuresCampagnes = [
+  Core.Structure.MILO,
+  Core.Structure.POLE_EMPLOI,
+  Core.Structure.POLE_EMPLOI_BRSA,
+  Core.Structure.POLE_EMPLOI_AIJ
+]
 export function peutVoirLesCampagnes(structure: Core.Structure): boolean {
-  return [
-    Core.Structure.MILO,
-    Core.Structure.POLE_EMPLOI,
-    Core.Structure.POLE_EMPLOI_BRSA
-  ].includes(structure)
+  return structuresCampagnes.includes(structure)
 }

@@ -365,7 +365,7 @@ import { RateLimiterService } from './utils/rate-limiter.service'
 import { CJEController } from './infrastructure/routes/cje.controller'
 import { GetCJETokenQueryHandler } from './application/queries/get-cje-token.query.handler'
 import { NotifierBonneAlternanceJobHandler } from './application/jobs/notifier-bonne-alternance.job.handler.db'
-import { NotifierCJEJobHandler } from './application/jobs/notifier-cje.job.handler.db'
+import { NotifierCampagneJobHandler } from './application/jobs/notifier-campagne.job.handler.db'
 import { GetNotificationsJeuneQueryHandler } from './application/queries/get-notifications-jeune.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
@@ -832,7 +832,7 @@ export const JobHandlerProviders = [
   RecupererAnalyseAntivirusJobHandler,
   NotifierRappelCreationActionsDemarchesJobHandler,
   NotifierBonneAlternanceJobHandler,
-  NotifierCJEJobHandler
+  NotifierCampagneJobHandler
 ]
 
 @Module(buildModuleMetadata())
