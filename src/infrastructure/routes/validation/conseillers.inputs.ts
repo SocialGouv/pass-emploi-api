@@ -95,6 +95,11 @@ export class CreerJeuneMiloPayload {
   @IsNotEmpty()
   idConseiller: string
 
+  @ApiProperty({ enum: [Jeune.Dispositif.CEJ, Jeune.Dispositif.PACEA] })
+  @IsString()
+  @IsNotEmpty()
+  dispositif: Jeune.Dispositif.CEJ | Jeune.Dispositif.PACEA
+
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()

@@ -129,6 +129,7 @@ export class ConseillersMiloController {
       nom: creerJeuneMiloPayload.nom,
       prenom: creerJeuneMiloPayload.prenom,
       idPartenaire: creerJeuneMiloPayload.idDossier,
+      dispositif: creerJeuneMiloPayload.dispositif,
       surcharge: creerJeuneMiloPayload.surcharge
     }
     const result = await this.creerJeuneMiloCommandHandler.execute(

@@ -20,6 +20,7 @@ import {
   failure,
   success
 } from 'src/building-blocks/types/result'
+import { Jeune } from 'src/domain/jeune/jeune'
 import { SessionMilo } from 'src/domain/milo/session.milo'
 import * as request from 'supertest'
 import {
@@ -173,6 +174,7 @@ describe('ConseillersMiloController', () => {
           prenom: 'prenom',
           email: 'email',
           idConseiller: 'idConseiller',
+          dispositif: Jeune.Dispositif.PACEA,
           surcharge: undefined
         }
 
@@ -181,7 +183,8 @@ describe('ConseillersMiloController', () => {
           nom: 'nom',
           prenom: 'prenom',
           email: 'email',
-          idConseiller: 'idConseiller'
+          idConseiller: 'idConseiller',
+          dispositif: Jeune.Dispositif.PACEA
         }
 
         creerJeuneMiloCommandHandler.execute.resolves(
@@ -210,7 +213,8 @@ describe('ConseillersMiloController', () => {
           nom: 'nom',
           prenom: 'prenom',
           email: 'email',
-          idConseiller: 'idConseiller'
+          idConseiller: 'idConseiller',
+          dispositif: Jeune.Dispositif.CEJ
         }
         creerJeuneMiloCommandHandler.execute.resolves(
           failure(new ErreurHttp('email pas bon', 400))
@@ -233,7 +237,8 @@ describe('ConseillersMiloController', () => {
           nom: 'nom',
           prenom: 'prenom',
           email: 'email',
-          idConseiller: 'idConseiller'
+          idConseiller: 'idConseiller',
+          dispositif: Jeune.Dispositif.CEJ
         }
 
         creerJeuneMiloCommandHandler.execute.resolves(
@@ -257,7 +262,8 @@ describe('ConseillersMiloController', () => {
           nom: 'nom',
           prenom: 'prenom',
           email: 'email',
-          idConseiller: 'idConseiller'
+          idConseiller: 'idConseiller',
+          dispositif: Jeune.Dispositif.PACEA
         }
 
         creerJeuneMiloCommandHandler.execute.resolves(
