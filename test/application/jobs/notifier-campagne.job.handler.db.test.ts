@@ -131,8 +131,8 @@ describe('NotifierCampagneJobHandler', () => {
         {
           token: 'token',
           notification: {
-            title: "Que pensez-vous de l'application du CEJ 😀 ?",
-            body: 'Donnez-nous votre avis !'
+            title: 'Votre avis compte ! 🙏',
+            body: 'Aidez-nous à améliorer l’application en partageant votre avis. Cela ne prend qu’une minute !'
           },
           data: { type: 'CAMPAGNE' }
         },
