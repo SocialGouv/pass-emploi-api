@@ -80,7 +80,7 @@
     "@google-cloud/bigquery": "7.9.1",
     "@nestjs/axios": "^3.1.2",
     "@nestjs/common": "11.0.3",
-    "@nestjs/config": "2.3.4",
+    "@nestjs/config": "4.0.0",
     "@nestjs/core": "11.0.3",
     "@nestjs/platform-express": "11.0.3",
     "@nestjs/swagger": "8.1.1",
