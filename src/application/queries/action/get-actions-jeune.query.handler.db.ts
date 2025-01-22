@@ -6,7 +6,7 @@ import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import { failure, Result, success } from '../../../building-blocks/types/result'
 import { Action } from '../../../domain/action/action'
 import { Authentification } from '../../../domain/authentification'
-import { fromSqlToActionQueryModel } from '../../../infrastructure/repositories/mappers/actions.mappers'
+import { fromSqlToActionQueryModelWithJeune } from '../../../infrastructure/repositories/mappers/actions.mappers'
 import { ActionSqlModel } from '../../../infrastructure/sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
@@ -72,7 +72,7 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
 
     return success({
       metadonnees,
-      actions: actionsFiltrees.rows.map(fromSqlToActionQueryModel)
+      actions: actionsFiltrees.rows.map(fromSqlToActionQueryModelWithJeune)
     })
   }
 
@@ -144,7 +144,7 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
         Sequelize.where(
           this.sequelize.literal(`CASE
             WHEN qualification_heures IS NOT null THEN 'QUALIFIEE'
-            WHEN statut = 'done' THEN 'A_QUALIFIER'
+            WHEN statut = 'done' AND dispositif = 'CEJ' THEN 'A_QUALIFIER'
             ELSE 'NON_QUALIFIABLE'
           END`),
           {

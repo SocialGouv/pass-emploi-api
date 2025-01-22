@@ -43,7 +43,7 @@ import {
   unUtilisateurDecode
 } from 'test/fixtures/authentification.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
-import { uneActionQueryModelSansJeune } from 'test/fixtures/query-models/action.query-model.fixtures'
+import { uneActionQueryModel } from 'test/fixtures/query-models/action.query-model.fixtures'
 import { StubbedClass, enleverLesUndefined, expect } from 'test/utils'
 import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
@@ -522,8 +522,8 @@ describe('JeunesController', () => {
     const maintenant = '2022-08-17T12:00:30+02:00'
     const queryModel: JeuneHomeAgendaQueryModel = {
       actions: [
-        enleverLesUndefined(uneActionQueryModelSansJeune()),
-        enleverLesUndefined(uneActionQueryModelSansJeune())
+        enleverLesUndefined(uneActionQueryModel()),
+        enleverLesUndefined(uneActionQueryModel())
       ],
       rendezVous: [],
       sessionsMilo: [],

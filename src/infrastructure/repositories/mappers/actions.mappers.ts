@@ -5,20 +5,12 @@ import {
 } from '../../../application/queries/query-models/actions.query-model'
 import { JeuneQueryModel } from '../../../application/queries/query-models/jeunes.query-model'
 import { Action } from '../../../domain/action/action'
+import { Jeune } from '../../../domain/jeune/jeune'
 import { DateService } from '../../../utils/date-service'
 import { ActionSqlModel } from '../../sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
 
 export function fromSqlToActionQueryModelWithJeune(
-  actionSqlModel: ActionSqlModel
-): ActionQueryModel {
-  return {
-    ...fromSqlToActionQueryModel(actionSqlModel),
-    jeune: fromSqlToJeuneQueryModel(actionSqlModel.jeune)
-  }
-}
-
-export function fromSqlToActionQueryModel(
   actionSqlModel: ActionSqlModel
 ): ActionQueryModel {
   return {
@@ -40,8 +32,11 @@ export function fromSqlToActionQueryModel(
     dateFinReelle: actionSqlModel.dateFinReelle
       ? DateService.fromJSDateToISOString(actionSqlModel.dateFinReelle)
       : undefined,
-    etat: buildEtat(actionSqlModel),
-    qualification: buildQualificationQueryModel(actionSqlModel)
+    etat: buildEtat(actionSqlModel, {
+      qualifiable: actionSqlModel.jeune.dispositif === Jeune.Dispositif.CEJ
+    }),
+    qualification: buildQualificationQueryModel(actionSqlModel),
+    jeune: fromSqlToJeuneQueryModel(actionSqlModel.jeune)
   }
 }
 
@@ -56,8 +51,9 @@ function fromSqlToJeuneQueryModel(
   }
 }
 
-export function buildEtat(
-  actionSqlModel: ActionSqlModel
+function buildEtat(
+  actionSqlModel: ActionSqlModel,
+  { qualifiable }: { qualifiable: boolean }
 ): Action.Qualification.Etat {
   if (
     actionSqlModel.codeQualification &&
@@ -65,7 +61,7 @@ export function buildEtat(
   ) {
     return Action.Qualification.Etat.QUALIFIEE
   }
-  if (actionSqlModel.statut === Action.Statut.TERMINEE) {
+  if (qualifiable && actionSqlModel.statut === Action.Statut.TERMINEE) {
     return Action.Qualification.Etat.A_QUALIFIER
   }
   return Action.Qualification.Etat.NON_QUALIFIABLE

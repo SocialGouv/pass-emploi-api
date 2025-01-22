@@ -56,11 +56,8 @@ export class ActionQueryModel {
   @ApiProperty()
   creator: string
 
-  @ApiProperty({
-    type: JeuneQueryModel,
-    required: false
-  })
-  jeune?: JeuneQueryModel
+  @ApiProperty({ type: JeuneQueryModel })
+  jeune: JeuneQueryModel
 
   @ApiProperty()
   dateEcheance: string

@@ -31,7 +31,7 @@ import {
   unUtilisateurJeune
 } from 'test/fixtures/authentification.fixture'
 import { unJeune } from 'test/fixtures/jeune.fixture'
-import { uneActionQueryModelSansJeune } from 'test/fixtures/query-models/action.query-model.fixtures'
+import { uneActionQueryModel } from 'test/fixtures/query-models/action.query-model.fixtures'
 import { unRendezVousQueryModel } from 'test/fixtures/query-models/rendez-vous.query-model.fixtures'
 import { uneSessionJeuneMiloQueryModel } from 'test/fixtures/sessions.fixture'
 import { uneActionDto } from 'test/fixtures/sql-models/action.sql-model'
@@ -169,11 +169,11 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
       // Then
       const expected: JeuneHomeAgendaQueryModel = {
         actions: [
-          uneActionQueryModelSansJeune({
+          uneActionQueryModel({
             id: lundiDernier.id,
             dateEcheance: DateTime.fromJSDate(lundiDernier.dateEcheance).toISO()
           }),
-          uneActionQueryModelSansJeune({
+          uneActionQueryModel({
             id: dimancheEnHuit.id,
             dateEcheance: DateTime.fromJSDate(
               dimancheEnHuit.dateEcheance
@@ -208,11 +208,11 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
       it('renvoie les actions triées par date', async () => {
         // Then
         const actionsQM: ActionQueryModel[] = [
-          uneActionQueryModelSansJeune({
+          uneActionQueryModel({
             id: demain.id,
             dateEcheance: DateTime.fromJSDate(demain.dateEcheance).toISO()
           }),
-          uneActionQueryModelSansJeune({
+          uneActionQueryModel({
             id: apresDemain.id,
             dateEcheance: DateTime.fromJSDate(apresDemain.dateEcheance).toISO()
           })

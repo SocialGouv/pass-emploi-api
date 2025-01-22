@@ -32,7 +32,7 @@ import {
 import { uneActionDto } from '../../../fixtures/sql-models/action.sql-model'
 import { DateTime } from 'luxon'
 import { ActionQueryModel } from '../../../../src/application/queries/query-models/actions.query-model'
-import { uneActionQueryModelSansJeune } from '../../../fixtures/query-models/action.query-model.fixtures'
+import { uneActionQueryModel } from '../../../fixtures/query-models/action.query-model.fixtures'
 import {
   RendezVousDto,
   RendezVousSqlModel
@@ -201,25 +201,25 @@ describe('GetMonSuiviMiloQueryHandler', () => {
         it('renvoie les actions triées par date', async () => {
           // Then
           const actionsQueryModel: ActionQueryModel[] = [
-            uneActionQueryModelSansJeune({
+            uneActionQueryModel({
               id: actionApresDateDebutUneHeure.id,
               dateEcheance: DateTime.fromJSDate(
                 actionApresDateDebutUneHeure.dateEcheance
               ).toISO()
             }),
-            uneActionQueryModelSansJeune({
+            uneActionQueryModel({
               id: actionApresDateDebutUnJour.id,
               dateEcheance: DateTime.fromJSDate(
                 actionApresDateDebutUnJour.dateEcheance
               ).toISO()
             }),
-            uneActionQueryModelSansJeune({
+            uneActionQueryModel({
               id: actionAvantDateFinUnJour.id,
               dateEcheance: DateTime.fromJSDate(
                 actionAvantDateFinUnJour.dateEcheance
               ).toISO()
             }),
-            uneActionQueryModelSansJeune({
+            uneActionQueryModel({
               id: actionAvantDateFinUneHeure.id,
               dateEcheance: DateTime.fromJSDate(
                 actionAvantDateFinUneHeure.dateEcheance

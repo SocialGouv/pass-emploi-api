@@ -93,7 +93,7 @@ describe('GetDetailActionQueryHandler', () => {
 
           // Then
           expect(actionQueryModel).to.deep.equal(
-            uneActionQueryModelTermineeAvecQualification(action)
+            uneActionQueryModelTermineeAvecQualification(action, jeune)
           )
         })
       })
@@ -113,13 +113,7 @@ describe('GetDetailActionQueryHandler', () => {
 
           // Then
           expect(actionQueryModel).to.deep.equal({
-            ...uneActionQueryModelFromDomain(action),
-            jeune: {
-              id: action.idJeune,
-              firstName: jeune.firstName,
-              lastName: jeune.lastName,
-              idConseiller: jeune.conseiller.id
-            },
+            ...uneActionQueryModelFromDomain(action, jeune),
             qualification: undefined
           })
         })

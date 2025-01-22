@@ -9,7 +9,7 @@ import { GetCampagneQueryGetter } from '../../../src/application/queries/query-g
 import { Core } from '../../../src/domain/core'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { uneCampagneQueryModel } from '../../fixtures/campagne.fixture'
-import { uneActionQueryModelFromDomain } from '../../fixtures/query-models/action.query-model.fixtures'
+import { uneActionQueryModel } from '../../fixtures/query-models/action.query-model.fixtures'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import Structure = Core.Structure
 
@@ -20,7 +20,7 @@ describe('GetJeuneHomeActionsQueryHandler', () => {
   let getJeuneHomeActionsQueryHandler: GetJeuneHomeActionsQueryHandler
 
   const campagneQueryModel = uneCampagneQueryModel()
-  const actionsQueryModel = [uneActionQueryModelFromDomain()]
+  const actionsQueryModel = [uneActionQueryModel()]
 
   beforeEach(() => {
     getActionsByJeuneQueryHandler = stubClass(GetActionsJeuneQueryHandler)

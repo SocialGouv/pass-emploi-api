@@ -17,7 +17,7 @@ import {
 } from 'src/config/feature-flipping'
 import { Action } from 'src/domain/action/action'
 import { Authentification } from 'src/domain/authentification'
-import { fromSqlToActionQueryModel } from 'src/infrastructure/repositories/mappers/actions.mappers'
+import { fromSqlToActionQueryModelWithJeune } from 'src/infrastructure/repositories/mappers/actions.mappers'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
@@ -75,7 +75,12 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
     const { lundiDernier, dimancheEnHuit } =
       this.recupererLesDatesEntreLundiDernierEtDeuxSemainesPlusTard(maintenant)
     const [actions, rendezVous, actionsEnRetard] = await Promise.all([
-      this.recupererLesActions(query, lundiDernier, dimancheEnHuit),
+      this.recupererLesActions(
+        query,
+        lundiDernier,
+        dimancheEnHuit,
+        jeuneSqlModel
+      ),
       this.recupererLesRendezVous(
         query,
         lundiDernier,
@@ -213,7 +218,8 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
   private async recupererLesActions(
     query: GetJeuneHomeAgendaQuery,
     dateDebut: DateTime,
-    dateFin: DateTime
+    dateFin: DateTime,
+    jeuneSqlModel: JeuneSqlModel
   ): Promise<ActionQueryModel[]> {
     const actionsSqlModel = await ActionSqlModel.findAll({
       where: {
@@ -226,7 +232,12 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
       order: [['dateEcheance', 'ASC']]
     })
 
-    return actionsSqlModel.map(fromSqlToActionQueryModel)
+    return actionsSqlModel.map(actionSqlModel =>
+      fromSqlToActionQueryModelWithJeune({
+        ...actionSqlModel.dataValues,
+        jeune: jeuneSqlModel
+      } as ActionSqlModel)
+    )
   }
 
   private async recupererLeNombreDactionsEnRetard(

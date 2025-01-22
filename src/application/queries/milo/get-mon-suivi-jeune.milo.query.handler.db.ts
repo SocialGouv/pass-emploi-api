@@ -20,7 +20,7 @@ import { DateTime } from 'luxon'
 import { ActionQueryModel } from '../query-models/actions.query-model'
 import { ActionSqlModel } from '../../../infrastructure/sequelize/models/action.sql-model'
 import { Op } from 'sequelize'
-import { fromSqlToActionQueryModel } from '../../../infrastructure/repositories/mappers/actions.mappers'
+import { fromSqlToActionQueryModelWithJeune } from '../../../infrastructure/repositories/mappers/actions.mappers'
 import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-model'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { fromSqlToRendezVousJeuneQueryModel } from '../query-mappers/rendez-vous-milo.mappers'
@@ -72,7 +72,7 @@ export class GetMonSuiviMiloQueryHandler extends QueryHandler<
     }
 
     const [actions, rendezVous, sessionsMilo] = await Promise.all([
-      this.recupererLesActions(query),
+      this.recupererLesActions(query, jeuneSqlModel),
       this.recupererLesRendezVous(query, utilisateur.type),
       this.sessionsJeuneQueryGetter
         .handle(query.idJeune, jeuneSqlModel.idPartenaire, query.accessToken, {
@@ -108,7 +108,8 @@ export class GetMonSuiviMiloQueryHandler extends QueryHandler<
   }
 
   private async recupererLesActions(
-    query: GetMonSuiviMiloQuery
+    query: GetMonSuiviMiloQuery,
+    jeuneSqlModel: JeuneSqlModel
   ): Promise<ActionQueryModel[]> {
     const actionsSqlModel = await ActionSqlModel.findAll({
       where: {
@@ -121,7 +122,12 @@ export class GetMonSuiviMiloQueryHandler extends QueryHandler<
       order: [['dateEcheance', 'ASC']]
     })
 
-    return actionsSqlModel.map(fromSqlToActionQueryModel)
+    return actionsSqlModel.map(actionSqlModel =>
+      fromSqlToActionQueryModelWithJeune({
+        ...actionSqlModel.dataValues,
+        jeune: jeuneSqlModel
+      } as ActionSqlModel)
+    )
   }
 
   private async recupererLesRendezVous(
