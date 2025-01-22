@@ -102,7 +102,7 @@
     "jose": "5.9.6",
     "lodash.isequal": "4.5.0",
     "luxon": "3.5.0",
-    "nestjs-pino": "4.2.0",
+    "nestjs-pino": "4.3.0",
     "openid-client": "5.7.1",
     "pg": "8.13.1",
     "pg-connection-string": "2.7.0",
