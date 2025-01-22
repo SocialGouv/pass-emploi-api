@@ -662,13 +662,6 @@ describe('ActionsController', () => {
           metadonnees: {
             nombreTotal: 1,
             nombreFiltrees: 1,
-            nombreEnCours: 2,
-            nombreTerminees: 3,
-            nombreAnnulees: 4,
-            nombrePasCommencees: 5,
-            nombreNonQualifiables: 6,
-            nombreAQualifier: 7,
-            nombreQualifiees: 8,
             nombreActionsParPage: 10
           }
         }

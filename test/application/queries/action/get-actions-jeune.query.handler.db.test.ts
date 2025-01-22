@@ -806,13 +806,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
             expect(result.data.metadonnees).to.deep.equal({
               nombreTotal: 6,
               nombreFiltrees: 6,
-              nombrePasCommencees: 1,
-              nombreEnCours: 2,
-              nombreTerminees: 2,
-              nombreAnnulees: 1,
-              nombreNonQualifiables: 4,
-              nombreAQualifier: 1,
-              nombreQualifiees: 1,
               nombreActionsParPage: 10
             })
           }

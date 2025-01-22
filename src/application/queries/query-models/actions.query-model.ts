@@ -90,16 +90,21 @@ export class CommentaireActionQueryModel {
 }
 
 export class ActionsMetadonneesQueryModel {
+  @ApiProperty()
   nombreTotal: number
-  nombreEnCours: number
-  nombreTerminees: number
-  nombreAnnulees: number
-  nombrePasCommencees: number
+
+  @ApiProperty()
+  nombreFiltrees: number
+
+  @ApiProperty()
   nombreActionsParPage: number
 }
 
 export class ListeActionsV2QueryModel {
+  @ApiProperty({ type: ActionQueryModel, isArray: true })
   actions: ActionQueryModel[]
+
+  @ApiProperty({ type: ActionsMetadonneesQueryModel, isArray: true })
   metadonnees: ActionsMetadonneesQueryModel
 }
 

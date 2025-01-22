@@ -159,7 +159,6 @@ import { GetEvenementsEmploiQueryHandler } from './application/queries/get-evene
 import { GetFavorisOffresEmploiJeuneQueryHandler } from './application/queries/get-favoris-offres-emploi-jeune.query.handler.db'
 import { GetFavorisOffresImmersionJeuneQueryHandler } from './application/queries/get-favoris-offres-immersion-jeune.query.handler.db'
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from './application/queries/get-favoris-service-civique-jeune.query.handler.db'
-import { GetHomeJeuneHandler } from './application/queries/get-home-jeune.query.handler'
 import { GetIndicateursPourConseillerQueryHandler } from './application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { GetJeuneHomeActionsQueryHandler } from './application/queries/get-jeune-home-actions.query.handler'
 import { GetJeuneHomeAgendaQueryHandler } from './application/queries/get-jeune-home-agenda.query.handler.db'
@@ -655,7 +654,6 @@ export function buildQueryCommandsProviders(): Provider[] {
     DeleteFavoriOffreImmersionCommandHandler,
     GetFavorisOffresEmploiJeuneQueryHandler,
     GetFavorisOffresImmersionJeuneQueryHandler,
-    GetHomeJeuneHandler,
     GetOffresEmploiQueryHandler,
     GetOffresImmersionQueryHandler,
     GetDetailOffreImmersionQueryHandler,
