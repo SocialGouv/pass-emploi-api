@@ -28,7 +28,8 @@ export const uneActionQueryModelFromDomain = (
     id: jeune.id,
     lastName: jeune.lastName,
     firstName: jeune.firstName,
-    idConseiller: jeune.conseiller!.id
+    idConseiller: jeune.conseiller!.id,
+    dispositif: jeune.dispositif
   },
   etat,
   qualification
@@ -65,7 +66,8 @@ export function uneActionQueryModel(
       firstName: 'John',
       id: 'ABCDE',
       idConseiller: '1',
-      lastName: 'Doe'
+      lastName: 'Doe',
+      dispositif: 'CEJ'
     },
     creatorType: Action.TypeCreateur.CONSEILLER,
     dateEcheance: '2021-11-11T08:03:30.000Z',

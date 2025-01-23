@@ -197,7 +197,8 @@ describe('ActionsController', () => {
             firstName: 'John',
             id: 'ABCDE',
             idConseiller: '1',
-            lastName: 'Doe'
+            lastName: 'Doe',
+            dispositif: 'CEJ'
           },
           lastUpdate: 'Thu, 11 Nov 2021 08:03:30 UTC',
           status: 'not_started'

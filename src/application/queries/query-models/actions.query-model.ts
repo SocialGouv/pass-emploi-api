@@ -1,7 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { Action } from '../../../domain/action/action'
 import { Demarche } from '../../../domain/demarche'
-import { JeuneQueryModel } from './jeunes.query-model'
 
 class CreateurQueryModel implements Action.Createur {
   @ApiProperty()
@@ -31,6 +30,23 @@ export class QualificationActionQueryModel {
   commentaireQualification?: string
 }
 
+export class BeneficiaireActionQueryModel {
+  @ApiProperty()
+  id: string
+
+  @ApiProperty()
+  lastName: string
+
+  @ApiProperty()
+  firstName: string
+
+  @ApiProperty()
+  idConseiller: string
+
+  @ApiProperty()
+  dispositif: string
+}
+
 export class ActionQueryModel {
   @ApiProperty()
   id: string
@@ -56,8 +72,8 @@ export class ActionQueryModel {
   @ApiProperty()
   creator: string
 
-  @ApiProperty({ type: JeuneQueryModel })
-  jeune: JeuneQueryModel
+  @ApiProperty({ type: BeneficiaireActionQueryModel })
+  jeune: BeneficiaireActionQueryModel
 
   @ApiProperty()
   dateEcheance: string

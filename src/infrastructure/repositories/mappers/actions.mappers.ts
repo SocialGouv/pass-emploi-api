@@ -1,9 +1,9 @@
 import { DateTime } from 'luxon'
 import {
   ActionQueryModel,
+  BeneficiaireActionQueryModel,
   QualificationActionQueryModel
 } from '../../../application/queries/query-models/actions.query-model'
-import { JeuneQueryModel } from '../../../application/queries/query-models/jeunes.query-model'
 import { Action } from '../../../domain/action/action'
 import { Jeune } from '../../../domain/jeune/jeune'
 import { DateService } from '../../../utils/date-service'
@@ -36,18 +36,19 @@ export function fromSqlToActionQueryModelWithJeune(
       qualifiable: actionSqlModel.jeune.dispositif === Jeune.Dispositif.CEJ
     }),
     qualification: buildQualificationQueryModel(actionSqlModel),
-    jeune: fromSqlToJeuneQueryModel(actionSqlModel.jeune)
+    jeune: fromSqlToBeneficiarieActionQueryModel(actionSqlModel.jeune)
   }
 }
 
-function fromSqlToJeuneQueryModel(
+function fromSqlToBeneficiarieActionQueryModel(
   jeuneSqlModel: JeuneSqlModel
-): JeuneQueryModel {
+): BeneficiaireActionQueryModel {
   return {
     id: jeuneSqlModel.id,
     firstName: jeuneSqlModel.prenom,
     lastName: jeuneSqlModel.nom,
-    idConseiller: jeuneSqlModel.idConseiller!
+    idConseiller: jeuneSqlModel.idConseiller!,
+    dispositif: jeuneSqlModel.dispositif
   }
 }
 
