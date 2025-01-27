@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Job } from 'bull'
 import { Op, WhereOptions } from 'sequelize'
+import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { JobHandler } from '../../building-blocks/types/job-handler'
 import { isFailure } from '../../building-blocks/types/result'
 import { Action, ActionRepositoryToken } from '../../domain/action/action'
@@ -39,6 +40,7 @@ export class QualifierActionsJobHandler extends JobHandler<Job> {
     try {
       do {
         actionsAQualifierSQL = await ActionSqlModel.findAll({
+          include: { model: JeuneSqlModel, where: { dispositif: 'CEJ' } },
           where: actionsAQualifierAvecEcheancePlusDe4Mois(maintenant),
           offset,
           limit: MAX_ACTIONS,

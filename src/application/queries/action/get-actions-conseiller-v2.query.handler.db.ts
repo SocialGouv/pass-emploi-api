@@ -107,9 +107,10 @@ export class GetActionsConseillerV2QueryHandler extends QueryHandler<
     const actionsSqlModel = await ActionSqlModel.findAndCountAll({
       include: {
         model: JeuneSqlModel,
-        attributes: ['id', 'nom', 'prenom'],
+        attributes: ['id', 'nom', 'prenom', 'dispositif'],
         where: {
-          idConseiller: query.idConseiller
+          idConseiller: query.idConseiller,
+          ...(query.aQualifier ? { dispositif: 'CEJ' } : {})
         },
         required: true
       },
