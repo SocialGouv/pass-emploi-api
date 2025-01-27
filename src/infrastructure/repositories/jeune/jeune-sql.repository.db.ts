@@ -1,22 +1,15 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { Op, Sequelize } from 'sequelize'
-import { JeuneHomeQueryModel } from '../../../application/queries/query-models/home-jeune.query-model'
-import { Action } from '../../../domain/action/action'
 import { Jeune } from '../../../domain/jeune/jeune'
 import { DateService } from '../../../utils/date-service'
 import { IdService } from '../../../utils/id-service'
 import { FirebaseClient } from '../../clients/firebase-client'
-import { ActionSqlModel } from '../../sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
 import { JeuneDto, JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
-import { RendezVousSqlModel } from '../../sequelize/models/rendez-vous.sql-model'
 import { TransfertConseillerSqlModel } from '../../sequelize/models/transfert-conseiller.sql-model'
 import { SequelizeInjectionToken } from '../../sequelize/providers'
 import { AsSql } from '../../sequelize/types'
-import {
-  fromSqlToJeune,
-  fromSqlToJeuneHomeQueryModel
-} from '../mappers/jeunes.mappers'
+import { fromSqlToJeune } from '../mappers/jeunes.mappers'
 import { Core } from '../../../domain/core'
 
 @Injectable()
@@ -181,35 +174,6 @@ export class JeuneSqlRepository implements Jeune.Repository {
 
   async supprimer(jeune: Jeune.Id): Promise<void> {
     await JeuneSqlModel.supprimer(jeune)
-  }
-
-  async getHomeQueryModel(idJeune: string): Promise<JeuneHomeQueryModel> {
-    const jeuneSqlModel = await JeuneSqlModel.findByPk(idJeune, {
-      include: [
-        ConseillerSqlModel,
-        {
-          model: ActionSqlModel,
-          required: false,
-          where: {
-            statut: Action.Statut.PAS_COMMENCEE
-          },
-          order: [['dateDerniereActualisation', 'DESC']],
-          limit: 2
-        }
-      ]
-    })
-    if (!jeuneSqlModel) {
-      throw new NotFoundException("Le jeune n'existe pas")
-    }
-    const rdvJeuneSqlModel = await RendezVousSqlModel.findAll({
-      include: [
-        {
-          model: JeuneSqlModel,
-          where: { id: idJeune }
-        }
-      ]
-    })
-    return fromSqlToJeuneHomeQueryModel(jeuneSqlModel, rdvJeuneSqlModel)
   }
 
   async saveAllJeuneTransferes(jeunes: Jeune[]): Promise<void> {

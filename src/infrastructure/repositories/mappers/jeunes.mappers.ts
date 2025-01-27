@@ -1,12 +1,6 @@
-import { DateTime, Duration } from 'luxon'
-import { JeuneHomeQueryModel } from '../../../application/queries/query-models/home-jeune.query-model'
-import { Action } from '../../../domain/action/action'
+import { DateTime } from 'luxon'
 import { Jeune } from '../../../domain/jeune/jeune'
-import { mapCodeLabelTypeRendezVous } from '../../../domain/rendez-vous/rendez-vous'
-import { ActionSqlModel } from '../../sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
-import { RendezVousSqlModel } from '../../sequelize/models/rendez-vous.sql-model'
-import { buildEtat } from './actions.mappers'
 
 export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
   const jeune: Jeune = {
@@ -54,75 +48,6 @@ export function fromSqlToPreferencesJeune(
     rendezVousSessions: jeuneSqlModel.notificationsRendezVousSessions,
     rappelActions: jeuneSqlModel.notificationsRappelActions
   }
-}
-
-export function fromSqlToJeuneHomeQueryModel(
-  jeuneSqlModel: JeuneSqlModel,
-  rdvJeuneSqlModel: RendezVousSqlModel[]
-): JeuneHomeQueryModel {
-  return {
-    conseiller: {
-      id: jeuneSqlModel.conseiller!.id,
-      firstName: jeuneSqlModel.conseiller!.prenom,
-      lastName: jeuneSqlModel.conseiller!.nom,
-      email: jeuneSqlModel.conseiller!.email ?? undefined
-    },
-    doneActionsCount: jeuneSqlModel.actions.filter(
-      actionsSql => actionsSql.statut === Action.Statut.TERMINEE
-    ).length,
-    actions: jeuneSqlModel.actions.map(actionSql => ({
-      id: actionSql.id,
-      creationDate: DateTime.fromJSDate(actionSql.dateCreation).toFormat(
-        'EEE, d MMM yyyy HH:mm:ss z'
-      ),
-      content: actionSql.contenu,
-      status: actionSql.statut,
-      comment: actionSql.description,
-      isDone: actionSql.statut === Action.Statut.TERMINEE,
-      lastUpdate: DateTime.fromJSDate(
-        actionSql.dateDerniereActualisation
-      ).toFormat('EEE, d MMM yyyy HH:mm:ss z'),
-      creatorType: actionSql.typeCreateur,
-      creator: toCreator(actionSql, jeuneSqlModel),
-      dateEcheance: actionSql.dateEcheance.toISOString(),
-      dateFinReelle: actionSql.dateFinReelle?.toISOString(),
-      etat: buildEtat(actionSql)
-    })),
-    rendezvous:
-      rdvJeuneSqlModel?.map(rendezVousSql => ({
-        id: rendezVousSql.id,
-        comment: rendezVousSql.commentaire ?? '',
-        date: DateTime.fromJSDate(rendezVousSql.date)
-          .setZone('Europe/Paris')
-          .toFormat('EEE, d MMM yyyy HH:mm:ss z'),
-        dateUtc: DateTime.fromJSDate(rendezVousSql.date).toISO(),
-        duration: Duration.fromObject({
-          minutes: rendezVousSql.duree
-        }).toFormat('h:mm:ss'),
-        modality: rendezVousSql.modalite ?? '',
-        title: rendezVousSql.titre,
-        subtitle: rendezVousSql.sousTitre,
-        type: {
-          code: rendezVousSql.type,
-          label: mapCodeLabelTypeRendezVous[rendezVousSql.type]
-        },
-        precision: rendezVousSql.precision ?? undefined,
-        adresse: rendezVousSql.adresse ?? undefined,
-        organisme: rendezVousSql.organisme ?? undefined,
-        presenceConseiller: rendezVousSql.presenceConseiller,
-        source: rendezVousSql.source
-      })) ?? []
-  }
-}
-
-function toCreator(
-  actionSql: ActionSqlModel,
-  jeuneSqlModel: JeuneSqlModel
-): string {
-  if (actionSql.typeCreateur === Action.TypeCreateur.JEUNE) {
-    return `${jeuneSqlModel.prenom} ${jeuneSqlModel.nom}`
-  }
-  return `${jeuneSqlModel.conseiller!.prenom} ${jeuneSqlModel.conseiller!.nom}`
 }
 
 export function toConfigurationApplication(

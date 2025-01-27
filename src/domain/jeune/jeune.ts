@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { JeuneHomeQueryModel } from '../../application/queries/query-models/home-jeune.query-model'
 import { Brand } from '../../building-blocks/types/brand'
 import { DateService } from '../../utils/date-service'
 import { IdService } from '../../utils/id-service'
@@ -117,8 +116,6 @@ export namespace Jeune {
     findAllJeunesByConseillerInitial(idConseiller: string): Promise<Jeune[]>
 
     supprimer(idJeune: Jeune.Id): Promise<void>
-
-    getHomeQueryModel(idJeune: string): Promise<JeuneHomeQueryModel>
 
     transferAndSaveAll(
       jeunes: Jeune[],

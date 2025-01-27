@@ -131,14 +131,17 @@ describe('GetActionsByJeuneQueryHandler', () => {
           expect(result.data.actions).to.be.deep.equal([
             uneActionQueryModelFromDomain(
               actionTerminee2,
+              jeune,
               Action.Qualification.Etat.A_QUALIFIER
             ),
             uneActionQueryModelFromDomain(
               actionTerminee3,
+              jeune,
               Action.Qualification.Etat.A_QUALIFIER
             ),
             uneActionQueryModelFromDomain(
               actionTerminee1,
+              jeune,
               Action.Qualification.Etat.A_QUALIFIER
             )
           ])
@@ -186,9 +189,9 @@ describe('GetActionsByJeuneQueryHandler', () => {
         expect(isSuccess(result)).to.be.true()
         if (isSuccess(result)) {
           expect(result.data.actions).to.be.deep.equal([
-            uneActionQueryModelFromDomain(actionEnCours2),
-            uneActionQueryModelFromDomain(actionPasCommencee),
-            uneActionQueryModelFromDomain(actionEnCours1)
+            uneActionQueryModelFromDomain(actionEnCours2, jeune),
+            uneActionQueryModelFromDomain(actionPasCommencee, jeune),
+            uneActionQueryModelFromDomain(actionEnCours1, jeune)
           ])
         }
       })
@@ -243,14 +246,16 @@ describe('GetActionsByJeuneQueryHandler', () => {
         expect(isSuccess(result)).to.be.true()
         if (isSuccess(result)) {
           expect(result.data.actions).to.be.deep.equal([
-            uneActionQueryModelFromDomain(actionEnCours),
-            uneActionQueryModelFromDomain(actionPasCommencee),
+            uneActionQueryModelFromDomain(actionEnCours, jeune),
+            uneActionQueryModelFromDomain(actionPasCommencee, jeune),
             uneActionQueryModelFromDomain(
               actionTerminee2,
+              jeune,
               Action.Qualification.Etat.A_QUALIFIER
             ),
             uneActionQueryModelFromDomain(
               actionTerminee1,
+              jeune,
               Action.Qualification.Etat.A_QUALIFIER
             )
           ])
@@ -318,7 +323,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
         expect(isSuccess(result)).to.be.true()
         if (isSuccess(result)) {
           expect(result.data.actions).to.be.deep.equal([
-            uneActionQueryModelFromDomain(actionPage2)
+            uneActionQueryModelFromDomain(actionPage2, jeune)
           ])
           expect(result.data.metadonnees.nombreTotal).to.equal(11)
         }
@@ -370,11 +375,12 @@ describe('GetActionsByJeuneQueryHandler', () => {
           expect(result.data.actions).to.be.deep.equal([
             uneActionQueryModelFromDomain(
               actionTermineeRecente,
+              jeune,
               Action.Qualification.Etat.A_QUALIFIER
             ),
-            uneActionQueryModelFromDomain(actionPasCommencee),
-            uneActionQueryModelFromDomain(actionEnCours),
-            uneActionQueryModelFromDomain(actionCanceled)
+            uneActionQueryModelFromDomain(actionPasCommencee, jeune),
+            uneActionQueryModelFromDomain(actionEnCours, jeune),
+            uneActionQueryModelFromDomain(actionCanceled, jeune)
           ])
         }
       })
@@ -427,11 +433,12 @@ describe('GetActionsByJeuneQueryHandler', () => {
         expect(isSuccess(result)).to.be.true()
         if (isSuccess(result)) {
           expect(result.data.actions).to.be.deep.equal([
-            uneActionQueryModelFromDomain(actionCanceled),
-            uneActionQueryModelFromDomain(actionEnCours),
-            uneActionQueryModelFromDomain(actionPasCommencee),
+            uneActionQueryModelFromDomain(actionCanceled, jeune),
+            uneActionQueryModelFromDomain(actionEnCours, jeune),
+            uneActionQueryModelFromDomain(actionPasCommencee, jeune),
             uneActionQueryModelFromDomain(
               actionTerminee,
+              jeune,
               Action.Qualification.Etat.A_QUALIFIER
             )
           ])
@@ -484,10 +491,12 @@ describe('GetActionsByJeuneQueryHandler', () => {
 
           actionQMNonQualifiable = uneActionQueryModelFromDomain(
             actionNonQualifiable,
+            jeune,
             Action.Qualification.Etat.NON_QUALIFIABLE
           )
           actionQMQualifiee = uneActionQueryModelFromDomain(
             actionQualifiee,
+            jeune,
             Action.Qualification.Etat.QUALIFIEE,
             {
               code: Action.Qualification.Code.SANTE,
@@ -498,6 +507,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
           )
           actionQMAQualifier = uneActionQueryModelFromDomain(
             actionAQualifier,
+            jeune,
             Action.Qualification.Etat.A_QUALIFIER
           )
 
@@ -623,8 +633,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
           expect(isSuccess(result)).to.be.true()
           if (isSuccess(result)) {
             expect(result.data.actions).to.be.deep.equal([
-              uneActionQueryModelFromDomain(actionEnCours),
-              uneActionQueryModelFromDomain(actionPasCommencee)
+              uneActionQueryModelFromDomain(actionEnCours, jeune),
+              uneActionQueryModelFromDomain(actionPasCommencee, jeune)
             ])
             expect(result.data.metadonnees.nombreTotal).to.equal(4)
           }
@@ -705,6 +715,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
             expect(result.data.actions).to.be.deep.equal([
               uneActionQueryModelFromDomain(
                 actionCitoyennete,
+                jeune,
                 Action.Qualification.Etat.NON_QUALIFIABLE,
                 {
                   code: Action.Qualification.Code.CITOYENNETE,
@@ -715,6 +726,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
               ),
               uneActionQueryModelFromDomain(
                 actionCitoyennete2,
+                jeune,
                 Action.Qualification.Etat.NON_QUALIFIABLE,
                 {
                   code: Action.Qualification.Code.CITOYENNETE,
@@ -806,13 +818,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
             expect(result.data.metadonnees).to.deep.equal({
               nombreTotal: 6,
               nombreFiltrees: 6,
-              nombrePasCommencees: 1,
-              nombreEnCours: 2,
-              nombreTerminees: 2,
-              nombreAnnulees: 1,
-              nombreNonQualifiables: 4,
-              nombreAQualifier: 1,
-              nombreQualifiees: 1,
               nombreActionsParPage: 10
             })
           }

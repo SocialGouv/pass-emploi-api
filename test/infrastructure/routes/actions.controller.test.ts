@@ -185,22 +185,23 @@ describe('ActionsController', () => {
 
         // When - Then
         const actionJson = {
-          id: idAction,
-          content: "Ceci est un contenu d'action",
-          comment: 'Ceci est un commentaire',
-          status: 'in_progress',
-          creationDate: '2021-11-11T08:03:30.000Z',
-          lastUpdate: '2021-11-11T09:03:30.000Z',
-          jeune: {
-            id: '1',
-            lastName: 'Saez',
-            firstName: 'Damien',
-            idConseiller: 'id-conseiller'
-          },
-          creatorType: 'conseiller',
+          comment: "Description de l'action",
+          content: "Contenu de l'action",
+          creationDate: 'Thu, 11 Nov 2021 08:03:30 UTC',
           creator: 'Nils Tavernier',
-          dateEcheance: '2021-11-11T10:03:30.000Z',
-          etat: 'NON_QUALIFIABLE'
+          creatorType: 'conseiller',
+          dateEcheance: '2021-11-11T08:03:30.000Z',
+          etat: 'NON_QUALIFIABLE',
+          id: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
+          jeune: {
+            firstName: 'John',
+            id: 'ABCDE',
+            idConseiller: '1',
+            lastName: 'Doe',
+            dispositif: 'CEJ'
+          },
+          lastUpdate: 'Thu, 11 Nov 2021 08:03:30 UTC',
+          status: 'not_started'
         }
         await request(app.getHttpServer())
           .get(`/actions/${idAction}`)
@@ -662,13 +663,6 @@ describe('ActionsController', () => {
           metadonnees: {
             nombreTotal: 1,
             nombreFiltrees: 1,
-            nombreEnCours: 2,
-            nombreTerminees: 3,
-            nombreAnnulees: 4,
-            nombrePasCommencees: 5,
-            nombreNonQualifiables: 6,
-            nombreAQualifier: 7,
-            nombreQualifiees: 8,
             nombreActionsParPage: 10
           }
         }
