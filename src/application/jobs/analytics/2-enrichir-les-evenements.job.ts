@@ -103,6 +103,25 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
     `)
   }
 
+  private async mettreAJourLaStructure(
+    connexion: Sequelize
+  ): Promise<void> {
+    this.logger.log('Mise à jour de la structure en fonction du dispositif')
+    await connexion.query(`
+      UPDATE evenement_engagement
+      SET structure = 'MILO_PACEA'
+      FROM (
+        SELECT id 
+        FROM jeune
+        WHERE structure = 'MILO' AND dispositif = 'PACEA'
+        ) AS subquery
+      WHERE evenement_engagement.id_utilisateur = subquery.id
+        AND evenement_engagement.type_utilisateur = 'JEUNE'
+        AND evenement_engagement.structure = 'MILO'
+      ;
+    `)
+  }
+
   private async ajouterLesAgencesConseiller(
     connexion: Sequelize
   ): Promise<void> {
