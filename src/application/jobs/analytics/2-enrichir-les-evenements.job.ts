@@ -37,6 +37,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
       const connexion = await createSequelizeForAnalytics()
       await this.mettreAJourLeSchema(connexion)
       await this.indexerLesColonnes(connexion)
+      await this.mettreAJourLaStructure(connexion)
       await this.creerTableAEJeune(connexion)
       await this.ajouterLesAgencesConseiller(connexion)
       await this.ajouterLesAgencesJeune(connexion)
