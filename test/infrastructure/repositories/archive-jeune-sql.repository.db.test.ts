@@ -21,6 +21,7 @@ import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { StructureMiloSqlModel } from '../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
 import {
   TransfertConseillerDto,
   TransfertConseillerSqlModel
@@ -39,13 +40,12 @@ import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
+import { uneStructureMiloDto } from '../../fixtures/sql-models/structureMilo.sql-model'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import {
   DatabaseForTesting,
   getDatabase
 } from '../../utils/database-for-testing'
-import { StructureMiloSqlModel } from '../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
-import { uneStructureMiloDto } from '../../fixtures/sql-models/structureMilo.sql-model'
 
 const idStructureMilo = 'test'
 
@@ -170,6 +170,7 @@ describe('ArchiveJeuneSqlRepository', () => {
         nomJeune: jeuneDto.nom,
         prenomJeune: jeuneDto.prenom,
         structure: jeuneDto.structure,
+        dispositif: jeuneDto.dispositif,
         idPartenaire: jeuneDto.idPartenaire!,
         email: jeuneDto.email!,
         dateCreation: new Date('2022-01-05T09:23:00Z'),
@@ -194,6 +195,7 @@ describe('ArchiveJeuneSqlRepository', () => {
         nomJeune: jeuneDto.nom,
         prenomJeune: jeuneDto.prenom,
         structure: jeuneDto.structure,
+        dispositif: jeuneDto.dispositif,
         email: jeuneDto.email!,
         dateCreation: new Date('2022-01-05T09:23:00Z'),
         datePremiereConnexion: new Date('2022-01-06T09:23:00Z'),

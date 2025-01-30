@@ -91,7 +91,8 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
       motif: command.motif,
       commentaire: command.commentaire,
       dateArchivage: this.dateService.nowJs(),
-      idPartenaire: jeune.idPartenaire
+      idPartenaire: jeune.idPartenaire,
+      dispositif: jeune.dispositif
     }
 
     try {
