@@ -27,6 +27,7 @@ export interface UpdateSessionMiloCommand extends Command {
   idConseiller: string
   accessToken: string
   estVisible?: boolean
+  autoinscription?: boolean
   inscriptions?: SessionMilo.Modification.Inscription[]
 }
 
@@ -78,7 +79,8 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
     const sessionModifiee = SessionMilo.modifier(
       session,
       this.dateService.now(),
-      command.estVisible
+      command.estVisible,
+      command.autoinscription
     )
 
     const resultInscriptions = SessionMilo.extraireInscriptionsATraiter(

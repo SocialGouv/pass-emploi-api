@@ -11,6 +11,7 @@ import {
   SessionJeuneDetailDto,
   SessionParDossierJeuneDto
 } from 'src/infrastructure/clients/dto/milo.dto'
+import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import {
   AgendaConseillerMiloSessionListItemQueryModel,
   DetailSessionConseillerMiloQueryModel,
@@ -73,16 +74,18 @@ export function mapSessionJeuneDtoToQueryModel(
 
 export function mapSessionConseillerDtoToQueryModel(
   { offre, session }: SessionConseillerDetailDto,
-  estVisible: boolean,
   timezone: string,
   maintenant: DateTime,
-  dateCloture?: DateTime
+  parametrageSqlModel?: SessionMiloSqlModel
 ): SessionConseillerMiloQueryModel {
   const dateHeureFin = DateTime.fromFormat(
     session.dateHeureFin,
     MILO_DATE_FORMAT,
     { zone: timezone }
   ).toUTC()
+  const dateCloture = parametrageSqlModel?.dateCloture
+    ? DateTime.fromJSDate(parametrageSqlModel.dateCloture)
+    : undefined
 
   const nombreParticipants = (session.instances ?? [])
     .map(({ idDossier, statut }) =>
@@ -94,11 +97,14 @@ export function mapSessionConseillerDtoToQueryModel(
         statut === SessionMilo.Inscription.Statut.PRESENT
     ).length
 
+  const autoinscription = parametrageSqlModel?.autoinscription ?? false
+
   const queryModel: SessionConseillerMiloQueryModel = {
     id: session.id.toString(),
     nomSession: session.nom,
     nomOffre: offre.nom,
-    estVisible: estVisible,
+    estVisible: (autoinscription || parametrageSqlModel?.estVisible) ?? false,
+    autoinscription,
     dateHeureDebut: DateTime.fromFormat(
       session.dateHeureDebut,
       MILO_DATE_FORMAT,
@@ -214,6 +220,7 @@ export function mapSessionToDetailSessionConseillerQueryModel(
     animateur: session.animateur,
     lieu: session.lieu,
     estVisible: session.estVisible,
+    autoinscription: session.autoinscription,
     statut: SessionMilo.calculerStatut(
       maintenant,
       session.fin,

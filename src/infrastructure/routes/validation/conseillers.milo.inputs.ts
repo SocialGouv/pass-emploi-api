@@ -85,7 +85,9 @@ export class UpdateSessionMiloPayload {
   @ApiProperty()
   @ValidateIf(
     payload =>
-      payload.inscriptions === undefined || payload.estVisible !== undefined
+      (payload.inscriptions === undefined &&
+        payload.autoinscription === undefined) ||
+      payload.estVisible !== undefined
   )
   @IsDefined({ message: 'Au moins un des champs doit être renseigné' })
   @IsBoolean()
@@ -94,8 +96,22 @@ export class UpdateSessionMiloPayload {
   @ApiProperty()
   @ValidateIf(
     payload =>
-      payload.estVisible === undefined || payload.inscriptions !== undefined
+      (payload.inscriptions === undefined &&
+        payload.estVisible === undefined) ||
+      payload.autoinscription !== undefined
   )
+  @IsDefined({ message: 'Au moins un des champs doit être renseigné' })
+  @IsBoolean()
+  autoinscription?: boolean
+
+  @ApiProperty()
+  @ValidateIf(
+    payload =>
+      (payload.estVisible === undefined &&
+        payload.autoinscription === undefined) ||
+      payload.inscriptions !== undefined
+  )
+  @IsDefined({ message: 'Au moins un des champs doit être renseigné' })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => InscriptionSessionMiloPayload)

@@ -74,13 +74,11 @@ export class GetSessionsConseillerMiloQueryGetter {
       const sessionSqlModel = sessionsSqlModels.find(
         ({ id }) => id === sessionMilo.session.id.toString()
       )
-      const dateCloture = sessionSqlModel?.dateCloture
       return mapSessionConseillerDtoToQueryModel(
         sessionMilo,
-        sessionSqlModel?.estVisible ?? false,
         timezoneStructure,
         this.dateService.now(),
-        dateCloture ? DateTime.fromJSDate(dateCloture) : undefined
+        sessionSqlModel
       )
     })
 
