@@ -34,6 +34,7 @@ import { uneInstanceSessionMilo } from '../../../fixtures/milo.fixture'
 import { expect, sinon, StubbedClass, stubClass } from '../../../utils'
 import { testConfig } from '../../../utils/module-for-testing'
 import { PlanificateurService } from '../../../../src/domain/planificateur'
+
 const structureConseiller = {
   id: 'structure-milo',
   timezone: 'America/Cayenne'
@@ -235,12 +236,13 @@ describe('SessionMiloHttpSqlRepository', () => {
       )
     })
 
-    it('récupère la visibilité si elle a été modifiée', async () => {
+    it('récupère le paramétrage de la session si elle a été modifiée', async () => {
       // Given
       const now = DateTime.now()
       await SessionMiloSqlModel.create({
         id: idSession,
         estVisible: true,
+        autoinscription: false,
         idStructureMilo: structureConseiller.id,
         dateModification: now.toJSDate()
       })
@@ -255,6 +257,7 @@ describe('SessionMiloHttpSqlRepository', () => {
       // Then
       const actualSession = (actual as Success<SessionMilo>).data
       expect(actualSession.estVisible).to.be.true()
+      expect(actualSession.autoinscription).to.be.false()
       expect(actualSession.dateModification).to.deep.equal(now)
     })
   })
@@ -299,6 +302,7 @@ describe('SessionMiloHttpSqlRepository', () => {
           id: idSession,
           idStructureMilo: idStructure,
           estVisible: true,
+          autoinscription: true,
           inscriptions: [
             {
               idJeune: 'id-hermione',
@@ -375,21 +379,25 @@ describe('SessionMiloHttpSqlRepository', () => {
       expect(sessionTrouve!.id).to.equal(idSession)
       expect(sessionTrouve!.idStructureMilo).to.equal(idStructure)
       expect(sessionTrouve!.estVisible).to.equal(true)
+      expect(sessionTrouve!.autoinscription).to.equal(true)
       expect(sessionTrouve!.dateModification).to.deep.equal(
         uneDatetime().minus({ day: 1 }).toJSDate()
       )
     })
 
     it('modifie la session en base', async () => {
-      // When
+      // Given
       const sessionModifiee = {
         ...uneSessionMilo({
           id: idSession,
           idStructureMilo: idStructure,
-          estVisible: false
+          estVisible: false,
+          autoinscription: false
         }),
         dateModification: uneDatetime()
       }
+
+      // When
       await repository.save(
         sessionModifiee,
         {
@@ -403,6 +411,7 @@ describe('SessionMiloHttpSqlRepository', () => {
       // Then
       const sessionTrouve = await SessionMiloSqlModel.findByPk(idSession)
       expect(sessionTrouve!.estVisible).to.equal(false)
+      expect(sessionTrouve!.autoinscription).to.equal(false)
       expect(sessionTrouve!.dateModification).to.deep.equal(
         uneDatetime().toJSDate()
       )

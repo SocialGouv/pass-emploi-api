@@ -41,6 +41,9 @@ export class SessionConseillerMiloQueryModel {
   estVisible: boolean
 
   @ApiProperty()
+  autoinscription: boolean
+
+  @ApiProperty()
   dateHeureDebut: string
 
   @ApiProperty()
@@ -147,6 +150,9 @@ export class DetailSessionConseillerQueryModel {
 
   @ApiProperty()
   estVisible: boolean
+
+  @ApiProperty()
+  autoinscription: boolean
 
   @ApiProperty({ required: false })
   nbPlacesDisponibles?: number

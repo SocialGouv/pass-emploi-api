@@ -74,8 +74,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
     const commandSansInscription: UpdateSessionMiloCommand = {
       idSession: 'idSession',
       idConseiller: conseiller.id,
-      accessToken: 'token',
-      estVisible: true
+      accessToken: 'token'
     }
 
     it('n’autorise pas un conseiller sans structure', async () => {
@@ -139,7 +138,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
         sessionMiloRepository.save.resolves(emptySuccess())
       })
 
-      it('la met à jour + planifie rappels', async () => {
+      it('met à jour la visibilité', async () => {
         // Given
         const session = uneSessionMilo({
           inscriptions: [],
@@ -149,7 +148,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
 
         // When
         const result = await updateSessionMiloCommandHandler.handle(
-          commandSansInscription,
+          { ...commandSansInscription, estVisible: true },
           utilisateur
         )
 
@@ -159,6 +158,38 @@ describe('UpdateSessionMiloCommandHandler', () => {
           {
             ...supprimerInscriptions(session),
             estVisible: true,
+            dateModification: uneDatetime()
+          },
+          {
+            idsJeunesAInscrire: [],
+            inscriptionsASupprimer: [],
+            inscriptionsAModifier: []
+          },
+          idpToken
+        )
+      })
+
+      it('met à jour l’autoinscription (et la visibilité)', async () => {
+        // Given
+        const session = uneSessionMilo({
+          inscriptions: [],
+          nbPlacesDisponibles: 3
+        })
+        sessionMiloRepository.getForConseiller.resolves(success(session))
+
+        // When
+        const result = await updateSessionMiloCommandHandler.handle(
+          { ...commandSansInscription, autoinscription: true },
+          utilisateur
+        )
+
+        // Then
+        expect(result).to.deep.equal(emptySuccess())
+        expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
+          {
+            ...supprimerInscriptions(session),
+            estVisible: true,
+            autoinscription: true,
             dateModification: uneDatetime()
           },
           {
@@ -217,7 +248,6 @@ describe('UpdateSessionMiloCommandHandler', () => {
         expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
           {
             ...supprimerInscriptions(session),
-            estVisible: true,
             dateModification: uneDatetime()
           },
           {
@@ -280,7 +310,6 @@ describe('UpdateSessionMiloCommandHandler', () => {
         expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
           {
             ...supprimerInscriptions(session),
-            estVisible: true,
             dateModification: uneDatetime()
           },
           {
@@ -387,7 +416,6 @@ describe('UpdateSessionMiloCommandHandler', () => {
         expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
           {
             ...supprimerInscriptions(session),
-            estVisible: true,
             dateModification: uneDatetime()
           },
           {
@@ -495,7 +523,6 @@ describe('UpdateSessionMiloCommandHandler', () => {
         expect(sessionMiloRepository.save).to.have.been.calledWithExactly(
           {
             ...supprimerInscriptions(session),
-            estVisible: true,
             dateModification: uneDatetime()
           },
           {
@@ -605,7 +632,6 @@ describe('UpdateSessionMiloCommandHandler', () => {
     it('authorize le conseiller', async () => {
       // Given
       const command: UpdateSessionMiloCommand = {
-        estVisible: true,
         idSession: 'idSession',
         idConseiller: conseiller.id,
         accessToken: 'token'

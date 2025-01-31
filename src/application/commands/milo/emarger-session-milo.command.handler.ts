@@ -39,7 +39,7 @@ export class EmargerSessionMiloCommandHandler extends CommandHandler<
     private dateService: DateService,
     private conseillerAuthorizer: ConseillerAuthorizer
   ) {
-    super('UpdateSessionMiloCommandHandler')
+    super('EmargerSessionMiloCommandHandler')
   }
 
   async handle(command: EmargerSessionMiloCommand): Promise<Result> {

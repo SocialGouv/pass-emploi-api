@@ -22,6 +22,7 @@ export interface SessionMilo {
   animateur: string
   lieu: string
   estVisible: boolean
+  autoinscription: boolean
   idStructureMilo: string
   offre: SessionMilo.Offre
   inscriptions: SessionMilo.Inscription[]
@@ -66,11 +67,15 @@ export namespace SessionMilo {
   export function modifier(
     session: SessionMilo,
     dateModification: DateTime,
-    visibilite?: boolean
+    nouvelleVisibilite?: boolean,
+    nouvelleAutoinscription?: boolean
   ): Omit<SessionMilo, 'inscriptions'> {
+    const autoinscription = nouvelleAutoinscription ?? session.autoinscription
+
     return {
       ...supprimerInscriptions(session),
-      estVisible: visibilite ?? session.estVisible,
+      estVisible: (autoinscription || nouvelleVisibilite) ?? session.estVisible,
+      autoinscription,
       dateModification
     }
   }
@@ -214,15 +219,6 @@ export namespace SessionMilo {
       REFUS_JEUNE = 'REFUS_JEUNE',
       REFUS_TIERS = 'REFUS_TIERS',
       PRESENT = 'PRESENT'
-    }
-
-    export function estInscrit(
-      statut?: SessionMilo.Inscription.Statut
-    ): boolean {
-      return (
-        statut === SessionMilo.Inscription.Statut.INSCRIT ||
-        statut === SessionMilo.Inscription.Statut.PRESENT
-      )
     }
   }
 
