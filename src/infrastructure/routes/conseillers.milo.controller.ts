@@ -270,6 +270,7 @@ export class ConseillersMiloController {
       idConseiller,
       accessToken: accessToken,
       estVisible: updateSessionMiloPayload.estVisible,
+      autoinscription: updateSessionMiloPayload.autoinscription,
       inscriptions: updateSessionMiloPayload.inscriptions
     }
 

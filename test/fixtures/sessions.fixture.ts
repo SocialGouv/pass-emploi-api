@@ -15,6 +15,7 @@ export const uneSessionConseillerMiloQueryModel: SessionConseillerMiloQueryModel
     nomSession: 'Une-session',
     nomOffre: 'Une-offre',
     estVisible: false,
+    autoinscription: false,
     dateHeureDebut: '2020-04-06T13:20:00.000Z',
     dateHeureFin: '2020-04-08T13:20:00.000Z',
     type: {
@@ -53,6 +54,7 @@ export const unDetailSessionConseillerMiloQueryModel: DetailSessionConseillerMil
       animateur: 'Un-animateur',
       lieu: 'Un-lieu',
       estVisible: false,
+      autoinscription: false,
       nbPlacesDisponibles: 10,
       commentaire: 'Un-commentaire',
       statut: SessionMilo.Statut.A_CLOTURER
@@ -123,6 +125,7 @@ export const uneSessionMilo = (
     animateur: 'Un-animateur',
     commentaire: 'Un-commentaire',
     estVisible: false,
+    autoinscription: false,
     dateMaxInscription: DateTime.fromISO('2020-04-07T23:59:59.999Z'),
     debut: DateTime.fromISO('2020-04-06T13:20:00.000Z', {
       zone: 'America/Cayenne'

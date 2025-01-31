@@ -429,7 +429,7 @@ describe('ConseillersMiloController', () => {
   })
 
   describe('PATCH /conseillers/milo/:idConseiller/sessions/:idSession', () => {
-    it('met à jour a visibilite', async () => {
+    it('met à jour la visibilite', async () => {
       // Given
       const idSession = '123'
       const idConseiller = 'id-conseiller'
@@ -439,7 +439,8 @@ describe('ConseillersMiloController', () => {
         idConseiller: idConseiller,
         idSession: idSession,
         accessToken: 'coucou',
-        inscriptions: undefined
+        inscriptions: undefined,
+        autoinscription: undefined
       }
 
       updateSessionCommandHandler.execute
@@ -451,6 +452,38 @@ describe('ConseillersMiloController', () => {
         .patch(`/conseillers/milo/${idConseiller}/sessions/${idSession}`)
         .send({
           estVisible: true
+        })
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+
+      expect(
+        updateSessionCommandHandler.execute
+      ).to.have.been.calledOnceWithExactly(command, unUtilisateurDecode())
+    })
+
+    it('met à jour l’autoinscription', async () => {
+      // Given
+      const idSession = '123'
+      const idConseiller = 'id-conseiller'
+
+      const command: UpdateSessionMiloCommand = {
+        autoinscription: true,
+        idConseiller: idConseiller,
+        idSession: idSession,
+        accessToken: 'coucou',
+        inscriptions: undefined,
+        estVisible: undefined
+      }
+
+      updateSessionCommandHandler.execute
+        .withArgs(command, unUtilisateurDecode())
+        .resolves(emptySuccess())
+
+      // When - Then
+      await request(app.getHttpServer())
+        .patch(`/conseillers/milo/${idConseiller}/sessions/${idSession}`)
+        .send({
+          autoinscription: true
         })
         .set('authorization', unHeaderAuthorization())
         .expect(HttpStatus.OK)
@@ -481,11 +514,12 @@ describe('ConseillersMiloController', () => {
       const idConseiller = 'id-conseiller'
 
       const command: UpdateSessionMiloCommand = {
-        estVisible: true,
         idConseiller: idConseiller,
         idSession: idSession,
         accessToken: 'coucou',
-        inscriptions: listeInscrits
+        inscriptions: listeInscrits,
+        estVisible: undefined,
+        autoinscription: undefined
       }
 
       updateSessionCommandHandler.execute
@@ -496,7 +530,6 @@ describe('ConseillersMiloController', () => {
       await request(app.getHttpServer())
         .patch(`/conseillers/milo/${idConseiller}/sessions/${idSession}`)
         .send({
-          estVisible: true,
           inscriptions: listeInscrits
         })
         .set('authorization', unHeaderAuthorization())
