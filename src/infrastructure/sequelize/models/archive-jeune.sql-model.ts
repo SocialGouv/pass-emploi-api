@@ -52,6 +52,12 @@ export class ArchiveJeuneDto extends Model {
   structure: string | null
 
   @Column({
+    field: 'dispositif',
+    type: DataType.STRING
+  })
+  dispositif: string | null
+
+  @Column({
     field: 'id_structure_milo',
     type: DataType.STRING
   })

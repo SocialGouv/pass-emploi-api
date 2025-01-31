@@ -1,5 +1,6 @@
 import { Result } from '../building-blocks/types/result'
 import { Core } from './core'
+import { Jeune } from './jeune/jeune'
 import { Offre } from './offre/offre'
 import { Recherche } from './offre/recherche/recherche'
 import { CodeTypeRendezVous } from './rendez-vous/rendez-vous'
@@ -176,6 +177,7 @@ export namespace ArchiveJeune {
     prenomJeune: string
     nomJeune: string
     structure: Core.Structure
+    dispositif: Jeune.Dispositif
     idPartenaire?: string
     dateCreation: Date
     datePremiereConnexion?: Date

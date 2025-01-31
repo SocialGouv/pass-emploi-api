@@ -77,7 +77,8 @@ export class ArchiverJeuneSupportCommandHandler extends CommandHandler<
       datePremiereConnexion: jeune.datePremiereConnexion?.toJSDate(),
       motif,
       commentaire: COMMENTAIRE_SUPPRESSION_SUPPORT,
-      dateArchivage: this.dateService.nowJs()
+      dateArchivage: this.dateService.nowJs(),
+      dispositif: jeune.dispositif
     }
     await this.archiveJeuneRepository.archiver(metadonneesArchive)
 

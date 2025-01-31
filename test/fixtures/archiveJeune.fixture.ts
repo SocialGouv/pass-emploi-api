@@ -1,3 +1,4 @@
+import { Jeune } from '../../src/domain/jeune/jeune'
 import { ArchiveJeune } from '../../src/domain/archive-jeune'
 import { uneDate } from './date.fixture'
 import { Core } from '../../src/domain/core'
@@ -14,6 +15,7 @@ export const uneArchiveJeuneMetadonnees = (
     nomJeune: 'test',
     prenomJeune: 'test',
     structure: Structure.MILO,
+    dispositif: Jeune.Dispositif.PACEA,
     dateCreation: DateTime.fromJSDate(uneDate()).minus({ month: 1 }).toJSDate(),
     dateArchivage: uneDate()
   }
