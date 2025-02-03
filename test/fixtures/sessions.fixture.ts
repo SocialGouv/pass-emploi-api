@@ -38,7 +38,10 @@ export const uneSessionJeuneMiloQueryModel = (
     type: {
       code: OffreTypeCode.WORKSHOP,
       label: 'Atelier'
-    }
+    },
+    autoinscription: false,
+    dateMaxInscription: '2020-04-07T21:59:59.999Z',
+    nbPlacesRestantes: 10
   }
   return { ...defaults, ...args }
 }
