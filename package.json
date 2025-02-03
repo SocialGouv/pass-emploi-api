@@ -94,7 +94,7 @@
     "crypto-js": "4.2.0",
     "elastic-apm-node": "3.52.2",
     "firebase-admin": "13.0.1",
-    "fuse.js": "7.0.0",
+    "fuse.js": "7.1.0",
     "geojson": "0.5.0",
     "helmet": "8.0.0",
     "ics": "3.8.1",
