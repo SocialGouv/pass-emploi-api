@@ -31,10 +31,12 @@ export class KeycloakClient {
     this.clientSecret = this.configService.get('oidc').clientSecret
   }
 
+  // FIXME remove
   public async exchangeTokenConseillerMilo(bearer: string): Promise<string> {
     return this.exchangeToken(bearer, Core.Structure.MILO)
   }
 
+  // FIXME remove
   public async exchangeTokenJeune(
     bearer: string,
     structure: Core.Structure
@@ -42,6 +44,7 @@ export class KeycloakClient {
     return this.exchangeToken(bearer, structure)
   }
 
+  // FIXME remove
   public async exchangeTokenConseillerJeune(
     bearer: string,
     subJeune: string
@@ -49,15 +52,7 @@ export class KeycloakClient {
     return this.exchangeToken(bearer, undefined, subJeune)
   }
 
-  // TODO
-  public async exchangeTokenBeneficiaireConseiller(
-    _bearer: string,
-    _subConseiller: string
-  ): Promise<string> {
-    throw new Error('not implemented')
-  }
-
-  private async exchangeToken(
+  async exchangeToken(
     bearer: string,
     structure?: Core.Structure,
     requestedTokenSub?: string

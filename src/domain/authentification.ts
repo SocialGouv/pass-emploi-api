@@ -112,19 +112,16 @@ export namespace Authentification {
       email?: string | null
     ): Promise<{ dansSaStructure: boolean; crossStructures: boolean }>
 
-    exchangeToken(bearer: string, structure: Core.Structure): Promise<string>
-
-    disguiseBeneficiaireAsConseiller(
-      idAuthentificationConseiller: string,
+    recupererAccesPartenaire(
       bearer: string,
       structure: Core.Structure
     ): Promise<string>
 
-    desguiseConseillerAsBeneficiaire(
-      idAuthentificationBeneficiaire: string,
+    seFairePasserPourUnConseiller(
+      idConseiller: string,
       bearer: string,
       structure: Core.Structure
-    ): Promise<string>
+    ): Promise<Result<string>>
   }
 
   @Injectable()

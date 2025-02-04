@@ -115,9 +115,13 @@ export default class InscrireBeneficiaireSessionMiloCommandHandler extends Comma
     idSession: string,
     accessToken: string
   ): Promise<Result> {
-    const { accesMiloBeneficiaire, accesMiloConseiller } =
-      await this.recupererAccesMilo(accessToken, beneficiaire.conseiller.id)
+    const resultAccesMilo = await this.recupererAccesMilo(
+      accessToken,
+      beneficiaire.conseiller.id
+    )
+    if (isFailure(resultAccesMilo)) return resultAccesMilo
 
+    const { accesMiloBeneficiaire, accesMiloConseiller } = resultAccesMilo.data
     const resultVerification =
       await this.sessionMiloRepository.peutInscrireBeneficiaire(
         idSession,
@@ -165,19 +169,26 @@ export default class InscrireBeneficiaireSessionMiloCommandHandler extends Comma
   private async recupererAccesMilo(
     accessToken: string,
     idConseiller: string
-  ): Promise<{ accesMiloBeneficiaire: string; accesMiloConseiller: string }> {
-    const [accesMiloBeneficiaire, accesMiloConseiller] = await Promise.all([
-      this.authentificationRepository.exchangeToken(
-        accessToken,
-        Core.Structure.MILO
-      ),
-      this.authentificationRepository.disguiseBeneficiaireAsConseiller(
-        idConseiller,
-        accessToken,
-        Core.Structure.MILO
-      )
-    ])
+  ): Promise<
+    Result<{ accesMiloBeneficiaire: string; accesMiloConseiller: string }>
+  > {
+    const [accesMiloBeneficiaire, resultAccesMiloConseiller] =
+      await Promise.all([
+        this.authentificationRepository.recupererAccesPartenaire(
+          accessToken,
+          Core.Structure.MILO
+        ),
+        this.authentificationRepository.seFairePasserPourUnConseiller(
+          idConseiller,
+          accessToken,
+          Core.Structure.MILO
+        )
+      ])
+    if (isFailure(resultAccesMiloConseiller)) return resultAccesMiloConseiller
 
-    return { accesMiloBeneficiaire, accesMiloConseiller }
+    return success({
+      accesMiloBeneficiaire,
+      accesMiloConseiller: resultAccesMiloConseiller.data
+    })
   }
 }

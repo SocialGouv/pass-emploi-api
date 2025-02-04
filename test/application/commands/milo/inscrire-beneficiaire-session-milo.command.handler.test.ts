@@ -62,12 +62,12 @@ describe('InscrireBeneficiaireSessionMiloCommandHandler', () => {
       beneficiaireMiloRepository.get
         .withArgs(beneficiaireMilo.id)
         .resolves(success(beneficiaireMilo))
-      authentificationRepository.exchangeToken
+      authentificationRepository.recupererAccesPartenaire
         .withArgs('accessToken', Core.Structure.MILO)
         .resolves('token-beneficiaire-milo')
-      authentificationRepository.disguiseBeneficiaireAsConseiller
+      authentificationRepository.seFairePasserPourUnConseiller
         .withArgs(beneficiaireMilo.conseiller!.id, 'accessToken')
-        .resolves('token-conseiller-milo')
+        .resolves(success('token-conseiller-milo'))
       sessionMiloRepository.peutInscrireBeneficiaire
         .withArgs('id-session', 'token-beneficiaire-milo')
         .resolves(emptySuccess())

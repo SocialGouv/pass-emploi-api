@@ -1,5 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { Sequelize } from 'sequelize-typescript'
+import { NonTrouveError } from 'src/building-blocks/types/domain-error'
+import { failure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Core, estMilo, getStructureDeReference } from '../../domain/core'
 import { KeycloakClient } from '../clients/keycloak-client.db'
@@ -200,32 +202,29 @@ export class AuthentificationSqlKeycloakRepository
     }
   }
 
-  // TODO + rename
-  async exchangeToken(
-    _bearer: string,
-    _structure: Core.Structure
+  async recupererAccesPartenaire(
+    bearer: string,
+    structure: Core.Structure
   ): Promise<string> {
-    throw new Error('not implemented')
+    return this.keycloakClient.exchangeToken(bearer, structure)
   }
 
-  // TODO
-  async desguiseConseillerAsBeneficiaire(
-    _idAuthentificationBeneficiaire: string,
-    _bearer: string,
-    _structure: Core.Structure
-  ): Promise<string> {
-    // exchange token conseiller -> beneficiaire
-    throw new Error('not implemented')
-  }
+  async seFairePasserPourUnConseiller(
+    idConseiller: string,
+    bearer: string,
+    structure: Core.Structure
+  ): Promise<Result<string>> {
+    const conseillerSqlModel = await ConseillerSqlModel.findByPk(idConseiller)
+    if (!conseillerSqlModel)
+      return failure(new NonTrouveError('Conseiller', idConseiller))
 
-  // TODO
-  async disguiseBeneficiaireAsConseiller(
-    _idAuthentificationConseiller: string,
-    _bearer: string,
-    _structure: Core.Structure
-  ): Promise<string> {
-    // exchange token beneficiaire -> conseiller
-    throw new Error('not implemented')
+    const accesConseiller = await this.keycloakClient.exchangeToken(
+      bearer,
+      structure,
+      conseillerSqlModel.idAuthentification
+    )
+
+    return success(accesConseiller)
   }
 }
 
