@@ -251,14 +251,13 @@ export class DateNonAutoriseeError implements DomainError {
   }
 }
 
-export class MaxInscritsDepasse implements DomainError {
-  static CODE = 'MAX_INSCRITS_DEPASSE'
-  readonly code: string = MaxInscritsDepasse.CODE
+export class NombrePlacesInsuffisant implements DomainError {
+  static CODE = 'NOMBRE_PLACE_INSUFFISANT'
+  readonly code: string = NombrePlacesInsuffisant.CODE
   readonly message: string
 
   constructor() {
-    this.message =
-      'Le nombre d’inscrits dépasse le nombre de participants maximum'
+    this.message = 'La session n’a pas suffisamment de places disponibles'
   }
 }
 

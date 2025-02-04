@@ -28,7 +28,7 @@ import {
   JeuneNonLieAuConseillerError,
   JeunePasInactifError,
   MauvaiseCommandeError,
-  MaxInscritsDepasse,
+  NombrePlacesInsuffisant,
   NonTraitableError,
   NonTrouveError,
   ReponsesCampagneInvalide,
@@ -69,7 +69,7 @@ function handleFailure(result: Failure): never {
     case ConseillerMiloSansStructure.CODE:
     case JeuneMiloSansStructure.CODE:
     case JeuneMiloSansIdDossier.CODE:
-    case MaxInscritsDepasse.CODE:
+    case NombrePlacesInsuffisant.CODE:
     case EmargementIncorrect.CODE:
     case ConseillerNonValide.CODE:
       throw new BadRequestException(result.error, result.error.message)

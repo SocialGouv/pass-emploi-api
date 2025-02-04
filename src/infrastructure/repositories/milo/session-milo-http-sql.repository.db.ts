@@ -4,10 +4,15 @@ import { ConfigService } from '@nestjs/config'
 import { DateTime } from 'luxon'
 import { firstValueFrom } from 'rxjs'
 import {
+  NombrePlacesInsuffisant,
+  NonTrouveError
+} from 'src/building-blocks/types/domain-error'
+import {
   Result,
   emptySuccess,
   isFailure,
-  success
+  success,
+  failure
 } from 'src/building-blocks/types/result'
 import { ConseillerMilo } from 'src/domain/milo/conseiller.milo.db'
 import {
@@ -193,21 +198,36 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     return emptySuccess()
   }
 
-  // TODO
   async peutInscrireBeneficiaire(
-    _idSession: string,
-    _tokenMiloBeneficiaire: string
+    idSession: string,
+    tokenMiloBeneficiaire: string
   ): Promise<Result> {
-    throw new Error('not implemented')
+    const resultSession = await this.miloClient.getDetailSessionJeune(
+      tokenMiloBeneficiaire,
+      idSession
+    )
+    if (isFailure(resultSession))
+      return failure(new NonTrouveError('Session', idSession))
+
+    if (resultSession.data.session.nbPlacesDisponibles === 0)
+      return failure(new NombrePlacesInsuffisant())
+
+    return emptySuccess()
   }
 
-  // TODO
   async inscrireBeneficiaire(
-    _idSession: string,
-    _idDossier: string,
-    _tokenMiloConseiller: string
+    idSession: string,
+    idDossier: string,
+    tokenMiloConseiller: string
   ): Promise<Result> {
-    throw new Error('not implemented')
+    const resultInscription = await this.miloClient.inscrireJeunesSession(
+      tokenMiloConseiller,
+      idSession,
+      [idDossier]
+    )
+    if (isFailure(resultInscription)) return resultInscription
+
+    return emptySuccess()
   }
 
   private async inscrire(

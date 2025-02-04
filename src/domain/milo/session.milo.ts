@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import {
   EmargementIncorrect,
-  MaxInscritsDepasse
+  NombrePlacesInsuffisant
 } from 'src/building-blocks/types/domain-error'
 import {
   Result,
@@ -10,7 +10,6 @@ import {
   isFailure,
   success
 } from 'src/building-blocks/types/result'
-import { ConseillerMilo } from './conseiller.milo.db'
 
 export const SessionMiloRepositoryToken = 'SessionMilo.Repository'
 
@@ -353,7 +352,7 @@ function verifierNombrePlaces(
   const nbPlacesLiberees = aDesinscrire.length + aRefuser.length
 
   if (session.nbPlacesDisponibles < nbPlacesPrises - nbPlacesLiberees) {
-    return failure(new MaxInscritsDepasse())
+    return failure(new NombrePlacesInsuffisant())
   }
   return emptySuccess()
 }
