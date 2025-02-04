@@ -11,18 +11,14 @@ import {
   fromJeuneSqlToUtilisateur
 } from './mappers/authentification.mappers'
 import { Op } from 'sequelize'
-import { ConfigService } from '@nestjs/config'
 
 @Injectable()
-export class AuthentificationSqlRepository
+export class AuthentificationSqlKeycloakRepository
   implements Authentification.Repository
 {
   private logger: Logger
 
-  constructor(
-    private keycloakClient: KeycloakClient,
-    private readonly configService: ConfigService
-  ) {
+  constructor(private keycloakClient: KeycloakClient) {
     this.logger = new Logger('AuthentificationSqlRepository')
   }
 
@@ -202,6 +198,34 @@ export class AuthentificationSqlRepository
         structure
       )
     }
+  }
+
+  // TODO + rename
+  async exchangeToken(
+    _bearer: string,
+    _structure: Core.Structure
+  ): Promise<string> {
+    throw new Error('not implemented')
+  }
+
+  // TODO
+  async desguiseConseillerAsBeneficiaire(
+    _idAuthentificationBeneficiaire: string,
+    _bearer: string,
+    _structure: Core.Structure
+  ): Promise<string> {
+    // exchange token conseiller -> beneficiaire
+    throw new Error('not implemented')
+  }
+
+  // TODO
+  async disguiseBeneficiaireAsConseiller(
+    _idAuthentificationConseiller: string,
+    _bearer: string,
+    _structure: Core.Structure
+  ): Promise<string> {
+    // exchange token beneficiaire -> conseiller
+    throw new Error('not implemented')
   }
 }
 

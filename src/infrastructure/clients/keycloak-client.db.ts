@@ -49,30 +49,35 @@ export class KeycloakClient {
     return this.exchangeToken(bearer, undefined, subJeune)
   }
 
+  // TODO
+  public async exchangeTokenBeneficiaireConseiller(
+    _bearer: string,
+    _subConseiller: string
+  ): Promise<string> {
+    throw new Error('not implemented')
+  }
+
   private async exchangeToken(
     bearer: string,
     structure?: Core.Structure,
     requestedTokenSub?: string
   ): Promise<string> {
     const url = `${this.issuerUrl}/protocol/openid-connect/token`
-    const payload = {
+    const query = new URLSearchParams({
       subject_token: bearer,
       subject_token_type: 'urn:ietf:params:oauth:token-type:access_token',
       grant_type: 'urn:ietf:params:oauth:grant-type:token-exchange',
       client_id: this.clientId,
       client_secret: this.clientSecret
-    }
+    })
     if (requestedTokenSub) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      payload.requested_token_sub = requestedTokenSub
+      query.append('requested_token_sub', 'requestedTokenSub')
     }
     const headers = { 'Content-Type': 'application/x-www-form-urlencoded' }
+
     try {
       const result: TokenExchangeResponse = (
-        await firstValueFrom(
-          this.httpService.post(url, new URLSearchParams(payload), { headers })
-        )
+        await firstValueFrom(this.httpService.post(url, query, { headers }))
       ).data
       this.logger.log({
         message: 'Token exchange success',
@@ -143,6 +148,7 @@ export class KeycloakClient {
       }
     }
   }
+
   public async deleteAccount(idUser: string): Promise<void> {
     const apiKey = this.configService.get('oidc.apiKey')
     const url = `${this.configService.get('oidc').issuerApiUrl}/accounts`

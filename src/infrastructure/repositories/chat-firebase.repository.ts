@@ -51,9 +51,10 @@ export class ChatFirebaseRepository implements Chat.Repository {
 
   async envoyerMessageIndividuel(
     idChat: string,
-    message: MessageIndividuel
+    message: MessageIndividuel,
+    options: { sentByBeneficiaire: boolean } = { sentByBeneficiaire: false }
   ): Promise<void> {
-    await this.firebaseClient.envoyerMessageIndividuel(idChat, message)
+    await this.firebaseClient.envoyerMessageIndividuel(idChat, message, options)
   }
 
   async envoyerMessageGroupe(

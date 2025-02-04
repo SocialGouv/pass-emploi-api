@@ -37,26 +37,15 @@ const AES = require('crypto-js/aes')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Base64 = require('crypto-js/enc-base64')
 
-// FIXME ça dégage ?
-export interface IFirebaseClient {
-  send(tokenMessage: TokenMessage): Promise<void>
-
-  initializeChatIfNotExists(
-    jeuneId: string,
-    conseillerId: string
-  ): Promise<void>
-
-  getToken(utilisateur: Authentification.Utilisateur): Promise<string>
-}
-
 const FIREBASE_CHAT_PATH = 'chat'
 const FIREBASE_GROUP_PATH = 'groupe'
 const FIREBASE_MESSAGES_PATH = 'messages'
 const FIREBASE_MESSAGES_HISTORY_PATH = 'history'
 const SENT_BY_CONSEILLER = 'conseiller'
+const SENT_BY_JEUNE = 'jeune'
 
 @Injectable()
-export class FirebaseClient implements IFirebaseClient {
+export class FirebaseClient {
   private messaging
   private auth
   private readonly app: admin.app.App
@@ -189,7 +178,8 @@ export class FirebaseClient implements IFirebaseClient {
 
   async envoyerMessageIndividuel(
     idChat: string,
-    message: MessageIndividuel
+    message: MessageIndividuel,
+    { sentByBeneficiaire }: { sentByBeneficiaire: boolean }
   ): Promise<void> {
     const maintenant = this.dateService.now()
     const collection = this.firestore.collection(FIREBASE_CHAT_PATH)
@@ -197,18 +187,20 @@ export class FirebaseClient implements IFirebaseClient {
     const newConseillerMessageCount = (
       (await chat.get()).data() as FirebaseChat
     ).newConseillerMessageCount
+    const sentBy = sentByBeneficiaire ? SENT_BY_JEUNE : SENT_BY_CONSEILLER
+
     const updatedFirebaseChat: UpdateData<FirebaseChat> = {
       lastMessageContent: message.message,
       lastMessageIv: message.iv,
       lastMessageSentAt: Timestamp.fromMillis(maintenant.toMillis()),
-      lastMessageSentBy: SENT_BY_CONSEILLER,
+      lastMessageSentBy: sentBy,
       newConseillerMessageCount: newConseillerMessageCount + 1
     }
     const firebaseMessage: FirebaseMessage = {
       content: message.message,
       iv: message.iv,
       conseillerId: message.idConseiller,
-      sentBy: SENT_BY_CONSEILLER,
+      sentBy,
       creationDate: Timestamp.fromMillis(maintenant.toMillis()),
       type: message.type
     }

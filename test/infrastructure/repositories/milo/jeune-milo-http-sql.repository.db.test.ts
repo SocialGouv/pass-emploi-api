@@ -99,7 +99,7 @@ describe('JeuneMiloHttpRepository', () => {
         const result = await miloHttpSqlRepository.get(jeuneMilo.id)
 
         // Then
-        delete jeuneMilo.conseiller
+        jeuneMilo.conseiller!.idAgence = undefined
         expect(result).to.deep.equal(success(jeuneMilo))
       })
     })

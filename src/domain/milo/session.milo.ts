@@ -178,7 +178,7 @@ export namespace SessionMilo {
 
     getForConseiller(
       idSession: string,
-      structureConseiller: ConseillerMilo.Structure,
+      structureConseiller: StructureMilo,
       tokenMilo: string
     ): Promise<Result<SessionMilo>>
 
@@ -186,6 +186,17 @@ export namespace SessionMilo {
       sessionSansInscriptions: Omit<SessionMilo, 'inscriptions'>,
       inscriptionsATraiter: InscriptionsATraiter,
       tokenMilo: string
+    ): Promise<Result>
+
+    peutInscrireBeneficiaire(
+      idSession: string,
+      tokenMiloBeneficiaire: string
+    ): Promise<Result>
+
+    inscrireBeneficiaire(
+      idSession: string,
+      idDossier: string,
+      tokenMiloConseiller: string
     ): Promise<Result>
   }
 
@@ -237,6 +248,8 @@ export namespace SessionMilo {
       DESINSCRIT = 'DESINSCRIT'
     }
   }
+
+  export type StructureMilo = { id: string; timezone: string }
 }
 
 function trierInscriptionsATraiter(

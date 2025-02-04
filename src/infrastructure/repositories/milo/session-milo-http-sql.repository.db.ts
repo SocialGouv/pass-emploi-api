@@ -193,6 +193,23 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     return emptySuccess()
   }
 
+  // TODO
+  async peutInscrireBeneficiaire(
+    _idSession: string,
+    _tokenMiloBeneficiaire: string
+  ): Promise<Result> {
+    throw new Error('not implemented')
+  }
+
+  // TODO
+  async inscrireBeneficiaire(
+    _idSession: string,
+    _idDossier: string,
+    _tokenMiloConseiller: string
+  ): Promise<Result> {
+    throw new Error('not implemented')
+  }
+
   private async inscrire(
     idSession: string,
     dateDebutSession: DateTime,

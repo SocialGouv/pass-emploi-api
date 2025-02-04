@@ -41,6 +41,7 @@ export namespace Chat {
     | 'MESSAGE_PJ'
     | 'NOUVEAU_CONSEILLER'
     | 'NOUVEAU_CONSEILLER_TEMPORAIRE'
+    | 'AUTO_INSCRIPTION'
 
   export interface MessageACreer {
     message: string
@@ -89,7 +90,8 @@ export namespace Chat {
 
     envoyerMessageIndividuel(
       idChat: string,
-      message: MessageIndividuel
+      message: MessageIndividuel,
+      options?: { sentByBeneficiaire: boolean }
     ): Promise<void>
 
     envoyerMessageGroupe(

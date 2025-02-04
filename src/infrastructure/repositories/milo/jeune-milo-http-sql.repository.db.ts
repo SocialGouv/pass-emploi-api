@@ -5,6 +5,7 @@ import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.excepti
 import { DateTime } from 'luxon'
 import { firstValueFrom } from 'rxjs'
 import { Op } from 'sequelize'
+import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneMiloAArchiverSqlModel } from 'src/infrastructure/sequelize/models/jeune-milo-a-archiver.sql-model'
 import {
   ErreurHttp,
@@ -40,7 +41,9 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
   }
 
   async get(id: string): Promise<Result<JeuneMilo>> {
-    const jeuneSqlModel = await JeuneSqlModel.findByPk(id)
+    const jeuneSqlModel = await JeuneSqlModel.findByPk(id, {
+      include: { model: ConseillerSqlModel, required: false }
+    })
     if (!jeuneSqlModel) {
       return failure(new NonTrouveError('Jeune', id))
     }

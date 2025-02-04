@@ -298,7 +298,7 @@ import { ActionSqlRepository } from './infrastructure/repositories/action/action
 import { CommentaireActionSqlRepositoryDb } from './infrastructure/repositories/action/commentaire-action-sql.repository.db'
 import { AgenceSqlRepository } from './infrastructure/repositories/agence-sql.repository.db'
 import { ArchiveJeuneSqlRepository } from './infrastructure/repositories/archive-jeune-sql.repository.db'
-import { AuthentificationSqlRepository } from './infrastructure/repositories/authentification-sql.repository.db'
+import { AuthentificationSqlKeycloakRepository } from './infrastructure/repositories/authentification-sql.repository.db'
 import { CampagneSqlRepository } from './infrastructure/repositories/campagne-sql.repository.db'
 import { ChatFirebaseRepository } from './infrastructure/repositories/chat-firebase.repository'
 import { ConseillerSqlRepository } from './infrastructure/repositories/conseiller-sql.repository.db'
@@ -508,7 +508,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     },
     {
       provide: AuthentificationRepositoryToken,
-      useClass: AuthentificationSqlRepository
+      useClass: AuthentificationSqlKeycloakRepository
     },
     {
       provide: JeuneMiloRepositoryToken,
