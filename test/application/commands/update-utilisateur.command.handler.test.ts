@@ -119,10 +119,42 @@ describe('UpdateUtilisateurCommandHandler', () => {
                   new NonTraitableError(
                     'Utilisateur',
                     command.idUtilisateurAuth,
-                    NonTraitableReason.UTILISATEUR_CONSEILLER_MAUVAISE_STRUCTURE
+                    NonTraitableReason.UTILISATEUR_DEJA_PE_BRSA
                   )
                 )
               )
+            })
+          })
+          describe('conseiller connu avec structure FRANCE_TRAVAIL', async () => {
+            it('retourne le conseiller', async () => {
+              // Given
+              const command: UpdateUtilisateurCommand = {
+                idUtilisateurAuth: 'nilstavernier',
+                type: Authentification.Type.CONSEILLER,
+                structure: 'FRANCE_TRAVAIL'
+              }
+
+              const utilisateur = unUtilisateurConseiller({
+                structure: Core.Structure.POLE_EMPLOI_BRSA
+              })
+              authentificationRepository.getConseiller
+                .withArgs(command.idUtilisateurAuth)
+                .resolves(utilisateur)
+
+              // When
+              const result = await updateUtilisateurCommandHandler.execute(
+                command
+              )
+
+              // Then
+              expect(isSuccess(result)).equal(true)
+              if (isSuccess(result)) {
+                expect(result.data).to.deep.equal(
+                  unUtilisateurQueryModel({
+                    structure: Core.Structure.POLE_EMPLOI_BRSA
+                  })
+                )
+              }
             })
           })
         })
@@ -361,6 +393,58 @@ describe('UpdateUtilisateurCommandHandler', () => {
                   mailBrevoService.envoyerEmailCreationConseillerMilo
                 ).to.have.been.calledOnce()
               })
+            })
+          })
+          describe('quand il est valide mais vient du bouton connexion unique (structure FRANCE_TRAVAIL)', () => {
+            let result: Result<UtilisateurQueryModel>
+            const command: UpdateUtilisateurCommand = {
+              nom: 'Tavernier',
+              prenom: 'Nils',
+              type: Authentification.Type.CONSEILLER,
+              email: 'Nils.Tavernier@Passemploi.com',
+              idUtilisateurAuth: 'nilstavernier',
+              structure: 'FRANCE_TRAVAIL',
+              username: 'milou'
+            }
+
+            beforeEach(() => {
+              // Given
+              authentificationRepository.getConseiller
+                .withArgs(command.idUtilisateurAuth)
+                .resolves(undefined)
+              authentificationRepository.estConseillerSuperviseur.resolves({
+                dansSaStructure: true,
+                crossStructures: false
+              })
+
+              const utilisateur: Authentification.Utilisateur = {
+                id: '1',
+                prenom: command.prenom || '',
+                nom: command.nom || '',
+                email: command.email,
+                username: command.username,
+                type: command.type as Authentification.Type,
+                structure: command.structure as Core.Structure,
+                roles: []
+              }
+              authentificationRepository.save
+                .withArgs(utilisateur, command.idUtilisateurAuth)
+                .resolves()
+            })
+            it('retourne erreur utilisateur inexistant', async () => {
+              // When
+              result = await updateUtilisateurCommandHandler.execute(command)
+
+              // Then
+              expect(result).to.deep.equal(
+                failure(
+                  new NonTraitableError(
+                    'Utilisateur',
+                    command.idUtilisateurAuth,
+                    NonTraitableReason.UTILISATEUR_INEXISTANT
+                  )
+                )
+              )
             })
           })
           describe("quand il est valide mais il manque l'email", () => {
