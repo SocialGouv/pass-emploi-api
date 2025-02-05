@@ -1,7 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { SessionMilo } from '../../../domain/milo/session.milo'
-import { PaginationQueryModel } from './common/pagination.query-model'
-import { IsArray } from 'class-validator'
 
 export class InscritSessionMiloQueryModel {
   @ApiProperty()
@@ -41,6 +39,9 @@ export class SessionConseillerMiloQueryModel {
   estVisible: boolean
 
   @ApiProperty()
+  autoinscription: boolean
+
+  @ApiProperty()
   dateHeureDebut: string
 
   @ApiProperty()
@@ -57,18 +58,6 @@ export class SessionConseillerMiloQueryModel {
 
   @ApiPropertyOptional()
   nombreMaxParticipants?: number
-}
-
-export class SessionsConseillerV2QueryModel {
-  @ApiProperty({ type: PaginationQueryModel })
-  pagination: PaginationQueryModel
-
-  @ApiProperty({
-    type: SessionConseillerMiloQueryModel,
-    isArray: true
-  })
-  @IsArray()
-  resultats: SessionConseillerMiloQueryModel[]
 }
 
 export class AgendaConseillerMiloSessionListItemQueryModel {
@@ -121,6 +110,15 @@ export class SessionJeuneMiloQueryModel {
 
   @ApiPropertyOptional({ enum: SessionMilo.Inscription.Statut })
   inscription?: SessionMilo.Inscription.Statut
+
+  @ApiProperty()
+  autoinscription: boolean
+
+  @ApiPropertyOptional()
+  dateMaxInscription?: string
+
+  @ApiPropertyOptional()
+  nbPlacesRestantes?: number
 }
 
 export class DetailSessionConseillerQueryModel {
@@ -148,6 +146,9 @@ export class DetailSessionConseillerQueryModel {
   @ApiProperty()
   estVisible: boolean
 
+  @ApiProperty()
+  autoinscription: boolean
+
   @ApiProperty({ required: false })
   nbPlacesDisponibles?: number
 
@@ -157,7 +158,6 @@ export class DetailSessionConseillerQueryModel {
   @ApiProperty({ enum: SessionMilo.Statut })
   statut: SessionMilo.Statut
 }
-
 class OffreSessionQueryModel {
   @ApiProperty()
   id: string

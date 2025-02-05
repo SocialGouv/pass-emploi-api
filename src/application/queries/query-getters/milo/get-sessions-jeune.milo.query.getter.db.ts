@@ -46,21 +46,15 @@ export class GetSessionsJeuneMiloQueryGetter {
       return success([])
     }
 
-    let resultSessionMiloClient: Result<SessionParDossierJeuneDto[]>
+    const sessionGetter = options?.pourConseiller
+      ? this.getSessionsJeunePourConseiller.bind(this)
+      : this.getSessionsJeune.bind(this)
+    const resultSessionMiloClient = await sessionGetter(
+      accessToken,
+      idPartenaire,
+      options?.periode
+    )
 
-    if (options?.pourConseiller) {
-      resultSessionMiloClient = await this.getSessionsJeunePourConseiller(
-        accessToken,
-        idPartenaire,
-        options?.periode
-      )
-    } else {
-      resultSessionMiloClient = await this.getSessionsJeune(
-        accessToken,
-        idPartenaire,
-        options?.periode
-      )
-    }
     if (isFailure(resultSessionMiloClient)) {
       this.logger.log(
         `Sessions venant de l'API en erreur : ${resultSessionMiloClient.error}`
@@ -68,13 +62,23 @@ export class GetSessionsJeuneMiloQueryGetter {
       return resultSessionMiloClient
     }
 
+    const sessionsDuJeuneVenantDeLAPI = resultSessionMiloClient.data
     this.logger.log(
-      `${resultSessionMiloClient.data.length} Sessions venant de l'API`
+      `${sessionsDuJeuneVenantDeLAPI.length} Sessions venant de l'API`
     )
+
+    const configurationsSessions = await SessionMiloSqlModel.findAll({
+      where: {
+        id: sessionsDuJeuneVenantDeLAPI.map(({ session }) =>
+          session.id.toString()
+        )
+      }
+    })
 
     const sessionsDuJeune: SessionParDossierJeuneDto[] =
       await recupererSessionsDuJeuneSelonFiltre(
-        resultSessionMiloClient.data,
+        sessionsDuJeuneVenantDeLAPI,
+        configurationsSessions,
         options?.filtrerEstInscrit
       )
 
@@ -84,7 +88,10 @@ export class GetSessionsJeuneMiloQueryGetter {
           mapSessionJeuneDtoToQueryModel(
             sessionDuJeune,
             idPartenaire,
-            timezoneDeLaStructureDuJeune
+            timezoneDeLaStructureDuJeune,
+            configurationsSessions.find(
+              ({ id }) => id === sessionDuJeune.session.id.toString()
+            )
           )
         )
         .sort(compareSessionsByDebut)
@@ -127,12 +134,16 @@ export class GetSessionsJeuneMiloQueryGetter {
 
 async function recupererSessionsDuJeuneSelonFiltre(
   sessionsDuJeuneVenantDeLAPI: SessionParDossierJeuneDto[],
+  configurationsSessions: SessionMiloSqlModel[],
   filtreInscription?: boolean
 ): Promise<SessionParDossierJeuneDto[]> {
   switch (filtreInscription) {
     case false: {
       return (
-        await recupererSessionsVisiblesPourLeJeune(sessionsDuJeuneVenantDeLAPI)
+        await recupererSessionsVisiblesPourLeJeune(
+          sessionsDuJeuneVenantDeLAPI,
+          configurationsSessions
+        )
       ).filter(sessionVisible => sessionVisible.sessionInstance === undefined)
     }
     case true: {
@@ -146,7 +157,10 @@ async function recupererSessionsDuJeuneSelonFiltre(
           sessionsDuJeuneVenantDeLAPI
         )
       const sessionsVisiblesPourLeJeune =
-        await recupererSessionsVisiblesPourLeJeune(sessionsDuJeuneVenantDeLAPI)
+        await recupererSessionsVisiblesPourLeJeune(
+          sessionsDuJeuneVenantDeLAPI,
+          configurationsSessions
+        )
       const sessionsVisiblesAuJeuneSansDoublons =
         recupererSessionsVisiblesPourLeJeuneSansDoublons(
           sessionsVisiblesPourLeJeune,
@@ -170,16 +184,12 @@ function recupererSessionsAuxquellesLeJeuneEstInscrit(
 }
 
 async function recupererSessionsVisiblesPourLeJeune(
-  sessions: SessionParDossierJeuneDto[]
+  sessions: SessionParDossierJeuneDto[],
+  configurationsSessions: SessionMiloSqlModel[]
 ): Promise<SessionParDossierJeuneDto[]> {
-  const idsSessionsVisibles = (
-    await SessionMiloSqlModel.findAll({
-      where: {
-        id: sessions.map(session => session.session.id.toString()),
-        estVisible: true
-      }
-    })
-  ).map(sessionVisibleSql => sessionVisibleSql.id)
+  const idsSessionsVisibles = configurationsSessions
+    .filter(({ estVisible }) => estVisible)
+    .map(({ id }) => id)
 
   return sessions.filter(session =>
     idsSessionsVisibles.includes(session.session.id.toString())

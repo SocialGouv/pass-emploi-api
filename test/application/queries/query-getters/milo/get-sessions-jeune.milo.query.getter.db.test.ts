@@ -230,7 +230,8 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
             uneSessionJeuneMiloQueryModel({
               id: idSession2.toString(),
               dateHeureDebut: '2020-04-07T13:20:00.000Z',
-              dateHeureFin: '2020-04-08T13:20:00.000Z'
+              dateHeureFin: '2020-04-08T13:20:00.000Z',
+              dateMaxInscription: '2020-04-08T02:59:59.999Z'
             })
           ])
         )

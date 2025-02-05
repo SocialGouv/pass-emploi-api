@@ -182,6 +182,7 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     const sessionMiloSqlModel: AsSql<SessionMiloDto> = {
       id: sessionSansInscription.id,
       estVisible: sessionSansInscription.estVisible,
+      autoinscription: sessionSansInscription.autoinscription,
       idStructureMilo: sessionSansInscription.idStructureMilo,
       dateModification:
         sessionSansInscription.dateModification?.toJSDate() ?? new Date(),
@@ -318,6 +319,7 @@ function dtoToSessionMilo(
     lieu: sessionDto.lieu,
     nbPlacesDisponibles: sessionDto.nbPlacesDisponibles ?? undefined,
     estVisible: false,
+    autoinscription: false,
     idStructureMilo: structureMilo.id,
     offre: dtoToOffre(offreDto),
     inscriptions: dtoToInscriptions(listeInscrits, jeunes),
@@ -335,7 +337,8 @@ function dtoToSessionMilo(
     ).endOf('day')
   }
   if (sessionSql) {
-    session.estVisible = sessionSql.estVisible
+    session.estVisible = sessionSql.autoinscription || sessionSql.estVisible
+    session.autoinscription = sessionSql.autoinscription
     session.dateModification = DateTime.fromJSDate(sessionSql.dateModification)
   }
   if (sessionDto.commentaire) session.commentaire = sessionDto.commentaire

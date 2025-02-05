@@ -10,7 +10,6 @@ import {
   IsEnum,
   IsIn,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
   ValidateIf,
@@ -35,21 +34,6 @@ export class GetSessionsQueryParams {
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  @Transform(params => transformStringToBoolean(params, 'filtrerAClore'))
-  filtrerAClore?: boolean
-}
-
-export class GetSessionsV2QueryParams {
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsNumber()
-  @Type(() => Number)
-  page?: number
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsBoolean()
-  @IsIn([true, false])
   @Transform(params => transformStringToBoolean(params, 'filtrerAClore'))
   filtrerAClore?: boolean
 }
@@ -83,19 +67,20 @@ class InscriptionSessionMiloPayload {
 
 export class UpdateSessionMiloPayload {
   @ApiProperty()
-  @ValidateIf(
-    payload =>
-      payload.inscriptions === undefined || payload.estVisible !== undefined
-  )
+  @ValidateIf(isDefinedOrOthersAreUndefined)
   @IsDefined({ message: 'Au moins un des champs doit être renseigné' })
   @IsBoolean()
   estVisible?: boolean
 
   @ApiProperty()
-  @ValidateIf(
-    payload =>
-      payload.estVisible === undefined || payload.inscriptions !== undefined
-  )
+  @ValidateIf(isDefinedOrOthersAreUndefined)
+  @IsDefined({ message: 'Au moins un des champs doit être renseigné' })
+  @IsBoolean()
+  autoinscription?: boolean
+
+  @ApiProperty()
+  @ValidateIf(isDefinedOrOthersAreUndefined)
+  @IsDefined({ message: 'Au moins un des champs doit être renseigné' })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => InscriptionSessionMiloPayload)
@@ -146,4 +131,12 @@ export class QualifierActionsMiloPayload {
   @ValidateNested({ each: true })
   @Type(() => QualificationActionMiloPayload)
   qualifications: QualificationActionMiloPayload[]
+}
+
+function isDefinedOrOthersAreUndefined<T extends object>(
+  payload: T,
+  fieldValue: T[keyof T]
+): boolean {
+  if (fieldValue !== undefined) return true
+  return Object.values(payload).every(value => value === undefined)
 }

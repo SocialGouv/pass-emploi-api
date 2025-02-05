@@ -17,6 +17,9 @@ export class SessionMiloDto extends Model {
   @Column({ field: 'est_visible', type: DataType.BOOLEAN })
   estVisible: boolean
 
+  @Column({ field: 'autoinscription', type: DataType.BOOLEAN })
+  autoinscription: boolean
+
   @Column({
     field: 'date_modification',
     type: DataType.DATE

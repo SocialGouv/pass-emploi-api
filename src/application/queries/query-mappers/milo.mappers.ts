@@ -11,6 +11,7 @@ import {
   SessionJeuneDetailDto,
   SessionParDossierJeuneDto
 } from 'src/infrastructure/clients/dto/milo.dto'
+import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import {
   AgendaConseillerMiloSessionListItemQueryModel,
   DetailSessionConseillerMiloQueryModel,
@@ -38,28 +39,34 @@ function buildSessionTypeQueryModel(
 export function mapSessionJeuneDtoToQueryModel(
   sessionDto: SessionParDossierJeuneDto,
   idDossier: string,
-  timezone: string
+  timezone: string,
+  sqlModel?: SessionMiloSqlModel
 ): SessionJeuneMiloQueryModel {
   const queryModel: SessionJeuneMiloQueryModel = {
     id: sessionDto.session.id.toString(),
     nomSession: sessionDto.session.nom,
     nomOffre: sessionDto.offre.nom,
-    dateHeureDebut: DateTime.fromFormat(
+    dateHeureDebut: dateFromMilo(
       sessionDto.session.dateHeureDebut,
-      MILO_DATE_FORMAT,
-      { zone: timezone }
-    )
-      .toUTC()
-      .toISO(),
-    dateHeureFin: DateTime.fromFormat(
+      timezone
+    ).toISO(),
+    dateHeureFin: dateFromMilo(
       sessionDto.session.dateHeureFin,
-      MILO_DATE_FORMAT,
-      { zone: timezone }
-    )
-      .toUTC()
-      .toISO(),
-    type: buildSessionTypeQueryModel(sessionDto.offre.type)
+      timezone
+    ).toISO(),
+    type: buildSessionTypeQueryModel(sessionDto.offre.type),
+    dateMaxInscription: sessionDto.session.dateMaxInscription
+      ? DateTime.fromISO(sessionDto.session.dateMaxInscription, {
+          zone: timezone
+        })
+          .endOf('day')
+          .toUTC()
+          .toISO()
+      : undefined,
+    nbPlacesRestantes: sessionDto.session.nbPlacesDisponibles ?? undefined,
+    autoinscription: false
   }
+
   if (sessionDto.sessionInstance) {
     queryModel.inscription = dtoToStatutInscription(
       sessionDto.sessionInstance.statut,
@@ -68,21 +75,23 @@ export function mapSessionJeuneDtoToQueryModel(
     )
   }
 
+  if (sqlModel) {
+    queryModel.autoinscription = sqlModel.autoinscription
+  }
+
   return queryModel
 }
 
 export function mapSessionConseillerDtoToQueryModel(
   { offre, session }: SessionConseillerDetailDto,
-  estVisible: boolean,
   timezone: string,
   maintenant: DateTime,
-  dateCloture?: DateTime
+  parametrageSqlModel?: SessionMiloSqlModel
 ): SessionConseillerMiloQueryModel {
-  const dateHeureFin = DateTime.fromFormat(
-    session.dateHeureFin,
-    MILO_DATE_FORMAT,
-    { zone: timezone }
-  ).toUTC()
+  const dateHeureFin = dateFromMilo(session.dateHeureFin, timezone)
+  const dateCloture = parametrageSqlModel?.dateCloture
+    ? DateTime.fromJSDate(parametrageSqlModel.dateCloture)
+    : undefined
 
   const nombreParticipants = (session.instances ?? [])
     .map(({ idDossier, statut }) =>
@@ -94,18 +103,15 @@ export function mapSessionConseillerDtoToQueryModel(
         statut === SessionMilo.Inscription.Statut.PRESENT
     ).length
 
+  const autoinscription = parametrageSqlModel?.autoinscription ?? false
+
   const queryModel: SessionConseillerMiloQueryModel = {
     id: session.id.toString(),
     nomSession: session.nom,
     nomOffre: offre.nom,
-    estVisible: estVisible,
-    dateHeureDebut: DateTime.fromFormat(
-      session.dateHeureDebut,
-      MILO_DATE_FORMAT,
-      { zone: timezone }
-    )
-      .toUTC()
-      .toISO(),
+    estVisible: (autoinscription || parametrageSqlModel?.estVisible) ?? false,
+    autoinscription,
+    dateHeureDebut: dateFromMilo(session.dateHeureDebut, timezone).toISO(),
     dateHeureFin: dateHeureFin.toISO(),
     type: buildSessionTypeQueryModel(offre.type),
     statut: SessionMilo.calculerStatut(maintenant, dateHeureFin, dateCloture),
@@ -128,20 +134,14 @@ export function mapSessionConseillerDtoToAgendaQueryModel(
     id: sessionDto.session.id.toString(),
     nomSession: sessionDto.session.nom,
     nomOffre: sessionDto.offre.nom,
-    dateHeureDebut: DateTime.fromFormat(
+    dateHeureDebut: dateFromMilo(
       sessionDto.session.dateHeureDebut,
-      MILO_DATE_FORMAT,
-      { zone: timezone }
-    )
-      .toUTC()
-      .toISO(),
-    dateHeureFin: DateTime.fromFormat(
+      timezone
+    ).toISO(),
+    dateHeureFin: dateFromMilo(
       sessionDto.session.dateHeureFin,
-      MILO_DATE_FORMAT,
-      { zone: timezone }
-    )
-      .toUTC()
-      .toISO(),
+      timezone
+    ).toISO(),
     type: buildSessionTypeQueryModel(sessionDto.offre.type),
     beneficiaires: inscrits,
     nbPlacesRestantes: sessionDto.session.nbPlacesDisponibles ?? undefined,
@@ -161,20 +161,14 @@ export function mapDetailSessionJeuneDtoToQueryModel(
     nomOffre: sessionDto.offre.nom,
     theme: sessionDto.offre.theme,
     type: buildSessionTypeQueryModel(sessionDto.offre.type),
-    dateHeureDebut: DateTime.fromFormat(
+    dateHeureDebut: dateFromMilo(
       sessionDto.session.dateHeureDebut,
-      MILO_DATE_FORMAT,
-      { zone: timezone }
-    )
-      .toUTC()
-      .toISO(),
-    dateHeureFin: DateTime.fromFormat(
+      timezone
+    ).toISO(),
+    dateHeureFin: dateFromMilo(
       sessionDto.session.dateHeureFin,
-      MILO_DATE_FORMAT,
-      { zone: timezone }
-    )
-      .toUTC()
-      .toISO(),
+      timezone
+    ).toISO(),
     lieu: sessionDto.session.lieu,
     animateur: sessionDto.session.animateur,
     nomPartenaire: sessionDto.offre.nomPartenaire ?? undefined,
@@ -214,6 +208,7 @@ export function mapSessionToDetailSessionConseillerQueryModel(
     animateur: session.animateur,
     lieu: session.lieu,
     estVisible: session.estVisible,
+    autoinscription: session.autoinscription,
     statut: SessionMilo.calculerStatut(
       maintenant,
       session.fin,
@@ -263,4 +258,10 @@ export function dtoToStatutInscription(
       )
       return SessionMilo.Inscription.Statut.INSCRIT
   }
+}
+
+function dateFromMilo(dateMilo: string, timezone: string): DateTime {
+  return DateTime.fromFormat(dateMilo, MILO_DATE_FORMAT, {
+    zone: timezone
+  }).toUTC()
 }
