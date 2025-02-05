@@ -2,20 +2,12 @@ import { HttpService } from '@nestjs/axios'
 import { DateTime } from 'luxon'
 import * as nock from 'nock'
 import {
-  ErreurHttp,
-  NombrePlacesInsuffisant,
-  NonTrouveError
-} from 'src/building-blocks/types/domain-error'
-import {
   emptySuccess,
-  Failure,
-  failure,
-  isFailure,
   isSuccess,
   Success,
   success
 } from 'src/building-blocks/types/result'
-import { SessionMilo } from 'src/domain/milo/session.milo'
+import { SessionMilo, SessionMiloAllegee } from 'src/domain/milo/session.milo'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { SessionMiloHttpSqlRepository } from 'src/infrastructure/repositories/milo/session-milo-http-sql.repository.db'
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
@@ -25,9 +17,8 @@ import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/struc
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import {
   unDetailSessionConseillerDto,
-  uneInscriptionSessionMiloDto,
-  uneOffreDto,
-  uneSessionDto
+  unDetailSessionJeuneDto,
+  uneInscriptionSessionMiloDto
 } from 'test/fixtures/milo-dto.fixture'
 import { uneSessionMilo } from 'test/fixtures/sessions.fixture'
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
@@ -514,46 +505,24 @@ describe('SessionMiloHttpSqlRepository', () => {
     })
   })
 
-  describe('.peutInscrireBeneficiaire', () => {
-    it('renvoie false si la session n’existe pas', async () => {
+  describe('.getForBeneficiaire', () => {
+    it('récupère le minimum des informations de la session', async () => {
       // Given
-      miloClient.getDetailSessionJeune
-        .withArgs('token-milo-beneficiaire', 'id-session')
-        .resolves(failure(new ErreurHttp('Ressource Milo introuvable', 404)))
+      miloClient.getDetailSessionJeune.resolves(
+        success(unDetailSessionJeuneDto)
+      )
 
       // When
-      const result = await repository.peutInscrireBeneficiaire(
-        'id-session',
-        'token-milo-beneficiaire'
+      const result = await repository.getForBeneficiaire(
+        'idSession',
+        'token-milo'
       )
 
       // Then
-      expect(isFailure(result)).to.equal(true)
-      expect((result as Failure).error).to.be.an.instanceOf(NonTrouveError)
-    })
-
-    it('renvoie false s’il n’y a pas assez de place', async () => {
-      // Given
-      miloClient.getDetailSessionJeune
-        .withArgs('token-milo-beneficiaire', 'id-session')
-        .resolves(
-          success({
-            session: { ...uneSessionDto, nbPlacesDisponibles: 0 },
-            offre: uneOffreDto
-          })
-        )
-
-      // When
-      const result = await repository.peutInscrireBeneficiaire(
-        'id-session',
-        'token-milo-beneficiaire'
-      )
-
-      // Then
-      expect(isFailure(result)).to.equal(true)
-      expect((result as Failure).error).to.be.an.instanceOf(
-        NombrePlacesInsuffisant
-      )
+      expect(isSuccess(result)).to.be.true()
+      expect((result as Success<SessionMiloAllegee>).data).to.deep.equal({
+        nbPlacesDisponibles: 10
+      })
     })
   })
 

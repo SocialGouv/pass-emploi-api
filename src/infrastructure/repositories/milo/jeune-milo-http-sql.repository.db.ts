@@ -41,12 +41,14 @@ export class MiloJeuneHttpSqlRepository implements JeuneMilo.Repository {
   }
 
   async get(id: string): Promise<Result<JeuneMilo>> {
-    const jeuneSqlModel = await JeuneSqlModel.findByPk(id, {
+    const jeuneSqlModel = await JeuneSqlModel.findOne({
+      where: { id, structure: Core.Structure.MILO },
       include: { model: ConseillerSqlModel, required: false }
     })
     if (!jeuneSqlModel) {
       return failure(new NonTrouveError('Jeune', id))
     }
+
     const jeuneMilo: JeuneMilo = {
       ...fromSqlToJeune(jeuneSqlModel),
       idStructureMilo: jeuneSqlModel.idStructureMilo ?? undefined

@@ -1,25 +1,27 @@
 import { HttpService } from '@nestjs/axios'
 import { HttpStatus, Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import * as APM from 'elastic-apm-node'
 import { DateTime } from 'luxon'
 import { firstValueFrom } from 'rxjs'
 import {
-  NombrePlacesInsuffisant,
-  NonTrouveError
-} from 'src/building-blocks/types/domain-error'
-import {
-  Result,
   emptySuccess,
   isFailure,
-  success,
-  failure
+  Result,
+  success
 } from 'src/building-blocks/types/result'
 import { ConseillerMilo } from 'src/domain/milo/conseiller.milo.db'
 import {
   InscriptionsATraiter,
   InstanceSessionMilo,
-  SessionMilo
+  SessionMilo,
+  SessionMiloAllegee
 } from 'src/domain/milo/session.milo'
+import {
+  PlanificateurService,
+  planifierRappelsInstanceSessionMilo,
+  supprimerRappelsInstanceSessionMilo
+} from '../../../domain/planificateur'
 import { RateLimiterService } from '../../../utils/rate-limiter.service'
 import {
   InscritSessionMiloDto,
@@ -32,6 +34,7 @@ import {
   SessionConseillerDetailDto
 } from '../../clients/dto/milo.dto'
 import { MiloClient } from '../../clients/milo-client'
+import { getAPMInstance } from '../../monitoring/apm.init'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
 import {
   SessionMiloDto,
@@ -39,13 +42,6 @@ import {
 } from '../../sequelize/models/session-milo.sql-model'
 import { AsSql } from '../../sequelize/types'
 import { InstanceSessionMiloDto } from '../dto/milo.dto'
-import {
-  PlanificateurService,
-  planifierRappelsInstanceSessionMilo,
-  supprimerRappelsInstanceSessionMilo
-} from '../../../domain/planificateur'
-import { getAPMInstance } from '../../monitoring/apm.init'
-import * as APM from 'elastic-apm-node'
 
 @Injectable()
 export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
@@ -101,14 +97,35 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     }
   }
 
+  async getForBeneficiaire(
+    idSession: string,
+    tokenMiloBeneficiaire: string
+  ): Promise<Result<SessionMiloAllegee>> {
+    const resultSession = await this.miloClient.getDetailSessionJeune(
+      tokenMiloBeneficiaire,
+      idSession
+    )
+    if (isFailure(resultSession)) {
+      return resultSession
+    }
+    const sessionDto = resultSession.data
+
+    return success({
+      nbPlacesDisponibles: sessionDto.session.nbPlacesDisponibles ?? undefined
+    })
+  }
+
   async getForConseiller(
     idSession: string,
     structureConseiller: ConseillerMilo.Structure,
-    tokenMilo: string
+    tokenMiloConseiller: string
   ): Promise<Result<SessionMilo>> {
     const [resultSession, resultInscrits] = await Promise.all([
-      this.miloClient.getDetailSessionConseiller(tokenMilo, idSession),
-      this.miloClient.getListeInscritsSession(tokenMilo, idSession)
+      this.miloClient.getDetailSessionConseiller(
+        tokenMiloConseiller,
+        idSession
+      ),
+      this.miloClient.getListeInscritsSession(tokenMiloConseiller, idSession)
     ])
     if (isFailure(resultSession)) {
       return resultSession
@@ -194,23 +211,6 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
       dateCloture: sessionSansInscription.dateCloture?.toJSDate() ?? null
     }
     await SessionMiloSqlModel.upsert(sessionMiloSqlModel)
-
-    return emptySuccess()
-  }
-
-  async peutInscrireBeneficiaire(
-    idSession: string,
-    tokenMiloBeneficiaire: string
-  ): Promise<Result> {
-    const resultSession = await this.miloClient.getDetailSessionJeune(
-      tokenMiloBeneficiaire,
-      idSession
-    )
-    if (isFailure(resultSession))
-      return failure(new NonTrouveError('Session', idSession))
-
-    if (resultSession.data.session.nbPlacesDisponibles === 0)
-      return failure(new NombrePlacesInsuffisant())
 
     return emptySuccess()
   }

@@ -32,6 +32,8 @@ export interface SessionMilo {
   dateCloture?: DateTime
 }
 
+export type SessionMiloAllegee = Pick<SessionMilo, 'nbPlacesDisponibles'>
+
 export interface InstanceSessionMilo {
   id: string
   idSession: string
@@ -169,27 +171,34 @@ export namespace SessionMilo {
       : SessionMilo.Statut.A_CLOTURER
   }
 
+  export function peutInscrireBeneficiaire({
+    nbPlacesDisponibles
+  }: Pick<SessionMilo, 'nbPlacesDisponibles'>): Result {
+    if (nbPlacesDisponibles === 0) return failure(new NombrePlacesInsuffisant())
+    return emptySuccess()
+  }
+
   export interface Repository {
     findInstanceSession(
       idInstance: string,
       idDossier: string
     ): Promise<InstanceSessionMilo | undefined>
 
+    getForBeneficiaire(
+      idSession: string,
+      tokenMiloBeneficiaire: string
+    ): Promise<Result<SessionMiloAllegee>>
+
     getForConseiller(
       idSession: string,
       structureConseiller: StructureMilo,
-      tokenMilo: string
+      tokenMiloConseiller: string
     ): Promise<Result<SessionMilo>>
 
     save(
       sessionSansInscriptions: Omit<SessionMilo, 'inscriptions'>,
       inscriptionsATraiter: InscriptionsATraiter,
       tokenMilo: string
-    ): Promise<Result>
-
-    peutInscrireBeneficiaire(
-      idSession: string,
-      tokenMiloBeneficiaire: string
     ): Promise<Result>
 
     inscrireBeneficiaire(

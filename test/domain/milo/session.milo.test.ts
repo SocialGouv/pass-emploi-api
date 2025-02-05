@@ -1,8 +1,16 @@
 import { SessionMilo } from 'src/domain/milo/session.milo'
 import { DateTime } from 'luxon'
 import { uneSessionMilo } from '../../fixtures/sessions.fixture'
-import { failure, isSuccess } from 'src/building-blocks/types/result'
-import { EmargementIncorrect } from 'src/building-blocks/types/domain-error'
+import {
+  Failure,
+  failure,
+  isFailure,
+  isSuccess
+} from 'src/building-blocks/types/result'
+import {
+  EmargementIncorrect,
+  NombrePlacesInsuffisant
+} from 'src/building-blocks/types/domain-error'
 import { expect } from 'test/utils'
 
 describe('SessionMilo', () => {
@@ -162,5 +170,40 @@ describe('SessionMilo', () => {
         expect(result.data.inscriptionsAModifier).to.deep.equal(expected)
       }
     }
+  })
+
+  describe('peutInscrireBeneficiaire', () => {
+    it('réussi s’il n’y a pas de maximum de places', async () => {
+      // When
+      const result = SessionMilo.peutInscrireBeneficiaire({
+        nbPlacesDisponibles: undefined
+      })
+
+      // Then
+      expect(isSuccess(result)).to.be.true()
+    })
+
+    it('réussi s’il reste des places', async () => {
+      // When
+      const result = SessionMilo.peutInscrireBeneficiaire({
+        nbPlacesDisponibles: 12
+      })
+
+      // Then
+      expect(isSuccess(result)).to.be.true()
+    })
+
+    it('échoue s’il n’y a plus de place disponible', async () => {
+      // When
+      const result = SessionMilo.peutInscrireBeneficiaire({
+        nbPlacesDisponibles: 0
+      })
+
+      // Then
+      expect(isFailure(result)).to.be.true()
+      expect((result as Failure).error).to.be.an.instanceOf(
+        NombrePlacesInsuffisant
+      )
+    })
   })
 })

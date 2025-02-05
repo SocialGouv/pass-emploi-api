@@ -1,9 +1,11 @@
 import { Inject } from '@nestjs/common'
 import { CommandHandler } from 'src/building-blocks/types/command-handler'
 import {
+  DroitsInsuffisants,
   JeuneMiloSansIdDossier,
   NonTraitableError,
-  NonTraitableReason
+  NonTraitableReason,
+  NonTrouveError
 } from 'src/building-blocks/types/domain-error'
 import {
   emptySuccess,
@@ -18,6 +20,7 @@ import {
 } from 'src/domain/authentification'
 import { Chat, ChatRepositoryToken } from 'src/domain/chat'
 import { Core } from 'src/domain/core'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { JeuneMilo, JeuneMiloRepositoryToken } from 'src/domain/milo/jeune.milo'
 import {
   SessionMilo,
@@ -25,17 +28,20 @@ import {
 } from 'src/domain/milo/session.milo'
 import { ChatCryptoService } from 'src/utils/chat-crypto-service'
 
-export type InscrireBeneficiaireSessionMiloCommand = {
+export type AutoinscrireBeneficiaireSessionMiloCommand = {
   idSession: string
   idBeneficiaire: string
   accessToken: string
 }
 
-type BeneficiaireMilo = Omit<JeuneMilo, 'conseiller' | 'idPartenaire'> &
-  Required<Pick<JeuneMilo, 'conseiller' | 'idPartenaire'>>
-export default class InscrireBeneficiaireSessionMiloCommandHandler extends CommandHandler<
-  InscrireBeneficiaireSessionMiloCommand,
-  void
+type ChampsObligatoire = 'conseiller' | 'idPartenaire'
+type BeneficiaireMilo = Omit<JeuneMilo, ChampsObligatoire> &
+  Required<Pick<JeuneMilo, ChampsObligatoire>>
+
+export default class AutoinscrireBeneficiaireSessionMiloCommandHandler extends CommandHandler<
+  AutoinscrireBeneficiaireSessionMiloCommand,
+  void,
+  JeuneMilo
 > {
   constructor(
     @Inject(JeuneMiloRepositoryToken)
@@ -46,16 +52,30 @@ export default class InscrireBeneficiaireSessionMiloCommandHandler extends Comma
     private readonly sessionMiloRepository: SessionMilo.Repository,
     @Inject(ChatRepositoryToken)
     private readonly chatRepository: Chat.Repository,
-    private readonly chatCryptoService: ChatCryptoService
+    private readonly chatCryptoService: ChatCryptoService,
+    private readonly evenementService: EvenementService
   ) {
     super('InscrireBeneficiaireSessionMiloCommandHandler')
   }
 
+  async getAggregate(
+    command: AutoinscrireBeneficiaireSessionMiloCommand
+  ): Promise<JeuneMilo | undefined> {
+    const resultBeneficiaire = await this.beneficiaireMiloRepository.get(
+      command.idBeneficiaire
+    )
+    if (isFailure(resultBeneficiaire)) return undefined
+    return resultBeneficiaire.data
+  }
+
   async handle(
-    command: InscrireBeneficiaireSessionMiloCommand
+    command: AutoinscrireBeneficiaireSessionMiloCommand,
+    _utilisateur: Authentification.Utilisateur,
+    aggregate?: JeuneMilo
   ): Promise<Result> {
     const resultBeneficiaire = await this.recupererBeneficiaire(
-      command.idBeneficiaire
+      command.idBeneficiaire,
+      aggregate
     )
     if (isFailure(resultBeneficiaire)) return resultBeneficiaire
     const beneficiaire = resultBeneficiaire.data
@@ -73,40 +93,54 @@ export default class InscrireBeneficiaireSessionMiloCommandHandler extends Comma
     )
   }
 
-  authorize(): Promise<Result> {
-    throw new Error('not implemented')
+  async authorize(
+    command: AutoinscrireBeneficiaireSessionMiloCommand,
+    utilisateur: Authentification.Utilisateur,
+    aggregate?: JeuneMilo
+  ): Promise<Result> {
+    if (!aggregate)
+      return failure(new NonTrouveError('Bénéficiaire', command.idBeneficiaire))
+
+    if (
+      utilisateur.type !== Authentification.Type.JEUNE ||
+      aggregate.id !== utilisateur.id
+    )
+      return failure(new DroitsInsuffisants())
+
+    return emptySuccess()
   }
 
-  monitor(): Promise<void> {
-    throw new Error('not implemented')
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creer(
+      Evenement.Code.SESSION_INSCRIPTION,
+      utilisateur
+    )
   }
 
   private async recupererBeneficiaire(
-    idBeneficiaire: string
+    idBeneficiaire: string,
+    aggregate?: JeuneMilo
   ): Promise<Result<BeneficiaireMilo>> {
-    const resultBeneficiaire = await this.beneficiaireMiloRepository.get(
-      idBeneficiaire
-    )
-    if (isFailure(resultBeneficiaire)) return resultBeneficiaire
-    const beneficiaire = resultBeneficiaire.data
+    if (!aggregate)
+      return failure(new NonTrouveError('Bénéficiaire', idBeneficiaire))
 
-    if (!beneficiaire.conseiller) {
+    if (!aggregate.conseiller) {
       return failure(
         new NonTraitableError(
           'Beneficiaire',
-          beneficiaire.id,
+          aggregate.id,
           NonTraitableReason.BENEFICIAIRE_SANS_CONSEILLER
         )
       )
     }
-    if (!beneficiaire.idPartenaire) {
-      return failure(new JeuneMiloSansIdDossier(beneficiaire.id))
+    if (!aggregate.idPartenaire) {
+      return failure(new JeuneMiloSansIdDossier(aggregate.id))
     }
 
     return success({
-      ...beneficiaire,
-      conseiller: beneficiaire.conseiller,
-      idPartenaire: beneficiaire.idPartenaire
+      ...aggregate,
+      conseiller: aggregate.conseiller,
+      idPartenaire: aggregate.idPartenaire
     })
   }
 
@@ -122,12 +156,16 @@ export default class InscrireBeneficiaireSessionMiloCommandHandler extends Comma
     if (isFailure(resultAccesMilo)) return resultAccesMilo
 
     const { accesMiloBeneficiaire, accesMiloConseiller } = resultAccesMilo.data
-    const resultVerification =
-      await this.sessionMiloRepository.peutInscrireBeneficiaire(
-        idSession,
-        accesMiloBeneficiaire
-      )
-    if (isFailure(resultVerification)) return resultVerification
+    const resultSession = await this.sessionMiloRepository.getForBeneficiaire(
+      idSession,
+      accesMiloBeneficiaire
+    )
+    if (isFailure(resultSession)) return resultSession
+
+    const verificationInscription = SessionMilo.peutInscrireBeneficiaire(
+      resultSession.data
+    )
+    if (isFailure(verificationInscription)) return verificationInscription
 
     return this.sessionMiloRepository.inscrireBeneficiaire(
       idSession,

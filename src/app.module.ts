@@ -12,6 +12,7 @@ import { ConfigModule } from '@nestjs/config'
 import { APP_GUARD } from '@nestjs/core'
 import { TerminusModule } from '@nestjs/terminus'
 import { EmargerSessionMiloCommandHandler } from 'src/application/commands/milo/emarger-session-milo.command.handler'
+import AutoinscrireBeneficiaireSessionMiloCommandHandler from 'src/application/commands/milo/autoinscrire-beneficiaire-session-milo.command.handler'
 import { GetTokenPoleEmploiQueryHandler } from 'src/application/queries/get-token-pole-emploi.query.handler'
 import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
 import { GetCompteursBeneficiaireMiloQueryHandler } from 'src/application/queries/milo/get-compteurs-portefeuille-milo.query.handler.db'
@@ -791,7 +792,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetMonSuiviPoleEmploiQueryHandler,
     GetCompteursBeneficiaireMiloQueryHandler,
     GetDemarchesConseillerQueryHandler,
-    GetNotificationsJeuneQueryHandler
+    GetNotificationsJeuneQueryHandler,
+    AutoinscrireBeneficiaireSessionMiloCommandHandler
   ]
 }
 
