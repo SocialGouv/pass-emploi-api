@@ -22,6 +22,7 @@ export interface FirebaseMessage {
     nom: string
     statut?: string
   }>
+  sessionMilo?: { id: string; titre: string }
 }
 
 export interface FirebaseGroupeMessage extends FirebaseMessage {

@@ -20,6 +20,10 @@ export interface MessageIndividuel {
     id: string
     nom: string
   }
+  infoSession?: {
+    id: string
+    titre: string
+  }
 }
 
 export interface MessageRecherche {

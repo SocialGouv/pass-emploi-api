@@ -32,7 +32,10 @@ export interface SessionMilo {
   dateCloture?: DateTime
 }
 
-export type SessionMiloAllegee = Pick<SessionMilo, 'nbPlacesDisponibles'>
+export type SessionMiloAllegee = Pick<
+  SessionMilo,
+  'id' | 'nom' | 'nbPlacesDisponibles'
+>
 
 export interface InstanceSessionMilo {
   id: string

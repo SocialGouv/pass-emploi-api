@@ -521,6 +521,8 @@ describe('SessionMiloHttpSqlRepository', () => {
       // Then
       expect(isSuccess(result)).to.be.true()
       expect((result as Success<SessionMiloAllegee>).data).to.deep.equal({
+        id: '1',
+        nom: 'Une-session',
         nbPlacesDisponibles: 10
       })
     })

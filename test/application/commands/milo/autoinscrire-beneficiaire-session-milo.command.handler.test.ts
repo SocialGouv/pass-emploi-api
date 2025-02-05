@@ -108,7 +108,13 @@ describe('AutoinscrireBeneficiaireSessionMiloCommandHandler', () => {
         .resolves(success('token-conseiller-milo'))
       sessionMiloRepository.getForBeneficiaire
         .withArgs('id-session', 'token-beneficiaire-milo')
-        .resolves(success({ nbPlacesDisponibles: undefined }))
+        .resolves(
+          success({
+            id: 'id-session',
+            nom: 'Une session',
+            nbPlacesDisponibles: undefined
+          })
+        )
       sessionMiloRepository.inscrireBeneficiaire
         .withArgs(
           'id-session',
@@ -161,7 +167,11 @@ describe('AutoinscrireBeneficiaireSessionMiloCommandHandler', () => {
             'ENCRYPTED Votre bénéficiaire s’est inscrit à l’événement suivant',
           iv: 'IV Votre bénéficiaire s’est inscrit à l’événement suivant',
           idConseiller: '1',
-          type: 'AUTO_INSCRIPTION'
+          type: 'AUTO_INSCRIPTION',
+          infoSession: {
+            id: 'id-session',
+            titre: 'Une session'
+          }
         },
         { sentByBeneficiaire: true }
       )

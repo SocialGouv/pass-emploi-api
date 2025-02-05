@@ -108,10 +108,12 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     if (isFailure(resultSession)) {
       return resultSession
     }
-    const sessionDto = resultSession.data
+    const { session } = resultSession.data
 
     return success({
-      nbPlacesDisponibles: sessionDto.session.nbPlacesDisponibles ?? undefined
+      id: session.id.toString(),
+      nom: session.nom,
+      nbPlacesDisponibles: session.nbPlacesDisponibles ?? undefined
     })
   }
 

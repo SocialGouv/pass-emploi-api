@@ -24,6 +24,7 @@ import { Evenement, EvenementService } from 'src/domain/evenement'
 import { JeuneMilo, JeuneMiloRepositoryToken } from 'src/domain/milo/jeune.milo'
 import {
   SessionMilo,
+  SessionMiloAllegee,
   SessionMiloRepositoryToken
 } from 'src/domain/milo/session.milo'
 import { ChatCryptoService } from 'src/utils/chat-crypto-service'
@@ -89,7 +90,8 @@ export default class AutoinscrireBeneficiaireSessionMiloCommandHandler extends C
 
     return this.envoyerMessageConseiller(
       beneficiaire.id,
-      beneficiaire.conseiller.id
+      beneficiaire.conseiller.id,
+      resultatInscription.data
     )
   }
 
@@ -148,7 +150,7 @@ export default class AutoinscrireBeneficiaireSessionMiloCommandHandler extends C
     beneficiaire: BeneficiaireMilo,
     idSession: string,
     accessToken: string
-  ): Promise<Result> {
+  ): Promise<Result<SessionMiloAllegee>> {
     const resultAccesMilo = await this.recupererAccesMilo(
       accessToken,
       beneficiaire.conseiller.id
@@ -161,22 +163,26 @@ export default class AutoinscrireBeneficiaireSessionMiloCommandHandler extends C
       accesMiloBeneficiaire
     )
     if (isFailure(resultSession)) return resultSession
+    const sessionAllegee = resultSession.data
 
-    const verificationInscription = SessionMilo.peutInscrireBeneficiaire(
-      resultSession.data
-    )
+    const verificationInscription =
+      SessionMilo.peutInscrireBeneficiaire(sessionAllegee)
     if (isFailure(verificationInscription)) return verificationInscription
 
-    return this.sessionMiloRepository.inscrireBeneficiaire(
+    const inscription = await this.sessionMiloRepository.inscrireBeneficiaire(
       idSession,
       beneficiaire.idPartenaire,
       accesMiloConseiller
     )
+    if (isFailure(inscription)) return inscription
+
+    return success(sessionAllegee)
   }
 
   private async envoyerMessageConseiller(
     idBeneficiaire: string,
-    idConseiller: string
+    idConseiller: string,
+    session: SessionMiloAllegee
   ): Promise<Result> {
     const conversation =
       await this.chatRepository.recupererConversationIndividuelle(
@@ -196,7 +202,11 @@ export default class AutoinscrireBeneficiaireSessionMiloCommandHandler extends C
         message: encryptedText,
         iv,
         idConseiller: idConseiller,
-        type: 'AUTO_INSCRIPTION'
+        type: 'AUTO_INSCRIPTION',
+        infoSession: {
+          id: session.id,
+          titre: session.nom
+        }
       },
       { sentByBeneficiaire: true }
     )

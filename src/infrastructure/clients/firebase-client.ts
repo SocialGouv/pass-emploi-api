@@ -209,6 +209,10 @@ export class FirebaseClient {
       firebaseMessage.piecesJointes = [message.infoPieceJointe]
     }
 
+    if (message.infoSession) {
+      firebaseMessage.sessionMilo = message.infoSession
+    }
+
     await getMessagesRef(chat).add(firebaseMessage)
     await chat.update(updatedFirebaseChat)
   }
