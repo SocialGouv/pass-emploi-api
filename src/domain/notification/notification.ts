@@ -574,7 +574,7 @@ export namespace Notification {
         body: `Vous pouvez renseigner vos ${trucs} sur l’application`
       },
       {
-        title: `Comment s’est passé votre semaine ?`,
+        title: `Comment s’est passée votre semaine ?`,
         body: `Prenez 5 min pour renseigner vos ${trucs}`
       },
       {
