@@ -27,6 +27,7 @@ import {
   SessionMiloAllegee,
   SessionMiloRepositoryToken
 } from 'src/domain/milo/session.milo'
+import { Notification } from 'src/domain/notification/notification'
 import { ChatCryptoService } from 'src/utils/chat-crypto-service'
 
 export type AutoinscrireBeneficiaireSessionMiloCommand = {
@@ -54,6 +55,7 @@ export default class AutoinscrireBeneficiaireSessionMiloCommandHandler extends C
     @Inject(ChatRepositoryToken)
     private readonly chatRepository: Chat.Repository,
     private readonly chatCryptoService: ChatCryptoService,
+    private readonly notificationService: Notification.Service,
     private readonly evenementService: EvenementService
   ) {
     super('InscrireBeneficiaireSessionMiloCommandHandler')
@@ -87,12 +89,19 @@ export default class AutoinscrireBeneficiaireSessionMiloCommandHandler extends C
       command.accessToken
     )
     if (isFailure(resultatInscription)) return resultatInscription
+    const session = resultatInscription.data
 
-    return this.envoyerMessageConseiller(
+    this.envoyerMessageConseiller(
       beneficiaire.id,
       beneficiaire.conseiller.id,
-      resultatInscription.data
+      session
     )
+    this.notificationService.notifierAutoinscriptionSession(
+      session,
+      beneficiaire
+    )
+
+    return emptySuccess()
   }
 
   async authorize(
@@ -160,7 +169,8 @@ export default class AutoinscrireBeneficiaireSessionMiloCommandHandler extends C
     const { accesMiloBeneficiaire, accesMiloConseiller } = resultAccesMilo.data
     const resultSession = await this.sessionMiloRepository.getForBeneficiaire(
       idSession,
-      accesMiloBeneficiaire
+      accesMiloBeneficiaire,
+      beneficiaire.configuration.fuseauHoraire ?? 'Europe/Paris'
     )
     if (isFailure(resultSession)) return resultSession
     const sessionAllegee = resultSession.data
@@ -183,14 +193,14 @@ export default class AutoinscrireBeneficiaireSessionMiloCommandHandler extends C
     idBeneficiaire: string,
     idConseiller: string,
     session: SessionMiloAllegee
-  ): Promise<Result> {
+  ): Promise<void> {
     const conversation =
       await this.chatRepository.recupererConversationIndividuelle(
         idBeneficiaire
       )
     if (!conversation) {
       this.logger.error({ message: 'Aucune conversation trouvée' })
-      return emptySuccess()
+      return
     }
 
     const { encryptedText, iv } = this.chatCryptoService.encrypt(
@@ -210,8 +220,6 @@ export default class AutoinscrireBeneficiaireSessionMiloCommandHandler extends C
       },
       { sentByBeneficiaire: true }
     )
-
-    return emptySuccess()
   }
 
   private async recupererAccesMilo(

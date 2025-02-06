@@ -10,6 +10,7 @@ import {
 import { uneNotification } from 'test/fixtures/notification.fixture'
 import { uneRecherche } from 'test/fixtures/recherche.fixture'
 import { unRendezVous } from 'test/fixtures/rendez-vous.fixture'
+import { uneSessionMiloAllegee } from 'test/fixtures/sessions.fixture'
 import { Core } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { Notification } from '../../../src/domain/notification/notification'
@@ -147,6 +148,7 @@ describe('Notification', () => {
         )
       })
     })
+
     describe('notifierLesJeunesDuNouveauMessage', () => {
       it('notifie les jeunes avec pushNotificationToken', async () => {
         // Given
@@ -184,6 +186,7 @@ describe('Notification', () => {
         )
       })
     })
+
     describe('notifierRappelCreationActionDemarche', () => {
       it('notifie les jeunes Milo en choix 4', async () => {
         // Given
@@ -242,6 +245,7 @@ describe('Notification', () => {
         )
       })
     })
+
     describe('notifierNouvelleAction', () => {
       it('notifie les jeunes avec pushNotificationToken', async () => {
         // Given
@@ -283,6 +287,7 @@ describe('Notification', () => {
         expect(notificationRepository.send).to.not.have.been.called()
       })
     })
+
     describe('notifierNouveauCommentaireAction', () => {
       describe('quand le jeune a un token', () => {
         it('notifie', async () => {
@@ -336,6 +341,7 @@ describe('Notification', () => {
         })
       })
     })
+
     describe('notifierNouvellesOffres', () => {
       it('notifie les jeunes avec pushNotificationToken', async () => {
         // Given
@@ -384,6 +390,7 @@ describe('Notification', () => {
         expect(notificationRepository.send).not.to.have.been.called()
       })
     })
+
     describe('notifierUnRendezVousPoleEmploi', () => {
       it('notifie un jeune', async () => {
         // Given
@@ -419,6 +426,7 @@ describe('Notification', () => {
         )
       })
     })
+
     describe('notifierInscriptionSession', () => {
       it('notifie les jeunes avec pushNotificationToken', async () => {
         // Given
@@ -446,6 +454,35 @@ describe('Notification', () => {
         )
       })
     })
+
+    describe('notifierAutoinscriptionSession', () => {
+      it('notifie le jeune', async () => {
+        // Given
+        const jeune: Jeune = unJeune()
+        const session = uneSessionMiloAllegee()
+
+        // When
+        await notificationService.notifierAutoinscriptionSession(session, jeune)
+
+        // Then
+        const expectedNotification = uneNotification({
+          token: jeune.configuration?.pushNotificationToken,
+          notification: {
+            title: 'Inscription confirmée',
+            body: 'Votre inscription à l’événement Une session le 06/04/2020 à 15h20 a bien été prise en compte.'
+          },
+          data: {
+            type: Notification.Type.DETAIL_SESSION_MILO,
+            id: 'id-session'
+          }
+        })
+        expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
+          expectedNotification,
+          jeune.id
+        )
+      })
+    })
+
     describe('notifierModificationSession', () => {
       it('notifie les jeunes avec pushNotificationToken', async () => {
         // Given
@@ -475,6 +512,7 @@ describe('Notification', () => {
         )
       })
     })
+
     describe('notifierDesinscriptionSession', () => {
       it('notifie les jeunes avec pushNotificationToken', async () => {
         // Given

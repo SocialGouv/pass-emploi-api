@@ -1,5 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
+import { SessionMiloAllegee } from 'src/domain/milo/session.milo'
 import { DateService } from '../../utils/date-service'
 import { Action } from '../action/action'
 import { Core, estPoleEmploiOuCDOuAvenirPro } from '../core'
@@ -378,7 +379,7 @@ export namespace Notification {
             jeune.preferences.rendezVousSessions
           ) {
             const notification = creerNotificationInscriptionSession(
-              jeune.configuration?.pushNotificationToken,
+              jeune.configuration.pushNotificationToken,
               idSsession
             )
             if (notification) {
@@ -389,6 +390,26 @@ export namespace Notification {
           }
         })
       )
+    }
+
+    async notifierAutoinscriptionSession(
+      session: SessionMiloAllegee,
+      jeune: Jeune
+    ): Promise<void> {
+      if (
+        jeune.configuration.pushNotificationToken &&
+        jeune.preferences.rendezVousSessions
+      ) {
+        const notification = creerNotificationAutoinscriptionSession(
+          jeune.configuration.pushNotificationToken,
+          session
+        )
+        if (notification) {
+          return this.notificationRepository.send(notification, jeune.id)
+        }
+      } else {
+        this.logMessageEchec(jeune.id)
+      }
     }
 
     async notifierModificationSession(
@@ -639,6 +660,25 @@ export namespace Notification {
       data: {
         type: Type.DETAIL_SESSION_MILO,
         id: idSession
+      }
+    }
+  }
+
+  function creerNotificationAutoinscriptionSession(
+    token: string,
+    session: SessionMiloAllegee
+  ): Notification.Message {
+    const date = session.debut.toFormat("dd/MM/yyyy à HH'h'mm")
+
+    return {
+      token,
+      notification: {
+        title: 'Inscription confirmée',
+        body: `Votre inscription à l’événement ${session.nom} le ${date} a bien été prise en compte.`
+      },
+      data: {
+        type: Type.DETAIL_SESSION_MILO,
+        id: session.id
       }
     }
   }
