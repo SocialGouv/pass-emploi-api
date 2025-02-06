@@ -70,7 +70,9 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
           case Core.Structure.POLE_EMPLOI_AIJ:
           case Core.Structure.CONSEIL_DEPT:
           case Core.Structure.AVENIR_PRO:
-            return this.authentificationConseillerSSO(commandSanitized)
+            return this.recupererOuCreerUtilisateurConseiller(commandSanitized)
+          case 'FRANCE_TRAVAIL':
+            return this.recupererUtilisateurConseillerExistant(commandSanitized)
         }
         break
       case Authentification.Type.JEUNE:
@@ -294,13 +296,13 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
 
     const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
       utilisateurTrouve,
-      commandSanitized
+      { ...commandSanitized, structure: utilisateurTrouve.structure }
     )
 
     return success(queryModelFromUtilisateur(utilisateurMisAJour))
   }
 
-  private async authentificationConseillerSSO(
+  private async recupererOuCreerUtilisateurConseiller(
     commandSanitized: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
     const utilisateurTrouve =
@@ -311,11 +313,36 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       return this.creerNouveauConseiller(commandSanitized)
     }
     if (utilisateurTrouve.structure !== commandSanitized.structure) {
+      const reason = reasonFromStructure(utilisateurTrouve.structure)
       return failure(
         new NonTraitableError(
           'Utilisateur',
           commandSanitized.idUtilisateurAuth,
-          NonTraitableReason.UTILISATEUR_CONSEILLER_MAUVAISE_STRUCTURE
+          reason
+        )
+      )
+    }
+
+    const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
+      utilisateurTrouve,
+      commandSanitized
+    )
+    return success(queryModelFromUtilisateur(utilisateurMisAJour))
+  }
+
+  private async recupererUtilisateurConseillerExistant(
+    commandSanitized: UpdateUtilisateurCommand
+  ): Promise<Result<UtilisateurQueryModel>> {
+    const utilisateurTrouve =
+      await this.authentificationRepository.getConseiller(
+        commandSanitized.idUtilisateurAuth
+      )
+    if (!utilisateurTrouve) {
+      return failure(
+        new NonTraitableError(
+          'Utilisateur',
+          commandSanitized.idUtilisateurAuth,
+          NonTraitableReason.UTILISATEUR_INEXISTANT
         )
       )
     }
@@ -353,29 +380,30 @@ function verifierStructureBeneficiaire(
     }
   }
   if (utilisateurTrouve.structure !== structureAttendue) {
-    let reason: NonTraitableReason | undefined
-
-    switch (utilisateurTrouve.structure) {
-      case Core.Structure.MILO:
-        reason = NonTraitableReason.UTILISATEUR_DEJA_MILO
-        break
-      case Core.Structure.POLE_EMPLOI:
-        reason = NonTraitableReason.UTILISATEUR_DEJA_PE
-        break
-      case Core.Structure.POLE_EMPLOI_BRSA:
-        reason = NonTraitableReason.UTILISATEUR_DEJA_PE_BRSA
-        break
-      case Core.Structure.POLE_EMPLOI_AIJ:
-        reason = NonTraitableReason.UTILISATEUR_DEJA_PE_AIJ
-        break
-      case Core.Structure.CONSEIL_DEPT:
-        reason = NonTraitableReason.UTILISATEUR_DEJA_CONSEIL_DEPT
-        break
-      case Core.Structure.AVENIR_PRO:
-        reason = NonTraitableReason.UTILISATEUR_DEJA_AVENIR_PRO
-    }
+    const reason = reasonFromStructure(utilisateurTrouve.structure)
 
     return failure(new NonTraitableError('Utilisateur', idUtilisateur, reason))
   }
   return emptySuccess()
+}
+
+function reasonFromStructure(
+  structure: Core.Structure
+): NonTraitableReason | undefined {
+  switch (structure) {
+    case Core.Structure.MILO:
+      return NonTraitableReason.UTILISATEUR_DEJA_MILO
+    case Core.Structure.POLE_EMPLOI:
+      return NonTraitableReason.UTILISATEUR_DEJA_PE
+    case Core.Structure.POLE_EMPLOI_BRSA:
+      return NonTraitableReason.UTILISATEUR_DEJA_PE_BRSA
+    case Core.Structure.POLE_EMPLOI_AIJ:
+      return NonTraitableReason.UTILISATEUR_DEJA_PE_AIJ
+    case Core.Structure.CONSEIL_DEPT:
+      return NonTraitableReason.UTILISATEUR_DEJA_CONSEIL_DEPT
+    case Core.Structure.AVENIR_PRO:
+      return NonTraitableReason.UTILISATEUR_DEJA_AVENIR_PRO
+    default:
+      return
+  }
 }
