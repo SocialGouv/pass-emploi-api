@@ -2,7 +2,7 @@ import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-auth
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { Suggestion } from '../../../src/domain/offre/recherche/suggestion/suggestion'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { createSandbox } from 'sinon'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import {
@@ -32,7 +32,7 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
   let suggestionPoleEmploiService: StubbedClass<SuggestionPoleEmploiService>
   let diagorienteClient: StubbedClass<DiagorienteClient>
   let suggestionPoleEmploiRepository: StubbedType<Suggestion.PoleEmploi.Repository>
-  let keycloakClient: StubbedClass<KeycloakClient>
+  let oidcClient: StubbedClass<OidcClient>
   const jeune = unJeune()
 
   beforeEach(() => {
@@ -43,7 +43,7 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
     suggestionPoleEmploiService = stubClass(SuggestionPoleEmploiService)
     diagorienteClient = stubClass(DiagorienteClient)
     suggestionPoleEmploiRepository = stubInterface(sandbox)
-    keycloakClient = stubClass(KeycloakClient)
+    oidcClient = stubClass(OidcClient)
     handler = new RafraichirSuggestionsCommandHandler(
       jeuneRepository,
       jeuneAuthorizer,
@@ -51,7 +51,7 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
       suggestionPoleEmploiService,
       diagorienteClient,
       suggestionPoleEmploiRepository,
-      keycloakClient
+      oidcClient
     )
   })
 
@@ -81,7 +81,7 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
   describe('handle', () => {
     beforeEach(() => {
       jeuneRepository.get.resolves(jeune)
-      keycloakClient.exchangeTokenJeune
+      oidcClient.exchangeTokenJeune
         .withArgs('token', jeune.structure)
         .resolves('idpToken')
     })

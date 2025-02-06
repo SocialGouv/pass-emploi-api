@@ -18,7 +18,7 @@ import { Demarche } from '../../../../src/domain/demarche'
 import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
 import { unRendezVousQueryModel } from '../../../fixtures/query-models/rendez-vous.query-model.fixtures'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
-import { KeycloakClient } from '../../../../src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { Core, estPoleEmploi } from '../../../../src/domain/core'
 import Structure = Core.Structure
 import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
@@ -40,7 +40,7 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
   let getRecherchesSauvegardeesQueryGetter: StubbedClass<GetRecherchesSauvegardeesQueryGetter>
   let getFavorisQueryGetter: StubbedClass<GetFavorisAccueilQueryGetter>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
-  let keycloakClient: StubbedClass<KeycloakClient>
+  let oidcClient: StubbedClass<OidcClient>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let dateService: StubbedClass<DateService>
   const idpToken = 'id-token'
@@ -59,15 +59,15 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
     const sandbox = createSandbox()
     jeuneRepository = stubInterface(sandbox)
     jeuneRepository.get.resolves(jeune)
-    keycloakClient = stubClass(KeycloakClient)
-    keycloakClient.exchangeTokenJeune.resolves(idpToken)
+    oidcClient = stubClass(OidcClient)
+    oidcClient.exchangeTokenJeune.resolves(idpToken)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     dateService = stubClass(DateService)
 
     handler = new GetAccueilJeunePoleEmploiQueryHandler(
       jeuneRepository,
       jeuneAuthorizer,
-      keycloakClient,
+      oidcClient,
       getDemarchesQueryGetter,
       getRendezVousJeunePoleEmploiQueryGetter,
       getRecherchesSauvegardeesQueryGetter,

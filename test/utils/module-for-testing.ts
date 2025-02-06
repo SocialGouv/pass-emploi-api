@@ -18,10 +18,7 @@ import {
 import { Authentification } from 'src/domain/authentification'
 import { IJwtService, JwtService } from 'src/infrastructure/auth/jwt.service'
 import { OidcAuthGuard } from 'src/infrastructure/auth/oidc.auth-guard'
-import {
-  FirebaseClient,
-  IFirebaseClient
-} from 'src/infrastructure/clients/firebase-client'
+import { FirebaseClient } from 'src/infrastructure/clients/firebase-client'
 import { DateService } from 'src/utils/date-service'
 import { unJwtPayloadValide } from '../fixtures/authentification.fixture'
 import { FakeController } from '../infrastructure/auth/fake.controller'
@@ -262,7 +259,7 @@ export class FakeJwtService implements IJwtService {
   }
 }
 
-class FakeFirebaseClient implements IFirebaseClient {
+class FakeFirebaseClient {
   getToken(_utilisateur: Authentification.Utilisateur): Promise<string> {
     return Promise.resolve('un-pushNotificationToken-firebase')
   }

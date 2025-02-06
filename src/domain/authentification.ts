@@ -111,6 +111,17 @@ export namespace Authentification {
       structure: Core.Structure,
       email?: string | null
     ): Promise<{ dansSaStructure: boolean; crossStructures: boolean }>
+
+    recupererAccesPartenaire(
+      bearer: string,
+      structure: Core.Structure
+    ): Promise<string>
+
+    seFairePasserPourUnConseiller(
+      idConseiller: string,
+      bearer: string,
+      structure: Core.Structure
+    ): Promise<Result<string>>
   }
 
   @Injectable()

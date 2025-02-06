@@ -9,7 +9,7 @@ import {
   success
 } from '../../../../building-blocks/types/result'
 import { Jeune, JeuneRepositoryToken } from '../../../../domain/jeune/jeune'
-import { KeycloakClient } from '../../../../infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import {
   PoleEmploiPartenaireClient,
   PoleEmploiPartenaireClientToken
@@ -38,7 +38,7 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
     @Inject(PoleEmploiPartenaireClientToken)
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,
     private idService: IdService,
-    private keycloakClient: KeycloakClient
+    private oidcClient: OidcClient
   ) {
     this.logger = new Logger('GetRendezVousJeunePoleEmploiQueryGetter')
   }
@@ -52,7 +52,7 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
     }
     const idpToken =
       query.idpToken ??
-      (await this.keycloakClient.exchangeTokenJeune(
+      (await this.oidcClient.exchangeTokenJeune(
         query.accessToken,
         jeune.structure
       ))

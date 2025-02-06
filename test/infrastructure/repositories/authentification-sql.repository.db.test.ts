@@ -1,11 +1,18 @@
+import { NonTrouveError } from 'src/building-blocks/types/domain-error'
+import {
+  Failure,
+  isFailure,
+  isSuccess,
+  Success
+} from 'src/building-blocks/types/result'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { SuperviseurSqlModel } from 'src/infrastructure/sequelize/models/superviseur.sql-model'
 import { uneDate, uneDatetime } from 'test/fixtures/date.fixture'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { Authentification } from '../../../src/domain/authentification'
 import { Core } from '../../../src/domain/core'
-import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client.db'
-import { AuthentificationSqlRepository } from '../../../src/infrastructure/repositories/authentification-sql.repository.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
+import { AuthentificationSqlOidcRepository } from '../../../src/infrastructure/repositories/authentification-sql.repository.db'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import {
   unUtilisateurConseiller,
@@ -14,20 +21,15 @@ import {
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
-import { testConfig } from '../../utils/module-for-testing'
 
 describe('AuthentificationSqlRepository', () => {
-  let authentificationSqlRepository: AuthentificationSqlRepository
-  let keycloakClient: StubbedClass<KeycloakClient>
-  const configService = testConfig()
+  let repository: AuthentificationSqlOidcRepository
+  let oidcClient: StubbedClass<OidcClient>
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
-    keycloakClient = stubClass(KeycloakClient)
-    authentificationSqlRepository = new AuthentificationSqlRepository(
-      keycloakClient,
-      configService
-    )
+    oidcClient = stubClass(OidcClient)
+    repository = new AuthentificationSqlOidcRepository(oidcClient)
   })
 
   describe('getConseiller', () => {
@@ -50,7 +52,7 @@ describe('AuthentificationSqlRepository', () => {
     describe("quand c'est un conseiller non inscrit dans les superviseurs", () => {
       it("retourne l'utilisateur quand il existe sans roles quand c'est un non MILO", async () => {
         // When
-        const utilisateur = await authentificationSqlRepository.getConseiller(
+        const utilisateur = await repository.getConseiller(
           conseillerDtoPE.idAuthentification
         )
 
@@ -66,7 +68,7 @@ describe('AuthentificationSqlRepository', () => {
       })
       it("retourne l'utilisateur quand il existe avec role SUPERVISEUR quand c'est un MILO", async () => {
         // When
-        const utilisateur = await authentificationSqlRepository.getConseiller(
+        const utilisateur = await repository.getConseiller(
           conseillerDtoMilo.idAuthentification
         )
 
@@ -81,9 +83,7 @@ describe('AuthentificationSqlRepository', () => {
 
       it("retourne undefined quand il n'existe pas", async () => {
         // When
-        const utilisateur = await authentificationSqlRepository.getConseiller(
-          'id-auth-inconnu'
-        )
+        const utilisateur = await repository.getConseiller('id-auth-inconnu')
 
         // Then
         expect(utilisateur).to.deep.equal(undefined)
@@ -109,7 +109,7 @@ describe('AuthentificationSqlRepository', () => {
         })
 
         // When
-        const utilisateur = await authentificationSqlRepository.getConseiller(
+        const utilisateur = await repository.getConseiller(
           conseillerDtoPE.idAuthentification
         )
 
@@ -139,7 +139,7 @@ describe('AuthentificationSqlRepository', () => {
         })
 
         // When
-        const utilisateur = await authentificationSqlRepository.getConseiller(
+        const utilisateur = await repository.getConseiller(
           conseillerDtoPE.idAuthentification
         )
 
@@ -179,11 +179,10 @@ describe('AuthentificationSqlRepository', () => {
     })
     it("retourne l'utilisateur quand il existe", async () => {
       // When
-      const utilisateur =
-        await authentificationSqlRepository.getJeuneByStructure(
-          'id-authentification-jeune',
-          Core.Structure.MILO
-        )
+      const utilisateur = await repository.getJeuneByStructure(
+        'id-authentification-jeune',
+        Core.Structure.MILO
+      )
 
       // Then
       expect(utilisateur).to.deep.equal(
@@ -193,11 +192,10 @@ describe('AuthentificationSqlRepository', () => {
 
     it("retourne undefined quand il n'existe pas", async () => {
       // When
-      const utilisateur =
-        await authentificationSqlRepository.getJeuneByStructure(
-          'plop',
-          Core.Structure.MILO
-        )
+      const utilisateur = await repository.getJeuneByStructure(
+        'plop',
+        Core.Structure.MILO
+      )
 
       // Then
       expect(utilisateur).to.deep.equal(undefined)
@@ -223,10 +221,9 @@ describe('AuthentificationSqlRepository', () => {
     })
     it("retourne l'utilisateur quand il existe", async () => {
       // When
-      const utilisateur =
-        await authentificationSqlRepository.getJeuneByIdAuthentification(
-          'id-authentification-jeune'
-        )
+      const utilisateur = await repository.getJeuneByIdAuthentification(
+        'id-authentification-jeune'
+      )
 
       // Then
       expect(utilisateur).to.deep.equal(
@@ -236,8 +233,7 @@ describe('AuthentificationSqlRepository', () => {
 
     it("retourne undefined quand il n'existe pas", async () => {
       // When
-      const utilisateur =
-        await authentificationSqlRepository.getJeuneByIdAuthentification('plop')
+      const utilisateur = await repository.getJeuneByIdAuthentification('plop')
 
       // Then
       expect(utilisateur).to.deep.equal(undefined)
@@ -262,9 +258,7 @@ describe('AuthentificationSqlRepository', () => {
         })
       )
       // When
-      const utilisateur = await authentificationSqlRepository.getJeuneById(
-        'ABCDE'
-      )
+      const utilisateur = await repository.getJeuneById('ABCDE')
 
       // Then
       expect(utilisateur).to.deep.equal(
@@ -274,9 +268,7 @@ describe('AuthentificationSqlRepository', () => {
 
     it("retourne undefined quand il n'existe pas", async () => {
       // When
-      const utilisateur = await authentificationSqlRepository.getJeuneById(
-        'plop'
-      )
+      const utilisateur = await repository.getJeuneById('plop')
 
       // Then
       expect(utilisateur).to.deep.equal(undefined)
@@ -304,9 +296,7 @@ describe('AuthentificationSqlRepository', () => {
     describe("quand c'est un jeune connu par son email", () => {
       it("retourne l'utilisateur quand il existe", async () => {
         // When
-        const utilisateur = await authentificationSqlRepository.getJeuneByEmail(
-          'john.doe@plop.io'
-        )
+        const utilisateur = await repository.getJeuneByEmail('john.doe@plop.io')
 
         // Then
         expect(utilisateur).to.deep.equal(
@@ -315,7 +305,7 @@ describe('AuthentificationSqlRepository', () => {
       })
       it("retourne undefined quand l'email n'existe pas", async () => {
         // When
-        const utilisateur = await authentificationSqlRepository.getJeuneByEmail(
+        const utilisateur = await repository.getJeuneByEmail(
           'email@passemploi.com'
         )
 
@@ -355,14 +345,13 @@ describe('AuthentificationSqlRepository', () => {
         dateDerniereConnexion: uneDate(),
         datePremiereConnexion: uneDate()
       }
-      await authentificationSqlRepository.update(unJeuneMisAJour)
+      await repository.update(unJeuneMisAJour)
 
       // Then
-      const utilisateur =
-        await authentificationSqlRepository.getJeuneByStructure(
-          'nouvelIdAuthentification',
-          Core.Structure.MILO
-        )
+      const utilisateur = await repository.getJeuneByStructure(
+        'nouvelIdAuthentification',
+        Core.Structure.MILO
+      )
       expect(utilisateur).to.deep.equal(unJeuneMisAJour)
     })
     it("conserve l'id dossier d'un jeune MILO", async () => {
@@ -381,7 +370,7 @@ describe('AuthentificationSqlRepository', () => {
         idAuthentification: 'nouvelIdAuthentification',
         dateDerniereConnexion: uneDate()
       }
-      await authentificationSqlRepository.update(unJeuneMisAJour)
+      await repository.update(unJeuneMisAJour)
 
       // Then
       const jeune = await JeuneSqlModel.findByPk(unJeune.id)
@@ -402,10 +391,10 @@ describe('AuthentificationSqlRepository', () => {
         datePremiereConnexion: uneDatetime().toJSDate(),
         username: 'milou'
       }
-      await authentificationSqlRepository.update(unConseillerMisAJour)
+      await repository.update(unConseillerMisAJour)
 
       // Then
-      const utilisateur = await authentificationSqlRepository.getConseiller(
+      const utilisateur = await repository.getConseiller(
         'nouvelIdAuthentification'
       )
 
@@ -421,13 +410,10 @@ describe('AuthentificationSqlRepository', () => {
     describe("quand c'est un conseiller", () => {
       it("met à jour l'utilisateur", async () => {
         // When
-        await authentificationSqlRepository.save(
-          unUtilisateurConseiller(),
-          uneDate()
-        )
+        await repository.save(unUtilisateurConseiller(), uneDate())
 
         // Then
-        const utilisateur = await authentificationSqlRepository.getConseiller(
+        const utilisateur = await repository.getConseiller(
           'id-authentification-conseiller'
         )
 
@@ -447,17 +433,14 @@ describe('AuthentificationSqlRepository', () => {
         const dateCreation = uneDatetime().toJSDate()
 
         // When
-        await authentificationSqlRepository.save(
-          utilisateurConseiller,
-          dateCreation
-        )
-        await authentificationSqlRepository.save({
+        await repository.save(utilisateurConseiller, dateCreation)
+        await repository.save({
           ...utilisateurConseiller,
           email: nouvelEmail
         })
 
         // Then
-        const utilisateur = await authentificationSqlRepository.getConseiller(
+        const utilisateur = await repository.getConseiller(
           'id-authentification-conseiller'
         )
 
@@ -488,7 +471,7 @@ describe('AuthentificationSqlRepository', () => {
       await JeuneSqlModel.create(jeune)
 
       // When
-      await authentificationSqlRepository.updateJeune({
+      await repository.updateJeune({
         id: jeune.id,
         idAuthentification: 'un-nouveau-id'
       })
@@ -497,6 +480,75 @@ describe('AuthentificationSqlRepository', () => {
     it("met à jour l'id jeune", async () => {
       // Then
       expect(jeuneTrouve?.idAuthentification).to.equal('un-nouveau-id')
+    })
+  })
+
+  describe('recupererAccesPartenaire', () => {
+    it('récupère le token pour appeler l’API partenaire', async () => {
+      // Given
+      oidcClient.exchangeToken.resolves('accesPartenaire')
+
+      // When
+      const accesPartenaire = await repository.recupererAccesPartenaire(
+        'bearer',
+        Core.Structure.MILO
+      )
+
+      // Then
+      expect(oidcClient.exchangeToken).to.have.been.calledOnceWithExactly(
+        'bearer',
+        Core.Structure.MILO
+      )
+      expect(accesPartenaire).to.equal('accesPartenaire')
+    })
+  })
+
+  describe('seFairePasserPourUnConseiller', () => {
+    it('récupère le token du conseiller pour appeler l’API partenaire', async () => {
+      // Given
+      await ConseillerSqlModel.creer(
+        unConseillerDto({
+          id: 'id-conseiller',
+          idAuthentification: 'id-authentification-conseiller'
+        })
+      )
+      oidcClient.exchangeToken.resolves('accesPartenaireConseiller')
+
+      // When
+      const resultAccesPartenaireConseiller =
+        await repository.seFairePasserPourUnConseiller(
+          'id-conseiller',
+          'bearer',
+          Core.Structure.MILO
+        )
+
+      // Then
+      expect(oidcClient.exchangeToken).to.have.been.calledOnceWithExactly(
+        'bearer',
+        Core.Structure.MILO,
+        'id-authentification-conseiller'
+      )
+      expect(isSuccess(resultAccesPartenaireConseiller)).to.equal(true)
+      expect(
+        (resultAccesPartenaireConseiller as Success<string>).data
+      ).to.equal('accesPartenaireConseiller')
+    })
+
+    it('échoue si le conseiller n’existe pas', async () => {
+      // When
+      const resultAccesPartenaireConseiller =
+        await repository.seFairePasserPourUnConseiller(
+          'id-conseiller',
+          'bearer',
+          Core.Structure.MILO
+        )
+
+      // Then
+      expect(oidcClient.exchangeToken).not.to.have.been.called()
+      expect(isFailure(resultAccesPartenaireConseiller)).to.equal(true)
+      expect(
+        (resultAccesPartenaireConseiller as Failure).error
+      ).to.be.an.instanceOf(NonTrouveError)
     })
   })
 })

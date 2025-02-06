@@ -1,8 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { Sequelize } from 'sequelize-typescript'
+import { NonTrouveError } from 'src/building-blocks/types/domain-error'
+import { failure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Core, estMilo, getStructureDeReference } from '../../domain/core'
-import { KeycloakClient } from '../clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { SuperviseurSqlModel } from '../sequelize/models/superviseur.sql-model'
@@ -11,19 +13,15 @@ import {
   fromJeuneSqlToUtilisateur
 } from './mappers/authentification.mappers'
 import { Op } from 'sequelize'
-import { ConfigService } from '@nestjs/config'
 
 @Injectable()
-export class AuthentificationSqlRepository
+export class AuthentificationSqlOidcRepository
   implements Authentification.Repository
 {
   private logger: Logger
 
-  constructor(
-    private keycloakClient: KeycloakClient,
-    private readonly configService: ConfigService
-  ) {
-    this.logger = new Logger('AuthentificationSqlRepository')
+  constructor(private oidcClient: OidcClient) {
+    this.logger = new Logger('AuthentificationSqlOidcRepository')
   }
 
   async getConseiller(
@@ -175,7 +173,7 @@ export class AuthentificationSqlRepository
 
   async deleteUtilisateurIdp(idUserCEJ: string): Promise<void> {
     try {
-      await this.keycloakClient.deleteAccount(idUserCEJ)
+      await this.oidcClient.deleteAccount(idUserCEJ)
     } catch (_e) {}
     this.logger.log(`Utilisateur ${idUserCEJ} supprimé de OIDC SSO`)
   }
@@ -202,6 +200,31 @@ export class AuthentificationSqlRepository
         structure
       )
     }
+  }
+
+  async recupererAccesPartenaire(
+    bearer: string,
+    structure: Core.Structure
+  ): Promise<string> {
+    return this.oidcClient.exchangeToken(bearer, structure)
+  }
+
+  async seFairePasserPourUnConseiller(
+    idConseiller: string,
+    bearer: string,
+    structure: Core.Structure
+  ): Promise<Result<string>> {
+    const conseillerSqlModel = await ConseillerSqlModel.findByPk(idConseiller)
+    if (!conseillerSqlModel)
+      return failure(new NonTrouveError('Conseiller', idConseiller))
+
+    const accesConseiller = await this.oidcClient.exchangeToken(
+      bearer,
+      structure,
+      conseillerSqlModel.idAuthentification
+    )
+
+    return success(accesConseiller)
   }
 }
 

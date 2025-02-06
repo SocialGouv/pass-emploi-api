@@ -6,7 +6,7 @@ import { Authentification } from 'src/domain/authentification'
 import { Conseiller } from 'src/domain/milo/conseiller'
 import { estMilo } from 'src/domain/core'
 import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo.db'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import {
   SessionMilo,
   SessionMiloRepositoryToken
@@ -33,7 +33,7 @@ export class GetDetailSessionConseillerMiloQueryHandler extends QueryHandler<
     @Inject(SessionMiloRepositoryToken)
     private sessionRepository: SessionMilo.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer,
-    private keycloakClient: KeycloakClient,
+    private oidcClient: OidcClient,
     private dateService: DateService
   ) {
     super('GetDetailSessionMiloQueryHandler')
@@ -50,7 +50,7 @@ export class GetDetailSessionConseillerMiloQueryHandler extends QueryHandler<
     }
     const { structure } = resultConseiller.data
 
-    const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
+    const idpToken = await this.oidcClient.exchangeTokenConseillerMilo(
       query.accessToken
     )
 

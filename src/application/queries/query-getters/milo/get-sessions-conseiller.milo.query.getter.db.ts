@@ -6,7 +6,7 @@ import {
   success
 } from '../../../../building-blocks/types/result'
 import { SessionMilo } from '../../../../domain/milo/session.milo'
-import { KeycloakClient } from '../../../../infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { MiloClient } from '../../../../infrastructure/clients/milo-client'
 import { SessionMiloSqlModel } from '../../../../infrastructure/sequelize/models/session-milo.sql-model'
 import { DateService } from '../../../../utils/date-service'
@@ -18,7 +18,7 @@ export const NB_MOIS_PASSES_SESSIONS_A_CLORE = 3
 @Injectable()
 export class GetSessionsConseillerMiloQueryGetter {
   constructor(
-    private readonly keycloakClient: KeycloakClient,
+    private readonly oidcClient: OidcClient,
     private readonly miloClient: MiloClient,
     private readonly dateService: DateService
   ) {}
@@ -32,7 +32,7 @@ export class GetSessionsConseillerMiloQueryGetter {
       filtrerAClore?: boolean
     }
   ): Promise<Result<SessionConseillerMiloQueryModel[]>> {
-    const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
+    const idpToken = await this.oidcClient.exchangeTokenConseillerMilo(
       accessToken
     )
 

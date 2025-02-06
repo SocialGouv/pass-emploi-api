@@ -3,10 +3,11 @@ import { DateTime } from 'luxon'
 import * as nock from 'nock'
 import {
   emptySuccess,
+  isSuccess,
   Success,
   success
 } from 'src/building-blocks/types/result'
-import { SessionMilo } from 'src/domain/milo/session.milo'
+import { SessionMilo, SessionMiloAllegee } from 'src/domain/milo/session.milo'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { SessionMiloHttpSqlRepository } from 'src/infrastructure/repositories/milo/session-milo-http-sql.repository.db'
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
@@ -16,12 +17,14 @@ import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/struc
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import {
   unDetailSessionConseillerDto,
+  unDetailSessionJeuneDto,
   uneInscriptionSessionMiloDto
 } from 'test/fixtures/milo-dto.fixture'
 import { uneSessionMilo } from 'test/fixtures/sessions.fixture'
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { getDatabase } from 'test/utils/database-for-testing'
+import { PlanificateurService } from '../../../../src/domain/planificateur'
 import {
   MILO_INSCRIT,
   MILO_PRESENT,
@@ -33,7 +36,6 @@ import { RateLimiterService } from '../../../../src/utils/rate-limiter.service'
 import { uneInstanceSessionMilo } from '../../../fixtures/milo.fixture'
 import { expect, sinon, StubbedClass, stubClass } from '../../../utils'
 import { testConfig } from '../../../utils/module-for-testing'
-import { PlanificateurService } from '../../../../src/domain/planificateur'
 
 const structureConseiller = {
   id: 'structure-milo',
@@ -500,6 +502,59 @@ describe('SessionMiloHttpSqlRepository', () => {
         'id-dossier-hermione',
         'id-dossier-ron'
       ])
+    })
+  })
+
+  describe('.getForBeneficiaire', () => {
+    it('récupère le minimum des informations de la session', async () => {
+      // Given
+      miloClient.getDetailSessionJeune.resolves(
+        success(unDetailSessionJeuneDto)
+      )
+
+      // When
+      const result = await repository.getForBeneficiaire(
+        'idSession',
+        'token-milo'
+      )
+
+      // Then
+      expect(isSuccess(result)).to.be.true()
+      expect((result as Success<SessionMiloAllegee>).data).to.deep.equal({
+        id: '1',
+        nom: 'Une-session',
+        nbPlacesDisponibles: 10
+      })
+    })
+  })
+
+  describe('.inscrireBeneficiaire', () => {
+    it('inscrit le bénéficiaire à la session', async () => {
+      // Given
+      const idSession = '67890'
+      const idDossier = '12345'
+      miloClient.inscrireJeunesSession
+        .withArgs('token-milo-conseiller', idSession, [idDossier])
+        .resolves(
+          success([
+            {
+              id: 1,
+              idDossier: parseInt(idSession),
+              idSession: parseInt(idDossier),
+              statut: 'test'
+            }
+          ])
+        )
+
+      // When
+      const result = await repository.inscrireBeneficiaire(
+        idSession,
+        idDossier,
+        'token-milo-conseiller'
+      )
+
+      // Then
+      expect(isSuccess(result)).to.equal(true)
     })
   })
 })

@@ -14,7 +14,7 @@ import { Authentification } from '../../domain/authentification'
 import { estPoleEmploiOuCDOuAvenirPro } from '../../domain/core'
 import { Demarche } from '../../domain/demarche'
 import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
-import { KeycloakClient } from '../../infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from './query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
@@ -37,7 +37,7 @@ export class GetSuiviSemainePoleEmploiQueryHandler extends QueryHandler<
     private getDemarchesQueryGetter: GetDemarchesQueryGetter,
     private getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter,
     private jeuneAuthorizer: JeuneAuthorizer,
-    private keycloakClient: KeycloakClient,
+    private oidcClient: OidcClient,
     private dateService: DateService
   ) {
     super('GetSuiviSemainePoleEmploiQueryHandler')
@@ -50,7 +50,7 @@ export class GetSuiviSemainePoleEmploiQueryHandler extends QueryHandler<
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
-    const idpToken = await this.keycloakClient.exchangeTokenJeune(
+    const idpToken = await this.oidcClient.exchangeTokenJeune(
       query.accessToken,
       jeune.structure
     )

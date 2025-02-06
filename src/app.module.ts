@@ -12,6 +12,7 @@ import { ConfigModule } from '@nestjs/config'
 import { APP_GUARD } from '@nestjs/core'
 import { TerminusModule } from '@nestjs/terminus'
 import { EmargerSessionMiloCommandHandler } from 'src/application/commands/milo/emarger-session-milo.command.handler'
+import AutoinscrireBeneficiaireSessionMiloCommandHandler from 'src/application/commands/milo/autoinscrire-beneficiaire-session-milo.command.handler'
 import { GetTokenPoleEmploiQueryHandler } from 'src/application/queries/get-token-pole-emploi.query.handler'
 import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
 import { GetCompteursBeneficiaireMiloQueryHandler } from 'src/application/queries/milo/get-compteurs-portefeuille-milo.query.handler.db'
@@ -282,7 +283,7 @@ import { EngagementClient } from './infrastructure/clients/engagement-client'
 import { FirebaseClient } from './infrastructure/clients/firebase-client'
 import { ImmersionClient } from './infrastructure/clients/immersion-client'
 import { InvitationIcsClient } from './infrastructure/clients/invitation-ics.client'
-import { KeycloakClient } from './infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { MailBrevoService } from './infrastructure/clients/mail-brevo.service.db'
 import { MatomoClient } from './infrastructure/clients/matomo-client'
 import { MiloClient } from './infrastructure/clients/milo-client'
@@ -298,7 +299,7 @@ import { ActionSqlRepository } from './infrastructure/repositories/action/action
 import { CommentaireActionSqlRepositoryDb } from './infrastructure/repositories/action/commentaire-action-sql.repository.db'
 import { AgenceSqlRepository } from './infrastructure/repositories/agence-sql.repository.db'
 import { ArchiveJeuneSqlRepository } from './infrastructure/repositories/archive-jeune-sql.repository.db'
-import { AuthentificationSqlRepository } from './infrastructure/repositories/authentification-sql.repository.db'
+import { AuthentificationSqlOidcRepository } from './infrastructure/repositories/authentification-sql.repository.db'
 import { CampagneSqlRepository } from './infrastructure/repositories/campagne-sql.repository.db'
 import { ChatFirebaseRepository } from './infrastructure/repositories/chat-firebase.repository'
 import { ConseillerSqlRepository } from './infrastructure/repositories/conseiller-sql.repository.db'
@@ -454,7 +455,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     WorkerService,
     TaskService,
     InvitationIcsClient,
-    KeycloakClient,
+    OidcClient,
     Context,
     Recherche.Factory,
     Conseiller.ListeDeDiffusion.Factory,
@@ -508,7 +509,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     },
     {
       provide: AuthentificationRepositoryToken,
-      useClass: AuthentificationSqlRepository
+      useClass: AuthentificationSqlOidcRepository
     },
     {
       provide: JeuneMiloRepositoryToken,
@@ -791,7 +792,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetMonSuiviPoleEmploiQueryHandler,
     GetCompteursBeneficiaireMiloQueryHandler,
     GetDemarchesConseillerQueryHandler,
-    GetNotificationsJeuneQueryHandler
+    GetNotificationsJeuneQueryHandler,
+    AutoinscrireBeneficiaireSessionMiloCommandHandler
   ]
 }
 

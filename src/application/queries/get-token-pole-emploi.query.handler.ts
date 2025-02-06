@@ -4,7 +4,7 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { estPoleEmploi } from '../../domain/core'
-import { KeycloakClient } from '../../infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 
 export interface GetTokenPoleEmploiQuery extends Query {
@@ -18,7 +18,7 @@ export class GetTokenPoleEmploiQueryHandler extends QueryHandler<
   Result<string>
 > {
   constructor(
-    private keycloakClient: KeycloakClient,
+    private oidcClient: OidcClient,
     private jeuneAuthorizer: JeuneAuthorizer
   ) {
     super('GetTokenPoleEmploiQueryHandler')
@@ -38,7 +38,7 @@ export class GetTokenPoleEmploiQueryHandler extends QueryHandler<
     query: GetTokenPoleEmploiQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result<string>> {
-    const token = await this.keycloakClient.exchangeTokenJeune(
+    const token = await this.oidcClient.exchangeTokenJeune(
       query.accessToken,
       utilisateur.structure
     )

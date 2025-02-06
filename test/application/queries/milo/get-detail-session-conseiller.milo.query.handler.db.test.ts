@@ -6,7 +6,7 @@ import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/quer
 import { ConseillerMiloSansStructure } from 'src/building-blocks/types/domain-error'
 import { failure, isSuccess, success } from 'src/building-blocks/types/result'
 import { ConseillerMilo } from 'src/domain/milo/conseiller.milo.db'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
 import {
@@ -21,7 +21,7 @@ import { DateTime } from 'luxon'
 
 describe('GetDetailSessionConseillerMiloQueryHandler', () => {
   let getDetailSessionMiloQueryHandler: GetDetailSessionConseillerMiloQueryHandler
-  let keycloakClient: StubbedClass<KeycloakClient>
+  let oidcClient: StubbedClass<OidcClient>
   let conseillerRepository: StubbedType<ConseillerMilo.Repository>
   let sessionRepository: StubbedType<SessionMilo.Repository>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
@@ -35,7 +35,7 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
   beforeEach(async () => {
     await getDatabase().cleanPG()
 
-    keycloakClient = stubClass(KeycloakClient)
+    oidcClient = stubClass(OidcClient)
     conseillerRepository = stubInterface(sandbox)
     sessionRepository = stubInterface(sandbox)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
@@ -46,7 +46,7 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
         conseillerRepository,
         sessionRepository,
         conseillerAuthorizer,
-        keycloakClient,
+        oidcClient,
         dateService
       )
   })
@@ -107,7 +107,7 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
         conseillerRepository.get
           .withArgs(query.idConseiller)
           .resolves(success(unConseillerMilo()))
-        keycloakClient.exchangeTokenConseillerMilo
+        oidcClient.exchangeTokenConseillerMilo
           .withArgs(query.accessToken)
           .resolves(tokenMilo)
       })

@@ -15,7 +15,7 @@ import {
   success
 } from '../../../../building-blocks/types/result'
 import { Demarche } from '../../../../domain/demarche'
-import { KeycloakClient } from '../../../../infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import {
   PoleEmploiPartenaireClient,
   PoleEmploiPartenaireClientToken
@@ -43,7 +43,7 @@ export class GetDemarchesQueryGetter {
     @Inject(PoleEmploiPartenaireClientToken)
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,
     private dateService: DateService,
-    private authClient: KeycloakClient
+    private authClient: OidcClient
   ) {
     this.logger = new Logger('GetDemarchesQueryGetter')
   }

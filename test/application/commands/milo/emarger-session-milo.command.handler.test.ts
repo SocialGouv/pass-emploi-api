@@ -18,7 +18,7 @@ import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from 'test/utils'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { DateService } from 'src/utils/date-service'
 import { uneSessionMilo } from '../../../fixtures/sessions.fixture'
 import {
@@ -31,7 +31,7 @@ describe('EmargerSessionMiloCommandHandler', () => {
   let emargementCommandHandler: EmargerSessionMiloCommandHandler
   let conseillerMiloRepository: StubbedType<Conseiller.Milo.Repository>
   let sessionMiloRepository: StubbedType<SessionMilo.Repository>
-  let keycloakClient: StubbedClass<KeycloakClient>
+  let oidcClient: StubbedClass<OidcClient>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let dateService: StubbedClass<DateService>
   const conseiller = unConseillerMilo()
@@ -40,13 +40,13 @@ describe('EmargerSessionMiloCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     conseillerMiloRepository = stubInterface(sandbox)
     sessionMiloRepository = stubInterface(sandbox)
-    keycloakClient = stubClass(KeycloakClient)
+    oidcClient = stubClass(OidcClient)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     dateService = stubClass(DateService)
     emargementCommandHandler = new EmargerSessionMiloCommandHandler(
       conseillerMiloRepository,
       sessionMiloRepository,
-      keycloakClient,
+      oidcClient,
       dateService,
       conseillerAuthorizer
     )
@@ -85,7 +85,7 @@ describe('EmargerSessionMiloCommandHandler', () => {
         .withArgs(commandSansEmargement.idConseiller)
         .resolves(success(conseiller))
       const erreurHttp = new ErreurHttp('', 404)
-      keycloakClient.exchangeTokenConseillerMilo
+      oidcClient.exchangeTokenConseillerMilo
         .withArgs(commandSansEmargement.accessToken)
         .resolves(idpToken)
       sessionMiloRepository.getForConseiller
@@ -133,7 +133,7 @@ describe('EmargerSessionMiloCommandHandler', () => {
         conseillerMiloRepository.get
           .withArgs(commandSansEmargement.idConseiller)
           .resolves(success(conseiller))
-        keycloakClient.exchangeTokenConseillerMilo
+        oidcClient.exchangeTokenConseillerMilo
           .withArgs(commandSansEmargement.accessToken)
           .resolves(idpToken)
         sessionMiloRepository.getForConseiller

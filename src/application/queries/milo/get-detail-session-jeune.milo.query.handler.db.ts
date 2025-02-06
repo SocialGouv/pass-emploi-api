@@ -20,7 +20,7 @@ import {
 } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { estMilo } from 'src/domain/core'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
@@ -37,7 +37,7 @@ export class GetDetailSessionJeuneMiloQueryHandler extends QueryHandler<
   Result<DetailSessionJeuneMiloQueryModel>
 > {
   constructor(
-    private readonly keycloakClient: KeycloakClient,
+    private readonly oidcClient: OidcClient,
     private readonly miloClient: MiloClient,
     private readonly jeuneAuthorizer: JeuneAuthorizer
   ) {
@@ -60,7 +60,7 @@ export class GetDetailSessionJeuneMiloQueryHandler extends QueryHandler<
       return failure(new JeuneMiloSansIdDossier(query.idJeune))
     }
 
-    const idpToken = await this.keycloakClient.exchangeTokenJeune(
+    const idpToken = await this.oidcClient.exchangeTokenJeune(
       query.accessToken,
       jeune.structure
     )

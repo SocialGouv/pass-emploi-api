@@ -2,7 +2,7 @@ import { DateTime } from 'luxon'
 import { ErreurHttp } from 'src/building-blocks/types/domain-error'
 import { failure, isSuccess, success } from 'src/building-blocks/types/result'
 import { Demarche } from 'src/domain/demarche'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { PoleEmploiPartenaireClient } from 'src/infrastructure/clients/pole-emploi-partenaire-client.db'
 import { DemarcheHttpRepository } from 'src/infrastructure/repositories/demarche-http.repository'
 import { uneDemarcheDto } from 'test/fixtures/demarches-dto.fixtures'
@@ -13,7 +13,7 @@ import { uneDatetime } from '../../fixtures/date.fixture'
 
 describe('DemarcheHttpRepository', () => {
   let demarcheRepository: Demarche.Repository
-  let keycloakClient: StubbedClass<KeycloakClient>
+  let oidcClient: StubbedClass<OidcClient>
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
   const maintenant = DateTime.fromISO('2020-04-06T12:00:00.000Z')
 
@@ -21,12 +21,12 @@ describe('DemarcheHttpRepository', () => {
     const dateService = stubClass(DateService)
     dateService.now.returns(maintenant)
     dateService.nowJs.returns(maintenant.toJSDate())
-    keycloakClient = stubClass(KeycloakClient)
-    keycloakClient.exchangeTokenJeune.resolves('token')
+    oidcClient = stubClass(OidcClient)
+    oidcClient.exchangeTokenJeune.resolves('token')
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
 
     demarcheRepository = new DemarcheHttpRepository(
-      keycloakClient,
+      oidcClient,
       poleEmploiPartenaireClient,
       dateService
     )
@@ -63,7 +63,7 @@ describe('DemarcheHttpRepository', () => {
         )
 
         // Then
-        expect(keycloakClient.exchangeTokenJeune).to.have.been.calledWith(
+        expect(oidcClient.exchangeTokenJeune).to.have.been.calledWith(
           'token',
           Core.Structure.POLE_EMPLOI
         )
@@ -115,7 +115,7 @@ describe('DemarcheHttpRepository', () => {
         )
 
         // Then
-        expect(keycloakClient.exchangeTokenJeune).to.have.been.calledWith(
+        expect(oidcClient.exchangeTokenJeune).to.have.been.calledWith(
           'token',
           Core.Structure.POLE_EMPLOI_BRSA
         )
@@ -199,7 +199,7 @@ describe('DemarcheHttpRepository', () => {
         )
 
         // Then
-        expect(keycloakClient.exchangeTokenJeune).to.have.been.calledWith(
+        expect(oidcClient.exchangeTokenJeune).to.have.been.calledWith(
           'token',
           Core.Structure.POLE_EMPLOI
         )
@@ -252,7 +252,7 @@ describe('DemarcheHttpRepository', () => {
         )
 
         // Then
-        expect(keycloakClient.exchangeTokenJeune).to.have.been.calledWith(
+        expect(oidcClient.exchangeTokenJeune).to.have.been.calledWith(
           'token',
           Core.Structure.POLE_EMPLOI_BRSA
         )

@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import * as nock from 'nock'
-import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { expect } from '../../utils'
 import { testConfig } from '../../utils/module-for-testing'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
@@ -10,8 +10,8 @@ import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { getDatabase } from '../../utils/database-for-testing'
 
-describe('KeycloakClient', () => {
-  let keycloakClient: KeycloakClient
+describe('OidcClient', () => {
+  let oidcClient: OidcClient
   const configService = testConfig()
   const issuerUrl = configService.get('oidc').issuerUrl
   const clientId = configService.get('oidc').clientId
@@ -19,7 +19,7 @@ describe('KeycloakClient', () => {
 
   beforeEach(async () => {
     const httpService = new HttpService()
-    keycloakClient = new KeycloakClient(configService, httpService)
+    oidcClient = new OidcClient(configService, httpService)
   })
 
   describe('deleteUserByIdUser', () => {
@@ -36,7 +36,7 @@ describe('KeycloakClient', () => {
 
       try {
         // When
-        await keycloakClient.deleteUserByIdUser('id')
+        await oidcClient.deleteUserByIdUser('id')
         expect.fail(null, null, 'handle test did not reject with an error')
       } catch (e) {
         // Then
@@ -59,7 +59,7 @@ describe('KeycloakClient', () => {
 
       try {
         // When
-        await keycloakClient.deleteUserByIdUser(idUser)
+        await oidcClient.deleteUserByIdUser(idUser)
         expect.fail(null, null, 'handle test did not reject with an error')
       } catch (e) {
         // Then
@@ -82,7 +82,7 @@ describe('KeycloakClient', () => {
 
       try {
         // When
-        await keycloakClient.deleteUserByIdUser(idUser)
+        await oidcClient.deleteUserByIdUser(idUser)
       } catch (e) {
         // Then
         expect.fail(null, null, 'handle test rejected with an error')
@@ -104,7 +104,7 @@ describe('KeycloakClient', () => {
 
       try {
         // When
-        await keycloakClient.deleteUserByIdUser(idUser)
+        await oidcClient.deleteUserByIdUser(idUser)
       } catch (e) {
         // Then
         expect.fail(null, null, 'handle test rejected with an error')
@@ -122,16 +122,16 @@ describe('KeycloakClient', () => {
         .reply(200, { access_token: token })
 
       const idUser = 'id'
-      const idkeycloak = 'idKc'
+      const idAuth = 'idAuth'
       nock(apiUrl)
         .get(`/users?q=id_user:${idUser}`)
-        .reply(200, [{ id: idkeycloak }])
+        .reply(200, [{ id: idAuth }])
 
-      nock(apiUrl).delete(`/users/${idkeycloak}`).reply(400)
+      nock(apiUrl).delete(`/users/${idAuth}`).reply(400)
 
       try {
         // When
-        await keycloakClient.deleteUserByIdUser(idUser)
+        await oidcClient.deleteUserByIdUser(idUser)
         expect.fail(null, null, 'handle test did not reject with an error')
       } catch (e) {
         // Then
@@ -150,16 +150,16 @@ describe('KeycloakClient', () => {
         .reply(200, { access_token: token })
 
       const idUser = 'id'
-      const idkeycloak = 'idKc'
+      const idAuth = 'idAuth'
       nock(apiUrl)
         .get(`/users?q=id_user:${idUser}`)
-        .reply(200, [{ id: idkeycloak }])
+        .reply(200, [{ id: idAuth }])
 
-      nock(apiUrl).delete(`/users/${idkeycloak}`).reply(404)
+      nock(apiUrl).delete(`/users/${idAuth}`).reply(404)
 
       try {
         // When
-        await keycloakClient.deleteUserByIdUser(idUser)
+        await oidcClient.deleteUserByIdUser(idUser)
       } catch (e) {
         // Then
         expect.fail(null, null, 'handle test rejected with an error')
@@ -177,16 +177,16 @@ describe('KeycloakClient', () => {
         .reply(200, { access_token: token })
 
       const idUser = 'id'
-      const idkeycloak = 'idKc'
+      const idAuth = 'idAuth'
       nock(apiUrl)
         .get(`/users?q=id_user:${idUser}`)
-        .reply(200, [{ id: idkeycloak }])
+        .reply(200, [{ id: idAuth }])
 
-      nock(apiUrl).delete(`/users/${idkeycloak}`).reply(200)
+      nock(apiUrl).delete(`/users/${idAuth}`).reply(200)
 
       try {
         // When
-        await keycloakClient.deleteUserByIdUser(idUser)
+        await oidcClient.deleteUserByIdUser(idUser)
       } catch (e) {
         // Then
         expect.fail(null, null, 'handle test rejected with an error')
@@ -209,7 +209,7 @@ describe('KeycloakClient', () => {
 
       try {
         // When
-        await keycloakClient.deleteAccount(id)
+        await oidcClient.deleteAccount(id)
       } catch (e) {
         // Then
         expect.fail(null, null, 'handle test rejected with an error')
@@ -226,7 +226,7 @@ describe('KeycloakClient', () => {
 
       try {
         // When
-        await keycloakClient.deleteAccount(id)
+        await oidcClient.deleteAccount(id)
       } catch (e) {
         // Then
         expect.fail(null, null, 'handle test rejected with an error')
@@ -238,7 +238,7 @@ describe('KeycloakClient', () => {
 
       try {
         // When
-        await keycloakClient.deleteAccount('idAuth')
+        await oidcClient.deleteAccount('idAuth')
         expect.fail(null, null, 'handle test did not reject with an error')
       } catch (e) {}
     })

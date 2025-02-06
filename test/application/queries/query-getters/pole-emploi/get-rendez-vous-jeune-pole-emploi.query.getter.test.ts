@@ -29,7 +29,7 @@ import { Jeune } from '../../../../../src/domain/jeune/jeune'
 import { DateService } from '../../../../../src/utils/date-service'
 import { IdService } from '../../../../../src/utils/id-service'
 import { PoleEmploiPartenaireClient } from '../../../../../src/infrastructure/clients/pole-emploi-partenaire-client.db'
-import { KeycloakClient } from '../../../../../src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { SinonSandbox } from 'sinon'
 import {
   GetRendezVousJeunePoleEmploiQueryGetter,
@@ -44,7 +44,7 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
   let dateService: StubbedClass<DateService>
   let idService: StubbedClass<IdService>
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
-  let keycloakClient: StubbedClass<KeycloakClient>
+  let oidcClient: StubbedClass<OidcClient>
   let queryGetter: GetRendezVousJeunePoleEmploiQueryGetter
   let sandbox: SinonSandbox
   const idpToken = 'idpToken'
@@ -53,17 +53,17 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
     sandbox = createSandbox()
     jeunesRepository = stubInterface(sandbox)
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
-    keycloakClient = stubClass(KeycloakClient)
+    oidcClient = stubClass(OidcClient)
     dateService = stubClass(DateService)
     idService = stubClass(IdService)
     idService.uuid.returns('random-id')
-    keycloakClient.exchangeTokenJeune.resolves(idpToken)
+    oidcClient.exchangeTokenJeune.resolves(idpToken)
 
     queryGetter = new GetRendezVousJeunePoleEmploiQueryGetter(
       jeunesRepository,
       poleEmploiPartenaireClient,
       idService,
-      keycloakClient
+      oidcClient
     )
   })
 

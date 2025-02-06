@@ -54,7 +54,6 @@ export class ConseillerInterStructureMiloAuthorizer {
 
         if (
           isSuccess(jeuneMilo) &&
-          jeuneMilo.data.idStructureMilo &&
           jeuneMilo.data.idStructureMilo === conseillerMilo.data.structure.id
         ) {
           return emptySuccess()

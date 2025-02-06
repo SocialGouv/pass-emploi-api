@@ -25,6 +25,7 @@ export class ConseillerMiloSqlRepository implements Conseiller.Milo.Repository {
     ) {
       return failure(new ConseillerMiloSansStructure(id))
     }
+
     return success({
       id,
       structure: {

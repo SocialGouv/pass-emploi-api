@@ -8,7 +8,7 @@ import * as APM from 'elastic-apm-node'
 import { DateTime } from 'luxon'
 import { Result, isFailure } from '../../building-blocks/types/result'
 import { StructureConseillerMiloDto } from '../../infrastructure/clients/dto/milo.dto'
-import { KeycloakClient } from '../../infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { MiloClient } from '../../infrastructure/clients/milo-client'
 import { getAPMInstance } from '../../infrastructure/monitoring/apm.init'
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
@@ -52,7 +52,7 @@ export namespace ConseillerMilo {
       @Inject(ConseillerMiloRepositoryToken)
       private conseillerMiloRepository: Conseiller.Milo.Repository,
       private miloClient: MiloClient,
-      private keycloakClient: KeycloakClient,
+      private oidcClient: OidcClient,
       private dateService: DateService
     ) {
       this.logger = new Logger('ConseillerMiloService')
@@ -94,8 +94,9 @@ export namespace ConseillerMilo {
           : true
 
         if (moinsDe30sPasseesDepuisConnexion || passees24hDepuisVerification) {
-          const idpToken =
-            await this.keycloakClient.exchangeTokenConseillerMilo(accessToken)
+          const idpToken = await this.oidcClient.exchangeTokenConseillerMilo(
+            accessToken
+          )
           const resultStructureMiloConseiller =
             await this.miloClient.getStructureConseiller(idpToken)
 

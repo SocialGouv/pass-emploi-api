@@ -1,7 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DateTime } from 'luxon'
 import { describe } from 'mocha'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { DateService } from 'src/utils/date-service'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import {
@@ -33,7 +33,7 @@ describe('GetSuiviSemainePoleEmploiQueryHandler', () => {
   let getDemarchesQueryGetter: StubbedClass<GetDemarchesQueryGetter>
   let getRendezVousJeunePoleEmploiQueryGetter: StubbedClass<GetRendezVousJeunePoleEmploiQueryGetter>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
-  let keycloakClient: StubbedClass<KeycloakClient>
+  let oidcClient: StubbedClass<OidcClient>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let dateService: StubbedClass<DateService>
   const idpToken = 'id-token'
@@ -48,8 +48,8 @@ describe('GetSuiviSemainePoleEmploiQueryHandler', () => {
     )
     jeuneRepository = stubInterface(sandbox)
     jeuneRepository.get.resolves(jeune)
-    keycloakClient = stubClass(KeycloakClient)
-    keycloakClient.exchangeTokenJeune.resolves(idpToken)
+    oidcClient = stubClass(OidcClient)
+    oidcClient.exchangeTokenJeune.resolves(idpToken)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
 
     dateService = stubClass(DateService)
@@ -60,7 +60,7 @@ describe('GetSuiviSemainePoleEmploiQueryHandler', () => {
       getDemarchesQueryGetter,
       getRendezVousJeunePoleEmploiQueryGetter,
       jeuneAuthorizer,
-      keycloakClient,
+      oidcClient,
       dateService
     )
   })

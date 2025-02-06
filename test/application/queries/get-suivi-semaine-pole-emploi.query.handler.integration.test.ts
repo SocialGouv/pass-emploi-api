@@ -4,7 +4,7 @@ import { describe } from 'mocha'
 import { createSandbox, SinonSandbox } from 'sinon'
 import { Authentification } from 'src/domain/authentification'
 import { Jeune } from 'src/domain/jeune/jeune'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { PoleEmploiPartenaireClient } from 'src/infrastructure/clients/pole-emploi-partenaire-client.db'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
@@ -30,7 +30,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
   let idService: StubbedClass<IdService>
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
   let getDemarchesQueryGetter: GetDemarchesQueryGetter
-  let keycloakClient: StubbedClass<KeycloakClient>
+  let oidcClient: StubbedClass<OidcClient>
   const idpToken = 'idpToken'
   const maintenant = DateTime.fromISO('2022-05-09T10:11:00+02:00', {
     setZone: true
@@ -57,14 +57,14 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
     idService = stubClass(IdService)
     idService.uuid.returns('random-id')
 
-    keycloakClient = stubClass(KeycloakClient)
-    keycloakClient.exchangeTokenJeune.resolves(idpToken)
+    oidcClient = stubClass(OidcClient)
+    oidcClient.exchangeTokenJeune.resolves(idpToken)
 
     getDemarchesQueryGetter = new GetDemarchesQueryGetter(
       authRepository,
       poleEmploiPartenaireClient,
       dateService,
-      keycloakClient
+      oidcClient
     )
 
     getRendezVousJeunePoleEmploiQueryGetter =
@@ -72,7 +72,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
         jeunesRepository,
         poleEmploiPartenaireClient,
         idService,
-        keycloakClient
+        oidcClient
       )
 
     handler = new GetSuiviSemainePoleEmploiQueryHandler(
@@ -80,7 +80,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
       getDemarchesQueryGetter,
       getRendezVousJeunePoleEmploiQueryGetter,
       jeuneAuthorizer,
-      keycloakClient,
+      oidcClient,
       dateService
     )
   })
@@ -101,7 +101,7 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
       await handler.handle(query)
 
       // Then
-      expect(keycloakClient.exchangeTokenJeune).to.have.callCount(1)
+      expect(oidcClient.exchangeTokenJeune).to.have.callCount(1)
     })
   })
 })

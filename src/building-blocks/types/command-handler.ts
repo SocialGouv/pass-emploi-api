@@ -63,6 +63,7 @@ export abstract class CommandHandler<C, R, A = void> {
     }
   }
 
+  // FIXME return Result
   async getAggregate(
     _command?: C,
     _utilisateur?: Authentification.Utilisateur

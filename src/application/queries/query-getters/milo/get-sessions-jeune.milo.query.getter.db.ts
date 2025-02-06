@@ -9,7 +9,7 @@ import {
   MILO_PRESENT,
   SessionParDossierJeuneDto
 } from 'src/infrastructure/clients/dto/milo.dto'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
@@ -20,7 +20,7 @@ export class GetSessionsJeuneMiloQueryGetter {
   private readonly logger: Logger
 
   constructor(
-    private readonly keycloakClient: KeycloakClient,
+    private readonly oidcClient: OidcClient,
     private readonly miloClient: MiloClient
   ) {
     this.logger = new Logger('GetSessionsJeuneMiloQueryGetter')
@@ -103,7 +103,7 @@ export class GetSessionsJeuneMiloQueryGetter {
     idPartenaire: string,
     periode?: { debut?: DateTime; fin?: DateTime }
   ): Promise<Result<SessionParDossierJeuneDto[]>> {
-    const idpToken = await this.keycloakClient.exchangeTokenJeune(
+    const idpToken = await this.oidcClient.exchangeTokenJeune(
       accessToken,
       Core.Structure.MILO
     )
@@ -120,7 +120,7 @@ export class GetSessionsJeuneMiloQueryGetter {
     idPartenaire: string,
     periode?: { debut?: DateTime; fin?: DateTime }
   ): Promise<Result<SessionParDossierJeuneDto[]>> {
-    const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
+    const idpToken = await this.oidcClient.exchangeTokenConseillerMilo(
       accessToken
     )
 

@@ -9,7 +9,7 @@ import {
   JeuneMiloSansStructure
 } from 'src/building-blocks/types/domain-error'
 import { failure, success } from 'src/building-blocks/types/result'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { unUtilisateurJeune } from 'test/fixtures/authentification.fixture'
@@ -36,7 +36,7 @@ describe('GetDetailSessionJeuneMiloQueryHandler', () => {
   const utilisateur = unUtilisateurJeune()
 
   let getDetailSessionQueryHandler: GetDetailSessionJeuneMiloQueryHandler
-  let keycloakClient: StubbedClass<KeycloakClient>
+  let oidcClient: StubbedClass<OidcClient>
   let miloClient: StubbedClass<MiloClient>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let sandbox: SinonSandbox
@@ -46,11 +46,11 @@ describe('GetDetailSessionJeuneMiloQueryHandler', () => {
   })
 
   beforeEach(async () => {
-    keycloakClient = stubClass(KeycloakClient)
+    oidcClient = stubClass(OidcClient)
     miloClient = stubClass(MiloClient)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     getDetailSessionQueryHandler = new GetDetailSessionJeuneMiloQueryHandler(
-      keycloakClient,
+      oidcClient,
       miloClient,
       jeuneAuthorizer
     )
@@ -136,7 +136,7 @@ describe('GetDetailSessionJeuneMiloQueryHandler', () => {
             idStructureMilo: 'paris'
           })
         )
-        keycloakClient.exchangeTokenJeune
+        oidcClient.exchangeTokenJeune
           .withArgs(query.accessToken, jeune.structure)
           .resolves(idpToken)
       })

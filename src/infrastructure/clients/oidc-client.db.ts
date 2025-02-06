@@ -15,7 +15,7 @@ import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 
 @Injectable()
-export class KeycloakClient {
+export class OidcClient {
   private logger: Logger
   private issuerUrl: string
   private clientId: string
@@ -25,16 +25,18 @@ export class KeycloakClient {
     private configService: ConfigService,
     private httpService: HttpService
   ) {
-    this.logger = new Logger('KeycloakClient')
+    this.logger = new Logger('OidcClient')
     this.issuerUrl = this.configService.get('oidc').issuerUrl
     this.clientId = this.configService.get('oidc').clientId
     this.clientSecret = this.configService.get('oidc').clientSecret
   }
 
+  // FIXME remove
   public async exchangeTokenConseillerMilo(bearer: string): Promise<string> {
     return this.exchangeToken(bearer, Core.Structure.MILO)
   }
 
+  // FIXME remove
   public async exchangeTokenJeune(
     bearer: string,
     structure: Core.Structure
@@ -42,6 +44,7 @@ export class KeycloakClient {
     return this.exchangeToken(bearer, structure)
   }
 
+  // FIXME remove
   public async exchangeTokenConseillerJeune(
     bearer: string,
     subJeune: string
@@ -49,30 +52,27 @@ export class KeycloakClient {
     return this.exchangeToken(bearer, undefined, subJeune)
   }
 
-  private async exchangeToken(
+  async exchangeToken(
     bearer: string,
     structure?: Core.Structure,
     requestedTokenSub?: string
   ): Promise<string> {
     const url = `${this.issuerUrl}/protocol/openid-connect/token`
-    const payload = {
+    const query = new URLSearchParams({
       subject_token: bearer,
       subject_token_type: 'urn:ietf:params:oauth:token-type:access_token',
       grant_type: 'urn:ietf:params:oauth:grant-type:token-exchange',
       client_id: this.clientId,
       client_secret: this.clientSecret
-    }
+    })
     if (requestedTokenSub) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      payload.requested_token_sub = requestedTokenSub
+      query.append('requested_token_sub', 'requestedTokenSub')
     }
     const headers = { 'Content-Type': 'application/x-www-form-urlencoded' }
+
     try {
       const result: TokenExchangeResponse = (
-        await firstValueFrom(
-          this.httpService.post(url, new URLSearchParams(payload), { headers })
-        )
+        await firstValueFrom(this.httpService.post(url, query, { headers }))
       ).data
       this.logger.log({
         message: 'Token exchange success',
@@ -121,15 +121,15 @@ export class KeycloakClient {
         })
       )
 
-      const userIdKeycloak = reponseGet.data[0]?.id
+      const userIdAuth = reponseGet.data[0]?.id
 
-      if (userIdKeycloak) {
+      if (userIdAuth) {
         await firstValueFrom(
-          this.httpService.delete(`${url}/${userIdKeycloak}`, { headers })
+          this.httpService.delete(`${url}/${userIdAuth}`, { headers })
         )
         this.logger.log(`utilisateur ${idUserCEJ} supprimé`)
       } else {
-        this.logger.log(`utilisateur ${idUserCEJ} n'existe pas dans keycloak`)
+        this.logger.log(`utilisateur ${idUserCEJ} n'existe pas`)
       }
     } catch (e) {
       this.logger.error(
@@ -143,6 +143,7 @@ export class KeycloakClient {
       }
     }
   }
+
   public async deleteAccount(idUser: string): Promise<void> {
     const apiKey = this.configService.get('oidc.apiKey')
     const url = `${this.configService.get('oidc').issuerApiUrl}/accounts`

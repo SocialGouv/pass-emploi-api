@@ -5,29 +5,29 @@ import { Core, estPoleEmploi } from '../../../src/domain/core'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { StubbedClass, expect, stubClass } from '../../utils'
 import { GetCatalogueDemarchesQueryHandler } from 'src/application/queries/get-catalogue-demarches.query.handler'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { success } from 'src/building-blocks/types/result'
 
 describe('GetCatalogueQueryHandler', () => {
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
-  let keycloakClient: StubbedClass<KeycloakClient>
+  let oidcClient: StubbedClass<OidcClient>
   let handler: GetCatalogueDemarchesQueryHandler
 
   beforeEach(() => {
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
-    keycloakClient = stubClass(KeycloakClient)
+    oidcClient = stubClass(OidcClient)
     handler = new GetCatalogueDemarchesQueryHandler(
       poleEmploiPartenaireClient,
       jeuneAuthorizer,
-      keycloakClient
+      oidcClient
     )
   })
 
   describe('handle', () => {
     beforeEach(() => {
-      keycloakClient.exchangeTokenJeune
+      oidcClient.exchangeTokenJeune
         .withArgs('token', Core.Structure.POLE_EMPLOI)
         .resolves('idpToken')
     })

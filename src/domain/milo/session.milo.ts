@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import {
   EmargementIncorrect,
-  MaxInscritsDepasse
+  NombrePlacesInsuffisant
 } from 'src/building-blocks/types/domain-error'
 import {
   Result,
@@ -10,7 +10,6 @@ import {
   isFailure,
   success
 } from 'src/building-blocks/types/result'
-import { ConseillerMilo } from './conseiller.milo.db'
 
 export const SessionMiloRepositoryToken = 'SessionMilo.Repository'
 
@@ -32,6 +31,11 @@ export interface SessionMilo {
   dateModification?: DateTime
   dateCloture?: DateTime
 }
+
+export type SessionMiloAllegee = Pick<
+  SessionMilo,
+  'id' | 'nom' | 'nbPlacesDisponibles'
+>
 
 export interface InstanceSessionMilo {
   id: string
@@ -170,22 +174,40 @@ export namespace SessionMilo {
       : SessionMilo.Statut.A_CLOTURER
   }
 
+  export function peutInscrireBeneficiaire({
+    nbPlacesDisponibles
+  }: Pick<SessionMilo, 'nbPlacesDisponibles'>): Result {
+    if (nbPlacesDisponibles === 0) return failure(new NombrePlacesInsuffisant())
+    return emptySuccess()
+  }
+
   export interface Repository {
     findInstanceSession(
       idInstance: string,
       idDossier: string
     ): Promise<InstanceSessionMilo | undefined>
 
+    getForBeneficiaire(
+      idSession: string,
+      tokenMiloBeneficiaire: string
+    ): Promise<Result<SessionMiloAllegee>>
+
     getForConseiller(
       idSession: string,
-      structureConseiller: ConseillerMilo.Structure,
-      tokenMilo: string
+      structureConseiller: StructureMilo,
+      tokenMiloConseiller: string
     ): Promise<Result<SessionMilo>>
 
     save(
       sessionSansInscriptions: Omit<SessionMilo, 'inscriptions'>,
       inscriptionsATraiter: InscriptionsATraiter,
       tokenMilo: string
+    ): Promise<Result>
+
+    inscrireBeneficiaire(
+      idSession: string,
+      idDossier: string,
+      tokenMiloConseiller: string
     ): Promise<Result>
   }
 
@@ -237,6 +259,8 @@ export namespace SessionMilo {
       DESINSCRIT = 'DESINSCRIT'
     }
   }
+
+  export type StructureMilo = { id: string; timezone: string }
 }
 
 function trierInscriptionsATraiter(
@@ -340,7 +364,7 @@ function verifierNombrePlaces(
   const nbPlacesLiberees = aDesinscrire.length + aRefuser.length
 
   if (session.nbPlacesDisponibles < nbPlacesPrises - nbPlacesLiberees) {
-    return failure(new MaxInscritsDepasse())
+    return failure(new NombrePlacesInsuffisant())
   }
   return emptySuccess()
 }
