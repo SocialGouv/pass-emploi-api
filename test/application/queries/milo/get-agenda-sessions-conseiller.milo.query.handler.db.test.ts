@@ -15,7 +15,7 @@ import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
 import { unDetailSessionConseillerDto } from 'test/fixtures/milo-dto.fixture'
 import { expect, StubbedClass, stubClass } from 'test/utils'
 import { SessionConseillerDetailDto } from '../../../../src/infrastructure/clients/dto/milo.dto'
-import { KeycloakClient } from '../../../../src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { MiloClient } from '../../../../src/infrastructure/clients/milo-client'
 import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
@@ -30,7 +30,7 @@ describe('GetAgendaSessionsConseillerMiloQueryHandler', () => {
   let conseillerRepository: StubbedType<ConseillerMilo.Repository>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let miloClient: StubbedClass<MiloClient>
-  let keycloakClient: StubbedClass<KeycloakClient>
+  let oidcClient: StubbedClass<OidcClient>
   let sandbox: SinonSandbox
 
   before(async () => {
@@ -41,11 +41,11 @@ describe('GetAgendaSessionsConseillerMiloQueryHandler', () => {
     conseillerRepository = stubInterface(sandbox)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     miloClient = stubClass(MiloClient)
-    keycloakClient = stubClass(KeycloakClient)
+    oidcClient = stubClass(OidcClient)
     getAgendaSessionsQueryHandler =
       new GetAgendaSessionsConseillerMiloQueryHandler(
         miloClient,
-        keycloakClient,
+        oidcClient,
         conseillerRepository,
         conseillerAuthorizer,
         testConfig()
@@ -125,7 +125,7 @@ describe('GetAgendaSessionsConseillerMiloQueryHandler', () => {
           .withArgs(query.idConseiller)
           .resolves(success(conseiller))
 
-        keycloakClient.exchangeTokenConseillerMilo
+        oidcClient.exchangeTokenConseillerMilo
           .withArgs(query.accessToken)
           .resolves('idpToken')
       })

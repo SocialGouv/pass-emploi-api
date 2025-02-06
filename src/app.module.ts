@@ -283,7 +283,7 @@ import { EngagementClient } from './infrastructure/clients/engagement-client'
 import { FirebaseClient } from './infrastructure/clients/firebase-client'
 import { ImmersionClient } from './infrastructure/clients/immersion-client'
 import { InvitationIcsClient } from './infrastructure/clients/invitation-ics.client'
-import { KeycloakClient } from './infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { MailBrevoService } from './infrastructure/clients/mail-brevo.service.db'
 import { MatomoClient } from './infrastructure/clients/matomo-client'
 import { MiloClient } from './infrastructure/clients/milo-client'
@@ -299,7 +299,7 @@ import { ActionSqlRepository } from './infrastructure/repositories/action/action
 import { CommentaireActionSqlRepositoryDb } from './infrastructure/repositories/action/commentaire-action-sql.repository.db'
 import { AgenceSqlRepository } from './infrastructure/repositories/agence-sql.repository.db'
 import { ArchiveJeuneSqlRepository } from './infrastructure/repositories/archive-jeune-sql.repository.db'
-import { AuthentificationSqlKeycloakRepository } from './infrastructure/repositories/authentification-sql.repository.db'
+import { AuthentificationSqlOidcRepository } from './infrastructure/repositories/authentification-sql.repository.db'
 import { CampagneSqlRepository } from './infrastructure/repositories/campagne-sql.repository.db'
 import { ChatFirebaseRepository } from './infrastructure/repositories/chat-firebase.repository'
 import { ConseillerSqlRepository } from './infrastructure/repositories/conseiller-sql.repository.db'
@@ -455,7 +455,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     WorkerService,
     TaskService,
     InvitationIcsClient,
-    KeycloakClient,
+    OidcClient,
     Context,
     Recherche.Factory,
     Conseiller.ListeDeDiffusion.Factory,
@@ -509,7 +509,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     },
     {
       provide: AuthentificationRepositoryToken,
-      useClass: AuthentificationSqlKeycloakRepository
+      useClass: AuthentificationSqlOidcRepository
     },
     {
       provide: JeuneMiloRepositoryToken,

@@ -6,7 +6,7 @@ import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { Conseiller } from '../../../src/domain/milo/conseiller'
 import { Core } from '../../../src/domain/core'
-import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { MiloClient } from '../../../src/infrastructure/clients/milo-client'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { StructureMiloSqlModel } from '../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
@@ -25,20 +25,20 @@ describe('Conseiller.Milo', () => {
     let conseillerMiloService: Conseiller.Milo.Service
     let conseillerMiloRepository: StubbedType<Conseiller.Milo.Repository>
     let miloClient: StubbedClass<MiloClient>
-    let keycloakClient: StubbedClass<KeycloakClient>
+    let oidcClient: StubbedClass<OidcClient>
     let dateService: StubbedClass<DateService>
 
     beforeEach(() => {
       const sandbox = createSandbox()
       conseillerMiloRepository = stubInterface(sandbox)
       miloClient = stubClass(MiloClient)
-      keycloakClient = stubClass(KeycloakClient)
+      oidcClient = stubClass(OidcClient)
       dateService = stubClass(DateService)
       dateService.now.returns(maintenant)
       conseillerMiloService = new Conseiller.Milo.Service(
         conseillerMiloRepository,
         miloClient,
-        keycloakClient,
+        oidcClient,
         dateService
       )
     })
@@ -60,7 +60,7 @@ describe('Conseiller.Milo', () => {
               structure: Core.Structure.MILO
             })
           )
-          keycloakClient.exchangeTokenConseillerMilo.withArgs(token).rejects(
+          oidcClient.exchangeTokenConseillerMilo.withArgs(token).rejects(
             new UnauthorizedException({
               statusCode: 401,
               code: 'Unauthorized',
@@ -115,7 +115,7 @@ describe('Conseiller.Milo', () => {
               structure: Core.Structure.MILO
             })
           )
-          keycloakClient.exchangeTokenConseillerMilo
+          oidcClient.exchangeTokenConseillerMilo
             .withArgs(token)
             .resolves(idpToken)
           miloClient.getStructureConseiller
@@ -183,7 +183,7 @@ describe('Conseiller.Milo', () => {
             })
           )
 
-          keycloakClient.exchangeTokenConseillerMilo
+          oidcClient.exchangeTokenConseillerMilo
             .withArgs(token)
             .resolves(idpToken)
           miloClient.getStructureConseiller
@@ -225,7 +225,7 @@ describe('Conseiller.Milo', () => {
           )
           const token = 'tok'
           const idpToken = 'idpTok'
-          keycloakClient.exchangeTokenConseillerMilo
+          oidcClient.exchangeTokenConseillerMilo
             .withArgs(token)
             .resolves(idpToken)
 
@@ -285,7 +285,7 @@ describe('Conseiller.Milo', () => {
           )
           const token = 'tok'
           const idpToken = 'idpTok'
-          keycloakClient.exchangeTokenConseillerMilo
+          oidcClient.exchangeTokenConseillerMilo
             .withArgs(token)
             .resolves(idpToken)
 
@@ -336,7 +336,7 @@ describe('Conseiller.Milo', () => {
             })
           )
 
-          keycloakClient.exchangeTokenConseillerMilo
+          oidcClient.exchangeTokenConseillerMilo
             .withArgs(token)
             .resolves(idpToken)
           miloClient.getStructureConseiller
@@ -383,7 +383,7 @@ describe('Conseiller.Milo', () => {
             })
           )
 
-          keycloakClient.exchangeTokenConseillerMilo
+          oidcClient.exchangeTokenConseillerMilo
             .withArgs(token)
             .resolves(idpToken)
           miloClient.getStructureConseiller
@@ -428,7 +428,7 @@ describe('Conseiller.Milo', () => {
             })
           )
 
-          keycloakClient.exchangeTokenConseillerMilo
+          oidcClient.exchangeTokenConseillerMilo
             .withArgs(token)
             .resolves(idpToken)
           miloClient.getStructureConseiller
@@ -471,7 +471,7 @@ describe('Conseiller.Milo', () => {
               idStructureMilo
             })
           )
-          keycloakClient.exchangeTokenConseillerMilo
+          oidcClient.exchangeTokenConseillerMilo
             .withArgs(token)
             .resolves(idpToken)
 
@@ -522,7 +522,7 @@ describe('Conseiller.Milo', () => {
               idStructureMilo
             })
           )
-          keycloakClient.exchangeTokenConseillerMilo
+          oidcClient.exchangeTokenConseillerMilo
             .withArgs(token)
             .resolves(idpToken)
 
@@ -589,7 +589,7 @@ describe('Conseiller.Milo', () => {
               idAgence: idStructureMilo
             })
           )
-          keycloakClient.exchangeTokenConseillerMilo
+          oidcClient.exchangeTokenConseillerMilo
             .withArgs(token)
             .resolves(idpToken)
 
@@ -638,7 +638,7 @@ describe('Conseiller.Milo', () => {
               idStructureMilo
             })
           )
-          keycloakClient.exchangeTokenConseillerMilo
+          oidcClient.exchangeTokenConseillerMilo
             .withArgs(token)
             .resolves(idpToken)
 
@@ -688,7 +688,7 @@ describe('Conseiller.Milo', () => {
               idStructureMilo
             })
           )
-          keycloakClient.exchangeTokenConseillerMilo
+          oidcClient.exchangeTokenConseillerMilo
             .withArgs(token)
             .resolves(idpToken)
 

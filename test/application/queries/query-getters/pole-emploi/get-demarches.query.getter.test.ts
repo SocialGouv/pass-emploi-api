@@ -25,7 +25,7 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { PoleEmploiPartenaireClient } from '../../../../../src/infrastructure/clients/pole-emploi-partenaire-client.db'
 import { DateService } from '../../../../../src/utils/date-service'
 import { DateTime } from 'luxon'
-import { KeycloakClient } from '../../../../../src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { SinonSandbox } from 'sinon'
 import { GetDemarchesQueryGetter } from '../../../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { failureApi } from '../../../../../src/building-blocks/types/result-api'
@@ -38,7 +38,7 @@ describe('GetDemarchesQueryGetter', () => {
   let dateService: StubbedClass<DateService>
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
   let getDemarchesQueryGetter: GetDemarchesQueryGetter
-  let keycloakClient: StubbedClass<KeycloakClient>
+  let oidcClient: StubbedClass<OidcClient>
   let sandbox: SinonSandbox
   const idpToken = 'idpToken'
   const maintenant = DateTime.fromISO('2022-05-09T10:11:00+02:00', {
@@ -51,14 +51,14 @@ describe('GetDemarchesQueryGetter', () => {
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
     dateService = stubClass(DateService)
     dateService.now.returns(maintenant)
-    keycloakClient = stubClass(KeycloakClient)
-    keycloakClient.exchangeTokenJeune.resolves(idpToken)
+    oidcClient = stubClass(OidcClient)
+    oidcClient.exchangeTokenJeune.resolves(idpToken)
 
     getDemarchesQueryGetter = new GetDemarchesQueryGetter(
       authRepository,
       poleEmploiPartenaireClient,
       dateService,
-      keycloakClient
+      oidcClient
     )
   })
 
@@ -305,7 +305,7 @@ describe('GetDemarchesQueryGetter', () => {
           pourConseiller: true
         }
         authRepository.getJeuneById.withArgs(query.idJeune).resolves(jeune)
-        keycloakClient.exchangeTokenConseillerJeune
+        oidcClient.exchangeTokenConseillerJeune
           .withArgs(query.accessToken, jeune.idAuthentification!)
           .resolves(idpToken)
         poleEmploiPartenaireClient.getDemarches
@@ -344,7 +344,7 @@ describe('GetDemarchesQueryGetter', () => {
           pourConseiller: true
         }
         authRepository.getJeuneById.withArgs(query.idJeune).resolves(jeune)
-        keycloakClient.exchangeTokenConseillerJeune
+        oidcClient.exchangeTokenConseillerJeune
           .withArgs(query.accessToken, jeune.idAuthentification!)
           .rejects(new Error())
         poleEmploiPartenaireClient.getDemarchesEnCache

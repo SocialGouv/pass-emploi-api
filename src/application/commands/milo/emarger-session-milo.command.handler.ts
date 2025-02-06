@@ -15,7 +15,7 @@ import {
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { ConseillerMiloRepositoryToken } from '../../../domain/milo/conseiller.milo.db'
 import { Conseiller } from '../../../domain/milo/conseiller'
-import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { DateService } from 'src/utils/date-service'
 
 export interface EmargerSessionMiloCommand extends Command {
@@ -35,7 +35,7 @@ export class EmargerSessionMiloCommandHandler extends CommandHandler<
     private conseillerMiloRepository: Conseiller.Milo.Repository,
     @Inject(SessionMiloRepositoryToken)
     private sessionMiloRepository: SessionMilo.Repository,
-    private keycloakClient: KeycloakClient,
+    private oidcClient: OidcClient,
     private dateService: DateService,
     private conseillerAuthorizer: ConseillerAuthorizer
   ) {
@@ -49,7 +49,7 @@ export class EmargerSessionMiloCommandHandler extends CommandHandler<
     if (isFailure(conseillerMiloResult)) return conseillerMiloResult
     const { structure: structureConseiller } = conseillerMiloResult.data
 
-    const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
+    const idpToken = await this.oidcClient.exchangeTokenConseillerMilo(
       command.accessToken
     )
 

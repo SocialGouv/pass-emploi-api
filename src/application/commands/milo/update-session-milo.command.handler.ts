@@ -14,7 +14,7 @@ import {
   SessionMilo,
   SessionMiloRepositoryToken
 } from 'src/domain/milo/session.milo'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import { Notification } from '../../../domain/notification/notification'
 import { DateService } from '../../../utils/date-service'
@@ -43,7 +43,7 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
     private sessionMiloRepository: SessionMilo.Repository,
     @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
-    private keycloakClient: KeycloakClient,
+    private oidcClient: OidcClient,
     private dateService: DateService,
     private conseillerAuthorizer: ConseillerAuthorizer,
     private notificationService: Notification.Service,
@@ -64,7 +64,7 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
     }
     const { structure: structureConseiller } = conseillerMiloResult.data
 
-    const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
+    const idpToken = await this.oidcClient.exchangeTokenConseillerMilo(
       command.accessToken
     )
 

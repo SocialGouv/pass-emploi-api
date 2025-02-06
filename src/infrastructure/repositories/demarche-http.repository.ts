@@ -3,7 +3,7 @@ import { fromDemarcheDtoToDemarche } from '../../application/queries/query-mappe
 import { isSuccess, Result, success } from '../../building-blocks/types/result'
 import { Demarche } from '../../domain/demarche'
 import { DateService } from '../../utils/date-service'
-import { KeycloakClient } from '../clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import {
   PoleEmploiPartenaireClient,
   PoleEmploiPartenaireClientToken
@@ -13,7 +13,7 @@ import { Core } from '../../domain/core'
 @Injectable()
 export class DemarcheHttpRepository implements Demarche.Repository {
   constructor(
-    private keycloakClient: KeycloakClient,
+    private oidcClient: OidcClient,
     @Inject(PoleEmploiPartenaireClientToken)
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,
     private dateService: DateService
@@ -24,7 +24,7 @@ export class DemarcheHttpRepository implements Demarche.Repository {
     accessToken: string,
     structure: Core.Structure
   ): Promise<Result<Demarche>> {
-    const token = await this.keycloakClient.exchangeTokenJeune(
+    const token = await this.oidcClient.exchangeTokenJeune(
       accessToken,
       structure
     )
@@ -45,7 +45,7 @@ export class DemarcheHttpRepository implements Demarche.Repository {
     accessToken: string,
     structure: Core.Structure
   ): Promise<Result<Demarche>> {
-    const token = await this.keycloakClient.exchangeTokenJeune(
+    const token = await this.oidcClient.exchangeTokenJeune(
       accessToken,
       structure
     )

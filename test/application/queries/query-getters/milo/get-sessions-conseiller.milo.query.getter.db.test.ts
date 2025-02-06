@@ -1,7 +1,7 @@
 import { describe } from 'mocha'
 import { createSandbox, SinonSandbox } from 'sinon'
 import { isSuccess, success } from 'src/building-blocks/types/result'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
 import {
@@ -31,7 +31,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
 
   let getSessionsQueryGetter: GetSessionsConseillerMiloQueryGetter
   let miloClient: StubbedClass<MiloClient>
-  let keycloakClient: StubbedClass<KeycloakClient>
+  let oidcClient: StubbedClass<OidcClient>
   let dateService: StubbedClass<DateService>
   let sandbox: SinonSandbox
 
@@ -41,11 +41,11 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
 
   beforeEach(async () => {
     miloClient = stubClass(MiloClient)
-    keycloakClient = stubClass(KeycloakClient)
+    oidcClient = stubClass(OidcClient)
     dateService = stubClass(DateService)
     dateService.now.returns(maintenantEn2023)
     getSessionsQueryGetter = new GetSessionsConseillerMiloQueryGetter(
-      keycloakClient,
+      oidcClient,
       miloClient,
       dateService
     )
@@ -93,7 +93,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
           idStructureMilo: conseiller.structure.id,
           dateModification: DateTime.now().toJSDate()
         })
-        keycloakClient.exchangeTokenConseillerMilo
+        oidcClient.exchangeTokenConseillerMilo
           .withArgs(query.accessToken)
           .resolves(idpToken)
       })

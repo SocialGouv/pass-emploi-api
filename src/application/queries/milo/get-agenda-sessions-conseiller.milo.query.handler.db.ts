@@ -14,7 +14,7 @@ import {
   MILO_PRESENT,
   SessionConseillerDetailDto
 } from '../../../infrastructure/clients/dto/milo.dto'
-import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { MiloClient } from '../../../infrastructure/clients/milo-client'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
@@ -42,7 +42,7 @@ export class GetAgendaSessionsConseillerMiloQueryHandler extends QueryHandler<
 > {
   constructor(
     private miloClient: MiloClient,
-    private keycloakClient: KeycloakClient,
+    private oidcClient: OidcClient,
     @Inject(ConseillerMiloRepositoryToken)
     private conseillerMiloRepository: Conseiller.Milo.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer,
@@ -66,7 +66,7 @@ export class GetAgendaSessionsConseillerMiloQueryHandler extends QueryHandler<
       return success([])
     }
 
-    const idpToken = await this.keycloakClient.exchangeTokenConseillerMilo(
+    const idpToken = await this.oidcClient.exchangeTokenConseillerMilo(
       query.accessToken
     )
 

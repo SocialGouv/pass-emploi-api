@@ -2,7 +2,7 @@ import { describe } from 'mocha'
 import { createSandbox, SinonSandbox } from 'sinon'
 import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { success } from 'src/building-blocks/types/result'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { unJeune } from 'test/fixtures/jeune.fixture'
@@ -24,7 +24,7 @@ import { MILO_INSCRIT } from '../../../../../src/infrastructure/clients/dto/milo
 
 describe('GetSessionsJeuneMiloQueryGetter', () => {
   let getSessionsQueryGetter: GetSessionsJeuneMiloQueryGetter
-  let keycloakClient: StubbedClass<KeycloakClient>
+  let oidcClient: StubbedClass<OidcClient>
   let miloClient: StubbedClass<MiloClient>
   let sandbox: SinonSandbox
 
@@ -33,10 +33,10 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
   })
 
   beforeEach(async () => {
-    keycloakClient = stubClass(KeycloakClient)
+    oidcClient = stubClass(OidcClient)
     miloClient = stubClass(MiloClient)
     getSessionsQueryGetter = new GetSessionsJeuneMiloQueryGetter(
-      keycloakClient,
+      oidcClient,
       miloClient
     )
   })
@@ -106,7 +106,7 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
     describe("quand c'est un conseiller", () => {
       it('récupère les sessions du jeune pour un conseiller', async () => {
         //Given
-        keycloakClient.exchangeTokenConseillerMilo
+        oidcClient.exchangeTokenConseillerMilo
           .withArgs(accessToken)
           .resolves(idpToken)
         miloClient.getSessionsParDossierJeunePourConseiller
@@ -124,7 +124,7 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
         // Then
         expect(result).to.deep.equal(success([]))
         expect(
-          keycloakClient.exchangeTokenConseillerMilo
+          oidcClient.exchangeTokenConseillerMilo
         ).to.have.been.calledOnceWithExactly(accessToken)
       })
     })
@@ -146,16 +146,14 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
 
         // Then
         expect(result).to.deep.equal(success([]))
-        expect(keycloakClient.exchangeTokenJeune).not.to.have.been.called()
+        expect(oidcClient.exchangeTokenJeune).not.to.have.been.called()
       })
     })
 
     describe('quand filtreEstInscrit false', () => {
       it('renvoie les sessions visible avec jeune non inscrit', async () => {
         //Given
-        keycloakClient.exchangeTokenJeune
-          .withArgs(accessToken)
-          .resolves(idpToken)
+        oidcClient.exchangeTokenJeune.withArgs(accessToken).resolves(idpToken)
         miloClient.getSessionsParDossierJeune
           .withArgs(idpToken, jeuneParis.idPartenaire)
           .resolves(
@@ -195,9 +193,7 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
       })
       it('applique la bonne timezone', async () => {
         //Given
-        keycloakClient.exchangeTokenJeune
-          .withArgs(accessToken)
-          .resolves(idpToken)
+        oidcClient.exchangeTokenJeune.withArgs(accessToken).resolves(idpToken)
         miloClient.getSessionsParDossierJeune
           .withArgs(idpToken, jeuneCayenne.idPartenaire)
           .resolves(
@@ -241,9 +237,7 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
     describe('quand filtreEstInscrit true', () => {
       it('renvoie toutes les sessions avec jeune inscrit', async () => {
         //Given
-        keycloakClient.exchangeTokenJeune
-          .withArgs(accessToken)
-          .resolves(idpToken)
+        oidcClient.exchangeTokenJeune.withArgs(accessToken).resolves(idpToken)
         miloClient.getSessionsParDossierJeune
           .withArgs(idpToken, jeuneParis.idPartenaire)
           .resolves(
@@ -293,9 +287,7 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
     describe('quand filtreEstInscrit vide', () => {
       it('renvoie toutes les sessions avec jeune inscrit + toutes sessions visible avec jeune non inscrit + retire doublons + trie par date', async () => {
         //Given
-        keycloakClient.exchangeTokenJeune
-          .withArgs(accessToken)
-          .resolves(idpToken)
+        oidcClient.exchangeTokenJeune.withArgs(accessToken).resolves(idpToken)
         miloClient.getSessionsParDossierJeune
           .withArgs(idpToken, jeuneParis.idPartenaire)
           .resolves(

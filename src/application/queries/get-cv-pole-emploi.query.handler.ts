@@ -12,7 +12,7 @@ import { Authentification } from '../../domain/authentification'
 import { estPoleEmploiOuCDOuAvenirPro } from '../../domain/core'
 import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { DocumentPoleEmploiDto } from '../../infrastructure/clients/dto/pole-emploi.dto'
-import { KeycloakClient } from '../../infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import {
   PoleEmploiPartenaireClient,
   PoleEmploiPartenaireClientToken
@@ -35,7 +35,7 @@ export class GetCVPoleEmploiQueryHandler extends QueryHandler<
     private jeuneRepository: Jeune.Repository,
     @Inject(PoleEmploiPartenaireClientToken)
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,
-    private keycloakClient: KeycloakClient,
+    private oidcClient: OidcClient,
     private jeuneAuthorizer: JeuneAuthorizer
   ) {
     super('GetCVPoleEmploiQueryHandler')
@@ -58,7 +58,7 @@ export class GetCVPoleEmploiQueryHandler extends QueryHandler<
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
-    const idpToken = await this.keycloakClient.exchangeTokenJeune(
+    const idpToken = await this.oidcClient.exchangeTokenJeune(
       query.accessToken,
       jeune.structure
     )

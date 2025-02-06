@@ -17,7 +17,7 @@ import {
 } from '../../../domain/core'
 import { Demarche } from '../../../domain/demarche'
 import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
-import { KeycloakClient } from '../../../infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { GetFavorisAccueilQueryGetter } from '../query-getters/accueil/get-favoris.query.getter.db'
 import { GetRecherchesSauvegardeesQueryGetter } from '../query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
@@ -41,7 +41,7 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
     @Inject(JeuneRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     private jeuneAuthorizer: JeuneAuthorizer,
-    private keycloakClient: KeycloakClient,
+    private oidcClient: OidcClient,
     private getDemarchesQueryGetter: GetDemarchesQueryGetter,
     private getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter,
     private getRecherchesSauvegardeesQueryGetter: GetRecherchesSauvegardeesQueryGetter,
@@ -59,7 +59,7 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
-    const idpToken = await this.keycloakClient.exchangeTokenJeune(
+    const idpToken = await this.oidcClient.exchangeTokenJeune(
       query.accessToken,
       jeune.structure
     )

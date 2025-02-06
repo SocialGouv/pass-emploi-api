@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Query } from 'src/building-blocks/types/query'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import {
   PoleEmploiPartenaireClient,
   PoleEmploiPartenaireClientToken
@@ -33,7 +33,7 @@ export class GetCatalogueDemarchesQueryHandler extends QueryHandler<
     @Inject(PoleEmploiPartenaireClientToken)
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,
     private readonly jeuneAuthorizer: JeuneAuthorizer,
-    private keycloakClient: KeycloakClient
+    private oidcClient: OidcClient
   ) {
     super('GetCatalogueQueryHandler')
   }
@@ -41,7 +41,7 @@ export class GetCatalogueDemarchesQueryHandler extends QueryHandler<
   async handle(
     query: GetCatalogueDemarchesQuery
   ): Promise<ThematiqueQueryModel[]> {
-    const idpToken = await this.keycloakClient.exchangeTokenJeune(
+    const idpToken = await this.oidcClient.exchangeTokenJeune(
       query.accessToken,
       query.structure
     )

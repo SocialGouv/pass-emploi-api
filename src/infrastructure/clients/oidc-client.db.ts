@@ -15,7 +15,7 @@ import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 
 @Injectable()
-export class KeycloakClient {
+export class OidcClient {
   private logger: Logger
   private issuerUrl: string
   private clientId: string
@@ -25,7 +25,7 @@ export class KeycloakClient {
     private configService: ConfigService,
     private httpService: HttpService
   ) {
-    this.logger = new Logger('KeycloakClient')
+    this.logger = new Logger('OidcClient')
     this.issuerUrl = this.configService.get('oidc').issuerUrl
     this.clientId = this.configService.get('oidc').clientId
     this.clientSecret = this.configService.get('oidc').clientSecret
@@ -121,15 +121,15 @@ export class KeycloakClient {
         })
       )
 
-      const userIdKeycloak = reponseGet.data[0]?.id
+      const userIdAuth = reponseGet.data[0]?.id
 
-      if (userIdKeycloak) {
+      if (userIdAuth) {
         await firstValueFrom(
-          this.httpService.delete(`${url}/${userIdKeycloak}`, { headers })
+          this.httpService.delete(`${url}/${userIdAuth}`, { headers })
         )
         this.logger.log(`utilisateur ${idUserCEJ} supprimé`)
       } else {
-        this.logger.log(`utilisateur ${idUserCEJ} n'existe pas dans keycloak`)
+        this.logger.log(`utilisateur ${idUserCEJ} n'existe pas`)
       }
     } catch (e) {
       this.logger.error(

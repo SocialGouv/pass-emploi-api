@@ -18,7 +18,7 @@ import {
 import { Authentification } from 'src/domain/authentification'
 import { Conseiller } from 'src/domain/milo/conseiller'
 import { SessionMilo } from 'src/domain/milo/session.milo'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { DateService } from 'src/utils/date-service'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
@@ -37,7 +37,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
   let conseillerMiloRepository: StubbedType<Conseiller.Milo.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let sessionMiloRepository: StubbedType<SessionMilo.Repository>
-  let keycloakClient: StubbedClass<KeycloakClient>
+  let oidcClient: StubbedClass<OidcClient>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let dateService: StubbedClass<DateService>
   let notificationService: StubbedClass<Notification.Service>
@@ -51,7 +51,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
     conseillerMiloRepository = stubInterface(sandbox)
     jeuneRepository = stubInterface(sandbox)
     sessionMiloRepository = stubInterface(sandbox)
-    keycloakClient = stubClass(KeycloakClient)
+    oidcClient = stubClass(OidcClient)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     dateService = stubClass(DateService)
     notificationService = stubClassSandbox(Notification.Service, sandbox)
@@ -62,7 +62,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
       conseillerMiloRepository,
       sessionMiloRepository,
       jeuneRepository,
-      keycloakClient,
+      oidcClient,
       dateService,
       conseillerAuthorizer,
       notificationService,
@@ -103,7 +103,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
         .withArgs(commandSansInscription.idConseiller)
         .resolves(success(conseiller))
       const erreurHttp = new ErreurHttp('', 404)
-      keycloakClient.exchangeTokenConseillerMilo
+      oidcClient.exchangeTokenConseillerMilo
         .withArgs(commandSansInscription.accessToken)
         .resolves(idpToken)
       sessionMiloRepository.getForConseiller
@@ -131,7 +131,7 @@ describe('UpdateSessionMiloCommandHandler', () => {
         conseillerMiloRepository.get
           .withArgs(commandSansInscription.idConseiller)
           .resolves(success(conseiller))
-        keycloakClient.exchangeTokenConseillerMilo
+        oidcClient.exchangeTokenConseillerMilo
           .withArgs(commandSansInscription.accessToken)
           .resolves(idpToken)
         dateService.now.returns(uneDatetime())

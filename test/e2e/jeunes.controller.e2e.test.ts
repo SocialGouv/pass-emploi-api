@@ -17,7 +17,7 @@ import {
   DemarcheDtoEtat,
   RendezVousPoleEmploiDto
 } from '../../src/infrastructure/clients/dto/pole-emploi.dto'
-import { KeycloakClient } from '../../src/infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { PoleEmploiPartenaireClient } from '../../src/infrastructure/clients/pole-emploi-partenaire-client.db'
 import { IdService } from '../../src/utils/id-service'
 import {
@@ -35,7 +35,7 @@ import {
 describe('JeunesControllerE2E', () => {
   let getJeuneHomeAgendaPoleEmploiQueryHandler: GetSuiviSemainePoleEmploiQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
-  let keycloakClient: StubbedClass<KeycloakClient>
+  let oidcClient: StubbedClass<OidcClient>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let authRepository: StubbedType<Authentification.Repository>
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
@@ -56,7 +56,7 @@ describe('JeunesControllerE2E', () => {
     idService.uuid.returns('9903de8a-76fc-44c0-b049-480d7ec2ee10')
 
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
-    keycloakClient = stubClass(KeycloakClient)
+    oidcClient = stubClass(OidcClient)
     jeuneRepository = stubInterface(createSandbox())
     authRepository = stubInterface(createSandbox())
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
@@ -65,14 +65,14 @@ describe('JeunesControllerE2E', () => {
       authRepository,
       poleEmploiPartenaireClient,
       dateService,
-      keycloakClient
+      oidcClient
     )
     const getRendezVousJeunePoleEmploiQueryGetter =
       new GetRendezVousJeunePoleEmploiQueryGetter(
         jeuneRepository,
         poleEmploiPartenaireClient,
         idService,
-        keycloakClient
+        oidcClient
       )
 
     getJeuneHomeAgendaPoleEmploiQueryHandler =
@@ -81,7 +81,7 @@ describe('JeunesControllerE2E', () => {
         getDemarchesQueryGetter,
         getRendezVousJeunePoleEmploiQueryGetter,
         jeuneAuthorizer,
-        keycloakClient,
+        oidcClient,
         dateService
       )
 
@@ -113,7 +113,7 @@ describe('JeunesControllerE2E', () => {
     it('retourne la page Mon suivi > Cette semaine du jeune', async () => {
       // Given
       jeuneAuthorizer.autoriserLeJeune.resolves(emptySuccess())
-      keycloakClient.exchangeTokenJeune.resolves('idpToken')
+      oidcClient.exchangeTokenJeune.resolves('idpToken')
       jeuneRepository.get.resolves(jeune)
       authRepository.getJeuneById.resolves(unUtilisateurJeune())
 

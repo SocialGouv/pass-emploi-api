@@ -4,7 +4,7 @@ import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { failure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Core, estMilo, getStructureDeReference } from '../../domain/core'
-import { KeycloakClient } from '../clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { SuperviseurSqlModel } from '../sequelize/models/superviseur.sql-model'
@@ -15,13 +15,13 @@ import {
 import { Op } from 'sequelize'
 
 @Injectable()
-export class AuthentificationSqlKeycloakRepository
+export class AuthentificationSqlOidcRepository
   implements Authentification.Repository
 {
   private logger: Logger
 
-  constructor(private keycloakClient: KeycloakClient) {
-    this.logger = new Logger('AuthentificationSqlRepository')
+  constructor(private oidcClient: OidcClient) {
+    this.logger = new Logger('AuthentificationSqlOidcRepository')
   }
 
   async getConseiller(
@@ -173,7 +173,7 @@ export class AuthentificationSqlKeycloakRepository
 
   async deleteUtilisateurIdp(idUserCEJ: string): Promise<void> {
     try {
-      await this.keycloakClient.deleteAccount(idUserCEJ)
+      await this.oidcClient.deleteAccount(idUserCEJ)
     } catch (_e) {}
     this.logger.log(`Utilisateur ${idUserCEJ} supprimé de OIDC SSO`)
   }
@@ -206,7 +206,7 @@ export class AuthentificationSqlKeycloakRepository
     bearer: string,
     structure: Core.Structure
   ): Promise<string> {
-    return this.keycloakClient.exchangeToken(bearer, structure)
+    return this.oidcClient.exchangeToken(bearer, structure)
   }
 
   async seFairePasserPourUnConseiller(
@@ -218,7 +218,7 @@ export class AuthentificationSqlKeycloakRepository
     if (!conseillerSqlModel)
       return failure(new NonTrouveError('Conseiller', idConseiller))
 
-    const accesConseiller = await this.keycloakClient.exchangeToken(
+    const accesConseiller = await this.oidcClient.exchangeToken(
       bearer,
       structure,
       conseillerSqlModel.idAuthentification

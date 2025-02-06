@@ -17,7 +17,7 @@ import {
   Suggestion,
   SuggestionsPoleEmploiRepositoryToken
 } from '../../domain/offre/recherche/suggestion/suggestion'
-import { KeycloakClient } from '../../infrastructure/clients/keycloak-client.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { buildError } from '../../utils/logger.module'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 
@@ -42,7 +42,7 @@ export class RafraichirSuggestionsCommandHandler extends CommandHandler<
     private readonly diagorienteClient: DiagorienteClient,
     @Inject(SuggestionsPoleEmploiRepositoryToken)
     private suggestionPoleEmploiRepository: Suggestion.PoleEmploi.Repository,
-    private keycloakClient: KeycloakClient
+    private oidcClient: OidcClient
   ) {
     super('RafraichirSuggestionsCommandHandler')
   }
@@ -62,7 +62,7 @@ export class RafraichirSuggestionsCommandHandler extends CommandHandler<
 
     if (rafraichirSuggestionsPE) {
       try {
-        const idpToken = await this.keycloakClient.exchangeTokenJeune(
+        const idpToken = await this.oidcClient.exchangeTokenJeune(
           command.accessToken,
           jeune.structure
         )

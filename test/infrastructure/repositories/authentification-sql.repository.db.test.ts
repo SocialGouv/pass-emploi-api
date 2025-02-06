@@ -11,8 +11,8 @@ import { uneDate, uneDatetime } from 'test/fixtures/date.fixture'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { Authentification } from '../../../src/domain/authentification'
 import { Core } from '../../../src/domain/core'
-import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client.db'
-import { AuthentificationSqlKeycloakRepository } from '../../../src/infrastructure/repositories/authentification-sql.repository.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
+import { AuthentificationSqlOidcRepository } from '../../../src/infrastructure/repositories/authentification-sql.repository.db'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import {
   unUtilisateurConseiller,
@@ -23,13 +23,13 @@ import { expect, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
 
 describe('AuthentificationSqlRepository', () => {
-  let repository: AuthentificationSqlKeycloakRepository
-  let keycloakClient: StubbedClass<KeycloakClient>
+  let repository: AuthentificationSqlOidcRepository
+  let oidcClient: StubbedClass<OidcClient>
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
-    keycloakClient = stubClass(KeycloakClient)
-    repository = new AuthentificationSqlKeycloakRepository(keycloakClient)
+    oidcClient = stubClass(OidcClient)
+    repository = new AuthentificationSqlOidcRepository(oidcClient)
   })
 
   describe('getConseiller', () => {
@@ -486,7 +486,7 @@ describe('AuthentificationSqlRepository', () => {
   describe('recupererAccesPartenaire', () => {
     it('récupère le token pour appeler l’API partenaire', async () => {
       // Given
-      keycloakClient.exchangeToken.resolves('accesPartenaire')
+      oidcClient.exchangeToken.resolves('accesPartenaire')
 
       // When
       const accesPartenaire = await repository.recupererAccesPartenaire(
@@ -495,7 +495,7 @@ describe('AuthentificationSqlRepository', () => {
       )
 
       // Then
-      expect(keycloakClient.exchangeToken).to.have.been.calledOnceWithExactly(
+      expect(oidcClient.exchangeToken).to.have.been.calledOnceWithExactly(
         'bearer',
         Core.Structure.MILO
       )
@@ -512,7 +512,7 @@ describe('AuthentificationSqlRepository', () => {
           idAuthentification: 'id-authentification-conseiller'
         })
       )
-      keycloakClient.exchangeToken.resolves('accesPartenaireConseiller')
+      oidcClient.exchangeToken.resolves('accesPartenaireConseiller')
 
       // When
       const resultAccesPartenaireConseiller =
@@ -523,7 +523,7 @@ describe('AuthentificationSqlRepository', () => {
         )
 
       // Then
-      expect(keycloakClient.exchangeToken).to.have.been.calledOnceWithExactly(
+      expect(oidcClient.exchangeToken).to.have.been.calledOnceWithExactly(
         'bearer',
         Core.Structure.MILO,
         'id-authentification-conseiller'
@@ -544,7 +544,7 @@ describe('AuthentificationSqlRepository', () => {
         )
 
       // Then
-      expect(keycloakClient.exchangeToken).not.to.have.been.called()
+      expect(oidcClient.exchangeToken).not.to.have.been.called()
       expect(isFailure(resultAccesPartenaireConseiller)).to.equal(true)
       expect(
         (resultAccesPartenaireConseiller as Failure).error
