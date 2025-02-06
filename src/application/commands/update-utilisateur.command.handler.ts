@@ -70,9 +70,9 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
           case Core.Structure.POLE_EMPLOI_AIJ:
           case Core.Structure.CONSEIL_DEPT:
           case Core.Structure.AVENIR_PRO:
-            return this.authentificationConseillerSSO(commandSanitized)
+            return this.recupererOuCreerUtilisateurConseiller(commandSanitized)
           case 'FRANCE_TRAVAIL':
-            return this.authentificationConseillerFT(commandSanitized)
+            return this.recupererUtilisateurConseillerExistant(commandSanitized)
         }
         break
       case Authentification.Type.JEUNE:
@@ -302,7 +302,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     return success(queryModelFromUtilisateur(utilisateurMisAJour))
   }
 
-  private async authentificationConseillerSSO(
+  private async recupererOuCreerUtilisateurConseiller(
     commandSanitized: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
     const utilisateurTrouve =
@@ -330,7 +330,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     return success(queryModelFromUtilisateur(utilisateurMisAJour))
   }
 
-  private async authentificationConseillerFT(
+  private async recupererUtilisateurConseillerExistant(
     commandSanitized: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
     const utilisateurTrouve =
