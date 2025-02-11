@@ -1,12 +1,14 @@
 export namespace Core {
   export enum Structure {
     MILO = 'MILO',
-    SUPPORT = 'SUPPORT',
     POLE_EMPLOI = 'POLE_EMPLOI',
     POLE_EMPLOI_BRSA = 'POLE_EMPLOI_BRSA',
     POLE_EMPLOI_AIJ = 'POLE_EMPLOI_AIJ',
     CONSEIL_DEPT = 'CONSEIL_DEPT',
-    AVENIR_PRO = 'AVENIR_PRO'
+    AVENIR_PRO = 'AVENIR_PRO',
+    FT_ACCOMPAGNEMENT_INTENSIF = 'FT_ACCOMPAGNEMENT_INTENSIF',
+    FT_ACCOMPAGNEMENT_GLOBAL = 'FT_ACCOMPAGNEMENT_GLOBAL',
+    FT_EQUIP_EMPLOI_RECRUT = 'FT_EQUIP_EMPLOI_RECRUT'
   }
 
   export const structuresBeneficiaireFranceTravail = [
@@ -44,7 +46,10 @@ export function estPoleEmploi(structure: Core.Structure): boolean {
   return [
     Core.Structure.POLE_EMPLOI,
     Core.Structure.POLE_EMPLOI_BRSA,
-    Core.Structure.POLE_EMPLOI_AIJ
+    Core.Structure.POLE_EMPLOI_AIJ,
+    Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF,
+    Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL,
+    Core.Structure.FT_EQUIP_EMPLOI_RECRUT
   ].includes(structure)
 }
 
@@ -53,7 +58,10 @@ export function estPassEmploi(structure: Core.Structure): boolean {
     Core.Structure.POLE_EMPLOI_BRSA,
     Core.Structure.POLE_EMPLOI_AIJ,
     Core.Structure.CONSEIL_DEPT,
-    Core.Structure.AVENIR_PRO
+    Core.Structure.AVENIR_PRO,
+    Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF,
+    Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL,
+    Core.Structure.FT_EQUIP_EMPLOI_RECRUT
   ].includes(structure)
 }
 

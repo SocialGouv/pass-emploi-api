@@ -27,6 +27,7 @@ import {
 
 export type StructureUtilisateurAuth = Core.Structure | 'FRANCE_TRAVAIL'
 export type TypeUtilisateurAuth = Authentification.Type | 'BENEFICIAIRE'
+
 export interface UpdateUtilisateurCommand extends Command {
   idUtilisateurAuth: string
   nom?: string
@@ -61,43 +62,22 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       ...command,
       email: command.email?.toLocaleLowerCase()
     }
+
     switch (commandSanitized.type) {
       case Authentification.Type.CONSEILLER:
-        switch (commandSanitized.structure) {
-          case Core.Structure.MILO:
-          case Core.Structure.POLE_EMPLOI:
-          case Core.Structure.POLE_EMPLOI_BRSA:
-          case Core.Structure.POLE_EMPLOI_AIJ:
-          case Core.Structure.CONSEIL_DEPT:
-          case Core.Structure.AVENIR_PRO:
-            return this.recupererOuCreerUtilisateurConseiller(commandSanitized)
-          case 'FRANCE_TRAVAIL':
-            return this.recupererUtilisateurConseillerExistant(commandSanitized)
-        }
-        break
+        return this.recupererConseiller(commandSanitized)
       case Authentification.Type.JEUNE:
-        switch (commandSanitized.structure) {
-          case Core.Structure.MILO:
-            return this.authentificationJeuneMilo(commandSanitized)
-          case Core.Structure.POLE_EMPLOI:
-          case Core.Structure.POLE_EMPLOI_BRSA:
-          case Core.Structure.POLE_EMPLOI_AIJ:
-            return this.authentificationBeneficiaireFT(commandSanitized)
-        }
-        break
       case 'BENEFICIAIRE':
-        if (commandSanitized.structure === 'FRANCE_TRAVAIL') {
-          return this.authentificationBeneficiaireFT(commandSanitized)
-        }
-        break
+        return this.recupererBeneficiaire(commandSanitized)
+      case Authentification.Type.SUPPORT:
+        return failure(
+          new NonTraitableError(
+            'Utilisateur',
+            commandSanitized.idUtilisateurAuth,
+            NonTraitableReason.TYPE_UTILISATEUR_NON_TRAITABLE
+          )
+        )
     }
-    return failure(
-      new NonTraitableError(
-        'Utilisateur',
-        command.idUtilisateurAuth,
-        NonTraitableReason.TYPE_STRUCTURE_NON_TRATABLE
-      )
-    )
   }
 
   async authorize(): Promise<Result> {
@@ -106,6 +86,51 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
 
   async monitor(): Promise<void> {
     return
+  }
+
+  private recupererConseiller(
+    commandSanitized: UpdateUtilisateurCommand
+  ): Promise<Result<UtilisateurQueryModel>> {
+    switch (commandSanitized.structure) {
+      case Core.Structure.MILO:
+      case Core.Structure.POLE_EMPLOI:
+      case Core.Structure.POLE_EMPLOI_BRSA:
+      case Core.Structure.POLE_EMPLOI_AIJ:
+      case Core.Structure.CONSEIL_DEPT:
+      case Core.Structure.AVENIR_PRO:
+      case Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF:
+      case Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL:
+      case Core.Structure.FT_EQUIP_EMPLOI_RECRUT:
+        return this.recupererOuCreerUtilisateurConseiller(commandSanitized)
+      case 'FRANCE_TRAVAIL':
+        return this.recupererUtilisateurConseillerExistant(commandSanitized)
+    }
+  }
+
+  private async recupererBeneficiaire(
+    commandSanitized: UpdateUtilisateurCommand
+  ): Promise<Result<UtilisateurQueryModel>> {
+    switch (commandSanitized.structure) {
+      case Core.Structure.MILO:
+        return this.authentificationJeuneMilo(commandSanitized)
+      case Core.Structure.POLE_EMPLOI:
+      case Core.Structure.POLE_EMPLOI_BRSA:
+      case Core.Structure.POLE_EMPLOI_AIJ:
+      case Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF:
+      case Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL:
+      case Core.Structure.FT_EQUIP_EMPLOI_RECRUT:
+      case 'FRANCE_TRAVAIL':
+        return this.authentificationBeneficiaireFT(commandSanitized)
+      case Core.Structure.CONSEIL_DEPT:
+      case Core.Structure.AVENIR_PRO:
+        return failure(
+          new NonTraitableError(
+            'Utilisateur',
+            commandSanitized.idUtilisateurAuth,
+            NonTraitableReason.TYPE_STRUCTURE_NON_TRAITABLE
+          )
+        )
+    }
   }
 
   private async authentifierJeuneParEmail(
@@ -379,6 +404,7 @@ function verifierStructureBeneficiaire(
         return emptySuccess()
     }
   }
+
   if (utilisateurTrouve.structure !== structureAttendue) {
     const reason = reasonFromStructure(utilisateurTrouve.structure)
 
