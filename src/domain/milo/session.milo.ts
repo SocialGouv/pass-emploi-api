@@ -34,7 +34,7 @@ export interface SessionMilo {
 
 export type SessionMiloAllegee = Pick<
   SessionMilo,
-  'id' | 'nom' | 'nbPlacesDisponibles'
+  'id' | 'nom' | 'debut' | 'nbPlacesDisponibles'
 >
 
 export interface InstanceSessionMilo {
@@ -189,7 +189,8 @@ export namespace SessionMilo {
 
     getForBeneficiaire(
       idSession: string,
-      tokenMiloBeneficiaire: string
+      tokenMiloBeneficiaire: string,
+      timezone: string
     ): Promise<Result<SessionMiloAllegee>>
 
     getForConseiller(

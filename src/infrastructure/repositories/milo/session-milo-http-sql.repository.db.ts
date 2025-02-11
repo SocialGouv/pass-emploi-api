@@ -43,6 +43,8 @@ import {
 import { AsSql } from '../../sequelize/types'
 import { InstanceSessionMiloDto } from '../dto/milo.dto'
 
+const FORMAT_DATETIME_MILO = 'yyyy-MM-dd HH:mm:ss'
+
 @Injectable()
 export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
   private readonly apiUrl: string
@@ -99,7 +101,8 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
 
   async getForBeneficiaire(
     idSession: string,
-    tokenMiloBeneficiaire: string
+    tokenMiloBeneficiaire: string,
+    timezone: string
   ): Promise<Result<SessionMiloAllegee>> {
     const resultSession = await this.miloClient.getDetailSessionJeune(
       tokenMiloBeneficiaire,
@@ -113,6 +116,9 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     return success({
       id: session.id.toString(),
       nom: session.nom,
+      debut: DateTime.fromFormat(session.dateHeureDebut, FORMAT_DATETIME_MILO, {
+        zone: timezone
+      }),
       nbPlacesDisponibles: session.nbPlacesDisponibles ?? undefined
     })
   }
@@ -346,12 +352,10 @@ function dtoToSessionMilo(
     nom: sessionDto.nom,
     debut: DateTime.fromFormat(
       sessionDto.dateHeureDebut,
-      'yyyy-MM-dd HH:mm:ss',
-      {
-        zone: structureMilo.timezone
-      }
+      FORMAT_DATETIME_MILO,
+      { zone: structureMilo.timezone }
     ),
-    fin: DateTime.fromFormat(sessionDto.dateHeureFin, 'yyyy-MM-dd HH:mm:ss', {
+    fin: DateTime.fromFormat(sessionDto.dateHeureFin, FORMAT_DATETIME_MILO, {
       zone: structureMilo.timezone
     }),
     animateur: sessionDto.animateur,

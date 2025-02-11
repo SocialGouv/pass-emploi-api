@@ -7,7 +7,10 @@ import {
   SessionJeuneMiloQueryModel
 } from 'src/application/queries/query-models/sessions.milo.query.model'
 import { OffreTypeCode } from 'src/infrastructure/clients/dto/milo.dto'
-import { SessionMilo } from '../../src/domain/milo/session.milo'
+import {
+  SessionMilo,
+  SessionMiloAllegee
+} from '../../src/domain/milo/session.milo'
 
 export const uneSessionConseillerMiloQueryModel: SessionConseillerMiloQueryModel =
   {
@@ -177,4 +180,15 @@ export const uneSessionMilo = (
   }
 
   return { ...defaults, ...args }
+}
+
+export function uneSessionMiloAllegee(): SessionMiloAllegee {
+  return {
+    id: 'id-session',
+    nom: 'Une session',
+    debut: DateTime.fromISO('2020-04-06T13:20:00.000Z', {
+      zone: 'Europe/Paris'
+    }),
+    nbPlacesDisponibles: undefined
+  }
 }

@@ -22,12 +22,14 @@ import { Core } from 'src/domain/core'
 import { EvenementService } from 'src/domain/evenement'
 import { JeuneMilo } from 'src/domain/milo/jeune.milo'
 import { SessionMilo } from 'src/domain/milo/session.milo'
+import { Notification } from 'src/domain/notification/notification'
 import { ChatCryptoService } from 'src/utils/chat-crypto-service'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
 } from 'test/fixtures/authentification.fixture'
 import { unJeune } from 'test/fixtures/jeune.fixture'
+import { uneSessionMiloAllegee } from 'test/fixtures/sessions.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from 'test/utils'
 
 describe('AutoinscrireBeneficiaireSessionMiloCommandHandler', () => {
@@ -36,6 +38,7 @@ describe('AutoinscrireBeneficiaireSessionMiloCommandHandler', () => {
   let sessionMiloRepository: StubbedType<SessionMilo.Repository>
   let chatRepository: StubbedType<Chat.Repository>
   let chatCryptoService: StubbedClass<ChatCryptoService>
+  let notificationService: StubbedClass<Notification.Service>
   let evenementService: StubbedClass<EvenementService>
   let commandHandler: AutoinscrireBeneficiaireSessionMiloCommandHandler
 
@@ -46,6 +49,7 @@ describe('AutoinscrireBeneficiaireSessionMiloCommandHandler', () => {
   const utilisateurBeneficiaire = unUtilisateurJeune({
     id: beneficiaireMilo.id
   })
+  const session = uneSessionMiloAllegee()
   const command: AutoinscrireBeneficiaireSessionMiloCommand = {
     idSession: 'id-session',
     idBeneficiaire: beneficiaireMilo.id,
@@ -59,6 +63,7 @@ describe('AutoinscrireBeneficiaireSessionMiloCommandHandler', () => {
     sessionMiloRepository = stubInterface(sandbox)
     chatRepository = stubInterface(sandbox)
     chatCryptoService = stubClass(ChatCryptoService)
+    notificationService = stubClass(Notification.Service)
     evenementService = stubClass(EvenementService)
     commandHandler = new AutoinscrireBeneficiaireSessionMiloCommandHandler(
       beneficiaireMiloRepository,
@@ -66,6 +71,7 @@ describe('AutoinscrireBeneficiaireSessionMiloCommandHandler', () => {
       sessionMiloRepository,
       chatRepository,
       chatCryptoService,
+      notificationService,
       evenementService
     )
   })
@@ -108,13 +114,7 @@ describe('AutoinscrireBeneficiaireSessionMiloCommandHandler', () => {
         .resolves(success('token-conseiller-milo'))
       sessionMiloRepository.getForBeneficiaire
         .withArgs('id-session', 'token-beneficiaire-milo')
-        .resolves(
-          success({
-            id: 'id-session',
-            nom: 'Une session',
-            nbPlacesDisponibles: undefined
-          })
-        )
+        .resolves(success(session))
       sessionMiloRepository.inscrireBeneficiaire
         .withArgs(
           'id-session',
@@ -175,6 +175,20 @@ describe('AutoinscrireBeneficiaireSessionMiloCommandHandler', () => {
         },
         { sentByBeneficiaire: true }
       )
+    })
+
+    it('notifie le bénéficiaire', async () => {
+      // When
+      await commandHandler.handle(
+        command,
+        utilisateurBeneficiaire,
+        beneficiaireMilo
+      )
+
+      // Then
+      expect(
+        notificationService.notifierAutoinscriptionSession
+      ).to.have.been.calledOnceWithExactly(session, beneficiaireMilo)
     })
 
     it('vérifie que le bénéficiaire existe', async () => {

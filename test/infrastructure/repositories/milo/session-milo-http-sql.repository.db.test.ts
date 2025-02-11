@@ -515,7 +515,8 @@ describe('SessionMiloHttpSqlRepository', () => {
       // When
       const result = await repository.getForBeneficiaire(
         'idSession',
-        'token-milo'
+        'token-milo',
+        'Europe/Paris'
       )
 
       // Then
@@ -523,6 +524,9 @@ describe('SessionMiloHttpSqlRepository', () => {
       expect((result as Success<SessionMiloAllegee>).data).to.deep.equal({
         id: '1',
         nom: 'Une-session',
+        debut: DateTime.fromISO('2020-04-06T10:20:00', {
+          zone: 'Europe/Paris'
+        }),
         nbPlacesDisponibles: 10
       })
     })
