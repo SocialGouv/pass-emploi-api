@@ -4,6 +4,12 @@ echo "First deploy"
 
 if [[ $APP =~ "pa-back-staging-pr" ]] ; then
   echo "Dump de la DB de staging"
+
+  if [[ $DATABASE_URL == *"pa_back_pro_817"* ]]; then
+    echo "Error: Target must not be production"
+    exit 1
+  fi
+
   export PATH=$HOME/bin:$PATH
   dbclient-fetcher psql 13
   psql --dbname $DATABASE_URL -c "CREATE extension postgis;"

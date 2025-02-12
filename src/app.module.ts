@@ -367,6 +367,7 @@ import { GetCJETokenQueryHandler } from './application/queries/get-cje-token.que
 import { NotifierBonneAlternanceJobHandler } from './application/jobs/notifier-bonne-alternance.job.handler.db'
 import { NotifierCampagneJobHandler } from './application/jobs/notifier-campagne.job.handler.db'
 import { GetNotificationsJeuneQueryHandler } from './application/queries/get-notifications-jeune.query.handler.db'
+import { DumpForPerfsJobHandler } from './application/jobs/perfs/dump-for-perfs.job'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -822,6 +823,7 @@ export const JobHandlerProviders = [
   SuivreEvenementsMiloCronJobHandler,
   TraiterEvenementMiloJobHandler,
   DumpForAnalyticsJobHandler,
+  DumpForPerfsJobHandler,
   ChargerEvenementsJobHandler,
   NettoyerEvenementsChargesAnalyticsJobHandler,
   EnrichirEvenementsJobHandler,
