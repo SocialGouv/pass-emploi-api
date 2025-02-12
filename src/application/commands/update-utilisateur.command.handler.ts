@@ -413,9 +413,7 @@ function verifierStructureBeneficiaire(
   return emptySuccess()
 }
 
-function reasonFromStructure(
-  structure: Core.Structure
-): NonTraitableReason | undefined {
+function reasonFromStructure(structure: Core.Structure): NonTraitableReason {
   switch (structure) {
     case Core.Structure.MILO:
       return NonTraitableReason.UTILISATEUR_DEJA_MILO
@@ -429,7 +427,11 @@ function reasonFromStructure(
       return NonTraitableReason.UTILISATEUR_DEJA_CONSEIL_DEPT
     case Core.Structure.AVENIR_PRO:
       return NonTraitableReason.UTILISATEUR_DEJA_AVENIR_PRO
-    default:
-      return
+    case Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF:
+      return NonTraitableReason.UTILISATEUR_DEJA_ACCOMPAGNEMENT_INTENSIF
+    case Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL:
+      return NonTraitableReason.UTILISATEUR_DEJA_ACCOMPAGNEMENT_GLOBAL
+    case Core.Structure.FT_EQUIP_EMPLOI_RECRUT:
+      return NonTraitableReason.UTILISATEUR_DEJA_EQUIP_EMPLOI_RECRUT
   }
 }
