@@ -315,7 +315,7 @@ describe('JeuneSqlRepository', () => {
         const result =
           await jeuneSqlRepository.findAllJeunesByIdsAuthentificationAndStructures(
             ['id-auth-1', 'id-auth-2', 'id-auth-3'],
-            Core.structuresBeneficiaireFranceTravail
+            Core.structuresBeneficiaireFTConnect
           )
 
         // Then
@@ -331,7 +331,7 @@ describe('JeuneSqlRepository', () => {
         const result =
           await jeuneSqlRepository.findAllJeunesByIdsAuthentificationAndStructures(
             ['FAUX_ID'],
-            Core.structuresBeneficiaireFranceTravail
+            Core.structuresBeneficiaireFTConnect
           )
 
         // Then

@@ -42,7 +42,10 @@ export class GetConseillersQueryParams {
   @IsIn([
     Core.Structure.POLE_EMPLOI,
     Core.Structure.POLE_EMPLOI_BRSA,
-    Core.Structure.POLE_EMPLOI_AIJ
+    Core.Structure.POLE_EMPLOI_AIJ,
+    Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF,
+    Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL,
+    Core.Structure.FT_EQUIP_EMPLOI_RECRUT
   ])
   structure?: string
 }
