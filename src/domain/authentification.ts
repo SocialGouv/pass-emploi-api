@@ -32,7 +32,8 @@ export namespace Authentification {
       id: 'SUPPORT',
       prenom: 'support',
       nom: 'cej',
-      structure: Core.Structure.SUPPORT,
+      // @ts-expect-error structure utilisateur SUPPORT inutile ailleurs
+      structure: 'SUPPORT',
       type: Authentification.Type.SUPPORT,
       roles: []
     }

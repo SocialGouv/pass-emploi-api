@@ -50,7 +50,7 @@ describe('SendNotificationsNouveauxMessagesExternesCommandHandler', () => {
         jeuneRepository.findAllJeunesByIdsAuthentificationAndStructures
           .withArgs(
             command.idsAuthentificationJeunes,
-            Core.structuresBeneficiaireFranceTravail
+            Core.structuresBeneficiaireFTConnect
           )
           .resolves(jeunes)
 
@@ -78,7 +78,7 @@ describe('SendNotificationsNouveauxMessagesExternesCommandHandler', () => {
         jeuneRepository.findAllJeunesByIdsAuthentificationAndStructures
           .withArgs(
             command.idsAuthentificationJeunes,
-            Core.structuresBeneficiaireFranceTravail
+            Core.structuresBeneficiaireFTConnect
           )
           .resolves([jeune1])
 
@@ -108,7 +108,7 @@ describe('SendNotificationsNouveauxMessagesExternesCommandHandler', () => {
         jeuneRepository.findAllJeunesByIdsAuthentificationAndStructures
           .withArgs(
             command.idsAuthentificationJeunes,
-            Core.structuresBeneficiaireFranceTravail
+            Core.structuresBeneficiaireFTConnect
           )
           .resolves([])
 
