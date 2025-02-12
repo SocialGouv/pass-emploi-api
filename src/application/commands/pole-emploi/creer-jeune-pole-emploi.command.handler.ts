@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {
@@ -64,7 +65,7 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
         email: conseiller.email
       },
       structure: conseiller.structure,
-      dispositif: fromStructureToDispositif(conseiller.structure)
+      dispositif: fromStructureFTToDispositif(conseiller.structure)
     }
     const nouveauJeune = this.jeuneFactory.creer(jeuneACreer)
     await this.jeuneRepository.save(nouveauJeune)
@@ -91,7 +92,7 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
   }
 }
 
-function fromStructureToDispositif(
+function fromStructureFTToDispositif(
   structure: Core.Structure
 ): Jeune.Dispositif {
   switch (structure) {
@@ -105,7 +106,13 @@ function fromStructureToDispositif(
       return Jeune.Dispositif.CONSEIL_DEPT
     case Core.Structure.AVENIR_PRO:
       return Jeune.Dispositif.AVENIR_PRO
-    default:
-      return Jeune.Dispositif.CEJ
+    case Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF:
+      return Jeune.Dispositif.ACCOMPAGNEMENT_INTENSIF
+    case Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL:
+      return Jeune.Dispositif.ACCOMPAGNEMENT_GLOBAL
+    case Core.Structure.FT_EQUIP_EMPLOI_RECRUT:
+      return Jeune.Dispositif.EQUIP_EMPLOI_RECRUT
+    case Core.Structure.MILO:
+      throw new RuntimeException()
   }
 }
