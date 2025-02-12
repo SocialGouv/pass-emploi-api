@@ -82,7 +82,8 @@ export const unUtilisateurSupport = (
     prenom: 'John',
     type: Authentification.Type.SUPPORT,
     email: 'john.doe@plop.io',
-    structure: Core.Structure.SUPPORT,
+    // @ts-expect-error structure utilisateur SUPPORT inutile ailleurs
+    structure: 'SUPPORT',
     roles: []
   }
 

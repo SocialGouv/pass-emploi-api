@@ -144,22 +144,23 @@ export class MailBrevoService implements Mail.Service {
     motif: ArchiveJeune.MotifSuppression | ArchiveJeune.MotifSuppressionSupport,
     commentaire?: string
   ): Promise<void> {
-    let templateId
-    switch (jeune.structure) {
-      case Core.Structure.MILO:
-      case Core.Structure.POLE_EMPLOI_AIJ:
-      case Core.Structure.AVENIR_PRO:
-      case Core.Structure.SUPPORT:
-        templateId = parseInt(this.templates.compteJeuneArchiveMILO)
-        break
-      case Core.Structure.POLE_EMPLOI:
-        templateId = parseInt(this.templates.compteJeuneArchivePECEJ)
-        break
-      case Core.Structure.POLE_EMPLOI_BRSA:
-      case Core.Structure.CONSEIL_DEPT:
-        templateId = parseInt(this.templates.compteJeuneArchivePEBRSA)
-        break
-    }
+    const templateId = ((): number => {
+      switch (jeune.structure) {
+        case Core.Structure.MILO:
+          return parseInt(this.templates.compteJeuneArchiveMILO)
+        case Core.Structure.POLE_EMPLOI:
+          return parseInt(this.templates.compteJeuneArchivePECEJ)
+        case Core.Structure.POLE_EMPLOI_BRSA:
+        case Core.Structure.POLE_EMPLOI_AIJ:
+        case Core.Structure.CONSEIL_DEPT:
+        case Core.Structure.AVENIR_PRO:
+        case Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF:
+        case Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL:
+        case Core.Structure.FT_EQUIP_EMPLOI_RECRUT:
+          return parseInt(this.templates.compteJeuneArchivePEBRSA)
+      }
+    })()
+
     const mailDataDto: MailDataDto = {
       to: [
         {
