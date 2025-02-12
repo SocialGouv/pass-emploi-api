@@ -11,17 +11,25 @@ export namespace Core {
     FT_EQUIP_EMPLOI_RECRUT = 'FT_EQUIP_EMPLOI_RECRUT'
   }
 
-  export const structuresBeneficiaireFranceTravail = [
+  export const structuresBeneficiaireFTConnect = [
     Core.Structure.POLE_EMPLOI,
     Core.Structure.CONSEIL_DEPT,
     Core.Structure.POLE_EMPLOI_BRSA,
     Core.Structure.POLE_EMPLOI_AIJ,
-    Core.Structure.AVENIR_PRO
+    Core.Structure.AVENIR_PRO,
+    Core.Structure.CONSEIL_DEPT,
+    Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF,
+    Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL,
+    Core.Structure.FT_EQUIP_EMPLOI_RECRUT
   ]
+
   export type StructuresPoleEmploi =
     | Core.Structure.POLE_EMPLOI
     | Core.Structure.POLE_EMPLOI_BRSA
     | Core.Structure.POLE_EMPLOI_AIJ
+    | Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF
+    | Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL
+    | Core.Structure.FT_EQUIP_EMPLOI_RECRUT
 
   export interface Id {
     id: string
@@ -90,6 +98,7 @@ export const structuresCampagnes = [
   Core.Structure.POLE_EMPLOI_BRSA,
   Core.Structure.POLE_EMPLOI_AIJ
 ]
+
 export function peutVoirLesCampagnes(structure: Core.Structure): boolean {
   return structuresCampagnes.includes(structure)
 }

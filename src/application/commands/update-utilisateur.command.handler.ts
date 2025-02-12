@@ -127,7 +127,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
           new NonTraitableError(
             'Utilisateur',
             commandSanitized.idUtilisateurAuth,
-            NonTraitableReason.TYPE_STRUCTURE_NON_TRAITABLE
+            NonTraitableReason.STRUCTURE_UTILISATEUR_NON_TRAITABLE
           )
         )
     }
