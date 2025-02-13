@@ -1,6 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common'
 import { Sequelize } from 'sequelize-typescript'
-import { NonTrouveError } from 'src/building-blocks/types/domain-error'
+import {
+  ConseillerInactifError,
+  NonTrouveError
+} from 'src/building-blocks/types/domain-error'
 import { failure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Core, estMilo, getStructureDeReference } from '../../domain/core'
@@ -218,13 +221,20 @@ export class AuthentificationSqlOidcRepository
     if (!conseillerSqlModel)
       return failure(new NonTrouveError('Conseiller', idConseiller))
 
-    const accesConseiller = await this.oidcClient.exchangeToken(
-      bearer,
-      structure,
-      conseillerSqlModel.idAuthentification
-    )
+    try {
+      const accesConseiller = await this.oidcClient.exchangeToken(
+        bearer,
+        structure,
+        conseillerSqlModel.idAuthentification
+      )
 
-    return success(accesConseiller)
+      return success(accesConseiller)
+    } catch (e) {
+      if (e instanceof UnauthorizedException) {
+        return failure(new ConseillerInactifError())
+      }
+      throw e
+    }
   }
 }
 
