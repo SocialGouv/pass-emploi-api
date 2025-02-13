@@ -12,6 +12,7 @@ import {
   CampagneExisteDejaError,
   CampagneNonActive,
   CompteDiagorienteInvalideError,
+  ConseillerInactifError,
   ConseillerMiloSansStructure,
   ConseillerNonValide,
   ConseillerSansAgenceError,
@@ -56,6 +57,7 @@ function handleFailure(result: Failure): never {
       }
       throw new RuntimeException(result.error.message)
     case NonTraitableError.CODE:
+    case ConseillerInactifError.CODE:
       throw new UnprocessableEntityException(result.error)
     case NonTrouveError.CODE:
       throw new NotFoundException(result.error.message)

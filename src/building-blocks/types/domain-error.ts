@@ -198,6 +198,16 @@ export class ConseillerNonValide implements DomainError {
   }
 }
 
+export class ConseillerInactifError implements DomainError {
+  static CODE = 'CONSEILLER_INACTIF'
+  readonly code: string = ConseillerInactifError.CODE
+  readonly message: string
+
+  constructor() {
+    this.message = 'Le conseiller est inactif depuis trop longtemps'
+  }
+}
+
 export class DroitsInsuffisants implements DomainError {
   static CODE = 'DROITS_INSUFFISANTS'
   readonly code: string = DroitsInsuffisants.CODE

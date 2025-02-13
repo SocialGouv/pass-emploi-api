@@ -1,4 +1,8 @@
-import { NonTrouveError } from 'src/building-blocks/types/domain-error'
+import { UnauthorizedException } from '@nestjs/common'
+import {
+  ConseillerInactifError,
+  NonTrouveError
+} from 'src/building-blocks/types/domain-error'
 import {
   Failure,
   isFailure,
@@ -549,6 +553,31 @@ describe('AuthentificationSqlRepository', () => {
       expect(
         (resultAccesPartenaireConseiller as Failure).error
       ).to.be.an.instanceOf(NonTrouveError)
+    })
+
+    it('échoue si le conseiller est inactif depuis trop longtemps', async () => {
+      // Given
+      await ConseillerSqlModel.creer(
+        unConseillerDto({
+          id: 'id-conseiller',
+          idAuthentification: 'id-authentification-conseiller'
+        })
+      )
+      oidcClient.exchangeToken.throws(new UnauthorizedException())
+
+      // When
+      const resultAccesPartenaireConseiller =
+        await repository.seFairePasserPourUnConseiller(
+          'id-conseiller',
+          'bearer',
+          Core.Structure.MILO
+        )
+
+      // Then
+      expect(isFailure(resultAccesPartenaireConseiller)).to.equal(true)
+      expect(
+        (resultAccesPartenaireConseiller as Failure).error
+      ).to.be.an.instanceOf(ConseillerInactifError)
     })
   })
 })
