@@ -151,9 +151,12 @@ export function mapSessionConseillerDtoToAgendaQueryModel(
 
 export function mapDetailSessionJeuneDtoToQueryModel(
   sessionDto: SessionJeuneDetailDto,
-  idDossier: string,
-  timezone: string,
-  inscription?: { statut: string }
+  beneficiaire: {
+    idDossier: string
+    timezone: string
+    inscription?: { statut: string }
+  },
+  configuration: { autoinscription: boolean }
 ): DetailSessionJeuneMiloQueryModel {
   const queryModel: DetailSessionJeuneMiloQueryModel = {
     id: sessionDto.session.id.toString(),
@@ -163,11 +166,11 @@ export function mapDetailSessionJeuneDtoToQueryModel(
     type: buildSessionTypeQueryModel(sessionDto.offre.type),
     dateHeureDebut: dateFromMilo(
       sessionDto.session.dateHeureDebut,
-      timezone
+      beneficiaire.timezone
     ).toISO(),
     dateHeureFin: dateFromMilo(
       sessionDto.session.dateHeureFin,
-      timezone
+      beneficiaire.timezone
     ).toISO(),
     lieu: sessionDto.session.lieu,
     animateur: sessionDto.session.animateur,
@@ -176,20 +179,22 @@ export function mapDetailSessionJeuneDtoToQueryModel(
     commentaire: sessionDto.session.commentaire ?? undefined,
     dateMaxInscription: sessionDto.session.dateMaxInscription
       ? DateTime.fromISO(sessionDto.session.dateMaxInscription, {
-          zone: timezone
+          zone: beneficiaire.timezone
         })
           .endOf('day')
           .toUTC()
           .toISO()
       : undefined,
-    nbPlacesDisponibles: sessionDto.session.nbPlacesDisponibles ?? undefined
+    nbPlacesDisponibles: sessionDto.session.nbPlacesDisponibles ?? undefined,
+    autoinscription: configuration.autoinscription
   }
-  if (inscription)
+
+  if (beneficiaire.inscription)
     queryModel.inscription = {
       statut: dtoToStatutInscription(
-        inscription.statut,
+        beneficiaire.inscription.statut,
         sessionDto.session.id,
-        idDossier
+        beneficiaire.idDossier
       )
     }
 

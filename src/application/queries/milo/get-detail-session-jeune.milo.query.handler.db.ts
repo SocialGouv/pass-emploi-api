@@ -22,6 +22,7 @@ import { Authentification } from 'src/domain/authentification'
 import { estMilo } from 'src/domain/core'
 import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
+import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 
@@ -50,12 +51,10 @@ export class GetDetailSessionJeuneMiloQueryHandler extends QueryHandler<
     const jeune = await JeuneSqlModel.findByPk(query.idJeune, {
       include: [{ model: StructureMiloSqlModel, required: true }]
     })
-
     const timezoneDeLaStructureDuJeune = jeune?.structureMilo?.timezone
     if (!timezoneDeLaStructureDuJeune) {
       return failure(new JeuneMiloSansStructure(query.idJeune))
     }
-
     if (!jeune.idPartenaire) {
       return failure(new JeuneMiloSansIdDossier(query.idJeune))
     }
@@ -64,7 +63,6 @@ export class GetDetailSessionJeuneMiloQueryHandler extends QueryHandler<
       query.accessToken,
       jeune.structure
     )
-
     const resultDetailSessionMiloClient =
       await this.miloClient.getDetailSessionJeune(idpToken, query.idSession)
     if (isFailure(resultDetailSessionMiloClient)) {
@@ -83,22 +81,27 @@ export class GetDetailSessionJeuneMiloQueryHandler extends QueryHandler<
         jeune.idPartenaire,
         { debut: dateSession, fin: dateSession }
       )
-
     if (isFailure(resultSessionsParDossier)) {
       return resultSessionsParDossier
     }
-
     const detailInscription = resultSessionsParDossier.data.find(
       session => session.session.id.toString() === query.idSession
     )
     const inscription = detailInscription?.sessionInstance
 
+    const configurationSession = await SessionMiloSqlModel.findByPk(
+      detailSession.session.id.toString()
+    )
+
     return success(
       mapDetailSessionJeuneDtoToQueryModel(
         detailSession,
-        jeune.idPartenaire,
-        timezoneDeLaStructureDuJeune,
-        inscription
+        {
+          idDossier: jeune.idPartenaire,
+          timezone: timezoneDeLaStructureDuJeune,
+          inscription
+        },
+        { autoinscription: configurationSession?.autoinscription ?? false }
       )
     )
   }

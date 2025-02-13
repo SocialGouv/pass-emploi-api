@@ -222,6 +222,9 @@ export class DetailSessionJeuneMiloQueryModel {
   @ApiProperty()
   animateur: string
 
+  @ApiProperty()
+  autoinscription: boolean
+
   @ApiProperty({ required: false })
   nomPartenaire?: string
 

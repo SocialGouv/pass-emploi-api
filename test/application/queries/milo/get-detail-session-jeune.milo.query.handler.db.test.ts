@@ -11,7 +11,12 @@ import {
 import { failure, success } from 'src/building-blocks/types/result'
 import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
+import {
+  SessionMiloDto,
+  SessionMiloSqlModel
+} from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
+import { AsSql } from 'src/infrastructure/sequelize/types'
 import { unUtilisateurJeune } from 'test/fixtures/authentification.fixture'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import { uneOffreDto, uneSessionDto } from 'test/fixtures/milo-dto.fixture'
@@ -77,7 +82,24 @@ describe('GetDetailSessionJeuneMiloQueryHandler', () => {
   describe('handle', () => {
     beforeEach(async () => {
       await getDatabase().cleanPG()
-      await ConseillerSqlModel.create(unConseillerDto())
+      const structureMilo = {
+        id: 'id-structure-milo',
+        nomOfficiel: 'Structure Milo',
+        timezone: 'America/Cayenne'
+      }
+      const conseiller = unConseillerDto({ idStructureMilo: structureMilo.id })
+      const sessionMilo: AsSql<SessionMiloDto> = {
+        id: idSession.toString(),
+        estVisible: true,
+        autoinscription: true,
+        idStructureMilo: structureMilo.id,
+        dateModification: new Date(),
+        dateCloture: null
+      }
+
+      await StructureMiloSqlModel.create(structureMilo)
+      await ConseillerSqlModel.create(conseiller)
+      await SessionMiloSqlModel.create(sessionMilo)
     })
 
     describe("quand le jeune n'a pas de structure", () => {
