@@ -73,7 +73,10 @@ export namespace ArchiveJeune {
         Core.Structure.POLE_EMPLOI,
         Core.Structure.MILO,
         Core.Structure.POLE_EMPLOI_BRSA,
-        Core.Structure.CONSEIL_DEPT
+        Core.Structure.CONSEIL_DEPT,
+        Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF,
+        Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL,
+        Core.Structure.FT_EQUIP_EMPLOI_RECRUT
       ],
       description:
         'CDI, CDD de plus de 6 mois dont alternance, titularisation dans la fonction publique'
@@ -93,7 +96,13 @@ export namespace ArchiveJeune {
       ]
     },
     [MotifSuppression.FORMATION]: {
-      structures: [Core.Structure.POLE_EMPLOI_AIJ, Core.Structure.AVENIR_PRO]
+      structures: [
+        Core.Structure.POLE_EMPLOI_AIJ,
+        Core.Structure.AVENIR_PRO,
+        Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF,
+        Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL,
+        Core.Structure.FT_EQUIP_EMPLOI_RECRUT
+      ]
     },
     [MotifSuppression.SERVICE_CIVIQUE]: {
       structures: [Core.Structure.POLE_EMPLOI_AIJ, Core.Structure.AVENIR_PRO]
@@ -118,17 +127,32 @@ export namespace ArchiveJeune {
         Core.Structure.POLE_EMPLOI_BRSA,
         Core.Structure.POLE_EMPLOI_AIJ,
         Core.Structure.CONSEIL_DEPT,
-        Core.Structure.AVENIR_PRO
+        Core.Structure.AVENIR_PRO,
+        Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF,
+        Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL,
+        Core.Structure.FT_EQUIP_EMPLOI_RECRUT
       ]
     },
     [MotifSuppression.DEMANDE_DU_JEUNE]: {
       structures: [Core.Structure.POLE_EMPLOI, Core.Structure.MILO]
     },
     [MotifSuppression.DEMANDE_DU_CONSEILLER]: {
-      structures: [Core.Structure.POLE_EMPLOI_BRSA, Core.Structure.CONSEIL_DEPT]
+      structures: [
+        Core.Structure.POLE_EMPLOI_BRSA,
+        Core.Structure.CONSEIL_DEPT,
+        Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF,
+        Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL,
+        Core.Structure.FT_EQUIP_EMPLOI_RECRUT
+      ]
     },
     [MotifSuppression.DEMANDE_DU_BENEFICIAIRE_BRSA]: {
-      structures: [Core.Structure.POLE_EMPLOI_BRSA, Core.Structure.CONSEIL_DEPT]
+      structures: [
+        Core.Structure.POLE_EMPLOI_BRSA,
+        Core.Structure.CONSEIL_DEPT,
+        Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF,
+        Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL,
+        Core.Structure.FT_EQUIP_EMPLOI_RECRUT
+      ]
     },
     [MotifSuppression.NON_RESPECT_OU_ABANDON]: {
       structures: [Core.Structure.POLE_EMPLOI, Core.Structure.MILO]
@@ -143,7 +167,10 @@ export namespace ArchiveJeune {
         Core.Structure.POLE_EMPLOI_BRSA,
         Core.Structure.POLE_EMPLOI_AIJ,
         Core.Structure.CONSEIL_DEPT,
-        Core.Structure.AVENIR_PRO
+        Core.Structure.AVENIR_PRO,
+        Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF,
+        Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL,
+        Core.Structure.FT_EQUIP_EMPLOI_RECRUT
       ]
     },
     [MotifSuppression.DEMENAGEMENT_TERRITOIRE_HORS_EXPERIMENTATION]: {
@@ -153,7 +180,13 @@ export namespace ArchiveJeune {
       structures: [Core.Structure.POLE_EMPLOI, Core.Structure.MILO]
     },
     [MotifSuppression.CREATION_ENTREPRISE]: {
-      structures: [Core.Structure.POLE_EMPLOI_AIJ, Core.Structure.AVENIR_PRO]
+      structures: [
+        Core.Structure.POLE_EMPLOI_AIJ,
+        Core.Structure.AVENIR_PRO,
+        Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF,
+        Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL,
+        Core.Structure.FT_EQUIP_EMPLOI_RECRUT
+      ]
     },
     [MotifSuppression.ESAT]: {
       structures: [Core.Structure.POLE_EMPLOI_AIJ]
