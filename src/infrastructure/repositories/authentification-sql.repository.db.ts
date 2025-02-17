@@ -225,7 +225,10 @@ export class AuthentificationSqlOidcRepository
       const accesConseiller = await this.oidcClient.exchangeToken(
         bearer,
         structure,
-        conseillerSqlModel.idAuthentification
+        {
+          sub: conseillerSqlModel.idAuthentification,
+          type: Authentification.Type.CONSEILLER
+        }
       )
 
       return success(accesConseiller)
