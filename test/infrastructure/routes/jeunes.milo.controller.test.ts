@@ -1,41 +1,50 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
-
-import * as request from 'supertest'
-import { uneDatetime } from 'test/fixtures/date.fixture'
-import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
-import { failure, success } from 'src/building-blocks/types/result'
-import { JwtService } from 'src/infrastructure/auth/jwt.service'
-import {
-  unJwtPayloadValide,
-  unUtilisateurDecode
-} from 'test/fixtures/authentification.fixture'
-import { StubbedClass } from 'test/utils'
-
-import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
-import { DateService } from 'src/utils/date-service'
-
-import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
+import { DateTime } from 'luxon'
+import AutoinscrireBeneficiaireSessionMiloCommandHandler from 'src/application/commands/milo/autoinscrire-beneficiaire-session-milo.command.handler'
 import { GetAccueilJeuneMiloQueryHandler } from 'src/application/queries/milo/get-accueil-jeune-milo.query.handler.db'
+import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
+import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
 import {
   AccueilJeuneMiloQueryModel,
   GetMonSuiviMiloQueryModel
 } from 'src/application/queries/query-models/jeunes.milo.query-model'
-import { GetSessionsJeuneMiloQueryHandler } from 'src/application/queries/milo/get-sessions-jeune.milo.query.handler.db'
+import {
+  DroitsInsuffisants,
+  NombrePlacesInsuffisant
+} from 'src/building-blocks/types/domain-error'
+import {
+  emptySuccess,
+  failure,
+  success
+} from 'src/building-blocks/types/result'
+import { JwtService } from 'src/infrastructure/auth/jwt.service'
+import { DateService } from 'src/utils/date-service'
+
+import * as request from 'supertest'
+import {
+  unJwtPayloadValide,
+  unUtilisateurDecode
+} from 'test/fixtures/authentification.fixture'
+import { uneDatetime } from 'test/fixtures/date.fixture'
 import {
   unDetailSessionJeuneMiloQueryModel,
   uneSessionJeuneMiloQueryModel
 } from 'test/fixtures/sessions.fixture'
-import { GetDetailSessionJeuneMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-jeune.milo.query.handler.db'
+import { StubbedClass } from 'test/utils'
+
+import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
+
+import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
 import {
   GetMonSuiviMiloQuery,
   GetMonSuiviMiloQueryHandler
 } from '../../../src/application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
-import { DateTime } from 'luxon'
 
 describe('JeunesMiloController', () => {
   let getAccueilQueryHandler: StubbedClass<GetAccueilJeuneMiloQueryHandler>
   let getSessionsQueryHandler: StubbedClass<GetSessionsJeuneMiloQueryHandler>
   let getDetailSessionQueryHandler: StubbedClass<GetDetailSessionJeuneMiloQueryHandler>
+  let autoinscrireBeneficiaireSessionMiloCommandHandler: StubbedClass<AutoinscrireBeneficiaireSessionMiloCommandHandler>
   let monSuiviQueryHandler: StubbedClass<GetMonSuiviMiloQueryHandler>
   let jwtService: StubbedClass<JwtService>
   let dateService: StubbedClass<DateService>
@@ -49,6 +58,9 @@ describe('JeunesMiloController', () => {
     getSessionsQueryHandler = app.get(GetSessionsJeuneMiloQueryHandler)
     getDetailSessionQueryHandler = app.get(
       GetDetailSessionJeuneMiloQueryHandler
+    )
+    autoinscrireBeneficiaireSessionMiloCommandHandler = app.get(
+      AutoinscrireBeneficiaireSessionMiloCommandHandler
     )
     monSuiviQueryHandler = app.get(GetMonSuiviMiloQueryHandler)
     jwtService = app.get(JwtService)
@@ -198,6 +210,45 @@ describe('JeunesMiloController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       `/jeunes/milo/${idJeune}/sessions/${idSession}`
+    )
+  })
+
+  describe('POST /jeunes/milo/:idBeneficiaire/sessions/:idSession/inscrire', () => {
+    const idBeneficiaire = '1'
+    const idSession = 'A'
+    const token = 'token'
+
+    it('inscrit le bénéfiaire à la session', async () => {
+      autoinscrireBeneficiaireSessionMiloCommandHandler.execute
+        .withArgs(
+          { idSession, idBeneficiaire, accessToken: token },
+          unUtilisateurDecode()
+        )
+        .resolves(emptySuccess())
+
+      await request(app.getHttpServer())
+        .post(`/jeunes/milo/${idBeneficiaire}/sessions/${idSession}/inscrire`)
+        .set('authorization', `bearer ${token}`)
+        .expect(HttpStatus.NO_CONTENT)
+    })
+
+    it('renvoie une erreur quand l’inscription échoue', async () => {
+      autoinscrireBeneficiaireSessionMiloCommandHandler.execute
+        .withArgs(
+          { idSession, idBeneficiaire, accessToken: token },
+          unUtilisateurDecode()
+        )
+        .resolves(failure(new NombrePlacesInsuffisant()))
+
+      await request(app.getHttpServer())
+        .post(`/jeunes/milo/${idBeneficiaire}/sessions/${idSession}/inscrire`)
+        .set('authorization', `bearer ${token}`)
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'post',
+      `/jeunes/milo/id-beneficiaire'/sessions/id-session/inscrire`
     )
   })
 
