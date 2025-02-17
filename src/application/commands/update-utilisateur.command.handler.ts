@@ -387,30 +387,40 @@ function verifierStructureBeneficiaire(
 ): Result {
   // TODO : ne garder que cette partie pour FT quand le mobile sera en prod avec bouton unique FT
   if (structureAttendue === 'FRANCE_TRAVAIL') {
-    switch (utilisateurTrouve.structure) {
-      case Core.Structure.MILO:
-        return failure(
-          new NonTraitableError(
-            'Utilisateur',
-            idUtilisateur,
-            NonTraitableReason.UTILISATEUR_DEJA_MILO
-          )
-        )
-      case Core.Structure.POLE_EMPLOI:
-      case Core.Structure.POLE_EMPLOI_AIJ:
-      case Core.Structure.POLE_EMPLOI_BRSA:
-      case Core.Structure.CONSEIL_DEPT:
-      case Core.Structure.AVENIR_PRO:
-        return emptySuccess()
-    }
+    return autoriseUtilisateurFTConnectOnly(utilisateurTrouve, idUtilisateur)
   }
 
   if (utilisateurTrouve.structure !== structureAttendue) {
     const reason = reasonFromStructure(utilisateurTrouve.structure)
-
     return failure(new NonTraitableError('Utilisateur', idUtilisateur, reason))
   }
+
   return emptySuccess()
+}
+
+function autoriseUtilisateurFTConnectOnly(
+  utilisateurTrouve: Authentification.Utilisateur,
+  idUtilisateur: string
+): Result {
+  switch (utilisateurTrouve.structure) {
+    case Core.Structure.MILO:
+      return failure(
+        new NonTraitableError(
+          'Utilisateur',
+          idUtilisateur,
+          NonTraitableReason.UTILISATEUR_DEJA_MILO
+        )
+      )
+    case Core.Structure.POLE_EMPLOI:
+    case Core.Structure.POLE_EMPLOI_AIJ:
+    case Core.Structure.POLE_EMPLOI_BRSA:
+    case Core.Structure.CONSEIL_DEPT:
+    case Core.Structure.AVENIR_PRO:
+    case Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL:
+    case Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF:
+    case Core.Structure.FT_EQUIP_EMPLOI_RECRUT:
+      return emptySuccess()
+  }
 }
 
 function reasonFromStructure(structure: Core.Structure): NonTraitableReason {
