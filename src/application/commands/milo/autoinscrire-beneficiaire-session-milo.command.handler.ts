@@ -165,8 +165,8 @@ export default class AutoinscrireBeneficiaireSessionMiloCommandHandler extends C
       beneficiaire.conseiller.id
     )
     if (isFailure(resultAccesMilo)) return resultAccesMilo
-
     const { accesMiloBeneficiaire, accesMiloConseiller } = resultAccesMilo.data
+
     const resultSession = await this.sessionMiloRepository.getForBeneficiaire(
       idSession,
       accesMiloBeneficiaire,

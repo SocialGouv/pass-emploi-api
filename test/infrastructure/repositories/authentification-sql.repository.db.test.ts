@@ -530,7 +530,7 @@ describe('AuthentificationSqlRepository', () => {
       expect(oidcClient.exchangeToken).to.have.been.calledOnceWithExactly(
         'bearer',
         Core.Structure.MILO,
-        'id-authentification-conseiller'
+        { sub: 'id-authentification-conseiller', type: 'CONSEILLER' }
       )
       expect(isSuccess(resultAccesPartenaireConseiller)).to.equal(true)
       expect(

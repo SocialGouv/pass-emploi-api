@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import { firstValueFrom } from 'rxjs'
+import { Authentification } from 'src/domain/authentification'
 import { Core, estMilo, estPoleEmploiOuCDOuAvenirPro } from 'src/domain/core'
 import { buildError } from 'src/utils/logger.module'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
@@ -49,13 +50,16 @@ export class OidcClient {
     bearer: string,
     subJeune: string
   ): Promise<string> {
-    return this.exchangeToken(bearer, undefined, subJeune)
+    return this.exchangeToken(bearer, undefined, {
+      sub: subJeune,
+      type: Authentification.Type.JEUNE
+    })
   }
 
   async exchangeToken(
     bearer: string,
     structure?: Core.Structure,
-    requestedTokenSub?: string
+    target?: { sub: string; type: Authentification.Type }
   ): Promise<string> {
     const url = `${this.issuerUrl}/protocol/openid-connect/token`
     const query = new URLSearchParams({
@@ -65,8 +69,9 @@ export class OidcClient {
       client_id: this.clientId,
       client_secret: this.clientSecret
     })
-    if (requestedTokenSub) {
-      query.append('requested_token_sub', 'requestedTokenSub')
+    if (target) {
+      query.append('requested_token_sub', target.sub)
+      query.append('requested_sub_type', target.type)
     }
     const headers = { 'Content-Type': 'application/x-www-form-urlencoded' }
 

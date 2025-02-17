@@ -199,6 +199,7 @@ describe('OidcClient', () => {
     beforeEach(async () => {
       await getDatabase().cleanPG()
     })
+
     it("passe lorsque l'appel d'api est ok avec user jeune", async () => {
       // Given
       const idAuthentification = 'idAuth'
