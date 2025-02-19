@@ -53,6 +53,7 @@ export namespace Evenement {
     SESSION_AFFICHEE = 'SESSION_AFFICHEE',
     MESSAGE_SESSION_MILO_PARTAGE = 'MESSAGE_SESSION_MILO_PARTAGE',
     SESSION_INSCRIPTION = 'SESSION_INSCRIPTION',
+    SESSION_AUTOINSCRIPTION = 'SESSION_AUTOINSCRIPTION',
     SESSION_MODIFICATION = 'SESSION_MODIFICATION',
     EVENEMENT_EXTERNE_RECHERCHE = 'EVENEMENT_EXTERNE_RECHERCHE',
     EVENEMENT_EXTERNE_DETAIL = 'EVENEMENT_EXTERNE_DETAIL',
@@ -307,6 +308,11 @@ const evenements: {
   [Evenement.Code.SESSION_INSCRIPTION]: {
     categorie: 'Rendez-vous',
     action: 'Inscription',
+    nom: 'Session'
+  },
+  [Evenement.Code.SESSION_AUTOINSCRIPTION]: {
+    categorie: 'Rendez-vous',
+    action: 'Auto-inscription',
     nom: 'Session'
   },
   [Evenement.Code.SESSION_MODIFICATION]: {

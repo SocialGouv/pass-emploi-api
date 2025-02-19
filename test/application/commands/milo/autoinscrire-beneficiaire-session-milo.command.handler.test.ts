@@ -323,7 +323,7 @@ describe('AutoinscrireBeneficiaireSessionMiloCommandHandler', () => {
 
       // Then
       expect(evenementService.creer).to.have.been.calledOnceWithExactly(
-        'SESSION_INSCRIPTION',
+        'SESSION_AUTOINSCRIPTION',
         utilisateurBeneficiaire
       )
     })

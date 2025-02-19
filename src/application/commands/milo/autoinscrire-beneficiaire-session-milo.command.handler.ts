@@ -123,7 +123,7 @@ export default class AutoinscrireBeneficiaireSessionMiloCommandHandler extends C
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
     await this.evenementService.creer(
-      Evenement.Code.SESSION_INSCRIPTION,
+      Evenement.Code.SESSION_AUTOINSCRIPTION,
       utilisateur
     )
   }
