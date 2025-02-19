@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon'
 import { describe } from 'mocha'
 import { SinonSandbox, createSandbox } from 'sinon'
 import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
@@ -183,29 +182,9 @@ describe('GetDetailSessionJeuneMiloQueryHandler', () => {
           .resolves(
             success({
               session: { ...uneSessionDto, id: idSession },
-              offre: uneOffreDto
+              offre: uneOffreDto,
+              sessionInstance: { statut: MILO_REFUS_JEUNE }
             })
-          )
-        const dateSession = DateTime.fromFormat(
-          '2020-04-06 10:20:00',
-          'yyyy-MM-dd HH:mm:ss',
-          {
-            zone: 'America/Cayenne'
-          }
-        )
-        miloClient.getSessionsParDossierJeune
-          .withArgs(idpToken, jeune.idPartenaire, {
-            debut: dateSession,
-            fin: dateSession
-          })
-          .resolves(
-            success([
-              {
-                session: uneSessionDto,
-                offre: uneOffreDto,
-                sessionInstance: { statut: MILO_REFUS_JEUNE }
-              }
-            ])
           )
 
         // When

@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon'
 import {
+  BeneficiaireDejaInscritError,
   EmargementIncorrect,
-  NombrePlacesInsuffisant
+  NombrePlacesInsuffisantError
 } from 'src/building-blocks/types/domain-error'
 import {
   Result,
@@ -32,10 +33,12 @@ export interface SessionMilo {
   dateCloture?: DateTime
 }
 
-export type SessionMiloAllegee = Pick<
+export type SessionMiloAllegeeForBeneficiaire = Pick<
   SessionMilo,
   'id' | 'nom' | 'debut' | 'nbPlacesDisponibles'
->
+> & {
+  statutInscription?: SessionMilo.Inscription.Statut
+}
 
 export interface InstanceSessionMilo {
   id: string
@@ -130,11 +133,7 @@ export namespace SessionMilo {
     const inscriptionsExistantes = getInscriptionsExistantes(session)
 
     for (const emargement of emargements) {
-      if (
-        emargement.statut !== Inscription.Statut.INSCRIT &&
-        emargement.statut !== Inscription.Statut.PRESENT
-      )
-        continue
+      if (!SessionMilo.Inscription.estIncrit(emargement.statut)) continue
 
       const inscription = inscriptionsExistantes.get(emargement.idJeune)!
 
@@ -174,10 +173,15 @@ export namespace SessionMilo {
       : SessionMilo.Statut.A_CLOTURER
   }
 
-  export function peutInscrireBeneficiaire({
-    nbPlacesDisponibles
-  }: Pick<SessionMilo, 'nbPlacesDisponibles'>): Result {
-    if (nbPlacesDisponibles === 0) return failure(new NombrePlacesInsuffisant())
+  export function peutInscrireBeneficiaire(
+    session: SessionMiloAllegeeForBeneficiaire
+  ): Result {
+    if (SessionMilo.Inscription.estIncrit(session.statutInscription))
+      return failure(new BeneficiaireDejaInscritError())
+
+    if (session.nbPlacesDisponibles === 0)
+      return failure(new NombrePlacesInsuffisantError())
+
     return emptySuccess()
   }
 
@@ -189,9 +193,10 @@ export namespace SessionMilo {
 
     getForBeneficiaire(
       idSession: string,
+      idDossier: string,
       tokenMiloBeneficiaire: string,
       timezone: string
-    ): Promise<Result<SessionMiloAllegee>>
+    ): Promise<Result<SessionMiloAllegeeForBeneficiaire>>
 
     getForConseiller(
       idSession: string,
@@ -242,6 +247,10 @@ export namespace SessionMilo {
       REFUS_JEUNE = 'REFUS_JEUNE',
       REFUS_TIERS = 'REFUS_TIERS',
       PRESENT = 'PRESENT'
+    }
+
+    export function estIncrit(statut?: Statut): boolean {
+      return statut === Statut.INSCRIT || statut === Statut.PRESENT
     }
   }
 
@@ -365,7 +374,7 @@ function verifierNombrePlaces(
   const nbPlacesLiberees = aDesinscrire.length + aRefuser.length
 
   if (session.nbPlacesDisponibles < nbPlacesPrises - nbPlacesLiberees) {
-    return failure(new NombrePlacesInsuffisant())
+    return failure(new NombrePlacesInsuffisantError())
   }
   return emptySuccess()
 }

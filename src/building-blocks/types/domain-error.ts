@@ -260,13 +260,23 @@ export class DateNonAutoriseeError implements DomainError {
   }
 }
 
-export class NombrePlacesInsuffisant implements DomainError {
+export class NombrePlacesInsuffisantError implements DomainError {
   static CODE = 'NOMBRE_PLACE_INSUFFISANT'
-  readonly code: string = NombrePlacesInsuffisant.CODE
+  readonly code: string = NombrePlacesInsuffisantError.CODE
   readonly message: string
 
   constructor() {
     this.message = 'La session n’a pas suffisamment de places disponibles'
+  }
+}
+
+export class BeneficiaireDejaInscritError implements DomainError {
+  static CODE = 'BENEFICIAIRE_DEJA_INSCRIT'
+  readonly code: string = BeneficiaireDejaInscritError.CODE
+  readonly message: string
+
+  constructor() {
+    this.message = 'Le bénéficiaire est déjà inscrit'
   }
 }
 

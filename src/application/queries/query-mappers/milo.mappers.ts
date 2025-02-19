@@ -8,7 +8,6 @@ import {
   MILO_REFUS_TIERS,
   OffreTypeCode,
   SessionConseillerDetailDto,
-  SessionJeuneDetailDto,
   SessionParDossierJeuneDto
 } from 'src/infrastructure/clients/dto/milo.dto'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
@@ -97,11 +96,7 @@ export function mapSessionConseillerDtoToQueryModel(
     .map(({ idDossier, statut }) =>
       dtoToStatutInscription(statut, session.id, idDossier.toString())
     )
-    .filter(
-      statut =>
-        statut === SessionMilo.Inscription.Statut.INSCRIT ||
-        statut === SessionMilo.Inscription.Statut.PRESENT
-    ).length
+    .filter(statut => SessionMilo.Inscription.estIncrit(statut)).length
 
   const autoinscription = parametrageSqlModel?.autoinscription ?? false
 
@@ -150,11 +145,10 @@ export function mapSessionConseillerDtoToAgendaQueryModel(
 }
 
 export function mapDetailSessionJeuneDtoToQueryModel(
-  sessionDto: SessionJeuneDetailDto,
+  sessionDto: SessionParDossierJeuneDto,
   beneficiaire: {
     idDossier: string
     timezone: string
-    inscription?: { statut: string }
   },
   configuration: { autoinscription: boolean }
 ): DetailSessionJeuneMiloQueryModel {
@@ -189,10 +183,10 @@ export function mapDetailSessionJeuneDtoToQueryModel(
     autoinscription: configuration.autoinscription
   }
 
-  if (beneficiaire.inscription)
+  if (sessionDto.sessionInstance)
     queryModel.inscription = {
       statut: dtoToStatutInscription(
-        beneficiaire.inscription.statut,
+        sessionDto.sessionInstance.statut,
         sessionDto.session.id,
         beneficiaire.idDossier
       )

@@ -1,6 +1,9 @@
 import { SessionMilo } from 'src/domain/milo/session.milo'
 import { DateTime } from 'luxon'
-import { uneSessionMilo } from '../../fixtures/sessions.fixture'
+import {
+  uneSessionMilo,
+  uneSessionMiloAllegee
+} from '../../fixtures/sessions.fixture'
 import {
   Failure,
   failure,
@@ -8,8 +11,9 @@ import {
   isSuccess
 } from 'src/building-blocks/types/result'
 import {
+  BeneficiaireDejaInscritError,
   EmargementIncorrect,
-  NombrePlacesInsuffisant
+  NombrePlacesInsuffisantError
 } from 'src/building-blocks/types/domain-error'
 import { expect } from 'test/utils'
 
@@ -175,9 +179,9 @@ describe('SessionMilo', () => {
   describe('peutInscrireBeneficiaire', () => {
     it('réussi s’il n’y a pas de maximum de places', async () => {
       // When
-      const result = SessionMilo.peutInscrireBeneficiaire({
-        nbPlacesDisponibles: undefined
-      })
+      const result = SessionMilo.peutInscrireBeneficiaire(
+        uneSessionMiloAllegee()
+      )
 
       // Then
       expect(isSuccess(result)).to.be.true()
@@ -185,9 +189,11 @@ describe('SessionMilo', () => {
 
     it('réussi s’il reste des places', async () => {
       // When
-      const result = SessionMilo.peutInscrireBeneficiaire({
-        nbPlacesDisponibles: 12
-      })
+      const result = SessionMilo.peutInscrireBeneficiaire(
+        uneSessionMiloAllegee({
+          nbPlacesDisponibles: 12
+        })
+      )
 
       // Then
       expect(isSuccess(result)).to.be.true()
@@ -195,14 +201,31 @@ describe('SessionMilo', () => {
 
     it('échoue s’il n’y a plus de place disponible', async () => {
       // When
-      const result = SessionMilo.peutInscrireBeneficiaire({
-        nbPlacesDisponibles: 0
-      })
+      const result = SessionMilo.peutInscrireBeneficiaire(
+        uneSessionMiloAllegee({
+          nbPlacesDisponibles: 0
+        })
+      )
 
       // Then
       expect(isFailure(result)).to.be.true()
       expect((result as Failure).error).to.be.an.instanceOf(
-        NombrePlacesInsuffisant
+        NombrePlacesInsuffisantError
+      )
+    })
+
+    it('échoue si le bénéficiaire est déjà inscrit', async () => {
+      // When
+      const result = SessionMilo.peutInscrireBeneficiaire(
+        uneSessionMiloAllegee({
+          statutInscription: SessionMilo.Inscription.Statut.INSCRIT
+        })
+      )
+
+      // Then
+      expect(isFailure(result)).to.be.true()
+      expect((result as Failure).error).to.be.an.instanceOf(
+        BeneficiaireDejaInscritError
       )
     })
   })

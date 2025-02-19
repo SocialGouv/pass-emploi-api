@@ -18,6 +18,7 @@ export interface SessionDto {
   lieu: string
   nbPlacesDisponibles: number | null
   commentaire: string | null
+  /** Seulement dans structures/${idStructure}/sessions?rechercheInscrits=true **/
   instances: InscritSessionMiloDto[] | null
 }
 

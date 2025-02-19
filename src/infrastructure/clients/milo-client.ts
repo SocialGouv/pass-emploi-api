@@ -1,8 +1,10 @@
 import { HttpService } from '@nestjs/axios'
 import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import * as APM from 'elastic-apm-node'
 import { DateTime } from 'luxon'
 import { firstValueFrom } from 'rxjs'
+import { MILO_DATE_FORMAT } from 'src/application/queries/query-mappers/milo.mappers'
 import { ErreurHttp } from 'src/building-blocks/types/domain-error'
 import {
   emptySuccess,
@@ -12,6 +14,9 @@ import {
   Result,
   success
 } from 'src/building-blocks/types/result'
+import { DateService } from '../../utils/date-service'
+import { RateLimiterService } from '../../utils/rate-limiter.service'
+import { getAPMInstance } from '../monitoring/apm.init'
 import {
   InscrireJeuneSessionDto,
   InscritSessionMiloDto,
@@ -23,10 +28,6 @@ import {
   StructureConseillerMiloDto
 } from './dto/milo.dto'
 import { handleAxiosError } from './utils/axios-error-handler'
-import * as APM from 'elastic-apm-node'
-import { getAPMInstance } from '../monitoring/apm.init'
-import { RateLimiterService } from '../../utils/rate-limiter.service'
-import { DateService } from '../../utils/date-service'
 
 export const TAILLE_PAGE_MAX_APIS_MILO: number = 150
 
@@ -155,12 +156,43 @@ export class MiloClient {
 
   async getDetailSessionJeune(
     idpToken: string,
-    idSession: string
-  ): Promise<Result<SessionJeuneDetailDto>> {
+    idSession: string,
+    idDossier: string,
+    timezone: string
+  ): Promise<Result<SessionParDossierJeuneDto>> {
     await this.rateLimiterService.sessionsJeuneMiloRateLimiter.attendreLaProchaineDisponibilite()
-    return this.get<SessionJeuneDetailDto>(`sessions/${idSession}`, {
-      apiKey: this.apiKeySessionsDetailEtListeJeune,
-      idpToken
+    const resultDetail = await this.get<SessionJeuneDetailDto>(
+      `sessions/${idSession}`,
+      {
+        apiKey: this.apiKeySessionsDetailEtListeJeune,
+        idpToken
+      }
+    )
+    if (isFailure(resultDetail)) {
+      return resultDetail
+    }
+    const detailSessionDto = resultDetail.data
+    const dateSession = DateTime.fromFormat(
+      detailSessionDto.session.dateHeureDebut,
+      MILO_DATE_FORMAT,
+      { zone: timezone }
+    )
+
+    const resultSessionsParDossier = await this.getSessionsParDossierJeune(
+      idpToken,
+      idDossier,
+      { debut: dateSession, fin: dateSession }
+    )
+    if (isFailure(resultSessionsParDossier)) {
+      return resultSessionsParDossier
+    }
+    const dtoAvecInscription = resultSessionsParDossier.data.find(
+      session => session.session.id.toString() === idSession
+    )
+
+    return success({
+      ...detailSessionDto,
+      sessionInstance: dtoAvecInscription?.sessionInstance
     })
   }
 

@@ -24,7 +24,7 @@ import { Evenement, EvenementService } from 'src/domain/evenement'
 import { JeuneMilo, JeuneMiloRepositoryToken } from 'src/domain/milo/jeune.milo'
 import {
   SessionMilo,
-  SessionMiloAllegee,
+  SessionMiloAllegeeForBeneficiaire,
   SessionMiloRepositoryToken
 } from 'src/domain/milo/session.milo'
 import { Notification } from 'src/domain/notification/notification'
@@ -159,7 +159,7 @@ export default class AutoinscrireBeneficiaireSessionMiloCommandHandler extends C
     beneficiaire: BeneficiaireMilo,
     idSession: string,
     accessToken: string
-  ): Promise<Result<SessionMiloAllegee>> {
+  ): Promise<Result<SessionMiloAllegeeForBeneficiaire>> {
     const resultAccesMilo = await this.recupererAccesMilo(
       accessToken,
       beneficiaire.conseiller.id
@@ -169,6 +169,7 @@ export default class AutoinscrireBeneficiaireSessionMiloCommandHandler extends C
 
     const resultSession = await this.sessionMiloRepository.getForBeneficiaire(
       idSession,
+      beneficiaire.idPartenaire,
       accesMiloBeneficiaire,
       beneficiaire.configuration.fuseauHoraire ?? 'Europe/Paris'
     )
@@ -192,7 +193,7 @@ export default class AutoinscrireBeneficiaireSessionMiloCommandHandler extends C
   private async envoyerMessageConseiller(
     idBeneficiaire: string,
     idConseiller: string,
-    session: SessionMiloAllegee
+    session: SessionMiloAllegeeForBeneficiaire
   ): Promise<void> {
     const conversation =
       await this.chatRepository.recupererConversationIndividuelle(

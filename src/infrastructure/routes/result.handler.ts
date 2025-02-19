@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import {
+  BeneficiaireDejaInscritError,
   CampagneExisteDejaError,
   CampagneNonActive,
   CompteDiagorienteInvalideError,
@@ -29,7 +30,7 @@ import {
   JeuneNonLieAuConseillerError,
   JeunePasInactifError,
   MauvaiseCommandeError,
-  NombrePlacesInsuffisant,
+  NombrePlacesInsuffisantError,
   NonTraitableError,
   NonTrouveError,
   ReponsesCampagneInvalide,
@@ -71,7 +72,8 @@ function handleFailure(result: Failure): never {
     case ConseillerMiloSansStructure.CODE:
     case JeuneMiloSansStructure.CODE:
     case JeuneMiloSansIdDossier.CODE:
-    case NombrePlacesInsuffisant.CODE:
+    case NombrePlacesInsuffisantError.CODE:
+    case BeneficiaireDejaInscritError.CODE:
     case EmargementIncorrect.CODE:
     case ConseillerNonValide.CODE:
       throw new BadRequestException(result.error, result.error.message)

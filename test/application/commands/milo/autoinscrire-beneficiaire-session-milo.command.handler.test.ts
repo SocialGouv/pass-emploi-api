@@ -5,7 +5,7 @@ import AutoinscrireBeneficiaireSessionMiloCommandHandler, {
 } from 'src/application/commands/milo/autoinscrire-beneficiaire-session-milo.command.handler'
 import {
   DroitsInsuffisants,
-  NombrePlacesInsuffisant,
+  NombrePlacesInsuffisantError,
   NonTraitableError,
   NonTrouveError
 } from 'src/building-blocks/types/domain-error'
@@ -113,7 +113,12 @@ describe('AutoinscrireBeneficiaireSessionMiloCommandHandler', () => {
         .withArgs(beneficiaireMilo.conseiller!.id, 'accessToken')
         .resolves(success('token-conseiller-milo'))
       sessionMiloRepository.getForBeneficiaire
-        .withArgs('id-session', 'token-beneficiaire-milo')
+        .withArgs(
+          'id-session',
+          beneficiaireMilo.idPartenaire,
+          'token-beneficiaire-milo',
+          beneficiaireMilo.configuration.fuseauHoraire
+        )
         .resolves(success(session))
       sessionMiloRepository.inscrireBeneficiaire
         .withArgs(
@@ -220,7 +225,12 @@ describe('AutoinscrireBeneficiaireSessionMiloCommandHandler', () => {
     it('vérifie que le bénéficiaire peut s’inscrire', async () => {
       // Given
       sessionMiloRepository.getForBeneficiaire
-        .withArgs('id-session', 'token-beneficiaire-milo')
+        .withArgs(
+          'id-session',
+          beneficiaireMilo.idPartenaire,
+          'token-beneficiaire-milo',
+          beneficiaireMilo.configuration.fuseauHoraire
+        )
         .resolves(success({ nbPlacesDisponibles: 0 }))
 
       // When
@@ -233,7 +243,7 @@ describe('AutoinscrireBeneficiaireSessionMiloCommandHandler', () => {
       // Then
       expect(isFailure(result)).to.be.true()
       expect((result as Failure).error).to.be.an.instanceOf(
-        NombrePlacesInsuffisant
+        NombrePlacesInsuffisantError
       )
     })
 

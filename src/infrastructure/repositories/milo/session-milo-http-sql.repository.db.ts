@@ -15,7 +15,7 @@ import {
   InscriptionsATraiter,
   InstanceSessionMilo,
   SessionMilo,
-  SessionMiloAllegee
+  SessionMiloAllegeeForBeneficiaire
 } from 'src/domain/milo/session.milo'
 import {
   PlanificateurService,
@@ -101,25 +101,31 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
 
   async getForBeneficiaire(
     idSession: string,
+    idDossier: string,
     tokenMiloBeneficiaire: string,
     timezone: string
-  ): Promise<Result<SessionMiloAllegee>> {
+  ): Promise<Result<SessionMiloAllegeeForBeneficiaire>> {
     const resultSession = await this.miloClient.getDetailSessionJeune(
       tokenMiloBeneficiaire,
-      idSession
+      idSession,
+      idDossier,
+      timezone
     )
     if (isFailure(resultSession)) {
       return resultSession
     }
-    const { session } = resultSession.data
+    const { session, sessionInstance } = resultSession.data
 
     return success({
-      id: session.id.toString(),
+      id: idSession,
       nom: session.nom,
       debut: DateTime.fromFormat(session.dateHeureDebut, FORMAT_DATETIME_MILO, {
         zone: timezone
       }),
-      nbPlacesDisponibles: session.nbPlacesDisponibles ?? undefined
+      nbPlacesDisponibles: session.nbPlacesDisponibles ?? undefined,
+      statutInscription: sessionInstance
+        ? dtoToStatutInscription(sessionInstance?.statut, idSession, idDossier)
+        : undefined
     })
   }
 
@@ -347,8 +353,9 @@ function dtoToSessionMilo(
   listeInscrits: InscritSessionMiloDto[],
   jeunes: Array<Pick<JeuneSqlModel, 'id' | 'idPartenaire'>>
 ): SessionMilo {
+  const idSession = sessionDto.id.toString()
   const session: SessionMilo = {
-    id: sessionDto.id.toString(),
+    id: idSession,
     nom: sessionDto.nom,
     debut: DateTime.fromFormat(
       sessionDto.dateHeureDebut,
@@ -365,7 +372,7 @@ function dtoToSessionMilo(
     autoinscription: false,
     idStructureMilo: structureMilo.id,
     offre: dtoToOffre(offreDto),
-    inscriptions: dtoToInscriptions(listeInscrits, jeunes),
+    inscriptions: dtoToInscriptions(idSession, listeInscrits, jeunes),
     dateCloture: sessionSql?.dateCloture
       ? DateTime.fromJSDate(sessionSql?.dateCloture)
       : undefined
@@ -404,6 +411,7 @@ function dtoToOffre(offreDto: OffreDto): SessionMilo.Offre {
 }
 
 function dtoToInscriptions(
+  idSession: string,
   listeInscrits: InscritSessionMiloDto[],
   jeunes: Array<Pick<JeuneSqlModel, 'id' | 'idPartenaire'>>
 ): SessionMilo.Inscription[] {
@@ -421,6 +429,7 @@ function dtoToInscriptions(
     )
     .map(inscription =>
       dtoToInscription(
+        idSession,
         inscription,
         mapIdPartenaireToIdJeune.get(inscription.idDossier.toString())!
       )
@@ -428,6 +437,7 @@ function dtoToInscriptions(
 }
 
 function dtoToInscription(
+  idSession: string,
   inscritSessionMilo: InscritSessionMiloDto,
   idJeune: string
 ): SessionMilo.Inscription {
@@ -436,14 +446,20 @@ function dtoToInscription(
     idInscription: inscritSessionMilo.idInstanceSession.toString(),
     nom: inscritSessionMilo.nom,
     prenom: inscritSessionMilo.prenom,
-    statut: dtoToStatutInscription(inscritSessionMilo)
+    statut: dtoToStatutInscription(
+      inscritSessionMilo.statut,
+      idSession,
+      inscritSessionMilo.idDossier.toString()
+    )
   }
 }
 
 function dtoToStatutInscription(
-  inscription: InscritSessionMiloDto
+  statut: string,
+  idSession: string,
+  idDossier: string
 ): SessionMilo.Inscription.Statut {
-  switch (inscription.statut) {
+  switch (statut) {
     case MILO_INSCRIT:
       return SessionMilo.Inscription.Statut.INSCRIT
     case MILO_REFUS_TIERS:
@@ -455,7 +471,7 @@ function dtoToStatutInscription(
     default:
       const logger = new Logger('SessionMilo.dtoToStatutInscription')
       logger.error(
-        `Une inscription a un statut inconnu : session ${inscription.idInstanceSession}, dossier ${inscription.idDossier}`
+        `Une inscription a un statut inconnu : session ${idSession}, dossier ${idDossier}`
       )
       return SessionMilo.Inscription.Statut.INSCRIT
   }

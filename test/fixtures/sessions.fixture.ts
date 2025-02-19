@@ -9,7 +9,7 @@ import {
 import { OffreTypeCode } from 'src/infrastructure/clients/dto/milo.dto'
 import {
   SessionMilo,
-  SessionMiloAllegee
+  SessionMiloAllegeeForBeneficiaire
 } from '../../src/domain/milo/session.milo'
 
 export const uneSessionConseillerMiloQueryModel: SessionConseillerMiloQueryModel =
@@ -183,8 +183,10 @@ export const uneSessionMilo = (
   return { ...defaults, ...args }
 }
 
-export function uneSessionMiloAllegee(): SessionMiloAllegee {
-  return {
+export function uneSessionMiloAllegee(
+  overrides: Partial<SessionMiloAllegeeForBeneficiaire> = {}
+): SessionMiloAllegeeForBeneficiaire {
+  const defaults: SessionMiloAllegeeForBeneficiaire = {
     id: 'id-session',
     nom: 'Une session',
     debut: DateTime.fromISO('2020-04-06T13:20:00.000Z', {
@@ -192,4 +194,6 @@ export function uneSessionMiloAllegee(): SessionMiloAllegee {
     }),
     nbPlacesDisponibles: undefined
   }
+
+  return { ...defaults, ...overrides }
 }

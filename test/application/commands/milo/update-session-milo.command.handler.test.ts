@@ -8,7 +8,7 @@ import {
 import {
   ConseillerMiloSansStructure,
   ErreurHttp,
-  NombrePlacesInsuffisant
+  NombrePlacesInsuffisantError
 } from 'src/building-blocks/types/domain-error'
 import {
   emptySuccess,
@@ -622,7 +622,9 @@ describe('UpdateSessionMiloCommandHandler', () => {
         )
 
         // Then
-        expect(result).to.deep.equal(failure(new NombrePlacesInsuffisant()))
+        expect(result).to.deep.equal(
+          failure(new NombrePlacesInsuffisantError())
+        )
         expect(sessionMiloRepository.save).not.to.have.been.called()
       })
     })

@@ -7,7 +7,10 @@ import {
   Success,
   success
 } from 'src/building-blocks/types/result'
-import { SessionMilo, SessionMiloAllegee } from 'src/domain/milo/session.milo'
+import {
+  SessionMilo,
+  SessionMiloAllegeeForBeneficiaire
+} from 'src/domain/milo/session.milo'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { SessionMiloHttpSqlRepository } from 'src/infrastructure/repositories/milo/session-milo-http-sql.repository.db'
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
@@ -515,19 +518,23 @@ describe('SessionMiloHttpSqlRepository', () => {
       // When
       const result = await repository.getForBeneficiaire(
         'idSession',
+        'id-dossier',
         'token-milo',
         'Europe/Paris'
       )
 
       // Then
       expect(isSuccess(result)).to.be.true()
-      expect((result as Success<SessionMiloAllegee>).data).to.deep.equal({
-        id: '1',
+      expect(
+        (result as Success<SessionMiloAllegeeForBeneficiaire>).data
+      ).to.deep.equal({
+        id: 'idSession',
         nom: 'Une-session',
         debut: DateTime.fromISO('2020-04-06T10:20:00', {
           zone: 'Europe/Paris'
         }),
-        nbPlacesDisponibles: 10
+        nbPlacesDisponibles: 10,
+        statutInscription: undefined
       })
     })
   })

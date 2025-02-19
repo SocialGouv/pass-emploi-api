@@ -231,17 +231,43 @@ describe('MiloClient', () => {
       // Given
       const idpToken = 'idpToken'
       const idSession = '1'
+      const idDossier = 'id-dossier'
 
       nock(MILO_BASE_URL)
         .get(`/operateurs/sessions/${idSession}`)
         .reply(200, unDetailSessionJeuneDto)
         .isDone()
 
+      nock(MILO_BASE_URL)
+        .get(
+          '/operateurs/sessions?idDossier=id-dossier&taillePage=150&dateDebutRecherche=2020-04-06&dateFinRecherche=2020-04-06'
+        )
+        .reply(200, {
+          page: 1,
+          nbSessions: 1,
+          sessions: [
+            {
+              ...unDetailSessionJeuneDto,
+              sessionInstance: { statut: MILO_INSCRIT }
+            }
+          ]
+        })
+
       // When
-      const result = await miloClient.getDetailSessionJeune(idpToken, idSession)
+      const result = await miloClient.getDetailSessionJeune(
+        idpToken,
+        idSession,
+        idDossier,
+        'America/Cayenne'
+      )
 
       // Then
-      expect(result).to.deep.equal(success(unDetailSessionJeuneDto))
+      expect(result).to.deep.equal(
+        success({
+          ...unDetailSessionJeuneDto,
+          sessionInstance: { statut: MILO_INSCRIT }
+        })
+      )
     })
   })
 

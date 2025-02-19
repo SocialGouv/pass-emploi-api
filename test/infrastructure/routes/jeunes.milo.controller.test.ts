@@ -10,7 +10,7 @@ import {
 } from 'src/application/queries/query-models/jeunes.milo.query-model'
 import {
   DroitsInsuffisants,
-  NombrePlacesInsuffisant
+  NombrePlacesInsuffisantError
 } from 'src/building-blocks/types/domain-error'
 import {
   emptySuccess,
@@ -238,7 +238,7 @@ describe('JeunesMiloController', () => {
           { idSession, idBeneficiaire, accessToken: token },
           unUtilisateurDecode()
         )
-        .resolves(failure(new NombrePlacesInsuffisant()))
+        .resolves(failure(new NombrePlacesInsuffisantError()))
 
       await request(app.getHttpServer())
         .post(`/jeunes/milo/${idBeneficiaire}/sessions/${idSession}/inscrire`)

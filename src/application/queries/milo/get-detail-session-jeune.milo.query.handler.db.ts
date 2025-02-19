@@ -1,10 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { DateTime } from 'luxon'
 import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
-import {
-  MILO_DATE_FORMAT,
-  mapDetailSessionJeuneDtoToQueryModel
-} from 'src/application/queries/query-mappers/milo.mappers'
+import { mapDetailSessionJeuneDtoToQueryModel } from 'src/application/queries/query-mappers/milo.mappers'
 import { DetailSessionJeuneMiloQueryModel } from 'src/application/queries/query-models/sessions.milo.query.model'
 import {
   JeuneMiloSansIdDossier,
@@ -13,15 +9,15 @@ import {
 import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
 import {
-  Result,
   failure,
   isFailure,
+  Result,
   success
 } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { estMilo } from 'src/domain/core'
-import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
@@ -64,30 +60,16 @@ export class GetDetailSessionJeuneMiloQueryHandler extends QueryHandler<
       jeune.structure
     )
     const resultDetailSessionMiloClient =
-      await this.miloClient.getDetailSessionJeune(idpToken, query.idSession)
+      await this.miloClient.getDetailSessionJeune(
+        idpToken,
+        query.idSession,
+        jeune.idPartenaire,
+        timezoneDeLaStructureDuJeune
+      )
     if (isFailure(resultDetailSessionMiloClient)) {
       return resultDetailSessionMiloClient
     }
     const detailSession = resultDetailSessionMiloClient.data
-
-    const dateSession = DateTime.fromFormat(
-      detailSession.session.dateHeureDebut,
-      MILO_DATE_FORMAT,
-      { zone: timezoneDeLaStructureDuJeune }
-    )
-    const resultSessionsParDossier =
-      await this.miloClient.getSessionsParDossierJeune(
-        idpToken,
-        jeune.idPartenaire,
-        { debut: dateSession, fin: dateSession }
-      )
-    if (isFailure(resultSessionsParDossier)) {
-      return resultSessionsParDossier
-    }
-    const detailInscription = resultSessionsParDossier.data.find(
-      session => session.session.id.toString() === query.idSession
-    )
-    const inscription = detailInscription?.sessionInstance
 
     const configurationSession = await SessionMiloSqlModel.findByPk(
       detailSession.session.id.toString()
@@ -98,8 +80,7 @@ export class GetDetailSessionJeuneMiloQueryHandler extends QueryHandler<
         detailSession,
         {
           idDossier: jeune.idPartenaire,
-          timezone: timezoneDeLaStructureDuJeune,
-          inscription
+          timezone: timezoneDeLaStructureDuJeune
         },
         { autoinscription: configurationSession?.autoinscription ?? false }
       )
