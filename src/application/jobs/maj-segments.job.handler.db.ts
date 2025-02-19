@@ -22,7 +22,6 @@ interface RawJeune {
 }
 
 enum SEGMENTS {
-  CAMPAGNE_NON_REPONDUE = 'CAMPAGNE_NON_REPONDUE',
   JEUNES_MILO = 'JEUNES_MILO',
   JEUNES_POLE_EMPLOI = 'JEUNES_POLE_EMPLOI',
   JEUNES_POLE_EMPLOI_BRSA = 'JEUNES_POLE_EMPLOI_BRSA',
@@ -55,8 +54,6 @@ export class MajSegmentsJobHandler extends JobHandler<Job> {
 
       const segments: Map<string, string[]> = new Map<string, string[]>()
       const nbJeunes = await this.handleSegmentJeunes(segments)
-      const nbCampagnesNonRepondues =
-        await this.handleSegmentCampagneNonRepondue(segments)
 
       this.writeMemberships(segments, maintenant)
       await this.bigqueryClient.loadData(
@@ -75,7 +72,7 @@ export class MajSegmentsJobHandler extends JobHandler<Job> {
         succes: true,
         dateExecution: maintenant,
         tempsExecution: DateService.calculerTempsExecution(maintenant),
-        resultat: { nbJeunes, nbCampagnesNonRepondues }
+        resultat: { nbJeunes }
       }
     } catch (e) {
       this.logger.error(e)
@@ -91,33 +88,6 @@ export class MajSegmentsJobHandler extends JobHandler<Job> {
     }
   }
 
-  async fetchJeunesCEJInstanceIdNayantPasReponduAUneCampagneActive(): Promise<
-    RawJeune[]
-  > {
-    const sqlCampagneEnCours = `select id
-                                    from campagne
-                                    where date_debut < now()
-                                      and date_fin > now()`
-    const campagnesEnCours = await this.sequelize.query(sqlCampagneEnCours, {
-      type: QueryTypes.SELECT
-    })
-    if (!campagnesEnCours.length) {
-      return []
-    }
-
-    const sql = `select instance_id, structure
-                     from jeune
-                     where instance_id is not null
-                       and (structure = 'POLE_EMPLOI' OR structure = 'MILO' OR structure = 'POLE_EMPLOI_BRSA') 
-                       and id not in (select id_jeune
-                                      from reponse_campagne
-                                      where id_campagne in
-                                            (select id from campagne where date_debut < now() and date_fin > now()))`
-    return this.sequelize.query(sql, {
-      type: QueryTypes.SELECT
-    })
-  }
-
   async fetchJeunes(): Promise<RawJeune[]> {
     const sql = `select instance_id, structure
                      from jeune
@@ -129,38 +99,26 @@ export class MajSegmentsJobHandler extends JobHandler<Job> {
 
   writeMetadata(): void {
     const metadataWriteStream = createWriteStream(metadataFile)
-    const metadatas = [
-      {
-        segment_label: SEGMENTS.CAMPAGNE_NON_REPONDUE,
-        display_name: 'Campagne non répondue'
-      },
-      {
-        segment_label: SEGMENTS.JEUNES_MILO,
-        display_name: 'Jeunes MILO'
-      },
-      {
-        segment_label: SEGMENTS.JEUNES_POLE_EMPLOI,
-        display_name: 'Jeunes POLE EMPLOI'
-      },
-      {
-        segment_label: SEGMENTS.JEUNES_POLE_EMPLOI_BRSA,
-        display_name: 'Jeunes POLE EMPLOI BRSA'
-      },
-      {
-        segment_label: SEGMENTS.JEUNES_POLE_EMPLOI_AIJ,
-        display_name: 'Jeunes POLE EMPLOI AIJ'
-      },
-      {
-        segment_label: SEGMENTS.JEUNES_POLE_EMPLOI_CD,
-        display_name: 'Jeunes POLE EMPLOI CD'
-      },
-      {
-        segment_label: SEGMENTS.JEUNES_POLE_EMPLOI_AVENIR_PRO,
-        display_name: 'Lycéens POLE EMPLOI Avenir Pro'
-      }
-    ]
-    metadatas.forEach(metadata => {
-      metadataWriteStream.write(JSON.stringify(metadata) + NEW_LINE)
+    const metadatas: { [key in SEGMENTS]: string } = {
+      [SEGMENTS.JEUNES_MILO]: 'Jeunes MILO',
+      [SEGMENTS.JEUNES_POLE_EMPLOI]: 'Jeunes POLE EMPLOI',
+      [SEGMENTS.JEUNES_POLE_EMPLOI_BRSA]: 'Jeunes POLE EMPLOI BRSA',
+      [SEGMENTS.JEUNES_POLE_EMPLOI_AIJ]: 'Jeunes POLE EMPLOI AIJ',
+      [SEGMENTS.JEUNES_POLE_EMPLOI_CD]: 'Jeunes POLE EMPLOI CD',
+      [SEGMENTS.JEUNES_POLE_EMPLOI_AVENIR_PRO]:
+        'Lycéens POLE EMPLOI Avenir Pro',
+      [SEGMENTS.BENEFICIAIRES_FRANCE_TRAVAIL_ACCOMPAGNEMENT_INTENSIF]:
+        'Bénéficiaires France Travail Accompagnement intensif',
+      [SEGMENTS.BENEFICIAIRES_FRANCE_TRAVAIL_ACCOMPAGNEMENT_GLOBAL]:
+        'Bénéficiaires France Travail Accompagnement global',
+      [SEGMENTS.BENEFICIAIRES_FRANCE_TRAVAIL_EQUIP_EMPLOI_RECRUT]:
+        'Bénéficiaires France Travail Equip’emploi / Equip’recrut'
+    }
+
+    Object.entries(metadatas).forEach(([key, value]) => {
+      metadataWriteStream.write(
+        JSON.stringify({ segment_label: key, display_name: value }) + NEW_LINE
+      )
     })
     metadataWriteStream.end()
   }
@@ -212,21 +170,6 @@ export class MajSegmentsJobHandler extends JobHandler<Job> {
       case Core.Structure.FT_EQUIP_EMPLOI_RECRUT:
         return SEGMENTS.BENEFICIAIRES_FRANCE_TRAVAIL_EQUIP_EMPLOI_RECRUT
     }
-  }
-
-  async handleSegmentCampagneNonRepondue(
-    segments: Map<string, string[]>
-  ): Promise<number> {
-    const jeunes: RawJeune[] =
-      await this.fetchJeunesCEJInstanceIdNayantPasReponduAUneCampagneActive()
-    jeunes.forEach(jeune => {
-      this.addOrSetSegment(
-        segments,
-        jeune.instance_id,
-        SEGMENTS.CAMPAGNE_NON_REPONDUE
-      )
-    })
-    return jeunes.length
   }
 
   addOrSetSegment(

@@ -1,7 +1,9 @@
-{"segment_label":"CAMPAGNE_NON_REPONDUE","display_name":"Campagne non répondue"}
 {"segment_label":"JEUNES_MILO","display_name":"Jeunes MILO"}
 {"segment_label":"JEUNES_POLE_EMPLOI","display_name":"Jeunes POLE EMPLOI"}
 {"segment_label":"JEUNES_POLE_EMPLOI_BRSA","display_name":"Jeunes POLE EMPLOI BRSA"}
 {"segment_label":"JEUNES_POLE_EMPLOI_AIJ","display_name":"Jeunes POLE EMPLOI AIJ"}
 {"segment_label":"JEUNES_POLE_EMPLOI_CD","display_name":"Jeunes POLE EMPLOI CD"}
 {"segment_label":"JEUNES_POLE_EMPLOI_AVENIR_PRO","display_name":"Lycéens POLE EMPLOI Avenir Pro"}
+{"segment_label":"BENEFICIAIRES_FRANCE_TRAVAIL_ACCOMPAGNEMENT_INTENSIF","display_name":"Bénéficiaires France Travail Accompagnement intensif"}
+{"segment_label":"BENEFICIAIRES_FRANCE_TRAVAIL_ACCOMPAGNEMENT_GLOBAL","display_name":"Bénéficiaires France Travail Accompagnement global"}
+{"segment_label":"BENEFICIAIRES_FRANCE_TRAVAIL_EQUIP_EMPLOI_RECRUT","display_name":"Bénéficiaires France Travail Equip’emploi / Equip’recrut"}
