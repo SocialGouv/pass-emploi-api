@@ -311,7 +311,7 @@ const evenements: {
     nom: 'Session'
   },
   [Evenement.Code.SESSION_AUTOINSCRIPTION]: {
-    categorie: 'Rendez-vous',
+    categorie: 'Evénement',
     action: 'Auto-inscription',
     nom: 'Session'
   },
