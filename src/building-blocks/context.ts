@@ -4,13 +4,7 @@ import { AsyncLocalStorage } from 'node:async_hooks'
 export type ContextData = Map<ContextKey, unknown>
 
 export enum ContextKey {
-  UTILISATEUR = 'UTILISATEUR',
-  RESULTATS_APPEL_PARTENAIRE = 'RESULTATS_APPEL_PARTENAIRE'
-}
-
-export interface AppelPartenaireResultat {
-  path: string
-  resultat: unknown
+  UTILISATEUR = 'UTILISATEUR'
 }
 
 @Injectable()

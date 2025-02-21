@@ -13,11 +13,14 @@ import {
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { ErreurHttp } from 'src/building-blocks/types/domain-error'
 import { Context, ContextKey } from 'src/building-blocks/context'
-import { getDatabase } from '../../utils/database-for-testing'
 import {
-  LogApiPartenaireDto,
-  LogApiPartenaireSqlModel
-} from '../../../src/infrastructure/sequelize/models/log-api-partenaire.sql-model'
+  DatabaseForTesting,
+  getDatabase
+} from '../../utils/database-for-testing'
+import {
+  CacheApiPartenaireDto,
+  CacheApiPartenaireSqlModel
+} from '../../../src/infrastructure/sequelize/models/cache-api-partenaire.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { unePrestationDto } from '../../fixtures/pole-emploi-partenaire.fixture'
 import {
@@ -30,6 +33,7 @@ import {
   successApi
 } from '../../../src/building-blocks/types/result-api'
 import { DocumentPoleEmploiDto } from '../../../src/infrastructure/clients/dto/pole-emploi.dto'
+import { Op } from 'sequelize'
 
 describe('PoleEmploiPartenaireClient', () => {
   let poleEmploiPartenaireClient: PoleEmploiPartenaireClient
@@ -37,6 +41,7 @@ describe('PoleEmploiPartenaireClient', () => {
   const PARTENAIRE_BASE_URL = 'https://api.peio.pe-qvr.fr/partenaire'
   const tokenJeune = 'token'
   let context: StubbedClass<Context>
+  let databaseForTesting: DatabaseForTesting
   const utilisateurJeunePE = unUtilisateurJeune({
     id: 'hermione',
     structure: Core.Structure.POLE_EMPLOI
@@ -44,6 +49,7 @@ describe('PoleEmploiPartenaireClient', () => {
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
+    databaseForTesting = getDatabase()
     context = stubClass(Context)
     context.get.withArgs(ContextKey.UTILISATEUR).returns(utilisateurJeunePE)
 
@@ -51,7 +57,8 @@ describe('PoleEmploiPartenaireClient', () => {
     poleEmploiPartenaireClient = new PoleEmploiPartenaireClient(
       httpService,
       configService,
-      context
+      context,
+      databaseForTesting.sequelize
     )
   })
 
@@ -88,7 +95,7 @@ describe('PoleEmploiPartenaireClient', () => {
       describe('quand il y a un cache', () => {
         it('renvoie les prestations du cache', async () => {
           // Given
-          const logApiDto: AsSql<LogApiPartenaireDto> = {
+          const CacheApiDto: AsSql<CacheApiPartenaireDto> = {
             id: 'd90e397a-dcb3-4a7b-8eac-3dec0aa55dfa',
             idUtilisateur: 'hermione',
             typeUtilisateur: 'JEUNE',
@@ -96,10 +103,9 @@ describe('PoleEmploiPartenaireClient', () => {
             pathPartenaire:
               '/peconnect-gerer-prestations/v1/rendez-vous?dateRecherche=2020-03-06',
             resultatPartenaire: [unePrestationDto()],
-            resultat: [],
             transactionId: 'transactionId'
           }
-          await LogApiPartenaireSqlModel.create(logApiDto)
+          await CacheApiPartenaireSqlModel.create(CacheApiDto)
 
           // When
           const response = await poleEmploiPartenaireClient.getPrestations(
@@ -116,7 +122,7 @@ describe('PoleEmploiPartenaireClient', () => {
       describe("quand il n'y a pas de cache", () => {
         it('renvoie la 500', async () => {
           // Given
-          const logApiDto: AsSql<LogApiPartenaireDto> = {
+          const CacheApiDto: AsSql<CacheApiPartenaireDto> = {
             id: 'd90e397a-dcb3-4a7b-8eac-3dec0aa55dfa',
             idUtilisateur: 'le-cache-de-quelqun-dautre',
             typeUtilisateur: 'JEUNE',
@@ -124,10 +130,9 @@ describe('PoleEmploiPartenaireClient', () => {
             pathPartenaire:
               '/peconnect-gerer-prestations/v1/rendez-vous?dateRecherche=2020-03-06',
             resultatPartenaire: [unePrestationDto()],
-            resultat: [],
             transactionId: 'transactionId'
           }
-          await LogApiPartenaireSqlModel.create(logApiDto)
+          await CacheApiPartenaireSqlModel.create(CacheApiDto)
 
           // When
           const response = await poleEmploiPartenaireClient.getPrestations(
@@ -325,7 +330,7 @@ describe('PoleEmploiPartenaireClient', () => {
 
   describe('getDemarches', () => {
     describe('quand il y a des data', () => {
-      it('renvoie les démarches', async () => {
+      it('renvoie les démarches et stocke en cache', async () => {
         // Given
         nock(PARTENAIRE_BASE_URL)
           .get('/peconnect-demarches/v1/demarches')
@@ -339,41 +344,20 @@ describe('PoleEmploiPartenaireClient', () => {
 
         // Then
         expect(demarcheDtos).to.deep.equal(success([uneDemarcheDto()]))
-        expect(context.set).to.have.been.calledOnceWithExactly(
-          'RESULTATS_APPEL_PARTENAIRE',
-          [
-            {
-              resultat: [uneDemarcheDto()],
-              path: '/partenaire/peconnect-demarches/v1/demarches'
-            }
-          ]
-        )
-      })
 
-      it('stock en cache', async () => {
-        // Given
-        nock(PARTENAIRE_BASE_URL)
-          .get('/peconnect-demarches/v1/demarches')
-          .reply(200, [uneDemarcheDto()])
-          .isDone()
+        await new Promise(resolve => setTimeout(resolve, 3000))
+        expect(context.get).to.have.been.calledOnceWithExactly('UTILISATEUR')
 
-        // When
-        const demarcheDtos = await poleEmploiPartenaireClient.getDemarches(
-          tokenJeune,
-          'hermione'
-        )
-
-        // Then
-        expect(demarcheDtos).to.deep.equal(success([uneDemarcheDto()]))
-        expect(context.set).to.have.been.calledOnceWithExactly(
-          'RESULTATS_APPEL_PARTENAIRE',
-          [
-            {
-              resultat: [uneDemarcheDto()],
-              path: '/partenaire/peconnect-demarches/v1/demarches?cacheParam=hermione'
-            }
-          ]
-        )
+        const cacheAPI = await CacheApiPartenaireSqlModel.findOne({
+          where: {
+            pathPartenaire: {
+              [Op.like]: `%peconnect-demarches/v1/demarches%`
+            },
+            idUtilisateur: utilisateurJeunePE.id
+          },
+          order: [['date', 'DESC']]
+        })
+        expect(cacheAPI?.resultatPartenaire).to.deep.equal([uneDemarcheDto()])
       })
     })
     describe('quand il y a no content', () => {
@@ -401,7 +385,7 @@ describe('PoleEmploiPartenaireClient', () => {
         // Given
         const conseiller = unUtilisateurConseiller()
         context.get.withArgs(ContextKey.UTILISATEUR).returns(conseiller)
-        const logApiDto: AsSql<LogApiPartenaireDto> = {
+        const CacheApiDto: AsSql<CacheApiPartenaireDto> = {
           id: 'd90e397a-dcb3-4a7b-8eac-3dec0aa55dfa',
           idUtilisateur: conseiller.id,
           typeUtilisateur: 'CONSEILLER',
@@ -409,10 +393,9 @@ describe('PoleEmploiPartenaireClient', () => {
           pathPartenaire:
             'peconnect-demarches/v1/demarches?cacheParam=hermione',
           resultatPartenaire: [uneDemarcheDto()],
-          resultat: [],
           transactionId: 'transactionId'
         }
-        await LogApiPartenaireSqlModel.create(logApiDto)
+        await CacheApiPartenaireSqlModel.create(CacheApiDto)
 
         // When
         const response = await poleEmploiPartenaireClient.getDemarchesEnCache(
@@ -428,17 +411,16 @@ describe('PoleEmploiPartenaireClient', () => {
     describe("quand il n'y a pas de cache", () => {
       it('remonte une 404', async () => {
         // Given
-        const logApiDto: AsSql<LogApiPartenaireDto> = {
+        const CacheApiDto: AsSql<CacheApiPartenaireDto> = {
           id: 'd90e397a-dcb3-4a7b-8eac-3dec0aa55dfa',
           idUtilisateur: 'hermione',
           typeUtilisateur: 'JEUNE',
           date: uneDatetime().toJSDate(),
           pathPartenaire: '/peconnect-demarches/v1/demarches',
           resultatPartenaire: [uneDemarcheDto()],
-          resultat: [],
           transactionId: 'transactionId'
         }
-        await LogApiPartenaireSqlModel.create(logApiDto)
+        await CacheApiPartenaireSqlModel.create(CacheApiDto)
 
         // When
         const response = await poleEmploiPartenaireClient.getDemarchesEnCache(

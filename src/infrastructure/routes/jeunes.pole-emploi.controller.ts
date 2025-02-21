@@ -182,6 +182,10 @@ export class JeunesPoleEmploiController {
   }
 
   @Get('v2/jeunes/:idJeune/home/agenda/pole-emploi')
+  @ApiOperation({
+    summary: 'Remplacée depuis la 3.14.0 il y a 10 mois par mon-suivi',
+    deprecated: true
+  })
   @ApiResponse({
     type: JeuneHomeAgendaPoleEmploiQueryModelV2
   })

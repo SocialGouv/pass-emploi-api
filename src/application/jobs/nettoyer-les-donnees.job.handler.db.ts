@@ -19,7 +19,7 @@ import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql
 import { ArchiveJeuneSqlModel } from '../../infrastructure/sequelize/models/archive-jeune.sql-model'
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
-import { LogApiPartenaireSqlModel } from '../../infrastructure/sequelize/models/log-api-partenaire.sql-model'
+import { CacheApiPartenaireSqlModel } from '../../infrastructure/sequelize/models/cache-api-partenaire.sql-model'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { SuiviJobSqlModel } from '../../infrastructure/sequelize/models/suivi-job.sql-model'
 import { DateService } from '../../utils/date-service'
@@ -127,7 +127,7 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
     }
 
     try {
-      nombreLogsApiSupprimes = await LogApiPartenaireSqlModel.destroy({
+      nombreLogsApiSupprimes = await CacheApiPartenaireSqlModel.destroy({
         where: dateSuperieureADeuxSemaines(maintenant)
       })
     } catch (e) {
