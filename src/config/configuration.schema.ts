@@ -113,7 +113,11 @@ export const configurationSchema = Joi.object({
       milo: Joi.number().required(),
       brsa: Joi.number().required(),
       aij: Joi.number().required(),
-      cd: Joi.number().required()
+      cd: Joi.number().required(),
+      avenirPro: Joi.number().required(),
+      accompagnementIntensif: Joi.number().required(),
+      accompagnementGlobal: Joi.number().required(),
+      equipEmploi: Joi.number().required()
     })
   }),
   s3: Joi.object({

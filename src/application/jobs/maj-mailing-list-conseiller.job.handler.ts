@@ -11,14 +11,6 @@ import { DateService } from '../../utils/date-service'
 @Injectable()
 @ProcessJobType(Planificateur.JobType.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS)
 export class MajMailingListConseillerJobHandler extends JobHandler<Job> {
-  private mailingLists: {
-    poleEmploi: string
-    milo: string
-    brsa: string
-    aij: string
-    cd: string
-  }
-
   constructor(
     @Inject(MailServiceToken)
     private mailService: Mail.Service,
@@ -33,11 +25,14 @@ export class MajMailingListConseillerJobHandler extends JobHandler<Job> {
       Planificateur.JobType.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS,
       suiviJobService
     )
-    this.mailingLists = this.configuration.get('brevo').mailingLists
   }
 
   async handle(): Promise<SuiviJob> {
     const maintenant = this.dateService.now()
+    const stats: Partial<
+      Record<Core.Structure | 'conseillersSansEmail', number>
+    > = {}
+
     const suivi: SuiviJob = {
       jobType: this.jobType,
       nbErreurs: 0,
@@ -47,51 +42,52 @@ export class MajMailingListConseillerJobHandler extends JobHandler<Job> {
       resultat: {}
     }
 
-    const contactsMilo =
-      await this.mailRepository.findAllContactsConseillerByStructures([
-        Core.Structure.MILO
-      ])
-    const contactsPoleEmploi =
-      await this.mailRepository.findAllContactsConseillerByStructures([
-        Core.Structure.POLE_EMPLOI
-      ])
-    const contactsBRSA =
-      await this.mailRepository.findAllContactsConseillerByStructures([
-        Core.Structure.POLE_EMPLOI_BRSA
-      ])
-    const contactsAIJ =
-      await this.mailRepository.findAllContactsConseillerByStructures([
-        Core.Structure.POLE_EMPLOI_AIJ
-      ])
-    const contactsCD =
-      await this.mailRepository.findAllContactsConseillerByStructures([
-        Core.Structure.CONSEIL_DEPT
-      ])
-    await this.mailService.mettreAJourMailingList(
-      contactsMilo,
-      parseInt(this.mailingLists.milo)
-    )
-    await this.mailService.mettreAJourMailingList(
-      contactsPoleEmploi,
-      parseInt(this.mailingLists.poleEmploi)
-    )
-    await this.mailService.mettreAJourMailingList(
-      contactsBRSA,
-      parseInt(this.mailingLists.brsa)
-    )
-    await this.mailService.mettreAJourMailingList(
-      contactsCD,
-      parseInt(this.mailingLists.cd)
-    )
-    const conseillersSansEmail =
-      await this.mailRepository.countContactsConseillerSansEmail()
-    const stats = {
-      conseillersMilo: contactsMilo.length,
-      conseillersPoleEmploi: contactsPoleEmploi.length,
-      conseillersBRSA: contactsBRSA.length,
-      conseillersAIJ: contactsAIJ.length,
-      conseillersSansEmail
+    const mailingLists: Record<Core.Structure, { id: string }> = {
+      [Core.Structure.POLE_EMPLOI]: {
+        id: this.configuration.get('brevo').mailingLists.poleEmploi
+      },
+      [Core.Structure.MILO]: {
+        id: this.configuration.get('brevo').mailingLists.milo
+      },
+      [Core.Structure.POLE_EMPLOI_BRSA]: {
+        id: this.configuration.get('brevo').mailingLists.brsa
+      },
+      [Core.Structure.POLE_EMPLOI_AIJ]: {
+        id: this.configuration.get('brevo').mailingLists.aij
+      },
+      [Core.Structure.CONSEIL_DEPT]: {
+        id: this.configuration.get('brevo').mailingLists.cd
+      },
+      [Core.Structure.AVENIR_PRO]: {
+        id: this.configuration.get('brevo').mailingLists.avenirPro
+      },
+      [Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF]: {
+        id: this.configuration.get('brevo').mailingLists.accompagnementIntensif
+      },
+      [Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL]: {
+        id: this.configuration.get('brevo').mailingLists.accompagnementGlobal
+      },
+      [Core.Structure.FT_EQUIP_EMPLOI_RECRUT]: {
+        id: this.configuration.get('brevo').mailingLists.equipEmploi
+      }
     }
+
+    Object.entries(mailingLists).forEach(async ([structure, mailingList]) => {
+      const contacts =
+        await this.mailRepository.findAllContactsConseillerByStructures([
+          structure as Core.Structure
+        ])
+      stats[structure as Core.Structure] = contacts.length
+
+      await this.mailService.mettreAJourMailingList(
+        contacts,
+        parseInt(mailingList.id)
+      )
+    })
+
+    stats.conseillersSansEmail =
+      await this.mailRepository.countContactsConseillerSansEmail()
+
     return {
       ...suivi,
       succes: true,

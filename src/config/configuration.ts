@@ -157,7 +157,13 @@ export default () => {
         milo: process.env.SENDINBLUE_MILO_MAILING_LIST_ID ?? 8,
         brsa: process.env.SENDINBLUE_BRSA_MAILING_LIST_ID ?? 56,
         aij: process.env.SENDINBLUE_AIJ_MAILING_LIST_ID ?? 55,
-        cd: process.env.SENDINBLUE_CD_MAILING_LIST_ID ?? 59
+        cd: process.env.SENDINBLUE_CD_MAILING_LIST_ID ?? 59,
+        avenirPro: process.env.BREVO_AVENIR_PRO_MAILING_LIST_ID ?? 61,
+        accompagnementIntensif:
+          process.env.BREVO_ACCOMPAGNEMENT_INTENSIF_MAILING_LIST_ID ?? 62,
+        accompagnementGlobal:
+          process.env.BREVO_ACCOMPAGNEMENT_GLOBAL_MAILING_LIST_ID ?? 63,
+        equipEmploi: process.env.BREVO_EQUIP_EMPLOI_MAILING_LIST_ID ?? 64
       }
     },
     s3: {
