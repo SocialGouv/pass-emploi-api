@@ -6,7 +6,7 @@ import {
   Table
 } from 'sequelize-typescript'
 
-export class LogApiPartenaireDto extends Model {
+export class CacheApiPartenaireDto extends Model {
   @PrimaryKey
   @Column({
     field: 'id',
@@ -36,29 +36,23 @@ export class LogApiPartenaireDto extends Model {
     field: 'path_partenaire',
     type: DataType.STRING
   })
-  pathPartenaire: string
+  pathPartenaire: string | null
 
   @Column({
     field: 'resultat_partenaire',
     type: DataType.JSONB
   })
-  resultatPartenaire: unknown
-
-  @Column({
-    field: 'resultat',
-    type: DataType.JSONB
-  })
-  resultat: unknown
+  resultatPartenaire: unknown | null
 
   @Column({
     field: 'transaction_id',
     type: DataType.STRING
   })
-  transactionId: string
+  transactionId: string | null
 }
 
 @Table({
   timestamps: false,
-  tableName: 'log_api_partenaire'
+  tableName: 'cache_api_partenaire'
 })
-export class LogApiPartenaireSqlModel extends LogApiPartenaireDto {}
+export class CacheApiPartenaireSqlModel extends CacheApiPartenaireDto {}

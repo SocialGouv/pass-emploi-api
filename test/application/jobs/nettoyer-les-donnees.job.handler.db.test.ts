@@ -14,7 +14,7 @@ import {
 import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
 import { ArchiveJeuneSqlModel } from '../../../src/infrastructure/sequelize/models/archive-jeune.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { LogApiPartenaireSqlModel } from '../../../src/infrastructure/sequelize/models/log-api-partenaire.sql-model'
+import { CacheApiPartenaireSqlModel } from '../../../src/infrastructure/sequelize/models/cache-api-partenaire.sql-model'
 import {
   RendezVousDto,
   RendezVousSqlModel
@@ -143,7 +143,7 @@ describe('NettoyerLesDonneesJobHandler', () => {
     })
 
     // Given - Log Api Partenaire
-    await LogApiPartenaireSqlModel.create({
+    await CacheApiPartenaireSqlModel.create({
       id: 'a282ae5e-b1f0-4a03-86a3-1870d913da93',
       date: maintenant.minus({ week: 2, day: 1 }).toJSDate(),
       idUtilisateur: 'idUtilisateur',
@@ -153,7 +153,7 @@ describe('NettoyerLesDonneesJobHandler', () => {
       resultat: { nom: 'nom' },
       transactionId: 'transactionId'
     })
-    await LogApiPartenaireSqlModel.create({
+    await CacheApiPartenaireSqlModel.create({
       id: '826553e8-7581-44ab-9d76-f04be13f8971',
       date: maintenant.minus({ week: 2 }).plus({ day: 1 }).toJSDate(),
       idUtilisateur: 'idUtilisateur',
@@ -358,7 +358,7 @@ describe('NettoyerLesDonneesJobHandler', () => {
   describe('logs api partenaires', () => {
     it('supprime les logs de plus de deux semaines', async () => {
       // Then
-      const logs = await LogApiPartenaireSqlModel.findAll()
+      const logs = await CacheApiPartenaireSqlModel.findAll()
       expect(logs).to.have.length(1)
       expect(logs[0].pathPartenaire).to.equal('pathAGarder')
     })

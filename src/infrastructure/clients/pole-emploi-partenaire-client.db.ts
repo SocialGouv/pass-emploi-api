@@ -1,16 +1,13 @@
 import { HttpService } from '@nestjs/axios'
-import { Injectable, Logger } from '@nestjs/common'
+import { Inject, Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import * as https from 'https'
 import { DateTime } from 'luxon'
 import { firstValueFrom } from 'rxjs'
-import { Op } from 'sequelize'
-import {
-  AppelPartenaireResultat,
-  Context,
-  ContextKey
-} from '../../building-blocks/context'
+import { Op, QueryTypes, Sequelize } from 'sequelize'
+import * as uuid from 'uuid'
+import { Context, ContextKey } from '../../building-blocks/context'
 import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import { Result, failure, success } from '../../building-blocks/types/result'
 import {
@@ -21,8 +18,11 @@ import {
 } from '../../building-blocks/types/result-api'
 import { Authentification } from '../../domain/authentification'
 import { Demarche } from '../../domain/demarche'
+import { buildError } from '../../utils/logger.module'
+import { getAPMInstance } from '../monitoring/apm.init'
 import { suggestionsPEInMemory } from '../repositories/dto/pole-emploi.in-memory.dto'
-import { LogApiPartenaireSqlModel } from '../sequelize/models/log-api-partenaire.sql-model'
+import { CacheApiPartenaireSqlModel } from '../sequelize/models/cache-api-partenaire.sql-model'
+import { SequelizeInjectionToken } from '../sequelize/providers'
 import {
   DemarcheDto,
   DocumentPoleEmploiDto,
@@ -33,7 +33,6 @@ import {
   toEtat
 } from './dto/pole-emploi.dto'
 import { handleAxiosError } from './utils/axios-error-handler'
-import { buildError } from '../../utils/logger.module'
 
 const ORIGINE = 'INDIVIDU'
 const DEMARCHES_URL = 'peconnect-demarches/v1/demarches'
@@ -87,7 +86,8 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
   constructor(
     private httpService: HttpService,
     private configService: ConfigService,
-    private context: Context
+    private context: Context,
+    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
   ) {
     this.logger = new Logger('PoleEmploiPartenaireClient')
     this.apiUrl = this.configService.get('poleEmploi').url
@@ -357,14 +357,18 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
       } else {
         res = await this.get<T>(suffixUrl, tokenDuJeune, params)
       }
-      this.ajouterLeRetourAuContexteNode(res, cacheParam)
+      this.sauvegarderLeRetourEnCache(res, cacheParam)
       return success(res.data)
     } catch (e) {
-      if (!e.response || e.response.status === 500) {
+      if (
+        !e.response ||
+        e.response.status >= 500 ||
+        e.response.status === 429
+      ) {
         const cache = await this.recupererLesDernieresDonnees(suffixUrl)
         if (cache) {
           this.logger.warn(
-            `Utilisation du cache pour ${suffixUrl} avec le log ${cache.id}`
+            `Utilisation du cache pour ${suffixUrl} avec l'id ${cache.id}`
           )
           return successApi(
             cache.resultatPartenaire as T,
@@ -420,37 +424,55 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     )
   }
 
-  private ajouterLeRetourAuContexteNode<T>(
+  private async sauvegarderLeRetourEnCache<T>(
     res: AxiosResponse<T>,
     cacheParam?: string
-  ): void {
-    let resultatsAppelPartenaire = this.context.get<AppelPartenaireResultat[]>(
-      ContextKey.RESULTATS_APPEL_PARTENAIRE
-    )
-    if (!resultatsAppelPartenaire) {
-      resultatsAppelPartenaire = []
-    }
-
-    resultatsAppelPartenaire.push({
-      resultat: res.data,
-      path: appendCacheParam(res.request.path, cacheParam)
-    } as AppelPartenaireResultat)
-    this.context.set(
-      ContextKey.RESULTATS_APPEL_PARTENAIRE,
-      resultatsAppelPartenaire
-    )
-  }
-
-  private async recupererLesDernieresDonnees(
-    suffixUrl: string
-  ): Promise<LogApiPartenaireSqlModel | null> {
+  ): Promise<void> {
     const utilisateur = this.context.get<Authentification.Utilisateur>(
       ContextKey.UTILISATEUR
     )!
-    return LogApiPartenaireSqlModel.findOne({
+
+    await this.sequelize
+      .query(
+        `
+      INSERT INTO cache_api_partenaire (id, id_utilisateur, type_utilisateur, date, path_partenaire, resultat_partenaire, transaction_id)
+      VALUES (:id, :idUtilisateur, :typeUtilisateur, :date, :pathPartenaire, :resultatPartenaire, :transactionId)
+      ON CONFLICT (id_utilisateur, path_partenaire) 
+      DO UPDATE SET date = :date, resultat_partenaire = :resultatPartenaire, transaction_id = :transactionId;
+      `,
+        {
+          replacements: {
+            id: uuid.v4(),
+            idUtilisateur: utilisateur.id,
+            typeUtilisateur: utilisateur.type,
+            date: new Date(),
+            pathPartenaire: appendCacheParam(
+              res.request.path.split('?')[0],
+              cacheParam
+            ),
+            resultatPartenaire: JSON.stringify(res.data),
+            transactionId:
+              getAPMInstance().currentTraceIds['transaction.id'] || null
+          },
+          type: QueryTypes.INSERT
+        }
+      )
+      .catch(e => {
+        getAPMInstance().captureError(e)
+        this.logger.error(e)
+      })
+  }
+
+  private async recupererLesDernieresDonnees(
+    pathPartenaire: string
+  ): Promise<CacheApiPartenaireSqlModel | null> {
+    const utilisateur = this.context.get<Authentification.Utilisateur>(
+      ContextKey.UTILISATEUR
+    )!
+    return CacheApiPartenaireSqlModel.findOne({
       where: {
         pathPartenaire: {
-          [Op.like]: `%${suffixUrl}%`
+          [Op.like]: `%${pathPartenaire}%`
         },
         idUtilisateur: utilisateur.id
       },
