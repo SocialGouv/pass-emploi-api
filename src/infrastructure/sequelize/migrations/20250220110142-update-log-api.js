@@ -13,24 +13,6 @@ module.exports = {
         transaction
       })
 
-      await queryInterface.sequelize.query(
-        `
-        DELETE FROM cache_api_partenaire
-        WHERE id IN (
-            SELECT id FROM (
-                SELECT id, 
-                       ROW_NUMBER() OVER (
-                           PARTITION BY id_utilisateur, path_partenaire 
-                           ORDER BY date DESC
-                       ) AS row_num
-                FROM cache_api_partenaire
-            ) t
-            WHERE row_num > 1
-        );
-        `,
-        { transaction }
-      )
-
       await queryInterface.addConstraint('cache_api_partenaire', {
         fields: ['id_utilisateur', 'path_partenaire'],
         type: 'unique',

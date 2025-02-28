@@ -30,7 +30,7 @@ dbclient-fetcher psql 13
 
 pg_dump --clean --if-exists --format c --dbname "$DUMP_RESTORE_DB_SOURCE" --no-owner --no-privileges --no-comments --schema 'public' --file dump.pgsql \
   --exclude-table 'spatial_ref_sys' \
-  --exclude-table 'log_api_partenaire' \
+  --exclude-table 'cache_api_partenaire' \
   --exclude-table 'suivi_job' \
   --exclude-table 'evenement_engagement' \
   --exclude-table 'evenement_engagement_hebdo'
