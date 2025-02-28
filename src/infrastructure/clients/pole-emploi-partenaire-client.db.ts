@@ -5,7 +5,7 @@ import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios
 import * as https from 'https'
 import { DateTime } from 'luxon'
 import { firstValueFrom } from 'rxjs'
-import { Op, QueryTypes, Sequelize } from 'sequelize'
+import { QueryTypes, Sequelize } from 'sequelize'
 import * as uuid from 'uuid'
 import { Context, ContextKey } from '../../building-blocks/context'
 import { ErreurHttp } from '../../building-blocks/types/domain-error'
@@ -350,6 +350,8 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     retry?: boolean,
     cacheParam?: string
   ): Promise<ResultApi<T>> {
+    const cacheUrl = appendCacheParam(suffixUrl, cacheParam)
+
     try {
       let res
       if (retry) {
@@ -357,7 +359,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
       } else {
         res = await this.get<T>(suffixUrl, tokenDuJeune, params)
       }
-      this.sauvegarderLeRetourEnCache(res, cacheParam)
+      this.sauvegarderLeRetourEnCache(res, cacheUrl)
       return success(res.data)
     } catch (e) {
       if (
@@ -365,7 +367,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
         e.response.status >= 500 ||
         e.response.status === 429
       ) {
-        const cache = await this.recupererLesDernieresDonnees(suffixUrl)
+        const cache = await this.recupererLesDernieresDonnees(cacheUrl)
         if (cache) {
           this.logger.warn(
             `Utilisation du cache pour ${suffixUrl} avec l'id ${cache.id}`
@@ -426,7 +428,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
 
   private async sauvegarderLeRetourEnCache<T>(
     res: AxiosResponse<T>,
-    cacheParam?: string
+    pathPartenaire: string
   ): Promise<void> {
     const utilisateur = this.context.get<Authentification.Utilisateur>(
       ContextKey.UTILISATEUR
@@ -446,10 +448,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
             idUtilisateur: utilisateur.id,
             typeUtilisateur: utilisateur.type,
             date: new Date(),
-            pathPartenaire: appendCacheParam(
-              res.request.path.split('?')[0],
-              cacheParam
-            ),
+            pathPartenaire,
             resultatPartenaire: JSON.stringify(res.data),
             transactionId:
               getAPMInstance().currentTraceIds['transaction.id'] || null
@@ -471,9 +470,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     )!
     return CacheApiPartenaireSqlModel.findOne({
       where: {
-        pathPartenaire: {
-          [Op.like]: `%${pathPartenaire}%`
-        },
+        pathPartenaire,
         idUtilisateur: utilisateur.id
       },
       order: [['date', 'DESC']]

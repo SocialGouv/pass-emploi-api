@@ -100,8 +100,7 @@ describe('PoleEmploiPartenaireClient', () => {
             idUtilisateur: 'hermione',
             typeUtilisateur: 'JEUNE',
             date: uneDatetime().toJSDate(),
-            pathPartenaire:
-              '/peconnect-gerer-prestations/v1/rendez-vous?dateRecherche=2020-03-06',
+            pathPartenaire: 'peconnect-gerer-prestations/v1/rendez-vous',
             resultatPartenaire: [unePrestationDto()],
             transactionId: 'transactionId'
           }
