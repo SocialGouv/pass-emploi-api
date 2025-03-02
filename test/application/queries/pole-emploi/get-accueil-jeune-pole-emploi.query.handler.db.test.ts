@@ -257,34 +257,63 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
       })
     })
 
-    describe('quand les démarches sont en échec', () => {
-      it("retourne l'échec", async () => {
+    describe('quand les démarches et les rdv sont en échec', () => {
+      it("retourne une page d'acceuil avec un message informatif", async () => {
         // Given
         getDemarchesQueryGetter.handle.resolves(
           failure(new ErreurHttp('Erreur', 500))
         )
 
-        // When
-        result = await handler.handle(query)
-
-        // Then
-        expect(result).to.deep.equal(failure(new ErreurHttp('Erreur', 500)))
-      })
-    })
-
-    describe('quand les rendez vous sont en échec', () => {
-      it("retourne l'échec", async () => {
-        // Given
-        getDemarchesQueryGetter.handle.resolves(success({ queryModel: [] }))
+        dateService.now.returns(maintenant)
         getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
           failure(new ErreurHttp('Erreur', 418))
         )
 
+        getRecherchesSauvegardeesQueryGetter.handle
+          .withArgs({
+            idJeune: query.idJeune
+          })
+          .resolves([
+            {
+              ...recherche,
+              geometrie: undefined,
+              criteres: {}
+            }
+          ])
+
+        getFavorisQueryGetter.handle
+          .withArgs({
+            idJeune: query.idJeune
+          })
+          .resolves([])
+
+        getCampagneQueryGetter.handle
+          .withArgs({
+            idJeune: query.idJeune
+          })
+          .resolves(campagneQueryModel)
+
         // When
         result = await handler.handle(query)
 
         // Then
-        expect(result).to.deep.equal(failure(new ErreurHttp('Erreur', 418)))
+        expect(isSuccess(result)).to.be.true()
+        if (isSuccess(result)) {
+          expect(
+            result.data.cetteSemaine
+              .nombreActionsDemarchesAFaireSemaineCalendaire
+          ).to.equal(0)
+          expect(
+            result.data.cetteSemaine.nombreActionsDemarchesARealiser
+          ).to.equal(0)
+          expect(
+            result.data.cetteSemaine.nombreActionsDemarchesEnRetard
+          ).to.equal(0)
+          expect(result.data.cetteSemaine.nombreRendezVous).to.equal(0)
+          expect(result.data.messageDonneesManquantes).to.equal(
+            'Les données suivantes sont temporairement indisponibles : démarches, rendez-vous'
+          )
+        }
       })
     })
   })

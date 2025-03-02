@@ -1,8 +1,7 @@
 /* eslint-disable */
-import { parse } from 'pg-connection-string'
 import * as Joi from 'joi'
+import { parse } from 'pg-connection-string'
 import { configurationSchema } from './configuration.schema'
-import { max } from 'class-validator'
 
 export default () => {
   const scalingoApp = process.env.APP

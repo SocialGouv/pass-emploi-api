@@ -1,21 +1,23 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { ResultApi } from '../../../../building-blocks/types/result-api'
-import {
-  Authentification,
-  AuthentificationRepositoryToken
-} from '../../../../domain/authentification'
 import { DemarcheDto } from 'src/infrastructure/clients/dto/pole-emploi.dto'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { NonTrouveError } from '../../../../building-blocks/types/domain-error'
 import { Cached } from '../../../../building-blocks/types/query'
 import {
   failure,
-  isFailure,
   Result,
   success
 } from '../../../../building-blocks/types/result'
+import {
+  isFailureApi,
+  ResultApi
+} from '../../../../building-blocks/types/result-api'
+import {
+  Authentification,
+  AuthentificationRepositoryToken
+} from '../../../../domain/authentification'
 import { Demarche } from '../../../../domain/demarche'
-import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import {
   PoleEmploiPartenaireClient,
   PoleEmploiPartenaireClientToken
@@ -62,15 +64,16 @@ export class GetDemarchesQueryGetter {
           jeuneUtilisateur.idAuthentification
         )
       : await this.fetchDemarchesPourJeune(query, jeuneUtilisateur)
-    if (isFailure(demarchesDto)) {
+    if (isFailureApi(demarchesDto)) {
       return demarchesDto
     }
 
-    let demarches = demarchesDto.data
-      .map(demarcheDto =>
-        fromDemarcheDtoToDemarche(demarcheDto, this.dateService)
-      )
-      .sort(query.tri)
+    let demarches =
+      demarchesDto.data
+        .map(demarcheDto =>
+          fromDemarcheDtoToDemarche(demarcheDto, this.dateService)
+        )
+        .sort(query.tri) ?? []
 
     if (query.dateDebut) {
       demarches = demarches.filter(({ dateDebut, dateFin }) => {

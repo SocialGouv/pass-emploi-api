@@ -108,8 +108,8 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
         idJeune
       )
 
-      if (isSuccessApi(response) && !response.data) {
-        return successApi([])
+      if (isSuccessApi(response)) {
+        if (!response.data || !response.data.length) return successApi([])
       }
 
       return response
@@ -141,11 +141,17 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     this.logger.log('recuperation des rendez-vous passés du jeune')
     const params = new URLSearchParams()
     params.append('dateDebut', dateDebut.toUTC().toISO())
-    return this.getWithCache<RendezVousPoleEmploiDto[]>(
+
+    const response = await this.getWithCache<RendezVousPoleEmploiDto[]>(
       'peconnect-rendezvousagenda/v2/listerendezvous',
       tokenDuJeune,
       params
     )
+
+    if (isSuccessApi(response)) {
+      if (!response.data || !response.data.length) return successApi([])
+    }
+    return response
   }
 
   async getPrestations(
@@ -160,11 +166,16 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     const params = new URLSearchParams()
     params.append('dateRecherche', dateRechercheRendezVous.toISODate())
 
-    return this.getWithCache<PrestationDto[]>(
+    const response = await this.getWithCache<PrestationDto[]>(
       'peconnect-gerer-prestations/v1/rendez-vous',
       tokenDuJeune,
       params
     )
+
+    if (isSuccessApi(response)) {
+      if (!response.data || !response.data.length) return successApi([])
+    }
+    return response
   }
 
   async getLienVisio(

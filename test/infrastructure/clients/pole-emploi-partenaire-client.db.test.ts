@@ -1,39 +1,39 @@
 import { HttpService } from '@nestjs/axios'
 import * as nock from 'nock'
-import { testConfig } from '../../utils/module-for-testing'
-import { uneDatetime } from '../../fixtures/date.fixture'
-import { PoleEmploiPartenaireClient } from '../../../src/infrastructure/clients/pole-emploi-partenaire-client.db'
-import { uneDemarcheDto } from '../../fixtures/demarches-dto.fixtures'
-import { Demarche } from '../../../src/domain/demarche'
+import { Op } from 'sequelize'
+import { Context, ContextKey } from 'src/building-blocks/context'
+import { ErreurHttp } from 'src/building-blocks/types/domain-error'
 import {
   failure,
   isSuccess,
   success
 } from '../../../src/building-blocks/types/result'
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { ErreurHttp } from 'src/building-blocks/types/domain-error'
-import { Context, ContextKey } from 'src/building-blocks/context'
 import {
-  DatabaseForTesting,
-  getDatabase
-} from '../../utils/database-for-testing'
+  failureApi,
+  successApi
+} from '../../../src/building-blocks/types/result-api'
+import { Core } from '../../../src/domain/core'
+import { Demarche } from '../../../src/domain/demarche'
+import { DocumentPoleEmploiDto } from '../../../src/infrastructure/clients/dto/pole-emploi.dto'
+import { PoleEmploiPartenaireClient } from '../../../src/infrastructure/clients/pole-emploi-partenaire-client.db'
 import {
   CacheApiPartenaireDto,
   CacheApiPartenaireSqlModel
 } from '../../../src/infrastructure/sequelize/models/cache-api-partenaire.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
-import { unePrestationDto } from '../../fixtures/pole-emploi-partenaire.fixture'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
-import { Core } from '../../../src/domain/core'
+import { uneDatetime } from '../../fixtures/date.fixture'
+import { uneDemarcheDto } from '../../fixtures/demarches-dto.fixtures'
+import { unePrestationDto } from '../../fixtures/pole-emploi-partenaire.fixture'
+import { expect, StubbedClass, stubClass } from '../../utils'
 import {
-  failureApi,
-  successApi
-} from '../../../src/building-blocks/types/result-api'
-import { DocumentPoleEmploiDto } from '../../../src/infrastructure/clients/dto/pole-emploi.dto'
-import { Op } from 'sequelize'
+  DatabaseForTesting,
+  getDatabase
+} from '../../utils/database-for-testing'
+import { testConfig } from '../../utils/module-for-testing'
 
 describe('PoleEmploiPartenaireClient', () => {
   let poleEmploiPartenaireClient: PoleEmploiPartenaireClient
@@ -80,7 +80,7 @@ describe('PoleEmploiPartenaireClient', () => {
         )
 
         // Then
-        expect(response).to.deep.equal(success([]))
+        expect(response).to.deep.equal(successApi([]))
       })
     })
     describe("quand l'api est en 500", () => {
@@ -286,7 +286,7 @@ describe('PoleEmploiPartenaireClient', () => {
       )
 
       // Then
-      expect(response).to.deep.equal(success([]))
+      expect(response).to.deep.equal(successApi([]))
     })
   })
 
