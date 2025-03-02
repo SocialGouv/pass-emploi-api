@@ -2,6 +2,7 @@
 import { parse } from 'pg-connection-string'
 import * as Joi from 'joi'
 import { configurationSchema } from './configuration.schema'
+import { max } from 'class-validator'
 
 export default () => {
   const scalingoApp = process.env.APP
@@ -262,7 +263,13 @@ export default () => {
       maxRechercheConseillers: process.env.MAX_RECHERCHE_CONSEILLERS ?? '10'
     },
     headers: {
-      maxAge: process.env.CACHE_CONTROL_MAX_AGE_APP_MOBILE_EN_SECONDES
+      staleIfErrorSeconds: process.env.CACHE_CONTROL_STALE_IF_ERROR_EN_SECONDES,
+      maxAgeMobile: process.env.CACHE_CONTROL_MAX_AGE_APP_MOBILE_EN_SECONDES,
+      maxAgeReferentiels:
+        process.env.CACHE_CONTROL_MAX_AGE_REFERENTIELS_EN_SECONDES,
+      maxAgeCV: process.env.CACHE_CONTROL_MAX_AGE_CV_EN_SECONDES,
+      maxAgeSuggestions:
+        process.env.CACHE_CONTROL_MAX_AGE_SUGGESTIONS_EN_SECONDES
     },
     recherche: {
       seuil: process.env.THRESHOLD_SEARCH_MESSAGES

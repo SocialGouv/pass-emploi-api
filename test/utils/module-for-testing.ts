@@ -200,7 +200,11 @@ export const testConfig = (): ConfigService => {
       maxRechercheConseillers: '5'
     },
     headers: {
-      maxAge: '600'
+      staleIfErrorSeconds: '60',
+      maxAgeMobile: '600',
+      maxAgeReferentiels: '600',
+      maxAgeCV: '600',
+      maxAgeSuggestions: '600'
     }
   })
 }
