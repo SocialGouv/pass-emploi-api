@@ -26,6 +26,11 @@ export class AccueilJeunePoleEmploiQueryModel {
   @ApiProperty({
     required: false
   })
+  messageDonneesManquantes?: string
+
+  @ApiProperty({
+    required: false
+  })
   dateDerniereMiseAJour?: string
 
   @ApiProperty()

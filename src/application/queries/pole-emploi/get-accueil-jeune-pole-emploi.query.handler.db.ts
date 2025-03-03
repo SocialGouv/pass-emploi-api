@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { DateService } from 'src/utils/date-service'
 import { NonTrouveError } from '../../../building-blocks/types/domain-error'
-import { Query } from '../../../building-blocks/types/query'
+import { Cached, Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import {
   Result,
@@ -25,6 +25,8 @@ import { GetCampagneQueryGetter } from '../query-getters/get-campagne.query.gett
 import { GetDemarchesQueryGetter } from '../query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { AccueilJeunePoleEmploiQueryModel } from '../query-models/jeunes.pole-emploi.query-model'
+import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-model'
+import { DemarcheQueryModel } from '../query-models/actions.query-model'
 
 export interface GetAccueilJeunePoleEmploiQuery extends Query {
   idJeune: string
@@ -87,46 +89,73 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
         idpToken,
         dateDebut: this.dateService.now()
       }),
-      this.getRecherchesSauvegardeesQueryGetter.handle({
-        idJeune: query.idJeune
-      }),
-      this.getFavorisQueryGetter.handle({
-        idJeune: query.idJeune
-      }),
+      this.getRecherchesSauvegardeesQueryGetter
+        .handle({
+          idJeune: query.idJeune
+        })
+        .catch(e => {
+          this.logger.error(e)
+          donneesManquantes.push('alertes')
+          return []
+        }),
+      this.getFavorisQueryGetter
+        .handle({
+          idJeune: query.idJeune
+        })
+        .catch(e => {
+          this.logger.error(e)
+          donneesManquantes.push('favoris')
+          return []
+        }),
       peutVoirLesCampagnes(jeune.structure)
-        ? this.getCampagneQueryGetter.handle({ idJeune: query.idJeune })
+        ? this.getCampagneQueryGetter
+            .handle({ idJeune: query.idJeune })
+            .catch(e => {
+              this.logger.error(e)
+              return undefined
+            })
         : Promise.resolve(undefined)
     ])
 
+    const donneesManquantes: string[] = []
+    let demarches: Cached<DemarcheQueryModel[]>
+    let rendezVous: Cached<RendezVousJeuneQueryModel[]>
+
     if (isFailure(resultDemarches)) {
-      return resultDemarches
+      donneesManquantes.push('démarches')
+      demarches = { queryModel: [] }
+    } else {
+      demarches = resultDemarches.data
     }
 
     if (isFailure(resultRendezVous)) {
-      return resultRendezVous
+      donneesManquantes.push('rendez-vous')
+      rendezVous = { queryModel: [] }
+    } else {
+      rendezVous = resultRendezVous.data
     }
 
-    const nombreDeRendezVous = resultRendezVous.data.queryModel.filter(
+    const nombreDeRendezVous = rendezVous.queryModel.filter(
       unRendezVous =>
         unRendezVous.date >= maintenant.toJSDate() &&
         unRendezVous.date <= dateFinDeSemaine.toJSDate()
     ).length
 
-    const nombreDeDemarchesARealiser = resultDemarches.data.queryModel.filter(
+    const nombreDeDemarchesARealiser = demarches.queryModel.filter(
       demarche =>
         DateTime.fromISO(demarche.dateFin) >= maintenant &&
         DateTime.fromISO(demarche.dateFin) <= dateFinDeSemaine &&
         demarche.statut !== Demarche.Statut.REALISEE &&
         demarche.statut !== Demarche.Statut.ANNULEE
     ).length
-    const nombreDeDemarchesEnRetard = resultDemarches.data.queryModel.filter(
+    const nombreDeDemarchesEnRetard = demarches.queryModel.filter(
       demarche =>
         DateTime.fromISO(demarche.dateFin) <= maintenant &&
         demarche.statut !== Demarche.Statut.REALISEE &&
         demarche.statut !== Demarche.Statut.ANNULEE
     ).length
     const nombreDeDemarchesAFaireSemaineCalendaire =
-      resultDemarches.data.queryModel.filter(
+      demarches.queryModel.filter(
         demarche =>
           DateTime.fromISO(demarche.dateFin) >= dateDebutDeSemaine &&
           DateTime.fromISO(demarche.dateFin) <= dateFinDeSemaine &&
@@ -135,16 +164,16 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
       ).length
 
     const prochainRendezVous =
-      resultRendezVous.data.queryModel.length > 0
-        ? resultRendezVous.data.queryModel.filter(
+      rendezVous.queryModel.length > 0
+        ? rendezVous.queryModel.filter(
             rdv => rdv.date >= maintenant.toJSDate()
           )[0]
         : undefined
     let dateDerniereMiseAJour: string | undefined = undefined
-    if (resultDemarches.data.dateDuCache && resultRendezVous.data.dateDuCache) {
+    if (demarches.dateDuCache && rendezVous.dateDuCache) {
       dateDerniereMiseAJour = recupererLaDateLaPlusAncienne(
-        resultDemarches.data.dateDuCache,
-        resultRendezVous.data.dateDuCache
+        demarches.dateDuCache,
+        rendezVous.dateDuCache
       ).toISO()
     }
 
@@ -162,6 +191,12 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
       mesFavoris: favorisQueryModels,
       campagne: campagneQueryModel
     }
+
+    if (donneesManquantes.length)
+      data.messageDonneesManquantes = `Les données suivantes sont temporairement indisponibles : ${donneesManquantes.join(
+        ', '
+      )}`
+
     return success(data)
   }
 

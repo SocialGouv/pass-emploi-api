@@ -41,6 +41,8 @@ import {
   unFavoriOffreImmersion
 } from '../../fixtures/sql-models/favoris.sql-model'
 import { NotificationJeuneSqlModel } from '../../../src/infrastructure/sequelize/models/notification-jeune.sql-model'
+import { RechercheSqlModel } from '../../../src/infrastructure/sequelize/models/recherche.sql-model'
+import { uneRechercheDto } from '../../fixtures/sql-models/recherche.sql-model'
 
 let stats: SuiviJob
 
@@ -266,6 +268,18 @@ describe('NettoyerLesDonneesJobHandler', () => {
       idJeune: idJeuneAUpdateSonConseillerInitial,
       idRendezVous: animationsCollectivesPasseesAvecInscrits.id
     })
+    await RechercheSqlModel.bulkCreate([
+      uneRechercheDto({
+        id: '149d80b2-a79d-46ba-a222-311d3b19d1b1',
+        idJeune: idJeune2,
+        dateCreation: maintenant.minus({ years: 3 }).toJSDate()
+      }),
+      uneRechercheDto({
+        id: 'c3fe1f24-8d25-45be-be7d-0cda70bf23e1',
+        idJeune: idJeune2,
+        dateCreation: maintenant.minus({ years: 1 }).toJSDate()
+      })
+    ])
     await FavoriOffreEmploiSqlModel.bulkCreate([
       unFavoriOffreEmploi({
         idJeune: idJeune2,
@@ -421,6 +435,17 @@ describe('NettoyerLesDonneesJobHandler', () => {
     })
   })
 
+  describe('recherche', () => {
+    it('supprime les recherches de plus de 2 ans', async () => {
+      // Then
+      const recherchesApresNettoyage = await RechercheSqlModel.findAll()
+      expect(recherchesApresNettoyage.length).to.equal(1)
+      expect(
+        (stats.resultat as { nombreRecherchesSupprimees: number })
+          .nombreRecherchesSupprimees
+      ).to.equal(1)
+    })
+  })
   describe('favoris emploi', () => {
     it('supprime les favoris emploi de plus de 6 mois', async () => {
       // Then
@@ -428,8 +453,8 @@ describe('NettoyerLesDonneesJobHandler', () => {
         await FavoriOffreEmploiSqlModel.findAll()
       expect(favorisEmploiApresNettoyage.length).to.equal(1)
       expect(
-        (stats.resultat as { nombreFavrisEmploiSupprimes: number })
-          .nombreFavrisEmploiSupprimes
+        (stats.resultat as { nombreFavorisEmploiSupprimes: number })
+          .nombreFavorisEmploiSupprimes
       ).to.equal(1)
     })
   })
@@ -441,8 +466,8 @@ describe('NettoyerLesDonneesJobHandler', () => {
         await FavoriOffreEngagementSqlModel.findAll()
       expect(favorisEngagementApresNettoyage.length).to.equal(1)
       expect(
-        (stats.resultat as { nombreFavrisEngagementSupprimes: number })
-          .nombreFavrisEngagementSupprimes
+        (stats.resultat as { nombreFavorisEngagementSupprimes: number })
+          .nombreFavorisEngagementSupprimes
       ).to.equal(1)
     })
   })
@@ -454,8 +479,8 @@ describe('NettoyerLesDonneesJobHandler', () => {
         await FavoriOffreImmersionSqlModel.findAll()
       expect(favorisImmersionApresNettoyage.length).to.equal(1)
       expect(
-        (stats.resultat as { nombreFavrisImmersionSupprimes: number })
-          .nombreFavrisImmersionSupprimes
+        (stats.resultat as { nombreFavorisImmersionSupprimes: number })
+          .nombreFavorisImmersionSupprimes
       ).to.equal(1)
     })
   })

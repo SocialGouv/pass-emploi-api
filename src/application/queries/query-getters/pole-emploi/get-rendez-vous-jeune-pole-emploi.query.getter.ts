@@ -1,15 +1,15 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { NonTrouveError } from '../../../../building-blocks/types/domain-error'
 import { Cached } from '../../../../building-blocks/types/query'
 import {
   failure,
-  isFailure,
   Result,
   success
 } from '../../../../building-blocks/types/result'
+import { isFailureApi } from '../../../../building-blocks/types/result-api'
 import { Jeune, JeuneRepositoryToken } from '../../../../domain/jeune/jeune'
-import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import {
   PoleEmploiPartenaireClient,
   PoleEmploiPartenaireClientToken
@@ -63,7 +63,7 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
       this.poleEmploiPartenaireClient.getRendezVous(idpToken, dateDebut)
     ])
 
-    if (isFailure(responsePrestations)) {
+    if (isFailureApi(responsePrestations)) {
       return responsePrestations
     }
 
@@ -85,7 +85,7 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
                 prestation.identifiantStable!
               )
 
-            if (isFailure(responseLienVisio)) {
+            if (isFailureApi(responseLienVisio)) {
               this.logger.error(responseLienVisio.error)
             } else {
               lienVisio = responseLienVisio.data
@@ -106,7 +106,7 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
         })
     )
 
-    const rendezVousPoleEmploi = isFailure(responseRendezVous)
+    const rendezVousPoleEmploi = isFailureApi(responseRendezVous)
       ? []
       : responseRendezVous.data.map(rendezVous => {
           return fromRendezVousDtoToRendezVousQueryModel(
@@ -132,7 +132,9 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
       queryModel: rendezVousDuJeune,
       dateDuCache: recupererLaDateLaPlusAncienne(
         responsePrestations.dateCache,
-        isFailure(responseRendezVous) ? undefined : responseRendezVous.dateCache
+        isFailureApi(responseRendezVous)
+          ? undefined
+          : responseRendezVous.dateCache
       )
     }
     return success(data)
