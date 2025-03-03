@@ -28,6 +28,8 @@ import { FavoriOffreEmploiSqlModel } from '../../infrastructure/sequelize/models
 import { FavoriOffreEngagementSqlModel } from '../../infrastructure/sequelize/models/favori-offre-engagement.sql-model'
 import { FavoriOffreImmersionSqlModel } from '../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 import { NotificationJeuneSqlModel } from '../../infrastructure/sequelize/models/notification-jeune.sql-model'
+import { LogModificationRendezVousDto } from '../../infrastructure/sequelize/models/log-modification-rendez-vous-sql.model'
+import { RechercheSqlModel } from '../../infrastructure/sequelize/models/recherche.sql-model'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.NETTOYER_LES_DONNEES)
@@ -59,10 +61,12 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
     let nombreJeunesPasConnectesDepuis60Jours = -1
     let nombreActionsSupprimees = -1
     let nombreAnimationsCollectivesCloses = -1
-    let nombreFavrisEmploiSupprimes = -1
-    let nombreFavrisImmersionSupprimes = -1
-    let nombreFavrisEngagementSupprimes = -1
+    let nombreFavorisEmploiSupprimes = -1
+    let nombreFavorisImmersionSupprimes = -1
+    let nombreFavorisEngagementSupprimes = -1
     let nombreNotificationsJeuneSupprimes = -1
+    let nombreHistoriqueRdvSupprimes = -1
+    let nombreRecherchesSupprimees = -1
 
     try {
       const jeunes = await JeuneSqlModel.findAll({
@@ -163,6 +167,17 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
     }
 
     try {
+      nombreHistoriqueRdvSupprimes = await LogModificationRendezVousDto.destroy(
+        {
+          where: dateSuperieureADeuxAns(maintenant)
+        }
+      )
+    } catch (e) {
+      this.logger.warn(e)
+      nbErreurs++
+    }
+
+    try {
       nombreJeunesPasConnectesDepuis60Jours = (
         await JeuneSqlModel.update(
           {
@@ -187,9 +202,19 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
       nbErreurs++
     }
 
+    // Recherche
+    try {
+      nombreRecherchesSupprimees = await RechercheSqlModel.destroy({
+        where: dateCreationSuperieureADeuxAns(maintenant)
+      })
+    } catch (e) {
+      this.logger.warn(e)
+      nbErreurs++
+    }
+
     // Favoris
     try {
-      nombreFavrisEmploiSupprimes = await FavoriOffreEmploiSqlModel.destroy({
+      nombreFavorisEmploiSupprimes = await FavoriOffreEmploiSqlModel.destroy({
         where: dateCreationSuperieureASixMois(maintenant)
       })
     } catch (e) {
@@ -197,7 +222,7 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
       nbErreurs++
     }
     try {
-      nombreFavrisEngagementSupprimes =
+      nombreFavorisEngagementSupprimes =
         await FavoriOffreEngagementSqlModel.destroy({
           where: dateCreationSuperieureASixMois(maintenant)
         })
@@ -206,7 +231,7 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
       nbErreurs++
     }
     try {
-      nombreFavrisImmersionSupprimes =
+      nombreFavorisImmersionSupprimes =
         await FavoriOffreImmersionSqlModel.destroy({
           where: dateCreationSuperieureASixMois(maintenant)
         })
@@ -284,10 +309,12 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
         nombreJeunesPasConnectesDepuis60Jours,
         nombreActionsSupprimees,
         nombreAnimationsCollectivesCloses,
-        nombreFavrisEmploiSupprimes,
-        nombreFavrisEngagementSupprimes,
-        nombreFavrisImmersionSupprimes,
-        nombreNotificationsJeuneSupprimes
+        nombreFavorisEmploiSupprimes,
+        nombreFavorisEngagementSupprimes,
+        nombreFavorisImmersionSupprimes,
+        nombreNotificationsJeuneSupprimes,
+        nombreHistoriqueRdvSupprimes,
+        nombreRecherchesSupprimees
       }
     }
   }
@@ -342,6 +369,12 @@ function dateSuperieureATroisMoisEtVenantDeMilo(
 function dateCreationSuperieureASixMois(maintenant: DateTime): WhereOptions {
   return {
     dateCreation: { [Op.lte]: maintenant.minus({ months: 6 }).toJSDate() }
+  }
+}
+
+function dateCreationSuperieureADeuxAns(maintenant: DateTime): WhereOptions {
+  return {
+    dateCreation: { [Op.lte]: maintenant.minus({ years: 2 }).toJSDate() }
   }
 }
 
