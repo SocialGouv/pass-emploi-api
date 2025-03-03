@@ -204,7 +204,8 @@ export const testConfig = (): ConfigService => {
       maxAgeMobile: '600',
       maxAgeReferentiels: '600',
       maxAgeCV: '600',
-      maxAgeSuggestions: '600'
+      maxAgeSuggestions: '600',
+      maxAgeMinimal: '60'
     }
   })
 }

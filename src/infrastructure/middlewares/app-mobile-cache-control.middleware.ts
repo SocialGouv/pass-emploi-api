@@ -9,12 +9,15 @@ export class AppMobileCacheControlMiddleware implements NestMiddleware {
   private readonly maxAgeReferentiels: number
   private readonly maxAgeCV: number
   private readonly maxAgeSuggestions: number
+  private readonly maxAgeMinimal: number
 
   constructor(config: ConfigService) {
+    this.staleIfErrorSeconds = config.get('headers.staleIfErrorSeconds')!
     this.maxAgeMobile = config.get('headers.maxAgeMobile')!
     this.maxAgeReferentiels = config.get('headers.maxAgeReferentiels')!
     this.maxAgeCV = config.get('headers.maxAgeCV')!
     this.maxAgeSuggestions = config.get('headers.maxAgeSuggestions')!
+    this.maxAgeMinimal = config.get('headers.maxAgeMinimal')!
   }
 
   use(req: Request, res: Response, next: NextFunction): void {
@@ -37,6 +40,11 @@ export class AppMobileCacheControlMiddleware implements NestMiddleware {
       res.header(
         'Cache-control',
         `max-age=${this.maxAgeMobile}, stale-if-error=${this.staleIfErrorSeconds}`
+      )
+    } else {
+      res.header(
+        'Cache-control',
+        `max-age=${this.maxAgeMinimal}, stale-if-error=${this.maxAgeMinimal}`
       )
     }
     next()
