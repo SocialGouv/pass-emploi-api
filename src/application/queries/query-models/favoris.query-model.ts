@@ -24,6 +24,12 @@ export class FavorisQueryModel {
   })
   dateCreation?: string
 
+  @ApiPropertyOptional({
+    format: 'date-time',
+    required: false
+  })
+  dateCandidature?: string
+
   @ApiProperty({
     type: String,
     isArray: true
@@ -34,6 +40,7 @@ export class FavorisQueryModel {
   origine?: OrigineOffreEmploiQueryModel
 }
 
+// TODO verifier pourquoi y'a plein de trucs useless
 class MetadonneesFavorisOffresJeuneQueryModel {
   total: number
   nombreOffresImmersion: number

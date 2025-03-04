@@ -43,17 +43,19 @@ import {
   MetadonneesFavorisQueryModel
 } from '../../application/queries/query-models/favoris.query-model'
 import {
-  FavoriOffreEmploiIdQueryModel,
+  FavoriOffreEmploiQueryModel,
   OffreEmploiResumeQueryModel
 } from '../../application/queries/query-models/offres-emploi.query-model'
 import {
-  FavoriOffreImmersionIdQueryModel,
   FavoriOffreImmersionQueryModel,
+  ObsoleteFavoriOffreImmersionQueryModel,
   OffreImmersionQueryModel
 } from '../../application/queries/query-models/offres-immersion.query-model'
-import { ServiceCiviqueQueryModel } from '../../application/queries/query-models/service-civique.query-model'
+import {
+  FavoriOffreServiceCiviqueQueryModel,
+  ServiceCiviqueQueryModel
+} from '../../application/queries/query-models/service-civique.query-model'
 import { Authentification } from '../../domain/authentification'
-import { Core } from '../../domain/core'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import { handleResult } from './result.handler'
@@ -113,7 +115,7 @@ export class FavorisController {
     @Param('idJeune') idJeune: string,
     @Query() getFavorisQuery: GetFavorisOffresEmploiQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<OffreEmploiResumeQueryModel[] | FavoriOffreEmploiIdQueryModel[]> {
+  ): Promise<OffreEmploiResumeQueryModel[] | FavoriOffreEmploiQueryModel[]> {
     return this.getFavorisOffresEmploiJeuneQueryHandler.execute(
       { idJeune, detail: Boolean(getFavorisQuery.detail) },
       utilisateur
@@ -134,7 +136,7 @@ export class FavorisController {
     @Query() getFavorisQuery: GetFavorisOffresImmersionQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<
-    FavoriOffreImmersionQueryModel[] | FavoriOffreImmersionIdQueryModel[]
+    ObsoleteFavoriOffreImmersionQueryModel[] | FavoriOffreImmersionQueryModel[]
   > {
     return this.getFavorisOffresImmersionJeuneQueryHandler.execute(
       { idJeune, detail: Boolean(getFavorisQuery.detail) },
@@ -155,7 +157,9 @@ export class FavorisController {
     @Param('idJeune') idJeune: string,
     @Query() getFavorisQuery: GetFavorisServicesCiviqueQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<ServiceCiviqueQueryModel[] | Core.Id[]> {
+  ): Promise<
+    ServiceCiviqueQueryModel[] | FavoriOffreServiceCiviqueQueryModel[]
+  > {
     return this.getFavorisServiceCiviqueJeuneQueryHandler.execute(
       { idJeune, detail: Boolean(getFavorisQuery.detail) },
       utilisateur

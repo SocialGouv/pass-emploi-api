@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common'
-import { Result } from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
-import { Jeune } from '../../domain/jeune/jeune'
+import { DateService } from 'src/utils/date-service'
 
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Core } from '../../domain/core'
-import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
-import { ServiceCiviqueQueryModel } from './query-models/service-civique.query-model'
+import { Result } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { Jeune } from '../../domain/jeune/jeune'
+import { fromSqlToOffreServiceCivique } from '../../infrastructure/repositories/mappers/service-civique.mapper'
 import { FavoriOffreEngagementSqlModel } from '../../infrastructure/sequelize/models/favori-offre-engagement.sql-model'
+import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import {
-  fromSqlToIds,
-  fromSqlToOffreServiceCivique
-} from '../../infrastructure/repositories/mappers/service-civique.mapper'
+  FavoriOffreServiceCiviqueQueryModel,
+  ServiceCiviqueQueryModel
+} from './query-models/service-civique.query-model'
 
 export interface GetFavorisOffresEngagementJeuneQuery extends Query {
   idJeune: Jeune.Id
@@ -22,7 +22,7 @@ export interface GetFavorisOffresEngagementJeuneQuery extends Query {
 @Injectable()
 export class GetFavorisServiceCiviqueJeuneQueryHandler extends QueryHandler<
   GetFavorisOffresEngagementJeuneQuery,
-  ServiceCiviqueQueryModel[] | Core.Id[]
+  ServiceCiviqueQueryModel[] | FavoriOffreServiceCiviqueQueryModel[]
 > {
   constructor(private jeuneAuthorizer: JeuneAuthorizer) {
     super('GetFavorisServiceCiviqueJeuneQueryHandler')
@@ -30,7 +30,9 @@ export class GetFavorisServiceCiviqueJeuneQueryHandler extends QueryHandler<
 
   async handle(
     query: GetFavorisOffresEngagementJeuneQuery
-  ): Promise<ServiceCiviqueQueryModel[] | Core.Id[]> {
+  ): Promise<
+    ServiceCiviqueQueryModel[] | FavoriOffreServiceCiviqueQueryModel[]
+  > {
     const favorisSql = await FavoriOffreEngagementSqlModel.findAll({
       where: {
         idJeune: query.idJeune
@@ -41,7 +43,7 @@ export class GetFavorisServiceCiviqueJeuneQueryHandler extends QueryHandler<
     if (query.detail) {
       return favorisSql.map(fromSqlToOffreServiceCivique)
     } else {
-      return fromSqlToIds(favorisSql)
+      return fromSqlToQueryModel(favorisSql)
     }
   }
 
@@ -55,4 +57,17 @@ export class GetFavorisServiceCiviqueJeuneQueryHandler extends QueryHandler<
   async monitor(): Promise<void> {
     return
   }
+}
+
+export function fromSqlToQueryModel(
+  favoriOffreEngagementSqlModels: FavoriOffreEngagementSqlModel[]
+): FavoriOffreServiceCiviqueQueryModel[] {
+  return favoriOffreEngagementSqlModels.map(favori => {
+    return {
+      id: favori.idOffre,
+      dateCandidature: favori.dateCandidature
+        ? DateService.fromJSDateToISOString(favori.dateCandidature)
+        : undefined
+    }
+  })
 }

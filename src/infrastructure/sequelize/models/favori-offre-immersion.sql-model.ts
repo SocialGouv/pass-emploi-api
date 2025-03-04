@@ -38,4 +38,7 @@ export class FavoriOffreImmersionSqlModel extends Model {
 
   @Column({ field: 'date_creation', type: DataType.DATE })
   dateCreation: Date | null
+
+  @Column({ field: 'date_candidature', type: DataType.DATE })
+  dateCandidature: Date | null
 }

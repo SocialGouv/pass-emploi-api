@@ -146,7 +146,7 @@ export class AddFavoriServicesCivique implements Offre.Favori.ServiceCivique {
 }
 
 export class GetFavorisOffresEmploiQueryParams {
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ deprecated: true })
   @IsBoolean()
   @IsOptional()
   @IsIn([true, false])
@@ -155,7 +155,7 @@ export class GetFavorisOffresEmploiQueryParams {
 }
 
 export class GetFavorisOffresImmersionQueryParams {
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ deprecated: true })
   @IsBoolean()
   @IsOptional()
   @IsIn([true, false])
@@ -164,7 +164,7 @@ export class GetFavorisOffresImmersionQueryParams {
 }
 
 export class GetFavorisServicesCiviqueQueryParams {
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ deprecated: true })
   @IsBoolean()
   @IsOptional()
   @IsIn([true, false])
