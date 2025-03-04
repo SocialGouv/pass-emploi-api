@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { PaginationQueryModel } from './common/pagination.query-model'
 
 export class OrigineOffreEmploiQueryModel {
@@ -76,6 +76,13 @@ export class OffresEmploiQueryModel {
   results: OffreEmploiResumeQueryModel[]
 }
 
-export interface FavoriOffreEmploiIdQueryModel {
+export class FavoriOffreEmploiQueryModel {
+  @ApiProperty()
   id: string
+
+  @ApiPropertyOptional({
+    format: 'date-time',
+    required: false
+  })
+  dateCandidature?: string
 }

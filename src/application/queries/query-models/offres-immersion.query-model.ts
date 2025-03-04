@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { Offre } from '../../../domain/offre/offre'
 
 export class ContactImmersionQueryModel {
@@ -28,7 +28,7 @@ export class OffreImmersionQueryModel {
   estVolontaire: boolean
 }
 
-export class FavoriOffreImmersionQueryModel {
+export class ObsoleteFavoriOffreImmersionQueryModel {
   @ApiProperty()
   id: string
   @ApiProperty()
@@ -41,8 +41,15 @@ export class FavoriOffreImmersionQueryModel {
   ville: string
 }
 
-export interface FavoriOffreImmersionIdQueryModel {
+export class FavoriOffreImmersionQueryModel {
+  @ApiProperty()
   id: string
+
+  @ApiProperty({
+    format: 'date-time',
+    required: false
+  })
+  dateCandidature?: string
 }
 
 export class DetailOffreImmersionQueryModel extends OffreImmersionQueryModel {

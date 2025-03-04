@@ -42,14 +42,6 @@ export function toOffreEngagement(
   }
 }
 
-export function fromSqlToIds(
-  favoriOffreEngagementSqlModels: FavoriOffreEngagementSqlModel[]
-): Core.Id[] {
-  return favoriOffreEngagementSqlModels.map(favori => {
-    return { id: favori.idOffre }
-  })
-}
-
 export function fromSqlToOffreServiceCivique(
   favoriOffreEngagementSqlModel: FavoriOffreEngagementSqlModel
 ): Offre.Favori.ServiceCivique {

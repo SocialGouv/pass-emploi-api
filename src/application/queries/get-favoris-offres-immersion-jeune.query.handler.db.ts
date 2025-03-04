@@ -1,18 +1,15 @@
 import { Injectable } from '@nestjs/common'
+import { DateService } from 'src/utils/date-service'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Jeune } from '../../domain/jeune/jeune'
-import {
-  fromSqlToFavorisOffreImmersionQueryModel,
-  fromSqlToFavorisOffresImmersionIdsQueryModels
-} from '../../infrastructure/repositories/mappers/offres-immersion.mappers'
 import { FavoriOffreImmersionSqlModel } from '../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import {
-  FavoriOffreImmersionIdQueryModel,
-  FavoriOffreImmersionQueryModel
+  FavoriOffreImmersionQueryModel,
+  ObsoleteFavoriOffreImmersionQueryModel
 } from './query-models/offres-immersion.query-model'
 
 export interface GetFavorisOffresImmersionJeuneQuery extends Query {
@@ -23,7 +20,7 @@ export interface GetFavorisOffresImmersionJeuneQuery extends Query {
 @Injectable()
 export class GetFavorisOffresImmersionJeuneQueryHandler extends QueryHandler<
   GetFavorisOffresImmersionJeuneQuery,
-  FavoriOffreImmersionQueryModel[] | FavoriOffreImmersionIdQueryModel[]
+  ObsoleteFavoriOffreImmersionQueryModel[] | FavoriOffreImmersionQueryModel[]
 > {
   constructor(private jeuneAuthorizer: JeuneAuthorizer) {
     super('GetFavorisOffresImmersionJeuneQueryHandler')
@@ -32,11 +29,11 @@ export class GetFavorisOffresImmersionJeuneQueryHandler extends QueryHandler<
   handle(
     query: GetFavorisOffresImmersionJeuneQuery
   ): Promise<
-    FavoriOffreImmersionQueryModel[] | FavoriOffreImmersionIdQueryModel[]
+    ObsoleteFavoriOffreImmersionQueryModel[] | FavoriOffreImmersionQueryModel[]
   > {
     return query.detail
-      ? this.getFavorisQueryModelsByJeune(query.idJeune)
-      : this.getFavorisIdsQueryModelsByJeune(query.idJeune)
+      ? this.getObsoleteFavorisQueryModelsByJeune(query.idJeune)
+      : this.getFavorisQueryModelsByJeune(query.idJeune)
   }
 
   async authorize(
@@ -50,9 +47,9 @@ export class GetFavorisOffresImmersionJeuneQueryHandler extends QueryHandler<
     return
   }
 
-  private async getFavorisIdsQueryModelsByJeune(
+  private async getFavorisQueryModelsByJeune(
     idJeune: string
-  ): Promise<FavoriOffreImmersionIdQueryModel[]> {
+  ): Promise<FavoriOffreImmersionQueryModel[]> {
     const favorisIdsSql = await FavoriOffreImmersionSqlModel.findAll({
       attributes: ['idOffre'],
       where: {
@@ -61,18 +58,43 @@ export class GetFavorisOffresImmersionJeuneQueryHandler extends QueryHandler<
       order: [['date_creation', 'DESC']]
     })
 
-    return fromSqlToFavorisOffresImmersionIdsQueryModels(favorisIdsSql)
+    return fromSqlToFavorisOffresImmersionQueryModels(favorisIdsSql)
   }
 
-  private async getFavorisQueryModelsByJeune(
+  private async getObsoleteFavorisQueryModelsByJeune(
     idJeune: string
-  ): Promise<FavoriOffreImmersionQueryModel[]> {
+  ): Promise<ObsoleteFavoriOffreImmersionQueryModel[]> {
     const favorisSql = await FavoriOffreImmersionSqlModel.findAll({
       where: {
         idJeune
       }
     })
 
-    return favorisSql.map(fromSqlToFavorisOffreImmersionQueryModel)
+    return favorisSql.map(fromSqlToObsoleteFavorisOffreImmersionQueryModel)
+  }
+}
+
+export function fromSqlToFavorisOffresImmersionQueryModels(
+  favorisIdsSql: FavoriOffreImmersionSqlModel[]
+): FavoriOffreImmersionQueryModel[] {
+  return favorisIdsSql.map(favori => {
+    return {
+      id: favori.idOffre,
+      dateCandidature: favori.dateCandidature
+        ? DateService.fromJSDateToISOString(favori.dateCandidature)
+        : undefined
+    }
+  })
+}
+
+export function fromSqlToObsoleteFavorisOffreImmersionQueryModel(
+  offreImmersionFavoriSql: FavoriOffreImmersionSqlModel
+): ObsoleteFavoriOffreImmersionQueryModel {
+  return {
+    id: offreImmersionFavoriSql.idOffre,
+    metier: offreImmersionFavoriSql.metier,
+    nomEtablissement: offreImmersionFavoriSql.nomEtablissement,
+    secteurActivite: offreImmersionFavoriSql.secteurActivite,
+    ville: offreImmersionFavoriSql.ville
   }
 }

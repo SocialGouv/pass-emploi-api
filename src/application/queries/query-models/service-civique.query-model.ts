@@ -25,6 +25,17 @@ export class ServiceCiviqueQueryModel {
   dateDeDebut?: string
 }
 
+export class FavoriOffreServiceCiviqueQueryModel {
+  @ApiProperty()
+  id: string
+
+  @ApiProperty({
+    format: 'date-time',
+    required: false
+  })
+  dateCandidature?: string
+}
+
 export class ServicesCiviqueQueryModel {
   @ApiProperty({ type: Pagination })
   pagination: Pagination

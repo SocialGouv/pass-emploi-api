@@ -1,29 +1,27 @@
 import { Injectable } from '@nestjs/common'
-import { Authentification } from '../../domain/authentification'
-import { Jeune } from '../../domain/jeune/jeune'
+import { DateService } from 'src/utils/date-service'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
+import { Result } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { Jeune } from '../../domain/jeune/jeune'
+import { toOffreEmploi } from '../../infrastructure/repositories/mappers/offres-emploi.mappers'
+import { FavoriOffreEmploiSqlModel } from '../../infrastructure/sequelize/models/favori-offre-emploi.sql-model'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import {
-  FavoriOffreEmploiIdQueryModel,
+  FavoriOffreEmploiQueryModel,
   OffreEmploiResumeQueryModel
 } from './query-models/offres-emploi.query-model'
-import { FavoriOffreEmploiSqlModel } from '../../infrastructure/sequelize/models/favori-offre-emploi.sql-model'
-import {
-  fromSqlToFavorisOffresEmploiIdsQueryModels,
-  toOffreEmploi
-} from '../../infrastructure/repositories/mappers/offres-emploi.mappers'
-import { Result } from '../../building-blocks/types/result'
 
 export interface GetFavorisJeuneQuery extends Query {
   idJeune: Jeune.Id
-  detail: boolean
+  detail: boolean // TODO faire le ménage, c'est legacy (verif utilisation sur elastic)
 }
 
 @Injectable()
 export class GetFavorisOffresEmploiJeuneQueryHandler extends QueryHandler<
   GetFavorisJeuneQuery,
-  OffreEmploiResumeQueryModel[] | FavoriOffreEmploiIdQueryModel[]
+  OffreEmploiResumeQueryModel[] | FavoriOffreEmploiQueryModel[]
 > {
   constructor(private jeuneAuthorizer: JeuneAuthorizer) {
     super('GetFavorisOffresEmploiJeuneQueryHandler')
@@ -31,10 +29,10 @@ export class GetFavorisOffresEmploiJeuneQueryHandler extends QueryHandler<
 
   handle(
     query: GetFavorisJeuneQuery
-  ): Promise<OffreEmploiResumeQueryModel[] | FavoriOffreEmploiIdQueryModel[]> {
+  ): Promise<OffreEmploiResumeQueryModel[] | FavoriOffreEmploiQueryModel[]> {
     return query.detail
-      ? this.getFavorisQueryModelsByJeune(query.idJeune)
-      : this.getFavorisIdsQueryModelsByJeune(query.idJeune)
+      ? this.getObsoleteFavorisQueryModelsByJeune(query.idJeune)
+      : this.getFavorisQueryModelsByJeune(query.idJeune)
   }
 
   async authorize(
@@ -48,9 +46,9 @@ export class GetFavorisOffresEmploiJeuneQueryHandler extends QueryHandler<
     return
   }
 
-  private async getFavorisIdsQueryModelsByJeune(
+  private async getFavorisQueryModelsByJeune(
     idJeune: string
-  ): Promise<FavoriOffreEmploiIdQueryModel[]> {
+  ): Promise<FavoriOffreEmploiQueryModel[]> {
     const favorisIdsSql = await FavoriOffreEmploiSqlModel.findAll({
       attributes: ['idOffre'],
       where: {
@@ -59,10 +57,10 @@ export class GetFavorisOffresEmploiJeuneQueryHandler extends QueryHandler<
       order: [['date_creation', 'DESC']]
     })
 
-    return fromSqlToFavorisOffresEmploiIdsQueryModels(favorisIdsSql)
+    return fromSqlToFavorisOffresEmploiQueryModels(favorisIdsSql)
   }
 
-  private async getFavorisQueryModelsByJeune(
+  private async getObsoleteFavorisQueryModelsByJeune(
     idJeune: string
   ): Promise<OffreEmploiResumeQueryModel[]> {
     const favorisSql = await FavoriOffreEmploiSqlModel.findAll({
@@ -73,4 +71,17 @@ export class GetFavorisOffresEmploiJeuneQueryHandler extends QueryHandler<
 
     return favorisSql.map(toOffreEmploi)
   }
+}
+
+function fromSqlToFavorisOffresEmploiQueryModels(
+  favorisIdsSql: FavoriOffreEmploiSqlModel[]
+): FavoriOffreEmploiQueryModel[] {
+  return favorisIdsSql.map(favori => {
+    return {
+      id: favori.idOffre,
+      dateCandidature: favori.dateCandidature
+        ? DateService.fromJSDateToISOString(favori.dateCandidature)
+        : undefined
+    }
+  })
 }

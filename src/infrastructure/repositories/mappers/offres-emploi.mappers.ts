@@ -1,10 +1,7 @@
+import { OffresEmploiQueryModel } from '../../../application/queries/query-models/offres-emploi.query-model'
+import { Offre } from '../../../domain/offre/offre'
 import { FavoriOffreEmploiSqlModel } from '../../sequelize/models/favori-offre-emploi.sql-model'
 import { OffreEmploiDto } from '../dto/pole-emploi.dto'
-import {
-  FavoriOffreEmploiIdQueryModel,
-  OffresEmploiQueryModel
-} from '../../../application/queries/query-models/offres-emploi.query-model'
-import { Offre } from '../../../domain/offre/offre'
 
 export function toOffresEmploiQueryModel(
   page: number,
@@ -92,14 +89,6 @@ export function buildLocalisation(
     codePostal: favoriOffreEmploiSqlModel.codePostalLocalisation || '',
     commune: favoriOffreEmploiSqlModel.communeLocalisation || ''
   }
-}
-
-export function fromSqlToFavorisOffresEmploiIdsQueryModels(
-  favorisIdsSql: FavoriOffreEmploiSqlModel[]
-): FavoriOffreEmploiIdQueryModel[] {
-  return favorisIdsSql.map(favori => {
-    return { id: favori.idOffre }
-  })
 }
 
 export function toPoleEmploiContrat(
