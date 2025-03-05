@@ -5,7 +5,7 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Jeune } from '../../domain/jeune/jeune'
-import { toOffreEmploi } from '../../infrastructure/repositories/mappers/offres-emploi.mappers'
+import { toFavoriOffreEmploi } from '../../infrastructure/repositories/mappers/offres-emploi.mappers'
 import { FavoriOffreEmploiSqlModel } from '../../infrastructure/sequelize/models/favori-offre-emploi.sql-model'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import {
@@ -69,7 +69,7 @@ export class GetFavorisOffresEmploiJeuneQueryHandler extends QueryHandler<
       }
     })
 
-    return favorisSql.map(toOffreEmploi)
+    return favorisSql.map(toFavoriOffreEmploi)
   }
 }
 

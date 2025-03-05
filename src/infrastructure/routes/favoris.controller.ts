@@ -5,10 +5,23 @@ import {
   Get,
   HttpCode,
   Param,
+  Patch,
   Post,
   Query
 } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import {
+  AddCandidatureOffreEmploiCommand,
+  AddCandidatureOffreEmploiCommandHandler
+} from 'src/application/commands/add-candidature-offre-emploi.command.handler'
+import {
+  AddCandidatureOffreImmersionCommand,
+  AddCandidatureOffreImmersionCommandHandler
+} from 'src/application/commands/add-candidature-offre-immersion.command.handler'
+import {
+  AddCandidatureOffreServiceCiviqueCommand,
+  AddCandidatureOffreServiceCiviqueCommandHandler
+} from 'src/application/commands/add-candidature-offre-service-civique.command.handler'
 import {
   AddFavoriOffreEmploiCommand,
   AddFavoriOffreEmploiCommandHandler
@@ -81,6 +94,9 @@ export class FavorisController {
     private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
     private readonly addFavoriOffreImmersionCommandHandler: AddFavoriOffreImmersionCommandHandler,
     private readonly addFavoriOffreEngagementCommandHandler: AddFavoriOffreServiceCiviqueCommandHandler,
+    private readonly addCandidatureOffreEmploiCommandHandler: AddCandidatureOffreEmploiCommandHandler,
+    private readonly addCandidatureOffreImmersionCommandHandler: AddCandidatureOffreImmersionCommandHandler,
+    private readonly addCandidatureOffreServiceCiviqueCommandHandler: AddCandidatureOffreServiceCiviqueCommandHandler,
     private readonly deleteFavoriOffreEmploiCommandHandler: DeleteFavoriOffreEmploiCommandHandler,
     private readonly deleteFavoriOffreImmersionCommandHandler: DeleteFavoriOffreImmersionCommandHandler,
     private readonly deleteFavoriOffreEngagementCommandHandler: DeleteFavoriOffreServiceCiviqueCommandHandler
@@ -206,7 +222,8 @@ export class FavorisController {
               logo: addFavoriPayload.origineLogo
             }
           : undefined
-      }
+      },
+      aPostule: Boolean(addFavoriPayload.aPostule)
     }
     const result = await this.addFavoriOffreEmploiCommandHandler.execute(
       command,
@@ -230,7 +247,8 @@ export class FavorisController {
         nomEtablissement: addFavoriPayload.nomEtablissement,
         secteurActivite: addFavoriPayload.secteurActivite,
         ville: addFavoriPayload.ville
-      }
+      },
+      aPostule: Boolean(addFavoriPayload.aPostule)
     }
     const result = await this.addFavoriOffreImmersionCommandHandler.execute(
       command,
@@ -246,14 +264,72 @@ export class FavorisController {
     @Body() addFavoriPayload: AddFavoriServicesCivique,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
+    const { aPostule, ...offre } = addFavoriPayload
     const command: AddFavoriServiceCiviqueCommand = {
       idJeune,
-      offre: addFavoriPayload
+      offre,
+      aPostule: Boolean(aPostule)
     }
     const result = await this.addFavoriOffreEngagementCommandHandler.execute(
       command,
       utilisateur
     )
+
+    return handleResult(result)
+  }
+
+  @Patch('favoris/offres-emploi/:idOffre')
+  async patchFavoriOffresEmploi(
+    @Param('idJeune') idBeneficiaire: string,
+    @Param('idOffre') idOffre: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: AddCandidatureOffreEmploiCommand = {
+      idBeneficiaire,
+      idOffre
+    }
+    const result = await this.addCandidatureOffreEmploiCommandHandler.execute(
+      command,
+      utilisateur
+    )
+
+    return handleResult(result)
+  }
+
+  @Patch('favoris/offres-immersion/:idOffre')
+  async patchFavoriOffresImmersion(
+    @Param('idJeune') idBeneficiaire: string,
+    @Param('idOffre') idOffre: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: AddCandidatureOffreImmersionCommand = {
+      idBeneficiaire,
+      idOffre
+    }
+    const result =
+      await this.addCandidatureOffreImmersionCommandHandler.execute(
+        command,
+        utilisateur
+      )
+
+    return handleResult(result)
+  }
+
+  @Patch('favoris/service-civique/:idOffre')
+  async patchFavoriServiceCivique(
+    @Param('idJeune') idBeneficiaire: string,
+    @Param('idOffre') idOffre: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: AddCandidatureOffreServiceCiviqueCommand = {
+      idBeneficiaire,
+      idOffre
+    }
+    const result =
+      await this.addCandidatureOffreServiceCiviqueCommandHandler.execute(
+        command,
+        utilisateur
+      )
 
     return handleResult(result)
   }

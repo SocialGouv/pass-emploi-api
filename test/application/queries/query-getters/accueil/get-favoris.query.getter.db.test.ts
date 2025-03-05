@@ -57,13 +57,13 @@ describe('GetFavorisAccueilQueryGetter', () => {
       const idOffreEmploiDb = 1
       const idImmersion1 = 1
 
-      const favoriSansDateCreationDto = unFavoriOffreEmploi({
+      const favoriDto = unFavoriOffreEmploi({
         id: 12,
         idOffre: 'id-offre-sans-date',
         titre: 'titre-1',
         nomEntreprise: 'entreprise',
         idJeune,
-        dateCreation: null
+        dateCreation: dateInitiale.toJSDate()
       })
       const favoriAncienDe1jourDto = unFavoriOffreEmploi({
         id: idOffreEmploiDb,
@@ -85,7 +85,7 @@ describe('GetFavorisAccueilQueryGetter', () => {
       })
 
       await Promise.all([
-        await FavoriOffreEmploiSqlModel.create(favoriSansDateCreationDto),
+        await FavoriOffreEmploiSqlModel.create(favoriDto),
         await FavoriOffreEmploiSqlModel.create(favoriAncienDe1jourDto),
         await FavoriOffreImmersionSqlModel.create(favoriAncienDe4joursDto)
       ])
@@ -97,6 +97,7 @@ describe('GetFavorisAccueilQueryGetter', () => {
         organisation: 'entreprise',
         localisation: undefined,
         dateCreation: dateInitiale.minus({ days: 1 }).toISO(),
+        dateCandidature: undefined,
         tags: ['aa', '2 ans'],
         origine: undefined
       }
@@ -107,23 +108,21 @@ describe('GetFavorisAccueilQueryGetter', () => {
         organisation: 'poi-etablissement',
         localisation: 'marseille',
         dateCreation: dateInitiale.minus({ days: 4 }).toISO(),
+        dateCandidature: undefined,
         tags: ['patisserie']
       }
-      const favoriSansDateCreation: FavorisQueryModel = {
+      const favori: FavorisQueryModel = {
         idOffre: 'id-offre-sans-date',
         titre: 'titre-1',
         type: Offre.Favori.Type.EMPLOI,
         organisation: 'entreprise',
         localisation: undefined,
-        dateCreation: undefined,
+        dateCreation: dateInitiale.toISO(),
+        dateCandidature: undefined,
         tags: ['aa', '2 ans'],
         origine: undefined
       }
-      const listeAttendue = [
-        favoriAncienDe1jour,
-        favoriAncienDe4jours,
-        favoriSansDateCreation
-      ]
+      const listeAttendue = [favori, favoriAncienDe1jour, favoriAncienDe4jours]
 
       // When
       const listeFavorisObtenue = await getFavorisAccueilQueryGetter.handle(

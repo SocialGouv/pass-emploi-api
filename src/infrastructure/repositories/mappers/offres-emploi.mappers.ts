@@ -36,29 +36,7 @@ export function toOffresEmploiQueryModel(
   }
 }
 
-export function toFavoriOffreEmploiSqlModel(
-  idJeune: string,
-  offreEmploi: Offre.Favori.Emploi,
-  dateCreation: Date
-): Partial<FavoriOffreEmploiSqlModel> {
-  return {
-    idJeune: idJeune,
-    idOffre: offreEmploi.id,
-    titre: offreEmploi.titre,
-    typeContrat: offreEmploi.typeContrat,
-    nomEntreprise: offreEmploi.nomEntreprise,
-    duree: offreEmploi.duree,
-    nomLocalisation: offreEmploi.localisation?.nom || null,
-    codePostalLocalisation: offreEmploi.localisation?.codePostal || null,
-    communeLocalisation: offreEmploi.localisation?.commune || null,
-    isAlternance: offreEmploi.alternance,
-    dateCreation,
-    origineNom: offreEmploi.origine?.nom || null,
-    origineLogoUrl: offreEmploi.origine?.logo || null
-  }
-}
-
-export function toOffreEmploi(
+export function toFavoriOffreEmploi(
   favoriOffreEmploiSqlModel: FavoriOffreEmploiSqlModel
 ): Offre.Favori.Emploi {
   return {

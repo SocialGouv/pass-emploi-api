@@ -20,9 +20,7 @@ export function fromOffreEmploiSqlToFavorisQueryModel(
       : Offre.Favori.Type.EMPLOI,
     organisation: offre.nomEntreprise ?? undefined,
     localisation: offre.nomLocalisation ?? undefined,
-    dateCreation: offre.dateCreation
-      ? DateService.fromJSDateToISOString(offre.dateCreation)
-      : undefined,
+    dateCreation: DateService.fromJSDateToISOString(offre.dateCreation),
     dateCandidature: offre.dateCandidature
       ? DateService.fromJSDateToISOString(offre.dateCandidature)
       : undefined,
@@ -45,9 +43,7 @@ export function fromOffreImmersionSqlToFavorisQueryModel(
     type: Offre.Favori.Type.IMMERSION,
     organisation: offre.nomEtablissement,
     localisation: offre.ville,
-    dateCreation: offre.dateCreation
-      ? DateService.fromJSDateToISOString(offre.dateCreation)
-      : undefined,
+    dateCreation: DateService.fromJSDateToISOString(offre.dateCreation),
     dateCandidature: offre.dateCandidature
       ? DateService.fromJSDateToISOString(offre.dateCandidature)
       : undefined,
@@ -68,9 +64,7 @@ export function fromOffreServiceCiviqueSqlToFavorisQueryModel(
     type: Offre.Favori.Type.SERVICE_CIVIQUE,
     organisation: offre.organisation ?? undefined,
     localisation: offre.ville ?? undefined,
-    dateCreation: offre.dateCreation
-      ? DateService.fromJSDateToISOString(offre.dateCreation)
-      : undefined,
+    dateCreation: DateService.fromJSDateToISOString(offre.dateCreation),
     dateCandidature: offre.dateCandidature
       ? DateService.fromJSDateToISOString(offre.dateCandidature)
       : undefined,

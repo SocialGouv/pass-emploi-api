@@ -1,6 +1,8 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { DateTime } from 'luxon'
 import { SinonSandbox } from 'sinon'
 import { Evenement, EvenementService } from 'src/domain/evenement'
+import { DateService } from 'src/utils/date-service'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import {
   AddFavoriOffreEmploiCommand,
@@ -21,6 +23,7 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler
   let evenementService: StubbedClass<EvenementService>
+  let dateService: StubbedClass<DateService>
   const jeune = unJeune()
 
   beforeEach(async () => {
@@ -28,40 +31,50 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
     offresEmploiRepository = stubInterface(sandbox)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     evenementService = stubClass(EvenementService)
+    dateService = stubClass(DateService)
     addFavoriOffreEmploiCommandHandler = new AddFavoriOffreEmploiCommandHandler(
       offresEmploiRepository,
       jeuneAuthorizer,
-      evenementService
+      evenementService,
+      dateService
     )
   })
 
   describe('handle', () => {
     it('sauvegarde un favori', async () => {
       // Given
+      const now = DateTime.now()
       const offreEmploi = uneOffreEmploi()
       const command: AddFavoriOffreEmploiCommand = {
         idJeune: jeune.id,
-        offreEmploi: offreEmploi
+        offreEmploi: offreEmploi,
+        aPostule: true
       }
       offresEmploiRepository.get
         .withArgs(jeune.id, offreEmploi.id)
         .resolves(undefined)
+      dateService.now.returns(now)
 
       // When
       await addFavoriOffreEmploiCommandHandler.handle(command)
 
       // Then
-      expect(offresEmploiRepository.save).to.have.been.calledWith(
-        command.idJeune,
-        command.offreEmploi
-      )
+      const favori: Offre.Favori<Offre.Favori.Emploi> = {
+        idBeneficiaire: command.idJeune,
+        dateCreation: now,
+        dateCandidature: now,
+        offre: command.offreEmploi
+      }
+      expect(offresEmploiRepository.save).to.have.been.calledWith(favori)
     })
+
     it('renvoie une failure ExisteDeja quand le jeune a déjà ce favori', async () => {
       // Given
       const offreEmploi = uneOffreEmploi()
       const command: AddFavoriOffreEmploiCommand = {
         idJeune: jeune.id,
-        offreEmploi: offreEmploi
+        offreEmploi: offreEmploi,
+        aPostule: true
       }
       offresEmploiRepository.get
         .withArgs(jeune.id, offreEmploi.id)
@@ -82,7 +95,8 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
       // Given
       const command: AddFavoriOffreEmploiCommand = {
         idJeune: 'idJeune',
-        offreEmploi: uneOffreEmploi()
+        offreEmploi: uneOffreEmploi(),
+        aPostule: true
       }
       const utilisateur: Utilisateur = unUtilisateurJeune()
 
@@ -107,7 +121,8 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
           idJeune: jeune.id,
           offreEmploi: uneOffreEmploi({
             alternance: true
-          })
+          }),
+          aPostule: true
         }
 
         // When
@@ -127,7 +142,8 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
           idJeune: jeune.id,
           offreEmploi: uneOffreEmploi({
             alternance: false
-          })
+          }),
+          aPostule: true
         }
 
         // When

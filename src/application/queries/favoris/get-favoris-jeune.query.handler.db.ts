@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { compareDateCreationAntechronologique } from 'src/application/queries/query-getters/accueil/get-favoris.query.getter.db'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import { Result } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
@@ -13,7 +14,6 @@ import {
   fromOffreServiceCiviqueSqlToFavorisQueryModel
 } from '../query-mappers/favoris.mappers'
 import { FavorisQueryModel } from '../query-models/favoris.query-model'
-import { comparerFavorisParDateCreationOuTitre } from '../query-getters/accueil/get-favoris.query.getter.db'
 
 interface GetFavorisJeuneQuery {
   idJeune: string
@@ -79,7 +79,7 @@ export class GetFavorisJeuneQueryHandler extends QueryHandler<
           fromOffreServiceCiviqueSqlToFavorisQueryModel
         )
       )
-      .sort(comparerFavorisParDateCreationOuTitre)
+      .sort(compareDateCreationAntechronologique)
   }
 
   async monitor(): Promise<void> {

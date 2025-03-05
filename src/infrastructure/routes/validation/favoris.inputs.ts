@@ -81,6 +81,10 @@ export class AddFavoriOffresEmploiPayload {
   @IsOptional()
   @IsNotEmpty()
   origineLogo?: string
+
+  @IsBoolean()
+  @IsOptional()
+  aPostule?: boolean
 }
 
 export class AddFavoriImmersionPayload {
@@ -108,6 +112,10 @@ export class AddFavoriImmersionPayload {
   @IsString()
   @IsNotEmpty()
   ville: string
+
+  @IsBoolean()
+  @IsOptional()
+  aPostule?: boolean
 }
 
 export class AddFavoriServicesCivique implements Offre.Favori.ServiceCivique {
@@ -143,6 +151,10 @@ export class AddFavoriServicesCivique implements Offre.Favori.ServiceCivique {
   @IsNotEmpty()
   @IsOptional()
   ville?: string
+
+  @IsBoolean()
+  @IsOptional()
+  aPostule?: boolean
 }
 
 export class GetFavorisOffresEmploiQueryParams {

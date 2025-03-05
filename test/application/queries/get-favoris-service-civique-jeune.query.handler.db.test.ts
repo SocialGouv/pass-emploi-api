@@ -14,7 +14,7 @@ import { FavoriOffreEngagementSqlModel } from '../../../src/infrastructure/seque
 import { unFavoriOffreEngagement } from '../../fixtures/sql-models/favoris.sql-model'
 import { getDatabase } from '../../utils/database-for-testing'
 
-describe('getDetailServiceCiviqueQueryHandler', () => {
+describe('GetFavorisServiceCiviqueJeuneQueryHandler', () => {
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let getFavorisServiceCiviqueJeuneQueryHandler: GetFavorisServiceCiviqueJeuneQueryHandler
 
@@ -67,7 +67,7 @@ describe('getDetailServiceCiviqueQueryHandler', () => {
       await FavoriOffreEngagementSqlModel.create(favori)
     })
     describe('avec detail', () => {
-      it('renvoie les favoris', async () => {
+      it('renvoie le détail des favoris', async () => {
         // When
         const result = await getFavorisServiceCiviqueJeuneQueryHandler.handle({
           detail: true,
@@ -89,7 +89,7 @@ describe('getDetailServiceCiviqueQueryHandler', () => {
     })
 
     describe('sans detail', () => {
-      it('renvoie les ids', async () => {
+      it('renvoie les favoris', async () => {
         // When
         const result = await getFavorisServiceCiviqueJeuneQueryHandler.handle({
           detail: false,
@@ -97,7 +97,9 @@ describe('getDetailServiceCiviqueQueryHandler', () => {
         })
 
         // Then
-        expect(result).to.deep.equal([{ id: favori.idOffre }])
+        expect(result).to.deep.equal([
+          { id: favori.idOffre, dateCandidature: undefined }
+        ])
       })
     })
   })

@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import { Offre } from '../../../domain/offre/offre'
 
 export class ContactImmersionQueryModel {

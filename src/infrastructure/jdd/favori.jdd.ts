@@ -16,7 +16,8 @@ export function unFavoriOffreEmploiJdd(
     nomLocalisation: 'Nantes',
     codePostalLocalisation: '44300',
     communeLocalisation: '44000',
-    dateCreation: null,
+    dateCreation: new Date(),
+    dateCandidature: null,
     origineLogoUrl: null,
     origineNom: null
   }
