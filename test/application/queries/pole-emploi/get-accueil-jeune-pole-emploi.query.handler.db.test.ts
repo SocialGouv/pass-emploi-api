@@ -311,7 +311,7 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
           ).to.equal(0)
           expect(result.data.cetteSemaine.nombreRendezVous).to.equal(0)
           expect(result.data.messageDonneesManquantes).to.equal(
-            'Les données suivantes sont temporairement indisponibles : démarches, rendez-vous'
+            'Les données suivantes sont temporairement indisponibles : Rendez-vous, Démarches'
           )
         }
       })

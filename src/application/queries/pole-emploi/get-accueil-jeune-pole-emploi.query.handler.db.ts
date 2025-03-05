@@ -95,7 +95,7 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
         })
         .catch(e => {
           this.logger.error(e)
-          donneesManquantes.push('alertes')
+          donneesManquantes.push('Alertes')
           return []
         }),
       this.getFavorisQueryGetter
@@ -104,7 +104,7 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
         })
         .catch(e => {
           this.logger.error(e)
-          donneesManquantes.push('favoris')
+          donneesManquantes.push('Favoris')
           return []
         }),
       peutVoirLesCampagnes(jeune.structure)
@@ -121,18 +121,17 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
     let demarches: Cached<DemarcheQueryModel[]>
     let rendezVous: Cached<RendezVousJeuneQueryModel[]>
 
-    if (isFailure(resultDemarches)) {
-      donneesManquantes.push('démarches')
-      demarches = { queryModel: [] }
-    } else {
-      demarches = resultDemarches.data
-    }
-
     if (isFailure(resultRendezVous)) {
-      donneesManquantes.push('rendez-vous')
+      donneesManquantes.push('Rendez-vous')
       rendezVous = { queryModel: [] }
     } else {
       rendezVous = resultRendezVous.data
+    }
+    if (isFailure(resultDemarches)) {
+      donneesManquantes.push('Démarches')
+      demarches = { queryModel: [] }
+    } else {
+      demarches = resultDemarches.data
     }
 
     const nombreDeRendezVous = rendezVous.queryModel.filter(
@@ -169,16 +168,12 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
             rdv => rdv.date >= maintenant.toJSDate()
           )[0]
         : undefined
-    let dateDerniereMiseAJour: string | undefined = undefined
-    if (demarches.dateDuCache && rendezVous.dateDuCache) {
-      dateDerniereMiseAJour = recupererLaDateLaPlusAncienne(
-        demarches.dateDuCache,
-        rendezVous.dateDuCache
-      ).toISO()
-    }
 
     const data: AccueilJeunePoleEmploiQueryModel = {
-      dateDerniereMiseAJour,
+      dateDerniereMiseAJour: recupererLaDateLaPlusAncienne(
+        demarches.dateDuCache,
+        rendezVous.dateDuCache
+      )?.toISO(),
       cetteSemaine: {
         nombreRendezVous: nombreDeRendezVous,
         nombreActionsDemarchesEnRetard: nombreDeDemarchesEnRetard,
@@ -217,9 +212,9 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
 }
 
 function recupererLaDateLaPlusAncienne(
-  dateUne: DateTime,
-  dateDeux: DateTime
-): DateTime {
+  dateUne?: DateTime,
+  dateDeux?: DateTime
+): DateTime | undefined {
   if (!dateUne) {
     return dateDeux
   }

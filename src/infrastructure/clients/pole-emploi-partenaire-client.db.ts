@@ -373,11 +373,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
       this.sauvegarderLeRetourEnCache(res, cacheUrl)
       return success(res.data)
     } catch (e) {
-      if (
-        !e.response ||
-        e.response.status >= 500 ||
-        e.response.status === 429
-      ) {
+      if (!e.response || e.response.status > 401) {
         const cache = await this.recupererLesDernieresDonnees(cacheUrl)
         if (cache) {
           this.logger.warn(
