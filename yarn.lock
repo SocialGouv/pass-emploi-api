@@ -1157,16 +1157,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@google-cloud/firestore@npm:^7.10.0":
-  version: 7.10.0
-  resolution: "@google-cloud/firestore@npm:7.10.0"
+"@google-cloud/firestore@npm:^7.11.0":
+  version: 7.11.0
+  resolution: "@google-cloud/firestore@npm:7.11.0"
   dependencies:
     "@opentelemetry/api": "npm:^1.3.0"
     fast-deep-equal: "npm:^3.1.1"
     functional-red-black-tree: "npm:^1.0.1"
     google-gax: "npm:^4.3.3"
     protobufjs: "npm:^7.2.6"
-  checksum: 10/32dcb08a0ae9f9c7fe2ce561319bb73030257459c1072f4918522093ae61e4113bcae1b3abce7e35a4835b2d16510be3fccab40007a81e414bcfcf4347f5206d
+  checksum: 10/ae0e42ffee1e5cf7160149e1a581c0ceee702ea34d87d7212f7ffa326d9101f0aa2e9c5d37527a7f75864ac174cf32b50f1c593a81d02476ca4c8b8e85cba3bc
   languageName: node
   linkType: hard
 
@@ -6437,14 +6437,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-admin@npm:13.0.1":
-  version: 13.0.1
-  resolution: "firebase-admin@npm:13.0.1"
+"firebase-admin@npm:13.2.0":
+  version: 13.2.0
+  resolution: "firebase-admin@npm:13.2.0"
   dependencies:
     "@fastify/busboy": "npm:^3.0.0"
     "@firebase/database-compat": "npm:^2.0.0"
     "@firebase/database-types": "npm:^1.0.6"
-    "@google-cloud/firestore": "npm:^7.10.0"
+    "@google-cloud/firestore": "npm:^7.11.0"
     "@google-cloud/storage": "npm:^7.14.0"
     "@types/node": "npm:^22.8.7"
     farmhash-modern: "npm:^1.1.0"
@@ -6458,7 +6458,7 @@ __metadata:
       optional: true
     "@google-cloud/storage":
       optional: true
-  checksum: 10/d20806be7812d09962c9079b330e3616f02490a645ff8fa8705dcf7c619c90175dd08ee99295547b12580c2ea21d81e8a226f24a4276cb234ac80e206e6d4ec5
+  checksum: 10/0903627950ec5c9dc9f5bdb28c6f92bfb142b0e22feed198d21cb572b2a915f08ed90a5efc0b094c5fd5d3d15658e1cd055637b902882176508ea317f9753ca8
   languageName: node
   linkType: hard
 
@@ -9247,7 +9247,7 @@ __metadata:
     eslint-plugin-chai-friendly: "npm:^1.0.1"
     eslint-plugin-mocha: "npm:^10.5.0"
     eslint-plugin-prettier: "npm:^4.2.1"
-    firebase-admin: "npm:13.0.1"
+    firebase-admin: "npm:13.2.0"
     fuse.js: "npm:7.1.0"
     geojson: "npm:0.5.0"
     helmet: "npm:8.0.0"
