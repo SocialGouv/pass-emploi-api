@@ -17,19 +17,19 @@ import {
 import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
 import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
 import { ArchiveJeuneSqlModel } from '../../infrastructure/sequelize/models/archive-jeune.sql-model'
-import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
-import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { CacheApiPartenaireSqlModel } from '../../infrastructure/sequelize/models/cache-api-partenaire.sql-model'
+import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
+import { FavoriOffreEmploiSqlModel } from '../../infrastructure/sequelize/models/favori-offre-emploi.sql-model'
+import { FavoriOffreEngagementSqlModel } from '../../infrastructure/sequelize/models/favori-offre-engagement.sql-model'
+import { FavoriOffreImmersionSqlModel } from '../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
+import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
+import { LogModificationRendezVousSqlModel } from '../../infrastructure/sequelize/models/log-modification-rendez-vous-sql.model'
+import { NotificationJeuneSqlModel } from '../../infrastructure/sequelize/models/notification-jeune.sql-model'
+import { RechercheSqlModel } from '../../infrastructure/sequelize/models/recherche.sql-model'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { SuiviJobSqlModel } from '../../infrastructure/sequelize/models/suivi-job.sql-model'
 import { DateService } from '../../utils/date-service'
 import Source = RendezVous.Source
-import { FavoriOffreEmploiSqlModel } from '../../infrastructure/sequelize/models/favori-offre-emploi.sql-model'
-import { FavoriOffreEngagementSqlModel } from '../../infrastructure/sequelize/models/favori-offre-engagement.sql-model'
-import { FavoriOffreImmersionSqlModel } from '../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
-import { NotificationJeuneSqlModel } from '../../infrastructure/sequelize/models/notification-jeune.sql-model'
-import { LogModificationRendezVousDto } from '../../infrastructure/sequelize/models/log-modification-rendez-vous-sql.model'
-import { RechercheSqlModel } from '../../infrastructure/sequelize/models/recherche.sql-model'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.NETTOYER_LES_DONNEES)
@@ -167,11 +167,12 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
     }
 
     try {
-      nombreHistoriqueRdvSupprimes = await LogModificationRendezVousDto.destroy(
-        {
-          where: dateSuperieureADeuxAns(maintenant)
-        }
-      )
+      nombreHistoriqueRdvSupprimes =
+        await LogModificationRendezVousSqlModel.destroy({
+          where: {
+            date: { [Op.lte]: maintenant.minus({ years: 1 }).toJSDate() }
+          }
+        })
     } catch (e) {
       this.logger.warn(e)
       nbErreurs++

@@ -43,6 +43,7 @@ import {
 import { NotificationJeuneSqlModel } from '../../../src/infrastructure/sequelize/models/notification-jeune.sql-model'
 import { RechercheSqlModel } from '../../../src/infrastructure/sequelize/models/recherche.sql-model'
 import { uneRechercheDto } from '../../fixtures/sql-models/recherche.sql-model'
+import { LogModificationRendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/log-modification-rendez-vous-sql.model'
 
 let stats: SuiviJob
 
@@ -264,6 +265,20 @@ describe('NettoyerLesDonneesJobHandler', () => {
       animationsCollectivesFutureSansInscrit,
       animationsCollectivesPasseesAvecInscrits
     ])
+    await LogModificationRendezVousSqlModel.bulkCreate([
+      {
+        id: '55497a9e-2d5b-4c7b-8032-8f38ac8c4592',
+        idRendezVous: rendezVousDtoAGarder.id,
+        date: maintenant.minus({ months: 13 }).toJSDate(),
+        auteur: { id: 'test', nom: 'test', prenom: 'test' }
+      },
+      {
+        id: 'b8b7237a-6912-415c-b2bc-e2e80b6e5aab',
+        idRendezVous: rendezVousDtoAGarder.id,
+        date: maintenant.minus({ months: 11 }).toJSDate(),
+        auteur: { id: 'test', nom: 'test', prenom: 'test' }
+      }
+    ])
     await RendezVousJeuneAssociationSqlModel.create({
       idJeune: idJeuneAUpdateSonConseillerInitial,
       idRendezVous: animationsCollectivesPasseesAvecInscrits.id
@@ -388,6 +403,15 @@ describe('NettoyerLesDonneesJobHandler', () => {
   })
 
   describe('rendez-vous supprimés', () => {
+    it('supprime les LogModificationRDV de plus de 1 an', async () => {
+      // Then
+      const logs = await LogModificationRendezVousSqlModel.findAll()
+      expect(logs.length).to.equal(1)
+      expect(
+        (stats.resultat as { nombreHistoriqueRdvSupprimes: number })
+          .nombreHistoriqueRdvSupprimes
+      ).to.equal(1)
+    })
     it('supprime les rendez-vous passés il y à plus de 3 mois et source = MILO', async () => {
       // Then
       const rendezVousApresNettoyage = await RendezVousSqlModel.findByPk(
