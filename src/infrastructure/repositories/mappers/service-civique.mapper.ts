@@ -1,11 +1,10 @@
-import { Core } from '../../../domain/core'
+import { Localisation } from 'src/domain/offre/favori/offre-service-civique'
+import { Offre } from '../../../domain/offre/offre'
 import { FavoriOffreEngagementSqlModel } from '../../sequelize/models/favori-offre-engagement.sql-model'
 import {
   EngagementDto,
   OffreEngagementDto
 } from '../offre/offre-service-civique-http.repository.db'
-import { Offre } from '../../../domain/offre/offre'
-import { Localisation } from 'src/domain/offre/favori/offre-service-civique'
 
 export function toOffresServicesCivique(servicesCiviqueDto: EngagementDto): {
   total: number

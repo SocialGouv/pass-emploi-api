@@ -298,33 +298,39 @@ describe('NettoyerLesDonneesJobHandler', () => {
     await FavoriOffreEmploiSqlModel.bulkCreate([
       unFavoriOffreEmploi({
         idJeune: idJeune2,
+        idOffre: 'id-offre-emploi-1',
         dateCreation: maintenant.minus({ month: 3 }).toJSDate()
       }),
       unFavoriOffreEmploi({
         id: 2,
         idJeune: idJeune2,
+        idOffre: 'id-offre-emploi-2',
         dateCreation: maintenant.minus({ month: 6 }).toJSDate()
       })
     ])
     await FavoriOffreEngagementSqlModel.bulkCreate([
       unFavoriOffreEngagement({
         idJeune: idJeune2,
-        id: 2,
+        idOffre: 'id-offre-engagement-1',
         dateCreation: maintenant.minus({ month: 3 }).toJSDate()
       }),
       unFavoriOffreEngagement({
+        id: 2,
         idJeune: idJeune2,
+        idOffre: 'id-offre-engagement-2',
         dateCreation: maintenant.minus({ month: 6 }).toJSDate()
       })
     ])
     await FavoriOffreImmersionSqlModel.bulkCreate([
       unFavoriOffreImmersion({
         idJeune: idJeune2,
-        id: 2,
+        idOffre: 'id-offre-immersion-1',
         dateCreation: maintenant.minus({ month: 3 }).toJSDate()
       }),
       unFavoriOffreImmersion({
+        id: 2,
         idJeune: idJeune2,
+        idOffre: 'id-offre-immersion-2',
         dateCreation: maintenant.minus({ month: 6 }).toJSDate()
       })
     ])

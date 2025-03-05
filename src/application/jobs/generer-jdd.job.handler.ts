@@ -191,7 +191,8 @@ export class HandleJobGenererJDDCommandHandler extends JobHandler<GenererJDDJobH
 
   private async onCreeUnFavori(jeune: JeuneSqlModel): Promise<void> {
     const leFavori = unFavoriOffreEmploiJdd({
-      idJeune: jeune.id
+      idJeune: jeune.id,
+      dateCreation: this.dateService.now().minus({ days: 1 }).toJSDate()
     })
     await FavoriOffreEmploiSqlModel.create(leFavori)
   }

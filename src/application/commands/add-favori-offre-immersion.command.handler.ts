@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { DateService } from 'src/utils/date-service'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { FavorisOffresImmersionRepositoryToken } from '../../domain/offre/favori/offre-immersion'
 import { Command } from '../../building-blocks/types/command'
@@ -16,6 +17,7 @@ import { Offre } from '../../domain/offre/offre'
 export interface AddFavoriOffreImmersionCommand extends Command {
   idJeune: string
   offreImmersion: Offre.Favori.Immersion
+  aPostule: boolean
 }
 
 @Injectable()
@@ -27,7 +29,8 @@ export class AddFavoriOffreImmersionCommandHandler extends CommandHandler<
     @Inject(FavorisOffresImmersionRepositoryToken)
     private offresImmersionRepository: Offre.Favori.Immersion.Repository,
     private jeuneAuthorizer: JeuneAuthorizer,
-    private evenementService: EvenementService
+    private evenementService: EvenementService,
+    private readonly dateService: DateService
   ) {
     super('AddFavoriOffreImmersionCommandHandler')
   }
@@ -37,17 +40,20 @@ export class AddFavoriOffreImmersionCommandHandler extends CommandHandler<
       command.idJeune,
       command.offreImmersion.id
     )
-
     if (favori) {
       return failure(
         new FavoriExisteDejaError(command.idJeune, command.offreImmersion.id)
       )
     }
 
-    await this.offresImmersionRepository.save(
+    const nouveauFavori = Offre.Favori.build(
       command.idJeune,
-      command.offreImmersion
+      command.offreImmersion,
+      command.aPostule,
+      this.dateService.now()
     )
+
+    await this.offresImmersionRepository.save(nouveauFavori)
 
     return emptySuccess()
   }

@@ -11,8 +11,11 @@ import {
 import { ConfigModule } from '@nestjs/config'
 import { APP_GUARD } from '@nestjs/core'
 import { TerminusModule } from '@nestjs/terminus'
-import { EmargerSessionMiloCommandHandler } from 'src/application/commands/milo/emarger-session-milo.command.handler'
+import { AddCandidatureOffreEmploiCommandHandler } from 'src/application/commands/add-candidature-offre-emploi.command.handler'
+import { AddCandidatureOffreImmersionCommandHandler } from 'src/application/commands/add-candidature-offre-immersion.command.handler'
+import { AddCandidatureOffreServiceCiviqueCommandHandler } from 'src/application/commands/add-candidature-offre-service-civique.command.handler'
 import AutoinscrireBeneficiaireSessionMiloCommandHandler from 'src/application/commands/milo/autoinscrire-beneficiaire-session-milo.command.handler'
+import { EmargerSessionMiloCommandHandler } from 'src/application/commands/milo/emarger-session-milo.command.handler'
 import { GetTokenPoleEmploiQueryHandler } from 'src/application/queries/get-token-pole-emploi.query.handler'
 import { GetAgendaSessionsConseillerMiloQueryHandler } from 'src/application/queries/milo/get-agenda-sessions-conseiller.milo.query.handler.db'
 import { GetCompteursBeneficiaireMiloQueryHandler } from 'src/application/queries/milo/get-compteurs-portefeuille-milo.query.handler.db'
@@ -25,6 +28,7 @@ import { EvenementEmploiCodePostalQueryGetter } from 'src/application/queries/qu
 import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { RechercherMessageQueryHandler } from 'src/application/queries/rechercher-message.query.handler'
 import { AntivirusClient } from 'src/infrastructure/clients/antivirus-client'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { AppMobileCacheControlMiddleware } from 'src/infrastructure/middlewares/app-mobile-cache-control.middleware'
 import { ActionAuthorizer } from './application/authorizers/action-authorizer'
 import { ConseillerAuthorizer } from './application/authorizers/conseiller-authorizer'
@@ -117,6 +121,8 @@ import { MonitorJobsJobHandler } from './application/jobs/monitor-jobs.job.handl
 import { NettoyerLesDonneesJobHandler } from './application/jobs/nettoyer-les-donnees.job.handler.db'
 import { NettoyerLesJobsJobHandler } from './application/jobs/nettoyer-les-jobs.job.handler'
 import { NettoyerPiecesJointesJobHandler } from './application/jobs/nettoyer-pieces-jointes.job.handler'
+import { NotifierBonneAlternanceJobHandler } from './application/jobs/notifier-bonne-alternance.job.handler.db'
+import { NotifierCampagneJobHandler } from './application/jobs/notifier-campagne.job.handler.db'
 import { NotifierRappelActionJobHandler } from './application/jobs/notifier-rappel-action.job.handler'
 import { NotifierRappelCreationActionsDemarchesJobHandler } from './application/jobs/notifier-rappel-creation-actions-demarches.job.handler.db'
 import { NotifierRappelInstanceSessionMiloJobHandler } from './application/jobs/notifier-rappel-instance-session-milo.job.handler'
@@ -140,6 +146,7 @@ import { GetMetadonneesFavorisJeuneQueryHandler } from './application/queries/fa
 import { GetAgencesQueryHandler } from './application/queries/get-agences.query.handler.db'
 import { GetCatalogueDemarchesQueryHandler } from './application/queries/get-catalogue-demarches.query.handler'
 import { GetChatSecretsQueryHandler } from './application/queries/get-chat-secrets.query.handler'
+import { GetCJETokenQueryHandler } from './application/queries/get-cje-token.query.handler'
 import { GetCommunesEtDepartementsQueryHandler } from './application/queries/get-communes-et-departements.query.handler.db'
 import { GetConseillersJeuneQueryHandler } from './application/queries/get-conseillers-jeune.query.handler.db'
 import { GetConseillersQueryHandler } from './application/queries/get-conseillers.query.handler.db'
@@ -172,6 +179,7 @@ import { GetJeunesIdentitesQueryHandler } from './application/queries/get-jeunes
 import { GetListesDeDiffusionDuConseillerQueryHandler } from './application/queries/get-listes-de-diffusion-du-conseiller.query.handler.db'
 import { GetMetiersRomeQueryHandler } from './application/queries/get-metiers-rome.query.handler.db'
 import { GetMotifsSuppressionJeuneQueryHandler } from './application/queries/get-motifs-suppression-jeune.query.handler'
+import { GetNotificationsJeuneQueryHandler } from './application/queries/get-notifications-jeune.query.handler.db'
 import { GetOffresEmploiQueryHandler } from './application/queries/get-offres-emploi.query.handler'
 import { GetOffresImmersionQueryHandler } from './application/queries/get-offres-immersion.query.handler'
 import { GetOffresServicesCiviqueQueryHandler } from './application/queries/get-offres-services-civique.query.handler'
@@ -249,9 +257,9 @@ import {
   Notification,
   NotificationRepositoryToken
 } from './domain/notification/notification'
-import { OffresEmploiRepositoryToken } from './domain/offre/favori/offre-emploi'
+import { FavorisOffresEmploiRepositoryToken } from './domain/offre/favori/offre-emploi'
 import { FavorisOffresImmersionRepositoryToken } from './domain/offre/favori/offre-immersion'
-import { OffreServiceCiviqueRepositoryToken } from './domain/offre/favori/offre-service-civique'
+import { FavorisOffresServiceCiviqueRepositoryToken } from './domain/offre/favori/offre-service-civique'
 import {
   Recherche,
   RecherchesRepositoryToken
@@ -283,7 +291,6 @@ import { EngagementClient } from './infrastructure/clients/engagement-client'
 import { FirebaseClient } from './infrastructure/clients/firebase-client'
 import { ImmersionClient } from './infrastructure/clients/immersion-client'
 import { InvitationIcsClient } from './infrastructure/clients/invitation-ics.client'
-import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { MailBrevoService } from './infrastructure/clients/mail-brevo.service.db'
 import { MatomoClient } from './infrastructure/clients/matomo-client'
 import { MiloClient } from './infrastructure/clients/milo-client'
@@ -332,6 +339,7 @@ import { SuperviseurSqlRepository } from './infrastructure/repositories/supervis
 import { ActionsController } from './infrastructure/routes/actions.controller'
 import { AuthentificationController } from './infrastructure/routes/authentification.controller'
 import { CampagnesController } from './infrastructure/routes/campagnes.controller'
+import { CJEController } from './infrastructure/routes/cje.controller'
 import { ConseillersController } from './infrastructure/routes/conseillers.controller'
 import { ConseillersMiloController } from './infrastructure/routes/conseillers.milo.controller'
 import { ConseillersPoleEmploiController } from './infrastructure/routes/conseillers.pole-emploi.controller'
@@ -362,11 +370,6 @@ import { DateService } from './utils/date-service'
 import { IdService } from './utils/id-service'
 import { configureLoggerModule } from './utils/logger.module'
 import { RateLimiterService } from './utils/rate-limiter.service'
-import { CJEController } from './infrastructure/routes/cje.controller'
-import { GetCJETokenQueryHandler } from './application/queries/get-cje-token.query.handler'
-import { NotifierBonneAlternanceJobHandler } from './application/jobs/notifier-bonne-alternance.job.handler.db'
-import { NotifierCampagneJobHandler } from './application/jobs/notifier-campagne.job.handler.db'
-import { GetNotificationsJeuneQueryHandler } from './application/queries/get-notifications-jeune.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -488,7 +491,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       useClass: SessionMiloHttpSqlRepository
     },
     {
-      provide: OffresEmploiRepositoryToken,
+      provide: FavorisOffresEmploiRepositoryToken,
       useClass: OffresEmploiHttpSqlRepository
     },
     {
@@ -532,7 +535,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       useClass: RechercheSqlRepository
     },
     {
-      provide: OffreServiceCiviqueRepositoryToken,
+      provide: FavorisOffresServiceCiviqueRepositoryToken,
       useClass: OffreServiceCiviqueHttpSqlRepository
     },
     {
@@ -651,6 +654,9 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreerJeunePoleEmploiCommandHandler,
     AddFavoriOffreEmploiCommandHandler,
     AddFavoriOffreImmersionCommandHandler,
+    AddCandidatureOffreEmploiCommandHandler,
+    AddCandidatureOffreImmersionCommandHandler,
+    AddCandidatureOffreServiceCiviqueCommandHandler,
     DeleteFavoriOffreEmploiCommandHandler,
     DeleteFavoriOffreImmersionCommandHandler,
     GetFavorisOffresEmploiJeuneQueryHandler,

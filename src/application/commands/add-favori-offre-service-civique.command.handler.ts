@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { DateService } from 'src/utils/date-service'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
@@ -9,13 +10,14 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { OffreServiceCiviqueRepositoryToken } from '../../domain/offre/favori/offre-service-civique'
+import { FavorisOffresServiceCiviqueRepositoryToken } from '../../domain/offre/favori/offre-service-civique'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { Offre } from '../../domain/offre/offre'
 
 export interface AddFavoriServiceCiviqueCommand extends Command {
   idJeune: string
   offre: Offre.Favori.ServiceCivique
+  aPostule: boolean
 }
 
 @Injectable()
@@ -24,10 +26,11 @@ export class AddFavoriOffreServiceCiviqueCommandHandler extends CommandHandler<
   void
 > {
   constructor(
-    @Inject(OffreServiceCiviqueRepositoryToken)
+    @Inject(FavorisOffresServiceCiviqueRepositoryToken)
     private offreServiceCiviqueRepository: Offre.Favori.ServiceCivique.Repository,
     private jeuneAuthorizer: JeuneAuthorizer,
-    private evenementService: EvenementService
+    private evenementService: EvenementService,
+    private readonly dateService: DateService
   ) {
     super('AddFavoriOffreEngagementCommandHandler')
   }
@@ -44,10 +47,13 @@ export class AddFavoriOffreServiceCiviqueCommandHandler extends CommandHandler<
       )
     }
 
-    await this.offreServiceCiviqueRepository.save(
+    const nouveauFavori = Offre.Favori.build(
       command.idJeune,
-      command.offre
+      command.offre,
+      command.aPostule,
+      this.dateService.now()
     )
+    await this.offreServiceCiviqueRepository.save(nouveauFavori)
 
     return emptySuccess()
   }

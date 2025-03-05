@@ -6,13 +6,13 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { OffreServiceCiviqueRepositoryToken } from '../../domain/offre/favori/offre-service-civique'
+import { FavorisOffresServiceCiviqueRepositoryToken } from '../../domain/offre/favori/offre-service-civique'
 import { Offre } from '../../domain/offre/offre'
 
 @Injectable()
 export class FavoriOffreServiceCiviqueAuthorizer {
   constructor(
-    @Inject(OffreServiceCiviqueRepositoryToken)
+    @Inject(FavorisOffresServiceCiviqueRepositoryToken)
     private offresServiceCiviqueRepository: Offre.Favori.ServiceCivique.Repository
   ) {}
 

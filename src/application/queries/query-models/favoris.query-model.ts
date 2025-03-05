@@ -22,7 +22,7 @@ export class FavorisQueryModel {
     format: 'date-time',
     required: false
   })
-  dateCreation?: string
+  dateCreation: string
 
   @ApiPropertyOptional({
     format: 'date-time',
@@ -40,30 +40,44 @@ export class FavorisQueryModel {
   origine?: OrigineOffreEmploiQueryModel
 }
 
-// TODO verifier pourquoi y'a plein de trucs useless
 class MetadonneesFavorisOffresJeuneQueryModel {
+  @ApiProperty()
   total: number
+  @ApiProperty()
   nombreOffresImmersion: number
+  @ApiProperty()
   nombreOffresServiceCivique: number
+  @ApiProperty()
   nombreOffresAlternance: number
+  @ApiProperty()
   nombreOffresEmploi: number
 }
 
 class MetadonneesFavorisRecherchesJeuneQueryModel {
+  @ApiProperty()
   total: number
+  @ApiProperty()
   nombreRecherchesOffresImmersion: number
+  @ApiProperty()
   nombreRecherchesOffresServiceCivique: number
+  @ApiProperty()
   nombreRecherchesOffresAlternance: number
+  @ApiProperty()
   nombreRecherchesOffresEmploi: number
 }
 
 class MetadonneesFavorisJeuneQueryModel {
+  @ApiProperty()
   autoriseLePartage: boolean
+
+  @ApiProperty({ type: MetadonneesFavorisOffresJeuneQueryModel })
   offres: MetadonneesFavorisOffresJeuneQueryModel
+
+  @ApiProperty({ type: MetadonneesFavorisRecherchesJeuneQueryModel })
   recherches: MetadonneesFavorisRecherchesJeuneQueryModel
 }
 
 export class MetadonneesFavorisQueryModel {
-  @ApiProperty()
+  @ApiProperty({ type: MetadonneesFavorisJeuneQueryModel })
   favoris: MetadonneesFavorisJeuneQueryModel
 }
