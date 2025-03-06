@@ -6,13 +6,13 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { OffresEmploiRepositoryToken } from '../../domain/offre/favori/offre-emploi'
+import { FavorisOffresEmploiRepositoryToken } from '../../domain/offre/favori/offre-emploi'
 import { Offre } from '../../domain/offre/offre'
 
 @Injectable()
 export class FavoriOffresEmploiAuthorizer {
   constructor(
-    @Inject(OffresEmploiRepositoryToken)
+    @Inject(FavorisOffresEmploiRepositoryToken)
     private offresEmploiRepository: Offre.Favori.Emploi.Repository
   ) {}
 

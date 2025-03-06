@@ -1,3 +1,5 @@
+import { Offre } from 'src/domain/offre/offre'
+
 export const FavorisOffresImmersionRepositoryToken =
   'Favoris.OffresImmersion.Repository'
 
@@ -14,9 +16,9 @@ export namespace Immersion {
     get(
       idJeune: string,
       idOffreImmersion: string
-    ): Promise<Immersion | undefined>
+    ): Promise<Offre.Favori<Immersion> | undefined>
 
-    save(idJeune: string, offreImmersion: Immersion): Promise<void>
+    save(favori: Offre.Favori<Immersion>): Promise<void>
 
     delete(idJeune: string, idOffreImmersion: string): Promise<void>
   }

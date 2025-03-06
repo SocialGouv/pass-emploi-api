@@ -71,6 +71,7 @@ describe('GetFavorisJeuneQueryHandler', () => {
       // Then
       expect(listeFavorisObtenue).to.deep.equal([])
     })
+
     it('retourne une liste de deux favoris, une offre emploi et une offre alternance, triés par date decroissante', async () => {
       // Given
       const idOffreEmploiDb = 1
@@ -81,7 +82,8 @@ describe('GetFavorisJeuneQueryHandler', () => {
         titre: 'poi-titre-1',
         nomEntreprise: 'poi-entreprise',
         idJeune,
-        dateCreation: now.toJSDate()
+        dateCreation: now.toJSDate(),
+        dateCandidature: now.toJSDate()
       })
       const favoriOffreAlternanceDb = unFavoriOffreEmploi({
         id: idOffreAlternanceDb,
@@ -103,6 +105,7 @@ describe('GetFavorisJeuneQueryHandler', () => {
         localisation: undefined,
         tags: ['aa', '2 ans'],
         dateCreation: now.toISO(),
+        dateCandidature: now.toISO(),
         origine: undefined
       }
       const favoriOffreAlternance: FavorisQueryModel = {
@@ -113,12 +116,13 @@ describe('GetFavorisJeuneQueryHandler', () => {
         localisation: undefined,
         tags: ['aa', '2 ans'],
         dateCreation: now.plus({ minutes: 1 }).toISO(),
+        dateCandidature: undefined,
         origine: undefined
       }
       const listeAttendue = [favoriOffreAlternance, favoriOffreEmploi]
 
-      const query = { idJeune: jeuneDto.id }
       // When
+      const query = { idJeune: jeuneDto.id }
       const listeFavorisObtenue = await getFavorisJeuneQueryHandler.handle(
         query
       )
@@ -126,23 +130,23 @@ describe('GetFavorisJeuneQueryHandler', () => {
       // Then
       expect(listeFavorisObtenue).to.deep.equal(listeAttendue)
     })
+
     it('retourne une liste de deux favoris offre immersion du jeune avec tri date', async () => {
       // Given
-      const idImmersion1 = 1
-      const idImmersion2 = 2
       const favoriOffreImmersionDb1 = unFavoriOffreImmersion({
-        id: idImmersion1,
-        idOffre: 'poi-id-offre',
+        id: 1,
+        idOffre: 'poi-id-offre-1',
         metier: 'poi-titre-4',
         nomEtablissement: 'poi-etablissement',
         ville: 'marseille',
         idJeune,
-        dateCreation: now.toJSDate()
+        dateCreation: now.toJSDate(),
+        dateCandidature: now.toJSDate()
       })
       await FavoriOffreImmersionSqlModel.create(favoriOffreImmersionDb1)
       const favoriOffreImmersionDb2 = unFavoriOffreImmersion({
-        id: idImmersion2,
-        idOffre: 'poi-id-offre',
+        id: 2,
+        idOffre: 'poi-id-offre-2',
         metier: 'poi-titre-3',
         nomEtablissement: 'poi-etablissement',
         ville: 'marseille',
@@ -152,22 +156,24 @@ describe('GetFavorisJeuneQueryHandler', () => {
       await FavoriOffreImmersionSqlModel.create(favoriOffreImmersionDb2)
 
       const favoriOffreImmersion1: FavorisQueryModel = {
-        idOffre: 'poi-id-offre',
+        idOffre: 'poi-id-offre-1',
         titre: 'poi-titre-4',
         type: Offre.Favori.Type.IMMERSION,
         organisation: 'poi-etablissement',
         localisation: 'marseille',
         tags: ['patisserie'],
-        dateCreation: now.toISO()
+        dateCreation: now.toISO(),
+        dateCandidature: now.toISO()
       }
       const favoriOffreImmersion2: FavorisQueryModel = {
-        idOffre: 'poi-id-offre',
+        idOffre: 'poi-id-offre-2',
         titre: 'poi-titre-3',
         type: Offre.Favori.Type.IMMERSION,
         organisation: 'poi-etablissement',
         localisation: 'marseille',
         tags: ['patisserie'],
-        dateCreation: now.plus({ days: 1 }).toISO()
+        dateCreation: now.plus({ days: 1 }).toISO(),
+        dateCandidature: undefined
       }
 
       const idOffreEmploiDb = 1
@@ -201,6 +207,7 @@ describe('GetFavorisJeuneQueryHandler', () => {
         localisation: undefined,
         tags: ['aa', '2 ans'],
         dateCreation: now.plus({ days: 2 }).toISO(),
+        dateCandidature: undefined,
         origine: undefined
       }
       const favoriOffreAlternance: FavorisQueryModel = {
@@ -211,6 +218,7 @@ describe('GetFavorisJeuneQueryHandler', () => {
         localisation: undefined,
         tags: ['aa', '2 ans'],
         dateCreation: now.plus({ days: 3 }).toISO(),
+        dateCandidature: undefined,
         origine: undefined
       }
 
@@ -231,41 +239,43 @@ describe('GetFavorisJeuneQueryHandler', () => {
       // Then
       expect(listeFavorisObtenue).to.deep.equal(listeAttendue)
     })
+
     it('retourne une liste de deux favoris offre immersion du jeune', async () => {
       // Given
-      const idImmersion1 = 1
-      const idImmersion2 = 2
-      const favoriOffreImmersionDbfirst = unFavoriOffreImmersion({
-        id: 10,
-        idOffre: 'poi-id-offre',
+      const favoriOffreImmersionDb1 = unFavoriOffreImmersion({
+        id: 1,
+        idOffre: 'poi-id-offre-1',
         metier: 'poi-metier-first-dans-la-liste-triee',
         nomEtablissement: 'poi-etablissement',
         ville: 'marseille',
         idJeune,
-        dateCreation: uneDatetime().plus({ days: 1 }).toJSDate()
-      })
-      await FavoriOffreImmersionSqlModel.create(favoriOffreImmersionDbfirst)
-      const favoriOffreImmersionDb1 = unFavoriOffreImmersion({
-        id: idImmersion1,
-        idOffre: 'poi-id-offre',
-        metier: 'poi-metier-2e-dans-la-liste-triee',
-        nomEtablissement: 'poi-etablissement',
-        ville: 'marseille',
-        idJeune
+        dateCreation: uneDatetime().plus({ days: 1 }).toJSDate(),
+        dateCandidature: uneDatetime().plus({ days: 2 }).toJSDate()
       })
       await FavoriOffreImmersionSqlModel.create(favoriOffreImmersionDb1)
       const favoriOffreImmersionDb2 = unFavoriOffreImmersion({
-        id: idImmersion2,
-        idOffre: 'poi-id-offre',
+        id: 2,
+        idOffre: 'poi-id-offre-2',
+        metier: 'poi-metier-2e-dans-la-liste-triee',
+        nomEtablissement: 'poi-etablissement',
+        ville: 'marseille',
+        idJeune,
+        dateCreation: uneDatetime().plus({ days: 2 }).toJSDate()
+      })
+      await FavoriOffreImmersionSqlModel.create(favoriOffreImmersionDb2)
+      const favoriOffreImmersionDb3 = unFavoriOffreImmersion({
+        id: 3,
+        idOffre: 'poi-id-offre-3',
         metier: 'poi-metier-1er-dans-la-liste-triee',
         nomEtablissement: 'poi-etablissement',
         ville: 'marseille',
-        idJeune
+        idJeune,
+        dateCreation: uneDatetime().plus({ days: 3 }).toJSDate()
       })
-      await FavoriOffreImmersionSqlModel.create(favoriOffreImmersionDb2)
+      await FavoriOffreImmersionSqlModel.create(favoriOffreImmersionDb3)
       const favoriOffreImmersionDb0 = unFavoriOffreImmersion({
         id: 0,
-        idOffre: 'poi-id-offre',
+        idOffre: 'poi-id-offre-0',
         metier: 'poi-metier-0e-dans-la-liste-triee',
         nomEtablissement: 'poi-etablissement',
         ville: 'marseille',
@@ -274,47 +284,51 @@ describe('GetFavorisJeuneQueryHandler', () => {
       })
       await FavoriOffreImmersionSqlModel.create(favoriOffreImmersionDb0)
 
-      const favoriOffreImmersionFirst: FavorisQueryModel = {
-        idOffre: 'poi-id-offre',
+      const favoriOffreImmersion1: FavorisQueryModel = {
+        idOffre: 'poi-id-offre-1',
         titre: 'poi-metier-first-dans-la-liste-triee',
         type: Offre.Favori.Type.IMMERSION,
         organisation: 'poi-etablissement',
         localisation: 'marseille',
         tags: ['patisserie'],
-        dateCreation: now.plus({ days: 1 }).toISO()
+        dateCreation: now.plus({ days: 1 }).toISO(),
+        dateCandidature: now.plus({ days: 2 }).toISO()
       }
       const favoriOffreImmersion0: FavorisQueryModel = {
-        idOffre: 'poi-id-offre',
+        idOffre: 'poi-id-offre-0',
         titre: 'poi-metier-0e-dans-la-liste-triee',
         type: Offre.Favori.Type.IMMERSION,
         organisation: 'poi-etablissement',
         localisation: 'marseille',
         tags: ['patisserie'],
-        dateCreation: now.toISO()
+        dateCreation: now.toISO(),
+        dateCandidature: undefined
       }
-      const favoriOffreImmersion1: FavorisQueryModel = {
-        idOffre: 'poi-id-offre',
+      const favoriOffreImmersion2: FavorisQueryModel = {
+        idOffre: 'poi-id-offre-2',
         titre: 'poi-metier-2e-dans-la-liste-triee',
         type: Offre.Favori.Type.IMMERSION,
         organisation: 'poi-etablissement',
         localisation: 'marseille',
         tags: ['patisserie'],
-        dateCreation: undefined
+        dateCreation: now.plus({ days: 2 }).toISO(),
+        dateCandidature: undefined
       }
-      const favoriOffreImmersion2: FavorisQueryModel = {
-        idOffre: 'poi-id-offre',
+      const favoriOffreImmersion3: FavorisQueryModel = {
+        idOffre: 'poi-id-offre-3',
         titre: 'poi-metier-1er-dans-la-liste-triee',
         type: Offre.Favori.Type.IMMERSION,
         organisation: 'poi-etablissement',
         localisation: 'marseille',
         tags: ['patisserie'],
-        dateCreation: undefined
+        dateCreation: now.plus({ days: 3 }).toISO(),
+        dateCandidature: undefined
       }
       const listeAttendue = [
-        favoriOffreImmersionFirst,
-        favoriOffreImmersion0,
+        favoriOffreImmersion3,
         favoriOffreImmersion2,
-        favoriOffreImmersion1
+        favoriOffreImmersion1,
+        favoriOffreImmersion0
       ]
 
       const query = { idJeune: jeuneDto.id }
@@ -327,12 +341,14 @@ describe('GetFavorisJeuneQueryHandler', () => {
       // Then
       expect(listeFavorisObtenue).to.deep.equal(listeAttendue)
     })
+
     it("retourne une liste d'un favori offre service civique du jeune", async () => {
       // Given
       const favoriOffreServiceCiviqueDb = unFavoriOffreEngagement({
         idOffre: 'poi-id-offre',
         titre: 'poi-titre',
-        idJeune
+        idJeune,
+        dateCreation: now.toJSDate()
       })
       await FavoriOffreEngagementSqlModel.create(favoriOffreServiceCiviqueDb)
 
@@ -343,7 +359,8 @@ describe('GetFavorisJeuneQueryHandler', () => {
         organisation: undefined,
         localisation: undefined,
         tags: ['infra'],
-        dateCreation: undefined
+        dateCreation: now.toISO(),
+        dateCandidature: undefined
       }
       const listeAttendue = [favoriOffreServiceCivique]
 

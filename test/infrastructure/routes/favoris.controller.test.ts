@@ -1,5 +1,17 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
 import {
+  AddCandidatureOffreEmploiCommand,
+  AddCandidatureOffreEmploiCommandHandler
+} from 'src/application/commands/add-candidature-offre-emploi.command.handler'
+import {
+  AddCandidatureOffreImmersionCommand,
+  AddCandidatureOffreImmersionCommandHandler
+} from 'src/application/commands/add-candidature-offre-immersion.command.handler'
+import {
+  AddCandidatureOffreServiceCiviqueCommand,
+  AddCandidatureOffreServiceCiviqueCommandHandler
+} from 'src/application/commands/add-candidature-offre-service-civique.command.handler'
+import {
   AddFavoriOffreImmersionCommand,
   AddFavoriOffreImmersionCommandHandler
 } from 'src/application/commands/add-favori-offre-immersion.command.handler'
@@ -27,6 +39,9 @@ import {
   DeleteFavoriOffreServiceCiviqueCommand,
   DeleteFavoriOffreServiceCiviqueCommandHandler
 } from '../../../src/application/commands/delete-favori-offre-service-civique.command.handler'
+import { GetFavorisJeuneQueryHandler } from '../../../src/application/queries/favoris/get-favoris-jeune.query.handler.db'
+import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/favoris/get-metadonnees-favoris-jeune.query.handler.db'
+import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../../src/application/queries/get-favoris-service-civique-jeune.query.handler.db'
 import {
   FavoriExisteDejaError,
   NonTrouveError
@@ -36,6 +51,7 @@ import {
   failure,
   success
 } from '../../../src/building-blocks/types/result'
+import { Offre } from '../../../src/domain/offre/offre'
 import {
   AddFavoriImmersionPayload,
   AddFavoriOffresEmploiPayload
@@ -46,23 +62,22 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
+import { uneOffreServiceCivique } from '../../fixtures/offre-service-civique.fixture'
 import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../../src/application/queries/get-favoris-service-civique-jeune.query.handler.db'
-import { uneOffreServiceCivique } from '../../fixtures/offre-service-civique.fixture'
-import { GetFavorisJeuneQueryHandler } from '../../../src/application/queries/favoris/get-favoris-jeune.query.handler.db'
-import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/favoris/get-metadonnees-favoris-jeune.query.handler.db'
-import { Offre } from '../../../src/domain/offre/offre'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
 describe('FavorisController', () => {
   let addFavoriOffreEmploiCommandHandler: StubbedClass<AddFavoriOffreEmploiCommandHandler>
+  let addCandidatureOffreEmploiCommandHandler: StubbedClass<AddCandidatureOffreEmploiCommandHandler>
   let deleteFavoriOffreEmploiCommandHandler: StubbedClass<DeleteFavoriOffreEmploiCommandHandler>
   let getFavorisOffresEmploiJeuneQueryHandler: StubbedClass<GetFavorisOffresEmploiJeuneQueryHandler>
   let addFavoriOffreImmersionCommandHandler: StubbedClass<AddFavoriOffreImmersionCommandHandler>
+  let addCandidatureOffreImmersionCommandHandler: StubbedClass<AddCandidatureOffreImmersionCommandHandler>
   let deleteFavoriOffreImmersionCommandHandler: StubbedClass<DeleteFavoriOffreImmersionCommandHandler>
   let getFavorisOffresImmersionJeuneQueryHandler: StubbedClass<GetFavorisOffresImmersionJeuneQueryHandler>
   let addFavoriOffreEngagementCommandHandler: StubbedClass<AddFavoriOffreServiceCiviqueCommandHandler>
+  let addCandidatureOffreServiceCiviqueCommandHandler: StubbedClass<AddCandidatureOffreServiceCiviqueCommandHandler>
   let deleteFavoriOffreEngagementCommandHandler: StubbedClass<DeleteFavoriOffreServiceCiviqueCommandHandler>
   let getFavorisServiceCiviqueJeuneQueryHandler: StubbedClass<GetFavorisServiceCiviqueJeuneQueryHandler>
   let getFavorisJeunePourConseillerQueryHandler: StubbedClass<GetFavorisJeuneQueryHandler>
@@ -74,6 +89,9 @@ describe('FavorisController', () => {
     addFavoriOffreEmploiCommandHandler = app.get(
       AddFavoriOffreEmploiCommandHandler
     )
+    addCandidatureOffreEmploiCommandHandler = app.get(
+      AddCandidatureOffreEmploiCommandHandler
+    )
     deleteFavoriOffreEmploiCommandHandler = app.get(
       DeleteFavoriOffreEmploiCommandHandler
     )
@@ -83,6 +101,9 @@ describe('FavorisController', () => {
     addFavoriOffreImmersionCommandHandler = app.get(
       AddFavoriOffreImmersionCommandHandler
     )
+    addCandidatureOffreImmersionCommandHandler = app.get(
+      AddCandidatureOffreImmersionCommandHandler
+    )
     deleteFavoriOffreImmersionCommandHandler = app.get(
       DeleteFavoriOffreImmersionCommandHandler
     )
@@ -91,6 +112,9 @@ describe('FavorisController', () => {
     )
     addFavoriOffreEngagementCommandHandler = app.get(
       AddFavoriOffreServiceCiviqueCommandHandler
+    )
+    addCandidatureOffreServiceCiviqueCommandHandler = app.get(
+      AddCandidatureOffreServiceCiviqueCommandHandler
     )
     deleteFavoriOffreEngagementCommandHandler = app.get(
       DeleteFavoriOffreServiceCiviqueCommandHandler
@@ -155,7 +179,8 @@ describe('FavorisController', () => {
       })
       const command: AddFavoriOffreEmploiCommand = {
         idJeune: 'ABCDE',
-        offreEmploi: offreEmploi
+        offreEmploi: offreEmploi,
+        aPostule: true
       }
 
       const payload: AddFavoriOffresEmploiPayload = {
@@ -167,8 +192,10 @@ describe('FavorisController', () => {
         typeContrat: offreEmploi.typeContrat,
         localisation: offreEmploi.localisation,
         origineNom: 'France Travail',
-        origineLogo: 'https://ft.io/image.png'
+        origineLogo: 'https://ft.io/image.png',
+        aPostule: true
       }
+
       it('crée un favori', async () => {
         // Given
         addFavoriOffreEmploiCommandHandler.execute.resolves(emptySuccess())
@@ -185,7 +212,8 @@ describe('FavorisController', () => {
           addFavoriOffreEmploiCommandHandler.execute
         ).to.have.been.calledWithExactly(command, unUtilisateurDecode())
       })
-      it('renvoie une 409 (Conflict) quand l"offre n"existe pas', async () => {
+
+      it('renvoie une 409 (Conflict) quand l’offre existe déjà', async () => {
         // Given
         addFavoriOffreEmploiCommandHandler.execute
           .withArgs(command)
@@ -207,6 +235,49 @@ describe('FavorisController', () => {
       ensureUserAuthenticationFailsIfInvalid(
         'POST',
         '/jeunes/ABCDE/favoris/offres-emploi'
+      )
+    })
+
+    describe('PATCH /jeunes/:idJeune/favoris/offres-emploi/:idOffre', () => {
+      const command: AddCandidatureOffreEmploiCommand = {
+        idBeneficiaire: 'ABCDE',
+        idOffre: 'id-offre'
+      }
+
+      it('crée un favori', async () => {
+        // Given
+        addCandidatureOffreEmploiCommandHandler.execute.resolves(emptySuccess())
+
+        // When
+        await request(app.getHttpServer())
+          .patch('/jeunes/ABCDE/favoris/offres-emploi/id-offre')
+          .set('authorization', unHeaderAuthorization())
+
+          // Then
+          .expect(HttpStatus.OK)
+        expect(
+          addCandidatureOffreEmploiCommandHandler.execute
+        ).to.have.been.calledWithExactly(command, unUtilisateurDecode())
+      })
+
+      it('renvoie une 404 (Not found) quand l’offre n’existe pas', async () => {
+        // Given
+        addCandidatureOffreEmploiCommandHandler.execute
+          .withArgs(command)
+          .resolves(failure(new NonTrouveError('Favori', 'offre emploi')))
+
+        // When
+        await request(app.getHttpServer())
+          .patch('/jeunes/ABCDE/favoris/offres-emploi/id-offre')
+          .set('authorization', unHeaderAuthorization())
+
+          // Then
+          .expect(HttpStatus.NOT_FOUND)
+      })
+
+      ensureUserAuthenticationFailsIfInvalid(
+        'PATCH',
+        '/jeunes/ABCDE/favoris/offres-emploi/id-offre'
       )
     })
 
@@ -292,7 +363,8 @@ describe('FavorisController', () => {
       const offreImmersion = unFavoriOffreImmersion()
       const command: AddFavoriOffreImmersionCommand = {
         idJeune: 'ABCDE',
-        offreImmersion: offreImmersion
+        offreImmersion: offreImmersion,
+        aPostule: true
       }
 
       const payload: AddFavoriImmersionPayload = {
@@ -300,7 +372,8 @@ describe('FavorisController', () => {
         metier: offreImmersion.metier,
         nomEtablissement: offreImmersion.nomEtablissement,
         secteurActivite: offreImmersion.secteurActivite,
-        ville: offreImmersion.ville
+        ville: offreImmersion.ville,
+        aPostule: true
       }
       it('crée un favori', async () => {
         // Given
@@ -345,6 +418,51 @@ describe('FavorisController', () => {
       ensureUserAuthenticationFailsIfInvalid(
         'POST',
         '/jeunes/ABCDE/favoris/offres-immersion'
+      )
+    })
+
+    describe('PATCH /jeunes/:idJeune/favoris/offres-immersion/:idOffre', () => {
+      const command: AddCandidatureOffreImmersionCommand = {
+        idBeneficiaire: 'ABCDE',
+        idOffre: 'id-offre'
+      }
+
+      it('crée un favori', async () => {
+        // Given
+        addCandidatureOffreImmersionCommandHandler.execute.resolves(
+          emptySuccess()
+        )
+
+        // When
+        await request(app.getHttpServer())
+          .patch('/jeunes/ABCDE/favoris/offres-immersion/id-offre')
+          .set('authorization', unHeaderAuthorization())
+
+          // Then
+          .expect(HttpStatus.OK)
+        expect(
+          addCandidatureOffreImmersionCommandHandler.execute
+        ).to.have.been.calledWithExactly(command, unUtilisateurDecode())
+      })
+
+      it('renvoie une 404 (Not found) quand l’offre n’existe pas', async () => {
+        // Given
+        addCandidatureOffreImmersionCommandHandler.execute
+          .withArgs(command)
+          .resolves(failure(new NonTrouveError('Favori', 'offre immersion')))
+
+        // When
+        await request(app.getHttpServer())
+          .patch('/jeunes/ABCDE/favoris/offres-immersion/id-offre')
+          .set('authorization', unHeaderAuthorization())
+
+          // Then
+          .expect(HttpStatus.NOT_FOUND)
+      })
+
+      ensureUserAuthenticationFailsIfInvalid(
+        'PATCH',
+        '/jeunes/ABCDE/favoris/offres-immersion/id-offre'
       )
     })
 
@@ -436,7 +554,8 @@ describe('FavorisController', () => {
       }
       const command: AddFavoriServiceCiviqueCommand = {
         idJeune: 'ABCDE',
-        offre
+        offre,
+        aPostule: true
       }
 
       it('crée un favori', async () => {
@@ -449,7 +568,7 @@ describe('FavorisController', () => {
         await request(app.getHttpServer())
           .post('/jeunes/ABCDE/favoris/services-civique')
           .set('authorization', unHeaderAuthorization())
-          .send(offre)
+          .send({ ...offre, aPostule: true })
 
           // Then
           .expect(HttpStatus.CREATED)
@@ -457,6 +576,7 @@ describe('FavorisController', () => {
           addFavoriOffreEngagementCommandHandler.execute
         ).to.have.been.calledWithExactly(command, unUtilisateurDecode())
       })
+
       it("renvoie une 409 (Conflict) quand l'offre n'existe pas", async () => {
         // Given
         addFavoriOffreEngagementCommandHandler.execute
@@ -471,7 +591,7 @@ describe('FavorisController', () => {
         await request(app.getHttpServer())
           .post('/jeunes/ABCDE/favoris/services-civique')
           .set('authorization', unHeaderAuthorization())
-          .send(offre)
+          .send({ ...offre, aPostule: true })
 
           // Then
           .expect(HttpStatus.CONFLICT)
@@ -479,6 +599,53 @@ describe('FavorisController', () => {
       ensureUserAuthenticationFailsIfInvalid(
         'post',
         '/jeunes/ABCDE/favoris/services-civique'
+      )
+    })
+
+    describe('PATCH /jeunes/:idJeune/favoris/service-civique/:idOffre', () => {
+      const command: AddCandidatureOffreServiceCiviqueCommand = {
+        idBeneficiaire: 'ABCDE',
+        idOffre: 'id-offre'
+      }
+
+      it('crée un favori', async () => {
+        // Given
+        addCandidatureOffreServiceCiviqueCommandHandler.execute.resolves(
+          emptySuccess()
+        )
+
+        // When
+        await request(app.getHttpServer())
+          .patch('/jeunes/ABCDE/favoris/service-civique/id-offre')
+          .set('authorization', unHeaderAuthorization())
+
+          // Then
+          .expect(HttpStatus.OK)
+        expect(
+          addCandidatureOffreServiceCiviqueCommandHandler.execute
+        ).to.have.been.calledWithExactly(command, unUtilisateurDecode())
+      })
+
+      it('renvoie une 404 (Not found) quand l’offre n’existe pas', async () => {
+        // Given
+        addCandidatureOffreServiceCiviqueCommandHandler.execute
+          .withArgs(command)
+          .resolves(
+            failure(new NonTrouveError('Favori', 'offre service civique'))
+          )
+
+        // When
+        await request(app.getHttpServer())
+          .patch('/jeunes/ABCDE/favoris/service-civique/id-offre')
+          .set('authorization', unHeaderAuthorization())
+
+          // Then
+          .expect(HttpStatus.NOT_FOUND)
+      })
+
+      ensureUserAuthenticationFailsIfInvalid(
+        'PATCH',
+        '/jeunes/ABCDE/favoris/service-civique/id-offre'
       )
     })
 

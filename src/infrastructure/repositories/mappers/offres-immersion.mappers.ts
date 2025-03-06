@@ -1,8 +1,6 @@
 import {
   ContactImmersionQueryModel,
   DetailOffreImmersionQueryModel,
-  FavoriOffreImmersionIdQueryModel,
-  FavoriOffreImmersionQueryModel,
   LocalisationQueryModel,
   OffreImmersionQueryModel
 } from '../../../application/queries/query-models/offres-immersion.query-model'
@@ -17,29 +15,9 @@ const fromContactMode = {
   IN_PERSON: Offre.Immersion.MethodeDeContact.PRESENTIEL
 }
 
-export function fromSqlToFavorisOffresImmersionIdsQueryModels(
-  favorisIdsSql: FavoriOffreImmersionSqlModel[]
-): FavoriOffreImmersionIdQueryModel[] {
-  return favorisIdsSql.map(favori => {
-    return { id: favori.idOffre }
-  })
-}
-
 export function fromSqlToFavorisOffreImmersion(
   offreImmersionFavoriSql: FavoriOffreImmersionSqlModel
 ): Offre.Favori.Immersion {
-  return {
-    id: offreImmersionFavoriSql.idOffre,
-    metier: offreImmersionFavoriSql.metier,
-    nomEtablissement: offreImmersionFavoriSql.nomEtablissement,
-    secteurActivite: offreImmersionFavoriSql.secteurActivite,
-    ville: offreImmersionFavoriSql.ville
-  }
-}
-
-export function fromSqlToFavorisOffreImmersionQueryModel(
-  offreImmersionFavoriSql: FavoriOffreImmersionSqlModel
-): FavoriOffreImmersionQueryModel {
   return {
     id: offreImmersionFavoriSql.idOffre,
     metier: offreImmersionFavoriSql.metier,

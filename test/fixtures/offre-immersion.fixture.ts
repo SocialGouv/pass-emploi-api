@@ -1,4 +1,4 @@
-import { FavoriOffreImmersionQueryModel } from 'src/application/queries/query-models/offres-immersion.query-model'
+import { ObsoleteFavoriOffreImmersionQueryModel } from 'src/application/queries/query-models/offres-immersion.query-model'
 import { NotifierNouvellesImmersionsCommand } from '../../src/application/commands/notifier-nouvelles-immersions.command.handler'
 import { Immersion } from '../../src/domain/offre/favori/offre-immersion'
 
@@ -29,10 +29,10 @@ export const unFavoriOffreImmersion = (
   return { ...defaults, ...overrides }
 }
 
-export const unFavoriOffreImmersionQueryModel = (
-  overrides: Partial<FavoriOffreImmersionQueryModel> = {}
-): FavoriOffreImmersionQueryModel => {
-  const defaults: FavoriOffreImmersionQueryModel = {
+export const unFavoriOffreImmersionQueryModelObsolete = (
+  overrides: Partial<ObsoleteFavoriOffreImmersionQueryModel> = {}
+): ObsoleteFavoriOffreImmersionQueryModel => {
+  const defaults: ObsoleteFavoriOffreImmersionQueryModel = {
     id: '123ABC',
     nomEtablissement: 'Mécanique du Rhône',
     metier: 'Mécanicien',
