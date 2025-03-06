@@ -209,7 +209,8 @@ export const configurationSchema = Joi.object({
     maxAgeReferentiels: Joi.number().required(),
     maxAgeCV: Joi.number().required(),
     maxAgeSuggestions: Joi.number().required(),
-    maxAgeMinimal: Joi.number().required()
+    maxAgeMinimal: Joi.number().required(),
+    staleIfErrorAgeMinimal: Joi.number().required()
   }),
   recherche: Joi.object({
     seuil: Joi.number().required()

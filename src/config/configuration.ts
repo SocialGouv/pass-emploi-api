@@ -269,7 +269,9 @@ export default () => {
       maxAgeCV: process.env.CACHE_CONTROL_MAX_AGE_CV_EN_SECONDES,
       maxAgeSuggestions:
         process.env.CACHE_CONTROL_MAX_AGE_SUGGESTIONS_EN_SECONDES,
-      maxAgeMinimal: process.env.CACHE_CONTROL_MAX_AGE_MINIMAL_EN_SECONDES
+      maxAgeMinimal: process.env.CACHE_CONTROL_MAX_AGE_MINIMAL_EN_SECONDES,
+      staleIfErrorAgeMinimal:
+        process.env.CACHE_CONTROL_STALE_IF_ERROR_MINIMAL_EN_SECONDES
     },
     recherche: {
       seuil: process.env.THRESHOLD_SEARCH_MESSAGES
