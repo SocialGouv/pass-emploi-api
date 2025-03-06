@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { DateService } from 'src/utils/date-service'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
@@ -9,13 +10,14 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { OffresEmploiRepositoryToken } from '../../domain/offre/favori/offre-emploi'
+import { FavorisOffresEmploiRepositoryToken } from '../../domain/offre/favori/offre-emploi'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { Offre } from '../../domain/offre/offre'
 
 export interface AddFavoriOffreEmploiCommand extends Command {
   idJeune: string
   offreEmploi: Offre.Favori.Emploi
+  aPostule: boolean
 }
 
 @Injectable()
@@ -24,10 +26,11 @@ export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
   void
 > {
   constructor(
-    @Inject(OffresEmploiRepositoryToken)
+    @Inject(FavorisOffresEmploiRepositoryToken)
     private offresEmploiRepository: Offre.Favori.Emploi.Repository,
     private jeuneAuthorizer: JeuneAuthorizer,
-    private evenementService: EvenementService
+    private evenementService: EvenementService,
+    private readonly dateService: DateService
   ) {
     super('AddFavoriOffreEmploiCommandHandler')
   }
@@ -44,7 +47,14 @@ export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
       )
     }
 
-    await this.offresEmploiRepository.save(command.idJeune, command.offreEmploi)
+    const favori = Offre.Favori.build(
+      command.idJeune,
+      command.offreEmploi,
+      command.aPostule,
+      this.dateService.now()
+    )
+
+    await this.offresEmploiRepository.save(favori)
     return emptySuccess()
   }
 

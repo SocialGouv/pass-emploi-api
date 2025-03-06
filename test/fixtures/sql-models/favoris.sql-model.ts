@@ -18,7 +18,8 @@ export function unFavoriOffreEmploi(
     nomLocalisation: null,
     codePostalLocalisation: null,
     communeLocalisation: null,
-    dateCreation: null,
+    dateCreation: new Date(),
+    dateCandidature: null,
     origineNom: null,
     origineLogoUrl: null
   }
@@ -38,7 +39,8 @@ export function unFavoriOffreEngagement(
     ville: null,
     organisation: null,
     dateDeDebut: null,
-    dateCreation: null
+    dateCreation: new Date(),
+    dateCandidature: null
   }
 
   return { ...defaults, ...args }
@@ -55,7 +57,8 @@ export function unFavoriOffreImmersion(
     ville: '',
     nomEtablissement: '',
     secteurActivite: 'patisserie',
-    dateCreation: null
+    dateCreation: new Date(),
+    dateCandidature: null
   }
 
   return { ...defaults, ...args }
