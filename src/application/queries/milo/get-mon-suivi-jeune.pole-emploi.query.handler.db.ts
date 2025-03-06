@@ -55,17 +55,26 @@ export class GetMonSuiviPoleEmploiQueryHandler extends QueryHandler<
       })
     ])
 
-    if (isFailure(rdvs)) return rdvs
-    if (isFailure(demarches)) return demarches
+    if (isFailure(rdvs) && isFailure(demarches)) return rdvs
+    let messageDonneesManquantes = ''
+    if (isFailure(rdvs)) {
+      messageDonneesManquantes =
+        'Les Rendez-vous sont temporairement indisponibles'
+    }
+    if (isFailure(demarches)) {
+      messageDonneesManquantes =
+        'Les Démarches sont temporairement indisponibles'
+    }
 
     return success({
       queryModel: {
-        rendezVous: rdvs.data.queryModel,
-        demarches: demarches.data.queryModel
+        rendezVous: isFailure(rdvs) ? [] : rdvs.data.queryModel,
+        demarches: isFailure(demarches) ? [] : demarches.data.queryModel,
+        messageDonneesManquantes
       },
       dateDuCache: recupererLaDateLaPlusAncienne(
-        rdvs.data.dateDuCache,
-        demarches.data.dateDuCache
+        isFailure(rdvs) ? undefined : rdvs.data.dateDuCache,
+        isFailure(demarches) ? undefined : demarches.data.dateDuCache
       )
     })
   }

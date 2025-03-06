@@ -77,6 +77,9 @@ export class MonSuiviPoleEmploiQueryModel {
     isArray: true
   })
   rendezVous: RendezVousJeuneQueryModel[]
+
+  @ApiPropertyOptional()
+  messageDonneesManquantes?: string
 }
 
 export class GetMonSuiviPoleEmploiQueryModel {
@@ -85,4 +88,7 @@ export class GetMonSuiviPoleEmploiQueryModel {
 
   @ApiPropertyOptional({ type: Date })
   dateDerniereMiseAJour?: string
+
+  @ApiPropertyOptional()
+  messageDonneesManquantes?: string
 }
