@@ -55,17 +55,16 @@ export class GetMonSuiviPoleEmploiQueryHandler extends QueryHandler<
       })
     ])
 
-    if (isFailure(rdvs)) return rdvs
-    if (isFailure(demarches)) return demarches
+    if (isFailure(rdvs) && isFailure(demarches)) return rdvs
 
     return success({
       queryModel: {
-        rendezVous: rdvs.data.queryModel,
-        demarches: demarches.data.queryModel
+        rendezVous: isFailure(rdvs) ? [] : rdvs.data.queryModel,
+        demarches: isFailure(demarches) ? [] : demarches.data.queryModel
       },
       dateDuCache: recupererLaDateLaPlusAncienne(
-        rdvs.data.dateDuCache,
-        demarches.data.dateDuCache
+        isFailure(rdvs) ? DateTime.now() : rdvs.data.dateDuCache,
+        isFailure(demarches) ? DateTime.now() : demarches.data.dateDuCache
       )
     })
   }

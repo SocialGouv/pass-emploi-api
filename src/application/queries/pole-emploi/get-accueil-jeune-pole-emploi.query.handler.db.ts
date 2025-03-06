@@ -188,9 +188,9 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
     }
 
     if (donneesManquantes.length)
-      data.messageDonneesManquantes = `Les données suivantes sont temporairement indisponibles : ${donneesManquantes.join(
+      data.messageDonneesManquantes = `Oups ! Ces données sont temporairement indisponibles (${donneesManquantes.join(
         ', '
-      )}`
+      )}). Nous vous invitons à réessayer plus tard.`
 
     return success(data)
   }

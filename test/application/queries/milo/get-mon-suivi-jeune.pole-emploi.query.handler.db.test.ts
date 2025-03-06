@@ -4,9 +4,11 @@ import { GetMonSuiviPoleEmploiQueryHandler } from '../../../../src/application/q
 import { GetDemarchesQueryGetter } from '../../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { MonSuiviPoleEmploiQueryModel } from '../../../../src/application/queries/query-models/jeunes.pole-emploi.query-model'
+import { NonTrouveError } from '../../../../src/building-blocks/types/domain-error'
 import { Cached } from '../../../../src/building-blocks/types/query'
 import {
   emptySuccess,
+  failure,
   isSuccess,
   Result,
   success
@@ -97,6 +99,25 @@ describe('GetMonSuiviPoleEmploiQueryHandler', () => {
       expect(
         isSuccess(result) && result.data.queryModel.demarches
       ).to.deep.equal([demarche])
+    })
+
+    it('renvoie dateCache quand les démarches sont KO', async () => {
+      getDemarchesQueryGetter.handle.resolves(
+        failure(new NonTrouveError('Démarches KO'))
+      )
+
+      result = await handler.handle({
+        idJeune: 'id-jeune',
+        dateDebut,
+        accessToken: 'accessToken'
+      })
+      expect(isSuccess(result) && result.data.dateDuCache).not.to.be.undefined()
+      expect(
+        isSuccess(result) && result.data.queryModel.rendezVous
+      ).to.deep.equal([rdv])
+      expect(
+        isSuccess(result) && result.data.queryModel.demarches
+      ).to.deep.equal([])
     })
   })
 
