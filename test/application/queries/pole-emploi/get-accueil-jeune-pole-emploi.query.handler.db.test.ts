@@ -82,6 +82,7 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
     const maintenant = DateTime.fromISO(maintenantString)
     const query: GetAccueilJeunePoleEmploiQuery = {
       idJeune: 'idJeune',
+      structure: Structure.POLE_EMPLOI,
       maintenant: maintenantString,
       accessToken: 'accessToken'
     }
@@ -327,7 +328,8 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
       const query: GetAccueilJeunePoleEmploiQuery = {
         idJeune: 'idJeune',
         maintenant: '2023-03-30T15:00:00Z',
-        accessToken: 'accessToken'
+        accessToken: 'accessToken',
+        structure: Structure.POLE_EMPLOI
       }
 
       // When

@@ -68,7 +68,12 @@ export class JeunesPoleEmploiController {
     @AccessToken() accessToken: string
   ): Promise<AccueilJeunePoleEmploiQueryModel> {
     const result = await this.getAccueilJeunePoleEmploiQueryHandler.execute(
-      { idJeune, maintenant: queryParams.maintenant, accessToken },
+      {
+        idJeune,
+        maintenant: queryParams.maintenant,
+        accessToken,
+        structure: utilisateur.structure
+      },
       utilisateur
     )
 

@@ -1,35 +1,35 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { DateService } from 'src/utils/date-service'
-import { NonTrouveError } from '../../../building-blocks/types/domain-error'
 import { Cached, Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import {
   Result,
-  failure,
   isFailure,
   success
 } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
 import {
+  Core,
   estPoleEmploiOuCDOuAvenirPro,
   peutVoirLesCampagnes
 } from '../../../domain/core'
 import { Demarche } from '../../../domain/demarche'
 import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
-import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { GetFavorisAccueilQueryGetter } from '../query-getters/accueil/get-favoris.query.getter.db'
 import { GetRecherchesSauvegardeesQueryGetter } from '../query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
 import { GetCampagneQueryGetter } from '../query-getters/get-campagne.query.getter'
 import { GetDemarchesQueryGetter } from '../query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
+import { DemarcheQueryModel } from '../query-models/actions.query-model'
 import { AccueilJeunePoleEmploiQueryModel } from '../query-models/jeunes.pole-emploi.query-model'
 import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-model'
-import { DemarcheQueryModel } from '../query-models/actions.query-model'
 
 export interface GetAccueilJeunePoleEmploiQuery extends Query {
   idJeune: string
+  structure: Core.Structure
   maintenant: string
   accessToken: string
 }
@@ -57,13 +57,9 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
   async handle(
     query: GetAccueilJeunePoleEmploiQuery
   ): Promise<Result<AccueilJeunePoleEmploiQueryModel>> {
-    const jeune = await this.jeuneRepository.get(query.idJeune)
-    if (!jeune) {
-      return failure(new NonTrouveError('Jeune', query.idJeune))
-    }
     const idpToken = await this.oidcClient.exchangeTokenJeune(
       query.accessToken,
-      jeune.structure
+      query.structure
     )
 
     const maintenant = DateTime.fromISO(query.maintenant, {
@@ -107,7 +103,7 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
           donneesManquantes.push('Favoris')
           return []
         }),
-      peutVoirLesCampagnes(jeune.structure)
+      peutVoirLesCampagnes(query.structure)
         ? this.getCampagneQueryGetter
             .handle({ idJeune: query.idJeune })
             .catch(e => {

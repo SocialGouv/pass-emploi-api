@@ -39,6 +39,7 @@ import {
   CreateDemarchePayload
 } from '../../../src/infrastructure/routes/validation/demarches.inputs'
 import { uneDemarche } from '../../fixtures/demarche.fixture'
+import { Core } from '../../../src/domain/core'
 
 describe('JeunesPoleEmploiController', () => {
   let getAccueilJeunePoleEmploiQueryHandler: StubbedClass<GetAccueilJeunePoleEmploiQueryHandler>
@@ -97,7 +98,8 @@ describe('JeunesPoleEmploiController', () => {
           {
             idJeune,
             maintenant,
-            accessToken: 'coucou'
+            accessToken: 'coucou',
+            structure: Core.Structure.MILO
           },
           unUtilisateurDecode()
         )
@@ -126,7 +128,8 @@ describe('JeunesPoleEmploiController', () => {
           {
             idJeune,
             maintenant,
-            accessToken: 'coucou'
+            accessToken: 'coucou',
+            structure: Core.Structure.MILO
           },
           unUtilisateurDecode()
         )
