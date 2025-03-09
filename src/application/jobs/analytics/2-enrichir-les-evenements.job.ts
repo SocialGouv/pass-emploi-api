@@ -46,6 +46,8 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
       await this.associerChaqueConseillerASonDernierAE(connexion)
       await this.associerChaqueConseillerASonPremierAE(connexion)
 
+      await this.mettreAJourLaStructureSelonDispositif(connexion)
+
       await connexion.close()
 
       if (maintenant.weekday === JOUR_DE_LA_SEMAINE_LUNDI) {
@@ -247,6 +249,52 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
             structure;
     `
     await connexion.query(query)
+  }
+
+  private async mettreAJourLaStructureSelonDispositif(
+    connexion: Sequelize
+  ): Promise<void> {
+    this.logger.log('Mise à jour de la structure en fonction du dispositif')
+    await connexion.query(`
+      UPDATE evenement_engagement
+      SET structure = 'MILO_PACEA'
+      FROM (
+        SELECT id 
+        FROM jeune
+        WHERE structure = 'MILO' AND dispositif = 'PACEA'
+        ) AS subquery
+      WHERE evenement_engagement.id_utilisateur = subquery.id
+        AND evenement_engagement.type_utilisateur = 'JEUNE'
+        AND evenement_engagement.structure = 'MILO'
+      ;
+    `)
+    await connexion.query(`
+      UPDATE evenement_engagement
+      SET structure = 'MILO'
+      FROM (
+        SELECT id 
+        FROM jeune
+        WHERE structure = 'MILO' AND dispositif = 'CEJ'
+        ) AS subquery
+      WHERE evenement_engagement.id_utilisateur = subquery.id
+        AND evenement_engagement.type_utilisateur = 'JEUNE'
+        AND evenement_engagement.structure = 'MILO_PACEA'
+      ;
+    `)
+    await connexion.query(`
+      UPDATE evenement_engagement_jeune eej
+      SET structure = 'MILO_PACEA'
+      WHERE structure = 'MILO'
+      AND EXISTS 
+        (SELECT 1 FROM jeune j WHERE j.id = eej.id_utilisateur AND j.structure = 'MILO' AND j.dispositif = 'PACEA');
+    `)
+    await connexion.query(`
+      UPDATE evenement_engagement_jeune eej
+      SET structure = 'MILO'
+      WHERE structure = 'MILO_PACEA'
+      AND EXISTS 
+        (SELECT 1 FROM jeune j WHERE j.id = eej.id_utilisateur AND j.structure = 'MILO' AND j.dispositif = 'CEJ');
+    `)
   }
 }
 
