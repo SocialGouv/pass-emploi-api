@@ -12,17 +12,14 @@ export class FavorisQueryModel {
   @ApiProperty()
   type: Offre.Favori.Type
 
+  @ApiProperty({ format: 'date-time' })
+  dateCreation: string
+
   @ApiPropertyOptional()
   organisation?: string
 
   @ApiPropertyOptional()
   localisation?: string
-
-  @ApiPropertyOptional({
-    format: 'date-time',
-    required: false
-  })
-  dateCreation: string
 
   @ApiPropertyOptional({
     format: 'date-time',
