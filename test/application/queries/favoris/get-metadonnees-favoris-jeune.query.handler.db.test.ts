@@ -1,5 +1,8 @@
+import { DateTime } from 'luxon'
 import { Core } from 'src/domain/core'
+import { Offre } from 'src/domain/offre/offre'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
+import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 import {
   GetMetadonneesFavorisJeuneQuery,
   GetMetadonneesFavorisJeuneQueryHandler
@@ -21,14 +24,11 @@ import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
-import { DateService } from '../../../../src/utils/date-service'
-import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 
 describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
   let getMetadonneesFavorisJeuneQueryHandler: GetMetadonneesFavorisJeuneQueryHandler
   let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
-  let dateService: StubbedClass<DateService>
 
   let recherchesSauvegardeesRepository: RechercheSqlRepository
   before(() => {
@@ -41,8 +41,6 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
       databaseForTesting.sequelize
     )
     conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
-    dateService = stubClass(DateService)
-    dateService.nowJs.returns(new Date('2023-04-17T12:00:00Z'))
 
     getMetadonneesFavorisJeuneQueryHandler =
       new GetMetadonneesFavorisJeuneQueryHandler(conseillerAgenceAuthorizer)
@@ -62,6 +60,7 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
       })
       await JeuneSqlModel.creer(jeuneDto)
     })
+
     describe('offres', () => {
       it("récupère le nombre d'offres immersion et l'autorisation de partage", async () => {
         // Given
@@ -73,8 +72,12 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
           ville: 'poi-ville'
         }
         const offreImmersionRepository =
-          new FavorisOffresImmersionSqlRepository(dateService)
-        await offreImmersionRepository.save(idJeune, uneOffreImmersion)
+          new FavorisOffresImmersionSqlRepository()
+        await offreImmersionRepository.save({
+          idBeneficiaire: idJeune,
+          offre: uneOffreImmersion,
+          dateCreation: DateTime.now()
+        })
 
         const query = {
           idJeune: idJeune
@@ -116,11 +119,12 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
           titre: 'poi-titre'
         }
         const offreServiceCiviqueRepository =
-          new OffreServiceCiviqueHttpSqlRepository(dateService)
-        await offreServiceCiviqueRepository.save(
-          idJeune,
-          uneOffreServiceCivique
-        )
+          new OffreServiceCiviqueHttpSqlRepository()
+        await offreServiceCiviqueRepository.save({
+          idBeneficiaire: idJeune,
+          offre: uneOffreServiceCivique,
+          dateCreation: DateTime.now()
+        })
 
         const query = {
           idJeune: idJeune
@@ -153,6 +157,7 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
         // Then
         expect(result).to.deep.equal(success(expectedMetadonnees))
       })
+
       it("récupère le nombre d'offres alternance et l'autorisation de partage", async () => {
         // Given
         const uneOffreAlternance = {
@@ -161,10 +166,13 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
           typeContrat: 'poi-type-contrat',
           alternance: true
         }
-        const offreEmploiRepository = new OffresEmploiHttpSqlRepository(
-          dateService
-        )
-        await offreEmploiRepository.save(idJeune, uneOffreAlternance)
+        const favori: Offre.Favori<Offre.Favori.Emploi> = {
+          idBeneficiaire: idJeune,
+          dateCreation: DateTime.now(),
+          offre: uneOffreAlternance
+        }
+        const offreEmploiRepository = new OffresEmploiHttpSqlRepository()
+        await offreEmploiRepository.save(favori)
 
         const query = {
           idJeune: idJeune
@@ -196,6 +204,7 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
         // Then
         expect(result).to.deep.equal(success(expectedMetadonnees))
       })
+
       it("récupère le nombre d'offres emploi et l'autorisation de partage", async () => {
         // Given
         const uneOffreEmploi = {
@@ -203,10 +212,13 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
           titre: 'poi-titre',
           typeContrat: 'poi-type-contrat'
         }
-        const offreEmploiRepository = new OffresEmploiHttpSqlRepository(
-          dateService
-        )
-        await offreEmploiRepository.save(idJeune, uneOffreEmploi)
+        const favori: Offre.Favori<Offre.Favori.Emploi> = {
+          idBeneficiaire: idJeune,
+          dateCreation: DateTime.now(),
+          offre: uneOffreEmploi
+        }
+        const offreEmploiRepository = new OffresEmploiHttpSqlRepository()
+        await offreEmploiRepository.save(favori)
 
         const query = {
           idJeune: idJeune
@@ -240,6 +252,7 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
         expect(result).to.deep.equal(success(expectedMetadonnees))
       })
     })
+
     describe('recherches sauvegardées', () => {
       const idService: StubbedClass<IdService> = stubClass(IdService)
       idService.uuid.returns('poi-id-recherche')
@@ -306,6 +319,7 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
         expect(result).to.deep.equal(success(expectedMetadonnees))
       })
     })
+
     describe('authorize', () => {
       it("appelle l'authorizer pour le conseiller", async () => {
         // Given

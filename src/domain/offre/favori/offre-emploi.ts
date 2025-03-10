@@ -1,3 +1,5 @@
+import { Offre } from 'src/domain/offre/offre'
+
 export interface Emploi {
   id: string
   titre: string
@@ -12,13 +14,17 @@ export interface Emploi {
   }
 }
 
-export const OffresEmploiRepositoryToken = 'OffresEmploi.Repository'
+export const FavorisOffresEmploiRepositoryToken =
+  'Favoris.OffresEmploi.Repository'
 
 export namespace Emploi {
   export interface Repository {
-    save(idJeune: string, offreEmploi: Emploi): Promise<void>
+    save(favori: Offre.Favori<Emploi>): Promise<void>
 
-    get(idJeune: string, idOffreEmploi: string): Promise<Emploi | undefined>
+    get(
+      idJeune: string,
+      idOffreEmploi: string
+    ): Promise<Offre.Favori<Emploi> | undefined>
 
     delete(idJeune: string, idOffreEmploi: string): Promise<void>
   }

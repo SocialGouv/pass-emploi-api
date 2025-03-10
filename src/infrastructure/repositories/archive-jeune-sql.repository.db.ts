@@ -22,7 +22,7 @@ import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { RechercheSqlModel } from '../sequelize/models/recherche.sql-model'
 import { RendezVousSqlModel } from '../sequelize/models/rendez-vous.sql-model'
 import { TransfertConseillerSqlModel } from '../sequelize/models/transfert-conseiller.sql-model'
-import { toOffreEmploi } from './mappers/offres-emploi.mappers'
+import { toFavoriOffreEmploi } from './mappers/offres-emploi.mappers'
 import { fromSqlToFavorisOffreImmersion } from './mappers/offres-immersion.mappers'
 import { fromSqlToRecherche } from './mappers/recherches.mappers'
 import { fromSqlToOffreServiceCivique } from './mappers/service-civique.mapper'
@@ -169,7 +169,7 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
       rendezVous: rdv.map(this.toRendezVousArchive),
       actions: this.fromActionSqlToActionArchive(actions, metadonnes),
       favoris: {
-        offresEmploi: favorisOffreEmploi.map(toOffreEmploi),
+        offresEmploi: favorisOffreEmploi.map(toFavoriOffreEmploi),
         offresImmersions: favorisOffreImmersion.map(
           fromSqlToFavorisOffreImmersion
         ),
