@@ -28,19 +28,6 @@ export class OffreImmersionQueryModel {
   estVolontaire: boolean
 }
 
-export class ObsoleteFavoriOffreImmersionQueryModel {
-  @ApiProperty()
-  id: string
-  @ApiProperty()
-  metier: string
-  @ApiProperty()
-  nomEtablissement: string
-  @ApiProperty()
-  secteurActivite: string
-  @ApiProperty()
-  ville: string
-}
-
 export class FavoriOffreImmersionQueryModel {
   @ApiProperty()
   id: string

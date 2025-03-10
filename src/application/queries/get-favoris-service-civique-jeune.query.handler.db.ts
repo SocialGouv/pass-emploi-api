@@ -6,7 +6,6 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Jeune } from '../../domain/jeune/jeune'
-import { fromSqlToOffreServiceCivique } from '../../infrastructure/repositories/mappers/service-civique.mapper'
 import { FavoriOffreEngagementSqlModel } from '../../infrastructure/sequelize/models/favori-offre-engagement.sql-model'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import {
@@ -16,7 +15,6 @@ import {
 
 export interface GetFavorisOffresEngagementJeuneQuery extends Query {
   idJeune: Jeune.Id
-  detail: boolean
 }
 
 @Injectable()
@@ -40,11 +38,7 @@ export class GetFavorisServiceCiviqueJeuneQueryHandler extends QueryHandler<
       order: [['date_creation', 'DESC']]
     })
 
-    if (query.detail) {
-      return favorisSql.map(fromSqlToOffreServiceCivique)
-    } else {
-      return fromSqlToQueryModel(favorisSql)
-    }
+    return fromSqlToQueryModel(favorisSql)
   }
 
   async authorize(

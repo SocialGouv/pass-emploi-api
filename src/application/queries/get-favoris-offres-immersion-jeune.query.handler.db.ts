@@ -7,20 +7,16 @@ import { Authentification } from '../../domain/authentification'
 import { Jeune } from '../../domain/jeune/jeune'
 import { FavoriOffreImmersionSqlModel } from '../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
-import {
-  FavoriOffreImmersionQueryModel,
-  ObsoleteFavoriOffreImmersionQueryModel
-} from './query-models/offres-immersion.query-model'
+import { FavoriOffreImmersionQueryModel } from './query-models/offres-immersion.query-model'
 
 export interface GetFavorisOffresImmersionJeuneQuery extends Query {
   idJeune: Jeune.Id
-  detail: boolean
 }
 
 @Injectable()
 export class GetFavorisOffresImmersionJeuneQueryHandler extends QueryHandler<
   GetFavorisOffresImmersionJeuneQuery,
-  ObsoleteFavoriOffreImmersionQueryModel[] | FavoriOffreImmersionQueryModel[]
+  FavoriOffreImmersionQueryModel[]
 > {
   constructor(private jeuneAuthorizer: JeuneAuthorizer) {
     super('GetFavorisOffresImmersionJeuneQueryHandler')
@@ -28,12 +24,8 @@ export class GetFavorisOffresImmersionJeuneQueryHandler extends QueryHandler<
 
   handle(
     query: GetFavorisOffresImmersionJeuneQuery
-  ): Promise<
-    ObsoleteFavoriOffreImmersionQueryModel[] | FavoriOffreImmersionQueryModel[]
-  > {
-    return query.detail
-      ? this.getObsoleteFavorisQueryModelsByJeune(query.idJeune)
-      : this.getFavorisQueryModelsByJeune(query.idJeune)
+  ): Promise<FavoriOffreImmersionQueryModel[]> {
+    return this.getFavorisQueryModelsByJeune(query.idJeune)
   }
 
   async authorize(
@@ -60,18 +52,6 @@ export class GetFavorisOffresImmersionJeuneQueryHandler extends QueryHandler<
 
     return fromSqlToFavorisOffresImmersionQueryModels(favorisIdsSql)
   }
-
-  private async getObsoleteFavorisQueryModelsByJeune(
-    idJeune: string
-  ): Promise<ObsoleteFavoriOffreImmersionQueryModel[]> {
-    const favorisSql = await FavoriOffreImmersionSqlModel.findAll({
-      where: {
-        idJeune
-      }
-    })
-
-    return favorisSql.map(fromSqlToObsoleteFavorisOffreImmersionQueryModel)
-  }
 }
 
 export function fromSqlToFavorisOffresImmersionQueryModels(
@@ -85,16 +65,4 @@ export function fromSqlToFavorisOffresImmersionQueryModels(
         : undefined
     }
   })
-}
-
-export function fromSqlToObsoleteFavorisOffreImmersionQueryModel(
-  offreImmersionFavoriSql: FavoriOffreImmersionSqlModel
-): ObsoleteFavoriOffreImmersionQueryModel {
-  return {
-    id: offreImmersionFavoriSql.idOffre,
-    metier: offreImmersionFavoriSql.metier,
-    nomEtablissement: offreImmersionFavoriSql.nomEtablissement,
-    secteurActivite: offreImmersionFavoriSql.secteurActivite,
-    ville: offreImmersionFavoriSql.ville
-  }
 }

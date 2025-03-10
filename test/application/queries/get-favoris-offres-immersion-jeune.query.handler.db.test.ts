@@ -6,10 +6,7 @@ import { FavorisOffresImmersionSqlRepository } from '../../../src/infrastructure
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import {
-  unFavoriOffreImmersion,
-  unFavoriOffreImmersionQueryModelObsolete
-} from '../../fixtures/offre-immersion.fixture'
+import { unFavoriOffreImmersion } from '../../fixtures/offre-immersion.fixture'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { expect, StubbedClass, stubClass } from '../../utils'
@@ -43,43 +40,22 @@ describe('GetFavorisOffresImmersionJeuneQueryHandler', () => {
   })
 
   describe('handle', () => {
-    describe('avec détail', () => {
-      it('recupère le détail de tous les favoris immersions du jeune', async () => {
-        // Given
-        const expectedResult: FavoriOffreImmersionQueryModel[] = [
-          unFavoriOffreImmersionQueryModelObsolete()
-        ]
+    it('recupère tous les favoris immersions du jeune', async () => {
+      // Given
+      const expectedResult: FavoriOffreImmersionQueryModel[] = [
+        {
+          id: unFavoriOffreImmersion().id,
+          dateCandidature: undefined
+        }
+      ]
 
-        // When
-        const result = await getFavorisOffresImmersionJeuneQueryHandler.handle({
-          idJeune,
-          detail: true
-        })
-        // Then
-
-        expect(result).to.deep.equal(expectedResult)
+      // When
+      const result = await getFavorisOffresImmersionJeuneQueryHandler.handle({
+        idJeune
       })
-    })
 
-    describe('sans détail', () => {
-      it('recupère tous les favoris immersions du jeune', async () => {
-        // Given
-        const expectedResult: FavoriOffreImmersionQueryModel[] = [
-          {
-            id: unFavoriOffreImmersionQueryModelObsolete().id,
-            dateCandidature: undefined
-          }
-        ]
-
-        // When
-        const result = await getFavorisOffresImmersionJeuneQueryHandler.handle({
-          idJeune,
-          detail: false
-        })
-
-        // Then
-        expect(result).to.deep.equal(expectedResult)
-      })
+      // Then
+      expect(result).to.deep.equal(expectedResult)
     })
   })
 
@@ -87,10 +63,7 @@ describe('GetFavorisOffresImmersionJeuneQueryHandler', () => {
     it('authorize un jeune', () => {
       // When
       getFavorisOffresImmersionJeuneQueryHandler.authorize(
-        {
-          idJeune,
-          detail: true
-        },
+        { idJeune },
         unUtilisateurJeune()
       )
 
