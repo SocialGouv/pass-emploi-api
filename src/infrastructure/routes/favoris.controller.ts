@@ -6,8 +6,7 @@ import {
   HttpCode,
   Param,
   Patch,
-  Post,
-  Query
+  Post
 } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
@@ -61,7 +60,6 @@ import {
 } from '../../application/queries/query-models/offres-emploi.query-model'
 import {
   FavoriOffreImmersionQueryModel,
-  ObsoleteFavoriOffreImmersionQueryModel,
   OffreImmersionQueryModel
 } from '../../application/queries/query-models/offres-immersion.query-model'
 import {
@@ -75,10 +73,7 @@ import { handleResult } from './result.handler'
 import {
   AddFavoriImmersionPayload,
   AddFavoriOffresEmploiPayload,
-  AddFavoriServicesCivique,
-  GetFavorisOffresEmploiQueryParams,
-  GetFavorisOffresImmersionQueryParams,
-  GetFavorisServicesCiviqueQueryParams
+  AddFavoriServicesCivique
 } from './validation/favoris.inputs'
 
 @Controller('jeunes/:idJeune')
@@ -129,11 +124,10 @@ export class FavorisController {
   @Get('favoris/offres-emploi')
   async getFavorisOffresEmploi(
     @Param('idJeune') idJeune: string,
-    @Query() getFavorisQuery: GetFavorisOffresEmploiQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<OffreEmploiResumeQueryModel[] | FavoriOffreEmploiQueryModel[]> {
+  ): Promise<FavoriOffreEmploiQueryModel[]> {
     return this.getFavorisOffresEmploiJeuneQueryHandler.execute(
-      { idJeune, detail: Boolean(getFavorisQuery.detail) },
+      { idJeune },
       utilisateur
     )
   }
@@ -149,13 +143,10 @@ export class FavorisController {
   @Get('favoris/offres-immersion')
   async getFavorisOffresImmersion(
     @Param('idJeune') idJeune: string,
-    @Query() getFavorisQuery: GetFavorisOffresImmersionQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<
-    ObsoleteFavoriOffreImmersionQueryModel[] | FavoriOffreImmersionQueryModel[]
-  > {
+  ): Promise<FavoriOffreImmersionQueryModel[]> {
     return this.getFavorisOffresImmersionJeuneQueryHandler.execute(
-      { idJeune, detail: Boolean(getFavorisQuery.detail) },
+      { idJeune },
       utilisateur
     )
   }
@@ -171,13 +162,10 @@ export class FavorisController {
   @Get('favoris/services-civique')
   async getFavorisServicesCivique(
     @Param('idJeune') idJeune: string,
-    @Query() getFavorisQuery: GetFavorisServicesCiviqueQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<
-    ServiceCiviqueQueryModel[] | FavoriOffreServiceCiviqueQueryModel[]
-  > {
+  ): Promise<FavoriOffreServiceCiviqueQueryModel[]> {
     return this.getFavorisServiceCiviqueJeuneQueryHandler.execute(
-      { idJeune, detail: Boolean(getFavorisQuery.detail) },
+      { idJeune },
       utilisateur
     )
   }

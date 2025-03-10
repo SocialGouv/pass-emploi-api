@@ -1,14 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { Type } from 'class-transformer'
 import {
   IsBoolean,
-  IsIn,
   IsNotEmpty,
   IsOptional,
   IsString,
   ValidateNested
 } from 'class-validator'
-import { Transform, Type } from 'class-transformer'
-import { transformStringToBoolean } from './utils/transformers'
 import { Offre } from 'src/domain/offre/offre'
 
 export class LocalisationPayload {
@@ -155,31 +153,4 @@ export class AddFavoriServicesCivique implements Offre.Favori.ServiceCivique {
   @IsBoolean()
   @IsOptional()
   aPostule?: boolean
-}
-
-export class GetFavorisOffresEmploiQueryParams {
-  @ApiPropertyOptional({ deprecated: true })
-  @IsBoolean()
-  @IsOptional()
-  @IsIn([true, false])
-  @Transform(params => transformStringToBoolean(params, 'detail'))
-  detail?: boolean
-}
-
-export class GetFavorisOffresImmersionQueryParams {
-  @ApiPropertyOptional({ deprecated: true })
-  @IsBoolean()
-  @IsOptional()
-  @IsIn([true, false])
-  @Transform(params => transformStringToBoolean(params, 'detail'))
-  detail?: boolean
-}
-
-export class GetFavorisServicesCiviqueQueryParams {
-  @ApiPropertyOptional({ deprecated: true })
-  @IsBoolean()
-  @IsOptional()
-  @IsIn([true, false])
-  @Transform(params => transformStringToBoolean(params, 'detail'))
-  detail?: boolean
 }

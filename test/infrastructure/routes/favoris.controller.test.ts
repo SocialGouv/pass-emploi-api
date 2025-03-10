@@ -154,7 +154,7 @@ describe('FavorisController', () => {
       it("Renvoie la liste des favoris offres emploi d'un jeune", async () => {
         // Given
         getFavorisOffresEmploiJeuneQueryHandler.execute
-          .withArgs({ idJeune: '1', detail: false }, unUtilisateurDecode())
+          .withArgs({ idJeune: '1' }, unUtilisateurDecode())
           .resolves([])
 
         // When - Then
@@ -343,7 +343,7 @@ describe('FavorisController', () => {
       it("Renvoie la liste des favoris immersion d'un jeune", async () => {
         // Given
         getFavorisOffresImmersionJeuneQueryHandler.execute
-          .withArgs({ idJeune: '1', detail: false }, unUtilisateurDecode())
+          .withArgs({ idJeune: '1' }, unUtilisateurDecode())
           .resolves([])
 
         // When - Then
@@ -531,7 +531,7 @@ describe('FavorisController', () => {
       it('Renvoie la liste des favoris services civique d’un jeune', async () => {
         // Given
         getFavorisServiceCiviqueJeuneQueryHandler.execute
-          .withArgs({ idJeune: '1', detail: false }, unUtilisateurDecode())
+          .withArgs({ idJeune: '1' }, unUtilisateurDecode())
           .resolves([])
 
         // When - Then
