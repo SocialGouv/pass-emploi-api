@@ -9,6 +9,8 @@ import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { getConnexionToDBTarget } from '../../../infrastructure/sequelize/connector-analytics'
 import { DateService } from '../../../utils/date-service'
 
+const ANNEE_A_TRAITER = 2024
+
 interface PgConnexion {
   client: PoolClient
   close: () => Promise<void>
@@ -21,7 +23,8 @@ export interface InfoTableAEAnnuelle {
 export const infosTablesAEAnnuelles: InfoTableAEAnnuelle[] = [
   { depuisAnnee: 2022, suffix: '_2022' },
   { depuisAnnee: 2023, suffix: '_2023' },
-  { depuisAnnee: 2024, suffix: '' }
+  { depuisAnnee: 2024, suffix: '_2024' },
+  { depuisAnnee: 2025, suffix: '' }
 ]
 
 @Injectable()
@@ -48,7 +51,10 @@ export class CreerTablesAEAnnuellesJobHandler extends JobHandler<Planificateur.J
       this.connexionTarget = await getConnexionToDBTarget()
 
       for (const tableAnnuelle of infosTablesAEAnnuelles) {
-        if (tableAnnuelle.suffix !== '')
+        if (
+          tableAnnuelle.suffix !== '' &&
+          tableAnnuelle.depuisAnnee === ANNEE_A_TRAITER
+        )
           await this.calculAnnuel(tableAnnuelle.depuisAnnee.toString())
       }
     } catch (e) {
