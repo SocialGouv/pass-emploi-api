@@ -1,5 +1,7 @@
-export const OffreServiceCiviqueRepositoryToken =
-  'OffreServiceCivique.Repository'
+import { Offre } from 'src/domain/offre/offre'
+
+export const FavorisOffresServiceCiviqueRepositoryToken =
+  'Favoris.OffreServiceCivique.Repository'
 
 export interface Localisation {
   latitude: number
@@ -27,9 +29,12 @@ export interface ServiceCivique {
 
 export namespace ServiceCivique {
   export interface Repository {
-    save(idJeune: string, offre: ServiceCivique): Promise<void>
+    save(favori: Offre.Favori<ServiceCivique>): Promise<void>
 
-    get(idJeune: string, idOffre: string): Promise<ServiceCivique | undefined>
+    get(
+      idJeune: string,
+      idOffre: string
+    ): Promise<Offre.Favori<ServiceCivique> | undefined>
 
     delete(idJeune: string, idOffre: string): Promise<void>
   }

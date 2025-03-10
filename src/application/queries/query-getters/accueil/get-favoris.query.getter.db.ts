@@ -62,47 +62,16 @@ export class GetFavorisAccueilQueryGetter {
           fromOffreServiceCiviqueSqlToFavorisQueryModel
         )
       )
-      .sort(comparerFavorisParDateCreationOuTitre)
+      .sort(compareDateCreationAntechronologique)
       .slice(0, 3)
   }
 }
 
-function comparerTitreDeFavoris(
+export function compareDateCreationAntechronologique(
   favori1: FavorisQueryModel,
   favori2: FavorisQueryModel
 ): number {
-  if (favori1.titre >= favori2.titre) {
-    return 1
-  } else {
-    return -1
-  }
-}
-
-function comparerDateCreationDeFavoris(
-  favori1: FavorisQueryModel,
-  favori2: FavorisQueryModel
-): number {
-  if (
-    (favori1.dateCreation ? DateTime.fromISO(favori1.dateCreation!) : 0) >=
-    (favori2.dateCreation ? DateTime.fromISO(favori2.dateCreation!) : 0)
-  ) {
-    return -1
-  } else {
-    return 1
-  }
-}
-
-export function comparerFavorisParDateCreationOuTitre(
-  favori1: FavorisQueryModel,
-  favori2: FavorisQueryModel
-): number {
-  if (!favori1.dateCreation && !favori2.dateCreation) {
-    return comparerTitreDeFavoris(favori1, favori2)
-  } else if (favori1.dateCreation && favori2.dateCreation) {
-    return comparerDateCreationDeFavoris(favori1, favori2)
-  } else if (favori1.dateCreation && !favori2.dateCreation) {
-    return -1
-  } else {
-    return 1
-  }
+  return DateTime.fromISO(favori2.dateCreation)
+    .diff(DateTime.fromISO(favori1.dateCreation))
+    .toMillis()
 }

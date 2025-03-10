@@ -1,46 +1,51 @@
 import { Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
+import { Offre } from '../../../domain/offre/offre'
 import { FavoriOffreEngagementSqlModel } from '../../sequelize/models/favori-offre-engagement.sql-model'
 import { fromSqlToOffreServiceCivique } from '../mappers/service-civique.mapper'
-import { Offre } from '../../../domain/offre/offre'
-import { DateService } from '../../../utils/date-service'
 
 @Injectable()
 export class OffreServiceCiviqueHttpSqlRepository
   implements Offre.Favori.ServiceCivique.Repository
 {
-  constructor(private readonly dateService: DateService) {}
-
   async get(
     idJeune: string,
     idOffre: string
-  ): Promise<Offre.Favori.ServiceCivique | undefined> {
-    const result = await FavoriOffreEngagementSqlModel.findOne({
+  ): Promise<Offre.Favori<Offre.Favori.ServiceCivique> | undefined> {
+    const sqlModel = await FavoriOffreEngagementSqlModel.findOne({
       where: {
         idJeune,
         idOffre
       }
     })
-
-    if (!result) {
+    if (!sqlModel) {
       return undefined
     }
 
-    return fromSqlToOffreServiceCivique(result)
+    const favori: Offre.Favori<Offre.Favori.ServiceCivique> = {
+      idBeneficiaire: idJeune,
+      dateCreation: DateTime.fromJSDate(sqlModel.dateCreation),
+      offre: fromSqlToOffreServiceCivique(sqlModel)
+    }
+    if (sqlModel.dateCandidature) {
+      favori.dateCandidature = DateTime.fromJSDate(sqlModel.dateCandidature)
+    }
+    return favori
   }
 
-  async save(
-    idJeune: string,
-    offre: Offre.Favori.ServiceCivique
-  ): Promise<void> {
-    await FavoriOffreEngagementSqlModel.create({
+  async save(favori: Offre.Favori<Offre.Favori.ServiceCivique>): Promise<void> {
+    const { idBeneficiaire, offre, dateCreation, dateCandidature } = favori
+
+    await FavoriOffreEngagementSqlModel.upsert({
       idOffre: offre.id,
-      idJeune,
+      idJeune: idBeneficiaire,
       domaine: offre.domaine,
       titre: offre.titre,
       ville: offre.ville,
       organisation: offre.organisation,
       dateDeDebut: offre.dateDeDebut,
-      dateCreation: this.dateService.nowJs()
+      dateCreation: dateCreation.toJSDate(),
+      dateCandidature: dateCandidature?.toJSDate()
     })
   }
 

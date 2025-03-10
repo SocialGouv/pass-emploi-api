@@ -216,7 +216,7 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
     // Favoris
     try {
       nombreFavorisEmploiSupprimes = await FavoriOffreEmploiSqlModel.destroy({
-        where: dateCreationSuperieureASixMois(maintenant)
+        where: dateCreationVideOuSuperieureASixMois(maintenant)
       })
     } catch (e) {
       this.logger.warn(e)
@@ -225,7 +225,7 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
     try {
       nombreFavorisEngagementSupprimes =
         await FavoriOffreEngagementSqlModel.destroy({
-          where: dateCreationSuperieureASixMois(maintenant)
+          where: dateCreationVideOuSuperieureASixMois(maintenant)
         })
     } catch (e) {
       this.logger.warn(e)
@@ -234,7 +234,7 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
     try {
       nombreFavorisImmersionSupprimes =
         await FavoriOffreImmersionSqlModel.destroy({
-          where: dateCreationSuperieureASixMois(maintenant)
+          where: dateCreationVideOuSuperieureASixMois(maintenant)
         })
     } catch (e) {
       this.logger.warn(e)
@@ -367,9 +367,16 @@ function dateSuperieureATroisMoisEtVenantDeMilo(
   }
 }
 
-function dateCreationSuperieureASixMois(maintenant: DateTime): WhereOptions {
+function dateCreationVideOuSuperieureASixMois(
+  maintenant: DateTime
+): WhereOptions {
   return {
-    dateCreation: { [Op.lte]: maintenant.minus({ months: 6 }).toJSDate() }
+    dateCreation: {
+      [Op.or]: {
+        [Op.lte]: maintenant.minus({ months: 6 }).toJSDate(),
+        [Op.is]: null
+      }
+    }
   }
 }
 

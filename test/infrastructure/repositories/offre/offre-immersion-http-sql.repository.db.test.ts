@@ -1,56 +1,94 @@
 import { expect } from 'chai'
-import { FavorisOffresImmersionSqlRepository } from '../../../../src/infrastructure/repositories/offre/offre-immersion-http-sql.repository.db'
-import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
-import { unFavoriOffreImmersion } from '../../../fixtures/offre-immersion.fixture'
-import { FavoriOffreImmersionSqlModel } from '../../../../src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
-import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
+import { DateTime } from 'luxon'
 import { Immersion } from '../../../../src/domain/offre/favori/offre-immersion'
+import { FavorisOffresImmersionSqlRepository } from '../../../../src/infrastructure/repositories/offre/offre-immersion-http-sql.repository.db'
+import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { FavoriOffreImmersionSqlModel } from '../../../../src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
+import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { unFavoriOffreImmersion } from '../../../fixtures/offre-immersion.fixture'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { getDatabase } from '../../../utils/database-for-testing'
-import { StubbedClass, stubClass } from '../../../utils'
-import { DateService } from '../../../../src/utils/date-service'
 
 describe('OffresImmersionHttpSqlRepository', () => {
   let offresImmersionHttpSqlRepository: FavorisOffresImmersionSqlRepository
-  let dateService: StubbedClass<DateService>
+  const now = DateTime.now()
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
 
-    dateService = stubClass(DateService)
-    dateService.nowJs.returns(new Date('2023-04-17T12:00:00Z'))
-
-    offresImmersionHttpSqlRepository = new FavorisOffresImmersionSqlRepository(
-      dateService
-    )
+    offresImmersionHttpSqlRepository = new FavorisOffresImmersionSqlRepository()
   })
-  describe('.saveAsFavori', () => {
-    describe("quand le favori n'existe pas", () => {
-      it('sauvegarde un favori', async () => {
-        // Given
-        await ConseillerSqlModel.creer(unConseillerDto({ id: 'ZIDANE' }))
-        await JeuneSqlModel.creer(
-          unJeuneDto({
-            id: 'ABCDE',
-            idConseiller: 'ZIDANE'
-          })
-        )
-        // When
-        await offresImmersionHttpSqlRepository.save(
-          'ABCDE',
-          unFavoriOffreImmersion()
-        )
 
-        // Then
-        const offresImmersion = await FavoriOffreImmersionSqlModel.findAll()
-        expect(offresImmersion.length).to.equal(1)
-        expect(offresImmersion[0].idOffre).to.equal('123ABC')
-        expect(offresImmersion[0].idJeune).to.equal('ABCDE')
+  describe('.save', () => {
+    it('sauvegarde un favori', async () => {
+      // Given
+      await ConseillerSqlModel.creer(unConseillerDto({ id: 'ZIDANE' }))
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: 'ABCDE',
+          idConseiller: 'ZIDANE'
+        })
+      )
+
+      // When
+      await offresImmersionHttpSqlRepository.save({
+        idBeneficiaire: 'ABCDE',
+        offre: unFavoriOffreImmersion(),
+        dateCreation: now
+      })
+
+      // Then
+      const offresImmersion = await FavoriOffreImmersionSqlModel.findAll()
+      expect(offresImmersion.length).to.equal(1)
+      expect(offresImmersion[0].dataValues).to.deep.include({
+        dateCandidature: null,
+        dateCreation: now.toJSDate(),
+        idJeune: 'ABCDE',
+        idOffre: '123ABC',
+        metier: 'Mécanicien',
+        nomEtablissement: 'Mécanique du Rhône',
+        secteurActivite: 'Industrie auto',
+        ville: 'Lyon'
+      })
+    })
+
+    it('modifie un favori', async () => {
+      // Given
+      await ConseillerSqlModel.creer(unConseillerDto({ id: 'ZIDANE' }))
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: 'ABCDE',
+          idConseiller: 'ZIDANE'
+        })
+      )
+      await offresImmersionHttpSqlRepository.save({
+        idBeneficiaire: 'ABCDE',
+        offre: unFavoriOffreImmersion(),
+        dateCreation: now.minus({ day: 1 })
+      })
+
+      // When
+      await offresImmersionHttpSqlRepository.save({
+        idBeneficiaire: 'ABCDE',
+        offre: unFavoriOffreImmersion(),
+        dateCreation: now.minus({ day: 1 }),
+        dateCandidature: now
+      })
+
+      // Then
+      const offresImmersion = await FavoriOffreImmersionSqlModel.findAll()
+      expect(offresImmersion.length).to.equal(1)
+      expect(offresImmersion[0].dataValues).to.deep.include({
+        dateCreation: now.minus({ day: 1 }).toJSDate(),
+        dateCandidature: now.toJSDate(),
+        idJeune: 'ABCDE',
+        idOffre: '123ABC'
       })
     })
   })
-  describe('.getFavori', () => {
+
+  describe('.get', () => {
     let offreImmersion: Immersion
 
     beforeEach(async () => {
@@ -63,7 +101,11 @@ describe('OffresImmersionHttpSqlRepository', () => {
         })
       )
       offreImmersion = unFavoriOffreImmersion()
-      await offresImmersionHttpSqlRepository.save('ABCDE', offreImmersion)
+      await offresImmersionHttpSqlRepository.save({
+        idBeneficiaire: 'ABCDE',
+        offre: offreImmersion,
+        dateCreation: now
+      })
     })
 
     describe("quand le favori n'existe pas", () => {
@@ -86,11 +128,16 @@ describe('OffresImmersionHttpSqlRepository', () => {
           offreImmersion.id
         )
         // Then
-        expect(favori).to.deep.equal(offreImmersion)
+        expect(favori).to.deep.equal({
+          idBeneficiaire: 'ABCDE',
+          dateCreation: now,
+          offre: offreImmersion
+        })
       })
     })
   })
-  describe('.deleteFavori', () => {
+
+  describe('.delete', () => {
     let offreImmersion: Immersion
 
     beforeEach(async () => {
@@ -107,9 +154,15 @@ describe('OffresImmersionHttpSqlRepository', () => {
     it('supprime le favori', async () => {
       // Given
       offreImmersion = unFavoriOffreImmersion()
-      await offresImmersionHttpSqlRepository.save('ABCDE', offreImmersion)
+      await offresImmersionHttpSqlRepository.save({
+        idBeneficiaire: 'ABCDE',
+        offre: offreImmersion,
+        dateCreation: now
+      })
+
       // When
       await offresImmersionHttpSqlRepository.delete('ABCDE', offreImmersion.id)
+
       // Then
       const actual = await offresImmersionHttpSqlRepository.get(
         'ABCDE',

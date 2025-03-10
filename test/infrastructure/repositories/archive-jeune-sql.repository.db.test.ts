@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import { uneArchiveJeuneMetadonnees } from 'test/fixtures/archiveJeune.fixture'
 import { uneDatetime, uneDatetimeLocale } from 'test/fixtures/date.fixture'
 import { MauvaiseCommandeError } from '../../../src/building-blocks/types/domain-error'
@@ -27,7 +28,6 @@ import {
   TransfertConseillerSqlModel
 } from '../../../src/infrastructure/sequelize/models/transfert-conseiller.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
-import { DateService } from '../../../src/utils/date-service'
 import { unCommentaire } from '../../fixtures/action.fixture'
 import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
 import { unFavoriOffreImmersion } from '../../fixtures/offre-immersion.fixture'
@@ -41,7 +41,7 @@ import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { uneStructureMiloDto } from '../../fixtures/sql-models/structureMilo.sql-model'
-import { expect, StubbedClass, stubClass } from '../../utils'
+import { expect, stubClass } from '../../utils'
 import {
   DatabaseForTesting,
   getDatabase
@@ -51,7 +51,6 @@ const idStructureMilo = 'test'
 
 describe('ArchiveJeuneSqlRepository', () => {
   let database: DatabaseForTesting
-  let dateService: StubbedClass<DateService>
 
   let rechercheSqlRepository: RechercheSqlRepository
   const firebaseClient = stubClass(FirebaseClient)
@@ -70,6 +69,7 @@ describe('ArchiveJeuneSqlRepository', () => {
   const jeuneDto = unJeuneDto({
     idConseiller: secondConseillerDto.id
   })
+  const now = DateTime.fromISO('2023-04-17T12:00:00Z')
 
   before(async () => {
     database = getDatabase()
@@ -78,24 +78,16 @@ describe('ArchiveJeuneSqlRepository', () => {
 
   beforeEach(async () => {
     await database.cleanPG()
-    dateService = stubClass(DateService)
   })
 
   describe('archiver', () => {
     let archiveJeuneSql: ArchiveJeuneSqlModel | null
     let metadonnees: ArchiveJeune.Metadonnees
 
-    dateService = stubClass(DateService)
-    dateService.nowJs.returns(new Date('2023-04-17T12:00:00Z'))
-
-    const offresEmploiHttpSqlRepository = new OffresEmploiHttpSqlRepository(
-      dateService
-    )
-    const offresImmersionRepository = new FavorisOffresImmersionSqlRepository(
-      dateService
-    )
+    const offresEmploiHttpSqlRepository = new OffresEmploiHttpSqlRepository()
+    const offresImmersionRepository = new FavorisOffresImmersionSqlRepository()
     const offreServiceCiviqueHttpSqlRepository =
-      new OffreServiceCiviqueHttpSqlRepository(dateService)
+      new OffreServiceCiviqueHttpSqlRepository()
 
     beforeEach(async () => {
       // Given
@@ -142,15 +134,21 @@ describe('ArchiveJeuneSqlRepository', () => {
         idJeune: jeuneDto.id
       })
 
-      await offresEmploiHttpSqlRepository.save(jeuneDto.id, uneOffreEmploi())
-      await offresImmersionRepository.save(
-        jeuneDto.id,
-        unFavoriOffreImmersion()
-      )
-      await offreServiceCiviqueHttpSqlRepository.save(
-        jeuneDto.id,
-        uneOffreServiceCivique()
-      )
+      await offresEmploiHttpSqlRepository.save({
+        idBeneficiaire: jeuneDto.id,
+        dateCreation: now,
+        offre: uneOffreEmploi()
+      })
+      await offresImmersionRepository.save({
+        idBeneficiaire: jeuneDto.id,
+        dateCreation: now,
+        offre: unFavoriOffreImmersion()
+      })
+      await offreServiceCiviqueHttpSqlRepository.save({
+        idBeneficiaire: jeuneDto.id,
+        dateCreation: now,
+        offre: uneOffreServiceCivique()
+      })
 
       // When
       await rechercheSqlRepository.save(

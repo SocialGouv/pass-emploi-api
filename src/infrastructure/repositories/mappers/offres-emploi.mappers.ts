@@ -1,10 +1,7 @@
+import { OffresEmploiQueryModel } from '../../../application/queries/query-models/offres-emploi.query-model'
+import { Offre } from '../../../domain/offre/offre'
 import { FavoriOffreEmploiSqlModel } from '../../sequelize/models/favori-offre-emploi.sql-model'
 import { OffreEmploiDto } from '../dto/pole-emploi.dto'
-import {
-  FavoriOffreEmploiIdQueryModel,
-  OffresEmploiQueryModel
-} from '../../../application/queries/query-models/offres-emploi.query-model'
-import { Offre } from '../../../domain/offre/offre'
 
 export function toOffresEmploiQueryModel(
   page: number,
@@ -39,29 +36,7 @@ export function toOffresEmploiQueryModel(
   }
 }
 
-export function toFavoriOffreEmploiSqlModel(
-  idJeune: string,
-  offreEmploi: Offre.Favori.Emploi,
-  dateCreation: Date
-): Partial<FavoriOffreEmploiSqlModel> {
-  return {
-    idJeune: idJeune,
-    idOffre: offreEmploi.id,
-    titre: offreEmploi.titre,
-    typeContrat: offreEmploi.typeContrat,
-    nomEntreprise: offreEmploi.nomEntreprise,
-    duree: offreEmploi.duree,
-    nomLocalisation: offreEmploi.localisation?.nom || null,
-    codePostalLocalisation: offreEmploi.localisation?.codePostal || null,
-    communeLocalisation: offreEmploi.localisation?.commune || null,
-    isAlternance: offreEmploi.alternance,
-    dateCreation,
-    origineNom: offreEmploi.origine?.nom || null,
-    origineLogoUrl: offreEmploi.origine?.logo || null
-  }
-}
-
-export function toOffreEmploi(
+export function toFavoriOffreEmploi(
   favoriOffreEmploiSqlModel: FavoriOffreEmploiSqlModel
 ): Offre.Favori.Emploi {
   return {
@@ -92,14 +67,6 @@ export function buildLocalisation(
     codePostal: favoriOffreEmploiSqlModel.codePostalLocalisation || '',
     commune: favoriOffreEmploiSqlModel.communeLocalisation || ''
   }
-}
-
-export function fromSqlToFavorisOffresEmploiIdsQueryModels(
-  favorisIdsSql: FavoriOffreEmploiSqlModel[]
-): FavoriOffreEmploiIdQueryModel[] {
-  return favorisIdsSql.map(favori => {
-    return { id: favori.idOffre }
-  })
 }
 
 export function toPoleEmploiContrat(
