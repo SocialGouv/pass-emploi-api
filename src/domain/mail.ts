@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { ArchiveJeune } from './archive-jeune'
-import { Core, estPoleEmploiOuCDOuAvenirPro } from './core'
+import { Core } from './core'
 import { Jeune } from './jeune/jeune'
 import { Conseiller } from './milo/conseiller'
 import { RendezVous } from './rendez-vous/rendez-vous'
@@ -79,6 +79,7 @@ export namespace Mail {
       rendezVousSupprime: string
       suppressionJeuneMilo: string
       suppressionJeunePE: string
+      suppressionBeneficiairePassEmploi: string
     }
 
     constructor(private configService: ConfigService) {
@@ -86,17 +87,26 @@ export namespace Mail {
     }
 
     creerMailSuppressionJeune(jeune: Jeune): MailDataDto {
-      let templateId: number
-
       if (!jeune.conseiller) {
         throw new Error(`Le jeune ${jeune.id} n'a pas de conseiller`)
       }
 
-      if (estPoleEmploiOuCDOuAvenirPro(jeune.structure)) {
-        templateId = parseInt(this.templates.suppressionJeunePE)
-      } else {
-        templateId = parseInt(this.templates.suppressionJeuneMilo)
-      }
+      const templateId = ((): number => {
+        switch (jeune.structure) {
+          case Core.Structure.MILO:
+            return parseInt(this.templates.suppressionJeuneMilo)
+          case Core.Structure.POLE_EMPLOI:
+            return parseInt(this.templates.suppressionJeunePE)
+          case Core.Structure.POLE_EMPLOI_BRSA:
+          case Core.Structure.POLE_EMPLOI_AIJ:
+          case Core.Structure.CONSEIL_DEPT:
+          case Core.Structure.AVENIR_PRO:
+          case Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF:
+          case Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL:
+          case Core.Structure.FT_EQUIP_EMPLOI_RECRUT:
+            return parseInt(this.templates.suppressionBeneficiairePassEmploi)
+        }
+      })()
 
       return {
         to: [

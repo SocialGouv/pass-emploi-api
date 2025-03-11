@@ -104,6 +104,7 @@ export const configurationSchema = Joi.object({
       rendezVousSupprime: Joi.number().required(),
       suppressionJeuneMilo: Joi.number().required(),
       suppressionJeunePE: Joi.number().required(),
+      suppressionBeneficiairePassEmploi: Joi.number().required(),
       compteJeuneArchiveMILO: Joi.number().required(),
       compteJeuneArchivePECEJ: Joi.number().required(),
       compteJeuneArchivePEBRSA: Joi.number().required()

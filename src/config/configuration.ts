@@ -143,6 +143,8 @@ export default () => {
           process.env.SENDINBLUE_SUPPRESSION_JEUNE_MILO_ID ?? '14',
         suppressionJeunePE:
           process.env.SENDINBLUE_SUPPRESSION_JEUNE_PE_ID ?? '17',
+        suppressionBeneficiairePassEmploi:
+          process.env.SENDINBLUE_BENEFICIAIRE_PASSEMPLOI_ID ?? '469',
         compteJeuneArchiveMILO:
           process.env.SENDINBLUE_COMPTE_JEUNE_ARCHIVE_MILO_ID ?? '51',
         compteJeuneArchivePECEJ:
