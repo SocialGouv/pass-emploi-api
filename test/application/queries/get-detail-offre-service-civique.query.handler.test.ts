@@ -1,16 +1,16 @@
 import { SinonSandbox } from 'sinon'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { DetailServiceCiviqueQueryModel } from 'src/application/queries/query-models/service-civique.query-model'
 import { GetDetailOffreServiceCiviqueQueryHandler } from '../../../src/application/queries/get-detail-offre-service-civique.query.handler'
-import { failure, success } from '../../../src/building-blocks/types/result'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import { failure, success } from '../../../src/building-blocks/types/result'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { EngagementClient } from '../../../src/infrastructure/clients/engagement-client'
-import { Offre } from '../../../src/domain/offre/offre'
-import { uneOffreServiceCiviqueDto } from '../../fixtures/offre-service-civique.fixture'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
-import { Evenement, EvenementService } from '../../../src/domain/evenement'
+import { uneOffreServiceCiviqueDto } from '../../fixtures/offre-service-civique.fixture'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('GetDetailServiceCiviqueQuery', () => {
   let getDetailServiceCiviqueQueryHandler: GetDetailOffreServiceCiviqueQueryHandler
@@ -58,7 +58,7 @@ describe('GetDetailServiceCiviqueQuery', () => {
       expect(serviceCiviqueClient.get).to.have.been.calledWithExactly(
         'v0/mission/unId'
       )
-      const offreEngagement: Offre.Favori.ServiceCivique = {
+      const offreEngagement: DetailServiceCiviqueQueryModel = {
         titre: 'unTitre',
         dateDeDebut: '2022-02-17T10:00:00.000Z',
         dateDeFin: '2022-07-17T10:00:00.000Z',
@@ -72,12 +72,7 @@ describe('GetDetailServiceCiviqueQuery', () => {
         codeDepartement: '75',
         description: 'offre très intéressante',
         codePostal: '75018',
-        descriptionOrganisation: 'description',
-        id: 'unId',
-        localisation: {
-          longitude: 1.2,
-          latitude: 3.4
-        }
+        descriptionOrganisation: 'description'
       }
       expect(result).to.be.deep.equal(success(offreEngagement))
     })

@@ -1,15 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { PaginationQueryModel } from './common/pagination.query-model'
 
-export class OrigineOffreEmploiQueryModel {
-  @ApiProperty()
-  nom: string
-
-  @ApiProperty()
-  logo?: string
-}
-
-export class LocalisationOffresEmploiQueryModel {
+class LocalisationOffresEmploiQueryModel {
   @ApiProperty({ required: false })
   nom?: string
 
@@ -18,6 +10,14 @@ export class LocalisationOffresEmploiQueryModel {
 
   @ApiProperty({ required: false })
   commune?: string
+}
+
+export class OrigineOffreEmploiQueryModel {
+  @ApiProperty()
+  nom: string
+
+  @ApiProperty()
+  logo?: string
 }
 
 export class OffreEmploiQueryModel {

@@ -1,14 +1,11 @@
-import {
-  uneOffreServiceCivique,
-  uneOffreServiceCiviqueDto
-} from '../../../fixtures/offre-service-civique.fixture'
-import { expect, StubbedClass, stubClass } from '../../../utils'
-import { failure, success } from '../../../../src/building-blocks/types/result'
-import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
-import { EngagementClient } from '../../../../src/infrastructure/clients/engagement-client'
-import { FindAllOffresServicesCiviqueQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-services-civique.query.getter'
-import { Offre } from '../../../../src/domain/offre/offre'
 import { GetServicesCiviqueQuery } from '../../../../src/application/queries/get-offres-services-civique.query.handler'
+import { FindAllOffresServicesCiviqueQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-services-civique.query.getter'
+import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
+import { failure, success } from '../../../../src/building-blocks/types/result'
+import { Offre } from '../../../../src/domain/offre/offre'
+import { EngagementClient } from '../../../../src/infrastructure/clients/engagement-client'
+import { uneOffreServiceCiviqueDto } from '../../../fixtures/offre-service-civique.fixture'
+import { expect, StubbedClass, stubClass } from '../../../utils'
 
 describe('FindAllOffresServicesCiviqueQueryGetter', () => {
   let serviceCiviqueClient: StubbedClass<EngagementClient>
@@ -66,7 +63,23 @@ describe('FindAllOffresServicesCiviqueQueryGetter', () => {
           params
         )
         expect(result).to.be.deep.equal(
-          success({ total: 1, results: [uneOffreServiceCivique()] })
+          success({
+            total: 1,
+            results: [
+              {
+                dateDeDebut: '2022-02-17T10:00:00.000Z',
+                domaine: 'Informatique',
+                id: 'unId',
+                localisation: {
+                  latitude: 3.4,
+                  longitude: 1.2
+                },
+                organisation: 'orga de ouf',
+                titre: 'unTitre',
+                ville: 'paris'
+              }
+            ]
+          })
         )
       })
       it('avec la deuxième page', async () => {
@@ -113,7 +126,23 @@ describe('FindAllOffresServicesCiviqueQueryGetter', () => {
           params
         )
         expect(result).to.be.deep.equal(
-          success({ total: 1, results: [uneOffreServiceCivique()] })
+          success({
+            total: 1,
+            results: [
+              {
+                dateDeDebut: '2022-02-17T10:00:00.000Z',
+                domaine: 'Informatique',
+                id: 'unId',
+                localisation: {
+                  latitude: 3.4,
+                  longitude: 1.2
+                },
+                organisation: 'orga de ouf',
+                titre: 'unTitre',
+                ville: 'paris'
+              }
+            ]
+          })
         )
       })
     })
