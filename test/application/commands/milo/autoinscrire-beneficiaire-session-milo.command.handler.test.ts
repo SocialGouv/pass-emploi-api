@@ -120,13 +120,7 @@ describe('AutoinscrireBeneficiaireSessionMiloCommandHandler', () => {
           beneficiaireMilo.configuration.fuseauHoraire
         )
         .resolves(success(session))
-      sessionMiloRepository.inscrireBeneficiaire
-        .withArgs(
-          'id-session',
-          beneficiaireMilo.idPartenaire,
-          'token-conseiller-milo'
-        )
-        .resolves(emptySuccess())
+      sessionMiloRepository.inscrireBeneficiaire.resolves(emptySuccess())
       chatRepository.recupererConversationIndividuelle
         .withArgs(beneficiaireMilo.id)
         .resolves({ id: 'id-chat', idBeneficiaire: beneficiaireMilo.id })
@@ -148,7 +142,7 @@ describe('AutoinscrireBeneficiaireSessionMiloCommandHandler', () => {
       expect(
         sessionMiloRepository.inscrireBeneficiaire
       ).to.have.been.calledOnceWithExactly(
-        'id-session',
+        { id: 'id-session', dateDebut: uneSessionMiloAllegee().debut },
         beneficiaireMilo.idPartenaire,
         'token-conseiller-milo'
       )

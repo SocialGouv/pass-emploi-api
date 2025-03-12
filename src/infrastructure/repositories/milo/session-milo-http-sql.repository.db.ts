@@ -57,6 +57,7 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     private httpService: HttpService,
     private configService: ConfigService,
     private rateLimiterService: RateLimiterService,
+    // FIXME c'est pas au repo de faire ça mais au command-handler
     private planificateurService: PlanificateurService
   ) {
     this.logger = new Logger('SessionMiloHttpSqlRepository')
@@ -187,30 +188,31 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
       .concat(inscriptionsAModifier.map(({ idJeune }) => idJeune))
     const idsDossier = await recupererIdsDossier(idsJeunes)
 
-    const resultDesinscriptions = await this.desinscrire(
-      inscriptionsASupprimer,
-      idsDossier,
-      tokenMilo
-    )
+    const resultDesinscriptions =
+      await this.desinscrireEtSupprimerNotifications(
+        inscriptionsASupprimer,
+        idsDossier,
+        tokenMilo
+      )
     if (isFailure(resultDesinscriptions)) return resultDesinscriptions
 
     const modificationsTriees = [...inscriptionsAModifier].sort(
       trierReinscriptionsEnDernier
     )
-    const resultModifications = await this.modifierInscriptions(
-      modificationsTriees,
-      sessionSansInscription.debut,
-      sessionSansInscription.id,
-      idsDossier,
-      tokenMilo
-    )
+    const resultModifications =
+      await this.modifierInscriptionsEtGererNotifications(
+        sessionSansInscription.id,
+        sessionSansInscription.debut,
+        modificationsTriees,
+        idsDossier,
+        tokenMilo
+      )
     if (isFailure(resultModifications)) return resultModifications
 
-    const resultInscriptions = await this.inscrire(
+    const resultInscriptions = await this.inscrireEtNotifier(
       sessionSansInscription.id,
       sessionSansInscription.debut,
-      idsJeunesAInscrire,
-      idsDossier,
+      idsJeunesAInscrire.map(idJeune => idsDossier.get(idJeune)!),
       tokenMilo
     )
     if (isFailure(resultInscriptions)) return resultInscriptions
@@ -230,34 +232,31 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
   }
 
   async inscrireBeneficiaire(
-    idSession: string,
+    session: { id: string; dateDebut: DateTime },
     idDossier: string,
     tokenMiloConseiller: string
   ): Promise<Result> {
-    const resultInscription = await this.miloClient.inscrireJeunesSession(
-      tokenMiloConseiller,
-      idSession,
-      [idDossier]
+    const resultInscription = await this.inscrireEtNotifier(
+      session.id,
+      session.dateDebut,
+      [idDossier],
+      tokenMiloConseiller
     )
     if (isFailure(resultInscription)) return resultInscription
 
     return emptySuccess()
   }
 
-  private async inscrire(
+  private async inscrireEtNotifier(
     idSession: string,
     dateDebutSession: DateTime,
-    idsJeunesAInscrire: string[],
-    idsDossier: Map<string, string>,
+    idsDossierAInscrire: string[],
     tokenMilo: string
   ): Promise<Result> {
-    const idsDossierNouveauxInscrits = idsJeunesAInscrire.map(
-      idJeune => idsDossier.get(idJeune)!
-    )
     const resultInscriptions = await this.miloClient.inscrireJeunesSession(
       tokenMilo,
       idSession,
-      idsDossierNouveauxInscrits
+      idsDossierAInscrire
     )
     if (isFailure(resultInscriptions)) {
       return resultInscriptions
@@ -278,12 +277,12 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     return emptySuccess()
   }
 
-  private async modifierInscriptions(
+  private async modifierInscriptionsEtGererNotifications(
+    idSession: string,
+    dateDebutSession: DateTime,
     inscriptionsAModifier: Array<
       Omit<SessionMilo.Inscription, 'nom' | 'prenom'>
     >,
-    dateDebutSession: DateTime,
-    idSession: string,
     idsDossier: Map<string, string>,
     tokenMilo: string
   ): Promise<Result> {
@@ -324,7 +323,7 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     )
   }
 
-  private async desinscrire(
+  private async desinscrireEtSupprimerNotifications(
     inscriptionsASupprimer: Array<{ idJeune: string; idInscription: string }>,
     idsDossier: Map<string, string>,
     tokenMilo: string
