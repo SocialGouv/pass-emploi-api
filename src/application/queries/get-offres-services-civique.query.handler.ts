@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import { Authentification } from '../../domain/authentification'
-import { Evenement, EvenementService } from '../../domain/evenement'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import {
@@ -9,11 +7,10 @@ import {
   Result,
   success
 } from '../../building-blocks/types/result'
-import {
-  ServiceCiviqueQueryModel,
-  ServicesCiviqueQueryModel
-} from './query-models/service-civique.query-model'
+import { Authentification } from '../../domain/authentification'
+import { Evenement, EvenementService } from '../../domain/evenement'
 import { FindAllOffresServicesCiviqueQueryGetter } from './query-getters/find-all-offres-services-civique.query.getter'
+import { ServicesCiviqueQueryModel } from './query-models/service-civique.query-model'
 
 export interface GetServicesCiviqueQuery extends Query {
   page?: number
@@ -51,16 +48,7 @@ export class GetOffresServicesCiviqueQueryHandler extends QueryHandler<
     }
 
     const { total, results } = result.data
-    const offresQueryModel: ServiceCiviqueQueryModel[] = results.map(offre => ({
-      id: offre.id,
-      titre: offre.titre,
-      organisation: offre.organisation,
-      ville: offre.ville,
-      domaine: offre.domaine,
-      dateDeDebut: offre.dateDeDebut
-    }))
-
-    return success({ pagination: { total }, results: offresQueryModel })
+    return success({ pagination: { total }, results })
   }
 
   async authorize(): Promise<Result> {

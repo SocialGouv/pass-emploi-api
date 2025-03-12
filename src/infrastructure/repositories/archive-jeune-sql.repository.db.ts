@@ -25,7 +25,7 @@ import { TransfertConseillerSqlModel } from '../sequelize/models/transfert-conse
 import { toFavoriOffreEmploi } from './mappers/offres-emploi.mappers'
 import { fromSqlToFavorisOffreImmersion } from './mappers/offres-immersion.mappers'
 import { fromSqlToRecherche } from './mappers/recherches.mappers'
-import { fromSqlToOffreServiceCivique } from './mappers/service-civique.mapper'
+import { sqlToOffreServiceCivique } from './mappers/service-civique.mapper'
 
 @Injectable()
 export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
@@ -174,7 +174,7 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
           fromSqlToFavorisOffreImmersion
         ),
         offresServiceCivique: favorisOffreEngagement.map(
-          fromSqlToOffreServiceCivique
+          sqlToOffreServiceCivique
         )
       },
       recherches: recherches.map(fromSqlToRecherche),

@@ -1,22 +1,24 @@
 import { Injectable } from '@nestjs/common'
+import {
+  ErreurHttp,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { DetailServiceCiviqueQueryModel } from './query-models/service-civique.query-model'
 import {
   emptySuccess,
   failure,
   Result,
   success
 } from '../../building-blocks/types/result'
-import { toOffreEngagement } from '../../infrastructure/repositories/mappers/service-civique.mapper'
-import {
-  ErreurHttp,
-  NonTrouveError
-} from '../../building-blocks/types/domain-error'
-import { DetailOffreEngagementDto } from '../../infrastructure/repositories/offre/offre-service-civique-http.repository.db'
-import { EngagementClient } from '../../infrastructure/clients/engagement-client'
 import { Authentification } from '../../domain/authentification'
 import { Evenement, EvenementService } from '../../domain/evenement'
+import { EngagementClient } from '../../infrastructure/clients/engagement-client'
+import {
+  DetailOffreEngagementDto,
+  OffreEngagementDto
+} from '../../infrastructure/repositories/offre/offre-service-civique-http.repository.db'
+import { DetailServiceCiviqueQueryModel } from './query-models/service-civique.query-model'
 
 export interface GetDetailOffreServiceCiviqueQuery extends Query {
   idOffre: string
@@ -42,7 +44,7 @@ export class GetDetailOffreServiceCiviqueQueryHandler extends QueryHandler<
         await this.engagementClient.get<DetailOffreEngagementDto>(
           `v0/mission/${query.idOffre}`
         )
-      return success(toOffreEngagement(response.data.data))
+      return success(dtoToDetailServiceCiviqueQueryModel(response.data.data))
     } catch (e) {
       this.logger.error(e)
       if (e.response?.status >= 400 && e.response?.status < 500) {
@@ -72,5 +74,26 @@ export class GetDetailOffreServiceCiviqueQueryHandler extends QueryHandler<
         utilisateur
       )
     }
+  }
+}
+
+function dtoToDetailServiceCiviqueQueryModel(
+  dto: OffreEngagementDto
+): DetailServiceCiviqueQueryModel {
+  return {
+    titre: dto.title,
+    dateDeDebut: dto.startAt,
+    dateDeFin: dto.endAt,
+    domaine: dto.domain,
+    ville: dto.city,
+    organisation: dto.organizationName,
+    lienAnnonce: dto.applicationUrl,
+    urlOrganisation: dto.organizationUrl,
+    adresseMission: dto.address,
+    adresseOrganisation: dto.organizationFullAddress,
+    codeDepartement: dto.departmentCode,
+    description: dto.description,
+    codePostal: dto.postalCode,
+    descriptionOrganisation: dto.organizationDescription
   }
 }

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { Offre } from '../../../domain/offre/offre'
 import { FavoriOffreEngagementSqlModel } from '../../sequelize/models/favori-offre-engagement.sql-model'
-import { fromSqlToOffreServiceCivique } from '../mappers/service-civique.mapper'
+import { sqlToOffreServiceCivique } from '../mappers/service-civique.mapper'
 
 @Injectable()
 export class OffreServiceCiviqueHttpSqlRepository
@@ -25,7 +25,7 @@ export class OffreServiceCiviqueHttpSqlRepository
     const favori: Offre.Favori<Offre.Favori.ServiceCivique> = {
       idBeneficiaire: idJeune,
       dateCreation: DateTime.fromJSDate(sqlModel.dateCreation),
-      offre: fromSqlToOffreServiceCivique(sqlModel)
+      offre: sqlToOffreServiceCivique(sqlModel)
     }
     if (sqlModel.dateCandidature) {
       favori.dateCandidature = DateTime.fromJSDate(sqlModel.dateCandidature)
