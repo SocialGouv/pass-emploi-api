@@ -32,6 +32,7 @@ import {
 } from '../repositories/dto/pole-emploi.dto'
 import { ListeTypeDemarchesDto, TypeDemarcheDto } from './dto/pole-emploi.dto'
 import { handleAxiosError } from './utils/axios-error-handler'
+import * as https from 'https'
 
 const CODE_UTILISATEUR = 0
 
@@ -336,12 +337,16 @@ export class PoleEmploiClient {
     params.append('scope', poleEmploiConfiguration.scope)
 
     const loginUrl = `${poleEmploiConfiguration.loginUrl}?realm=%2Fpartenaire`
+    const httpsAgent = new https.Agent({
+      rejectUnauthorized: false // Disables SSL certificate validation
+    })
 
     const reponse = await firstValueFrom(
       this.httpService.post(loginUrl, params, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
-        }
+        },
+        httpsAgent
       })
     )
 
