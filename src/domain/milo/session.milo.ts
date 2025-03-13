@@ -211,7 +211,7 @@ export namespace SessionMilo {
     ): Promise<Result>
 
     inscrireBeneficiaire(
-      idSession: string,
+      session: { id: string; dateDebut: DateTime },
       idDossier: string,
       tokenMiloConseiller: string
     ): Promise<Result>

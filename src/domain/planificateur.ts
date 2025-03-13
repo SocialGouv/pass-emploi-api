@@ -366,6 +366,7 @@ export async function planifierRappelsInstanceSessionMilo(
     apmService.captureError(e)
   }
 }
+
 export async function supprimerRappelsInstanceSessionMilo(
   idInstanceSessionMilo: string,
   planificateurService: PlanificateurService,

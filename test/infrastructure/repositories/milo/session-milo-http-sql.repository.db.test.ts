@@ -544,27 +544,39 @@ describe('SessionMiloHttpSqlRepository', () => {
       // Given
       const idSession = '67890'
       const idDossier = '12345'
-      miloClient.inscrireJeunesSession
-        .withArgs('token-milo-conseiller', idSession, [idDossier])
-        .resolves(
-          success([
-            {
-              id: 1,
-              idDossier: parseInt(idSession),
-              idSession: parseInt(idDossier),
-              statut: 'test'
-            }
-          ])
-        )
+      const dateDebut = DateTime.now()
+      miloClient.inscrireJeunesSession.resolves(
+        success([
+          {
+            id: 1,
+            idDossier: parseInt(idDossier),
+            idSession: parseInt(idSession),
+            statut: 'test'
+          }
+        ])
+      )
 
       // When
       const result = await repository.inscrireBeneficiaire(
-        idSession,
+        { id: idSession, dateDebut },
         idDossier,
         'token-milo-conseiller'
       )
 
       // Then
+      expect(
+        miloClient.inscrireJeunesSession
+      ).to.have.been.calledOnceWithExactly('token-milo-conseiller', idSession, [
+        idDossier
+      ])
+      expect(
+        planificateurService.planifierRappelsInstanceSessionMilo
+      ).to.have.been.calledOnceWithExactly({
+        idInstance: '1',
+        idDossier,
+        idSession,
+        dateDebut
+      })
       expect(isSuccess(result)).to.equal(true)
     })
   })

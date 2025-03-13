@@ -181,7 +181,7 @@ export default class AutoinscrireBeneficiaireSessionMiloCommandHandler extends C
     if (isFailure(verificationInscription)) return verificationInscription
 
     const inscription = await this.sessionMiloRepository.inscrireBeneficiaire(
-      idSession,
+      { id: idSession, dateDebut: sessionAllegee.debut },
       beneficiaire.idPartenaire,
       accesMiloConseiller
     )
