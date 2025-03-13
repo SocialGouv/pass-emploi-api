@@ -44,21 +44,23 @@ export function estPoleEmploiOuCDOuAvenirPro(
   structure: Core.Structure
 ): boolean {
   return (
-    estPoleEmploi(structure) ||
+    estFranceTravail(structure) ||
     structure === Core.Structure.CONSEIL_DEPT ||
     structure === Core.Structure.AVENIR_PRO
   )
 }
 
-export function estPoleEmploi(structure: Core.Structure): boolean {
-  return [
-    Core.Structure.POLE_EMPLOI,
-    Core.Structure.POLE_EMPLOI_BRSA,
-    Core.Structure.POLE_EMPLOI_AIJ,
-    Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF,
-    Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL,
-    Core.Structure.FT_EQUIP_EMPLOI_RECRUT
-  ].includes(structure)
+export const structuresFT = [
+  Core.Structure.POLE_EMPLOI,
+  Core.Structure.POLE_EMPLOI_BRSA,
+  Core.Structure.POLE_EMPLOI_AIJ,
+  Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF,
+  Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL,
+  Core.Structure.FT_EQUIP_EMPLOI_RECRUT
+]
+
+export function estFranceTravail(structure: Core.Structure): boolean {
+  return structuresFT.includes(structure)
 }
 
 export function estPassEmploi(structure: Core.Structure): boolean {
@@ -76,7 +78,7 @@ export function estPassEmploi(structure: Core.Structure): boolean {
 export function getStructureDeReference(
   structure: Core.Structure
 ): Core.Structure {
-  if (estPoleEmploi(structure)) {
+  if (estFranceTravail(structure)) {
     return Core.Structure.POLE_EMPLOI
   }
   return structure

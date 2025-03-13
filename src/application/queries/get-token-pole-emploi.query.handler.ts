@@ -3,7 +3,7 @@ import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { estPoleEmploi } from '../../domain/core'
+import { estFranceTravail } from '../../domain/core'
 import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 
@@ -30,7 +30,7 @@ export class GetTokenPoleEmploiQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
-      estPoleEmploi(utilisateur.structure)
+      estFranceTravail(utilisateur.structure)
     )
   }
 
