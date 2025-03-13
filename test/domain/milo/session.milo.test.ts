@@ -1,21 +1,21 @@
-import { SessionMilo } from 'src/domain/milo/session.milo'
 import { DateTime } from 'luxon'
 import {
-  uneSessionMilo,
-  uneSessionMiloAllegee
-} from '../../fixtures/sessions.fixture'
+  BeneficiaireDejaInscritError,
+  EmargementIncorrect,
+  NombrePlacesInsuffisantError
+} from 'src/building-blocks/types/domain-error'
 import {
   Failure,
   failure,
   isFailure,
   isSuccess
 } from 'src/building-blocks/types/result'
-import {
-  BeneficiaireDejaInscritError,
-  EmargementIncorrect,
-  NombrePlacesInsuffisantError
-} from 'src/building-blocks/types/domain-error'
+import { SessionMilo } from 'src/domain/milo/session.milo'
 import { expect } from 'test/utils'
+import {
+  uneSessionMilo,
+  uneSessionMiloAllegee
+} from '../../fixtures/sessions.fixture'
 
 describe('SessionMilo', () => {
   describe('calculerStatut', () => {
@@ -29,6 +29,7 @@ describe('SessionMilo', () => {
 
         // When
         const statut = SessionMilo.calculerStatut(
+          [],
           maintenant,
           dateFin,
           dateCloture
@@ -42,12 +43,13 @@ describe('SessionMilo', () => {
     describe('quand la date de clôture n’est pas renseignée', () => {
       const dateCloture = undefined
 
-      it('si la date de fin est ultérieure à maintenant, retourne  le statut A_VENIR', () => {
+      it('si la session se termine dans le futur, retourne le statut A_VENIR', () => {
         // Given
         const dateFin = maintenant.plus({ days: 1 })
 
         // When
         const statut = SessionMilo.calculerStatut(
+          [],
           maintenant,
           dateFin,
           dateCloture
@@ -57,19 +59,63 @@ describe('SessionMilo', () => {
         expect(statut).to.equal(SessionMilo.Statut.A_VENIR)
       })
 
-      it('si la date de fin est antérieure à maintenant, retourne  le statut A_CLOTURER', () => {
-        // Given
-        const dateFin = maintenant.minus({ days: 1 })
+      describe('quand la session s’est terminée', () => {
+        it('s’il n’y a pas de participant, retourne le statut CLOTUREE', () => {
+          // Given
+          const dateFin = maintenant.minus({ days: 1 })
 
-        // When
-        const statut = SessionMilo.calculerStatut(
-          maintenant,
-          dateFin,
-          dateCloture
-        )
+          // When
+          const statut = SessionMilo.calculerStatut(
+            [],
+            maintenant,
+            dateFin,
+            dateCloture
+          )
 
-        // Then
-        expect(statut).to.equal(SessionMilo.Statut.A_CLOTURER)
+          // Then
+          expect(statut).to.equal(SessionMilo.Statut.CLOTUREE)
+        })
+
+        it('s’il y a des participants non émargés, retourne le statut A_CLOTURER', () => {
+          // Given
+          const dateFin = maintenant.minus({ days: 1 })
+
+          // When
+          const statut = SessionMilo.calculerStatut(
+            [
+              SessionMilo.Inscription.Statut.INSCRIT,
+              SessionMilo.Inscription.Statut.REFUS_JEUNE,
+              SessionMilo.Inscription.Statut.REFUS_TIERS,
+              SessionMilo.Inscription.Statut.PRESENT
+            ],
+            maintenant,
+            dateFin,
+            dateCloture
+          )
+
+          // Then
+          expect(statut).to.equal(SessionMilo.Statut.A_CLOTURER)
+        })
+
+        it('si tous les partcipants sont émargés, retourne le statut CLOTUREE', () => {
+          // Given
+          const dateFin = maintenant.minus({ days: 1 })
+
+          // When
+          const statut = SessionMilo.calculerStatut(
+            [
+              SessionMilo.Inscription.Statut.REFUS_JEUNE,
+              SessionMilo.Inscription.Statut.REFUS_TIERS,
+              SessionMilo.Inscription.Statut.PRESENT
+            ],
+            maintenant,
+            dateFin,
+            dateCloture
+          )
+
+          // Then
+          expect(statut).to.equal(SessionMilo.Statut.CLOTUREE)
+        })
       })
     })
   })
