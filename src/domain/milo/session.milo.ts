@@ -163,14 +163,20 @@ export namespace SessionMilo {
   }
 
   export function calculerStatut(
+    participants: SessionMilo.Inscription.Statut[],
     maintenant: DateTime,
     dateFin: DateTime,
     dateCloture?: DateTime
   ): SessionMilo.Statut {
     if (dateCloture) return SessionMilo.Statut.CLOTUREE
-    return maintenant < dateFin
-      ? SessionMilo.Statut.A_VENIR
-      : SessionMilo.Statut.A_CLOTURER
+    if (dateFin > maintenant) return SessionMilo.Statut.A_VENIR
+
+    const participantsNonEmarges = participants.filter(
+      statut => statut === SessionMilo.Inscription.Statut.INSCRIT
+    )
+    return participantsNonEmarges.length > 0
+      ? SessionMilo.Statut.A_CLOTURER
+      : SessionMilo.Statut.CLOTUREE
   }
 
   export function peutInscrireBeneficiaire(
