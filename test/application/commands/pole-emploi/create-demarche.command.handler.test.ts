@@ -12,7 +12,7 @@ import {
   isSuccess,
   success
 } from '../../../../src/building-blocks/types/result'
-import { estPoleEmploi } from '../../../../src/domain/core'
+import { estFranceTravail } from '../../../../src/domain/core'
 import { Demarche } from '../../../../src/domain/demarche'
 import { Evenement, EvenementService } from '../../../../src/domain/evenement'
 import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
@@ -126,7 +126,7 @@ describe('CreateDemarcheCommandHandler', () => {
       expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         command.idJeune,
         utilisateur,
-        estPoleEmploi(utilisateur.structure)
+        estFranceTravail(utilisateur.structure)
       )
     })
   })

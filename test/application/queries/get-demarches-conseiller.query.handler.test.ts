@@ -1,7 +1,7 @@
 import { GetDemarchesConseillerQueryHandler } from 'src/application/queries/get-demarches-conseiller.query.handler'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import { GetDemarchesQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
-import { estPoleEmploi } from '../../../src/domain/core'
+import { estFranceTravail } from '../../../src/domain/core'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { StubbedClass, expect, stubClass } from '../../utils'
 import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
@@ -75,7 +75,7 @@ describe('GetDemarchesConseillerQueryHandler', () => {
         query.idConseiller,
         query.idJeune,
         utilisateur,
-        estPoleEmploi(utilisateur.structure)
+        estFranceTravail(utilisateur.structure)
       )
     })
   })

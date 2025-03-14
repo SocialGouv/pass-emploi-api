@@ -19,7 +19,7 @@ import {
   Result,
   success
 } from '../../../src/building-blocks/types/result'
-import { estPoleEmploi } from '../../../src/domain/core'
+import { estFranceTravail } from '../../../src/domain/core'
 import { Demarche } from '../../../src/domain/demarche'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
@@ -503,7 +503,7 @@ describe('GetSuiviSemainePoleEmploiQueryHandler', () => {
       expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         query.idJeune,
         utilisateur,
-        estPoleEmploi(utilisateur.structure)
+        estFranceTravail(utilisateur.structure)
       )
     })
   })

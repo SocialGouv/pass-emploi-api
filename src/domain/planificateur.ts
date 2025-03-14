@@ -76,7 +76,8 @@ export namespace Planificateur {
     RECUPERER_ANALYSE_ANTIVIRUS = 'RECUPERER_ANALYSE_ANTIVIRUS',
     NOTIFIER_RAPPEL_CREATION_ACTIONS_DEMARCHES = 'NOTIFIER_RAPPEL_CREATION_ACTIONS_DEMARCHES',
     NOTIFIER_BONNE_ALTERNANCE = 'NOTIFIER_BONNE_ALTERNANCE',
-    NOTIFIER_CAMPAGNE = 'NOTIFIER_CAMPAGNE'
+    NOTIFIER_CAMPAGNE = 'NOTIFIER_CAMPAGNE',
+    NOTIFIER_ACTUALISATION = 'NOTIFIER_ACTUALISATION'
   }
 
   export interface JobRendezVous {
@@ -139,6 +140,11 @@ export namespace Planificateur {
 }
 
 export const listeCronJobs: Planificateur.CronJob[] = [
+  {
+    type: Planificateur.JobType.NOTIFIER_ACTUALISATION,
+    expression: '0 8 7 * *',
+    description: 'Tous les 7 du moins à 8h.'
+  },
   {
     type: Planificateur.JobType.SUIVRE_FILE_EVENEMENTS_MILO,
     expression: '*/15 * * * *',

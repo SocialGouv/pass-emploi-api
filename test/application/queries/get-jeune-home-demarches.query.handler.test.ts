@@ -6,7 +6,7 @@ import { JeuneHomeDemarcheQueryModel } from '../../../src/application/queries/qu
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { Cached } from '../../../src/building-blocks/types/query'
 import { failure, success } from '../../../src/building-blocks/types/result'
-import { Core, estPoleEmploi } from '../../../src/domain/core'
+import { Core, estFranceTravail } from '../../../src/domain/core'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { uneCampagneQueryModel } from '../../fixtures/campagne.fixture'
 import { desDemarchesQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
@@ -141,7 +141,7 @@ describe('GetJeuneHomeDemarchesQueryHandler', () => {
       expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         'idJeune',
         utilisateur,
-        estPoleEmploi(utilisateur.structure)
+        estFranceTravail(utilisateur.structure)
       )
     })
   })
