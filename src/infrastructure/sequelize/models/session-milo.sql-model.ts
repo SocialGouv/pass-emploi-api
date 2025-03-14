@@ -7,6 +7,7 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
+import { AsSql } from 'src/infrastructure/sequelize/types'
 import { StructureMiloSqlModel } from './structure-milo.sql-model'
 
 export class SessionMiloDto extends Model {
@@ -42,6 +43,12 @@ export class SessionMiloDto extends Model {
 
 @Table({ timestamps: false, tableName: 'session_milo' })
 export class SessionMiloSqlModel extends SessionMiloDto {
+  static async modifierOuCreer(
+    modifications: AsSql<Omit<SessionMiloDto, 'datePremiereConfiguration'>>
+  ): Promise<void> {
+    await SessionMiloSqlModel.upsert(modifications)
+  }
+
   @BelongsTo(() => StructureMiloSqlModel)
   structure?: StructureMiloSqlModel
 }

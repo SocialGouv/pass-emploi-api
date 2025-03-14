@@ -113,22 +113,22 @@ describe('SuivreEvenementsMiloCronJobHandler', () => {
 
         // Then
         expect(
-          planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant
+          planificateurService.ajouterJobEvenementMiloSiIlNaPasEteCreeAvant
         ).to.have.callCount(5)
         expect(
-          planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant
+          planificateurService.ajouterJobEvenementMiloSiIlNaPasEteCreeAvant
         ).to.have.been.calledWith(eventMilo1RDV)
         expect(
-          planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant
+          planificateurService.ajouterJobEvenementMiloSiIlNaPasEteCreeAvant
         ).to.have.been.calledWith(eventMilo1RDVIdentique)
         expect(
-          planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant
+          planificateurService.ajouterJobEvenementMiloSiIlNaPasEteCreeAvant
         ).to.have.been.calledWith(eventMilo2RDV)
         expect(
-          planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant
+          planificateurService.ajouterJobEvenementMiloSiIlNaPasEteCreeAvant
         ).to.have.been.calledWith(eventMilo1Session)
         expect(
-          planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant
+          planificateurService.ajouterJobEvenementMiloSiIlNaPasEteCreeAvant
         ).to.have.been.calledWith(eventMilo2Session)
       })
       it('acquitte chaque évènement', async () => {
@@ -173,10 +173,10 @@ describe('SuivreEvenementsMiloCronJobHandler', () => {
         // Then
         expect(evenementMiloRepository.findAllEvenements).to.have.callCount(3)
         expect(
-          planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant
+          planificateurService.ajouterJobEvenementMiloSiIlNaPasEteCreeAvant
         ).to.have.been.calledWith(eventMilo1RDV)
         expect(
-          planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant
+          planificateurService.ajouterJobEvenementMiloSiIlNaPasEteCreeAvant
         ).to.have.been.calledWith(eventMilo2RDV)
         expect(
           evenementMiloRepository.acquitterEvenement

@@ -140,7 +140,7 @@ describe('NotifierCreationActionsDemarchesJobHandler', () => {
         structure: Core.Structure.MILO,
         token: 'push1'
       })
-      expect(planificateurRepository.creerJob).not.to.have.been.called()
+      expect(planificateurRepository.ajouterJob).not.to.have.been.called()
     })
   })
 })

@@ -3,10 +3,15 @@ import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
 import { isFailure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { Conseiller } from 'src/domain/milo/conseiller'
 import { estMilo } from 'src/domain/core'
+import { Conseiller } from 'src/domain/milo/conseiller'
 import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo.db'
+import {
+  Planificateur,
+  PlanificateurRepositoryToken
+} from 'src/domain/planificateur'
 import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
+import { DateService } from 'src/utils/date-service'
 import {
   SessionMilo,
   SessionMiloRepositoryToken
@@ -14,7 +19,8 @@ import {
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { mapSessionToDetailSessionConseillerQueryModel } from '../query-mappers/milo.mappers'
 import { DetailSessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
-import { DateService } from 'src/utils/date-service'
+import JobType = Planificateur.JobType
+import estEmargeeMaisPasClose = SessionMilo.estEmargeeMaisPasClose
 
 export interface GetDetailSessionConseillerMiloQuery extends Query {
   idSession: string
@@ -34,7 +40,9 @@ export class GetDetailSessionConseillerMiloQueryHandler extends QueryHandler<
     private sessionRepository: SessionMilo.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer,
     private oidcClient: OidcClient,
-    private dateService: DateService
+    private dateService: DateService,
+    @Inject(PlanificateurRepositoryToken)
+    private readonly planificateurRepository: Planificateur.Repository
   ) {
     super('GetDetailSessionMiloQueryHandler')
   }
@@ -54,19 +62,25 @@ export class GetDetailSessionConseillerMiloQueryHandler extends QueryHandler<
       query.accessToken
     )
 
-    const resultat = await this.sessionRepository.getForConseiller(
+    const resultatSession = await this.sessionRepository.getForConseiller(
       query.idSession,
       structure,
       idpToken
     )
-    if (isFailure(resultat)) return resultat
+    if (isFailure(resultatSession)) return resultatSession
+    const session = resultatSession.data
 
-    return success(
-      mapSessionToDetailSessionConseillerQueryModel(
-        resultat.data,
-        this.dateService.now()
-      )
+    const queryModel = mapSessionToDetailSessionConseillerQueryModel(
+      session,
+      this.dateService.now()
     )
+
+    if (estEmargeeMaisPasClose(queryModel.session.statut)) {
+      this.planifierClotureSession(session)
+      queryModel.session.statut = SessionMilo.Statut.CLOTUREE
+    }
+
+    return success(queryModel)
   }
 
   async authorize(
@@ -82,5 +96,18 @@ export class GetDetailSessionConseillerMiloQueryHandler extends QueryHandler<
 
   async monitor(): Promise<void> {
     return
+  }
+
+  private planifierClotureSession(session: SessionMilo): void {
+    const maintenant = this.dateService.now().toJSDate()
+    const job: Planificateur.Job<Planificateur.JobCloreSessions> = {
+      dateExecution: maintenant,
+      type: JobType.CLORE_SESSIONS,
+      contenu: {
+        dateCloture: maintenant,
+        sessions: [{ id: session.id, idStructureMilo: session.idStructureMilo }]
+      }
+    }
+    this.planificateurRepository.ajouterJob(job)
   }
 }

@@ -44,7 +44,7 @@ export class DumpForAnalyticsJobHandler extends JobHandler<Planificateur.Job> {
       type: Planificateur.JobType.CHARGER_EVENEMENTS_ANALYTICS,
       contenu: undefined
     }
-    await this.planificateurRepository.creerJob(jobChargementAnalytics)
+    await this.planificateurRepository.ajouterJob(jobChargementAnalytics)
 
     return {
       jobType: this.jobType,
