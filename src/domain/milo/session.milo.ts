@@ -176,7 +176,7 @@ export namespace SessionMilo {
     )
     return participantsNonEmarges.length > 0
       ? SessionMilo.Statut.A_CLOTURER
-      : SessionMilo.Statut.CLOTUREE
+      : SessionMilo.Statut.EMARGEE
   }
 
   export function peutInscrireBeneficiaire(
@@ -189,6 +189,10 @@ export namespace SessionMilo {
       return failure(new NombrePlacesInsuffisantError())
 
     return emptySuccess()
+  }
+
+  export function estEmargeeMaisPasClose(statut: Statut): boolean {
+    return statut === Statut.EMARGEE
   }
 
   export interface Repository {
@@ -226,6 +230,7 @@ export namespace SessionMilo {
   export enum Statut {
     A_VENIR = 'A_VENIR',
     A_CLOTURER = 'A_CLOTURER',
+    EMARGEE = 'EMARGEE',
     CLOTUREE = 'CLOTUREE'
   }
 

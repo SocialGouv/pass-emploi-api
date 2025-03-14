@@ -42,7 +42,7 @@ export class TaskService {
               type: Planificateur.JobType.FAKE,
               contenu: { message: 'dummy job' }
             }
-            await this.planificateurRepository.creerJob(job)
+            await this.planificateurRepository.ajouterJob(job)
             break
           case Task.INIT_JOBS:
             await this.synchronizeJobsCommandHandler.execute()

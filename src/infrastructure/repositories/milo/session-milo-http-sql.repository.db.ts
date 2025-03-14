@@ -36,11 +36,7 @@ import {
 import { MiloClient } from '../../clients/milo-client'
 import { getAPMInstance } from '../../monitoring/apm.init'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
-import {
-  SessionMiloDto,
-  SessionMiloSqlModel
-} from '../../sequelize/models/session-milo.sql-model'
-import { AsSql } from '../../sequelize/types'
+import { SessionMiloSqlModel } from '../../sequelize/models/session-milo.sql-model'
 import { InstanceSessionMiloDto } from '../dto/milo.dto'
 
 const FORMAT_DATETIME_MILO = 'yyyy-MM-dd HH:mm:ss'
@@ -217,7 +213,7 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
     )
     if (isFailure(resultInscriptions)) return resultInscriptions
 
-    const sessionMiloSqlModel: AsSql<SessionMiloDto> = {
+    await SessionMiloSqlModel.modifierOuCreer({
       id: sessionSansInscription.id,
       estVisible: sessionSansInscription.estVisible,
       autoinscription: sessionSansInscription.autoinscription,
@@ -225,8 +221,7 @@ export class SessionMiloHttpSqlRepository implements SessionMilo.Repository {
       dateModification:
         sessionSansInscription.dateModification?.toJSDate() ?? new Date(),
       dateCloture: sessionSansInscription.dateCloture?.toJSDate() ?? null
-    }
-    await SessionMiloSqlModel.upsert(sessionMiloSqlModel)
+    })
 
     return emptySuccess()
   }

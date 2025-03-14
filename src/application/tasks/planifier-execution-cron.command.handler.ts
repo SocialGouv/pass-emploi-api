@@ -34,7 +34,7 @@ export class PlanifierExecutionCronCommandHandler extends CommandHandler<
       type: command.jobType,
       contenu: undefined
     }
-    await this.planificateurRepository.creerJob(job)
+    await this.planificateurRepository.ajouterJob(job)
     return emptySuccess()
   }
 

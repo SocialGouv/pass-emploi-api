@@ -106,7 +106,7 @@ export class RecupererAnalyseAntivirusJobHandler extends JobHandler<Job> {
       'jecliqueoupas.intervalleAnalyse'
     )
     const dateExecution = this.dateService.now().plus({ seconds: intervalle })
-    await this.planificateurRepository.creerJob({
+    await this.planificateurRepository.ajouterJob({
       ...job,
       dateExecution: dateExecution.toJSDate()
     })
