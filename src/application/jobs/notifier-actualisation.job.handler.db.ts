@@ -76,7 +76,7 @@ export class NotifierActualisationJobHandler extends JobHandler<Job> {
       stats.nbNotifsEnvoyees += jeunesANotifier.rows.length
       stats.totalBeneficiairesANotifier = jeunesANotifier.count
       if (jeunesANotifier.rows.length === PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM) {
-        this.planificateurRepository.creerJob({
+        this.planificateurRepository.ajouterJob({
           dateExecution: DateTime.now().plus({ seconds: 15 }).toJSDate(),
           type: Planificateur.JobType.NOTIFIER_ACTUALISATION,
           contenu: {
@@ -113,7 +113,7 @@ export class NotifierActualisationJobHandler extends JobHandler<Job> {
       .set({ hour: 8 })
       .toJSDate()
 
-    await this.planificateurRepository.creerJob({
+    await this.planificateurRepository.ajouterJob({
       dateExecution: demainA8h,
       type: Planificateur.JobType.NOTIFIER_ACTUALISATION,
       contenu: job?.contenu

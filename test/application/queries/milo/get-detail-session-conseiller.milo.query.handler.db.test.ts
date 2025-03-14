@@ -1,12 +1,17 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { DateTime } from 'luxon'
 import { describe } from 'mocha'
 import { createSandbox, SinonSandbox } from 'sinon'
 import { ConseillerAuthorizer } from 'src/application/authorizers/conseiller-authorizer'
 import { GetDetailSessionConseillerMiloQueryHandler } from 'src/application/queries/milo/get-detail-session-conseiller.milo.query.handler.db'
+import { DetailSessionConseillerMiloQueryModel } from 'src/application/queries/query-models/sessions.milo.query.model'
 import { ConseillerMiloSansStructure } from 'src/building-blocks/types/domain-error'
-import { failure, isSuccess, success } from 'src/building-blocks/types/result'
+import { failure, Result, success } from 'src/building-blocks/types/result'
 import { ConseillerMilo } from 'src/domain/milo/conseiller.milo.db'
+import { SessionMilo } from 'src/domain/milo/session.milo'
+import { Planificateur } from 'src/domain/planificateur'
 import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
+import { DateService } from 'src/utils/date-service'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
 import {
@@ -15,17 +20,17 @@ import {
 } from 'test/fixtures/sessions.fixture'
 import { expect, StubbedClass, stubClass } from 'test/utils'
 import { getDatabase } from 'test/utils/database-for-testing'
-import { SessionMilo } from 'src/domain/milo/session.milo'
-import { DateService } from 'src/utils/date-service'
-import { DateTime } from 'luxon'
 
 describe('GetDetailSessionConseillerMiloQueryHandler', () => {
+  const now = DateTime.local(2023)
+
   let getDetailSessionMiloQueryHandler: GetDetailSessionConseillerMiloQueryHandler
   let oidcClient: StubbedClass<OidcClient>
   let conseillerRepository: StubbedType<ConseillerMilo.Repository>
   let sessionRepository: StubbedType<SessionMilo.Repository>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let dateService: StubbedClass<DateService>
+  let planificateurRepository: StubbedType<Planificateur.Repository>
   let sandbox: SinonSandbox
 
   before(() => {
@@ -40,14 +45,18 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
     sessionRepository = stubInterface(sandbox)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     dateService = stubClass(DateService)
-    dateService.now.returns(DateTime.local(2023))
+    planificateurRepository = stubInterface(sandbox)
+
+    dateService.now.returns(now)
+
     getDetailSessionMiloQueryHandler =
       new GetDetailSessionConseillerMiloQueryHandler(
         conseillerRepository,
         sessionRepository,
         conseillerAuthorizer,
         oidcClient,
-        dateService
+        dateService,
+        planificateurRepository
       )
   })
 
@@ -102,23 +111,47 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
 
     describe('récupère le détail d’une session', () => {
       const tokenMilo = 'token-milo'
+      const sessionMilo = uneSessionMilo()
 
-      beforeEach(() => {
+      let result: Result<DetailSessionConseillerMiloQueryModel>
+      beforeEach(async () => {
+        // Given
         conseillerRepository.get
           .withArgs(query.idConseiller)
           .resolves(success(unConseillerMilo()))
         oidcClient.exchangeTokenConseillerMilo
           .withArgs(query.accessToken)
           .resolves(tokenMilo)
-      })
 
-      it('avec toutes ses informations', async () => {
-        // Given
-        sessionRepository.getForConseiller.resolves(success(uneSessionMilo()))
+        sessionMilo.inscriptions = sessionMilo.inscriptions.filter(
+          ({ statut }) => statut !== SessionMilo.Inscription.Statut.INSCRIT
+        )
+        sessionRepository.getForConseiller.resolves(success(sessionMilo))
 
         // When
-        const result = await getDetailSessionMiloQueryHandler.handle(query)
+        result = await getDetailSessionMiloQueryHandler.handle(query)
+      })
 
+      it('déclenche la cloture de la session', async () => {
+        // Then
+        expect(
+          planificateurRepository.ajouterJob
+        ).to.have.been.calledOnceWithExactly({
+          dateExecution: now.toJSDate(),
+          type: 'CLORE_SESSIONS',
+          contenu: {
+            dateCloture: now.toJSDate(),
+            sessions: [
+              {
+                id: sessionMilo.id,
+                idStructureMilo: sessionMilo.idStructureMilo
+              }
+            ]
+          }
+        })
+      })
+
+      it('renvoie la session', async () => {
         // Then
         expect(
           sessionRepository.getForConseiller
@@ -133,13 +166,11 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
         expect(result).to.deep.equal(
           success({
             ...unDetailSessionConseillerMiloQueryModel,
+            session: {
+              ...unDetailSessionConseillerMiloQueryModel.session,
+              statut: SessionMilo.Statut.CLOTUREE
+            },
             inscriptions: [
-              {
-                idJeune: 'id-hermione',
-                nom: 'Granger',
-                prenom: 'Hermione',
-                statut: SessionMilo.Inscription.Statut.INSCRIT
-              },
               {
                 idJeune: 'id-ron',
                 nom: 'Weasley',
@@ -155,76 +186,6 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
             ]
           })
         )
-      })
-
-      describe('et lui affecte le statut ', () => {
-        it('CLOTUREE si elle a une de date de clôture', async () => {
-          // Given
-          const maintenant = DateTime.local(2023)
-          sessionRepository.getForConseiller.resolves(
-            success({
-              ...uneSessionMilo(),
-              dateCloture: maintenant.minus({ hours: 1 })
-            })
-          )
-
-          // When
-          const result = await getDetailSessionMiloQueryHandler.handle(query)
-
-          // Then
-          expect(isSuccess(result)).to.be.true()
-          if (isSuccess(result)) {
-            expect(result.data.session.statut).to.deep.equal(
-              SessionMilo.Statut.CLOTUREE
-            )
-          }
-        })
-
-        it('A_VENIR si elle n’est pas encore passée et qu’elle n’a pas de date de clôture', async () => {
-          // Given
-          const maintenant = DateTime.local(2023)
-          sessionRepository.getForConseiller.resolves(
-            success({
-              ...uneSessionMilo(),
-              fin: maintenant.plus({ days: 1 }),
-              dateCloture: undefined
-            })
-          )
-
-          // When
-          const result = await getDetailSessionMiloQueryHandler.handle(query)
-
-          // Then
-          expect(isSuccess(result)).to.be.true()
-          if (isSuccess(result)) {
-            expect(result.data.session.statut).to.deep.equal(
-              SessionMilo.Statut.A_VENIR
-            )
-          }
-        })
-
-        it('A_CLOTURER si elle est passée et qu’elle n’a pas de date de clôture', async () => {
-          // Given
-          const maintenant = DateTime.local(2023)
-          sessionRepository.getForConseiller.resolves(
-            success({
-              ...uneSessionMilo(),
-              fin: maintenant.minus({ days: 1 }),
-              dateCloture: undefined
-            })
-          )
-
-          // When
-          const result = await getDetailSessionMiloQueryHandler.handle(query)
-
-          // Then
-          expect(isSuccess(result)).to.be.true()
-          if (isSuccess(result)) {
-            expect(result.data.session.statut).to.deep.equal(
-              SessionMilo.Statut.A_CLOTURER
-            )
-          }
-        })
       })
     })
   })

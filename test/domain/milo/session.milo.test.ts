@@ -60,7 +60,7 @@ describe('SessionMilo', () => {
       })
 
       describe('quand la session s’est terminée', () => {
-        it('s’il n’y a pas de participant, retourne le statut CLOTUREE', () => {
+        it('s’il n’y a pas de participant, retourne le statut EMARGEE', () => {
           // Given
           const dateFin = maintenant.minus({ days: 1 })
 
@@ -73,7 +73,7 @@ describe('SessionMilo', () => {
           )
 
           // Then
-          expect(statut).to.equal(SessionMilo.Statut.CLOTUREE)
+          expect(statut).to.equal(SessionMilo.Statut.EMARGEE)
         })
 
         it('s’il y a des participants non émargés, retourne le statut A_CLOTURER', () => {
@@ -97,7 +97,7 @@ describe('SessionMilo', () => {
           expect(statut).to.equal(SessionMilo.Statut.A_CLOTURER)
         })
 
-        it('si tous les partcipants sont émargés, retourne le statut CLOTUREE', () => {
+        it('si tous les partcipants sont émargés, retourne le statut EMARGEE', () => {
           // Given
           const dateFin = maintenant.minus({ days: 1 })
 
@@ -114,7 +114,7 @@ describe('SessionMilo', () => {
           )
 
           // Then
-          expect(statut).to.equal(SessionMilo.Statut.CLOTUREE)
+          expect(statut).to.equal(SessionMilo.Statut.EMARGEE)
         })
       })
     })

@@ -13,6 +13,10 @@ import {
   ConseillerMiloRepositoryToken
 } from 'src/domain/milo/conseiller.milo.db'
 import { SessionMilo } from 'src/domain/milo/session.milo'
+import {
+  Planificateur,
+  PlanificateurRepositoryToken
+} from 'src/domain/planificateur'
 import { SessionConseillerDetailDto } from 'src/infrastructure/clients/dto/milo.dto'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
@@ -21,6 +25,8 @@ import { DateService } from 'src/utils/date-service'
 import { sessionsMiloActives } from '../../../config/feature-flipping'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { SessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
+import JobType = Planificateur.JobType
+import estEmargeeMaisPasClose = SessionMilo.estEmargeeMaisPasClose
 
 const NB_MOIS_PASSES_SESSIONS_A_CLORE = 3
 
@@ -44,6 +50,8 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
     private readonly oidcClient: OidcClient,
     private readonly miloClient: MiloClient,
     private readonly dateService: DateService,
+    @Inject(PlanificateurRepositoryToken)
+    private readonly planificateurRepository: Planificateur.Repository,
     private readonly conseillerAuthorizer: ConseillerAuthorizer
   ) {
     super('GetSessionsConseillerMiloQueryHandler')
@@ -56,19 +64,22 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
       query.idConseiller
     )
     if (isFailure(resultConseiller)) return resultConseiller
+    const conseiller = resultConseiller.data
 
     if (!sessionsMiloActives(this.configService)) return success([])
 
     const resultSessionsDtos = await this.getSessionsDtos(
       query,
-      resultConseiller.data.structure
+      conseiller.structure
     )
     if (isFailure(resultSessionsDtos)) return resultSessionsDtos
 
     const sessionsQueryModels = await this.buildQueryModels(
       resultSessionsDtos.data,
-      resultConseiller.data.structure
+      conseiller.structure
     )
+
+    this.planifierClotureSessions(sessionsQueryModels, conseiller)
 
     if (query.filtrerAClore)
       return success(
@@ -143,5 +154,34 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
         debut: this.dateService.now().minus({ months: maxMoisSessionsAClore })
       }
     else return { debut: query.dateDebut, fin: query.dateFin }
+  }
+
+  private planifierClotureSessions(
+    sessionsQueryModels: SessionConseillerMiloQueryModel[],
+    conseiller: ConseillerMilo
+  ): void {
+    const idsSessionsAClore: string[] = []
+    sessionsQueryModels.forEach(queryModel => {
+      if (estEmargeeMaisPasClose(queryModel.statut)) {
+        idsSessionsAClore.push(queryModel.id)
+        queryModel.statut = SessionMilo.Statut.CLOTUREE
+      }
+    })
+
+    if (idsSessionsAClore.length) {
+      const maintenant = this.dateService.now().toJSDate()
+      const job: Planificateur.Job<Planificateur.JobCloreSessions> = {
+        dateExecution: maintenant,
+        type: JobType.CLORE_SESSIONS,
+        contenu: {
+          dateCloture: maintenant,
+          sessions: idsSessionsAClore.map(id => ({
+            id,
+            idStructureMilo: conseiller.structure.id
+          }))
+        }
+      }
+      this.planificateurRepository.ajouterJob(job)
+    }
   }
 }

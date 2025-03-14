@@ -80,7 +80,7 @@ describe('CreateCampagneCommandHandler', () => {
         // Then
         expect(result).to.deep.equal(success({ id: campagne.id }))
         expect(campagneRepository.save).to.have.been.calledWithExactly(campagne)
-        expect(planificateurRepository.creerJob).to.have.been.calledTwice()
+        expect(planificateurRepository.ajouterJob).to.have.been.calledTwice()
       })
       it('la créer et planifie une seule notif', async () => {
         // Given
@@ -103,7 +103,7 @@ describe('CreateCampagneCommandHandler', () => {
         expect(result).to.deep.equal(success({ id: campagne.id }))
         expect(campagneRepository.save).to.have.been.calledWithExactly(campagne)
         expect(
-          planificateurRepository.creerJob
+          planificateurRepository.ajouterJob
         ).to.have.been.calledOnceWithExactly({
           dateExecution: uneDatetime()
             .plus({ days: 1 })

@@ -19,9 +19,13 @@ export interface InstanceSessionRappel {
 
 export namespace Planificateur {
   export interface Repository {
-    creerJob<T>(job: Job<T>, jobId?: string, params?: JobParams): Promise<void>
+    ajouterJob<T>(
+      job: Job<T>,
+      jobId?: string,
+      params?: JobParams
+    ): Promise<void>
 
-    creerCronJob(cronJob: CronJob): Promise<void>
+    ajouterCronJob(cronJob: CronJob): Promise<void>
 
     subscribe(callback: Handler<unknown>): Promise<void>
 
@@ -77,7 +81,8 @@ export namespace Planificateur {
     NOTIFIER_RAPPEL_CREATION_ACTIONS_DEMARCHES = 'NOTIFIER_RAPPEL_CREATION_ACTIONS_DEMARCHES',
     NOTIFIER_BONNE_ALTERNANCE = 'NOTIFIER_BONNE_ALTERNANCE',
     NOTIFIER_CAMPAGNE = 'NOTIFIER_CAMPAGNE',
-    NOTIFIER_ACTUALISATION = 'NOTIFIER_ACTUALISATION'
+    NOTIFIER_ACTUALISATION = 'NOTIFIER_ACTUALISATION',
+    CLORE_SESSIONS = 'CLORE_SESSIONS'
   }
 
   export interface JobRendezVous {
@@ -88,6 +93,11 @@ export namespace Planificateur {
     idInstance: string
     idDossier: string
     idSession: string
+  }
+
+  export type JobCloreSessions = {
+    dateCloture: Date
+    sessions: Array<{ id: string; idStructureMilo: string }>
   }
 
   export interface JobRappelCreationActionsDemarches {
@@ -143,7 +153,7 @@ export const listeCronJobs: Planificateur.CronJob[] = [
   {
     type: Planificateur.JobType.NOTIFIER_ACTUALISATION,
     expression: '0 8 7 * *',
-    description: 'Tous les 7 du moins à 8h.'
+    description: 'Tous les 7 du mois à 8h.'
   },
   {
     type: Planificateur.JobType.SUIVRE_FILE_EVENEMENTS_MILO,
@@ -236,7 +246,7 @@ export class PlanificateurService {
 
   async planifierLesCronJobs(): Promise<void> {
     for (const cronJob of listeCronJobs) {
-      await this.planificateurRepository.creerCronJob(cronJob)
+      await this.planificateurRepository.ajouterCronJob(cronJob)
     }
   }
 
@@ -248,11 +258,11 @@ export class PlanificateurService {
       .as('days')
 
     if (nombreDeJoursAvantLeRdv > 7) {
-      await this.creerJobRendezVous(rendezVous, 7)
+      await this.ajouterJobRendezVous(rendezVous, 7)
     }
 
     if (nombreDeJoursAvantLeRdv > 1) {
-      await this.creerJobRendezVous(rendezVous, 1)
+      await this.ajouterJobRendezVous(rendezVous, 1)
     }
   }
 
@@ -266,23 +276,23 @@ export class PlanificateurService {
       .as('days')
 
     if (nombreDeJoursAvantLeRdv > 7) {
-      await this.creerJobSession(rappel, 7)
+      await this.ajouterJobSession(rappel, 7)
     }
 
     if (nombreDeJoursAvantLeRdv > 1) {
-      await this.creerJobSession(rappel, 1)
+      await this.ajouterJobSession(rappel, 1)
     }
   }
 
   async planifierRappelAction(action: Action): Promise<void> {
-    await this.creerJobRappelAction(action, 3)
+    await this.ajouterJobRappelAction(action, 3)
   }
 
   async supprimerRappelsParId(id: string): Promise<void> {
     await this.planificateurRepository.supprimerLesJobsSelonPattern(id)
   }
 
-  async creerJobEvenementMiloSiIlNaPasEteCreeAvant(
+  async ajouterJobEvenementMiloSiIlNaPasEteCreeAvant(
     evenementMilo: EvenementMilo
   ): Promise<void> {
     const jobId = `event-milo:${evenementMilo.id}`
@@ -293,7 +303,7 @@ export class PlanificateurService {
       dateExecution: this.dateService.now().toJSDate()
     }
     // Si on créée un job avec un id qui existe déjà, il ne se passe rien
-    await this.planificateurRepository.creerJob(job, jobId, {
+    await this.planificateurRepository.ajouterJob(job, jobId, {
       priority: 2,
       attempts: 3,
       backoff: {
@@ -303,7 +313,7 @@ export class PlanificateurService {
     })
   }
 
-  private async creerJobRendezVous(
+  private async ajouterJobRendezVous(
     rendezVous: RendezVous,
     days: number
   ): Promise<void> {
@@ -315,10 +325,10 @@ export class PlanificateurService {
       type: Planificateur.JobType.RENDEZVOUS,
       contenu: { idRendezVous: rendezVous.id }
     }
-    await this.planificateurRepository.creerJob(job, jobId)
+    await this.planificateurRepository.ajouterJob(job, jobId)
   }
 
-  private async creerJobSession(
+  private async ajouterJobSession(
     rappel: InstanceSessionRappel,
     days: number
   ): Promise<void> {
@@ -330,10 +340,10 @@ export class PlanificateurService {
       type: Planificateur.JobType.RAPPEL_SESSION,
       contenu: rappel
     }
-    await this.planificateurRepository.creerJob(job, jobId)
+    await this.planificateurRepository.ajouterJob(job, jobId)
   }
 
-  private async creerJobRappelAction(
+  private async ajouterJobRappelAction(
     action: Action,
     days: number
   ): Promise<void> {
@@ -344,7 +354,7 @@ export class PlanificateurService {
       type: Planificateur.JobType.RAPPEL_ACTION,
       contenu: { idAction: action.id }
     }
-    await this.planificateurRepository.creerJob(job, jobId)
+    await this.planificateurRepository.ajouterJob(job, jobId)
   }
 }
 
@@ -354,6 +364,7 @@ export function ProcessJobType(type: Planificateur.JobType): ClassDecorator {
   }
 }
 
+// TODO refactorer tout ça 👇 ça devrait être des méthodes publiques de planificateurService
 export async function planifierRappelsInstanceSessionMilo(
   rappel: InstanceSessionRappel,
   planificateurService: PlanificateurService,
