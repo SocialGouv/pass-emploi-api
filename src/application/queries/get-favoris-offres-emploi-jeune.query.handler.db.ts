@@ -41,7 +41,7 @@ export class GetFavorisOffresEmploiJeuneQueryHandler extends QueryHandler<
     idJeune: string
   ): Promise<FavoriOffreEmploiQueryModel[]> {
     const favorisIdsSql = await FavoriOffreEmploiSqlModel.findAll({
-      attributes: ['idOffre'],
+      attributes: ['idOffre', 'dateCandidature'],
       where: {
         idJeune
       },

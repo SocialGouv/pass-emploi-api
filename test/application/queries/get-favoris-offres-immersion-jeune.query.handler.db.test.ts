@@ -16,6 +16,7 @@ describe('GetFavorisOffresImmersionJeuneQueryHandler', () => {
   const idJeune = 'ABCDE'
   let getFavorisOffresImmersionJeuneQueryHandler: GetFavorisOffresImmersionJeuneQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
+  const now = DateTime.now()
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
@@ -31,7 +32,8 @@ describe('GetFavorisOffresImmersionJeuneQueryHandler', () => {
     await offresImmersionRepository.save({
       idBeneficiaire: idJeune,
       offre: unFavoriOffreImmersion(),
-      dateCreation: DateTime.now()
+      dateCreation: now,
+      dateCandidature: now
     })
 
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
@@ -45,7 +47,7 @@ describe('GetFavorisOffresImmersionJeuneQueryHandler', () => {
       const expectedResult: FavoriOffreImmersionQueryModel[] = [
         {
           id: unFavoriOffreImmersion().id,
-          dateCandidature: undefined
+          dateCandidature: now.toISO()
         }
       ]
 

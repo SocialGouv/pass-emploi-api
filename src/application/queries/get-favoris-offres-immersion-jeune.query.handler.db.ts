@@ -43,7 +43,7 @@ export class GetFavorisOffresImmersionJeuneQueryHandler extends QueryHandler<
     idJeune: string
   ): Promise<FavoriOffreImmersionQueryModel[]> {
     const favorisIdsSql = await FavoriOffreImmersionSqlModel.findAll({
-      attributes: ['idOffre'],
+      attributes: ['idOffre', 'dateCandidature'],
       where: {
         idJeune
       },

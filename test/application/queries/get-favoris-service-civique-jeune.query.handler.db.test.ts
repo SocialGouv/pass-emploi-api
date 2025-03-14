@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../../src/application/queries/get-favoris-service-civique-jeune.query.handler.db'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
@@ -46,17 +47,20 @@ describe('GetFavorisServiceCiviqueJeuneQueryHandler', () => {
   })
 
   describe('handle', () => {
-    const unJeune = unJeuneDto()
-    const favori = unFavoriOffreEngagement({
-      idJeune: unJeune.id,
-      idOffre: '123',
-      organisation: 'organisation',
-      domaine: 'domaine',
-      dateDeDebut: '2021-01-01',
-      titre: 'titre',
-      ville: 'ville'
-    })
-    beforeEach(async () => {
+    it('renvoie les favoris', async () => {
+      const now = DateTime.now()
+      const unJeune = unJeuneDto()
+      const favori = unFavoriOffreEngagement({
+        idJeune: unJeune.id,
+        idOffre: '123',
+        organisation: 'organisation',
+        domaine: 'domaine',
+        dateDeDebut: '2021-01-01',
+        titre: 'titre',
+        ville: 'ville',
+        dateCandidature: now.toJSDate()
+      })
+
       const conseillerDto = unConseillerDto()
       await ConseillerSqlModel.creer(conseillerDto)
       const jeuneDto: AsSql<JeuneDto> = {
@@ -65,9 +69,7 @@ describe('GetFavorisServiceCiviqueJeuneQueryHandler', () => {
       }
       await JeuneSqlModel.creer(jeuneDto)
       await FavoriOffreEngagementSqlModel.create(favori)
-    })
 
-    it('renvoie les favoris', async () => {
       // When
       const result = await getFavorisServiceCiviqueJeuneQueryHandler.handle({
         idJeune: unJeune.id
@@ -75,7 +77,7 @@ describe('GetFavorisServiceCiviqueJeuneQueryHandler', () => {
 
       // Then
       expect(result).to.deep.equal([
-        { id: favori.idOffre, dateCandidature: undefined }
+        { id: favori.idOffre, dateCandidature: now.toISO() }
       ])
     })
   })

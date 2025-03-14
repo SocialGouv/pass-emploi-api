@@ -25,8 +25,10 @@ describe('GetFavorisOffresEmploiJeuneQueryHandler', () => {
       new GetFavorisOffresEmploiJeuneQueryHandler(jeuneAuthorizer)
   })
 
-  beforeEach(async () => {
+  it('renvoie la liste des favoris', async () => {
     // Given
+    const now = DateTime.now()
+
     await ConseillerSqlModel.creer(unConseillerDto({ id: 'ZIDANE' }))
     await JeuneSqlModel.creer(
       unJeuneDto({
@@ -37,23 +39,20 @@ describe('GetFavorisOffresEmploiJeuneQueryHandler', () => {
     const offreEmploi = uneOffreEmploi()
     const favori: Offre.Favori<Offre.Favori.Emploi> = {
       idBeneficiaire: 'ABCDE',
-      dateCreation: DateTime.now(),
-      offre: offreEmploi
+      offre: offreEmploi,
+      dateCreation: now,
+      dateCandidature: now
     }
     await offresEmploiHttpSqlRepository.save(favori)
-  })
 
-  describe('quand le jeune a des favoris', () => {
-    it('renvoie la liste des favoris', async () => {
-      // When
-      const favoris = await getFavorisOffresEmploiJeuneQueryHandler.handle({
-        idJeune: 'ABCDE'
-      })
-
-      // Then
-      expect(favoris).to.deep.equal([
-        { id: '123DXPM', dateCandidature: undefined }
-      ])
+    // When
+    const favoris = await getFavorisOffresEmploiJeuneQueryHandler.handle({
+      idJeune: 'ABCDE'
     })
+
+    // Then
+    expect(favoris).to.deep.equal([
+      { id: '123DXPM', dateCandidature: now.toISO() }
+    ])
   })
 })
