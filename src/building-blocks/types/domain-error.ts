@@ -64,7 +64,7 @@ export class ReponsesCampagneInvalide implements DomainError {
   readonly message: string
 
   constructor() {
-    this.message = `Il faut répondre au moins à la première question`
+    this.message = `Il faut répondre au mois à la première question`
   }
 }
 

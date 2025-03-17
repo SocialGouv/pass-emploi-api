@@ -11,7 +11,7 @@ import {
   success
 } from '../../../src/building-blocks/types/result'
 import { failureApi } from '../../../src/building-blocks/types/result-api'
-import { estPoleEmploi } from '../../../src/domain/core'
+import { estFranceTravail } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { DocumentPoleEmploiDto } from '../../../src/infrastructure/clients/dto/pole-emploi.dto'
 import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
@@ -123,7 +123,7 @@ describe('GetCVPoleEmploiQueryHandler', () => {
         .withArgs(
           query.idJeune,
           utilisateur,
-          estPoleEmploi(utilisateur.structure)
+          estFranceTravail(utilisateur.structure)
         )
         .resolves(emptySuccess())
 

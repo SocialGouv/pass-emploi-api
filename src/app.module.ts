@@ -370,6 +370,7 @@ import { DateService } from './utils/date-service'
 import { IdService } from './utils/id-service'
 import { configureLoggerModule } from './utils/logger.module'
 import { RateLimiterService } from './utils/rate-limiter.service'
+import { NotifierActualisationJobHandler } from './application/jobs/notifier-actualisation.job.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -838,7 +839,8 @@ export const JobHandlerProviders = [
   RecupererAnalyseAntivirusJobHandler,
   NotifierRappelCreationActionsDemarchesJobHandler,
   NotifierBonneAlternanceJobHandler,
-  NotifierCampagneJobHandler
+  NotifierCampagneJobHandler,
+  NotifierActualisationJobHandler
 ]
 
 @Module(buildModuleMetadata())

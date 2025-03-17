@@ -19,7 +19,7 @@ import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
 import { unRendezVousQueryModel } from '../../../fixtures/query-models/rendez-vous.query-model.fixtures'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
-import { Core, estPoleEmploi } from '../../../../src/domain/core'
+import { Core, estFranceTravail } from '../../../../src/domain/core'
 import Structure = Core.Structure
 import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import { uneDemarcheQueryModel } from '../../../fixtures/query-models/demarche.query-model.fixtures'
@@ -339,7 +339,7 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
       expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
         query.idJeune,
         utilisateur,
-        estPoleEmploi(utilisateur.structure)
+        estFranceTravail(utilisateur.structure)
       )
     })
   })
