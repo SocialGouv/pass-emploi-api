@@ -81,7 +81,7 @@ export class CreateCampagneCommandHandler extends CommandHandler<
         .set(heureMinuteExecution)
     }
 
-    await this.planificateurRepository.creerJob({
+    await this.planificateurRepository.ajouterJob({
       dateExecution: dateExecution.toJSDate(),
       type: Planificateur.JobType.NOTIFIER_CAMPAGNE,
       contenu: {
@@ -96,7 +96,7 @@ export class CreateCampagneCommandHandler extends CommandHandler<
       if (rappel.weekday === jeudi) {
         rappel = maintenant.plus({ days: 8 }).setZone('Europe/Paris')
       }
-      await this.planificateurRepository.creerJob({
+      await this.planificateurRepository.ajouterJob({
         dateExecution: rappel.set(heureMinuteExecution).toJSDate(),
         type: Planificateur.JobType.NOTIFIER_CAMPAGNE,
         contenu: {

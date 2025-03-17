@@ -198,7 +198,6 @@ import { FindAllOffresEmploiQueryGetter } from './application/queries/query-gett
 import { FindAllOffresImmersionQueryGetter } from './application/queries/query-getters/find-all-offres-immersion.query.getter.db'
 import { FindAllOffresServicesCiviqueQueryGetter } from './application/queries/query-getters/find-all-offres-services-civique.query.getter'
 import { GetCampagneQueryGetter } from './application/queries/query-getters/get-campagne.query.getter'
-import { GetSessionsConseillerMiloQueryGetter } from './application/queries/query-getters/milo/get-sessions-conseiller.milo.query.getter.db'
 import { GetDemarchesQueryGetter } from './application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from './application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { RechercherTypesDemarcheQueryHandler } from './application/queries/rechercher-types-demarche.query.handler'
@@ -786,7 +785,6 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetEvenementsEmploiQueryHandler,
     GetEvenementEmploiQueryHandler,
     GetSessionsConseillerMiloQueryHandler,
-    GetSessionsConseillerMiloQueryGetter,
     GetAgendaSessionsConseillerMiloQueryHandler,
     GetSessionsJeuneMiloQueryHandler,
     GetSessionsJeuneMiloQueryGetter,
