@@ -33,23 +33,25 @@ export class CloreSessionsJobHandler extends JobHandler<
 
     const query = `
         INSERT INTO session_milo (id, date_premiere_configuration, date_modification, date_cloture, id_structure_milo)
-        VALUES ?
+        VALUES :values
         ON CONFLICT (id) DO UPDATE
-            SET date_modification = excluded.date_modification, date_cloture = excluded.date_cloture
+            SET date_modification = :dateExecution, date_cloture = :dateCloture
             WHERE session_milo.date_cloture IS NULL
         RETURNING date_premiere_configuration as datepremiereconfiguration;
     `
 
     const [rows, nbAffectedRows] = (await this.sequelize.query(query, {
-      replacements: [
-        contenu.idsSessions.map(id => [
+      replacements: {
+        values: contenu.idsSessions.map(id => [
           id,
           debutExecutionJob.toSQL(),
           debutExecutionJob.toSQL(),
           contenu.dateCloture,
           contenu.idStructureMilo
-        ])
-      ],
+        ]),
+        dateExecution: debutExecutionJob.toSQL(),
+        dateCloture: contenu.dateCloture
+      },
       type: QueryTypes.RAW
     })) as [Array<{ datepremiereconfiguration: Date }>, number]
     resultat.nombreSessionsCloses = nbAffectedRows
