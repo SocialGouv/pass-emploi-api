@@ -43,14 +43,14 @@ export class NotifierActualisationJobHandler extends JobHandler<Job> {
   }
 
   async handle(
-    job: Planificateur.Job<{
+    job?: Planificateur.Job<{
       offset: number
       nbNotifsEnvoyees: number
     }>
   ): Promise<SuiviJob> {
     let succes = true
     const stats: Stats = {
-      nbNotifsEnvoyees: job.contenu.nbNotifsEnvoyees,
+      nbNotifsEnvoyees: job?.contenu?.nbNotifsEnvoyees || 0,
       totalBeneficiairesANotifier: 0,
       estLaDerniereExecution: false,
       reprogrammmationPourLeLendemain: false
@@ -61,11 +61,11 @@ export class NotifierActualisationJobHandler extends JobHandler<Job> {
     const jeudi = 4
 
     if (jour === jeudi || heure >= 18) {
-      return this.reprogrammerPourLeLendemain(debutExecutionJob, job, stats)
+      return this.reprogrammerPourLeLendemain(debutExecutionJob, stats, job)
     }
 
     try {
-      const offset = job.contenu.offset
+      const offset = job?.contenu?.offset || 0
 
       const jeunesANotifier = await recupererBeneficiairesANotifier(offset)
 
@@ -104,8 +104,8 @@ export class NotifierActualisationJobHandler extends JobHandler<Job> {
 
   private async reprogrammerPourLeLendemain(
     maintenant: DateTime,
-    job: Planificateur.Job<{ offset: number; nbNotifsEnvoyees: number }>,
-    stats: Stats
+    stats: Stats,
+    job?: Planificateur.Job<{ offset: number; nbNotifsEnvoyees: number }>
   ): Promise<SuiviJob> {
     const demainA8h = maintenant
       .plus({ days: 1 })
@@ -116,7 +116,7 @@ export class NotifierActualisationJobHandler extends JobHandler<Job> {
     await this.planificateurRepository.creerJob({
       dateExecution: demainA8h,
       type: Planificateur.JobType.NOTIFIER_ACTUALISATION,
-      contenu: job.contenu
+      contenu: job?.contenu
     })
 
     stats.reprogrammmationPourLeLendemain = true
@@ -137,7 +137,7 @@ export class NotifierActualisationJobHandler extends JobHandler<Job> {
         const notification: Notification.Message = {
           token: pushNotificationToken!,
           notification: {
-            title: 'La période d’actualisation Pôle emploi a commencé',
+            title: 'La période d’actualisation France Travail a commencé',
             body: 'Pensez à vous actualiser avant le 15 du mois'
           },
           data: {
