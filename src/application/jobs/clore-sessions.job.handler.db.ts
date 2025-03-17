@@ -42,12 +42,12 @@ export class CloreSessionsJobHandler extends JobHandler<
 
     const [rows, nbAffectedRows] = (await this.sequelize.query(query, {
       replacements: [
-        contenu.sessions.map(({ id, idStructureMilo }) => [
+        contenu.idsSessions.map(id => [
           id,
           debutExecutionJob.toSQL(),
           debutExecutionJob.toSQL(),
           contenu.dateCloture,
-          idStructureMilo
+          contenu.idStructureMilo
         ])
       ],
       type: QueryTypes.RAW

@@ -9,7 +9,7 @@ import { ConseillerMiloSansStructure } from 'src/building-blocks/types/domain-er
 import { failure, Result, success } from 'src/building-blocks/types/result'
 import { ConseillerMilo } from 'src/domain/milo/conseiller.milo.db'
 import { SessionMilo } from 'src/domain/milo/session.milo'
-import { Planificateur } from 'src/domain/planificateur'
+import { PlanificateurService } from 'src/domain/planificateur'
 import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { DateService } from 'src/utils/date-service'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
@@ -30,7 +30,7 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
   let sessionRepository: StubbedType<SessionMilo.Repository>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let dateService: StubbedClass<DateService>
-  let planificateurRepository: StubbedType<Planificateur.Repository>
+  let planificateurService: StubbedClass<PlanificateurService>
   let sandbox: SinonSandbox
 
   before(() => {
@@ -45,7 +45,7 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
     sessionRepository = stubInterface(sandbox)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     dateService = stubClass(DateService)
-    planificateurRepository = stubInterface(sandbox)
+    planificateurService = stubClass(PlanificateurService)
 
     dateService.now.returns(now)
 
@@ -56,7 +56,7 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
         conseillerAuthorizer,
         oidcClient,
         dateService,
-        planificateurRepository
+        planificateurService
       )
   })
 
@@ -135,20 +135,13 @@ describe('GetDetailSessionConseillerMiloQueryHandler', () => {
       it('déclenche la cloture de la session', async () => {
         // Then
         expect(
-          planificateurRepository.ajouterJob
-        ).to.have.been.calledOnceWithExactly({
-          dateExecution: now.toJSDate(),
-          type: 'CLORE_SESSIONS',
-          contenu: {
-            dateCloture: now.toJSDate(),
-            sessions: [
-              {
-                id: sessionMilo.id,
-                idStructureMilo: sessionMilo.idStructureMilo
-              }
-            ]
-          }
-        })
+          planificateurService.ajouterJobClotureSessions
+        ).to.have.been.calledOnceWithExactly(
+          [sessionMilo.id],
+          sessionMilo.idStructureMilo,
+          now,
+          sandbox.match.object
+        )
       })
 
       it('renvoie la session', async () => {

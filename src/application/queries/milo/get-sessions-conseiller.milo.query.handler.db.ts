@@ -13,10 +13,7 @@ import {
   ConseillerMiloRepositoryToken
 } from 'src/domain/milo/conseiller.milo.db'
 import { SessionMilo } from 'src/domain/milo/session.milo'
-import {
-  Planificateur,
-  PlanificateurRepositoryToken
-} from 'src/domain/planificateur'
+import { PlanificateurService } from 'src/domain/planificateur'
 import { SessionConseillerDetailDto } from 'src/infrastructure/clients/dto/milo.dto'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
@@ -25,7 +22,6 @@ import { DateService } from 'src/utils/date-service'
 import { sessionsMiloActives } from '../../../config/feature-flipping'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { SessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
-import JobType = Planificateur.JobType
 import estEmargeeMaisPasClose = SessionMilo.estEmargeeMaisPasClose
 
 const NB_MOIS_PASSES_SESSIONS_A_CLORE = 3
@@ -50,8 +46,7 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
     private readonly oidcClient: OidcClient,
     private readonly miloClient: MiloClient,
     private readonly dateService: DateService,
-    @Inject(PlanificateurRepositoryToken)
-    private readonly planificateurRepository: Planificateur.Repository,
+    private readonly planificateurService: PlanificateurService,
     private readonly conseillerAuthorizer: ConseillerAuthorizer
   ) {
     super('GetSessionsConseillerMiloQueryHandler')
@@ -169,19 +164,12 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
     })
 
     if (idsSessionsAClore.length) {
-      const maintenant = this.dateService.now().toJSDate()
-      const job: Planificateur.Job<Planificateur.JobCloreSessions> = {
-        dateExecution: maintenant,
-        type: JobType.CLORE_SESSIONS,
-        contenu: {
-          dateCloture: maintenant,
-          sessions: idsSessionsAClore.map(id => ({
-            id,
-            idStructureMilo: conseiller.structure.id
-          }))
-        }
-      }
-      this.planificateurRepository.ajouterJob(job)
+      this.planificateurService.ajouterJobClotureSessions(
+        idsSessionsAClore,
+        conseiller.structure.id,
+        this.dateService.now(),
+        this.logger
+      )
     }
   }
 }

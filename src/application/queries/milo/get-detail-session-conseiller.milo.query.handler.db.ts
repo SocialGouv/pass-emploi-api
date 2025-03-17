@@ -6,10 +6,7 @@ import { Authentification } from 'src/domain/authentification'
 import { estMilo } from 'src/domain/core'
 import { Conseiller } from 'src/domain/milo/conseiller'
 import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo.db'
-import {
-  Planificateur,
-  PlanificateurRepositoryToken
-} from 'src/domain/planificateur'
+import { PlanificateurService } from 'src/domain/planificateur'
 import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { DateService } from 'src/utils/date-service'
 import {
@@ -19,8 +16,6 @@ import {
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { mapSessionToDetailSessionConseillerQueryModel } from '../query-mappers/milo.mappers'
 import { DetailSessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
-import JobType = Planificateur.JobType
-import estEmargeeMaisPasClose = SessionMilo.estEmargeeMaisPasClose
 
 export interface GetDetailSessionConseillerMiloQuery extends Query {
   idSession: string
@@ -41,8 +36,7 @@ export class GetDetailSessionConseillerMiloQueryHandler extends QueryHandler<
     private conseillerAuthorizer: ConseillerAuthorizer,
     private oidcClient: OidcClient,
     private dateService: DateService,
-    @Inject(PlanificateurRepositoryToken)
-    private readonly planificateurRepository: Planificateur.Repository
+    private readonly planificateurService: PlanificateurService
   ) {
     super('GetDetailSessionMiloQueryHandler')
   }
@@ -75,7 +69,7 @@ export class GetDetailSessionConseillerMiloQueryHandler extends QueryHandler<
       this.dateService.now()
     )
 
-    if (estEmargeeMaisPasClose(queryModel.session.statut)) {
+    if (SessionMilo.estEmargeeMaisPasClose(queryModel.session.statut)) {
       this.planifierClotureSession(session)
       queryModel.session.statut = SessionMilo.Statut.CLOTUREE
     }
@@ -99,15 +93,11 @@ export class GetDetailSessionConseillerMiloQueryHandler extends QueryHandler<
   }
 
   private planifierClotureSession(session: SessionMilo): void {
-    const maintenant = this.dateService.now().toJSDate()
-    const job: Planificateur.Job<Planificateur.JobCloreSessions> = {
-      dateExecution: maintenant,
-      type: JobType.CLORE_SESSIONS,
-      contenu: {
-        dateCloture: maintenant,
-        sessions: [{ id: session.id, idStructureMilo: session.idStructureMilo }]
-      }
-    }
-    this.planificateurRepository.ajouterJob(job)
+    this.planificateurService.ajouterJobClotureSessions(
+      [session.id],
+      session.idStructureMilo,
+      this.dateService.now(),
+      this.logger
+    )
   }
 }

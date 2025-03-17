@@ -11,7 +11,7 @@ import { ConseillerMiloSansStructure } from 'src/building-blocks/types/domain-er
 import { failure, Success, success } from 'src/building-blocks/types/result'
 import { ConseillerMilo } from 'src/domain/milo/conseiller.milo.db'
 import { SessionMilo } from 'src/domain/milo/session.milo'
-import { Planificateur } from 'src/domain/planificateur'
+import { PlanificateurService } from 'src/domain/planificateur'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
@@ -34,7 +34,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
   let miloClient: StubbedClass<MiloClient>
   let oidcClient: StubbedClass<OidcClient>
   let dateService: StubbedClass<DateService>
-  let planificateurRepository: StubbedType<Planificateur.Repository>
+  let planificateurService: StubbedClass<PlanificateurService>
   let sandbox: SinonSandbox
 
   before(async () => {
@@ -47,7 +47,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
     miloClient = stubClass(MiloClient)
     oidcClient = stubClass(OidcClient)
     dateService = stubClass(DateService)
-    planificateurRepository = stubInterface(sandbox)
+    planificateurService = stubClass(PlanificateurService)
 
     dateService.now.returns(maintenantEn2023)
 
@@ -57,7 +57,7 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
       oidcClient,
       miloClient,
       dateService,
-      planificateurRepository,
+      planificateurService,
       conseillerAuthorizer
     )
   })
@@ -243,15 +243,13 @@ describe('GetSessionsConseillerMiloQueryHandler', () => {
 
         // Then
         expect(
-          planificateurRepository.ajouterJob
-        ).to.have.been.calledOnceWithExactly({
-          dateExecution: maintenantEn2023.toJSDate(),
-          type: 'CLORE_SESSIONS',
-          contenu: {
-            dateCloture: maintenantEn2023.toJSDate(),
-            sessions: [{ id: '1', idStructureMilo: conseiller.structure.id }]
-          }
-        })
+          planificateurService.ajouterJobClotureSessions
+        ).to.have.been.calledOnceWithExactly(
+          ['1'],
+          conseiller.structure.id,
+          maintenantEn2023,
+          sandbox.match.object
+        )
         expect((result as Success<never>).data[0]).to.deep.include({
           statut: SessionMilo.Statut.CLOTUREE
         })

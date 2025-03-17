@@ -1,6 +1,7 @@
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import { Inject, Injectable, Logger, LoggerService } from '@nestjs/common'
 import * as APM from 'elastic-apm-node'
 import { DateTime } from 'luxon'
+import { getAPMInstance } from 'src/infrastructure/monitoring/apm.init'
 import { DateService } from '../utils/date-service'
 import { buildError } from '../utils/logger.module'
 import { Action } from './action/action'
@@ -97,7 +98,8 @@ export namespace Planificateur {
 
   export type JobCloreSessions = {
     dateCloture: Date
-    sessions: Array<{ id: string; idStructureMilo: string }>
+    idsSessions: string[]
+    idStructureMilo: string
   }
 
   export interface JobRappelCreationActionsDemarches {
@@ -238,11 +240,15 @@ export const listeCronJobs: Planificateur.CronJob[] = [
 
 @Injectable()
 export class PlanificateurService {
+  private readonly apmService: APM.Agent
+
   constructor(
     @Inject(PlanificateurRepositoryToken)
     private planificateurRepository: Planificateur.Repository,
     private dateService: DateService
-  ) {}
+  ) {
+    this.apmService = getAPMInstance()
+  }
 
   async planifierLesCronJobs(): Promise<void> {
     for (const cronJob of listeCronJobs) {
@@ -311,6 +317,36 @@ export class PlanificateurService {
         delay: 5 * 60 * 1000
       }
     })
+  }
+
+  async ajouterJobClotureSessions(
+    idsSessionsAClore: string[],
+    idStructureMilo: string,
+    dateCloture: DateTime,
+    logger: LoggerService
+  ): Promise<void> {
+    const maintenant = this.dateService.nowJs()
+
+    try {
+      const job: Planificateur.Job<Planificateur.JobCloreSessions> = {
+        dateExecution: maintenant,
+        type: Planificateur.JobType.CLORE_SESSIONS,
+        contenu: {
+          dateCloture: dateCloture.toJSDate(),
+          idsSessions: idsSessionsAClore,
+          idStructureMilo
+        }
+      }
+      await this.planificateurRepository.ajouterJob(job)
+    } catch (e) {
+      logger.error(
+        buildError(
+          `La cloture des sessions de la structure ${idStructureMilo} a échoué`,
+          e
+        )
+      )
+      this.apmService.captureError(e)
+    }
   }
 
   private async ajouterJobRendezVous(

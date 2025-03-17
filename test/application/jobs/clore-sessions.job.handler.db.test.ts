@@ -53,10 +53,8 @@ describe('CloreSessionsJobHandler', () => {
       type: Planificateur.JobType.CLORE_SESSIONS,
       dateExecution,
       contenu: {
-        sessions: idSessionsAClore.map(id => ({
-          id,
-          idStructureMilo: structureMilo.id
-        })),
+        idsSessions: idSessionsAClore,
+        idStructureMilo: structureMilo.id,
         dateCloture: dateCloture.toJSDate()
       }
     }
