@@ -25,7 +25,7 @@ export const uneSessionConseillerMiloQueryModel: SessionConseillerMiloQueryModel
       code: OffreTypeCode.WORKSHOP,
       label: 'Atelier'
     },
-    statut: SessionMilo.Statut.A_CLOTURER,
+    statut: SessionMilo.Statut.CLOTUREE,
     nombreParticipants: 2
   }
 
