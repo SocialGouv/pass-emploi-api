@@ -211,7 +211,7 @@ describe('TeleverserFichierCommandHandler', () => {
             'ANALYSE_EN_COURS'
           )
           expect(
-            planificateurRepository.creerJob
+            planificateurRepository.ajouterJob
           ).to.have.been.calledOnceWithExactly({
             dateExecution: new Date('2024-04-12T12:00:15'),
             type: Planificateur.JobType.RECUPERER_ANALYSE_ANTIVIRUS,

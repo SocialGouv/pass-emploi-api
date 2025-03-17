@@ -62,7 +62,7 @@ describe('WorkerService', () => {
         type: Planificateur.JobType.FAKE,
         contenu: { message: 'my test dummy job' }
       }
-      await planificateurRepository.creerJob(job)
+      await planificateurRepository.ajouterJob(job)
     })
 
     it('exécute la commande idoine', done => {

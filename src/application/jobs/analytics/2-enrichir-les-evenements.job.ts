@@ -56,7 +56,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
           type: Planificateur.JobType.CHARGER_LES_VUES_ANALYTICS,
           contenu: undefined
         }
-        await this.planificateurRepository.creerJob(jobCalculerLesVues)
+        await this.planificateurRepository.ajouterJob(jobCalculerLesVues)
       }
     } catch (e) {
       erreur = e

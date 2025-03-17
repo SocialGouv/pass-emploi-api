@@ -96,7 +96,7 @@ describe('NotifierCampagneJobHandler', () => {
         nbNotifsEnvoyees: 2,
         estLaDerniereExecution: true
       })
-      expect(planificateurRepository.creerJob).not.to.have.been.called()
+      expect(planificateurRepository.ajouterJob).not.to.have.been.called()
     })
     it("envoie notifications aux jeunes qui n'ont pas répondu", async () => {
       // Given
@@ -138,7 +138,7 @@ describe('NotifierCampagneJobHandler', () => {
         },
         'idJeune2'
       )
-      expect(planificateurRepository.creerJob).not.to.have.been.called()
+      expect(planificateurRepository.ajouterJob).not.to.have.been.called()
     })
   })
 })
