@@ -51,7 +51,7 @@ describe('PlanificateurRedisRepository', () => {
         }
 
         // When
-        await planificateurRedisRepository.creerJob(job)
+        await planificateurRedisRepository.ajouterJob(job)
 
         // Then
         const redisJob = await redisClient.hGetAll('bull:JobQueue:1')
@@ -71,7 +71,7 @@ describe('PlanificateurRedisRepository', () => {
         const idJob = 'test'
 
         // When
-        await planificateurRedisRepository.creerJob(job, idJob)
+        await planificateurRedisRepository.ajouterJob(job, idJob)
 
         // Then
         const redisJob = await redisClient.hGetAll(`bull:JobQueue:${idJob}`)
@@ -93,7 +93,7 @@ describe('PlanificateurRedisRepository', () => {
             idRendezVous: 'id'
           }
         }
-        await planificateurRedisRepository.creerJob(job)
+        await planificateurRedisRepository.ajouterJob(job)
 
         // When
         await planificateurRedisRepository.supprimerLesJobs()
@@ -117,7 +117,7 @@ describe('PlanificateurRedisRepository', () => {
           }
         }
         const idJob = 'test'
-        await planificateurRedisRepository.creerJob(job, idJob)
+        await planificateurRedisRepository.ajouterJob(job, idJob)
 
         // When
         await planificateurRedisRepository.supprimerLesJobsSelonPattern(idJob)
@@ -139,7 +139,7 @@ describe('PlanificateurRedisRepository', () => {
         }
 
         // When
-        await planificateurRedisRepository.creerCronJob(cron)
+        await planificateurRedisRepository.ajouterCronJob(cron)
 
         // Then
         const crons =
@@ -159,7 +159,7 @@ describe('PlanificateurRedisRepository', () => {
           type: Planificateur.JobType.NOUVELLES_OFFRES_EMPLOI,
           expression: '* * * * *'
         }
-        await planificateurRedisRepository.creerCronJob(cron)
+        await planificateurRedisRepository.ajouterCronJob(cron)
 
         // When
         await planificateurRedisRepository.supprimerLesCronJobs()

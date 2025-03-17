@@ -43,7 +43,7 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     })
   }
 
-  async creerJob<T>(
+  async ajouterJob<T>(
     job: Planificateur.Job<T>,
     jobId?: string,
     params?: Planificateur.JobParams
@@ -92,7 +92,7 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     await this.queue.close()
   }
 
-  async creerCronJob(cron: Planificateur.CronJob): Promise<void> {
+  async ajouterCronJob(cron: Planificateur.CronJob): Promise<void> {
     await this.queue.add(cron, {
       jobId: cron.type,
       repeat: {
