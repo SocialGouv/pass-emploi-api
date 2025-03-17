@@ -60,7 +60,7 @@ export class RefreshJddCommandHandler extends CommandHandler<
         menage: command.menage
       }
     }
-    await this.planificateurRepository.creerJob(job)
+    await this.planificateurRepository.ajouterJob(job)
     return emptySuccess()
   }
 

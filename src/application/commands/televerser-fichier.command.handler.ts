@@ -180,7 +180,7 @@ export class TeleverserFichierCommandHandler extends CommandHandler<
         .now()
         .plus({ seconds: intervalleRecuperationResultat })
       this.logger.log('Planification JOB récupération analyse PJ')
-      this.planificateurRepository.creerJob({
+      this.planificateurRepository.ajouterJob({
         dateExecution: dateExecutionRecuperationResultat.toJSDate(),
         type: Planificateur.JobType.RECUPERER_ANALYSE_ANTIVIRUS,
         contenu: { idFichier: fichier.id }

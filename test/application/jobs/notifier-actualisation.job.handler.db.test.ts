@@ -86,7 +86,7 @@ describe('NotifierActualisationJobHandler', () => {
         reprogrammmationPourLeLendemain: false,
         totalBeneficiairesANotifier: 1
       })
-      expect(planificateurRepository.creerJob).not.to.have.been.called()
+      expect(planificateurRepository.ajouterJob).not.to.have.been.called()
     })
     it("replanifie quand c'est 18h passée", async () => {
       // Given
@@ -117,7 +117,7 @@ describe('NotifierActualisationJobHandler', () => {
         totalBeneficiairesANotifier: 0
       })
       expect(
-        planificateurRepository.creerJob
+        planificateurRepository.ajouterJob
       ).to.have.been.calledOnceWithExactly({
         dateExecution: uneDatetime()
           .plus({ days: 1 })

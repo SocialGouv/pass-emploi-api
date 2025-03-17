@@ -54,7 +54,7 @@ export class SuivreEvenementsMiloCronJobHandler extends JobHandler<Job> {
 
         const evenementsAPlanifier = trouverEvenementsAPlanifier(evenementsMilo)
         for (const evenementAPlanifier of evenementsAPlanifier) {
-          await this.planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant(
+          await this.planificateurService.ajouterJobEvenementMiloSiIlNaPasEteCreeAvant(
             evenementAPlanifier
           )
         }

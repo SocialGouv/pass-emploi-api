@@ -108,7 +108,7 @@ export class NotifierCampagneJobHandler extends JobHandler<Job> {
 
       stats.nbNotifsEnvoyees += idsJeunesANotifier.length
       if (idsJeunesANotifier.length === PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM) {
-        this.planificateurRepository.creerJob({
+        this.planificateurRepository.ajouterJob({
           dateExecution: DateTime.now().plus({ seconds: 15 }).toJSDate(),
           type: Planificateur.JobType.NOTIFIER_CAMPAGNE,
           contenu: {
