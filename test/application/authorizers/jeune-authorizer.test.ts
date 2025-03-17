@@ -2,7 +2,7 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { DroitsInsuffisants } from '../../../src/building-blocks/types/domain-error'
-import { Core, estMilo, estPoleEmploi } from '../../../src/domain/core'
+import { Core, estMilo, estFranceTravail } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import {
   unUtilisateurConseiller,
@@ -59,7 +59,7 @@ describe('JeuneAuthorizer', () => {
         const result = await jeuneAuthorizer.autoriserLeJeune(
           'jeune-id',
           utilisateur,
-          estPoleEmploi(utilisateur.structure)
+          estFranceTravail(utilisateur.structure)
         )
 
         // Then

@@ -16,6 +16,8 @@ import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { ReponseCampagneSqlModel } from '../../infrastructure/sequelize/models/reponse-campagne.sql-model'
 import { DateService } from '../../utils/date-service'
+import { DateTime } from 'luxon'
+import { buildError } from '../../utils/logger.module'
 
 interface Stats {
   nbNotifsEnvoyees: number
@@ -96,10 +98,10 @@ export class NotifierCampagneJobHandler extends JobHandler<Job> {
             }
           }
           await this.notificationRepository.send(notification, jeune.id)
-          this.logger.log(`Notification envoyée pour le jeune ${jeune.id}`)
         } catch (e) {
-          this.logger.error(e)
-          this.logger.log(`Echec envoi notif pour le jeune ${jeune.id}`)
+          this.logger.error(
+            buildError(`Échec envoi notif pour le jeune ${jeune.id}`, e)
+          )
         }
         await new Promise(resolve => setTimeout(resolve, 150))
       }
@@ -107,7 +109,7 @@ export class NotifierCampagneJobHandler extends JobHandler<Job> {
       stats.nbNotifsEnvoyees += idsJeunesANotifier.length
       if (idsJeunesANotifier.length === PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM) {
         this.planificateurRepository.creerJob({
-          dateExecution: maintenant.plus({ seconds: 15 }).toJSDate(),
+          dateExecution: DateTime.now().plus({ seconds: 15 }).toJSDate(),
           type: Planificateur.JobType.NOTIFIER_CAMPAGNE,
           contenu: {
             offset: offset + PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM,
