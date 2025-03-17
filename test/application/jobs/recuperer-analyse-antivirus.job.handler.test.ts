@@ -130,13 +130,13 @@ describe('RecupererAnalyseAntivirusJobHandler', () => {
 
     // Then
     expect(chatRepository.envoyerStatutAnalysePJ).not.to.have.been.called()
-    expect(planificateurRepository.creerJob).to.have.been.calledOnceWithExactly(
-      {
-        dateExecution: dateService.now().plus({ seconds: 15 }).toJSDate(),
-        type: Planificateur.JobType.RECUPERER_ANALYSE_ANTIVIRUS,
-        contenu: { idFichier: 'id-fichier' }
-      }
-    )
+    expect(
+      planificateurRepository.ajouterJob
+    ).to.have.been.calledOnceWithExactly({
+      dateExecution: dateService.now().plus({ seconds: 15 }).toJSDate(),
+      type: Planificateur.JobType.RECUPERER_ANALYSE_ANTIVIRUS,
+      contenu: { idFichier: 'id-fichier' }
+    })
     expect(result.succes).to.be.true()
     expect(result.resultat).to.deep.equal({
       resultat: 'Récupération résultat analyse replanifiée'

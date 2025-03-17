@@ -61,7 +61,7 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
         type: Planificateur.JobType.ENRICHIR_EVENEMENTS_ANALYTICS,
         contenu: undefined
       }
-      await this.planificateurRepository.creerJob(jobEnrichirLesEvenements)
+      await this.planificateurRepository.ajouterJob(jobEnrichirLesEvenements)
 
       if (maintenant.weekday === JOUR_DE_LA_SEMAINE_LUNDI) {
         const jobNettoyerLesEvenements: Planificateur.Job<void> = {
@@ -69,7 +69,7 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
           type: Planificateur.JobType.NETTOYER_EVENEMENTS_CHARGES_ANALYTICS,
           contenu: undefined
         }
-        await this.planificateurRepository.creerJob(jobNettoyerLesEvenements)
+        await this.planificateurRepository.ajouterJob(jobNettoyerLesEvenements)
       }
     } finally {
       await connexionSource.close()
