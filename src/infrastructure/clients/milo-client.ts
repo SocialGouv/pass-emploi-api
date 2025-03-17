@@ -67,18 +67,18 @@ export class MiloClient {
     idStructure: string,
     timezone: string,
     options: {
-      periode?: { dateDebut?: DateTime; dateFin?: DateTime }
+      periode: { debut?: DateTime; fin?: DateTime }
     }
   ): Promise<Result<SessionConseillerDetailDto[]>> {
     const params = new URLSearchParams()
     params.append('taillePage', TAILLE_PAGE_MAX_APIS_MILO.toString())
     params.append('rechercheInscrits', 'true')
-    if (options.periode && options.periode.dateDebut) {
-      const debutRecherche = options.periode.dateDebut.setZone(timezone)
+    if (options.periode.debut) {
+      const debutRecherche = options.periode.debut.setZone(timezone)
       params.append('dateDebutRecherche', debutRecherche.toISODate())
     }
-    if (options.periode && options.periode.dateFin) {
-      const finRecherche = options.periode.dateFin.setZone(timezone)
+    if (options.periode.fin) {
+      const finRecherche = options.periode.fin.setZone(timezone)
       params.append('dateFinRecherche', finRecherche.toISODate())
     }
 
