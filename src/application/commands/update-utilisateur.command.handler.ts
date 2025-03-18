@@ -154,7 +154,8 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
         new NonTraitableError(
           'Utilisateur',
           command.idUtilisateurAuth,
-          NonTraitableReason.UTILISATEUR_INEXISTANT
+          NonTraitableReason.UTILISATEUR_INEXISTANT,
+          command.email
         )
       )
     }
@@ -280,7 +281,8 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
         new NonTraitableError(
           'Utilisateur',
           commandSanitized.idUtilisateurAuth,
-          NonTraitableReason.UTILISATEUR_INEXISTANT
+          NonTraitableReason.UTILISATEUR_INEXISTANT,
+          commandSanitized.email
         )
       )
     }
