@@ -652,7 +652,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
                 new NonTraitableError(
                   'Utilisateur',
                   command.idUtilisateurAuth,
-                  NonTraitableReason.UTILISATEUR_INEXISTANT
+                  NonTraitableReason.UTILISATEUR_INEXISTANT,
+                  command.email
                 )
               )
             )
@@ -877,7 +878,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
                 new NonTraitableError(
                   'Utilisateur',
                   command.idUtilisateurAuth,
-                  NonTraitableReason.UTILISATEUR_INEXISTANT
+                  NonTraitableReason.UTILISATEUR_INEXISTANT,
+                  command.email
                 )
               )
             )
