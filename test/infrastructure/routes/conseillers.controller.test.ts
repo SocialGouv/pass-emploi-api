@@ -531,19 +531,14 @@ describe('ConseillersController', () => {
           actions: {
             creees: 0,
             enRetard: 0,
-            terminees: 0,
-            aEcheance: 0
+            terminees: 0
           },
           rendezVous: {
             planifies: 0
           },
           offres: {
-            consultees: 0,
-            partagees: 0
-          },
-          favoris: {
-            offresSauvegardees: 0,
-            recherchesSauvegardees: 0
+            sauvegardees: 0,
+            postulees: 0
           }
         }
 
@@ -553,8 +548,7 @@ describe('ConseillersController', () => {
               idConseiller,
               idJeune,
               dateDebut: new Date(dateDebutString),
-              dateFin: new Date(dateFinString),
-              exclure: undefined
+              dateFin: new Date(dateFinString)
             },
             unUtilisateurDecode()
           )

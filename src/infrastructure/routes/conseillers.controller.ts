@@ -25,10 +25,7 @@ import { RecupererJeunesDuConseillerCommandHandler } from '../../application/com
 import { GetConseillersQueryHandler } from '../../application/queries/get-conseillers.query.handler.db'
 import { GetDemarchesConseillerQueryHandler } from '../../application/queries/get-demarches-conseiller.query.handler'
 import { GetDetailConseillerQueryHandler } from '../../application/queries/get-detail-conseiller.query.handler.db'
-import {
-  GetIndicateursPourConseillerExclusionQuery,
-  GetIndicateursPourConseillerQueryHandler
-} from '../../application/queries/get-indicateurs-pour-conseiller.query.handler.db'
+import { GetIndicateursPourConseillerQueryHandler } from '../../application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { GetJeunesByConseillerQueryHandler } from '../../application/queries/get-jeunes-by-conseiller.query.handler.db'
 import { GetJeunesIdentitesQueryHandler } from '../../application/queries/get-jeunes-identites.query.handler.db'
 import { DemarcheQueryModel } from '../../application/queries/query-models/actions.query-model'
@@ -258,23 +255,12 @@ export class ConseillersController {
     @Query()
     getIndicateursPourConseillerQueryParams: GetIndicateursPourConseillerQueryParams
   ): Promise<IndicateursPourConseillerQueryModel> {
-    let exclure: GetIndicateursPourConseillerExclusionQuery | undefined
-    if (
-      getIndicateursPourConseillerQueryParams.exclureOffresEtFavoris !==
-      undefined
-    ) {
-      exclure = {
-        offresEtFavoris:
-          getIndicateursPourConseillerQueryParams.exclureOffresEtFavoris
-      }
-    }
     const result = await this.getIndicateursPourConseillerQueryHandler.execute(
       {
         idConseiller,
         idJeune,
         dateDebut: getIndicateursPourConseillerQueryParams.dateDebut,
-        dateFin: getIndicateursPourConseillerQueryParams.dateFin,
-        exclure
+        dateFin: getIndicateursPourConseillerQueryParams.dateFin
       },
       utilisateur
     )

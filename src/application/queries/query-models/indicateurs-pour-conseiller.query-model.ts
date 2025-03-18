@@ -3,17 +3,12 @@ export interface IndicateursPourConseillerQueryModel {
     creees: number
     enRetard: number
     terminees: number
-    aEcheance: number
   }
   rendezVous: {
     planifies: number
   }
   offres: {
-    consultees: number
-    partagees: number
-  }
-  favoris: {
-    offresSauvegardees: number
-    recherchesSauvegardees: number
+    sauvegardees: number
+    postulees: number
   }
 }
