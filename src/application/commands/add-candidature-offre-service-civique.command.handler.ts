@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { DateService } from 'src/utils/date-service'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
@@ -25,9 +26,10 @@ export class AddCandidatureOffreServiceCiviqueCommandHandler extends CommandHand
 > {
   constructor(
     @Inject(FavorisOffresServiceCiviqueRepositoryToken)
-    private offresServiceCiviqueRepository: Offre.Favori.ServiceCivique.Repository,
-    private jeuneAuthorizer: JeuneAuthorizer,
-    private readonly dateService: DateService
+    private readonly offresServiceCiviqueRepository: Offre.Favori.ServiceCivique.Repository,
+    private readonly jeuneAuthorizer: JeuneAuthorizer,
+    private readonly dateService: DateService,
+    private readonly evenementService: EvenementService
   ) {
     super('AddCandidatureOffreServiceCiviqueCommandHandler')
   }
@@ -67,7 +69,10 @@ export class AddCandidatureOffreServiceCiviqueCommandHandler extends CommandHand
     )
   }
 
-  async monitor(): Promise<void> {
-    // TODO ?
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creer(
+      Evenement.Code.OFFRE_SERVICE_CIVIQUE_CANDIDATURE_CONFIRMEE,
+      utilisateur
+    )
   }
 }

@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { DateService } from 'src/utils/date-service'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
@@ -25,9 +26,10 @@ export class AddCandidatureOffreImmersionCommandHandler extends CommandHandler<
 > {
   constructor(
     @Inject(FavorisOffresImmersionRepositoryToken)
-    private offresImmersionRepository: Offre.Favori.Immersion.Repository,
-    private jeuneAuthorizer: JeuneAuthorizer,
-    private readonly dateService: DateService
+    private readonly offresImmersionRepository: Offre.Favori.Immersion.Repository,
+    private readonly jeuneAuthorizer: JeuneAuthorizer,
+    private readonly dateService: DateService,
+    private readonly evenementService: EvenementService
   ) {
     super('AddCandidatureOffreImmersionCommandHandler')
   }
@@ -65,7 +67,10 @@ export class AddCandidatureOffreImmersionCommandHandler extends CommandHandler<
     )
   }
 
-  async monitor(): Promise<void> {
-    // TODO ?
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creer(
+      Evenement.Code.OFFRE_IMMERSION_CANDIDATURE_CONFIRMEE,
+      utilisateur
+    )
   }
 }

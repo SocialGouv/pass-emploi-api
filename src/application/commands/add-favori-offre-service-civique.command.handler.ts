@@ -65,10 +65,14 @@ export class AddFavoriOffreServiceCiviqueCommandHandler extends CommandHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(command.idJeune, utilisateur)
   }
 
-  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creer(
-      Evenement.Code.OFFRE_SERVICE_CIVIQUE_SAUVEGARDEE,
-      utilisateur
-    )
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    { aPostule }: AddFavoriServiceCiviqueCommand
+  ): Promise<void> {
+    const codeEvenement = aPostule
+      ? Evenement.Code.OFFRE_SERVICE_CIVIQUE_CANDIDATURE_CONFIRMEE
+      : Evenement.Code.OFFRE_SERVICE_CIVIQUE_SAUVEGARDEE
+
+    await this.evenementService.creer(codeEvenement, utilisateur)
   }
 }
