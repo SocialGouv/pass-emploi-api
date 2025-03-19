@@ -19,7 +19,7 @@ import {
  * @see https://martinfowler.com/bliki/CommandQuerySeparation.html
  * @see https://udidahan.com/2009/12/09/clarified-cqrs/
  */
-export abstract class CommandHandler<C, R, A = void> {
+export abstract class CommandHandler<Command, Data, Aggregat = void> {
   protected logger: Logger
   protected apmService: APM.Agent
   private commandName: string
@@ -31,9 +31,9 @@ export abstract class CommandHandler<C, R, A = void> {
   }
 
   async execute(
-    command?: C,
+    command?: Command,
     utilisateur?: Authentification.Utilisateur
-  ): Promise<Result<R>> {
+  ): Promise<Result<Data>> {
     try {
       const aggregate = await this.getAggregate(command, utilisateur)
 
@@ -65,33 +65,33 @@ export abstract class CommandHandler<C, R, A = void> {
 
   // FIXME return Result
   async getAggregate(
-    _command?: C,
+    _command?: Command,
     _utilisateur?: Authentification.Utilisateur
-  ): Promise<A | undefined> {
+  ): Promise<Aggregat | undefined> {
     return undefined
   }
 
   abstract authorize(
-    command?: C,
+    command?: Command,
     utilisateur?: Authentification.Utilisateur,
-    aggregate?: A
+    aggregate?: Aggregat
   ): Promise<Result>
 
   abstract handle(
-    command?: C,
+    command?: Command,
     utilisateur?: Authentification.Utilisateur,
-    aggregate?: A
-  ): Promise<Result<R>>
+    aggregate?: Aggregat
+  ): Promise<Result<Data>>
 
   abstract monitor(
     utilisateur?: Authentification.Utilisateur,
-    command?: C,
-    aggregate?: A
+    command?: Command,
+    aggregate?: Aggregat
   ): Promise<void>
 
   protected logAfter(
-    result: Result<R>,
-    command?: C,
+    result: Result<Data>,
+    command?: Command,
     utilisateur?: Authentification.Utilisateur
   ): void {
     const resultPourLog = construireResultPourLog(result)
