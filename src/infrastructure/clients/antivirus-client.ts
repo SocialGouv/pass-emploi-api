@@ -44,6 +44,7 @@ export class AntivirusClient {
     body.append('file', new Blob([fichier.buffer]), fichier.nom)
 
     try {
+      this.logger.log('Envoi du fichier à l’antivirus')
       const response = await firstValueFrom(
         this.httpService.post<AnalyseSoumiseDto>(
           this.apiUrl + '/submit',
@@ -52,7 +53,7 @@ export class AntivirusClient {
         )
       )
       const data = response.data
-      this.logger.debug(`${response.status} ${JSON.stringify(response.data)}`)
+      this.logger.log(`${response.status} ${JSON.stringify(response.data)}`)
       const idAnalyse = data.status ? data.uuid || data.id : undefined
       if (idAnalyse) {
         return success(idAnalyse)
@@ -65,6 +66,8 @@ export class AntivirusClient {
       this.logger.error(analyseAntivirusEchouee)
       return failure(analyseAntivirusEchouee)
     } catch (e) {
+      this.logger.error(e)
+      this.logger.log('echec envoi')
       if (e.config) e.config.data = 'REDACTED'
       return handleAxiosError(
         e,
