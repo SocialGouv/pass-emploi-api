@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { DateService } from 'src/utils/date-service'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
@@ -21,32 +22,41 @@ export interface AddCandidatureOffreEmploiCommand extends Command {
 @Injectable()
 export class AddCandidatureOffreEmploiCommandHandler extends CommandHandler<
   AddCandidatureOffreEmploiCommand,
-  void
+  void,
+  Offre.Favori<Offre.Favori.Emploi> | undefined
 > {
   constructor(
     @Inject(FavorisOffresEmploiRepositoryToken)
-    private offresEmploiRepository: Offre.Favori.Emploi.Repository,
-    private jeuneAuthorizer: JeuneAuthorizer,
-    private readonly dateService: DateService
+    private readonly offresEmploiRepository: Offre.Favori.Emploi.Repository,
+    private readonly jeuneAuthorizer: JeuneAuthorizer,
+    private readonly dateService: DateService,
+    private readonly evenementService: EvenementService
   ) {
     super('AddCandidatureOffreEmploiCommandHandler')
   }
 
-  async handle(command: AddCandidatureOffreEmploiCommand): Promise<Result> {
-    const favori = await this.offresEmploiRepository.get(
+  async getAggregate(
+    command: AddCandidatureOffreEmploiCommand
+  ): Promise<Offre.Favori<Offre.Favori.Emploi> | undefined> {
+    return this.offresEmploiRepository.get(
       command.idBeneficiaire,
       command.idOffre
     )
+  }
+
+  async handle(
+    command: AddCandidatureOffreEmploiCommand,
+    _utilisateur: Authentification.Utilisateur,
+    favori: Offre.Favori<Offre.Favori.Emploi> | undefined
+  ): Promise<Result> {
     if (!favori) {
       return failure(
         new NonTrouveError('Favori', 'pour l’offre d’emploi ' + command.idOffre)
       )
     }
 
-    const favoriAvecCandidature = Offre.Favori.postuler(
-      favori,
-      this.dateService.now()
-    )
+    const dateCandidature = this.dateService.now()
+    const favoriAvecCandidature = Offre.Favori.postuler(favori, dateCandidature)
 
     await this.offresEmploiRepository.save(favoriAvecCandidature)
     return emptySuccess()
@@ -62,7 +72,15 @@ export class AddCandidatureOffreEmploiCommandHandler extends CommandHandler<
     )
   }
 
-  async monitor(): Promise<void> {
-    // TODO ?
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    _command: AddCandidatureOffreEmploiCommand,
+    favori: Offre.Favori<Offre.Favori.Emploi>
+  ): Promise<void> {
+    const codeEvenement = favori.offre.alternance
+      ? Evenement.Code.OFFRE_ALTERNANCE_CANDIDATURE_CONFIRMEE
+      : Evenement.Code.OFFRE_EMPLOI_CANDIDATURE_CONFIRMEE
+
+    await this.evenementService.creer(codeEvenement, utilisateur)
   }
 }

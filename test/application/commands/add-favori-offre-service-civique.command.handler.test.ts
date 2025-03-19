@@ -116,15 +116,40 @@ describe('AddFavoriOffreServiceCiviqueCommandHandler', () => {
   })
 
   describe('monitor', () => {
-    const utilisateur = unUtilisateurJeune()
+    it('créé l’événement d’ajout en favori', () => {
+      // Given
+      const utilisateur = unUtilisateurJeune()
+      const command: AddFavoriServiceCiviqueCommand = {
+        idJeune: 'idJeune',
+        offre: uneOffreServiceCivique(),
+        aPostule: false
+      }
 
-    it("créé l'événement idoine", () => {
       // When
-      addFavoriOffreServiceCiviqueCommandHandler.monitor(utilisateur)
+      addFavoriOffreServiceCiviqueCommandHandler.monitor(utilisateur, command)
 
       // Then
       expect(evenementService.creer).to.have.been.calledWithExactly(
         Evenement.Code.OFFRE_SERVICE_CIVIQUE_SAUVEGARDEE,
+        utilisateur
+      )
+    })
+
+    it('créé l’événement de candidature', () => {
+      // Given
+      const utilisateur = unUtilisateurJeune()
+      const command: AddFavoriServiceCiviqueCommand = {
+        idJeune: 'idJeune',
+        offre: uneOffreServiceCivique(),
+        aPostule: true
+      }
+
+      // When
+      addFavoriOffreServiceCiviqueCommandHandler.monitor(utilisateur, command)
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.OFFRE_SERVICE_CIVIQUE_CANDIDATURE_CONFIRMEE,
         utilisateur
       )
     })

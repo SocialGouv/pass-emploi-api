@@ -1,6 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DateTime } from 'luxon'
 import { SinonSandbox } from 'sinon'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { DateService } from 'src/utils/date-service'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import {
@@ -9,52 +10,53 @@ import {
 } from '../../../src/application/commands/add-candidature-offre-service-civique.command.handler'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { failure } from '../../../src/building-blocks/types/result'
-import { Authentification } from '../../../src/domain/authentification'
 import { Offre } from '../../../src/domain/offre/offre'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneOffreServiceCivique } from '../../fixtures/offre-service-civique.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import Utilisateur = Authentification.Utilisateur
 
 describe('AddCandidatureOffreServiceCiviqueCommandHandler', () => {
   let offresServiceCiviqueRepository: StubbedType<Offre.Favori.ServiceCivique.Repository>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let addCandidatureOffreServiceCiviqueCommandHandler: AddCandidatureOffreServiceCiviqueCommandHandler
   let dateService: StubbedClass<DateService>
-  const beneficiaire = unJeune()
+  let evenementService: StubbedClass<EvenementService>
+
+  const utilisateur = unUtilisateurJeune()
+  const now = DateTime.now()
+  const command: AddCandidatureOffreServiceCiviqueCommand = {
+    idBeneficiaire: 'id-beneficiaire',
+    idOffre: 'id-offre'
+  }
+  const favori = {
+    idBeneficiaire: 'id-beneficiaire',
+    dateCreation: now.minus({ day: 1 }),
+    offre: uneOffreServiceCivique()
+  }
 
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()
     offresServiceCiviqueRepository = stubInterface(sandbox)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     dateService = stubClass(DateService)
+    evenementService = stubClass(EvenementService)
     addCandidatureOffreServiceCiviqueCommandHandler =
       new AddCandidatureOffreServiceCiviqueCommandHandler(
         offresServiceCiviqueRepository,
         jeuneAuthorizer,
-        dateService
+        dateService,
+        evenementService
       )
+
+    dateService.now.returns(now)
   })
 
   describe('handle', () => {
     it('modifie un favori', async () => {
       // Given
-      const now = DateTime.now()
-      const offreServiceCivique = uneOffreServiceCivique()
-      const command: AddCandidatureOffreServiceCiviqueCommand = {
-        idBeneficiaire: beneficiaire.id,
-        idOffre: offreServiceCivique.id
-      }
-      const favori = {
-        idBeneficiaire: beneficiaire.id,
-        dateCreation: now.minus({ day: 1 }),
-        offre: offreServiceCivique
-      }
       offresServiceCiviqueRepository.get
-        .withArgs(beneficiaire.id, offreServiceCivique.id)
+        .withArgs('id-beneficiaire', 'id-offre')
         .resolves(favori)
-      dateService.now.returns(now)
 
       // When
       await addCandidatureOffreServiceCiviqueCommandHandler.handle(command)
@@ -68,12 +70,8 @@ describe('AddCandidatureOffreServiceCiviqueCommandHandler', () => {
 
     it('renvoie une failure NonTrouve quand le beneficiaire n’a pas ce favori', async () => {
       // Given
-      const command: AddCandidatureOffreServiceCiviqueCommand = {
-        idBeneficiaire: beneficiaire.id,
-        idOffre: 'id-offre'
-      }
       offresServiceCiviqueRepository.get
-        .withArgs(beneficiaire.id, 'id-offre')
+        .withArgs('id-beneficiaire', 'id-offre')
         .resolves(undefined)
 
       // When
@@ -94,13 +92,6 @@ describe('AddCandidatureOffreServiceCiviqueCommandHandler', () => {
 
   describe('authorize', () => {
     it('authorize le beneficiaire', async () => {
-      // Given
-      const command: AddCandidatureOffreServiceCiviqueCommand = {
-        idBeneficiaire: 'idJeune',
-        idOffre: 'id-offre'
-      }
-      const utilisateur: Utilisateur = unUtilisateurJeune()
-
       // When
       await addCandidatureOffreServiceCiviqueCommandHandler.authorize(
         command,
@@ -109,7 +100,20 @@ describe('AddCandidatureOffreServiceCiviqueCommandHandler', () => {
 
       // Then
       expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
-        'idJeune',
+        'id-beneficiaire',
+        utilisateur
+      )
+    })
+  })
+
+  describe('monitor', () => {
+    it('créé l’événement de candidature', () => {
+      // When
+      addCandidatureOffreServiceCiviqueCommandHandler.monitor(utilisateur)
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.OFFRE_SERVICE_CIVIQUE_CANDIDATURE_CONFIRMEE,
         utilisateur
       )
     })
