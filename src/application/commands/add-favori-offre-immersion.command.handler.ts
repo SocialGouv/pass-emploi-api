@@ -65,10 +65,14 @@ export class AddFavoriOffreImmersionCommandHandler extends CommandHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(command.idJeune, utilisateur)
   }
 
-  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creer(
-      Evenement.Code.OFFRE_IMMERSION_SAUVEGARDEE,
-      utilisateur
-    )
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    { aPostule }: AddFavoriOffreImmersionCommand
+  ): Promise<void> {
+    const codeEvenement = aPostule
+      ? Evenement.Code.OFFRE_IMMERSION_CANDIDATURE_CONFIRMEE
+      : Evenement.Code.OFFRE_IMMERSION_SAUVEGARDEE
+
+    await this.evenementService.creer(codeEvenement, utilisateur)
   }
 }

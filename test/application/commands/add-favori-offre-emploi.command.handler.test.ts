@@ -114,8 +114,28 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
   describe('monitor', () => {
     const utilisateur = unUtilisateurJeune()
 
-    describe("quand c'est une alternance", () => {
-      it("créé l'événement idoine", () => {
+    describe('quand c’est une alternance', () => {
+      it('créé l’événement d’ajout en favori', () => {
+        // Given
+        const command: AddFavoriOffreEmploiCommand = {
+          idJeune: jeune.id,
+          offreEmploi: uneOffreEmploi({
+            alternance: true
+          }),
+          aPostule: false
+        }
+
+        // When
+        addFavoriOffreEmploiCommandHandler.monitor(utilisateur, command)
+
+        // Then
+        expect(evenementService.creer).to.have.been.calledWithExactly(
+          Evenement.Code.OFFRE_ALTERNANCE_SAUVEGARDEE,
+          utilisateur
+        )
+      })
+
+      it('créé l’événement de candidature', () => {
         // Given
         const command: AddFavoriOffreEmploiCommand = {
           idJeune: jeune.id,
@@ -130,13 +150,34 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
 
         // Then
         expect(evenementService.creer).to.have.been.calledWithExactly(
-          Evenement.Code.OFFRE_ALTERNANCE_SAUVEGARDEE,
+          Evenement.Code.OFFRE_ALTERNANCE_CANDIDATURE_CONFIRMEE,
           utilisateur
         )
       })
     })
-    describe("quand c'est une offre d'emploi", () => {
-      it("créé l'événement idoine", () => {
+
+    describe('quand c’est une offre d’emploi', () => {
+      it('créé l’événement d’ajout en favori', () => {
+        // Given
+        const command: AddFavoriOffreEmploiCommand = {
+          idJeune: jeune.id,
+          offreEmploi: uneOffreEmploi({
+            alternance: false
+          }),
+          aPostule: false
+        }
+
+        // When
+        addFavoriOffreEmploiCommandHandler.monitor(utilisateur, command)
+
+        // Then
+        expect(evenementService.creer).to.have.been.calledWithExactly(
+          Evenement.Code.OFFRE_EMPLOI_SAUVEGARDEE,
+          utilisateur
+        )
+      })
+
+      it('créé l’événement de candidature', () => {
         // Given
         const command: AddFavoriOffreEmploiCommand = {
           idJeune: jeune.id,
@@ -151,7 +192,7 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
 
         // Then
         expect(evenementService.creer).to.have.been.calledWithExactly(
-          Evenement.Code.OFFRE_EMPLOI_SAUVEGARDEE,
+          Evenement.Code.OFFRE_EMPLOI_CANDIDATURE_CONFIRMEE,
           utilisateur
         )
       })

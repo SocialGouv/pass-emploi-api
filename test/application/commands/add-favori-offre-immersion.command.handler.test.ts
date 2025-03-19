@@ -116,15 +116,40 @@ describe('AddFavoriOffreImmersionCommandHandler', () => {
   })
 
   describe('monitor', () => {
-    const utilisateur = unUtilisateurJeune()
+    it('créé l’événement d’ajout en favori', () => {
+      // Given
+      const command: AddFavoriOffreImmersionCommand = {
+        idJeune: 'idJeune',
+        offreImmersion: unFavoriOffreImmersion(),
+        aPostule: false
+      }
+      const utilisateur = unUtilisateurJeune()
 
-    it("créé l'événement idoine", () => {
       // When
-      addFavoriOffreImmersionCommandHandler.monitor(utilisateur)
+      addFavoriOffreImmersionCommandHandler.monitor(utilisateur, command)
 
       // Then
       expect(evenementService.creer).to.have.been.calledWithExactly(
         Evenement.Code.OFFRE_IMMERSION_SAUVEGARDEE,
+        utilisateur
+      )
+    })
+
+    it('créé l’événement de candidature', () => {
+      // Given
+      const command: AddFavoriOffreImmersionCommand = {
+        idJeune: 'idJeune',
+        offreImmersion: unFavoriOffreImmersion(),
+        aPostule: true
+      }
+      const utilisateur = unUtilisateurJeune()
+
+      // When
+      addFavoriOffreImmersionCommandHandler.monitor(utilisateur, command)
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.OFFRE_IMMERSION_CANDIDATURE_CONFIRMEE,
         utilisateur
       )
     })

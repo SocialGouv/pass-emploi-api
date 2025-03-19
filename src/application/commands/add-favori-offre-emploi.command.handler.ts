@@ -67,12 +67,22 @@ export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
 
   async monitor(
     utilisateur: Authentification.Utilisateur,
-    command: AddFavoriOffreEmploiCommand
+    { offreEmploi: { alternance }, aPostule }: AddFavoriOffreEmploiCommand
   ): Promise<void> {
-    const evenementType =
-      command.offreEmploi.alternance === true
-        ? Evenement.Code.OFFRE_ALTERNANCE_SAUVEGARDEE
-        : Evenement.Code.OFFRE_EMPLOI_SAUVEGARDEE
-    await this.evenementService.creer(evenementType, utilisateur)
+    const codeEvenement = ((): Evenement.Code => {
+      switch (alternance) {
+        case true:
+          return aPostule
+            ? Evenement.Code.OFFRE_ALTERNANCE_CANDIDATURE_CONFIRMEE
+            : Evenement.Code.OFFRE_ALTERNANCE_SAUVEGARDEE
+        case false:
+        default:
+          return aPostule
+            ? Evenement.Code.OFFRE_EMPLOI_CANDIDATURE_CONFIRMEE
+            : Evenement.Code.OFFRE_EMPLOI_SAUVEGARDEE
+      }
+    })()
+
+    await this.evenementService.creer(codeEvenement, utilisateur)
   }
 }
