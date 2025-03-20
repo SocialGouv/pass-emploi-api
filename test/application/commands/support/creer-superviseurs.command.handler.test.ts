@@ -49,5 +49,41 @@ describe('CreerSuperviseursCommandHandler', () => {
         expect(result._isSuccess).to.equal(true)
       })
     })
+    describe('quand on veut enregistrer un superEmailFT', () => {
+      it('retourne un succes', async () => {
+        // Given
+        const command: CreerSuperviseursCommand = {
+          superEmailFT: 'test@ft'
+        }
+
+        superviseurRepository.saveSuperviseurs.resolves(emptySuccess())
+
+        // When
+        const result = await creerSuperviseursCommandHandler.handle(command)
+
+        // Then
+        expect(
+          superviseurRepository.saveSuperviseurs
+        ).to.have.been.calledOnceWithExactly([
+          { email: 'test@ft', structure: Core.Structure.POLE_EMPLOI },
+          { email: 'test@ft', structure: Core.Structure.POLE_EMPLOI_BRSA },
+          { email: 'test@ft', structure: Core.Structure.POLE_EMPLOI_AIJ },
+          {
+            email: 'test@ft',
+            structure: Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF
+          },
+          {
+            email: 'test@ft',
+            structure: Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL
+          },
+          {
+            email: 'test@ft',
+            structure: Core.Structure.FT_EQUIP_EMPLOI_RECRUT
+          },
+          { email: 'test@ft', structure: Core.Structure.AVENIR_PRO }
+        ])
+        expect(result._isSuccess).to.equal(true)
+      })
+    })
   })
 })

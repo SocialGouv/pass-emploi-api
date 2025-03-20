@@ -11,6 +11,6 @@ export interface Superviseur {
 export namespace Superviseur {
   export interface Repository {
     saveSuperviseurs(superviseurs: Superviseur[]): Promise<Result>
-    deleteSuperviseurs(superviseurs: Superviseur[]): Promise<Result>
+    deleteSuperviseurs(emails: string[]): Promise<Result>
   }
 }

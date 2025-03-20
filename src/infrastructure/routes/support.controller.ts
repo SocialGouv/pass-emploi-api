@@ -18,17 +18,17 @@ import {
   ApiSecurity,
   ApiTags
 } from '@nestjs/swagger'
+import {
+  RefreshJddCommand,
+  RefreshJddCommandHandler
+} from '../../application/commands/support//refresh-jdd.command.handler'
+import { ArchiverJeuneSupportCommandHandler } from '../../application/commands/support/archiver-jeune-support.command.handler'
 import { CreerSuperviseursCommandHandler } from '../../application/commands/support/creer-superviseurs.command.handler'
 import { DeleteSuperviseursCommandHandler } from '../../application/commands/support/delete-superviseurs.command.handler'
 import {
   MettreAJourLesJeunesCEJPoleEmploiCommand,
   MettreAJourLesJeunesCejPeCommandHandler
 } from '../../application/commands/support/mettre-a-jour-les-jeunes-cej-pe.command.handler'
-import {
-  RefreshJddCommand,
-  RefreshJddCommandHandler
-} from '../../application/commands/support//refresh-jdd.command.handler'
-import { ArchiverJeuneSupportCommandHandler } from '../../application/commands/support/archiver-jeune-support.command.handler'
 import {
   ChangementAgenceQueryModel,
   UpdateAgenceConseillerCommandHandler
@@ -38,9 +38,10 @@ import { Authentification } from '../../domain/authentification'
 import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
 import { SkipOidcAuth } from '../decorators/skip-oidc-auth.decorator'
 import { handleResult } from './result.handler'
-import { SuperviseursPayload } from './validation/conseillers.inputs'
 import {
   ChangerAgenceConseillerPayload,
+  CreateSuperviseursPayload,
+  DeleteSuperviseursPayload,
   RefreshJDDPayload,
   TeleverserCsvPayload,
   TransfererJeunesPayload
@@ -191,10 +192,13 @@ export class SupportController {
   })
   @Post('superviseurs')
   async postSuperviseurs(
-    @Body() superviseursPayload: SuperviseursPayload
+    @Body() superviseursPayload: CreateSuperviseursPayload
   ): Promise<void> {
     const result = await this.creerSuperviseursCommandHandler.execute(
-      { superviseurs: superviseursPayload.superviseurs },
+      {
+        superviseurs: superviseursPayload.superviseurs,
+        superEmailFT: superviseursPayload.superEmailFT
+      },
       Authentification.unUtilisateurSupport()
     )
 
@@ -212,10 +216,10 @@ export class SupportController {
   @Delete('superviseurs')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteSuperviseurs(
-    @Body() superviseursPayload: SuperviseursPayload
+    @Body() superviseursPayload: DeleteSuperviseursPayload
   ): Promise<void> {
     const result = await this.deleteSuperviseursCommandHandler.execute(
-      { superviseurs: superviseursPayload.superviseurs },
+      { emails: superviseursPayload.emails },
       Authentification.unUtilisateurSupport()
     )
 

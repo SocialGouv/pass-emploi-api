@@ -17,13 +17,12 @@ export class SuperviseurSqlRepository implements Superviseur.Repository {
     return emptySuccess()
   }
 
-  async deleteSuperviseurs(superviseurs: Superviseur[]): Promise<Result> {
+  async deleteSuperviseurs(emails: string[]): Promise<Result> {
     await Promise.all(
-      superviseurs.map(superviseur =>
+      emails.map(email =>
         SuperviseurSqlModel.destroy({
           where: {
-            email: superviseur.email.toLocaleLowerCase(),
-            structure: superviseur.structure
+            email: email.toLocaleLowerCase()
           }
         })
       )
