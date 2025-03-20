@@ -1,31 +1,35 @@
 import { DateTime } from 'luxon'
 import { Core } from 'src/domain/core'
+import { FavoriOffreEmploiSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-emploi.sql-model'
+import { FavoriOffreEngagementSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-engagement.sql-model'
+import { FavoriOffreImmersionSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { uneDate } from 'test/fixtures/date.fixture'
+import {
+  unFavoriOffreEmploi,
+  unFavoriOffreEngagement,
+  unFavoriOffreImmersion
+} from 'test/fixtures/sql-models/favoris.sql-model'
+import { ConseillerInterAgenceAuthorizer } from '../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 import {
   GetIndicateursPourConseillerQuery,
   GetIndicateursPourConseillerQueryHandler
 } from '../../../src/application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { isSuccess } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action/action'
-import { Authentification } from '../../../src/domain/authentification'
-import { Evenement } from '../../../src/domain/evenement'
 import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { EvenementEngagementHebdoSqlModel } from '../../../src/infrastructure/sequelize/models/evenement-engagement-hebdo.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { DateService } from '../../../src/utils/date-service'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { unEvenementEngagementDto } from '../../fixtures/sql-models/evenement-engagement.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
 import Statut = Action.Statut
-import { ConseillerInterAgenceAuthorizer } from '../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 
 describe('GetIndicateursPourConseillerQueryHandler', () => {
   let getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler
@@ -199,44 +203,6 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           isSuccess(response) && response.data.actions.terminees
         ).to.deep.equal(1)
       })
-
-      it('récupère le nombre d’actions à échéance entre deux dates', async () => {
-        // Given
-        const dateEcheance = DateTime.fromISO('2022-03-06T03:24:00')
-
-        const query: GetIndicateursPourConseillerQuery = {
-          idConseiller,
-          idJeune,
-          dateDebut: dateDebut.toJSDate(),
-          dateFin: dateFin.toJSDate()
-        }
-
-        const actionAvecEcheanceDto = uneActionDto({
-          idJeune,
-          dateEcheance: dateEcheance.toJSDate(),
-          statut: Statut.TERMINEE
-        })
-
-        const actionSansEcheanceSurIntervalleDto = uneActionDto({
-          idJeune,
-          statut: Statut.PAS_COMMENCEE
-        })
-
-        await ActionSqlModel.bulkCreate([
-          actionAvecEcheanceDto,
-          actionSansEcheanceSurIntervalleDto
-        ])
-
-        // When
-        const response = await getIndicateursPourConseillerQueryHandler.handle(
-          query
-        )
-
-        // Then
-        expect(
-          isSuccess(response) && response.data.actions.aEcheance
-        ).to.deep.equal(1)
-      })
     })
 
     describe('indicateurs rendez-vous', () => {
@@ -290,201 +256,80 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
       })
     })
 
-    describe('indicateurs offres', () => {
-      let dateEvenement: Date
-      let dateEvenementAvantDateDebut: Date
-      let dateEvenementApresDateFin: Date
-
-      beforeEach(() => {
-        dateEvenement = new Date('2022-03-05T03:24:00')
-        dateEvenementAvantDateDebut = new Date('2022-02-01T03:24:00')
-        dateEvenementApresDateFin = new Date('2022-03-15T03:24:00')
-      })
-      it('récupère le nombre d’offres d’emploi consultées', async () => {
-        // Given
-        const query: GetIndicateursPourConseillerQuery = {
-          idConseiller,
-          idJeune,
-          dateDebut: dateDebut.toJSDate(),
-          dateFin: dateFin.toJSDate()
-        }
-
-        const engagementDto = unEvenementEngagementDto({
-          typeUtilisateur: Authentification.Type.JEUNE,
-          idUtilisateur: idJeune,
-          code: Evenement.Code.OFFRE_EMPLOI_AFFICHEE,
-          dateEvenement
-        })
-        const engagementAvantDateDebutDto = unEvenementEngagementDto({
-          typeUtilisateur: Authentification.Type.JEUNE,
-          idUtilisateur: idJeune,
-          code: Evenement.Code.OFFRE_EMPLOI_AFFICHEE,
-          dateEvenement: dateEvenementAvantDateDebut
-        })
-        const engagementApresDateFinDto = unEvenementEngagementDto({
-          typeUtilisateur: Authentification.Type.JEUNE,
-          idUtilisateur: idJeune,
-          code: Evenement.Code.OFFRE_EMPLOI_AFFICHEE,
-          dateEvenement: dateEvenementApresDateFin
-        })
-        await EvenementEngagementHebdoSqlModel.bulkCreate([
-          engagementDto,
-          engagementAvantDateDebutDto,
-          engagementApresDateFinDto
-        ])
-
-        // When
-        const response = await getIndicateursPourConseillerQueryHandler.handle(
-          query
-        )
-        // Then
-        expect(
-          isSuccess(response) && response.data.offres.consultees
-        ).to.deep.equal(1)
-      })
-      it('récupère le nombre d’offres d’emploi partagées', async () => {
-        // Given
-        const query: GetIndicateursPourConseillerQuery = {
-          idConseiller,
-          idJeune,
-          dateDebut: dateDebut.toJSDate(),
-          dateFin: dateFin.toJSDate()
-        }
-
-        const engagementDto = unEvenementEngagementDto({
-          typeUtilisateur: Authentification.Type.JEUNE,
-          idUtilisateur: idJeune,
-          code: Evenement.Code.MESSAGE_OFFRE_PARTAGEE,
-          dateEvenement
-        })
-        const engagementAvantDateDebutDto = unEvenementEngagementDto({
-          typeUtilisateur: Authentification.Type.JEUNE,
-          idUtilisateur: idJeune,
-          code: Evenement.Code.MESSAGE_OFFRE_PARTAGEE,
-          dateEvenement: dateEvenementAvantDateDebut
-        })
-        const engagementApresDateFinDto = unEvenementEngagementDto({
-          typeUtilisateur: Authentification.Type.JEUNE,
-          idUtilisateur: idJeune,
-          code: Evenement.Code.MESSAGE_OFFRE_PARTAGEE,
-          dateEvenement: dateEvenementApresDateFin
-        })
-
-        await EvenementEngagementHebdoSqlModel.bulkCreate([
-          engagementDto,
-          engagementAvantDateDebutDto,
-          engagementApresDateFinDto
-        ])
-
-        // When
-        const response = await getIndicateursPourConseillerQueryHandler.handle(
-          query
-        )
-        // Then
-        expect(
-          isSuccess(response) && response.data.offres.partagees
-        ).to.deep.equal(1)
-      })
-    })
-
     describe('indicateurs favoris', () => {
-      let dateEvenement: Date
-      let dateEvenementAvantDateDebut: Date
-      let dateEvenementApresDateFin: Date
+      // Given
+      it('récupère le nombre d’offres sauvegardées et postulées', async () => {
+        const datePendantPeriode = dateDebut.plus({ day: 1 }).toJSDate()
+        const dateAvantPeriode = dateDebut.minus({ day: 1 }).toJSDate()
+        const dateApresPeriode = dateFin.plus({ day: 1 }).toJSDate()
 
-      beforeEach(() => {
-        dateEvenement = new Date('2022-03-05T03:24:00')
-        dateEvenementAvantDateDebut = new Date('2022-02-01T03:24:00')
-        dateEvenementApresDateFin = new Date('2022-03-15T03:24:00')
-      })
+        await FavoriOffreEmploiSqlModel.bulkCreate([
+          unFavoriOffreEmploi({
+            id: 1,
+            idJeune,
+            idOffre: 'id-offre-emploi-1',
+            dateCreation: datePendantPeriode
+          }),
+          unFavoriOffreEmploi({
+            id: 2,
+            idJeune,
+            idOffre: 'id-offre-emploi-2',
+            dateCreation: dateAvantPeriode,
+            dateCandidature: dateApresPeriode
+          })
+        ])
+        await FavoriOffreEngagementSqlModel.bulkCreate([
+          unFavoriOffreEngagement({
+            id: 3,
+            idJeune,
+            idOffre: 'id-offre-engagement-3',
+            dateCreation: dateAvantPeriode
+          }),
+          unFavoriOffreEngagement({
+            id: 4,
+            idJeune,
+            idOffre: 'id-offre-engagement-4',
+            dateCreation: dateAvantPeriode,
+            dateCandidature: datePendantPeriode
+          })
+        ])
+        await FavoriOffreImmersionSqlModel.bulkCreate([
+          unFavoriOffreImmersion({
+            id: 5,
+            idJeune,
+            idOffre: 'id-offre-immersion-5',
+            dateCreation: dateApresPeriode
+          }),
+          unFavoriOffreImmersion({
+            id: 6,
+            idJeune,
+            idOffre: 'id-offre-immersion-6',
+            dateCreation: datePendantPeriode,
+            dateCandidature: datePendantPeriode
+          })
+        ])
 
-      it('récupère le nombre d’offres sauvegardée', async () => {
-        // Given
+        // When
         const query: GetIndicateursPourConseillerQuery = {
           idConseiller,
           idJeune,
           dateDebut: dateDebut.toJSDate(),
           dateFin: dateFin.toJSDate()
         }
-
-        const engagementDto = unEvenementEngagementDto({
-          typeUtilisateur: Authentification.Type.JEUNE,
-          idUtilisateur: idJeune,
-          code: Evenement.Code.OFFRE_ALTERNANCE_SAUVEGARDEE,
-          dateEvenement
-        })
-        const engagementAvantDateDebutDto = unEvenementEngagementDto({
-          typeUtilisateur: Authentification.Type.JEUNE,
-          idUtilisateur: idJeune,
-          code: Evenement.Code.OFFRE_ALTERNANCE_SAUVEGARDEE,
-          dateEvenement: dateEvenementAvantDateDebut
-        })
-        const engagementApresDateFinDto = unEvenementEngagementDto({
-          typeUtilisateur: Authentification.Type.JEUNE,
-          idUtilisateur: idJeune,
-          code: Evenement.Code.OFFRE_ALTERNANCE_SAUVEGARDEE,
-          dateEvenement: dateEvenementApresDateFin
-        })
-        await EvenementEngagementHebdoSqlModel.bulkCreate([
-          engagementDto,
-          engagementAvantDateDebutDto,
-          engagementApresDateFinDto
-        ])
-
-        // When
         const response = await getIndicateursPourConseillerQueryHandler.handle(
           query
         )
         // Then
         expect(
-          isSuccess(response) && response.data.favoris.offresSauvegardees
-        ).to.deep.equal(1)
-      })
-      it('récupère le nombre de recherches sauvegardées', async () => {
-        // Given
-        const query: GetIndicateursPourConseillerQuery = {
-          idConseiller,
-          idJeune,
-          dateDebut: dateDebut.toJSDate(),
-          dateFin: dateFin.toJSDate()
-        }
-        const dateEvenement = new Date('2022-03-05T03:24:00')
-
-        const engagementDto = unEvenementEngagementDto({
-          typeUtilisateur: Authentification.Type.JEUNE,
-          idUtilisateur: idJeune,
-          code: Evenement.Code.RECHERCHE_IMMERSION_SAUVEGARDEE,
-          dateEvenement
-        })
-        const engagementAvantDateDebutDto = unEvenementEngagementDto({
-          typeUtilisateur: Authentification.Type.JEUNE,
-          idUtilisateur: idJeune,
-          code: Evenement.Code.RECHERCHE_IMMERSION_SAUVEGARDEE,
-          dateEvenement: dateEvenementAvantDateDebut
-        })
-        const engagementApresDateFinDto = unEvenementEngagementDto({
-          typeUtilisateur: Authentification.Type.JEUNE,
-          idUtilisateur: idJeune,
-          code: Evenement.Code.RECHERCHE_IMMERSION_SAUVEGARDEE,
-          dateEvenement: dateEvenementApresDateFin
-        })
-        await EvenementEngagementHebdoSqlModel.bulkCreate([
-          engagementDto,
-          engagementAvantDateDebutDto,
-          engagementApresDateFinDto
-        ])
-
-        // When
-        const response = await getIndicateursPourConseillerQueryHandler.handle(
-          query
-        )
-        // Then
+          isSuccess(response) && response.data.offres.sauvegardees
+        ).to.deep.equal(2)
         expect(
-          isSuccess(response) && response.data.favoris.recherchesSauvegardees
-        ).to.deep.equal(1)
+          isSuccess(response) && response.data.offres.postulees
+        ).to.deep.equal(2)
       })
     })
   })
+
   describe('authorize', () => {
     describe("quand c'est un conseiller", () => {
       it('valide le conseiller', async () => {
