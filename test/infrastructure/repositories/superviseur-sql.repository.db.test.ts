@@ -94,15 +94,16 @@ describe('SuperviseurSqlRepository', () => {
       it('on ne fait rien', async () => {
         // When
         const result = await superviseurSqlRepository.deleteSuperviseurs([
-          unSuperviseur1,
-          unSuperviseur2
+          unSuperviseur1.email,
+          unSuperviseur2.email
         ])
 
         // Then
-        await SuperviseurSqlModel.findAll({
+        const superviseurs = await SuperviseurSqlModel.findAll({
           raw: true
         })
 
+        expect(superviseurs.length).to.equal(0)
         expect(result._isSuccess).to.equal(true)
       })
     })
@@ -117,8 +118,8 @@ describe('SuperviseurSqlRepository', () => {
 
         // When
         const result = await superviseurSqlRepository.deleteSuperviseurs([
-          unSuperviseur1,
-          unSuperviseur2
+          unSuperviseur1.email,
+          unSuperviseur2.email
         ])
 
         // Then
@@ -149,7 +150,7 @@ describe('SuperviseurSqlRepository', () => {
 
         // When
         const result = await superviseurSqlRepository.deleteSuperviseurs([
-          unSuperviseurUppercase
+          unSuperviseurUppercase.email
         ])
 
         // Then

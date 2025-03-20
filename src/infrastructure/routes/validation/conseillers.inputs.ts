@@ -24,11 +24,11 @@ import { TriRendezVous } from 'src/application/queries/rendez-vous/get-rendez-vo
 import { Action } from 'src/domain/action/action'
 import { Core } from 'src/domain/core'
 import { AgenceInput } from 'src/infrastructure/routes/validation/agences.inputs'
+import { Jeune } from '../../../domain/jeune/jeune'
 import {
   transformStringToArray,
   transformStringToBoolean
 } from './utils/transformers'
-import { Jeune } from '../../../domain/jeune/jeune'
 
 export class GetConseillersQueryParams {
   @ApiProperty()
@@ -115,32 +115,6 @@ export class EnvoyerNotificationsPayload {
   @ArrayNotEmpty()
   @IsNotEmpty({ each: true })
   idsJeunes: string[]
-}
-
-class Superviseur {
-  @ApiProperty()
-  @IsString()
-  @IsEmail()
-  @IsNotEmpty()
-  email: string
-
-  @ApiProperty({
-    enum: Core.Structure,
-    example: Object.values(Core.Structure).join(' | ')
-  })
-  @IsString()
-  @IsNotEmpty()
-  @IsEnum(Core.Structure)
-  structure: Core.Structure
-}
-
-export class SuperviseursPayload {
-  @ApiProperty({ type: Superviseur, isArray: true })
-  @IsArray()
-  @ArrayNotEmpty()
-  @ValidateNested({ each: true })
-  @Type(() => Superviseur)
-  superviseurs: Superviseur[]
 }
 
 export class GetRendezVousConseillerQueryParams {

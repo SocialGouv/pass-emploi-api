@@ -10,7 +10,7 @@ import {
 import { SupportAuthorizer } from '../../authorizers/support-authorizer'
 
 export interface DeleteSuperviseursCommand extends Command {
-  superviseurs: Superviseur[]
+  emails: string[]
 }
 
 @Injectable()
@@ -27,7 +27,7 @@ export class DeleteSuperviseursCommandHandler extends CommandHandler<
   }
 
   async handle(command: DeleteSuperviseursCommand): Promise<Result<void>> {
-    await this.superviseurRepository.deleteSuperviseurs(command.superviseurs)
+    await this.superviseurRepository.deleteSuperviseurs(command.emails)
     return emptySuccess()
   }
 

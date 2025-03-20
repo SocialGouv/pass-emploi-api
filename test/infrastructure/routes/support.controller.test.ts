@@ -5,7 +5,10 @@ import {
   CreerSuperviseursCommand,
   CreerSuperviseursCommandHandler
 } from '../../../src/application/commands/support/creer-superviseurs.command.handler'
-import { DeleteSuperviseursCommandHandler } from '../../../src/application/commands/support/delete-superviseurs.command.handler'
+import {
+  DeleteSuperviseursCommand,
+  DeleteSuperviseursCommandHandler
+} from '../../../src/application/commands/support/delete-superviseurs.command.handler'
 import { UpdateAgenceConseillerCommandHandler } from '../../../src/application/commands/support/update-agence-conseiller.command.handler'
 import {
   TransfererJeunesConseillerCommand,
@@ -219,6 +222,7 @@ describe('SupportController', () => {
       it('renvoie 201', async () => {
         // Given
         const command: CreerSuperviseursCommand = {
+          superEmailFT: undefined,
           superviseurs: [
             { email: 'test@octo.com', structure: Core.Structure.MILO }
           ]
@@ -270,10 +274,8 @@ describe('SupportController', () => {
     describe('quand le payload est valide', () => {
       it('renvoie 201', async () => {
         // Given
-        const command: CreerSuperviseursCommand = {
-          superviseurs: [
-            { email: 'test@octo.com', structure: Core.Structure.MILO }
-          ]
+        const command: DeleteSuperviseursCommand = {
+          emails: ['test@octo.com']
         }
 
         deleteSuperviseursCommandHandler.execute
