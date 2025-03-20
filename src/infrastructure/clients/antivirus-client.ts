@@ -52,11 +52,15 @@ export class AntivirusClient {
         )
       )
       const data = response.data
-      if (data.status) {
-        return success(data.uuid)
+      const idAnalyse = data.status ? data.uuid || data.id : undefined
+      if (idAnalyse) {
+        return success(idAnalyse)
       }
 
-      const analyseAntivirusEchouee = new AnalyseAntivirusEchouee(data.error)
+      const messageDerreur = data.status ? 'ID Analyse non trouvé' : data.error
+      const analyseAntivirusEchouee = new AnalyseAntivirusEchouee(
+        messageDerreur
+      )
       this.logger.error(analyseAntivirusEchouee)
       return failure(analyseAntivirusEchouee)
     } catch (e) {
@@ -93,5 +97,5 @@ export class AntivirusClient {
 }
 
 type AnalyseSoumiseDto =
-  | { status: true; uuid: string }
+  | { status: true; uuid?: string; id?: string }
   | { status: false; error: string }
