@@ -1,19 +1,21 @@
-export interface IndicateursPourConseillerQueryModel {
+import { ApiProperty } from '@nestjs/swagger'
+
+export class IndicateursPourConseillerQueryModel {
+  @ApiProperty()
   actions: {
     creees: number
     enRetard: number
     terminees: number
-    aEcheance: number
   }
+
+  @ApiProperty()
   rendezVous: {
     planifies: number
   }
+
+  @ApiProperty()
   offres: {
-    consultees: number
-    partagees: number
-  }
-  favoris: {
-    offresSauvegardees: number
-    recherchesSauvegardees: number
+    sauvegardees: number
+    postulees: number
   }
 }
