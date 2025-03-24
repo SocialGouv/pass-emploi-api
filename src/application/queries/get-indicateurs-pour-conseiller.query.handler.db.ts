@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common'
 import { Op } from 'sequelize'
+import { FavoriOffreEmploiSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-emploi.sql-model'
+import { FavoriOffreEngagementSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-engagement.sql-model'
+import { FavoriOffreImmersionSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result, success } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
-import { Evenement } from '../../domain/evenement'
 import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
-import { EvenementEngagementHebdoSqlModel } from '../../infrastructure/sequelize/models/evenement-engagement-hebdo.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { DateService } from '../../utils/date-service'
@@ -19,11 +20,6 @@ export interface GetIndicateursPourConseillerQuery extends Query {
   idJeune: string
   dateDebut: Date
   dateFin: Date
-  exclure?: GetIndicateursPourConseillerExclusionQuery
-}
-
-export interface GetIndicateursPourConseillerExclusionQuery {
-  offresEtFavoris: boolean
 }
 
 @Injectable()
@@ -56,220 +52,30 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
     query: GetIndicateursPourConseillerQuery
   ): Promise<Result<IndicateursPourConseillerQueryModel>> {
     const maintenant = this.dateService.nowJs()
-    const exclureFavoris = query.exclure ? query.exclure.offresEtFavoris : false
 
-    const [
-      actionsSqlDuJeune,
-      rendezVousSqlDuJeune,
-      offresEtFavorisEvenementsSql
-    ] = await Promise.all([
-      findAllActions(query),
-      findAllRendezVous(query),
-      exclureFavoris ? Promise.resolve([]) : findAllFavoris(query)
-    ])
+    const [actionsSqlDuJeune, rendezVousSqlDuJeune, favorisSql] =
+      await Promise.all([
+        findAllActions(query),
+        findAllRendezVous(query),
+        findAllFavorisPostulesOuCreesPendantPeriode(query)
+      ])
 
-    const indicateursActions = this.getIndicateursActions(
+    const indicateursActions = getIndicateursActions(
       actionsSqlDuJeune,
-      query.dateDebut,
-      query.dateFin,
+      { debut: query.dateDebut, fin: query.dateFin },
       maintenant
     )
 
-    const nombreRendezVousPlanifies = rendezVousSqlDuJeune.length
+    const indicateursSuiviOffres = getIndicateursSuiviOffres(favorisSql, {
+      debut: query.dateDebut,
+      fin: query.dateFin
+    })
 
-    const indicateursOffresEtFavoris = this.getIndicateursOffresEtFavoris(
-      offresEtFavorisEvenementsSql
-    )
     return success({
       actions: indicateursActions,
-      rendezVous: {
-        planifies: nombreRendezVousPlanifies
-      },
-      offres: indicateursOffresEtFavoris.offres,
-      favoris: indicateursOffresEtFavoris.favoris
+      rendezVous: { planifies: rendezVousSqlDuJeune.length },
+      offres: indicateursSuiviOffres
     })
-  }
-
-  private getIndicateursActions(
-    actionsSqlDuJeune: ActionSqlModel[],
-    dateDebut: Date,
-    dateFin: Date,
-    maintenant: Date
-  ): {
-    creees: number
-    enRetard: number
-    terminees: number
-    aEcheance: number
-  } {
-    return actionsSqlDuJeune
-      .map(actionSql => {
-        return {
-          creees: this.lActionEstCreeeEntreLesDeuxDates(
-            actionSql,
-            dateDebut,
-            dateFin
-          )
-            ? 1
-            : 0,
-          enRetard: this.lActionEstEnRetard(actionSql, maintenant) ? 1 : 0,
-          terminees: this.lActionEstTermineeEntreLesDeuxDates(
-            actionSql,
-            dateDebut,
-            dateFin
-          )
-            ? 1
-            : 0,
-          aEcheance: this.lActionEstAEcheanceEntreLesDeuxDates(
-            actionSql,
-            dateDebut,
-            dateFin
-          )
-            ? 1
-            : 0
-        }
-      })
-      .reduce(
-        (indicateursActionsAccumulateur, indicateursAction) => {
-          indicateursActionsAccumulateur.creees += indicateursAction.creees
-          indicateursActionsAccumulateur.enRetard += indicateursAction.enRetard
-          indicateursActionsAccumulateur.terminees +=
-            indicateursAction.terminees
-          indicateursActionsAccumulateur.aEcheance +=
-            indicateursAction.aEcheance
-          return indicateursActionsAccumulateur
-        },
-        {
-          creees: 0,
-          enRetard: 0,
-          terminees: 0,
-          aEcheance: 0
-        }
-      )
-  }
-
-  private getIndicateursOffresEtFavoris(
-    evenementsSql: EvenementEngagementHebdoSqlModel[]
-  ): {
-    offres: { consultees: number; partagees: number }
-    favoris: { offresSauvegardees: number; recherchesSauvegardees: number }
-  } {
-    const codesOffreConsultee: string[] = [
-      Evenement.Code.OFFRE_ALTERNANCE_AFFICHEE,
-      Evenement.Code.OFFRE_EMPLOI_AFFICHEE,
-      Evenement.Code.OFFRE_IMMERSION_AFFICHEE,
-      Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHE,
-      Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHEE
-    ]
-    const codesOffreSauvegardee: string[] = [
-      Evenement.Code.OFFRE_ALTERNANCE_SAUVEGARDEE,
-      Evenement.Code.OFFRE_EMPLOI_SAUVEGARDEE,
-      Evenement.Code.OFFRE_IMMERSION_SAUVEGARDEE,
-      Evenement.Code.OFFRE_SERVICE_CIVIQUE_SAUVEGARDEE
-    ]
-    const codesRechercheSauvegardee: string[] = [
-      Evenement.Code.RECHERCHE_ALTERNANCE_SAUVEGARDEE,
-      Evenement.Code.RECHERCHE_IMMERSION_SAUVEGARDEE,
-      Evenement.Code.RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE,
-      Evenement.Code.RECHERCHE_SERVICE_CIVIQUE_SAUVEGARDEE
-    ]
-
-    return evenementsSql
-      .map(evenementSql => {
-        return {
-          offres: {
-            consultees: codesOffreConsultee.includes(evenementSql.code) ? 1 : 0,
-            partagees:
-              evenementSql.code === Evenement.Code.MESSAGE_OFFRE_PARTAGEE
-                ? 1
-                : 0
-          },
-          favoris: {
-            offresSauvegardees: codesOffreSauvegardee.includes(
-              evenementSql.code
-            )
-              ? 1
-              : 0,
-            recherchesSauvegardees: codesRechercheSauvegardee.includes(
-              evenementSql.code
-            )
-              ? 1
-              : 0
-          }
-        }
-      })
-      .reduce(
-        (
-          indicateursOffresEtFavorisAccumulateur,
-          indicateursOffresEtFavoris
-        ) => {
-          indicateursOffresEtFavorisAccumulateur.offres.consultees +=
-            indicateursOffresEtFavoris.offres.consultees
-          indicateursOffresEtFavorisAccumulateur.offres.partagees +=
-            indicateursOffresEtFavoris.offres.partagees
-          indicateursOffresEtFavorisAccumulateur.favoris.offresSauvegardees +=
-            indicateursOffresEtFavoris.favoris.offresSauvegardees
-          indicateursOffresEtFavorisAccumulateur.favoris.recherchesSauvegardees +=
-            indicateursOffresEtFavoris.favoris.recherchesSauvegardees
-          return indicateursOffresEtFavorisAccumulateur
-        },
-        {
-          offres: {
-            consultees: 0,
-            partagees: 0
-          },
-          favoris: {
-            offresSauvegardees: 0,
-            recherchesSauvegardees: 0
-          }
-        }
-      )
-  }
-
-  private lActionEstTermineeEntreLesDeuxDates(
-    actionSql: ActionSqlModel,
-    dateDebut: Date,
-    dateFin: Date
-  ): boolean {
-    return (
-      actionSql.statut === Action.Statut.TERMINEE &&
-      actionSql.dateFinReelle !== null &&
-      DateService.isBetweenDates(actionSql.dateFinReelle, dateDebut, dateFin)
-    )
-  }
-
-  private lActionEstEnRetard(
-    actionSql: ActionSqlModel,
-    maintenant: Date
-  ): boolean {
-    return (
-      actionSql.dateEcheance < maintenant &&
-      actionSql.statut !== Action.Statut.TERMINEE &&
-      actionSql.statut !== Action.Statut.ANNULEE
-    )
-  }
-
-  private lActionEstCreeeEntreLesDeuxDates(
-    actionSql: ActionSqlModel,
-    dateDebut: Date,
-    dateFin: Date
-  ): boolean {
-    return DateService.isBetweenDates(
-      actionSql.dateCreation,
-      dateDebut,
-      dateFin
-    )
-  }
-
-  private lActionEstAEcheanceEntreLesDeuxDates(
-    actionSql: ActionSqlModel,
-    dateDebut: Date,
-    dateFin: Date
-  ): boolean {
-    return DateService.isBetweenDates(
-      actionSql.dateEcheance,
-      dateDebut,
-      dateFin
-    )
   }
 }
 
@@ -299,14 +105,105 @@ function findAllRendezVous(
   })
 }
 
-function findAllFavoris(
+async function findAllFavorisPostulesOuCreesPendantPeriode(
   query: GetIndicateursPourConseillerQuery
-): Promise<EvenementEngagementHebdoSqlModel[]> {
-  return EvenementEngagementHebdoSqlModel.findAll({
+): Promise<Array<{ dateCreation: Date; dateCandidature: Date | null }>> {
+  const options = {
+    attributes: ['dateCreation', 'dateCandidature'],
     where: {
-      typeUtilisateur: Authentification.Type.JEUNE,
-      idUtilisateur: query.idJeune,
-      dateEvenement: { [Op.between]: [query.dateDebut, query.dateFin] }
+      idJeune: query.idJeune,
+      [Op.or]: {
+        dateCreation: { [Op.between]: [query.dateDebut, query.dateFin] },
+        dateCandidature: { [Op.between]: [query.dateDebut, query.dateFin] }
+      }
     }
+  }
+  const [offresEmploi, offresServiceCivique, offresImmersion] =
+    await Promise.all([
+      FavoriOffreEmploiSqlModel.findAll(options),
+      FavoriOffreEngagementSqlModel.findAll(options),
+      FavoriOffreImmersionSqlModel.findAll(options)
+    ])
+
+  return [...offresEmploi, ...offresServiceCivique, ...offresImmersion]
+}
+
+function getIndicateursActions(
+  actionsSqlDuJeune: ActionSqlModel[],
+  periode: { debut: Date; fin: Date },
+  maintenant: Date
+): {
+  creees: number
+  enRetard: number
+  terminees: number
+} {
+  const indicateurs = { creees: 0, enRetard: 0, terminees: 0 }
+  actionsSqlDuJeune.forEach(action => {
+    indicateurs.creees += +actionCreeePendantPeriode(action, periode)
+    if (actionEnRetard(action, maintenant)) indicateurs.enRetard += 1
+    else if (actionTermineePendantPeriode(action, periode))
+      indicateurs.terminees += 1
   })
+
+  return indicateurs
+}
+
+function getIndicateursSuiviOffres(
+  favorisSql: Array<{ dateCreation: Date; dateCandidature: Date | null }>,
+  periode: { debut: Date; fin: Date }
+): {
+  sauvegardees: number
+  postulees: number
+} {
+  const indicateurs = { sauvegardees: 0, postulees: 0 }
+  favorisSql.forEach(({ dateCreation, dateCandidature }) => {
+    indicateurs.sauvegardees += +offreSauvegardeePendantPeriode(
+      dateCreation,
+      periode
+    )
+    indicateurs.postulees += +(dateCandidature !== null)
+  })
+
+  return indicateurs
+}
+
+function actionCreeePendantPeriode(
+  actionSql: ActionSqlModel,
+  periode: { debut: Date; fin: Date }
+): boolean {
+  return DateService.isBetweenDates(
+    actionSql.dateCreation,
+    periode.debut,
+    periode.fin
+  )
+}
+
+function actionEnRetard(actionSql: ActionSqlModel, maintenant: Date): boolean {
+  return (
+    actionSql.dateEcheance < maintenant &&
+    actionSql.statut !== Action.Statut.TERMINEE &&
+    actionSql.statut !== Action.Statut.ANNULEE
+  )
+}
+
+function actionTermineePendantPeriode(
+  actionSql: ActionSqlModel,
+  periode: { debut: Date; fin: Date }
+): boolean {
+  return (
+    actionSql.statut === Action.Statut.TERMINEE &&
+    actionSql.dateFinReelle !== null &&
+    DateService.isBetweenDates(
+      actionSql.dateFinReelle,
+      periode.debut,
+      periode.fin
+    )
+  )
+}
+
+function offreSauvegardeePendantPeriode(
+  dateCreation: Date,
+  periode: { debut: Date; fin: Date }
+): boolean {
+  return DateService.isBetweenDates(dateCreation, periode.debut, periode.fin)
 }
