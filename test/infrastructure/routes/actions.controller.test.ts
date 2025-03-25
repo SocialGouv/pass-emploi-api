@@ -51,10 +51,6 @@ import { uneActionQueryModel } from '../../fixtures/query-models/action.query-mo
 import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
-import Statut = Action.Statut
-import Tri = Action.Tri
-import Code = Qualification.Code
-import Etat = Qualification.Etat
 
 let getDetailActionQueryHandler: StubbedClass<GetDetailActionQueryHandler>
 let deleteActionCommandHandler: StubbedClass<DeleteActionCommandHandler>
@@ -454,7 +450,7 @@ describe('ActionsController', () => {
         content: "Ceci est un contenu d'action",
         comment: 'Ceci est un commentaire',
         status: Action.Statut.EN_COURS,
-        codeQualification: Code.CITOYENNETE,
+        codeQualification: Qualification.Code.CITOYENNETE,
         estDuplicata: true
       }
       it("renvoie l'id de l'action créée avec echeance par defaut", async () => {
@@ -483,7 +479,7 @@ describe('ActionsController', () => {
             commentaire: 'Ceci est un commentaire',
             dateEcheance: nowJsPlus3Mois,
             rappel: false,
-            codeQualification: Code.CITOYENNETE,
+            codeQualification: Qualification.Code.CITOYENNETE,
             estDuplicata: true
           },
           unUtilisateurDecode()
@@ -501,7 +497,7 @@ describe('ActionsController', () => {
           .send({
             content: "Ceci est un contenu d'action",
             comment: 'Ceci est un commentaire',
-            codeQualification: Code.CITOYENNETE
+            codeQualification: Qualification.Code.CITOYENNETE
           })
 
           // Then
@@ -519,7 +515,7 @@ describe('ActionsController', () => {
             commentaire: 'Ceci est un commentaire',
             dateEcheance: nowJsPlus3Mois,
             rappel: false,
-            codeQualification: Code.CITOYENNETE,
+            codeQualification: Qualification.Code.CITOYENNETE,
             estDuplicata: undefined
           },
           unUtilisateurDecode()
@@ -538,7 +534,7 @@ describe('ActionsController', () => {
             content: "Ceci est un contenu d'action",
             comment: 'Ceci est un commentaire',
             status: Action.Statut.TERMINEE,
-            codeQualification: Code.CITOYENNETE
+            codeQualification: Qualification.Code.CITOYENNETE
           })
 
           // Then
@@ -556,7 +552,7 @@ describe('ActionsController', () => {
             commentaire: 'Ceci est un commentaire',
             dateEcheance: now,
             rappel: false,
-            codeQualification: Code.CITOYENNETE,
+            codeQualification: Qualification.Code.CITOYENNETE,
             estDuplicata: undefined
           },
           unUtilisateurDecode()
@@ -593,7 +589,7 @@ describe('ActionsController', () => {
             commentaire: 'Ceci est un commentaire',
             dateEcheance: uneDatetimeAvecOffset(),
             rappel: false,
-            codeQualification: Code.CITOYENNETE,
+            codeQualification: Qualification.Code.CITOYENNETE,
             estDuplicata: true
           },
           unUtilisateurDecode()
@@ -644,72 +640,51 @@ describe('ActionsController', () => {
       ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/ABCDE/action')
     })
 
-    describe('GET /v2/jeunes/:idJeune/actions', () => {
+    describe('GET /jeunes/:idJeune/actions', () => {
       const idJeune = '1'
-      it('renvoie 206', async () => {
+      const date = '2020-04-06T12:00:00.000Z'
+      it('renvoie 200', async () => {
         // Given
         const queryActions: GetActionsJeuneQuery = {
           idJeune: idJeune,
-          dateDebut: uneDate(),
-          dateFin: uneDate(),
-          tri: Tri.DATE_CROISSANTE,
-          statuts: [Statut.TERMINEE],
-          etats: [Etat.A_QUALIFIER],
-          codesCategories: [Code.SANTE]
+          dateDebut: date,
+          dateFin: date,
+          statuts: [Action.Statut.TERMINEE],
+          etats: [Qualification.Etat.A_QUALIFIER],
+          codesCategories: [Qualification.Code.SANTE]
         }
         getActionsByJeuneQueryHandler.execute.resolves(success([]))
 
         // When
         await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/actions`)
+          .get(`/jeunes/${idJeune}/actions`)
           .set('authorization', unHeaderAuthorization())
           .query({
             ...queryActions,
-            dateDebut: uneDate().toISOString(),
-            dateFin: uneDate().toISOString()
+            dateDebut: date,
+            dateFin: date
           })
           // Then
           .expect(HttpStatus.OK)
           .expect([])
       })
 
-      it('retourne 400 quand le paramètre tri est au mauvais format', async () => {
-        // Given
-        const queryActions = {
-          idJeune: idJeune,
-          dateDebut: uneDate(),
-          dateFin: uneDate(),
-          tri: 'croissants'
-        }
-        // When
-        await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/actions`)
-          .set('authorization', unHeaderAuthorization())
-          .query({
-            ...queryActions,
-            dateDebut: uneDate().toISOString(),
-            dateFin: uneDate().toISOString()
-          })
-          // Then
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-
       it('retourne 400 quand le paramètre statuts est au mauvais format', async () => {
         // Given
         const queryActions = {
           idJeune: idJeune,
-          dateDebut: uneDate(),
-          dateFin: uneDate(),
+          dateDebut: date,
+          dateFin: date,
           statuts: ['à tes souhaits']
         }
         // When
         await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/actions`)
+          .get(`/jeunes/${idJeune}/actions`)
           .set('authorization', unHeaderAuthorization())
           .query({
             ...queryActions,
-            dateDebut: uneDate().toISOString(),
-            dateFin: uneDate().toISOString()
+            dateDebut: date,
+            dateFin: date
           })
           // Then
           .expect(HttpStatus.BAD_REQUEST)
@@ -719,18 +694,18 @@ describe('ActionsController', () => {
         // Given
         const queryActions = {
           idJeune: idJeune,
-          dateDebut: uneDate(),
-          dateFin: uneDate(),
+          dateDebut: date,
+          dateFin: date,
           etats: ['à tes souhaits']
         }
         // When
         await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/actions`)
+          .get(`/jeunes/${idJeune}/actions`)
           .set('authorization', unHeaderAuthorization())
           .query({
             ...queryActions,
-            dateDebut: uneDate().toISOString(),
-            dateFin: uneDate().toISOString()
+            dateDebut: date,
+            dateFin: date
           })
           // Then
           .expect(HttpStatus.BAD_REQUEST)
@@ -740,18 +715,18 @@ describe('ActionsController', () => {
         // Given
         const queryActions = {
           idJeune: idJeune,
-          dateDebut: uneDate(),
-          dateFin: uneDate(),
+          dateDebut: date,
+          dateFin: date,
           categories: ['à tes souhaits']
         }
         // When
         await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/actions`)
+          .get(`/jeunes/${idJeune}/actions`)
           .set('authorization', unHeaderAuthorization())
           .query({
             ...queryActions,
-            dateDebut: uneDate().toISOString(),
-            dateFin: uneDate().toISOString()
+            dateDebut: date,
+            dateFin: date
           })
           // Then
           .expect(HttpStatus.BAD_REQUEST)
@@ -761,21 +736,20 @@ describe('ActionsController', () => {
         // Given
         const queryActions = {
           idJeune: idJeune,
-          dateDebut: uneDate(),
-          dateFin: uneDate(),
-          tri: 'date_croissante'
+          dateDebut: date,
+          dateFin: date
         }
         getActionsByJeuneQueryHandler.execute.resolves(
           failure(new NonTrouveError('test'))
         )
         // When
         await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/actions`)
+          .get(`/jeunes/${idJeune}/actions`)
           .set('authorization', unHeaderAuthorization())
           .query({
             ...queryActions,
-            dateDebut: uneDate().toISOString(),
-            dateFin: uneDate().toISOString()
+            dateDebut: date,
+            dateFin: date
           })
           // Then
           .expect(HttpStatus.NOT_FOUND)

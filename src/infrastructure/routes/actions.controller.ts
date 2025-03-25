@@ -65,7 +65,7 @@ import {
   UpdateActionPayload
 } from './validation/actions.inputs'
 import { GetActionsConseillerV2QueryParams } from './validation/conseillers.inputs'
-import { GetActionsByJeuneV2QueryParams } from './validation/jeunes.inputs'
+import { GetActionsByJeuneQueryParams } from './validation/jeunes.inputs'
 
 @Controller()
 @CustomSwaggerApiOAuth2()
@@ -338,7 +338,13 @@ export class ActionsController {
     return handleResult(result)
   }
 
-  @Get('v2/jeunes/:idJeune/actions')
+  @Get('jeunes/:idJeune/actions')
+  @ApiOperation({
+    summary:
+      'Récupère les actions d’un bénéficiaire, terminées ou prévues sur la période demandée',
+    description:
+      'Autorisé pour le conseiller du bénéficiaire ou un conseiller de son agence milo'
+  })
   @ApiResponse({
     type: ActionQueryModel,
     isArray: true
@@ -347,13 +353,12 @@ export class ActionsController {
   async getActionsJeune(
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
-    @Query() getActionsByBeneficiaireQueryParams: GetActionsByJeuneV2QueryParams
+    @Query() getActionsByBeneficiaireQueryParams: GetActionsByJeuneQueryParams
   ): Promise<ActionQueryModel[]> {
     const query: GetActionsJeuneQuery = {
       idJeune,
-      dateDebut: new Date(getActionsByBeneficiaireQueryParams.dateDebut),
-      dateFin: new Date(getActionsByBeneficiaireQueryParams.dateFin),
-      tri: getActionsByBeneficiaireQueryParams.tri,
+      dateDebut: getActionsByBeneficiaireQueryParams.dateDebut,
+      dateFin: getActionsByBeneficiaireQueryParams.dateFin,
       statuts: getActionsByBeneficiaireQueryParams.statuts,
       etats: getActionsByBeneficiaireQueryParams.etats,
       codesCategories: getActionsByBeneficiaireQueryParams.categories
