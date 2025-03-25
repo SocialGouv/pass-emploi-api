@@ -102,25 +102,6 @@ export class CommentaireActionQueryModel {
   message: string
 }
 
-export class ActionsMetadonneesQueryModel {
-  @ApiProperty()
-  nombreTotal: number
-
-  @ApiProperty()
-  nombreFiltrees: number
-
-  @ApiProperty()
-  nombreActionsParPage: number
-}
-
-export class ListeActionsV2QueryModel {
-  @ApiProperty({ type: ActionQueryModel, isArray: true })
-  actions: ActionQueryModel[]
-
-  @ApiProperty({ type: ActionsMetadonneesQueryModel, isArray: true })
-  metadonnees: ActionsMetadonneesQueryModel
-}
-
 export class AttributDemarcheQueryModel {
   @ApiProperty()
   label: string

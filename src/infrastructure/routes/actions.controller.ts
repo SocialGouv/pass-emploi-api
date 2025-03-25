@@ -46,7 +46,6 @@ import { toCommentaireQueryModel } from '../../application/queries/query-mappers
 import {
   ActionQueryModel,
   CommentaireActionQueryModel,
-  ListeActionsV2QueryModel,
   QualificationActionQueryModel
 } from '../../application/queries/query-models/actions.query-model'
 import { IdQueryModel } from '../../application/queries/query-models/common.query-models'
@@ -259,7 +258,7 @@ export class ActionsController {
       idCreateur: idConseiller,
       typeCreateur: Action.TypeCreateur.CONSEILLER,
       commentaire: createActionPayload.comment,
-      rappel: createActionPayload.dateEcheance ? true : false,
+      rappel: Boolean(createActionPayload.dateEcheance),
       dateEcheance: createActionPayload.dateEcheance
         ? DateTime.fromISO(createActionPayload.dateEcheance, { setZone: true })
         : this.buildDateEcheanceV1(),
@@ -341,21 +340,23 @@ export class ActionsController {
 
   @Get('v2/jeunes/:idJeune/actions')
   @ApiResponse({
-    type: ListeActionsV2QueryModel
+    type: ActionQueryModel,
+    isArray: true
   })
-  @HttpCode(HttpStatus.PARTIAL_CONTENT)
+  @HttpCode(HttpStatus.OK)
   async getActionsJeune(
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
-    @Query() getActionsByJeuneQueryParams: GetActionsByJeuneV2QueryParams
-  ): Promise<ListeActionsV2QueryModel> {
+    @Query() getActionsByBeneficiaireQueryParams: GetActionsByJeuneV2QueryParams
+  ): Promise<ActionQueryModel[]> {
     const query: GetActionsJeuneQuery = {
       idJeune,
-      page: getActionsByJeuneQueryParams.page,
-      tri: getActionsByJeuneQueryParams.tri,
-      statuts: getActionsByJeuneQueryParams.statuts,
-      etats: getActionsByJeuneQueryParams.etats,
-      codesCategories: getActionsByJeuneQueryParams.categories
+      dateDebut: new Date(getActionsByBeneficiaireQueryParams.dateDebut),
+      dateFin: new Date(getActionsByBeneficiaireQueryParams.dateFin),
+      tri: getActionsByBeneficiaireQueryParams.tri,
+      statuts: getActionsByBeneficiaireQueryParams.statuts,
+      etats: getActionsByBeneficiaireQueryParams.etats,
+      codesCategories: getActionsByBeneficiaireQueryParams.categories
     }
 
     const result = await this.getActionsByJeuneQueryHandler.execute(

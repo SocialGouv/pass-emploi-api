@@ -14,7 +14,6 @@ import {
   TriActionsConseillerV2
 } from '../../../src/application/queries/action/get-actions-conseiller-v2.query.handler.db'
 import {
-  ActionsJeuneQueryModel,
   GetActionsJeuneQuery,
   GetActionsJeuneQueryHandler
 } from '../../../src/application/queries/action/get-actions-jeune.query.handler.db'
@@ -49,10 +48,9 @@ import {
   uneDatetimeAvecOffset
 } from '../../fixtures/date.fixture'
 import { uneActionQueryModel } from '../../fixtures/query-models/action.query-model.fixtures'
-import { StubbedClass, expect } from '../../utils'
+import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
-
 import Statut = Action.Statut
 import Tri = Action.Tri
 import Code = Qualification.Code
@@ -652,87 +650,46 @@ describe('ActionsController', () => {
         // Given
         const queryActions: GetActionsJeuneQuery = {
           idJeune: idJeune,
-          page: 1,
+          dateDebut: uneDate(),
+          dateFin: uneDate(),
           tri: Tri.DATE_CROISSANTE,
           statuts: [Statut.TERMINEE],
           etats: [Etat.A_QUALIFIER],
           codesCategories: [Code.SANTE]
         }
-        const actionsByJeuneOutput: ActionsJeuneQueryModel = {
-          actions: [],
-          metadonnees: {
-            nombreTotal: 1,
-            nombreFiltrees: 1,
-            nombreActionsParPage: 10
-          }
-        }
-        const expectedActions = success(actionsByJeuneOutput)
-        getActionsByJeuneQueryHandler.execute.resolves(expectedActions)
+        getActionsByJeuneQueryHandler.execute.resolves(success([]))
 
         // When
         await request(app.getHttpServer())
           .get(`/v2/jeunes/${idJeune}/actions`)
           .set('authorization', unHeaderAuthorization())
-          .query(queryActions)
+          .query({
+            ...queryActions,
+            dateDebut: uneDate().toISOString(),
+            dateFin: uneDate().toISOString()
+          })
           // Then
-          .expect(HttpStatus.PARTIAL_CONTENT)
-          .expect(actionsByJeuneOutput)
-      })
-
-      it('retourne 400 quand le paramètre page est manquant', async () => {
-        // Given
-        const queryActions = {
-          idJeune: idJeune,
-          tri: 'date_croissante'
-        }
-        // When
-        await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/actions`)
-          .set('authorization', unHeaderAuthorization())
-          .query(queryActions)
-          // Then
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-
-      it('retourne 400 quand le paramètre page est au mauvais format', async () => {
-        // Given
-        const queryActions = {
-          idJeune: idJeune,
-          page: 'poi'
-        }
-        // When
-        await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/actions`)
-          .set('authorization', unHeaderAuthorization())
-          .query(queryActions)
-          // Then
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-
-      it('retourne 400 quand le paramètre tri est manquant', async () => {
-        // Given
-        const queryActions = {
-          page: 1
-        }
-        // When
-        await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/actions`)
-          .set('authorization', unHeaderAuthorization())
-          .query(queryActions)
-          // Then
-          .expect(HttpStatus.BAD_REQUEST)
+          .expect(HttpStatus.OK)
+          .expect([])
       })
 
       it('retourne 400 quand le paramètre tri est au mauvais format', async () => {
         // Given
         const queryActions = {
+          idJeune: idJeune,
+          dateDebut: uneDate(),
+          dateFin: uneDate(),
           tri: 'croissants'
         }
         // When
         await request(app.getHttpServer())
           .get(`/v2/jeunes/${idJeune}/actions`)
           .set('authorization', unHeaderAuthorization())
-          .query(queryActions)
+          .query({
+            ...queryActions,
+            dateDebut: uneDate().toISOString(),
+            dateFin: uneDate().toISOString()
+          })
           // Then
           .expect(HttpStatus.BAD_REQUEST)
       })
@@ -740,13 +697,20 @@ describe('ActionsController', () => {
       it('retourne 400 quand le paramètre statuts est au mauvais format', async () => {
         // Given
         const queryActions = {
+          idJeune: idJeune,
+          dateDebut: uneDate(),
+          dateFin: uneDate(),
           statuts: ['à tes souhaits']
         }
         // When
         await request(app.getHttpServer())
           .get(`/v2/jeunes/${idJeune}/actions`)
           .set('authorization', unHeaderAuthorization())
-          .query(queryActions)
+          .query({
+            ...queryActions,
+            dateDebut: uneDate().toISOString(),
+            dateFin: uneDate().toISOString()
+          })
           // Then
           .expect(HttpStatus.BAD_REQUEST)
       })
@@ -754,13 +718,20 @@ describe('ActionsController', () => {
       it('retourne 400 quand le paramètre etats est au mauvais format', async () => {
         // Given
         const queryActions = {
+          idJeune: idJeune,
+          dateDebut: uneDate(),
+          dateFin: uneDate(),
           etats: ['à tes souhaits']
         }
         // When
         await request(app.getHttpServer())
           .get(`/v2/jeunes/${idJeune}/actions`)
           .set('authorization', unHeaderAuthorization())
-          .query(queryActions)
+          .query({
+            ...queryActions,
+            dateDebut: uneDate().toISOString(),
+            dateFin: uneDate().toISOString()
+          })
           // Then
           .expect(HttpStatus.BAD_REQUEST)
       })
@@ -768,13 +739,20 @@ describe('ActionsController', () => {
       it('retourne 400 quand le paramètre categories est au mauvais format', async () => {
         // Given
         const queryActions = {
+          idJeune: idJeune,
+          dateDebut: uneDate(),
+          dateFin: uneDate(),
           categories: ['à tes souhaits']
         }
         // When
         await request(app.getHttpServer())
           .get(`/v2/jeunes/${idJeune}/actions`)
           .set('authorization', unHeaderAuthorization())
-          .query(queryActions)
+          .query({
+            ...queryActions,
+            dateDebut: uneDate().toISOString(),
+            dateFin: uneDate().toISOString()
+          })
           // Then
           .expect(HttpStatus.BAD_REQUEST)
       })
@@ -783,7 +761,8 @@ describe('ActionsController', () => {
         // Given
         const queryActions = {
           idJeune: idJeune,
-          page: 2,
+          dateDebut: uneDate(),
+          dateFin: uneDate(),
           tri: 'date_croissante'
         }
         getActionsByJeuneQueryHandler.execute.resolves(
@@ -793,7 +772,11 @@ describe('ActionsController', () => {
         await request(app.getHttpServer())
           .get(`/v2/jeunes/${idJeune}/actions`)
           .set('authorization', unHeaderAuthorization())
-          .query(queryActions)
+          .query({
+            ...queryActions,
+            dateDebut: uneDate().toISOString(),
+            dateFin: uneDate().toISOString()
+          })
           // Then
           .expect(HttpStatus.NOT_FOUND)
       })
