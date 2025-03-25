@@ -179,6 +179,7 @@ export class JeunesController {
   }
 
   @Get(':idJeune/home/actions')
+  @ApiOperation({ deprecated: true })
   @ApiResponse({
     type: JeuneHomeActionQueryModel
   })

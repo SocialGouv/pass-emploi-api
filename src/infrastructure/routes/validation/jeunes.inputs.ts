@@ -1,19 +1,17 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { Transform, Type } from 'class-transformer'
+import { Transform } from 'class-transformer'
 import {
   ArrayNotEmpty,
   IsArray,
   IsBoolean,
   IsDateString,
   IsEnum,
-  IsInt,
   IsISO8601,
   IsNotEmpty,
   IsOptional,
   IsString,
   IsTimeZone,
   MaxLength,
-  Min,
   ValidateIf
 } from 'class-validator'
 import { Action } from '../../../domain/action/action'
@@ -113,34 +111,11 @@ export class GetRendezVousJeuneQueryParams {
 }
 
 export class GetActionsByJeuneQueryParams {
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsInt()
-  @Type(() => Number)
-  @Min(1)
-  page?: number
-
-  @ApiPropertyOptional({ enum: Action.Tri })
-  @IsOptional()
-  @IsEnum(Action.Tri)
-  tri?: Action.Tri
-
-  @ApiPropertyOptional({ enum: Action.Statut, isArray: true })
-  @IsOptional()
-  @IsEnum(Action.Statut, { each: true })
-  @Transform(params => transformStringToArray(params, 'statuts'))
-  statuts?: Action.Statut[]
-}
-
-export class GetActionsByJeuneV2QueryParams {
   @IsDateString()
   dateDebut: string
 
   @IsDateString()
   dateFin: string
-
-  @IsEnum(Action.Tri)
-  tri: Action.Tri
 
   @IsOptional()
   @IsEnum(Action.Statut, { each: true })

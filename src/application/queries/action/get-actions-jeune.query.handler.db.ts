@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { Op, Order, Sequelize, WhereOptions } from 'sequelize'
+import { Op, Sequelize, WhereOptions } from 'sequelize'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import { Result, success } from '../../../building-blocks/types/result'
@@ -9,14 +9,12 @@ import { fromSqlToActionQueryModelWithJeune } from '../../../infrastructure/repo
 import { ActionSqlModel } from '../../../infrastructure/sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { ConseillerInterAgenceAuthorizer } from '../../authorizers/conseiller-inter-agence-authorizer'
-import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { ActionQueryModel } from '../query-models/actions.query-model'
 
 export interface GetActionsJeuneQuery extends Query {
   idJeune: string
-  dateDebut: Date
-  dateFin: Date
-  tri: Action.Tri
+  dateDebut: string
+  dateFin: string
   statuts?: Action.Statut[]
   etats?: Action.Qualification.Etat[]
   codesCategories?: Action.Qualification.Code[]
@@ -28,7 +26,6 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
   Result<ActionQueryModel[]>
 > {
   constructor(
-    private jeuneAuthorizer: JeuneAuthorizer,
     private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer
   ) {
     super('GetActionsJeuneQueryHandler')
@@ -46,13 +43,10 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
     query: GetActionsJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      return this.conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo(
-        query.idJeune,
-        utilisateur
-      )
-    }
-    return this.jeuneAuthorizer.autoriserLeJeune(query.idJeune, utilisateur)
+    return this.conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo(
+      query.idJeune,
+      utilisateur
+    )
   }
 
   async monitor(): Promise<void> {
@@ -64,7 +58,10 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
   ): Promise<ActionSqlModel[]> {
     return ActionSqlModel.findAll({
       where: this.generateWhere(query),
-      order: this.trier[query.tri],
+      order: [
+        ['date_echeance', 'DESC'],
+        ['date_creation', 'ASC']
+      ],
       include: [
         {
           model: JeuneSqlModel,
@@ -113,24 +110,5 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
       where.push({ qualification_code: { [Op.in]: query.codesCategories } })
 
     return where
-  }
-
-  private trier: Record<Action.Tri, Order> = {
-    date_croissante: [['date_creation', 'ASC']],
-    date_decroissante: [['date_creation', 'DESC']],
-    date_echeance_croissante: [
-      ['date_echeance', 'ASC'],
-      ['date_creation', 'ASC']
-    ],
-    date_echeance_decroissante: [
-      ['date_echeance', 'DESC'],
-      ['date_creation', 'ASC']
-    ],
-    statut: [
-      Sequelize.literal(
-        `CASE WHEN statut = '${Action.Statut.TERMINEE}' THEN 1 ELSE 0 END`
-      ),
-      ['date_derniere_actualisation', 'DESC']
-    ]
   }
 }

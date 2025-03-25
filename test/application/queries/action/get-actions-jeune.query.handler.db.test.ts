@@ -15,7 +15,6 @@ import { uneActionDto } from 'test/fixtures/sql-models/action.sql-model'
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
-import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
 import {
   GetActionsJeuneQuery,
   GetActionsJeuneQueryHandler
@@ -26,10 +25,7 @@ import {
 } from '../../../../src/application/queries/query-models/actions.query-model'
 import { Action } from '../../../../src/domain/action/action'
 import { Core } from '../../../../src/domain/core'
-import {
-  unUtilisateurConseiller,
-  unUtilisateurJeune
-} from '../../../fixtures/authentification.fixture'
+import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import {
   DatabaseForTesting,
@@ -38,7 +34,6 @@ import {
 
 describe('GetActionsByJeuneQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
-  let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
   let getActionsByJeuneQueryHandler: GetActionsJeuneQueryHandler
   let sandbox: SinonSandbox
@@ -53,10 +48,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
   before(() => {
     databaseForTesting = getDatabase()
     sandbox = createSandbox()
-    jeuneAuthorizer = stubClass(JeuneAuthorizer)
     conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
     getActionsByJeuneQueryHandler = new GetActionsJeuneQueryHandler(
-      jeuneAuthorizer,
       conseillerAgenceAuthorizer
     )
   })
@@ -81,9 +74,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
     it('retourne un tableau vide et 0 résultat', async () => {
       const result = await getActionsByJeuneQueryHandler.handle({
         idJeune: jeuneDto.id,
-        tri: Action.Tri.STATUT,
-        dateDebut: debutPeriode.toJSDate(),
-        dateFin: finPeriode.toJSDate()
+        dateDebut: debutPeriode.toISO(),
+        dateFin: finPeriode.toISO()
       })
 
       // Then
@@ -119,9 +111,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
       // When
       const result = await getActionsByJeuneQueryHandler.handle({
         idJeune: jeuneDto.id,
-        tri: Action.Tri.STATUT,
-        dateDebut: debutPeriode.toJSDate(),
-        dateFin: finPeriode.toJSDate()
+        dateDebut: debutPeriode.toISO(),
+        dateFin: finPeriode.toISO()
       })
 
       // Then
@@ -170,9 +161,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
       // When
       const result = await getActionsByJeuneQueryHandler.handle({
         idJeune: jeuneDto.id,
-        tri: Action.Tri.STATUT,
-        dateDebut: debutPeriode.toJSDate(),
-        dateFin: finPeriode.toJSDate()
+        dateDebut: debutPeriode.toISO(),
+        dateFin: finPeriode.toISO()
       })
 
       // Then
@@ -224,9 +214,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
       // When
       const result = await getActionsByJeuneQueryHandler.handle({
         idJeune: jeuneDto.id,
-        tri: Action.Tri.STATUT,
-        dateDebut: debutPeriode.toJSDate(),
-        dateFin: finPeriode.toJSDate()
+        dateDebut: debutPeriode.toISO(),
+        dateFin: finPeriode.toISO()
       })
 
       // Then
@@ -234,138 +223,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
       if (isSuccess(result)) {
         expect(result.data).to.be.deep.equal([
           fromDtoToQueryModel(actionPrevuePendantPeriode, jeuneDto)
-        ])
-      }
-    })
-
-    it('applique le tri par date de création', async () => {
-      // Given
-      const action1 = uneActionDto({
-        idJeune: jeuneDto.id,
-        dateCreation: debutPeriode.toJSDate(),
-        dateEcheance: pendantPeriode
-      })
-      const action2 = uneActionDto({
-        idJeune: jeuneDto.id,
-        dateCreation: debutPeriode.plus({ day: 1 }).toJSDate(),
-        dateEcheance: pendantPeriode
-      })
-      const action3 = uneActionDto({
-        idJeune: jeuneDto.id,
-        dateCreation: debutPeriode.plus({ day: 2 }).toJSDate(),
-        dateEcheance: pendantPeriode
-      })
-      await ActionSqlModel.bulkCreate([action3, action1, action2])
-
-      // When
-      const result = await getActionsByJeuneQueryHandler.handle({
-        idJeune: jeuneDto.id,
-        tri: Action.Tri.DATE_CROISSANTE,
-        dateDebut: debutPeriode.toJSDate(),
-        dateFin: finPeriode.toJSDate()
-      })
-
-      // Then
-      expect(isSuccess(result)).to.be.true()
-      if (isSuccess(result)) {
-        expect(result.data).to.deep.equal([
-          fromDtoToQueryModel(action1, jeuneDto),
-          fromDtoToQueryModel(action2, jeuneDto),
-          fromDtoToQueryModel(action3, jeuneDto)
-        ])
-      }
-    })
-
-    it('applique le tri par date d’échéance', async () => {
-      // Given
-      const action1 = uneActionDto({
-        idJeune: jeuneDto.id,
-        dateEcheance: debutPeriode.plus({ day: 1 }).toJSDate()
-      })
-      const action2 = uneActionDto({
-        idJeune: jeuneDto.id,
-        dateEcheance: debutPeriode.plus({ day: 2 }).toJSDate()
-      })
-      const action3 = uneActionDto({
-        idJeune: jeuneDto.id,
-        dateEcheance: debutPeriode.plus({ day: 3 }).toJSDate()
-      })
-      await ActionSqlModel.bulkCreate([action3, action1, action2])
-
-      // When
-      const result = await getActionsByJeuneQueryHandler.handle({
-        idJeune: jeuneDto.id,
-        tri: Action.Tri.DATE_ECHEANCE_CROISSANTE,
-        dateDebut: debutPeriode.toJSDate(),
-        dateFin: finPeriode.toJSDate()
-      })
-
-      // Then
-      expect(isSuccess(result)).to.be.true()
-      if (isSuccess(result)) {
-        expect(result.data).to.deep.equal([
-          fromDtoToQueryModel(action1, jeuneDto),
-          fromDtoToQueryModel(action2, jeuneDto),
-          fromDtoToQueryModel(action3, jeuneDto)
-        ])
-      }
-    })
-
-    it('tri les actions terminées en dernières et les actions actualisées récemment en premíères', async () => {
-      // Given
-      const actionTerminee1 = uneActionDto({
-        idJeune: jeuneDto.id,
-        statut: Action.Statut.TERMINEE,
-        dateEcheance: pendantPeriode,
-        dateDerniereActualisation: maintenant.minus({ minute: 1 }).toJSDate()
-      })
-      const actionTerminee2 = uneActionDto({
-        idJeune: jeuneDto.id,
-        statut: Action.Statut.TERMINEE,
-        dateEcheance: pendantPeriode,
-        dateDerniereActualisation: maintenant.minus({ minute: 2 }).toJSDate()
-      })
-      const action3 = uneActionDto({
-        idJeune: jeuneDto.id,
-        dateEcheance: pendantPeriode,
-        dateDerniereActualisation: maintenant.minus({ minute: 3 }).toJSDate()
-      })
-      const action4 = uneActionDto({
-        idJeune: jeuneDto.id,
-        dateEcheance: pendantPeriode,
-        dateDerniereActualisation: maintenant.minus({ minute: 4 }).toJSDate()
-      })
-      await ActionSqlModel.bulkCreate([
-        action3,
-        actionTerminee2,
-        action4,
-        actionTerminee1
-      ])
-
-      // When
-      const result = await getActionsByJeuneQueryHandler.handle({
-        idJeune: jeuneDto.id,
-        tri: Action.Tri.STATUT,
-        dateDebut: debutPeriode.toJSDate(),
-        dateFin: finPeriode.toJSDate()
-      })
-
-      // Then
-      expect(isSuccess(result)).to.be.true()
-      if (isSuccess(result)) {
-        expect(result.data).to.deep.equal([
-          fromDtoToQueryModel(action3, jeuneDto),
-          fromDtoToQueryModel(action4, jeuneDto),
-          fromDtoToQueryModel(
-            actionTerminee1,
-            jeuneDto,
-            Action.Qualification.Etat.A_QUALIFIER
-          ),
-          fromDtoToQueryModel(
-            actionTerminee2,
-            jeuneDto,
-            Action.Qualification.Etat.A_QUALIFIER
-          )
         ])
       }
     })
@@ -422,9 +279,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
           // When
           const result = await getActionsByJeuneQueryHandler.handle({
             idJeune: jeuneDto.id,
-            tri: Action.Tri.STATUT,
-            dateDebut: debutPeriode.toJSDate(),
-            dateFin: finPeriode.toJSDate(),
+            dateDebut: debutPeriode.toISO(),
+            dateFin: finPeriode.toISO(),
             etats: [Action.Qualification.Etat.NON_QUALIFIABLE]
           })
 
@@ -438,9 +294,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
           // When
           const result = await getActionsByJeuneQueryHandler.handle({
             idJeune: jeuneDto.id,
-            tri: Action.Tri.STATUT,
-            dateDebut: debutPeriode.toJSDate(),
-            dateFin: finPeriode.toJSDate(),
+            dateDebut: debutPeriode.toISO(),
+            dateFin: finPeriode.toISO(),
             etats: [Action.Qualification.Etat.QUALIFIEE]
           })
 
@@ -454,9 +309,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
           // When
           const result = await getActionsByJeuneQueryHandler.handle({
             idJeune: jeuneDto.id,
-            tri: Action.Tri.STATUT,
-            dateDebut: debutPeriode.toJSDate(),
-            dateFin: finPeriode.toJSDate(),
+            dateDebut: debutPeriode.toISO(),
+            dateFin: finPeriode.toISO(),
             etats: [Action.Qualification.Etat.A_QUALIFIER]
           })
 
@@ -470,9 +324,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
           // When
           const result = await getActionsByJeuneQueryHandler.handle({
             idJeune: jeuneDto.id,
-            tri: Action.Tri.STATUT,
-            dateDebut: debutPeriode.toJSDate(),
-            dateFin: finPeriode.toJSDate(),
+            dateDebut: debutPeriode.toISO(),
+            dateFin: finPeriode.toISO(),
             etats: [
               Action.Qualification.Etat.A_QUALIFIER,
               Action.Qualification.Etat.QUALIFIEE,
@@ -524,9 +377,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
           // When
           const result = await getActionsByJeuneQueryHandler.handle({
             idJeune: jeuneDto.id,
-            tri: Action.Tri.STATUT,
-            dateDebut: debutPeriode.toJSDate(),
-            dateFin: finPeriode.toJSDate(),
+            dateDebut: debutPeriode.toISO(),
+            dateFin: finPeriode.toISO(),
             statuts: [Action.Statut.EN_COURS, Action.Statut.PAS_COMMENCEE]
           })
           // Then
@@ -543,9 +395,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
           // When
           const result1 = await getActionsByJeuneQueryHandler.handle({
             idJeune: jeuneDto.id,
-            tri: Action.Tri.STATUT,
-            dateDebut: debutPeriode.toJSDate(),
-            dateFin: finPeriode.toJSDate(),
+            dateDebut: debutPeriode.toISO(),
+            dateFin: finPeriode.toISO(),
             statuts: [Action.Statut.TERMINEE],
             etats: [Action.Qualification.Etat.NON_QUALIFIABLE]
           })
@@ -558,9 +409,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
           // When
           const result2 = await getActionsByJeuneQueryHandler.handle({
             idJeune: jeuneDto.id,
-            tri: Action.Tri.STATUT,
-            dateDebut: debutPeriode.toJSDate(),
-            dateFin: finPeriode.toJSDate(),
+            dateDebut: debutPeriode.toISO(),
+            dateFin: finPeriode.toISO(),
             statuts: [Action.Statut.EN_COURS, Action.Statut.PAS_COMMENCEE],
             etats: [Action.Qualification.Etat.A_QUALIFIER]
           })
@@ -604,9 +454,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
           // When
           const result = await getActionsByJeuneQueryHandler.handle({
             idJeune: jeuneDto.id,
-            tri: Action.Tri.STATUT,
-            dateDebut: debutPeriode.toJSDate(),
-            dateFin: finPeriode.toJSDate(),
+            dateDebut: debutPeriode.toISO(),
+            dateFin: finPeriode.toISO(),
             codesCategories: [Action.Qualification.Code.CITOYENNETE]
           })
           // Then
@@ -643,51 +492,25 @@ describe('GetActionsByJeuneQueryHandler', () => {
   })
 
   describe('authorize', () => {
-    describe("quand c'est un conseiller", () => {
-      it('valide le conseiller', async () => {
-        // Given
-        const utilisateur = unUtilisateurConseiller({
-          structure: Core.Structure.MILO
-        })
-
-        const query: GetActionsJeuneQuery = {
-          idJeune: 'id-jeune',
-          tri: Action.Tri.STATUT,
-          dateDebut: debutPeriode.toJSDate(),
-          dateFin: finPeriode.toJSDate()
-        }
-
-        // When
-        await getActionsByJeuneQueryHandler.authorize(query, utilisateur)
-
-        // Then
-        expect(
-          conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo
-        ).to.have.been.calledWithExactly('id-jeune', utilisateur)
+    it('valide le conseiller', async () => {
+      // Given
+      const utilisateur = unUtilisateurConseiller({
+        structure: Core.Structure.MILO
       })
-    })
 
-    describe("quand c'est un jeune", () => {
-      it('valide le jeune', async () => {
-        // Given
-        const utilisateur = unUtilisateurJeune()
+      const query: GetActionsJeuneQuery = {
+        idJeune: 'id-jeune',
+        dateDebut: debutPeriode.toISO(),
+        dateFin: finPeriode.toISO()
+      }
 
-        const query: GetActionsJeuneQuery = {
-          idJeune: 'id-jeune',
-          tri: Action.Tri.STATUT,
-          dateDebut: debutPeriode.toJSDate(),
-          dateFin: finPeriode.toJSDate()
-        }
+      // When
+      await getActionsByJeuneQueryHandler.authorize(query, utilisateur)
 
-        // When
-        await getActionsByJeuneQueryHandler.authorize(query, utilisateur)
-
-        // Then
-        expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
-          'id-jeune',
-          utilisateur
-        )
-      })
+      // Then
+      expect(
+        conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo
+      ).to.have.been.calledWithExactly('id-jeune', utilisateur)
     })
   })
 })
