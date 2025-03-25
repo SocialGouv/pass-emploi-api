@@ -133,27 +133,25 @@ export class GetActionsByJeuneQueryParams {
 }
 
 export class GetActionsByJeuneV2QueryParams {
-  @IsInt()
-  @Type(() => Number)
-  @Min(1)
-  page: number
+  @IsDateString()
+  dateDebut: string
+
+  @IsDateString()
+  dateFin: string
 
   @IsEnum(Action.Tri)
   tri: Action.Tri
 
-  @ApiPropertyOptional({ enum: Action.Statut, isArray: true })
   @IsOptional()
   @IsEnum(Action.Statut, { each: true })
   @Transform(params => transformStringToArray(params, 'statuts'))
   statuts?: Action.Statut[]
 
-  @ApiPropertyOptional({ enum: Action.Qualification.Etat, isArray: true })
   @IsOptional()
   @IsEnum(Action.Qualification.Etat, { each: true })
   @Transform(params => transformStringToArray(params, 'etats'))
   etats?: Action.Qualification.Etat[]
 
-  @ApiPropertyOptional({ enum: Action.Qualification.Code, isArray: true })
   @IsOptional()
   @IsEnum(Action.Qualification.Code, { each: true })
   @Transform(params => transformStringToArray(params, 'categories'))

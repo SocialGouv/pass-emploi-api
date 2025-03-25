@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common'
+import { Sequelize } from 'sequelize'
+import { Action } from 'src/domain/action/action'
+import { fromSqlToActionQueryModelWithJeune } from 'src/infrastructure/repositories/mappers/actions.mappers'
+import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
+import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { isSuccess, Result } from '../../building-blocks/types/result'
+import { Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { peutVoirLesCampagnes } from '../../domain/core'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
-import { GetActionsJeuneQueryHandler } from './action/get-actions-jeune.query.handler.db'
 import { GetCampagneQueryGetter } from './query-getters/get-campagne.query.getter'
 import { CampagneQueryModel } from './query-models/campagne.query-model'
 import { JeuneHomeActionQueryModel } from './query-models/home-jeune.query-model'
@@ -20,7 +24,6 @@ export class GetJeuneHomeActionsQueryHandler extends QueryHandler<
   JeuneHomeActionQueryModel
 > {
   constructor(
-    private getActionsByJeuneQueryHandler: GetActionsJeuneQueryHandler,
     private getCampagneQueryGetter: GetCampagneQueryGetter,
     private jeuneAuthorizer: JeuneAuthorizer
   ) {
@@ -37,14 +40,12 @@ export class GetJeuneHomeActionsQueryHandler extends QueryHandler<
         : Promise.resolve(undefined)
 
     const [actionsJeuneResult, campagne] = await Promise.all([
-      this.getActionsByJeuneQueryHandler.handle(query),
+      this.recupererActionsDuBeneficiaire(query.idJeune),
       getCampagne()
     ])
 
     return {
-      actions: isSuccess(actionsJeuneResult)
-        ? actionsJeuneResult.data.actions
-        : [],
+      actions: actionsJeuneResult.map(fromSqlToActionQueryModelWithJeune),
       campagne
     }
   }
@@ -58,5 +59,20 @@ export class GetJeuneHomeActionsQueryHandler extends QueryHandler<
 
   async monitor(): Promise<void> {
     return
+  }
+
+  private async recupererActionsDuBeneficiaire(
+    idJeune: string
+  ): Promise<ActionSqlModel[]> {
+    return ActionSqlModel.findAll({
+      where: [{ id_jeune: idJeune }],
+      order: [
+        Sequelize.literal(
+          `CASE WHEN statut = '${Action.Statut.TERMINEE}' THEN 1 ELSE 0 END`
+        ),
+        ['date_derniere_actualisation', 'DESC']
+      ],
+      include: [{ model: JeuneSqlModel, required: true }]
+    })
   }
 }

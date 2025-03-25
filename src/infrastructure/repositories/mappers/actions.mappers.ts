@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon'
+import { DateService } from 'src/utils/date-service'
 import {
   ActionQueryModel,
   BeneficiaireActionQueryModel,
@@ -6,7 +7,6 @@ import {
 } from '../../../application/queries/query-models/actions.query-model'
 import { Action } from '../../../domain/action/action'
 import { Jeune } from '../../../domain/jeune/jeune'
-import { DateService } from '../../../utils/date-service'
 import { ActionSqlModel } from '../../sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
 

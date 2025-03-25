@@ -1,47 +1,33 @@
-import { Inject, Injectable } from '@nestjs/common'
-import { Op, Order, QueryTypes, Sequelize, WhereOptions } from 'sequelize'
-import { NonTrouveError } from '../../../building-blocks/types/domain-error'
+import { Injectable } from '@nestjs/common'
+import { Op, Order, Sequelize, WhereOptions } from 'sequelize'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
-import { failure, Result, success } from '../../../building-blocks/types/result'
+import { Result, success } from '../../../building-blocks/types/result'
 import { Action } from '../../../domain/action/action'
 import { Authentification } from '../../../domain/authentification'
 import { fromSqlToActionQueryModelWithJeune } from '../../../infrastructure/repositories/mappers/actions.mappers'
 import { ActionSqlModel } from '../../../infrastructure/sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
-import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
 import { ConseillerInterAgenceAuthorizer } from '../../authorizers/conseiller-inter-agence-authorizer'
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { ActionQueryModel } from '../query-models/actions.query-model'
 
-const OFFSET_PAR_DEFAUT = 0
-const LIMITE_NOMBRE_ACTIONS_PAR_PAGE = 10
-
 export interface GetActionsJeuneQuery extends Query {
   idJeune: string
-  page?: number
-  tri?: Action.Tri
+  dateDebut: Date
+  dateFin: Date
+  tri: Action.Tri
   statuts?: Action.Statut[]
   etats?: Action.Qualification.Etat[]
   codesCategories?: Action.Qualification.Code[]
 }
 
-export interface ActionsJeuneQueryModel {
-  actions: ActionQueryModel[]
-  metadonnees: {
-    nombreTotal: number
-    nombreFiltrees: number
-    nombreActionsParPage: number
-  }
-}
-
 @Injectable()
 export class GetActionsJeuneQueryHandler extends QueryHandler<
   GetActionsJeuneQuery,
-  Result<ActionsJeuneQueryModel>
+  Result<ActionQueryModel[]>
 > {
   constructor(
-    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
     private jeuneAuthorizer: JeuneAuthorizer,
     private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer
   ) {
@@ -50,30 +36,10 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
 
   async handle(
     query: GetActionsJeuneQuery
-  ): Promise<Result<ActionsJeuneQueryModel>> {
-    const [actionsFiltrees, statutRawCount] = await Promise.all([
-      this.findAndCountAllActionsFiltrees(query),
-      this.compterActionsParStatut(query.idJeune)
-    ])
+  ): Promise<Result<ActionQueryModel[]>> {
+    const actionsSqlFiltrees = await this.findAllActionsFiltrees(query)
 
-    if (!laPageExiste(actionsFiltrees.count, query.page)) {
-      return failure(new NonTrouveError('Page', query.page?.toString()))
-    }
-
-    const metadonnees = {
-      nombreTotal: this.compterToutesLesActions(statutRawCount),
-      nombreFiltrees: actionsFiltrees.count,
-      nombreActionsParPage: LIMITE_NOMBRE_ACTIONS_PAR_PAGE
-    }
-
-    if (actionsFiltrees.count === 0) {
-      return success({ metadonnees, actions: [] })
-    }
-
-    return success({
-      metadonnees,
-      actions: actionsFiltrees.rows.map(fromSqlToActionQueryModelWithJeune)
-    })
+    return success(actionsSqlFiltrees.map(fromSqlToActionQueryModelWithJeune))
   }
 
   async authorize(
@@ -93,17 +59,12 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
     return
   }
 
-  private async findAndCountAllActionsFiltrees(
+  private async findAllActionsFiltrees(
     query: GetActionsJeuneQuery
-  ): Promise<{
-    rows: ActionSqlModel[]
-    count: number
-  }> {
-    return ActionSqlModel.findAndCountAll({
+  ): Promise<ActionSqlModel[]> {
+    return ActionSqlModel.findAll({
       where: this.generateWhere(query),
-      order: this.trier[query.tri ?? Action.Tri.STATUT],
-      limit: generateLimit(query.page),
-      offset: generateOffset(query.page),
+      order: this.trier[query.tri],
       include: [
         {
           model: JeuneSqlModel,
@@ -113,36 +74,30 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
     })
   }
 
-  private compterActionsParStatut(
-    idJeune: string
-  ): Promise<Array<RawCount<Action.Statut>>> {
-    return this.sequelize.query<RawCount<Action.Statut>>(
-      `
-        SELECT statut AS value, COUNT(*)
-        FROM action
-        WHERE id_jeune = :idJeune
-        GROUP BY value;
-      `,
-      {
-        type: QueryTypes.SELECT,
-        replacements: {
-          idJeune
-        }
-      }
-    )
-  }
-
-  private compterToutesLesActions<T>(rawCount: Array<RawCount<T>>): number {
-    return rawCount.reduce((total, { count }) => total + parseInt(count), 0)
-  }
-
   private generateWhere(query: GetActionsJeuneQuery): WhereOptions {
-    const where: WhereOptions = [{ id_jeune: query.idJeune }]
+    const inPeriode = { [Op.between]: [query.dateDebut, query.dateFin] }
+
+    const where: WhereOptions = [
+      {
+        id_jeune: query.idJeune,
+        [Op.or]: [
+          { date_fin_reelle: inPeriode },
+          { [Op.and]: { date_fin_reelle: null, date_debut: inPeriode } },
+          {
+            [Op.and]: {
+              date_fin_reelle: null,
+              date_debut: null,
+              date_echeance: inPeriode
+            }
+          }
+        ]
+      }
+    ]
 
     if (query.etats?.length) {
       where.push(
         Sequelize.where(
-          this.sequelize.literal(`CASE
+          Sequelize.literal(`CASE
             WHEN qualification_heures IS NOT null THEN 'QUALIFIEE'
             WHEN statut = 'done' AND dispositif = 'CEJ' THEN 'A_QUALIFIER'
             ELSE 'NON_QUALIFIABLE'
@@ -172,31 +127,10 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
       ['date_creation', 'ASC']
     ],
     statut: [
-      this.sequelize.literal(
+      Sequelize.literal(
         `CASE WHEN statut = '${Action.Statut.TERMINEE}' THEN 1 ELSE 0 END`
       ),
       ['date_derniere_actualisation', 'DESC']
     ]
   }
-}
-
-function generateLimit(page?: number): number | undefined {
-  return page ? LIMITE_NOMBRE_ACTIONS_PAR_PAGE : undefined
-}
-
-function generateOffset(page?: number): number {
-  return page ? (page - 1) * LIMITE_NOMBRE_ACTIONS_PAR_PAGE : OFFSET_PAR_DEFAUT
-}
-
-function laPageExiste(nombreTotalActions: number, page?: number): boolean {
-  if (!page || page === 1) {
-    return true
-  }
-  const pageMax = Math.ceil(nombreTotalActions / LIMITE_NOMBRE_ACTIONS_PAR_PAGE)
-  return page <= pageMax
-}
-
-interface RawCount<T> {
-  value: T
-  count: string
 }
