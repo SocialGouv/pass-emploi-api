@@ -642,103 +642,33 @@ describe('ActionsController', () => {
 
     describe('GET /jeunes/:idJeune/actions', () => {
       const idJeune = '1'
-      const date = '2020-04-06T12:00:00.000Z'
+      const queryActions: GetActionsJeuneQuery = {
+        idJeune: idJeune,
+        dateDebut: '2020-04-06T12:00:00.000Z',
+        dateFin: '2020-04-06T12:00:00.000Z'
+      }
+
       it('renvoie 200', async () => {
         // Given
-        const queryActions: GetActionsJeuneQuery = {
-          idJeune: idJeune,
-          dateDebut: date,
-          dateFin: date,
-          statuts: [Action.Statut.TERMINEE],
-          etats: [Qualification.Etat.A_QUALIFIER],
-          codesCategories: [Qualification.Code.SANTE]
-        }
         getActionsByJeuneQueryHandler.execute.resolves(success([]))
 
         // When
         await request(app.getHttpServer())
           .get(`/jeunes/${idJeune}/actions`)
           .set('authorization', unHeaderAuthorization())
-          .query({
-            ...queryActions,
-            dateDebut: date,
-            dateFin: date
-          })
+          .query(queryActions)
           // Then
           .expect(HttpStatus.OK)
           .expect([])
-      })
 
-      it('retourne 400 quand le paramètre statuts est au mauvais format', async () => {
-        // Given
-        const queryActions = {
-          idJeune: idJeune,
-          dateDebut: date,
-          dateFin: date,
-          statuts: ['à tes souhaits']
-        }
-        // When
-        await request(app.getHttpServer())
-          .get(`/jeunes/${idJeune}/actions`)
-          .set('authorization', unHeaderAuthorization())
-          .query({
-            ...queryActions,
-            dateDebut: date,
-            dateFin: date
-          })
-          // Then
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-
-      it('retourne 400 quand le paramètre etats est au mauvais format', async () => {
-        // Given
-        const queryActions = {
-          idJeune: idJeune,
-          dateDebut: date,
-          dateFin: date,
-          etats: ['à tes souhaits']
-        }
-        // When
-        await request(app.getHttpServer())
-          .get(`/jeunes/${idJeune}/actions`)
-          .set('authorization', unHeaderAuthorization())
-          .query({
-            ...queryActions,
-            dateDebut: date,
-            dateFin: date
-          })
-          // Then
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-
-      it('retourne 400 quand le paramètre categories est au mauvais format', async () => {
-        // Given
-        const queryActions = {
-          idJeune: idJeune,
-          dateDebut: date,
-          dateFin: date,
-          categories: ['à tes souhaits']
-        }
-        // When
-        await request(app.getHttpServer())
-          .get(`/jeunes/${idJeune}/actions`)
-          .set('authorization', unHeaderAuthorization())
-          .query({
-            ...queryActions,
-            dateDebut: date,
-            dateFin: date
-          })
-          // Then
-          .expect(HttpStatus.BAD_REQUEST)
+        // Then
+        expect(
+          getActionsByJeuneQueryHandler.execute
+        ).to.have.been.calledOnceWith(queryActions)
       })
 
       it('retourne 404 quand une failure non trouvé se produit', async () => {
         // Given
-        const queryActions = {
-          idJeune: idJeune,
-          dateDebut: date,
-          dateFin: date
-        }
         getActionsByJeuneQueryHandler.execute.resolves(
           failure(new NonTrouveError('test'))
         )
@@ -746,11 +676,7 @@ describe('ActionsController', () => {
         await request(app.getHttpServer())
           .get(`/jeunes/${idJeune}/actions`)
           .set('authorization', unHeaderAuthorization())
-          .query({
-            ...queryActions,
-            dateDebut: date,
-            dateFin: date
-          })
+          .query(queryActions)
           // Then
           .expect(HttpStatus.NOT_FOUND)
       })

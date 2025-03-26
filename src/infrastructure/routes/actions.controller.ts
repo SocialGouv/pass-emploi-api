@@ -358,10 +358,7 @@ export class ActionsController {
     const query: GetActionsJeuneQuery = {
       idJeune,
       dateDebut: getActionsByBeneficiaireQueryParams.dateDebut,
-      dateFin: getActionsByBeneficiaireQueryParams.dateFin,
-      statuts: getActionsByBeneficiaireQueryParams.statuts,
-      etats: getActionsByBeneficiaireQueryParams.etats,
-      codesCategories: getActionsByBeneficiaireQueryParams.categories
+      dateFin: getActionsByBeneficiaireQueryParams.dateFin
     }
 
     const result = await this.getActionsByJeuneQueryHandler.execute(

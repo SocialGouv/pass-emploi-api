@@ -1,5 +1,4 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { Transform } from 'class-transformer'
 import {
   ArrayNotEmpty,
   IsArray,
@@ -14,10 +13,8 @@ import {
   MaxLength,
   ValidateIf
 } from 'class-validator'
-import { Action } from '../../../domain/action/action'
 import { ArchiveJeune } from '../../../domain/archive-jeune'
 import { RendezVous } from '../../../domain/rendez-vous/rendez-vous'
-import { transformStringToArray } from './utils/transformers'
 
 export class UpdateConfigurationInput {
   @ApiProperty()
@@ -116,21 +113,6 @@ export class GetActionsByJeuneQueryParams {
 
   @IsDateString()
   dateFin: string
-
-  @IsOptional()
-  @IsEnum(Action.Statut, { each: true })
-  @Transform(params => transformStringToArray(params, 'statuts'))
-  statuts?: Action.Statut[]
-
-  @IsOptional()
-  @IsEnum(Action.Qualification.Etat, { each: true })
-  @Transform(params => transformStringToArray(params, 'etats'))
-  etats?: Action.Qualification.Etat[]
-
-  @IsOptional()
-  @IsEnum(Action.Qualification.Code, { each: true })
-  @Transform(params => transformStringToArray(params, 'categories'))
-  categories?: Action.Qualification.Code[]
 }
 
 export class MaintenantQueryParams {
