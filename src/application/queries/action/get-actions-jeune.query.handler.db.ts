@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common'
-import { Op, Sequelize, WhereOptions } from 'sequelize'
+import { Op } from 'sequelize'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import { Result, success } from '../../../building-blocks/types/result'
-import { Action } from '../../../domain/action/action'
 import { Authentification } from '../../../domain/authentification'
 import { fromSqlToActionQueryModelWithJeune } from '../../../infrastructure/repositories/mappers/actions.mappers'
 import { ActionSqlModel } from '../../../infrastructure/sequelize/models/action.sql-model'
@@ -15,9 +14,6 @@ export interface GetActionsJeuneQuery extends Query {
   idJeune: string
   dateDebut: string
   dateFin: string
-  statuts?: Action.Statut[]
-  etats?: Action.Qualification.Etat[]
-  codesCategories?: Action.Qualification.Code[]
 }
 
 @Injectable()
@@ -34,7 +30,7 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
   async handle(
     query: GetActionsJeuneQuery
   ): Promise<Result<ActionQueryModel[]>> {
-    const actionsSqlFiltrees = await this.findAllActionsFiltrees(query)
+    const actionsSqlFiltrees = await this.findAllActionsPeriode(query)
 
     return success(actionsSqlFiltrees.map(fromSqlToActionQueryModelWithJeune))
   }
@@ -53,11 +49,28 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
     return
   }
 
-  private async findAllActionsFiltrees(
+  private async findAllActionsPeriode(
     query: GetActionsJeuneQuery
   ): Promise<ActionSqlModel[]> {
+    const inPeriode = { [Op.between]: [query.dateDebut, query.dateFin] }
+
     return ActionSqlModel.findAll({
-      where: this.generateWhere(query),
+      where: [
+        {
+          id_jeune: query.idJeune,
+          [Op.or]: [
+            { date_fin_reelle: inPeriode },
+            { [Op.and]: { date_fin_reelle: null, date_debut: inPeriode } },
+            {
+              [Op.and]: {
+                date_fin_reelle: null,
+                date_debut: null,
+                date_echeance: inPeriode
+              }
+            }
+          ]
+        }
+      ],
       order: [
         ['date_echeance', 'DESC'],
         ['date_creation', 'ASC']
@@ -69,46 +82,5 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
         }
       ]
     })
-  }
-
-  private generateWhere(query: GetActionsJeuneQuery): WhereOptions {
-    const inPeriode = { [Op.between]: [query.dateDebut, query.dateFin] }
-
-    const where: WhereOptions = [
-      {
-        id_jeune: query.idJeune,
-        [Op.or]: [
-          { date_fin_reelle: inPeriode },
-          { [Op.and]: { date_fin_reelle: null, date_debut: inPeriode } },
-          {
-            [Op.and]: {
-              date_fin_reelle: null,
-              date_debut: null,
-              date_echeance: inPeriode
-            }
-          }
-        ]
-      }
-    ]
-
-    if (query.etats?.length) {
-      where.push(
-        Sequelize.where(
-          Sequelize.literal(`CASE
-            WHEN qualification_heures IS NOT null THEN 'QUALIFIEE'
-            WHEN statut = 'done' AND dispositif = 'CEJ' THEN 'A_QUALIFIER'
-            ELSE 'NON_QUALIFIABLE'
-          END`),
-          {
-            [Op.in]: query.etats
-          }
-        )
-      )
-    }
-    if (query.statuts) where.push({ statut: query.statuts })
-    if (query.codesCategories)
-      where.push({ qualification_code: { [Op.in]: query.codesCategories } })
-
-    return where
   }
 }
