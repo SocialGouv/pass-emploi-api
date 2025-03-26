@@ -46,7 +46,6 @@ import { toCommentaireQueryModel } from '../../application/queries/query-mappers
 import {
   ActionQueryModel,
   CommentaireActionQueryModel,
-  ListeActionsV2QueryModel,
   QualificationActionQueryModel
 } from '../../application/queries/query-models/actions.query-model'
 import { IdQueryModel } from '../../application/queries/query-models/common.query-models'
@@ -66,7 +65,7 @@ import {
   UpdateActionPayload
 } from './validation/actions.inputs'
 import { GetActionsConseillerV2QueryParams } from './validation/conseillers.inputs'
-import { GetActionsByJeuneV2QueryParams } from './validation/jeunes.inputs'
+import { GetActionsByJeuneQueryParams } from './validation/jeunes.inputs'
 
 @Controller()
 @CustomSwaggerApiOAuth2()
@@ -259,7 +258,7 @@ export class ActionsController {
       idCreateur: idConseiller,
       typeCreateur: Action.TypeCreateur.CONSEILLER,
       commentaire: createActionPayload.comment,
-      rappel: createActionPayload.dateEcheance ? true : false,
+      rappel: Boolean(createActionPayload.dateEcheance),
       dateEcheance: createActionPayload.dateEcheance
         ? DateTime.fromISO(createActionPayload.dateEcheance, { setZone: true })
         : this.buildDateEcheanceV1(),
@@ -339,23 +338,27 @@ export class ActionsController {
     return handleResult(result)
   }
 
-  @Get('v2/jeunes/:idJeune/actions')
-  @ApiResponse({
-    type: ListeActionsV2QueryModel
+  @Get('jeunes/:idJeune/actions')
+  @ApiOperation({
+    summary:
+      'Récupère les actions d’un bénéficiaire, terminées ou prévues sur la période demandée',
+    description:
+      'Autorisé pour le conseiller du bénéficiaire ou un conseiller de son agence milo'
   })
-  @HttpCode(HttpStatus.PARTIAL_CONTENT)
+  @ApiResponse({
+    type: ActionQueryModel,
+    isArray: true
+  })
+  @HttpCode(HttpStatus.OK)
   async getActionsJeune(
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
-    @Query() getActionsByJeuneQueryParams: GetActionsByJeuneV2QueryParams
-  ): Promise<ListeActionsV2QueryModel> {
+    @Query() getActionsByBeneficiaireQueryParams: GetActionsByJeuneQueryParams
+  ): Promise<ActionQueryModel[]> {
     const query: GetActionsJeuneQuery = {
       idJeune,
-      page: getActionsByJeuneQueryParams.page,
-      tri: getActionsByJeuneQueryParams.tri,
-      statuts: getActionsByJeuneQueryParams.statuts,
-      etats: getActionsByJeuneQueryParams.etats,
-      codesCategories: getActionsByJeuneQueryParams.categories
+      dateDebut: getActionsByBeneficiaireQueryParams.dateDebut,
+      dateFin: getActionsByBeneficiaireQueryParams.dateFin
     }
 
     const result = await this.getActionsByJeuneQueryHandler.execute(

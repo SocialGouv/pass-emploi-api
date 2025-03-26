@@ -14,7 +14,6 @@ import {
   TriActionsConseillerV2
 } from '../../../src/application/queries/action/get-actions-conseiller-v2.query.handler.db'
 import {
-  ActionsJeuneQueryModel,
   GetActionsJeuneQuery,
   GetActionsJeuneQueryHandler
 } from '../../../src/application/queries/action/get-actions-jeune.query.handler.db'
@@ -49,14 +48,9 @@ import {
   uneDatetimeAvecOffset
 } from '../../fixtures/date.fixture'
 import { uneActionQueryModel } from '../../fixtures/query-models/action.query-model.fixtures'
-import { StubbedClass, expect } from '../../utils'
+import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
-
-import Statut = Action.Statut
-import Tri = Action.Tri
-import Code = Qualification.Code
-import Etat = Qualification.Etat
 
 let getDetailActionQueryHandler: StubbedClass<GetDetailActionQueryHandler>
 let deleteActionCommandHandler: StubbedClass<DeleteActionCommandHandler>
@@ -456,7 +450,7 @@ describe('ActionsController', () => {
         content: "Ceci est un contenu d'action",
         comment: 'Ceci est un commentaire',
         status: Action.Statut.EN_COURS,
-        codeQualification: Code.CITOYENNETE,
+        codeQualification: Qualification.Code.CITOYENNETE,
         estDuplicata: true
       }
       it("renvoie l'id de l'action créée avec echeance par defaut", async () => {
@@ -485,7 +479,7 @@ describe('ActionsController', () => {
             commentaire: 'Ceci est un commentaire',
             dateEcheance: nowJsPlus3Mois,
             rappel: false,
-            codeQualification: Code.CITOYENNETE,
+            codeQualification: Qualification.Code.CITOYENNETE,
             estDuplicata: true
           },
           unUtilisateurDecode()
@@ -503,7 +497,7 @@ describe('ActionsController', () => {
           .send({
             content: "Ceci est un contenu d'action",
             comment: 'Ceci est un commentaire',
-            codeQualification: Code.CITOYENNETE
+            codeQualification: Qualification.Code.CITOYENNETE
           })
 
           // Then
@@ -521,7 +515,7 @@ describe('ActionsController', () => {
             commentaire: 'Ceci est un commentaire',
             dateEcheance: nowJsPlus3Mois,
             rappel: false,
-            codeQualification: Code.CITOYENNETE,
+            codeQualification: Qualification.Code.CITOYENNETE,
             estDuplicata: undefined
           },
           unUtilisateurDecode()
@@ -540,7 +534,7 @@ describe('ActionsController', () => {
             content: "Ceci est un contenu d'action",
             comment: 'Ceci est un commentaire',
             status: Action.Statut.TERMINEE,
-            codeQualification: Code.CITOYENNETE
+            codeQualification: Qualification.Code.CITOYENNETE
           })
 
           // Then
@@ -558,7 +552,7 @@ describe('ActionsController', () => {
             commentaire: 'Ceci est un commentaire',
             dateEcheance: now,
             rappel: false,
-            codeQualification: Code.CITOYENNETE,
+            codeQualification: Qualification.Code.CITOYENNETE,
             estDuplicata: undefined
           },
           unUtilisateurDecode()
@@ -595,7 +589,7 @@ describe('ActionsController', () => {
             commentaire: 'Ceci est un commentaire',
             dateEcheance: uneDatetimeAvecOffset(),
             rappel: false,
-            codeQualification: Code.CITOYENNETE,
+            codeQualification: Qualification.Code.CITOYENNETE,
             estDuplicata: true
           },
           unUtilisateurDecode()
@@ -646,152 +640,41 @@ describe('ActionsController', () => {
       ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/ABCDE/action')
     })
 
-    describe('GET /v2/jeunes/:idJeune/actions', () => {
+    describe('GET /jeunes/:idJeune/actions', () => {
       const idJeune = '1'
-      it('renvoie 206', async () => {
+      const queryActions: GetActionsJeuneQuery = {
+        idJeune: idJeune,
+        dateDebut: '2020-04-06T12:00:00.000Z',
+        dateFin: '2020-04-06T12:00:00.000Z'
+      }
+
+      it('renvoie 200', async () => {
         // Given
-        const queryActions: GetActionsJeuneQuery = {
-          idJeune: idJeune,
-          page: 1,
-          tri: Tri.DATE_CROISSANTE,
-          statuts: [Statut.TERMINEE],
-          etats: [Etat.A_QUALIFIER],
-          codesCategories: [Code.SANTE]
-        }
-        const actionsByJeuneOutput: ActionsJeuneQueryModel = {
-          actions: [],
-          metadonnees: {
-            nombreTotal: 1,
-            nombreFiltrees: 1,
-            nombreActionsParPage: 10
-          }
-        }
-        const expectedActions = success(actionsByJeuneOutput)
-        getActionsByJeuneQueryHandler.execute.resolves(expectedActions)
+        getActionsByJeuneQueryHandler.execute.resolves(success([]))
 
         // When
         await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/actions`)
+          .get(`/jeunes/${idJeune}/actions`)
           .set('authorization', unHeaderAuthorization())
           .query(queryActions)
           // Then
-          .expect(HttpStatus.PARTIAL_CONTENT)
-          .expect(actionsByJeuneOutput)
-      })
+          .expect(HttpStatus.OK)
+          .expect([])
 
-      it('retourne 400 quand le paramètre page est manquant', async () => {
-        // Given
-        const queryActions = {
-          idJeune: idJeune,
-          tri: 'date_croissante'
-        }
-        // When
-        await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/actions`)
-          .set('authorization', unHeaderAuthorization())
-          .query(queryActions)
-          // Then
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-
-      it('retourne 400 quand le paramètre page est au mauvais format', async () => {
-        // Given
-        const queryActions = {
-          idJeune: idJeune,
-          page: 'poi'
-        }
-        // When
-        await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/actions`)
-          .set('authorization', unHeaderAuthorization())
-          .query(queryActions)
-          // Then
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-
-      it('retourne 400 quand le paramètre tri est manquant', async () => {
-        // Given
-        const queryActions = {
-          page: 1
-        }
-        // When
-        await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/actions`)
-          .set('authorization', unHeaderAuthorization())
-          .query(queryActions)
-          // Then
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-
-      it('retourne 400 quand le paramètre tri est au mauvais format', async () => {
-        // Given
-        const queryActions = {
-          tri: 'croissants'
-        }
-        // When
-        await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/actions`)
-          .set('authorization', unHeaderAuthorization())
-          .query(queryActions)
-          // Then
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-
-      it('retourne 400 quand le paramètre statuts est au mauvais format', async () => {
-        // Given
-        const queryActions = {
-          statuts: ['à tes souhaits']
-        }
-        // When
-        await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/actions`)
-          .set('authorization', unHeaderAuthorization())
-          .query(queryActions)
-          // Then
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-
-      it('retourne 400 quand le paramètre etats est au mauvais format', async () => {
-        // Given
-        const queryActions = {
-          etats: ['à tes souhaits']
-        }
-        // When
-        await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/actions`)
-          .set('authorization', unHeaderAuthorization())
-          .query(queryActions)
-          // Then
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-
-      it('retourne 400 quand le paramètre categories est au mauvais format', async () => {
-        // Given
-        const queryActions = {
-          categories: ['à tes souhaits']
-        }
-        // When
-        await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/actions`)
-          .set('authorization', unHeaderAuthorization())
-          .query(queryActions)
-          // Then
-          .expect(HttpStatus.BAD_REQUEST)
+        // Then
+        expect(
+          getActionsByJeuneQueryHandler.execute
+        ).to.have.been.calledOnceWith(queryActions)
       })
 
       it('retourne 404 quand une failure non trouvé se produit', async () => {
         // Given
-        const queryActions = {
-          idJeune: idJeune,
-          page: 2,
-          tri: 'date_croissante'
-        }
         getActionsByJeuneQueryHandler.execute.resolves(
           failure(new NonTrouveError('test'))
         )
         // When
         await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/actions`)
+          .get(`/jeunes/${idJeune}/actions`)
           .set('authorization', unHeaderAuthorization())
           .query(queryActions)
           // Then
