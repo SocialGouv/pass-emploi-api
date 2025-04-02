@@ -168,7 +168,7 @@ import { GetFavorisOffresEmploiJeuneQueryHandler } from './application/queries/g
 import { GetFavorisOffresImmersionJeuneQueryHandler } from './application/queries/get-favoris-offres-immersion-jeune.query.handler.db'
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from './application/queries/get-favoris-service-civique-jeune.query.handler.db'
 import { GetIndicateursPourConseillerQueryHandler } from './application/queries/get-indicateurs-pour-conseiller.query.handler.db'
-import { GetJeuneHomeActionsQueryHandler } from './application/queries/get-jeune-home-actions.query.handler'
+import { GetJeuneHomeActionsQueryHandler } from 'src/application/queries/get-jeune-home-actions.query.handler.db'
 import { GetJeuneHomeAgendaQueryHandler } from './application/queries/get-jeune-home-agenda.query.handler.db'
 import { GetJeuneHomeDemarchesQueryHandler } from './application/queries/get-jeune-home-demarches.query.handler'
 import { GetJeuneMiloByDossierQueryHandler } from './application/queries/get-jeune-milo-by-dossier.query.handler.db'
