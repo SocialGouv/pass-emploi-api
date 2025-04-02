@@ -207,7 +207,8 @@ export const testConfig = (): ConfigService => {
       maxAgeSuggestions: '600',
       maxAgeMinimal: '5',
       staleIfErrorAgeMinimal: '5'
-    }
+    },
+    remoteConfig: { conseillersCVM: ['ok'] }
   })
 }
 
