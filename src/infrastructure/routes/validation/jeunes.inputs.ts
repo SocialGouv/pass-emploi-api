@@ -1,25 +1,20 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { Transform, Type } from 'class-transformer'
 import {
   ArrayNotEmpty,
   IsArray,
   IsBoolean,
   IsDateString,
   IsEnum,
-  IsInt,
   IsISO8601,
   IsNotEmpty,
   IsOptional,
   IsString,
   IsTimeZone,
   MaxLength,
-  Min,
   ValidateIf
 } from 'class-validator'
-import { Action } from '../../../domain/action/action'
 import { ArchiveJeune } from '../../../domain/archive-jeune'
 import { RendezVous } from '../../../domain/rendez-vous/rendez-vous'
-import { transformStringToArray } from './utils/transformers'
 
 export class UpdateConfigurationInput {
   @ApiProperty()
@@ -113,51 +108,11 @@ export class GetRendezVousJeuneQueryParams {
 }
 
 export class GetActionsByJeuneQueryParams {
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsInt()
-  @Type(() => Number)
-  @Min(1)
-  page?: number
+  @IsDateString()
+  dateDebut: string
 
-  @ApiPropertyOptional({ enum: Action.Tri })
-  @IsOptional()
-  @IsEnum(Action.Tri)
-  tri?: Action.Tri
-
-  @ApiPropertyOptional({ enum: Action.Statut, isArray: true })
-  @IsOptional()
-  @IsEnum(Action.Statut, { each: true })
-  @Transform(params => transformStringToArray(params, 'statuts'))
-  statuts?: Action.Statut[]
-}
-
-export class GetActionsByJeuneV2QueryParams {
-  @IsInt()
-  @Type(() => Number)
-  @Min(1)
-  page: number
-
-  @IsEnum(Action.Tri)
-  tri: Action.Tri
-
-  @ApiPropertyOptional({ enum: Action.Statut, isArray: true })
-  @IsOptional()
-  @IsEnum(Action.Statut, { each: true })
-  @Transform(params => transformStringToArray(params, 'statuts'))
-  statuts?: Action.Statut[]
-
-  @ApiPropertyOptional({ enum: Action.Qualification.Etat, isArray: true })
-  @IsOptional()
-  @IsEnum(Action.Qualification.Etat, { each: true })
-  @Transform(params => transformStringToArray(params, 'etats'))
-  etats?: Action.Qualification.Etat[]
-
-  @ApiPropertyOptional({ enum: Action.Qualification.Code, isArray: true })
-  @IsOptional()
-  @IsEnum(Action.Qualification.Code, { each: true })
-  @Transform(params => transformStringToArray(params, 'categories'))
-  categories?: Action.Qualification.Code[]
+  @IsDateString()
+  dateFin: string
 }
 
 export class MaintenantQueryParams {
