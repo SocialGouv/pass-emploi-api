@@ -15,6 +15,7 @@ import { GetDetailConseillerQueryHandler } from 'src/application/queries/get-det
 import { GetIndicateursPourConseillerQueryHandler } from 'src/application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { GetJeunesByConseillerQueryHandler } from 'src/application/queries/get-jeunes-by-conseiller.query.handler.db'
 import { GetJeunesIdentitesQueryHandler } from 'src/application/queries/get-jeunes-identites.query.handler.db'
+import { GetRendezVousJeuneQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
 import {
   DroitsInsuffisants,
   NonTrouveError
@@ -25,6 +26,7 @@ import {
   success
 } from 'src/building-blocks/types/result'
 import { Core } from 'src/domain/core'
+import { RendezVous } from 'src/domain/rendez-vous/rendez-vous'
 import { EnvoyerNotificationsPayload } from 'src/infrastructure/routes/validation/conseillers.inputs'
 import * as request from 'supertest'
 import { uneAgence } from 'test/fixtures/agence.fixture'
@@ -35,7 +37,7 @@ import {
 import { unConseiller } from 'test/fixtures/conseiller.fixture'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import { detailConseillerQueryModel } from 'test/fixtures/query-models/conseiller.query-model.fixtures'
-import { StubbedClass, expect } from 'test/utils'
+import { expect, StubbedClass } from 'test/utils'
 import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
 import { GetDemarchesConseillerQueryHandler } from '../../../src/application/queries/get-demarches-conseiller.query.handler'
@@ -53,6 +55,7 @@ describe('ConseillersController', () => {
   let getIndicateursJeunePourConseillerQueryHandler: StubbedClass<GetIndicateursPourConseillerQueryHandler>
   let getIdentitesJeunesQueryHandler: StubbedClass<GetJeunesIdentitesQueryHandler>
   let getDemarchesConseillerQueryHandler: StubbedClass<GetDemarchesConseillerQueryHandler>
+  let getRendezVousJeuneQueryHandler: StubbedClass<GetRendezVousJeuneQueryHandler>
 
   let app: INestApplication
 
@@ -81,6 +84,7 @@ describe('ConseillersController', () => {
     getDemarchesConseillerQueryHandler = app.get(
       GetDemarchesConseillerQueryHandler
     )
+    getRendezVousJeuneQueryHandler = app.get(GetRendezVousJeuneQueryHandler)
   })
 
   describe('DELETE /conseillers/:idConseiller', () => {
@@ -658,6 +662,93 @@ describe('ConseillersController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       '/conseillers/1/jeunes/2/demarches'
+    )
+  })
+
+  describe('GET /conseillers/:idConseiller/jeunes/:idJeune/rendezvous', () => {
+    it("retourne une 404 quand le jeune n'existe pas", async () => {
+      // Given
+      getRendezVousJeuneQueryHandler.execute.resolves(
+        failure(new NonTrouveError('Jeune', '1'))
+      )
+
+      // When
+      await request(app.getHttpServer())
+        .get('/conseillers/id-conseiller/jeunes/id-jeune/rendezvous')
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.NOT_FOUND)
+    })
+
+    it("retourne tous les rendez-vous si aucune période n'est renseignée", async () => {
+      // Given
+      getRendezVousJeuneQueryHandler.execute.resolves(success([]))
+
+      // When - Then
+      await request(app.getHttpServer())
+        .get('/conseillers/id-conseiller/jeunes/id-jeune/rendezvous')
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+
+      expect(
+        getRendezVousJeuneQueryHandler.execute
+      ).to.have.been.calledWithExactly(
+        { idJeune: 'id-jeune', periode: undefined },
+        unUtilisateurDecode()
+      )
+    })
+
+    it('retourne les rendez-vous futurs si periode FUTURS est renseignée', async () => {
+      // Given
+      getRendezVousJeuneQueryHandler.execute.resolves(success([]))
+
+      // When - Then
+      await request(app.getHttpServer())
+        .get(
+          `/conseillers/id-conseiller/jeunes/id-jeune/rendezvous?periode=FUTURS`
+        )
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+
+      expect(
+        getRendezVousJeuneQueryHandler.execute
+      ).to.have.been.calledWithExactly(
+        { idJeune: 'id-jeune', periode: RendezVous.Periode.FUTURS },
+        unUtilisateurDecode()
+      )
+    })
+
+    it('retourne les rendez-vous passés si periode PASSES est renseignée', async () => {
+      // Given
+      getRendezVousJeuneQueryHandler.execute.resolves(success([]))
+
+      // When - Then
+      await request(app.getHttpServer())
+        .get(
+          `/conseillers/id-conseiller/jeunes/id-jeune/rendezvous?periode=PASSES`
+        )
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+
+      expect(
+        getRendezVousJeuneQueryHandler.execute
+      ).to.have.been.calledWithExactly(
+        { idJeune: 'id-jeune', periode: RendezVous.Periode.PASSES },
+        unUtilisateurDecode()
+      )
+    })
+
+    it('retourne une 400 quand periode est mal formatée', async () => {
+      // When - Then
+      await request(app.getHttpServer())
+        .get(`/conseillers/id-conseiller/jeunes/id-jeune/rendezvous?periode=XX`)
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/conseillers/1/jeunes/1/rendezvous'
     )
   })
 })

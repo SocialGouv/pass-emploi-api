@@ -2,12 +2,8 @@ import { stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { Core } from 'src/domain/core'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
-import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
-import {
-  GetRendezVousJeuneQuery,
-  GetRendezVousJeuneQueryHandler
-} from '../../../../src/application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
-import { Evenement, EvenementService } from '../../../../src/domain/evenement'
+import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
+import { GetRendezVousJeuneQueryHandler } from '../../../../src/application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
 import { RendezVous } from '../../../../src/domain/rendez-vous/rendez-vous'
 import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
@@ -29,15 +25,11 @@ import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-mo
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import { getDatabase } from '../../../utils/database-for-testing'
 import { testConfig } from '../../../utils/module-for-testing'
-import { stubClassSandbox } from '../../../utils/types'
-import { ConseillerInterAgenceAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 
 describe('GetRendezVousJeuneQueryHandler', () => {
   let dateService: StubbedClass<DateService>
-  let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
   let getRendezVousQueryHandler: GetRendezVousJeuneQueryHandler
-  let evenementService: StubbedClass<EvenementService>
   let sandbox: SinonSandbox
 
   const utilisateurJeune = unUtilisateurJeune()
@@ -56,18 +48,14 @@ describe('GetRendezVousJeuneQueryHandler', () => {
     dateService.nowJs.returns(maintenant.toJSDate())
     dateService.nowAtMidnightJs.returns(aujourdhuiMinuit.toJSDate())
     conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
-    jeuneAuthorizer = stubClass(JeuneAuthorizer)
   })
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
-    evenementService = stubClassSandbox(EvenementService, sandbox)
 
     getRendezVousQueryHandler = new GetRendezVousJeuneQueryHandler(
       dateService,
-      jeuneAuthorizer,
       conseillerAgenceAuthorizer,
-      evenementService,
       testConfig()
     )
   })
@@ -251,103 +239,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
     })
   })
 
-  describe('monitor', () => {
-    describe("quand c'est un jeune", () => {
-      it('envoie un évènement de consultation de la liste des rendez vous sans période', async () => {
-        // Given
-        const utilisateur = unUtilisateurJeune({ id: 'sans-periode' })
-        const query: GetRendezVousJeuneQuery = {
-          idJeune: 'id',
-          periode: undefined
-        }
-        // When
-        await getRendezVousQueryHandler.monitor(utilisateur, query)
-        // Then
-        expect(evenementService.creer).to.have.been.calledWithExactly(
-          Evenement.Code.RDV_LISTE,
-          utilisateur
-        )
-      })
-      it('envoie un évènement de consultation de la liste des rendez vous dans le futur', async () => {
-        // Given
-        const utilisateur = unUtilisateurJeune({ id: 'periode-futur' })
-        const query: GetRendezVousJeuneQuery = {
-          idJeune: 'id',
-          periode: RendezVous.Periode.FUTURS
-        }
-        // When
-        await getRendezVousQueryHandler.monitor(utilisateur, query)
-        // Then
-        expect(evenementService.creer).to.have.been.calledWithExactly(
-          Evenement.Code.RDV_LISTE,
-          utilisateur
-        )
-      })
-      it("n'envoie pas un évènement de consultation de la liste des rendez vous dans le passé", async () => {
-        // Given
-        const utilisateur = unUtilisateurJeune({ id: 'periode-passe' })
-        const query: GetRendezVousJeuneQuery = {
-          idJeune: 'id',
-          periode: RendezVous.Periode.PASSES
-        }
-        // When
-        await getRendezVousQueryHandler.monitor(utilisateur, query)
-        // Then
-        expect(evenementService.creer).not.to.have.been.calledWithExactly(
-          Evenement.Code.RDV_LISTE,
-          utilisateur
-        )
-      })
-    })
-    describe("quand c'est un conseiller", () => {
-      it("n'envoie pas un évènement de consultation de la liste des rendez vous passés", async () => {
-        // Given
-        const utilisateur = unUtilisateurConseiller({ id: 'periode-passe' })
-        const query: GetRendezVousJeuneQuery = {
-          idJeune: 'id',
-          periode: RendezVous.Periode.PASSES
-        }
-        // When
-        await getRendezVousQueryHandler.monitor(utilisateur, query)
-        // Then
-        expect(evenementService.creer).not.to.have.been.called()
-      })
-      it("n'envoie pas un évènement de consultation de la liste des rendez vous futurs", async () => {
-        // Given
-        const utilisateur = unUtilisateurConseiller({ id: 'periode-passe' })
-        const query: GetRendezVousJeuneQuery = {
-          idJeune: 'id',
-          periode: RendezVous.Periode.FUTURS
-        }
-        // When
-        await getRendezVousQueryHandler.monitor(utilisateur, query)
-        // Then
-        expect(evenementService.creer).not.to.have.been.called()
-      })
-    })
-  })
-
   describe('authorize', () => {
-    it('appelle l’authorizer idoine pou un jeune', async () => {
-      // Given
-      const utilisateur = unUtilisateurJeune({
-        structure: Core.Structure.MILO
-      })
-
-      // When
-      await getRendezVousQueryHandler.authorize(
-        {
-          idJeune: jeune1.id
-        },
-        utilisateur
-      )
-
-      // Then
-      expect(jeuneAuthorizer.autoriserLeJeune).to.have.been.calledWithExactly(
-        jeune1.id,
-        utilisateur
-      )
-    })
     it('appelle l’authorizer idoine pour un conseiller', async () => {
       // Given
       const conseiller = unUtilisateurConseiller({
@@ -356,9 +248,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
 
       // When
       await getRendezVousQueryHandler.authorize(
-        {
-          idJeune: jeune1.id
-        },
+        { idJeune: jeune1.id },
         conseiller
       )
 

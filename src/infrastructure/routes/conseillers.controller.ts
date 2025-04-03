@@ -14,6 +14,9 @@ import {
 } from '@nestjs/common'
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { DateTime } from 'luxon'
+import { RendezVousJeuneQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
+import { GetRendezVousJeuneQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
+import { GetRendezVousJeuneQueryParams } from 'src/infrastructure/routes/validation/jeunes.inputs'
 import { DeleteConseillerCommandHandler } from '../../application/commands/conseiller/delete-conseiller.command.handler'
 import { ModifierConseillerCommandHandler } from '../../application/commands/conseiller/modifier-conseiller.command.handler'
 import {
@@ -69,7 +72,8 @@ export class ConseillersController {
     private readonly createListeDeDiffusionCommandHandler: CreateListeDeDiffusionCommandHandler,
     private readonly getIdentitesJeunesQueryHandler: GetJeunesIdentitesQueryHandler,
     private readonly deleteConseillerCommandHandler: DeleteConseillerCommandHandler,
-    private readonly getDemarchesConseillerQueryHandler: GetDemarchesConseillerQueryHandler
+    private readonly getDemarchesConseillerQueryHandler: GetDemarchesConseillerQueryHandler,
+    private readonly getRendezVousJeuneQueryHandler: GetRendezVousJeuneQueryHandler
   ) {}
 
   @ApiOperation({
@@ -346,6 +350,28 @@ export class ConseillersController {
       },
       utilisateur
     )
+    return handleResult(result)
+  }
+
+  @Get(':idConseiller/jeunes/:idJeune/rendezvous')
+  @ApiOperation({
+    summary: 'Récupère les rendez-vous d’un jeune Milo',
+    description: 'Autorisé pour un jeune Milo'
+  })
+  @ApiResponse({
+    type: RendezVousJeuneQueryModel,
+    isArray: true
+  })
+  async getRendezVousJeune(
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @Query() getRendezVousQueryParams?: GetRendezVousJeuneQueryParams
+  ): Promise<RendezVousJeuneQueryModel[]> {
+    const result = await this.getRendezVousJeuneQueryHandler.execute(
+      { idJeune, periode: getRendezVousQueryParams?.periode },
+      utilisateur
+    )
+
     return handleResult(result)
   }
 }
