@@ -100,11 +100,18 @@ export class UpdateJeunePayload {
 }
 
 export class GetRendezVousJeuneQueryParams {
-  @ApiProperty({ required: false, enum: RendezVous.Periode })
   @IsOptional()
   @IsString()
   @IsEnum(RendezVous.Periode)
   periode?: RendezVous.Periode
+}
+
+export class GetRendezVousJeuneConseillerQueryParams {
+  @IsDateString()
+  dateDebut: string
+
+  @IsDateString()
+  dateFin: string
 }
 
 export class GetActionsByJeuneQueryParams {
