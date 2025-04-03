@@ -3,7 +3,7 @@ import { Cached, Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { estPoleEmploiOuCDOuAvenirPro } from '../../domain/core'
+import { beneficiaireEstFTConnect } from '../../domain/core'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
 import { DemarcheQueryModel } from './query-models/actions.query-model'
@@ -41,7 +41,7 @@ export class GetDemarchesQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
-      estPoleEmploiOuCDOuAvenirPro(utilisateur.structure)
+      beneficiaireEstFTConnect(utilisateur.structure)
     )
   }
 

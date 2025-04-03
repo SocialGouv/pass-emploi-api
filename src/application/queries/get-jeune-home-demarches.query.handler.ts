@@ -4,7 +4,7 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { isFailure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import {
-  estPoleEmploiOuCDOuAvenirPro,
+  beneficiaireEstFTConnect,
   peutVoirLesCampagnes
 } from '../../domain/core'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
@@ -69,7 +69,7 @@ export class GetJeuneHomeDemarchesQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
-      estPoleEmploiOuCDOuAvenirPro(utilisateur.structure)
+      beneficiaireEstFTConnect(utilisateur.structure)
     )
   }
 

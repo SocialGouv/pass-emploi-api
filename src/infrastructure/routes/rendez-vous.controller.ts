@@ -52,7 +52,7 @@ import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../application/quer
 import { GetRendezVousJeuneQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
 import { Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Core, estPoleEmploiOuCDOuAvenirPro } from '../../domain/core'
+import { Core, beneficiaireEstFTConnect } from '../../domain/core'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import {
@@ -290,7 +290,7 @@ export class RendezVousController {
     @AccessToken() accessToken: string,
     @Query() getRendezVousQueryParams?: GetRendezVousJeuneQueryParams
   ): Promise<RendezVousJeuneQueryModel[]> {
-    if (estPoleEmploiOuCDOuAvenirPro(utilisateur.structure) && accessToken) {
+    if (beneficiaireEstFTConnect(utilisateur.structure) && accessToken) {
       const result =
         await this.getRendezVousJeunePoleEmploiQueryHandler.execute(
           {
@@ -330,7 +330,7 @@ export class RendezVousController {
     @AccessToken() accessToken: string,
     @Query() getRendezVousQueryParams?: GetRendezVousJeuneQueryParams
   ): Promise<RendezVousJeuneQueryModelV2> {
-    if (estPoleEmploiOuCDOuAvenirPro(utilisateur.structure) && accessToken) {
+    if (beneficiaireEstFTConnect(utilisateur.structure) && accessToken) {
       const result =
         await this.getRendezVousJeunePoleEmploiQueryHandler.execute(
           {
