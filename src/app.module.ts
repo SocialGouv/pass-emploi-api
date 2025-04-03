@@ -371,6 +371,7 @@ import { IdService } from './utils/id-service'
 import { configureLoggerModule } from './utils/logger.module'
 import { RateLimiterService } from './utils/rate-limiter.service'
 import { NotifierActualisationJobHandler } from './application/jobs/notifier-actualisation.job.handler.db'
+import { ConfigController } from './infrastructure/routes/config.controller'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -420,6 +421,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     CJEController,
     AuthentificationController,
     SupportController,
+    ConfigController,
     HealthController
   ],
   providers: [

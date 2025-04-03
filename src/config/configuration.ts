@@ -277,7 +277,10 @@ export default () => {
     },
     recherche: {
       seuil: process.env.THRESHOLD_SEARCH_MESSAGES
-    }
+    },
+    remoteConfig: process.env.REMOTE_CONFIG
+      ? JSON.parse(process.env.REMOTE_CONFIG)
+      : {}
   }
   return Joi.attempt(configuration, configurationSchema)
 }
