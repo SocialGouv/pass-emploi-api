@@ -113,7 +113,7 @@ export default class AutoinscrireBeneficiaireSessionMiloCommandHandler extends C
       return failure(new NonTrouveError('Bénéficiaire', command.idBeneficiaire))
 
     if (
-      utilisateur.type !== Authentification.Type.JEUNE ||
+      !Authentification.estJeune(utilisateur.type) ||
       aggregate.id !== utilisateur.id
     )
       return failure(new DroitsInsuffisants())

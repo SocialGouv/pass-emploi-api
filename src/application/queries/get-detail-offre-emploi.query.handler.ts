@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import {
@@ -8,13 +9,12 @@ import {
   Result,
   success
 } from '../../building-blocks/types/result'
-import { PoleEmploiClient } from '../../infrastructure/clients/pole-emploi-client'
-import { OffreEmploiDto } from '../../infrastructure/repositories/dto/pole-emploi.dto'
-import { OffreEmploiQueryModel } from './query-models/offres-emploi.query-model'
 import { Authentification } from '../../domain/authentification'
 import { Evenement, EvenementService } from '../../domain/evenement'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import { PoleEmploiClient } from '../../infrastructure/clients/pole-emploi-client'
+import { OffreEmploiDto } from '../../infrastructure/repositories/dto/pole-emploi.dto'
 import { mapOrigine } from '../../infrastructure/repositories/mappers/offres-emploi.mappers'
+import { OffreEmploiQueryModel } from './query-models/offres-emploi.query-model'
 
 export interface GetDetailOffreEmploiQuery extends Query {
   idOffreEmploi: string
@@ -56,7 +56,7 @@ export class GetDetailOffreEmploiQueryHandler extends QueryHandler<
     utilisateur: Authentification.Utilisateur,
     query: GetDetailOffreEmploiQuery
   ): Promise<void> {
-    if (utilisateur.type == Authentification.Type.CONSEILLER) {
+    if (Authentification.estConseiller(utilisateur.type)) {
       const offreEmploiDtoResult = await this.poleEmploiClient.getOffreEmploi(
         query.idOffreEmploi
       )

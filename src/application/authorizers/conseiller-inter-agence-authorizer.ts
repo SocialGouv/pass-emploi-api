@@ -1,18 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
 import {
-  Result,
   emptySuccess,
-  failure
+  failure,
+  Result
 } from '../../building-blocks/types/result'
 import { Action, ActionRepositoryToken } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
+import { estMilo } from '../../domain/core'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import {
   Conseiller,
   ConseillerRepositoryToken
 } from '../../domain/milo/conseiller'
-import { estMilo } from '../../domain/core'
-import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import {
   RendezVous,
   RendezVousRepositoryToken
@@ -35,7 +35,7 @@ export class ConseillerInterAgenceAuthorizer {
     idAgence: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (Authentification.estConseiller(utilisateur.type)) {
       const conseiller = await this.conseillerRepository.get(utilisateur.id)
 
       if (conseiller?.agence?.id === idAgence) {
@@ -49,7 +49,7 @@ export class ConseillerInterAgenceAuthorizer {
     idJeune: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (Authentification.estConseiller(utilisateur.type)) {
       const jeune = await this.jeuneRepository.get(idJeune)
       return this.autoriserPourSonJeuneOuUnJeuneDeSonAgenceMilo(
         utilisateur,
@@ -63,7 +63,7 @@ export class ConseillerInterAgenceAuthorizer {
     idJeune: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (Authentification.estConseiller(utilisateur.type)) {
       const jeune = await this.jeuneRepository.get(idJeune)
 
       if (jeune && jeune.preferences.partageFavoris) {
@@ -80,7 +80,7 @@ export class ConseillerInterAgenceAuthorizer {
     idAction: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (Authentification.estConseiller(utilisateur.type)) {
       const action = await this.actionRepository.get(idAction)
       if (action) {
         return this.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo(
@@ -97,7 +97,7 @@ export class ConseillerInterAgenceAuthorizer {
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (
-      utilisateur.type === Authentification.Type.CONSEILLER &&
+      Authentification.estConseiller(utilisateur.type) &&
       estMilo(utilisateur.structure)
     ) {
       const rendezVous = await this.rendezVousRepository.get(idRendezVous)

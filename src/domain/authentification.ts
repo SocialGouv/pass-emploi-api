@@ -74,12 +74,10 @@ export namespace Authentification {
     )
   }
 
-  // TODO utilser partout
   export function estJeune(type: Authentification.Type): boolean {
     return type === Authentification.Type.JEUNE
   }
 
-  // TODO utilser partout
   export function estConseiller(type: Authentification.Type): boolean {
     return type === Authentification.Type.CONSEILLER
   }
