@@ -1,17 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { Op, Order, Sequelize } from 'sequelize'
-import { Result, success } from '../../../building-blocks/types/result'
-import { Authentification } from '../../../domain/authentification'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
+import { Result, success } from '../../../building-blocks/types/result'
+import { Authentification } from '../../../domain/authentification'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { fromSqlToRendezVousConseillerQueryModel } from '../query-mappers/rendez-vous-milo.mappers'
 import { RendezVousConseillerQueryModel } from '../query-models/rendez-vous.query-model'
-import { ConfigService } from '@nestjs/config'
-import { generateSourceRendezVousCondition } from '../../../config/feature-flipping'
 
 const NOMBRE_RDV_MAX = 200
 
@@ -61,7 +60,6 @@ export class GetRendezVousConseillerPaginesQueryHandler extends QueryHandler<
               AND jeune.id_conseiller = :id_conseiller
             )`)
         },
-        ...generateSourceRendezVousCondition(this.configuration),
         ...generateDateCondition(query.dateDebut, query.dateFin),
         ...presenceConseillerCondition
       },
