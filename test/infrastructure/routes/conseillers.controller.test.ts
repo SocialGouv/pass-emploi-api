@@ -26,7 +26,6 @@ import {
   success
 } from 'src/building-blocks/types/result'
 import { Core } from 'src/domain/core'
-import { RendezVous } from 'src/domain/rendez-vous/rendez-vous'
 import { EnvoyerNotificationsPayload } from 'src/infrastructure/routes/validation/conseillers.inputs'
 import * as request from 'supertest'
 import { uneAgence } from 'test/fixtures/agence.fixture'
@@ -674,38 +673,22 @@ describe('ConseillersController', () => {
 
       // When
       await request(app.getHttpServer())
-        .get('/conseillers/id-conseiller/jeunes/id-jeune/rendezvous')
+        .get(
+          '/conseillers/id-conseiller/jeunes/id-jeune/rendezvous?dateDebut=2025-02-21&dateFin=2025-03-03'
+        )
         .set('authorization', unHeaderAuthorization())
         // Then
         .expect(HttpStatus.NOT_FOUND)
     })
 
-    it("retourne tous les rendez-vous si aucune période n'est renseignée", async () => {
-      // Given
-      getRendezVousJeuneQueryHandler.execute.resolves(success([]))
-
-      // When - Then
-      await request(app.getHttpServer())
-        .get('/conseillers/id-conseiller/jeunes/id-jeune/rendezvous')
-        .set('authorization', unHeaderAuthorization())
-        .expect(HttpStatus.OK)
-
-      expect(
-        getRendezVousJeuneQueryHandler.execute
-      ).to.have.been.calledWithExactly(
-        { idJeune: 'id-jeune', periode: undefined },
-        unUtilisateurDecode()
-      )
-    })
-
-    it('retourne les rendez-vous futurs si periode FUTURS est renseignée', async () => {
+    it('retourne les rendez-vous de la période', async () => {
       // Given
       getRendezVousJeuneQueryHandler.execute.resolves(success([]))
 
       // When - Then
       await request(app.getHttpServer())
         .get(
-          `/conseillers/id-conseiller/jeunes/id-jeune/rendezvous?periode=FUTURS`
+          '/conseillers/id-conseiller/jeunes/id-jeune/rendezvous?dateDebut=2025-02-21&dateFin=2025-03-03'
         )
         .set('authorization', unHeaderAuthorization())
         .expect(HttpStatus.OK)
@@ -713,35 +696,17 @@ describe('ConseillersController', () => {
       expect(
         getRendezVousJeuneQueryHandler.execute
       ).to.have.been.calledWithExactly(
-        { idJeune: 'id-jeune', periode: RendezVous.Periode.FUTURS },
+        { idJeune: 'id-jeune', dateDebut: '2025-02-21', dateFin: '2025-03-03' },
         unUtilisateurDecode()
       )
     })
 
-    it('retourne les rendez-vous passés si periode PASSES est renseignée', async () => {
-      // Given
-      getRendezVousJeuneQueryHandler.execute.resolves(success([]))
-
+    it('contrôle les paramètres', async () => {
       // When - Then
       await request(app.getHttpServer())
         .get(
-          `/conseillers/id-conseiller/jeunes/id-jeune/rendezvous?periode=PASSES`
+          '/conseillers/id-conseiller/jeunes/id-jeune/rendezvous?dateDebut=2025-02-21&dateFin=03/03/2025'
         )
-        .set('authorization', unHeaderAuthorization())
-        .expect(HttpStatus.OK)
-
-      expect(
-        getRendezVousJeuneQueryHandler.execute
-      ).to.have.been.calledWithExactly(
-        { idJeune: 'id-jeune', periode: RendezVous.Periode.PASSES },
-        unUtilisateurDecode()
-      )
-    })
-
-    it('retourne une 400 quand periode est mal formatée', async () => {
-      // When - Then
-      await request(app.getHttpServer())
-        .get(`/conseillers/id-conseiller/jeunes/id-jeune/rendezvous?periode=XX`)
         .set('authorization', unHeaderAuthorization())
         .expect(HttpStatus.BAD_REQUEST)
     })

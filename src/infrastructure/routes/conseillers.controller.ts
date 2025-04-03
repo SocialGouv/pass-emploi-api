@@ -16,7 +16,7 @@ import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { DateTime } from 'luxon'
 import { RendezVousJeuneQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
 import { GetRendezVousJeuneQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
-import { GetRendezVousJeuneQueryParams } from 'src/infrastructure/routes/validation/jeunes.inputs'
+import { GetRendezVousJeuneConseillerQueryParams } from 'src/infrastructure/routes/validation/jeunes.inputs'
 import { DeleteConseillerCommandHandler } from '../../application/commands/conseiller/delete-conseiller.command.handler'
 import { ModifierConseillerCommandHandler } from '../../application/commands/conseiller/modifier-conseiller.command.handler'
 import {
@@ -365,10 +365,10 @@ export class ConseillersController {
   async getRendezVousJeune(
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
-    @Query() getRendezVousQueryParams?: GetRendezVousJeuneQueryParams
+    @Query() getRendezVousQueryParams: GetRendezVousJeuneConseillerQueryParams
   ): Promise<RendezVousJeuneQueryModel[]> {
     const result = await this.getRendezVousJeuneQueryHandler.execute(
-      { idJeune, periode: getRendezVousQueryParams?.periode },
+      { idJeune, ...getRendezVousQueryParams },
       utilisateur
     )
 
