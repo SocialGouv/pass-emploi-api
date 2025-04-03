@@ -6,10 +6,10 @@ import {
   NonTraitableReason
 } from '../../building-blocks/types/domain-error'
 import {
-  Result,
   emptySuccess,
   failure,
   isFailure,
+  Result,
   success
 } from '../../building-blocks/types/result'
 import {
@@ -21,8 +21,8 @@ import { MailServiceToken } from '../../domain/mail'
 import { MailBrevoService } from '../../infrastructure/clients/mail-brevo.service.db'
 import { DateService } from '../../utils/date-service'
 import {
-  UtilisateurQueryModel,
-  queryModelFromUtilisateur
+  queryModelFromUtilisateur,
+  UtilisateurQueryModel
 } from '../queries/query-models/authentification.query-model'
 
 export type StructureUtilisateurAuth = Core.Structure | 'FRANCE_TRAVAIL'
@@ -245,7 +245,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
 
     const estUnConseillerMilo =
       estMilo(utilisateur.structure) &&
-      utilisateur.type === Authentification.Type.CONSEILLER
+      Authentification.estConseiller(utilisateur.type)
 
     if (estUnConseillerMilo) {
       const quiVientDeRemplirSonEmail = !utilisateur.email && command.email

@@ -6,11 +6,11 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import {
   Conseiller,
   ConseillerRepositoryToken
 } from '../../domain/milo/conseiller'
-import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 
 @Injectable()
 export class ConseillerAuthorizer {
@@ -26,7 +26,7 @@ export class ConseillerAuthorizer {
     structureAutorisee = true
   ): Promise<Result> {
     if (
-      utilisateur.type === Authentification.Type.CONSEILLER &&
+      Authentification.estConseiller(utilisateur.type) &&
       structureAutorisee
     ) {
       const conseiller = await this.conseillerRepository.get(idConseiller)
@@ -47,7 +47,7 @@ export class ConseillerAuthorizer {
   ): Promise<Result> {
     if (
       structureAutorisee &&
-      utilisateur.type === Authentification.Type.CONSEILLER
+      Authentification.estConseiller(utilisateur.type)
     ) {
       const conseiller = await this.conseillerRepository.get(idConseiller)
       const jeune = await this.jeuneRepository.get(idJeune)
@@ -69,7 +69,7 @@ export class ConseillerAuthorizer {
     structureAutorisee = true
   ): Promise<Result> {
     if (
-      utilisateur.type === Authentification.Type.CONSEILLER &&
+      Authentification.estConseiller(utilisateur.type) &&
       structureAutorisee
     ) {
       const conseiller = await this.conseillerRepository.get(utilisateur.id)
@@ -88,7 +88,7 @@ export class ConseillerAuthorizer {
     structureAutorisee = true
   ): Promise<Result> {
     if (
-      utilisateur.type === Authentification.Type.CONSEILLER &&
+      Authentification.estConseiller(utilisateur.type) &&
       structureAutorisee
     ) {
       const jeune = await this.jeuneRepository.get(idJeune)
@@ -105,7 +105,7 @@ export class ConseillerAuthorizer {
     idsJeunes: string[],
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (Authentification.estConseiller(utilisateur.type)) {
       const idsJeunesSansDoublons = idsJeunes.filter(
         (value, index, array) => array.indexOf(value) === index
       )
@@ -127,7 +127,7 @@ export class ConseillerAuthorizer {
     idsJeunes: string[],
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (Authentification.estConseiller(utilisateur.type)) {
       const idsJeunesSansDoublons = idsJeunes.filter(
         (value, index, array) => array.indexOf(value) === index
       )
@@ -150,7 +150,7 @@ export class ConseillerAuthorizer {
   async autoriserConseillerSuperviseur(
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (Authentification.estConseiller(utilisateur.type)) {
       const conseiller = await this.conseillerRepository.get(utilisateur.id)
 
       if (conseiller && Authentification.estSuperviseur(utilisateur)) {
@@ -165,7 +165,7 @@ export class ConseillerAuthorizer {
     utilisateur: Authentification.Utilisateur,
     idAgence: string
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (Authentification.estConseiller(utilisateur.type)) {
       const conseiller = await this.conseillerRepository.get(utilisateur.id)
 
       if (

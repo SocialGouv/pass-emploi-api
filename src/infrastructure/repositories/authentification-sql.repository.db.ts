@@ -116,7 +116,7 @@ export class AuthentificationSqlOidcRepository
   }
 
   async update(utilisateur: Authentification.Utilisateur): Promise<void> {
-    if (Authentification.Type.JEUNE === utilisateur.type) {
+    if (Authentification.estJeune(utilisateur.type)) {
       await JeuneSqlModel.update(
         {
           idAuthentification: utilisateur.idAuthentification,
@@ -128,7 +128,7 @@ export class AuthentificationSqlOidcRepository
         },
         { where: { id: utilisateur.id } }
       )
-    } else if (Authentification.Type.CONSEILLER === utilisateur.type) {
+    } else if (Authentification.estConseiller(utilisateur.type)) {
       await ConseillerSqlModel.update(
         {
           idAuthentification: utilisateur.idAuthentification,
@@ -148,7 +148,7 @@ export class AuthentificationSqlOidcRepository
     utilisateur: Authentification.Utilisateur,
     dateCreation?: Date
   ): Promise<void> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (Authentification.estConseiller(utilisateur.type)) {
       await ConseillerSqlModel.upsert({
         id: utilisateur.id,
         nom: utilisateur.nom,

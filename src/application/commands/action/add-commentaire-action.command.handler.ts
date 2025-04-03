@@ -68,7 +68,7 @@ export class AddCommentaireActionCommandHandler extends CommandHandler<
     )
     await this.commentaireActionRepository.save(commentaire)
 
-    if (command.createur.type !== Authentification.Type.JEUNE) {
+    if (!Authentification.estJeune(command.createur.type)) {
       await this.notifier(action)
     }
     return success(commentaire)
@@ -100,7 +100,7 @@ export class AddCommentaireActionCommandHandler extends CommandHandler<
   }
 
   private getType(typeUtilisateur: Authentification.Type): Action.TypeCreateur {
-    return typeUtilisateur === Authentification.Type.JEUNE
+    return Authentification.estJeune(typeUtilisateur)
       ? Action.TypeCreateur.JEUNE
       : Action.TypeCreateur.CONSEILLER
   }

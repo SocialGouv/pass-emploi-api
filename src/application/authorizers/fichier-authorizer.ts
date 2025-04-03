@@ -28,7 +28,7 @@ export class FichierAuthorizer {
     idsJeunes?: string[],
     idsListeDiffusion?: string[]
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.JEUNE) return emptySuccess()
+    if (Authentification.estJeune(utilisateur.type)) return emptySuccess()
 
     if (idsJeunes?.length) {
       const resultJeunes =
@@ -67,23 +67,23 @@ export class FichierAuthorizer {
       if (fichierMetadata.idCreateur === utilisateur.id) return emptySuccess()
 
       if (
-        utilisateur.type === Authentification.Type.JEUNE &&
+        Authentification.estJeune(utilisateur.type) &&
         fichierMetadata.idsJeunes.includes(utilisateur.id)
       )
         return emptySuccess()
 
-      if (utilisateur.type === Authentification.Type.CONSEILLER) {
+      if (Authentification.estConseiller(utilisateur.type)) {
         const jeunesDuConseiller =
           await this.jeuneRepository.findAllJeunesByConseiller(utilisateur.id)
         const idsJeunesDuConseiller = jeunesDuConseiller.map(({ id }) => id)
 
         if (
-          fichierMetadata.typeCreateur === Authentification.Type.JEUNE &&
+          Authentification.estJeune(fichierMetadata.typeCreateur) &&
           idsJeunesDuConseiller.includes(fichierMetadata.idCreateur)
         )
           return emptySuccess()
 
-        if (fichierMetadata.typeCreateur === Authentification.Type.CONSEILLER) {
+        if (Authentification.estConseiller(fichierMetadata.typeCreateur)) {
           const leConseillerADesJeunesDansLeFichier =
             fichierMetadata.idsJeunes.some(idJeuneDuFichier =>
               idsJeunesDuConseiller.includes(idJeuneDuFichier)
