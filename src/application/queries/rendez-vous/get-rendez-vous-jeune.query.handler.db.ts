@@ -6,7 +6,6 @@ import { estMilo } from 'src/domain/core'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import { failure, Result, success } from '../../../building-blocks/types/result'
-import { generateSourceRendezVousCondition } from '../../../config/feature-flipping'
 import { Authentification } from '../../../domain/authentification'
 import { RendezVous } from '../../../domain/rendez-vous/rendez-vous'
 import { ConseillerSqlModel } from '../../../infrastructure/sequelize/models/conseiller.sql-model'
@@ -96,11 +95,11 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
         {
           model: JeuneSqlModel,
           where: { id: idJeune },
+          required: true,
           include: [ConseillerSqlModel]
         }
       ],
       where: {
-        ...generateSourceRendezVousCondition(this.configuration),
         date: {
           [Op.lt]: maintenant
         }
@@ -119,11 +118,11 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
         {
           model: JeuneSqlModel,
           where: { id: idJeune },
+          required: true,
           include: [ConseillerSqlModel]
         }
       ],
       where: {
-        ...generateSourceRendezVousCondition(this.configuration),
         date: {
           [Op.gte]: maintenant
         }
@@ -140,10 +139,10 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
         {
           model: JeuneSqlModel,
           where: { id: idJeune },
+          required: true,
           include: [ConseillerSqlModel]
         }
       ],
-      where: generateSourceRendezVousCondition(this.configuration),
       order: [['date', 'ASC']]
     })
   }

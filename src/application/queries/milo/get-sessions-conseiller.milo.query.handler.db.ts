@@ -19,7 +19,6 @@ import { MiloClient } from 'src/infrastructure/clients/milo-client'
 import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { DateService } from 'src/utils/date-service'
-import { sessionsMiloActives } from '../../../config/feature-flipping'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { SessionConseillerMiloQueryModel } from '../query-models/sessions.milo.query.model'
 import estEmargeeMaisPasClose = SessionMilo.estEmargeeMaisPasClose
@@ -60,8 +59,6 @@ export class GetSessionsConseillerMiloQueryHandler extends QueryHandler<
     )
     if (isFailure(resultConseiller)) return resultConseiller
     const conseiller = resultConseiller.data
-
-    if (!sessionsMiloActives(this.configService)) return success([])
 
     const resultSessionsDtos = await this.getSessionsDtos(
       query,

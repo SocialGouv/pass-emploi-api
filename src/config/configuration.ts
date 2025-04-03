@@ -253,12 +253,9 @@ export default () => {
     version: process.env.npm_package_version ?? '0.0.0',
     features: {
       envoyerStatsMatomo: process.env.FEATURE_ENVOYER_STATS_MATOMO === 'true',
-      rendezVousMilo: process.env.FEATURE_RDV_MILO === 'true',
       notifierRendezVousMilo: process.env.FEATURE_NOTIFIER_RDV_MILO === 'true',
       recupererStructureMilo:
         process.env.FEATURE_RECUPERER_STRUCTURE_MILO === 'true',
-      recupererSessionsMilo:
-        process.env.FEATURE_RECUPERER_SESSIONS_MILO === 'true'
     },
     values: {
       maxRechercheConseillers: process.env.MAX_RECHERCHE_CONSEILLERS ?? '10'
