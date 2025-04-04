@@ -7,8 +7,8 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Conseiller } from '../../domain/milo/conseiller'
-import ListeDeDiffusion = Conseiller.ListeDeDiffusion
 import { ListeDeDiffusionRepositoryToken } from '../../domain/milo/liste-de-diffusion'
+import ListeDeDiffusion = Conseiller.ListeDeDiffusion
 
 @Injectable()
 export class ListeDeDiffusionAuthorizer {
@@ -21,7 +21,7 @@ export class ListeDeDiffusionAuthorizer {
     idListe: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (Authentification.estConseiller(utilisateur.type)) {
       const listeDeDiffusion = await this.repository.get(idListe)
 
       if (listeDeDiffusion?.idConseiller === utilisateur.id) {

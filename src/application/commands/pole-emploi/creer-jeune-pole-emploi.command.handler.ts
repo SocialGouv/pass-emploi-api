@@ -9,7 +9,7 @@ import {
 import { Result, failure, success } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../../domain/chat'
-import { Core, estPoleEmploiOuCDOuAvenirPro } from '../../../domain/core'
+import { Core, beneficiaireEstFTConnect } from '../../../domain/core'
 import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import {
   Conseiller,
@@ -83,7 +83,7 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
     return this.conseillerAuthorizer.autoriserLeConseiller(
       command.idConseiller,
       utilisateur,
-      estPoleEmploiOuCDOuAvenirPro(utilisateur.structure)
+      beneficiaireEstFTConnect(utilisateur.structure)
     )
   }
 

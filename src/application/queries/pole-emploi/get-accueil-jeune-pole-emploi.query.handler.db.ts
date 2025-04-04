@@ -12,7 +12,7 @@ import {
 import { Authentification } from '../../../domain/authentification'
 import {
   Core,
-  estPoleEmploiOuCDOuAvenirPro,
+  beneficiaireEstFTConnect,
   peutVoirLesCampagnes
 } from '../../../domain/core'
 import { Demarche } from '../../../domain/demarche'
@@ -198,7 +198,7 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
-      estPoleEmploiOuCDOuAvenirPro(utilisateur.structure)
+      beneficiaireEstFTConnect(utilisateur.structure)
     )
   }
 

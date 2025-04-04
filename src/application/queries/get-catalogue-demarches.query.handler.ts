@@ -9,7 +9,7 @@ import { buildError } from 'src/utils/logger.module'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result, isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Core, estPoleEmploiOuCDOuAvenirPro } from '../../domain/core'
+import { Core, beneficiaireEstFTConnect } from '../../domain/core'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { ThematiqueQueryModel } from './query-models/catalogue.query-model'
 
@@ -103,7 +103,7 @@ export class GetCatalogueDemarchesQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       utilisateur.id,
       utilisateur,
-      estPoleEmploiOuCDOuAvenirPro(utilisateur.structure)
+      beneficiaireEstFTConnect(utilisateur.structure)
     )
   }
 

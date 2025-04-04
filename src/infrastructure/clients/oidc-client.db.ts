@@ -10,7 +10,7 @@ import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.excepti
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import { firstValueFrom } from 'rxjs'
 import { Authentification } from 'src/domain/authentification'
-import { Core, estMilo, estPoleEmploiOuCDOuAvenirPro } from 'src/domain/core'
+import { Core, estMilo, beneficiaireEstFTConnect } from 'src/domain/core'
 import { buildError } from 'src/utils/logger.module'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
@@ -92,7 +92,7 @@ export class OidcClient {
       } else {
         if (!structure) {
           message = 'token_expired'
-        } else if (estPoleEmploiOuCDOuAvenirPro(structure)) {
+        } else if (beneficiaireEstFTConnect(structure)) {
           message = 'token_pole_emploi_expired'
         } else if (estMilo(structure)) {
           message = 'token_milo_expired'

@@ -28,7 +28,7 @@ export class GetDetailRendezVousJeuneQueryHandler extends QueryHandler<
     query: GetDetailRendezVousJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.JEUNE) {
+    if (Authentification.estJeune(utilisateur.type)) {
       return this.rendezVousAuthorizer.autoriserJeunePourSonRendezVous(
         query.idRendezVous,
         utilisateur
