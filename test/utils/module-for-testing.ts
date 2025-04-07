@@ -11,6 +11,8 @@ import { TerminusModule } from '@nestjs/terminus'
 import { Test, TestingModuleBuilder } from '@nestjs/testing'
 import { messaging } from 'firebase-admin'
 import { JWTPayload } from 'jose'
+import { parse } from 'pg-connection-string'
+import { createSandbox, SinonSandbox } from 'sinon'
 import {
   buildModuleMetadata,
   buildQueryCommandsProviders
@@ -21,11 +23,9 @@ import { OidcAuthGuard } from 'src/infrastructure/auth/oidc.auth-guard'
 import { FirebaseClient } from 'src/infrastructure/clients/firebase-client'
 import { DateService } from 'src/utils/date-service'
 import { unJwtPayloadValide } from '../fixtures/authentification.fixture'
+import { uneDatetime } from '../fixtures/date.fixture'
 import { FakeController } from '../infrastructure/auth/fake.controller'
 import { stubClass, stubClassSandbox } from './types'
-import { uneDatetime } from '../fixtures/date.fixture'
-import { createSandbox, SinonSandbox } from 'sinon'
-import { parse } from 'pg-connection-string'
 import TokenMessage = messaging.TokenMessage
 
 export function buildTestingModuleForHttpTesting(
@@ -185,10 +185,8 @@ export const testConfig = (): ConfigService => {
       poleEmploi: ['api-key-consumer-pole-emploi']
     },
     features: {
-      rendezVousMilo: true,
       notifierRendezVousMilo: true,
-      recupererStructureMilo: true,
-      recupererSessionsMilo: true
+      recupererStructureMilo: true
     },
     oidc: {
       issuerUrl: 'https://pass-emploi-connect.com',

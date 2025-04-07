@@ -3,7 +3,7 @@ import { DateTime } from 'luxon'
 import { SessionMiloAllegeeForBeneficiaire } from 'src/domain/milo/session.milo'
 import { DateService } from '../../utils/date-service'
 import { Action } from '../action/action'
-import { Core, estPoleEmploiOuCDOuAvenirPro } from '../core'
+import { Core, beneficiaireEstFTConnect } from '../core'
 import { Jeune } from '../jeune/jeune'
 import { Recherche } from '../offre/recherche/recherche'
 import { RendezVous } from '../rendez-vous/rendez-vous'
@@ -586,9 +586,7 @@ export namespace Notification {
     structure: Core.Structure,
     dateService: DateService
   ): { title: string; body: string } {
-    const trucs = estPoleEmploiOuCDOuAvenirPro(structure)
-      ? 'démarches'
-      : 'actions'
+    const trucs = beneficiaireEstFTConnect(structure) ? 'démarches' : 'actions'
     const messages: Array<{ title: string; body: string }> = [
       {
         title: `Le saviez-vous ?`,
@@ -623,7 +621,7 @@ export namespace Notification {
         dateService
       ),
       data: {
-        type: estPoleEmploiOuCDOuAvenirPro(structure)
+        type: beneficiaireEstFTConnect(structure)
           ? Type.RAPPEL_CREATION_DEMARCHE
           : Type.RAPPEL_CREATION_ACTION
       }

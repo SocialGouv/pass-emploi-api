@@ -1,4 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
+import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {
   DroitsInsuffisants,
@@ -11,18 +13,16 @@ import {
   success
 } from '../../../building-blocks/types/result'
 import { Action, ActionRepositoryToken } from '../../../domain/action/action'
+import { Qualification } from '../../../domain/action/qualification'
 import { Authentification } from '../../../domain/authentification'
-import { ActionAuthorizer } from '../../authorizers/action-authorizer'
-import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
-import { QualificationActionQueryModel } from '../../queries/query-models/actions.query-model'
 import { Evenement, EvenementService } from '../../../domain/evenement'
-import { Command } from '../../../building-blocks/types/command'
-import { DateTime } from 'luxon'
+import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import {
   ActionMilo,
   ActionMiloRepositoryToken
 } from '../../../domain/milo/action.milo'
-import { Qualification } from '../../../domain/action/qualification'
+import { ActionAuthorizer } from '../../authorizers/action-authorizer'
+import { QualificationActionQueryModel } from '../../queries/query-models/actions.query-model'
 
 export interface QualifierActionCommand extends Command {
   idAction: string
@@ -117,7 +117,7 @@ export class QualifierActionCommandHandler extends CommandHandler<
     command: QualifierActionCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (Authentification.estConseiller(utilisateur.type)) {
       return this.actionAuthorizer.autoriserPourUneAction(
         command.idAction,
         utilisateur

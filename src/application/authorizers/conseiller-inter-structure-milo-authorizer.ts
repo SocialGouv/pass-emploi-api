@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
 import {
-  Result,
   emptySuccess,
   failure,
-  isSuccess
+  isSuccess,
+  Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Conseiller } from '../../domain/milo/conseiller'
@@ -27,7 +27,7 @@ export class ConseillerInterStructureMiloAuthorizer {
     idStructureMilo: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (Authentification.estConseiller(utilisateur.type)) {
       const conseiller = await this.conseillerMiloRepository.get(utilisateur.id)
 
       if (
@@ -44,7 +44,7 @@ export class ConseillerInterStructureMiloAuthorizer {
     idJeune: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (Authentification.estConseiller(utilisateur.type)) {
       const conseillerMilo = await this.conseillerMiloRepository.get(
         utilisateur.id
       )

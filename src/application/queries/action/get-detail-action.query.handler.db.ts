@@ -46,7 +46,7 @@ export class GetDetailActionQueryHandler extends QueryHandler<
     query: GetDetailActionQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (Authentification.estConseiller(utilisateur.type)) {
       return this.conseillerAgenceAuthorizer.autoriserConseillerPourUneActionDeSonJeuneOuDUnJeuneDeSonAgenceMilo(
         query.idAction,
         utilisateur

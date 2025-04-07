@@ -3,18 +3,18 @@ import { ConfigService } from '@nestjs/config'
 import { DateTime } from 'luxon'
 import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
-import { Result, isFailure, success } from 'src/building-blocks/types/result'
+import { isFailure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { estMilo } from 'src/domain/core'
 import { Conseiller } from 'src/domain/milo/conseiller'
 import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import {
   InscritSessionMiloDto,
   MILO_INSCRIT,
   MILO_PRESENT,
   SessionConseillerDetailDto
 } from '../../../infrastructure/clients/dto/milo.dto'
-import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { MiloClient } from '../../../infrastructure/clients/milo-client'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
@@ -26,7 +26,6 @@ import {
   AgendaConseillerMiloSessionListItemQueryModel,
   InscritSessionMiloQueryModel
 } from '../query-models/sessions.milo.query.model'
-import { sessionsMiloActives } from '../../../config/feature-flipping'
 
 export interface GetAgendaSessionsConseillerMiloQuery extends Query {
   idConseiller: string
@@ -61,10 +60,6 @@ export class GetAgendaSessionsConseillerMiloQueryHandler extends QueryHandler<
       return resultConseiller
     }
     const conseiller = resultConseiller.data
-
-    if (!sessionsMiloActives(this.configService)) {
-      return success([])
-    }
 
     const idpToken = await this.oidcClient.exchangeTokenConseillerMilo(
       query.accessToken
