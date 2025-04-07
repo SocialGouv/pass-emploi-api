@@ -7,10 +7,11 @@ import { Core } from 'src/domain/core'
 import {
   MILO_INSCRIT,
   MILO_PRESENT,
+  MILO_REFUS_JEUNE,
   SessionParDossierJeuneDto
 } from 'src/infrastructure/clients/dto/milo.dto'
-import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { SessionMiloSqlModel } from 'src/infrastructure/sequelize/models/session-milo.sql-model'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { JeuneSqlModel } from '../../../../infrastructure/sequelize/models/jeune.sql-model'
@@ -161,13 +162,10 @@ async function recupererSessionsDuJeuneSelonFiltre(
           sessionsDuJeuneVenantDeLAPI,
           configurationsSessions
         )
-      const sessionsVisiblesAuJeuneSansDoublons =
-        recupererSessionsVisiblesPourLeJeuneSansDoublons(
-          sessionsVisiblesPourLeJeune,
-          sessionsAuxquellesLeJeuneEstInscrit
-        )
-      return sessionsAuxquellesLeJeuneEstInscrit.concat(
-        sessionsVisiblesAuJeuneSansDoublons
+
+      return concatSessionsVisiblesSansDoublon(
+        sessionsAuxquellesLeJeuneEstInscrit,
+        sessionsVisiblesPourLeJeune
       )
     }
   }
@@ -179,7 +177,8 @@ function recupererSessionsAuxquellesLeJeuneEstInscrit(
   return sessions.filter(
     session =>
       session.sessionInstance?.statut === MILO_INSCRIT ||
-      session.sessionInstance?.statut === MILO_PRESENT
+      session.sessionInstance?.statut === MILO_PRESENT ||
+      session.sessionInstance?.statut === MILO_REFUS_JEUNE
   )
 }
 
@@ -196,17 +195,25 @@ async function recupererSessionsVisiblesPourLeJeune(
   )
 }
 
-function recupererSessionsVisiblesPourLeJeuneSansDoublons(
-  sessionsVisiblesPourLeJeune: SessionParDossierJeuneDto[],
-  sessionsAuxquellesLeJeuneEstInscrit: SessionParDossierJeuneDto[]
+function concatSessionsVisiblesSansDoublon(
+  sessionsAuxquellesLeJeuneEstInscrit: SessionParDossierJeuneDto[],
+  sessionsVisiblesPourLeJeune: SessionParDossierJeuneDto[]
 ): SessionParDossierJeuneDto[] {
-  return sessionsVisiblesPourLeJeune.filter(
-    sessionVisible =>
+  const sessions = [...sessionsAuxquellesLeJeuneEstInscrit]
+
+  sessionsVisiblesPourLeJeune.forEach(sessionVisible => {
+    if (
       sessionsAuxquellesLeJeuneEstInscrit.find(
         sessionInscrit =>
           sessionInscrit.session.id === sessionVisible.session.id
-      ) === undefined
-  )
+      )
+    )
+      return
+
+    sessions.push(sessionVisible)
+  })
+
+  return sessions
 }
 
 function compareSessionsByDebut(
