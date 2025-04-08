@@ -83,7 +83,8 @@ export const unJeuneDuRendezVous = (
     conseiller: unConseillerDuJeune(),
     configuration: uneConfiguration(),
     email: 'john.doe@plop.io',
-    preferences: desPreferencesJeune()
+    preferences: desPreferencesJeune(),
+    present: undefined
   }
 
   return { ...defaults, ...args }

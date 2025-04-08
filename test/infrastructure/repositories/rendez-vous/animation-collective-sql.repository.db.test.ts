@@ -163,7 +163,8 @@ describe('AnimationsCollectivesSqlRepository', () => {
             firstName: 'John',
             id: 'ABCDE',
             lastName: 'Doe',
-            preferences: desPreferencesJeune()
+            preferences: desPreferencesJeune(),
+            present: undefined
           }
         ],
         type: CodeTypeRendezVous.INFORMATION_COLLECTIVE,
@@ -269,7 +270,8 @@ describe('AnimationsCollectivesSqlRepository', () => {
             firstName: 'John',
             id: 'ABCDE',
             lastName: 'Doe',
-            preferences: desPreferencesJeune()
+            preferences: desPreferencesJeune(),
+            present: undefined
           }
         ],
         type: CodeTypeRendezVous.INFORMATION_COLLECTIVE,
@@ -408,7 +410,10 @@ describe('AnimationsCollectivesSqlRepository', () => {
           expect(actual).to.deep.equal({
             ...uneAnimationCollectiveModifiee,
             informationsPartenaire: undefined,
-            jeunes: [jeune, unAutreJeune]
+            jeunes: [
+              { ...jeune, present: true },
+              { ...unAutreJeune, present: false }
+            ]
           })
         })
       })

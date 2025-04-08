@@ -105,7 +105,7 @@ export class AnimationCollectiveSqlRepository
             {
               idJeune: jeune.id,
               idRendezVous: animationCollective.id,
-              present: present
+              present
             },
             { transaction }
           )

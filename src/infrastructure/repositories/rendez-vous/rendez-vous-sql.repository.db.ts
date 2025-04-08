@@ -32,15 +32,17 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
         }
       })
       await Promise.all(
-        rendezVous.jeunes.map(jeune =>
-          RendezVousJeuneAssociationSqlModel.upsert(
+        rendezVous.jeunes.map(jeune => {
+          const present = jeune.present === undefined ? null : jeune.present
+          return RendezVousJeuneAssociationSqlModel.upsert(
             {
               idJeune: jeune.id,
-              idRendezVous: rendezVous.id
+              idRendezVous: rendezVous.id,
+              present
             },
             { transaction }
           )
-        )
+        })
       )
     })
   }

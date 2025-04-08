@@ -77,7 +77,8 @@ export namespace RendezVousMilo {
             email: jeune.email,
             configuration: jeune.configuration,
             conseiller: jeune.conseiller,
-            preferences: jeune.preferences
+            preferences: jeune.preferences,
+            present: this.calculerPresence(rendezVousMilo.statut)
           }
         ],
         type: CodeTypeRendezVous.RENDEZ_VOUS_MILO,
@@ -108,7 +109,17 @@ export namespace RendezVousMilo {
         duree,
         commentaire: rendezVousMilo.commentaire,
         adresse: rendezVousMilo.adresse,
-        modalite: rendezVousMilo.modalite
+        modalite: rendezVousMilo.modalite,
+        jeunes: rendezVousCEJ.jeunes.map(jeune => ({
+          id: jeune.id,
+          firstName: jeune.firstName,
+          lastName: jeune.lastName,
+          email: jeune.email,
+          configuration: jeune.configuration,
+          conseiller: jeune.conseiller,
+          preferences: jeune.preferences,
+          present: this.calculerPresence(rendezVousMilo.statut)
+        }))
       }
     }
 
@@ -129,6 +140,17 @@ export namespace RendezVousMilo {
         duree = dateTimeFin.diff(dateTimeDebut, 'minutes').get('minutes')
       }
       return { dateTimeDebut, duree }
+    }
+
+    private calculerPresence(statut: string): boolean | undefined {
+      switch (statut) {
+        case 'Présent':
+          return true
+        case 'Absent':
+          return false
+        default:
+          return undefined
+      }
     }
   }
 }
