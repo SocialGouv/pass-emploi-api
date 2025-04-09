@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
+import { Op } from 'sequelize'
+import { WhereOptions } from 'sequelize/types/model'
 import { compareDateCreationAntechronologique } from 'src/application/queries/query-getters/accueil/get-favoris.query.getter.db'
+import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import { Result } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
@@ -15,8 +19,10 @@ import {
 } from '../query-mappers/favoris.mappers'
 import { FavorisQueryModel } from '../query-models/favoris.query-model'
 
-interface GetFavorisJeuneQuery {
+export interface GetFavorisJeuneQuery extends Query {
   idJeune: string
+  dateDebut?: DateTime
+  dateFin?: DateTime
 }
 
 @Injectable()
@@ -45,26 +51,34 @@ export class GetFavorisJeuneQueryHandler extends QueryHandler<
   }
 
   async handle(query: GetFavorisJeuneQuery): Promise<FavorisQueryModel[]> {
+    const dateDebut = query.dateDebut?.toJSDate()
+    const dateFin = query.dateFin?.toJSDate()
+
+    let dateCompare
+    if (dateDebut && dateFin)
+      dateCompare = { [Op.between]: [dateDebut, dateFin] }
+    else if (dateDebut) dateCompare = { [Op.gte]: dateDebut }
+    else if (dateFin) dateCompare = { [Op.lte]: dateFin }
+
+    let where: WhereOptions = { idJeune: query.idJeune }
+    if (dateCompare) {
+      where = {
+        ...where,
+        [Op.or]: [
+          { dateCandidature: dateCompare },
+          { [Op.and]: { dateCandidature: null, dateCreation: dateCompare } }
+        ]
+      }
+    }
+
     const [
       listeFavorisOffresEmploi,
       listeFavorisOffresImmersion,
       listeFavorisOffresServiceCivique
     ] = await Promise.all([
-      FavoriOffreEmploiSqlModel.findAll({
-        where: {
-          idJeune: query.idJeune
-        }
-      }),
-      FavoriOffreImmersionSqlModel.findAll({
-        where: {
-          idJeune: query.idJeune
-        }
-      }),
-      FavoriOffreEngagementSqlModel.findAll({
-        where: {
-          idJeune: query.idJeune
-        }
-      })
+      FavoriOffreEmploiSqlModel.findAll({ where }),
+      FavoriOffreImmersionSqlModel.findAll({ where }),
+      FavoriOffreEngagementSqlModel.findAll({ where })
     ])
 
     return listeFavorisOffresEmploi
