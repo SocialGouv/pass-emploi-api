@@ -1,3 +1,4 @@
+import { getPresence } from '../../../application/queries/query-mappers/rendez-vous-milo.mappers'
 import {
   JeuneDuRendezVous,
   RendezVous
@@ -92,7 +93,8 @@ function fromJeuneSqlToJeuneDuRdv(jeune: JeuneSqlModel): JeuneDuRendezVous {
       idAgence: jeune.conseiller!.idAgence ?? undefined
     },
     configuration: toConfigurationApplication(jeune),
-    preferences: fromSqlToPreferencesJeune(jeune)
+    preferences: fromSqlToPreferencesJeune(jeune),
+    present: getPresence(jeune)
   }
 }
 

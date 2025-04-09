@@ -99,16 +99,19 @@ export interface Createur {
   prenom: string
 }
 
-export type JeuneDuRendezVous = Pick<
-  Jeune,
-  | 'id'
-  | 'firstName'
-  | 'lastName'
-  | 'conseiller'
-  | 'email'
-  | 'configuration'
-  | 'preferences'
->
+export interface JeuneDuRendezVous
+  extends Pick<
+    Jeune,
+    | 'id'
+    | 'firstName'
+    | 'lastName'
+    | 'conseiller'
+    | 'email'
+    | 'configuration'
+    | 'preferences'
+  > {
+  present?: boolean
+}
 
 export interface RendezVous {
   id: string

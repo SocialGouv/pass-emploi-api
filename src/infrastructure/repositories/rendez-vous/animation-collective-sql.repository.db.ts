@@ -100,12 +100,11 @@ export class AnimationCollectiveSqlRepository
       })
       await Promise.all(
         animationCollective.jeunes.map(jeune => {
-          const present = jeune.present === undefined ? null : jeune.present
           return RendezVousJeuneAssociationSqlModel.upsert(
             {
               idJeune: jeune.id,
               idRendezVous: animationCollective.id,
-              present: present
+              present: jeune.present ?? null
             },
             { transaction }
           )

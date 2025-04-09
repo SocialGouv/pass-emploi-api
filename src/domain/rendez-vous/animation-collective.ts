@@ -3,22 +3,13 @@ import { DateTime } from 'luxon'
 import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { DateService } from '../../utils/date-service'
-import {
-  CodeTypeRendezVous,
-  JeuneDuRendezVous,
-  RendezVous
-} from './rendez-vous'
+import { CodeTypeRendezVous, RendezVous } from './rendez-vous'
 
 export const AnimationCollectiveRepositoryToken =
   'AnimationCollective.Repository'
 
-interface JeuneAnimationCollective extends JeuneDuRendezVous {
-  present?: boolean
-}
-
 export interface AnimationCollective extends RendezVous {
   type: CodeTypeRendezVous.ATELIER | CodeTypeRendezVous.INFORMATION_COLLECTIVE
-  jeunes: JeuneAnimationCollective[]
 }
 
 export namespace AnimationCollective {
