@@ -45,6 +45,7 @@ export function mapSessionJeuneDtoToQueryModel(
     id: sessionDto.session.id.toString(),
     nomSession: sessionDto.session.nom,
     nomOffre: sessionDto.offre.nom,
+    theme: sessionDto.offre.theme,
     dateHeureDebut: dateFromMilo(
       sessionDto.session.dateHeureDebut,
       timezone

@@ -100,6 +100,9 @@ export class SessionJeuneMiloQueryModel {
   nomOffre: string
 
   @ApiProperty()
+  theme: string
+
+  @ApiProperty()
   dateHeureDebut: string
 
   @ApiProperty()
