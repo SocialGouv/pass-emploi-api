@@ -211,7 +211,8 @@ describe('MiloRendezVous', () => {
         idService.uuid.returns(uuid)
         rdvMilo = unRendezVousMilo({
           dateHeureDebut: dateStringRendezVousDebut,
-          dateHeureFin: dateStringRendezVousFin
+          dateHeureFin: dateStringRendezVousFin,
+          statut: 'Absent'
         })
 
         // When
@@ -224,6 +225,18 @@ describe('MiloRendezVous', () => {
         // Then
         const expected: RendezVous = {
           ...rendezVousPassEmploi,
+          jeunes: [
+            {
+              id: jeune.id,
+              firstName: jeune.firstName,
+              lastName: jeune.lastName,
+              email: jeune.email,
+              configuration: jeune.configuration,
+              conseiller: jeune.conseiller,
+              preferences: jeune.preferences,
+              present: false
+            }
+          ],
           titre: rdvMilo.titre,
           date: new Date('2022-10-06T14:07:00Z'),
           duree: 96,

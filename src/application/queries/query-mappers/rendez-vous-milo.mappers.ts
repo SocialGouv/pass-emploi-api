@@ -171,7 +171,7 @@ export function construireStatut(
 // La requête SQL qui récupère les jeunes d'un rendez-vous passe par une table de jointure
 // Dans le résultat de la requête, on peut récupérer les informations supplémentaires de l'association
 // Pour palier au problème de typage, on utilise la technique ci-dessous.
-function getPresence(jeuneSqlModel: JeuneSqlModel): boolean | undefined {
+export function getPresence(jeuneSqlModel: JeuneSqlModel): boolean | undefined {
   const rendezVousJeuneAssociation = jeuneSqlModel.get(
     RendezVousJeuneAssociationSqlModel.name
   ) as RendezVousJeuneAssociationSqlModel | undefined
