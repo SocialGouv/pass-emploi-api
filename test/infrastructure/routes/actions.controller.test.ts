@@ -1,4 +1,5 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
+import { DateTime } from 'luxon'
 import { Action } from 'src/domain/action/action'
 import * as request from 'supertest'
 import { AddCommentaireActionCommandHandler } from '../../../src/application/commands/action/add-commentaire-action.command.handler'
@@ -181,7 +182,9 @@ describe('ActionsController', () => {
         const actionJson = {
           comment: "Description de l'action",
           content: "Contenu de l'action",
-          creationDate: 'Thu, 11 Nov 2021 08:03:30 UTC',
+          creationDate: DateTime.fromISO('2021-11-11T08:03:30.000Z').toFormat(
+            'EEE, d MMM yyyy HH:mm:ss z'
+          ),
           creator: 'Nils Tavernier',
           creatorType: 'conseiller',
           dateEcheance: '2021-11-11T08:03:30.000Z',
@@ -194,7 +197,9 @@ describe('ActionsController', () => {
             lastName: 'Doe',
             dispositif: 'CEJ'
           },
-          lastUpdate: 'Thu, 11 Nov 2021 08:03:30 UTC',
+          lastUpdate: DateTime.fromISO('2021-11-11T08:03:30.000Z').toFormat(
+            'EEE, d MMM yyyy HH:mm:ss z'
+          ),
           status: 'not_started'
         }
         await request(app.getHttpServer())
@@ -644,8 +649,8 @@ describe('ActionsController', () => {
       const idJeune = '1'
       const queryActions: GetActionsJeuneQuery = {
         idJeune: idJeune,
-        dateDebut: '2020-04-06T12:00:00.000Z',
-        dateFin: '2020-04-06T12:00:00.000Z'
+        dateDebut: DateTime.fromISO('2020-04-06'),
+        dateFin: DateTime.fromISO('2020-04-13')
       }
 
       it('renvoie 200', async () => {
@@ -654,7 +659,9 @@ describe('ActionsController', () => {
 
         // When
         await request(app.getHttpServer())
-          .get(`/jeunes/${idJeune}/actions`)
+          .get(
+            `/jeunes/${idJeune}/actions?dateDebut=2020-04-06&dateFin=2020-04-13`
+          )
           .set('authorization', unHeaderAuthorization())
           .query(queryActions)
           // Then
@@ -674,7 +681,9 @@ describe('ActionsController', () => {
         )
         // When
         await request(app.getHttpServer())
-          .get(`/jeunes/${idJeune}/actions`)
+          .get(
+            `/jeunes/${idJeune}/actions?dateDebut=2020-04-06&dateFin=2020-04-13`
+          )
           .set('authorization', unHeaderAuthorization())
           .query(queryActions)
           // Then

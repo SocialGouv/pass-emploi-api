@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
 import { Op } from 'sequelize'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
@@ -12,8 +13,8 @@ import { ActionQueryModel } from '../query-models/actions.query-model'
 
 export interface GetActionsJeuneQuery extends Query {
   idJeune: string
-  dateDebut: string
-  dateFin: string
+  dateDebut: DateTime
+  dateFin: DateTime
 }
 
 @Injectable()
@@ -52,7 +53,9 @@ export class GetActionsJeuneQueryHandler extends QueryHandler<
   private async findAllActionsPeriode(
     query: GetActionsJeuneQuery
   ): Promise<ActionSqlModel[]> {
-    const inPeriode = { [Op.between]: [query.dateDebut, query.dateFin] }
+    const inPeriode = {
+      [Op.between]: [query.dateDebut.toJSDate(), query.dateFin.toJSDate()]
+    }
 
     return ActionSqlModel.findAll({
       where: [

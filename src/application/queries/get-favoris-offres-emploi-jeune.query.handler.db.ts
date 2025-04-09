@@ -9,25 +9,27 @@ import { FavoriOffreEmploiSqlModel } from '../../infrastructure/sequelize/models
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { FavoriOffreEmploiQueryModel } from './query-models/offres-emploi.query-model'
 
-export interface GetFavorisJeuneQuery extends Query {
+interface GetFavorisOffresEmploiJeuneQuery extends Query {
   idJeune: Jeune.Id
 }
 
 @Injectable()
 export class GetFavorisOffresEmploiJeuneQueryHandler extends QueryHandler<
-  GetFavorisJeuneQuery,
+  GetFavorisOffresEmploiJeuneQuery,
   FavoriOffreEmploiQueryModel[]
 > {
   constructor(private jeuneAuthorizer: JeuneAuthorizer) {
     super('GetFavorisOffresEmploiJeuneQueryHandler')
   }
 
-  handle(query: GetFavorisJeuneQuery): Promise<FavoriOffreEmploiQueryModel[]> {
+  handle(
+    query: GetFavorisOffresEmploiJeuneQuery
+  ): Promise<FavoriOffreEmploiQueryModel[]> {
     return this.getFavorisQueryModelsByJeune(query.idJeune)
   }
 
   async authorize(
-    query: GetFavorisJeuneQuery,
+    query: GetFavorisOffresEmploiJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     return this.jeuneAuthorizer.autoriserLeJeune(query.idJeune, utilisateur)
