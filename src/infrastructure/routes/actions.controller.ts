@@ -357,8 +357,10 @@ export class ActionsController {
   ): Promise<ActionQueryModel[]> {
     const query: GetActionsJeuneQuery = {
       idJeune,
-      dateDebut: getActionsByBeneficiaireQueryParams.dateDebut,
-      dateFin: getActionsByBeneficiaireQueryParams.dateFin
+      dateDebut: DateTime.fromISO(
+        getActionsByBeneficiaireQueryParams.dateDebut
+      ),
+      dateFin: DateTime.fromISO(getActionsByBeneficiaireQueryParams.dateFin)
     }
 
     const result = await this.getActionsByJeuneQueryHandler.execute(

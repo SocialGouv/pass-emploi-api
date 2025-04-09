@@ -74,8 +74,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
     it('retourne un tableau vide et 0 résultat', async () => {
       const result = await getActionsByJeuneQueryHandler.handle({
         idJeune: jeuneDto.id,
-        dateDebut: debutPeriode.toISO(),
-        dateFin: finPeriode.toISO()
+        dateDebut: debutPeriode,
+        dateFin: finPeriode
       })
 
       // Then
@@ -111,8 +111,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
       // When
       const result = await getActionsByJeuneQueryHandler.handle({
         idJeune: jeuneDto.id,
-        dateDebut: debutPeriode.toISO(),
-        dateFin: finPeriode.toISO()
+        dateDebut: debutPeriode,
+        dateFin: finPeriode
       })
 
       // Then
@@ -161,8 +161,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
       // When
       const result = await getActionsByJeuneQueryHandler.handle({
         idJeune: jeuneDto.id,
-        dateDebut: debutPeriode.toISO(),
-        dateFin: finPeriode.toISO()
+        dateDebut: debutPeriode,
+        dateFin: finPeriode
       })
 
       // Then
@@ -214,8 +214,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
       // When
       const result = await getActionsByJeuneQueryHandler.handle({
         idJeune: jeuneDto.id,
-        dateDebut: debutPeriode.toISO(),
-        dateFin: finPeriode.toISO()
+        dateDebut: debutPeriode,
+        dateFin: finPeriode
       })
 
       // Then
@@ -237,8 +237,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
 
       const query: GetActionsJeuneQuery = {
         idJeune: 'id-jeune',
-        dateDebut: debutPeriode.toISO(),
-        dateFin: finPeriode.toISO()
+        dateDebut: debutPeriode,
+        dateFin: finPeriode
       }
 
       // When
