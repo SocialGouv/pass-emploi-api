@@ -35,6 +35,7 @@ export const uneSessionJeuneMiloQueryModel = (
   const defaults: SessionJeuneMiloQueryModel = {
     id: '1',
     nomSession: 'Une-session',
+    theme: 'Un-theme',
     nomOffre: 'Une-offre',
     dateHeureDebut: '2020-04-06T13:20:00.000Z',
     dateHeureFin: '2020-04-08T13:20:00.000Z',
