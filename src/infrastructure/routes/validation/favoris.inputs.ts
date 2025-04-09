@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
 import {
   IsBoolean,
+  IsDateString,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -153,4 +154,14 @@ export class AddFavoriServicesCivique implements Offre.Favori.ServiceCivique {
   @IsBoolean()
   @IsOptional()
   aPostule?: boolean
+}
+
+export class GetFavorisQueryParams {
+  @IsOptional()
+  @IsDateString()
+  dateDebut?: string
+
+  @IsOptional()
+  @IsDateString()
+  dateFin?: string
 }

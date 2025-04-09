@@ -1,4 +1,5 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
+import { DateTime } from 'luxon'
 import {
   AddCandidatureOffreEmploiCommand,
   AddCandidatureOffreEmploiCommandHandler
@@ -135,12 +136,19 @@ describe('FavorisController', () => {
       it('Renvoie la liste des favoris du jeune', async () => {
         // Given
         getFavorisJeunePourConseillerQueryHandler.execute
-          .withArgs({ idJeune: '1' }, unUtilisateurDecode())
+          .withArgs(
+            {
+              idJeune: '1',
+              dateDebut: DateTime.fromISO('2025-02-18'),
+              dateFin: DateTime.fromISO('2025-03-01')
+            },
+            unUtilisateurDecode()
+          )
           .resolves([])
 
         // When - Then
         await request(app.getHttpServer())
-          .get('/jeunes/1/favoris')
+          .get('/jeunes/1/favoris?dateDebut=2025-02-18&dateFin=2025-03-01')
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.OK)
           .expect(JSON.stringify([]))
