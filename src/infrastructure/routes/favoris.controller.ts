@@ -6,9 +6,11 @@ import {
   HttpCode,
   Param,
   Patch,
-  Post
+  Post,
+  Query
 } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { DateTime } from 'luxon'
 import {
   AddCandidatureOffreEmploiCommand,
   AddCandidatureOffreEmploiCommandHandler
@@ -45,7 +47,10 @@ import {
   DeleteFavoriOffreServiceCiviqueCommand,
   DeleteFavoriOffreServiceCiviqueCommandHandler
 } from '../../application/commands/delete-favori-offre-service-civique.command.handler'
-import { GetFavorisJeuneQueryHandler } from '../../application/queries/favoris/get-favoris-jeune.query.handler.db'
+import {
+  GetFavorisJeuneQuery,
+  GetFavorisJeuneQueryHandler
+} from '../../application/queries/favoris/get-favoris-jeune.query.handler.db'
 import { GetMetadonneesFavorisJeuneQueryHandler } from '../../application/queries/favoris/get-metadonnees-favoris-jeune.query.handler.db'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from '../../application/queries/get-favoris-offres-emploi-jeune.query.handler.db'
 import { GetFavorisOffresImmersionJeuneQueryHandler } from '../../application/queries/get-favoris-offres-immersion-jeune.query.handler.db'
@@ -73,7 +78,8 @@ import { handleResult } from './result.handler'
 import {
   AddFavoriImmersionPayload,
   AddFavoriOffresEmploiPayload,
-  AddFavoriServicesCivique
+  AddFavoriServicesCivique,
+  GetFavorisQueryParams
 } from './validation/favoris.inputs'
 
 @Controller('jeunes/:idJeune')
@@ -108,9 +114,19 @@ export class FavorisController {
   @Get('favoris')
   async getFavorisDuJeune(
     @Param('idJeune') idJeune: string,
+    @Query() getFavorisQueryParams: GetFavorisQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<FavorisQueryModel[]> {
-    return this.getFavorisJeuneQueryHandler.execute({ idJeune }, utilisateur)
+    const query: GetFavorisJeuneQuery = {
+      idJeune,
+      dateDebut: getFavorisQueryParams.dateDebut
+        ? DateTime.fromISO(getFavorisQueryParams.dateDebut)
+        : undefined,
+      dateFin: getFavorisQueryParams.dateFin
+        ? DateTime.fromISO(getFavorisQueryParams.dateFin)
+        : undefined
+    }
+    return this.getFavorisJeuneQueryHandler.execute(query, utilisateur)
   }
 
   @ApiOperation({
