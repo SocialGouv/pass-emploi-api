@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Op } from 'sequelize'
+import { estMilo } from 'src/domain/core'
 import { FavoriOffreEmploiSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-emploi.sql-model'
 import { FavoriOffreEngagementSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-engagement.sql-model'
 import { FavoriOffreImmersionSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
@@ -49,16 +50,21 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
   }
 
   async handle(
-    query: GetIndicateursPourConseillerQuery
+    query: GetIndicateursPourConseillerQuery,
+    utilisateur: Authentification.Utilisateur
   ): Promise<Result<IndicateursPourConseillerQueryModel>> {
     const maintenant = this.dateService.nowJs()
 
-    const [actionsSqlDuJeune, rendezVousSqlDuJeune, favorisSql] =
-      await Promise.all([
+    const favorisSql = await findAllFavorisPostulesOuCreesPendantPeriode(query)
+
+    let actionsSqlDuJeune: ActionSqlModel[] = []
+    let rendezVousSqlDuJeune: RendezVousSqlModel[] = []
+    if (estMilo(utilisateur.structure)) {
+      ;[actionsSqlDuJeune, rendezVousSqlDuJeune] = await Promise.all([
         findAllActions(query),
-        findAllRendezVous(query),
-        findAllFavorisPostulesOuCreesPendantPeriode(query)
+        findAllRendezVous(query)
       ])
+    }
 
     const indicateursActions = getIndicateursActions(
       actionsSqlDuJeune,
