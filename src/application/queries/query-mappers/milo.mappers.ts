@@ -63,7 +63,8 @@ export function mapSessionJeuneDtoToQueryModel(
           .toISO()
       : undefined,
     nbPlacesRestantes: sessionDto.session.nbPlacesDisponibles ?? undefined,
-    autoinscription: false
+    autoinscription: false,
+    theme: sessionDto.offre.theme
   }
 
   if (sessionDto.sessionInstance) {
