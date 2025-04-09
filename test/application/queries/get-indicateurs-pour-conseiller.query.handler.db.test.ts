@@ -37,6 +37,9 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
   let dateService: StubbedClass<DateService>
   const idConseiller = 'id-conseiller'
   const idJeune = 'id-jeune'
+  const utilisateur = unUtilisateurConseiller({
+    structure: Core.Structure.MILO
+  })
 
   before(async () => {
     dateService = stubClass(DateService)
@@ -95,7 +98,8 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
 
         // When
         const response = await getIndicateursPourConseillerQueryHandler.handle(
-          query
+          query,
+          utilisateur
         )
 
         // Then
@@ -141,7 +145,8 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
 
         // When
         const response = await getIndicateursPourConseillerQueryHandler.handle(
-          query
+          query,
+          utilisateur
         )
 
         // Then
@@ -195,7 +200,8 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
 
         // When
         const response = await getIndicateursPourConseillerQueryHandler.handle(
-          query
+          query,
+          utilisateur
         )
 
         // Then
@@ -246,7 +252,8 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
 
         // When
         const response = await getIndicateursPourConseillerQueryHandler.handle(
-          query
+          query,
+          utilisateur
         )
 
         // Then
@@ -317,7 +324,8 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           dateFin: dateFin.toJSDate()
         }
         const response = await getIndicateursPourConseillerQueryHandler.handle(
-          query
+          query,
+          utilisateur
         )
         // Then
         expect(
@@ -334,10 +342,6 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
     describe("quand c'est un conseiller", () => {
       it('valide le conseiller', async () => {
         // Given
-        const utilisateur = unUtilisateurConseiller({
-          structure: Core.Structure.MILO
-        })
-
         const query: GetIndicateursPourConseillerQuery = {
           idJeune: 'id-jeune',
           idConseiller: 'id-conseiller',
