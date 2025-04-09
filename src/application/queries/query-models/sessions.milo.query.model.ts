@@ -119,6 +119,9 @@ export class SessionJeuneMiloQueryModel {
 
   @ApiPropertyOptional()
   nbPlacesRestantes?: number
+
+  @ApiProperty()
+  theme: string
 }
 
 export class DetailSessionConseillerQueryModel {
