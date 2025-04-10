@@ -11,10 +11,6 @@ import {
   Result,
   success
 } from 'src/building-blocks/types/result'
-import {
-  generateSourceRendezVousCondition,
-  sessionsMiloActives
-} from 'src/config/feature-flipping'
 import { Action } from 'src/domain/action/action'
 import { Authentification } from 'src/domain/authentification'
 import { fromSqlToActionQueryModelWithJeune } from 'src/infrastructure/repositories/mappers/actions.mappers'
@@ -27,6 +23,7 @@ import {
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
 import { estMilo } from '../../domain/core'
+import { RendezVousJeuneAssociationSqlModel } from '../../infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { buildError } from '../../utils/logger.module'
 import { ConseillerInterAgenceAuthorizer } from '../authorizers/conseiller-inter-agence-authorizer'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
@@ -36,7 +33,6 @@ import { JeuneHomeAgendaQueryModel } from './query-models/home-jeune-suivi.query
 import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
 import { SessionJeuneMiloQueryModel } from './query-models/sessions.milo.query.model'
 import estConseiller = Authentification.estConseiller
-import { RendezVousJeuneAssociationSqlModel } from '../../infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 
 export interface GetJeuneHomeAgendaQuery extends Query {
   idJeune: string
@@ -96,11 +92,7 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
       estConseiller(utilisateur.type) &&
       jeuneSqlModel.idStructureMilo !==
         jeuneSqlModel.conseiller?.idStructureMilo
-    if (
-      estMilo(utilisateur.structure) &&
-      sessionsMiloActives(this.configuration) &&
-      !jeuneStructureDifferenteConseiller
-    ) {
+    if (estMilo(utilisateur.structure) && !jeuneStructureDifferenteConseiller) {
       if (!jeuneSqlModel.idPartenaire) {
         return failure(new JeuneMiloSansIdDossier(query.idJeune))
       }
@@ -150,7 +142,7 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
     query: GetJeuneHomeAgendaQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (Authentification.estConseiller(utilisateur.type)) {
       return this.conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo(
         query.idJeune,
         utilisateur
@@ -187,15 +179,8 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
       }
     })
     const rendezVousSqlModel = await RendezVousSqlModel.findAll({
-      // include: [
-      //   {
-      //     model: JeuneSqlModel,
-      //     where: { id: query.idJeune }
-      //     include: [ConseillerSqlModel]
-      //   }
-      // ],
       where: {
-        ...generateSourceRendezVousCondition(this.configuration),
+        // TODO réecrire en SQL RAW avec une jointure
         id: rdvsDuJeune.map(rdvAssoc => rdvAssoc.idRendezVous),
         date: {
           [Op.gte]: dateDebut.toJSDate(),

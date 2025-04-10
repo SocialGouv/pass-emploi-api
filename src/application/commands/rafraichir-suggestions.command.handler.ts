@@ -10,7 +10,7 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Core, estPoleEmploiOuCDOuAvenirPro } from '../../domain/core'
+import { Core, beneficiaireEstFTConnect } from '../../domain/core'
 import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { SuggestionPoleEmploiService } from '../../domain/offre/recherche/suggestion/pole-emploi.service'
 import {
@@ -55,9 +55,7 @@ export class RafraichirSuggestionsCommandHandler extends CommandHandler<
 
     let suggestionsPE: Suggestion[] = []
     let suggestionsDiagoriente: Suggestion[] = []
-    const rafraichirSuggestionsPE = estPoleEmploiOuCDOuAvenirPro(
-      command.structure
-    )
+    const rafraichirSuggestionsPE = beneficiaireEstFTConnect(command.structure)
     const rafraichirSuggestionsDiagoriente = command.avecDiagoriente
 
     if (rafraichirSuggestionsPE) {

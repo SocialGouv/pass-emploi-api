@@ -23,7 +23,6 @@ import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/j
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { getDatabase } from '../../../utils/database-for-testing'
-import { testConfig } from '../../../utils/module-for-testing'
 
 describe('GetAgendaSessionsConseillerMiloQueryHandler', () => {
   let getAgendaSessionsQueryHandler: GetAgendaSessionsConseillerMiloQueryHandler
@@ -47,8 +46,7 @@ describe('GetAgendaSessionsConseillerMiloQueryHandler', () => {
         miloClient,
         oidcClient,
         conseillerRepository,
-        conseillerAuthorizer,
-        testConfig()
+        conseillerAuthorizer
       )
   })
 

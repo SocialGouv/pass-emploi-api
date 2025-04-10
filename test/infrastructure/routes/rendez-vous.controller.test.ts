@@ -19,7 +19,6 @@ import { GetDetailRendezVousJeuneQueryHandler } from '../../../src/application/q
 import { GetDetailRendezVousQueryHandler } from '../../../src/application/queries/rendez-vous/get-detail-rendez-vous.query.handler.db'
 import { GetRendezVousConseillerPaginesQueryHandler } from '../../../src/application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../src/application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
-import { GetRendezVousJeuneQueryHandler } from '../../../src/application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
 import {
   JeuneNonLieAuConseillerError,
   MauvaiseCommandeError,
@@ -31,10 +30,7 @@ import {
   failure,
   success
 } from '../../../src/building-blocks/types/result'
-import {
-  CodeTypeRendezVous,
-  RendezVous
-} from '../../../src/domain/rendez-vous/rendez-vous'
+import { CodeTypeRendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
 import { JwtService } from '../../../src/infrastructure/auth/jwt.service'
 import {
   unHeaderAuthorization,
@@ -57,7 +53,6 @@ describe('RendezvousController', () => {
   let createRendezVousCommandHandler: StubbedClass<CreateRendezVousCommandHandler>
   let getRendezVousConseillerPaginesQueryHandler: StubbedClass<GetRendezVousConseillerPaginesQueryHandler>
   let getRendezVousJeunePoleEmploiQueryHandler: StubbedClass<GetRendezVousJeunePoleEmploiQueryHandler>
-  let getRendezVousJeuneQueryHandler: StubbedClass<GetRendezVousJeuneQueryHandler>
   let getDetailRendezVousJeuneQueryHandler: StubbedClass<GetDetailRendezVousJeuneQueryHandler>
   let getAnimationsCollectivesJeuneQueryHandler: StubbedClass<GetAnimationsCollectivesJeuneQueryHandler>
   let jwtService: StubbedClass<JwtService>
@@ -75,7 +70,6 @@ describe('RendezvousController', () => {
     getRendezVousJeunePoleEmploiQueryHandler = app.get(
       GetRendezVousJeunePoleEmploiQueryHandler
     )
-    getRendezVousJeuneQueryHandler = app.get(GetRendezVousJeuneQueryHandler)
     getDetailRendezVousJeuneQueryHandler = app.get(
       GetDetailRendezVousJeuneQueryHandler
     )
@@ -740,138 +734,47 @@ describe('RendezvousController', () => {
 
   describe('GET /jeunes/:idJeune/rendez-vous', () => {
     const idJeune = '1'
-    describe("quand c'est un jeune pole-emploi", () => {
-      it("renvoie une 404 quand le jeune n'existe pas", async () => {
-        // Given
-        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
-        getRendezVousJeunePoleEmploiQueryHandler.execute.resolves(
-          failure(new NonTrouveError('Jeune', '1'))
-        )
-        // When
-        await request(app.getHttpServer())
-          .get(`/jeunes/${idJeune}/rendezvous`)
-          .set('authorization', unHeaderAuthorization())
-          // Then
-          .expect(HttpStatus.NOT_FOUND)
-      })
-      it('retourne les rdv', async () => {
-        // Given
-        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
-        getRendezVousJeunePoleEmploiQueryHandler.execute.resolves(
-          success({ queryModel: [] })
-        )
-
-        // When
-        await request(app.getHttpServer())
-          .get(`/jeunes/${idJeune}/rendezvous`)
-          .set('authorization', unHeaderAuthorization())
-          // Then
-          .expect([])
-      })
-      it('renvoie une 500 quand la query est cachée', async () => {
-        // Given
-        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
-        const data: Cached<RendezVousJeuneQueryModel[]> = {
-          queryModel: [],
-          dateDuCache: uneDatetime()
-        }
-        getRendezVousJeunePoleEmploiQueryHandler.execute.resolves(success(data))
-        // When
-        await request(app.getHttpServer())
-          .get(`/jeunes/${idJeune}/rendezvous`)
-          .set('authorization', unHeaderAuthorization())
-          // Then
-          .expect(HttpStatus.INTERNAL_SERVER_ERROR)
-      })
+    it("renvoie une 404 quand le jeune n'existe pas", async () => {
+      // Given
+      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
+      getRendezVousJeunePoleEmploiQueryHandler.execute.resolves(
+        failure(new NonTrouveError('Jeune', '1'))
+      )
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/rendezvous`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.NOT_FOUND)
     })
+    it('retourne les rdv', async () => {
+      // Given
+      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
+      getRendezVousJeunePoleEmploiQueryHandler.execute.resolves(
+        success({ queryModel: [] })
+      )
 
-    describe("quand ce n'est pas un jeune pole-emploi", () => {
-      const idJeune = '1'
-      const rendezVousJeuneQueryModel: RendezVousJeuneQueryModel[] = []
-
-      beforeEach(() => {
-        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
-      })
-
-      it("retourne une 404 quand le jeune n'existe pas", async () => {
-        // Given
-        getRendezVousJeuneQueryHandler.execute.resolves(
-          failure(new NonTrouveError('Jeune', '1'))
-        )
-        // When
-        await request(app.getHttpServer())
-          .get(`/jeunes/${idJeune}/rendezvous`)
-          .set('authorization', unHeaderAuthorization())
-          // Then
-          .expect(HttpStatus.NOT_FOUND)
-      })
-      it("retourne tous les rendez-vous si aucune période n'est renseignée", async () => {
-        // Given
-        getRendezVousJeuneQueryHandler.execute.resolves(
-          success(rendezVousJeuneQueryModel)
-        )
-        // When - Then
-        await request(app.getHttpServer())
-          .get(`/jeunes/${idJeune}/rendezvous`)
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.OK)
-        expect(
-          getRendezVousJeuneQueryHandler.execute
-        ).to.have.been.calledWithExactly(
-          {
-            idJeune,
-            periode: undefined
-          },
-          unUtilisateurDecode()
-        )
-      })
-      it('retourne les rendez-vous futurs si periode FUTURS est renseignée', async () => {
-        // Given
-        getRendezVousJeuneQueryHandler.execute.resolves(
-          success(rendezVousJeuneQueryModel)
-        )
-        // When - Then
-        await request(app.getHttpServer())
-          .get(`/jeunes/${idJeune}/rendezvous?periode=FUTURS`)
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.OK)
-        expect(
-          getRendezVousJeuneQueryHandler.execute
-        ).to.have.been.calledWithExactly(
-          {
-            idJeune,
-            periode: RendezVous.Periode.FUTURS
-          },
-          unUtilisateurDecode()
-        )
-      })
-      it('retourne les rendez-vous passés si periode PASSES est renseignée', async () => {
-        // Given
-        getRendezVousJeuneQueryHandler.execute.resolves(
-          success(rendezVousJeuneQueryModel)
-        )
-        // When - Then
-        await request(app.getHttpServer())
-          .get(`/jeunes/${idJeune}/rendezvous?periode=PASSES`)
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.OK)
-        expect(
-          getRendezVousJeuneQueryHandler.execute
-        ).to.have.been.calledWithExactly(
-          {
-            idJeune,
-            periode: RendezVous.Periode.PASSES
-          },
-          unUtilisateurDecode()
-        )
-      })
-      it('retourne une 400 quand periode est mal formatée', async () => {
-        // When - Then
-        await request(app.getHttpServer())
-          .get(`/jeunes/${idJeune}/rendezvous?periode=XX`)
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.BAD_REQUEST)
-      })
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/rendezvous`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect([])
+    })
+    it('renvoie une 500 quand la query est cachée', async () => {
+      // Given
+      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
+      const data: Cached<RendezVousJeuneQueryModel[]> = {
+        queryModel: [],
+        dateDuCache: uneDatetime()
+      }
+      getRendezVousJeunePoleEmploiQueryHandler.execute.resolves(success(data))
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/rendezvous`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.INTERNAL_SERVER_ERROR)
     })
 
     ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1/rendezvous')
@@ -879,128 +782,37 @@ describe('RendezvousController', () => {
 
   describe('GET /v2/jeunes/:idJeune/rendez-vous', () => {
     const idJeune = '1'
-    describe("quand c'est un jeune pole-emploi", () => {
-      it('renvoie une 404 quand le jeune n"existe pas', async () => {
-        // Given
-        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
-        getRendezVousJeunePoleEmploiQueryHandler.execute.resolves(
-          failure(new NonTrouveError('Jeune', '1'))
-        )
-        // When
-        await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/rendezvous`)
-          .set('authorization', unHeaderAuthorization())
-          // Then
-          .expect(HttpStatus.NOT_FOUND)
-      })
-      it('retourne les rdv', async () => {
-        // Given
-        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
-        const data: Cached<RendezVousJeuneQueryModel[]> = {
-          queryModel: [],
-          dateDuCache: uneDatetime()
-        }
-        getRendezVousJeunePoleEmploiQueryHandler.execute.resolves(success(data))
-
-        // When
-        await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/rendezvous`)
-          .set('authorization', unHeaderAuthorization())
-          // Then
-          .expect({
-            resultat: [],
-            dateDerniereMiseAJour: uneDatetime().toJSDate().toISOString()
-          })
-      })
+    it('renvoie une 404 quand le jeune n"existe pas', async () => {
+      // Given
+      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
+      getRendezVousJeunePoleEmploiQueryHandler.execute.resolves(
+        failure(new NonTrouveError('Jeune', '1'))
+      )
+      // When
+      await request(app.getHttpServer())
+        .get(`/v2/jeunes/${idJeune}/rendezvous`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.NOT_FOUND)
     })
+    it('retourne les rdv', async () => {
+      // Given
+      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
+      const data: Cached<RendezVousJeuneQueryModel[]> = {
+        queryModel: [],
+        dateDuCache: uneDatetime()
+      }
+      getRendezVousJeunePoleEmploiQueryHandler.execute.resolves(success(data))
 
-    describe("quand ce n'est pas un jeune pole-emploi", () => {
-      const idJeune = '1'
-      const rendezVousJeuneQueryModel: RendezVousJeuneQueryModel[] = []
-
-      beforeEach(() => {
-        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
-      })
-
-      it("renvoit une 404 quand le jeune n'existe pas", async () => {
-        // Given
-        getRendezVousJeuneQueryHandler.execute.resolves(
-          failure(new NonTrouveError('Jeune', '1'))
-        )
-        // When
-        await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/rendezvous`)
-          .set('authorization', unHeaderAuthorization())
-          // Then
-          .expect(HttpStatus.NOT_FOUND)
-      })
-      it("retourne tous les rendez-vous si aucune période n'est renseignée", async () => {
-        // Given
-        getRendezVousJeuneQueryHandler.execute.resolves(
-          success(rendezVousJeuneQueryModel)
-        )
-        // When - Then
-        await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/rendezvous`)
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.OK)
-        expect(
-          getRendezVousJeuneQueryHandler.execute
-        ).to.have.been.calledWithExactly(
-          {
-            idJeune,
-            periode: undefined
-          },
-          unUtilisateurDecode()
-        )
-      })
-      it('retourne les rendez-vous futurs si periode FUTURS est renseignée', async () => {
-        // Given
-        getRendezVousJeuneQueryHandler.execute.resolves(
-          success(rendezVousJeuneQueryModel)
-        )
-        // When - Then
-        await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/rendezvous?periode=FUTURS`)
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.OK)
-        expect(
-          getRendezVousJeuneQueryHandler.execute
-        ).to.have.been.calledWithExactly(
-          {
-            idJeune,
-            periode: RendezVous.Periode.FUTURS
-          },
-          unUtilisateurDecode()
-        )
-      })
-      it('retourne les rendez-vous passés si periode PASSES est renseignée', async () => {
-        // Given
-        getRendezVousJeuneQueryHandler.execute.resolves(
-          success(rendezVousJeuneQueryModel)
-        )
-        // When - Then
-        await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/rendezvous?periode=PASSES`)
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.OK)
-        expect(
-          getRendezVousJeuneQueryHandler.execute
-        ).to.have.been.calledWithExactly(
-          {
-            idJeune,
-            periode: RendezVous.Periode.PASSES
-          },
-          unUtilisateurDecode()
-        )
-      })
-      it('retourne une 400 quand periode est mal formatée', async () => {
-        // When - Then
-        await request(app.getHttpServer())
-          .get(`/v2/jeunes/${idJeune}/rendezvous?periode=XX`)
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.BAD_REQUEST)
-      })
+      // When
+      await request(app.getHttpServer())
+        .get(`/v2/jeunes/${idJeune}/rendezvous`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect({
+          resultat: [],
+          dateDerniereMiseAJour: uneDatetime().toJSDate().toISOString()
+        })
     })
 
     ensureUserAuthenticationFailsIfInvalid('get', '/v2/jeunes/1/rendezvous')

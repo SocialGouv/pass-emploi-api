@@ -44,9 +44,9 @@ export function fromSqlToRendezVousJeuneQueryModel(
     createur: rendezVousSql.createur,
     conseiller: jeuneSqlModel?.conseiller
       ? {
-          id: jeuneSqlModel?.conseiller.id,
-          nom: jeuneSqlModel?.conseiller.nom,
-          prenom: jeuneSqlModel?.conseiller.prenom
+          id: jeuneSqlModel.conseiller.id,
+          nom: jeuneSqlModel.conseiller.nom,
+          prenom: jeuneSqlModel.conseiller.prenom
         }
       : {
           id: rendezVousSql.jeunes[0].conseiller!.id,
