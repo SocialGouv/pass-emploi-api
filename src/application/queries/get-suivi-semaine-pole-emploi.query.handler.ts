@@ -11,7 +11,7 @@ import {
   success
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { estPoleEmploiOuCDOuAvenirPro } from '../../domain/core'
+import { beneficiaireEstFTConnect } from '../../domain/core'
 import { Demarche } from '../../domain/demarche'
 import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
@@ -121,7 +121,7 @@ export class GetSuiviSemainePoleEmploiQueryHandler extends QueryHandler<
     return this.jeuneAuthorizer.autoriserLeJeune(
       query.idJeune,
       utilisateur,
-      estPoleEmploiOuCDOuAvenirPro(utilisateur.structure)
+      beneficiaireEstFTConnect(utilisateur.structure)
     )
   }
 

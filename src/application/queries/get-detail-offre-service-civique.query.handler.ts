@@ -68,7 +68,7 @@ export class GetDetailOffreServiceCiviqueQueryHandler extends QueryHandler<
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (Authentification.estConseiller(utilisateur.type)) {
       await this.evenementService.creer(
         Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHE,
         utilisateur

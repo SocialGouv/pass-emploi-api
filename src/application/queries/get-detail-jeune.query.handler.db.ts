@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { JeuneMiloAArchiverSqlModel } from '../../infrastructure/sequelize/models/jeune-milo-a-archiver.sql-model'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
@@ -8,6 +7,7 @@ import { failure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { estMilo } from '../../domain/core'
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneMiloAArchiverSqlModel } from '../../infrastructure/sequelize/models/jeune-milo-a-archiver.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { SituationsMiloSqlModel } from '../../infrastructure/sequelize/models/situations-milo.sql-model'
 import { TransfertConseillerSqlModel } from '../../infrastructure/sequelize/models/transfert-conseiller.sql-model'
@@ -72,7 +72,7 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
     query: GetDetailJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (Authentification.estConseiller(utilisateur.type)) {
       return this.conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMilo(
         query.idJeune,
         utilisateur
