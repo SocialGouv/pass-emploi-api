@@ -4,16 +4,16 @@ import {
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
 import {
-  Result,
   emptySuccess,
-  failure
+  failure,
+  Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
+import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import {
   Conseiller,
   ConseillerRepositoryToken
 } from '../../domain/milo/conseiller'
-import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import {
   RendezVous,
   RendezVousRepositoryToken
@@ -61,7 +61,7 @@ export class RendezVousAuthorizer {
     idRendezVous: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (Authentification.estConseiller(utilisateur.type)) {
       const rendezVous = await this.rendezVousRepository.get(idRendezVous)
       if (!rendezVous) {
         return failure(new NonTrouveError('RendezVous', idRendezVous))

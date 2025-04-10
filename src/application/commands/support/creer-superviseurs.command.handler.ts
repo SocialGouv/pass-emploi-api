@@ -8,7 +8,7 @@ import {
   SuperviseursRepositoryToken
 } from '../../../domain/superviseur'
 import { SupportAuthorizer } from '../../authorizers/support-authorizer'
-import { Core, structuresFT } from '../../../domain/core'
+import { Core } from '../../../domain/core'
 
 export interface CreerSuperviseursCommand extends Command {
   superEmailFT?: string
@@ -30,7 +30,7 @@ export class CreerSuperviseursCommandHandler extends CommandHandler<
 
   async handle(command: CreerSuperviseursCommand): Promise<Result> {
     const superviseurs: Superviseur[] = command.superEmailFT
-      ? structuresFT.concat(Core.Structure.AVENIR_PRO).map(structure => ({
+      ? Core.structuresFT.concat(Core.Structure.AVENIR_PRO).map(structure => ({
           email: command.superEmailFT!,
           structure
         }))

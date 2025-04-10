@@ -3,7 +3,7 @@ import { DateTime } from 'luxon'
 import { Op } from 'sequelize'
 import { Job } from '../../building-blocks/types/job'
 import { JobHandler } from '../../building-blocks/types/job-handler'
-import { structuresFT } from '../../domain/core'
+import { Core } from '../../domain/core'
 import {
   Notification,
   NotificationRepositoryToken
@@ -160,7 +160,7 @@ async function recupererBeneficiairesANotifier(
 ): Promise<{ rows: JeuneSqlModel[]; count: number }> {
   return await JeuneSqlModel.findAndCountAll({
     where: {
-      structure: structuresFT,
+      structure: Core.structuresFT,
       pushNotificationToken: {
         [Op.ne]: null
       }
