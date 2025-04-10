@@ -213,6 +213,17 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
       .map(tableAnnuelle => getQueryTableAEJeune(tableAnnuelle))
       .join(', ')
 
+    const fromTable = infosTablesAEAnnuelles.map(tableAnnuelle => {
+      let tableAeJeuneAnnuelle = `SELECT * FROM ae_jeune${tableAnnuelle.suffix}`
+      if (
+        tableAnnuelle.depuisAnnee !==
+        infosTablesAEAnnuelles[infosTablesAEAnnuelles.length - 1].depuisAnnee
+      ) {
+        tableAeJeuneAnnuelle += '  UNION ALL '
+      }
+      return tableAeJeuneAnnuelle
+    })
+
     const query = `INSERT INTO evenement_engagement_jeune (
       id_utilisateur, 
       structure, 
@@ -237,13 +248,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
         sum(nb_consultation_evenement) AS nb_consultation_evenement,
         min(date_premier_ae) AS date_premier_ae,
         max(date_dernier_ae) AS date_dernier_ae
-      FROM (
-        SELECT * FROM ae_jeune_2022
-        UNION ALL
-        SELECT * FROM ae_jeune_2023
-        UNION ALL
-        SELECT * FROM ae_jeune
-      ) AS concat_tables
+      FROM ( ${fromTable.join('')} ) AS concat_tables
           GROUP BY
             id_utilisateur,
             structure;
