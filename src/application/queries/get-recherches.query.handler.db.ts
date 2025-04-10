@@ -48,7 +48,7 @@ export class GetRecherchesQueryHandler extends QueryHandler<
     query: GetRecherchesQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+    if (Authentification.estConseiller(utilisateur.type)) {
       return this.conseillerAgenceAuthorizer.autoriserConseillerPourSonJeuneOuUnJeuneDeSonAgenceMiloAvecPartageFavoris(
         query.idJeune,
         utilisateur

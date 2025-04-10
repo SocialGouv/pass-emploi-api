@@ -24,11 +24,11 @@ import {
   FirebaseMessage
 } from './dto/firebase.dto'
 import CollectionReference = firestore.CollectionReference
+import DocumentData = firestore.DocumentData
 import DocumentReference = firestore.DocumentReference
+import QueryDocumentSnapshot = firestore.QueryDocumentSnapshot
 import Timestamp = firestore.Timestamp
 import UpdateData = firestore.UpdateData
-import DocumentData = firestore.DocumentData
-import QueryDocumentSnapshot = firestore.QueryDocumentSnapshot
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Utf8 = require('crypto-js/enc-utf8')
@@ -276,10 +276,9 @@ export class FirebaseClient {
       jeuneId: Authentification.estJeune(utilisateur.type)
         ? utilisateur.id
         : null,
-      conseillerId:
-        utilisateur.type === Authentification.Type.CONSEILLER
-          ? utilisateur.id
-          : null
+      conseillerId: Authentification.estConseiller(utilisateur.type)
+        ? utilisateur.id
+        : null
     }
     return this.auth.createCustomToken(utilisateur.id, customClaims)
   }

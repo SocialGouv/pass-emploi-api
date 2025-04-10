@@ -17,7 +17,6 @@ import {
 } from 'test/fixtures/authentification.fixture'
 import { uneSessionJeuneMiloQueryModel } from 'test/fixtures/sessions.fixture'
 import { expect, StubbedClass, stubClass } from 'test/utils'
-import { testConfig } from 'test/utils/module-for-testing'
 import { ConseillerInterStructureMiloAuthorizer } from '../../../../src/application/authorizers/conseiller-inter-structure-milo-authorizer'
 import { Core } from '../../../../src/domain/core'
 import { SessionMilo } from '../../../../src/domain/milo/session.milo'
@@ -55,8 +54,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
     getSessionsQueryHandler = new GetSessionsJeuneMiloQueryHandler(
       getSessionsQueryGetter,
       jeuneAuthorizer,
-      conseillerAuthorizer,
-      testConfig()
+      conseillerAuthorizer
     )
   })
 

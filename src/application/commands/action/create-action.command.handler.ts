@@ -81,7 +81,7 @@ export class CreateActionCommandHandler extends CommandHandler<
     command: CreateActionCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (utilisateur.type === Authentification.Type.JEUNE) {
+    if (Authentification.estJeune(utilisateur.type)) {
       return this.jeuneAuthorizer.autoriserLeJeune(command.idJeune, utilisateur)
     } else {
       return this.conseillerAuthorizer.autoriserLeConseillerPourSonJeune(
