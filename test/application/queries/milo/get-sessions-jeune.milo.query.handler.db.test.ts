@@ -138,7 +138,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
 
         const uneFailure = failure(new NonTrouveError('Jeune', query.idJeune))
         getSessionsQueryGetter.handle
-          .withArgs('idJeune', 'idDossier', 'token')
+          .withArgs('idJeune', 'token')
           .resolves(uneFailure)
 
         // When
@@ -164,7 +164,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
 
           const unSuccess = success([uneSessionJeuneMiloQueryModel()])
           getSessionsQueryGetter.handle
-            .withArgs('idJeune', 'idDossier', 'token')
+            .withArgs('idJeune', 'token')
             .resolves(unSuccess)
 
           // When
@@ -202,7 +202,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
             })
           ])
           getSessionsQueryGetter.handle
-            .withArgs('idJeune', 'idDossier', 'token', {
+            .withArgs('idJeune', 'token', {
               periode: {
                 debut: undefined,
                 fin: undefined
@@ -246,7 +246,7 @@ describe('GetSessionsJeuneMiloQueryHandler', () => {
             })
           ])
           getSessionsQueryGetter.handle
-            .withArgs('idJeune', 'idDossier', 'token', {
+            .withArgs('idJeune', 'token', {
               periode: {
                 debut: undefined,
                 fin: undefined
