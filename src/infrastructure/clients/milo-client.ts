@@ -313,7 +313,7 @@ export class MiloClient {
     params.append('idDossier', idDossier)
     params.append('taillePage', TAILLE_PAGE_MAX_APIS_MILO.toString())
     if (periode?.debut) {
-      params.append('dateDebutRecherche', periode.debut.toFormat('yyyy-MM-dd'))
+      params.append('dateDebutRecherche', periode.debut.toISODate())
     }
 
     let fin = periode?.fin
@@ -321,7 +321,7 @@ export class MiloClient {
       const debut = periode?.debut ?? this.dateService.now()
       fin = debut.plus({ months: 3 })
     }
-    params.append('dateFinRecherche', fin.toFormat('yyyy-MM-dd'))
+    params.append('dateFinRecherche', fin.toISODate())
 
     // On assure jusqu'à 300 résultats
     const sessions: SessionParDossierJeuneDto[] = []

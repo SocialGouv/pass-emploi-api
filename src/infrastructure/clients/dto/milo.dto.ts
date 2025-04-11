@@ -80,3 +80,14 @@ export interface InscrireJeuneSessionDto {
   idSession: number
   statut: string
 }
+
+export function aEteInscrit(withStatut?: { statut: string }): boolean {
+  switch (withStatut?.statut) {
+    case MILO_INSCRIT:
+    case MILO_PRESENT:
+    case MILO_REFUS_JEUNE:
+      return true
+    default:
+      return false
+  }
+}

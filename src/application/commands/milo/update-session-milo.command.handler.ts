@@ -170,9 +170,9 @@ export class UpdateSessionMiloCommandHandler extends CommandHandler<
 }
 
 function trouverListesJeunesModifiesPourDesinscription(
-  toto: Array<Omit<Inscription, 'nom' | 'prenom'>>
+  inscriptionsModifiees: Array<Omit<Inscription, 'nom' | 'prenom'>>
 ): string[] {
-  return toto
+  return inscriptionsModifiees
     .filter(inscription => inscription.statut !== Inscription.Statut.INSCRIT)
     .map(inscription => inscription.idJeune)
 }
