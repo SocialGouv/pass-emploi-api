@@ -319,14 +319,14 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
         )
         if (isSuccess(sessionsQueryModels)) {
           sessionsInscrit = sessionsQueryModels.data.filter(session =>
-            SessionMilo.Inscription.estIncrit(session.inscription)
+            SessionMilo.Inscription.aEteInscrit(session.inscription)
           )
           sessionsInscritCetteSemaine = sessionsInscrit.filter(session => {
             const dateDebutSession = DateTime.fromISO(session.dateHeureDebut)
             return dateDebutSession < dateFinDeSemaine
           })
           sessionsNonInscrit = sessionsQueryModels.data.filter(
-            session => !SessionMilo.Inscription.estIncrit(session.inscription)
+            session => !SessionMilo.Inscription.aEteInscrit(session.inscription)
           )
         }
       } catch (e) {
