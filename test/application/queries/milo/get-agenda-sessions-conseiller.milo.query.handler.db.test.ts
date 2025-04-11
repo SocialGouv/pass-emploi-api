@@ -10,20 +10,19 @@ import {
 import { ConseillerMiloSansStructure } from 'src/building-blocks/types/domain-error'
 import { failure, success } from 'src/building-blocks/types/result'
 import { ConseillerMilo } from 'src/domain/milo/conseiller.milo.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'
 import { unDetailSessionConseillerDto } from 'test/fixtures/milo-dto.fixture'
+import { unAgendaConseillerMiloSessionListItemQueryModel } from 'test/fixtures/sessions.fixture'
 import { expect, StubbedClass, stubClass } from 'test/utils'
 import { SessionConseillerDetailDto } from '../../../../src/infrastructure/clients/dto/milo.dto'
-import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { MiloClient } from '../../../../src/infrastructure/clients/milo-client'
 import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { getDatabase } from '../../../utils/database-for-testing'
-import { testConfig } from '../../../utils/module-for-testing'
-import { unAgendaConseillerMiloSessionListItemQueryModel } from 'test/fixtures/sessions.fixture'
 
 describe('GetAgendaSessionsConseillerMiloQueryHandler', () => {
   let getAgendaSessionsQueryHandler: GetAgendaSessionsConseillerMiloQueryHandler
@@ -47,8 +46,7 @@ describe('GetAgendaSessionsConseillerMiloQueryHandler', () => {
         miloClient,
         oidcClient,
         conseillerRepository,
-        conseillerAuthorizer,
-        testConfig()
+        conseillerAuthorizer
       )
   })
 

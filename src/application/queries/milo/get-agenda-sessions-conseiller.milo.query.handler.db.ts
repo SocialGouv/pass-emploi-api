@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
 import { DateTime } from 'luxon'
 import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
@@ -9,9 +8,8 @@ import { estMilo } from 'src/domain/core'
 import { Conseiller } from 'src/domain/milo/conseiller'
 import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo.db'
 import {
+  aEteInscrit,
   InscritSessionMiloDto,
-  MILO_INSCRIT,
-  MILO_PRESENT,
   SessionConseillerDetailDto
 } from '../../../infrastructure/clients/dto/milo.dto'
 import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
@@ -45,8 +43,7 @@ export class GetAgendaSessionsConseillerMiloQueryHandler extends QueryHandler<
     private oidcClient: OidcClient,
     @Inject(ConseillerMiloRepositoryToken)
     private conseillerMiloRepository: Conseiller.Milo.Repository,
-    private conseillerAuthorizer: ConseillerAuthorizer,
-    private configService: ConfigService
+    private conseillerAuthorizer: ConseillerAuthorizer
   ) {
     super('GetAgendaSessionsConseillerMiloQueryHandler')
   }
@@ -138,9 +135,7 @@ export class GetAgendaSessionsConseillerMiloQueryHandler extends QueryHandler<
   ): InscritSessionMiloQueryModel[] {
     return inscrits
       .filter(({ idDossier }) => jeunesByIdPartenaire.has(idDossier.toString()))
-      .filter(
-        ({ statut }) => statut === MILO_INSCRIT || statut === MILO_PRESENT
-      )
+      .filter(aEteInscrit)
       .map(inscrit => {
         const sqlModel = jeunesByIdPartenaire.get(inscrit.idDossier.toString())!
         return {

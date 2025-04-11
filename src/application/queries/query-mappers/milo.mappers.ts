@@ -97,7 +97,7 @@ export function mapSessionConseillerDtoToQueryModel(
     .map(({ idDossier, statut }) =>
       dtoToStatutInscription(statut, session.id, idDossier.toString())
     )
-    .filter(statut => SessionMilo.Inscription.estIncrit(statut))
+    .filter(statut => SessionMilo.Inscription.estOuSeraPresent(statut))
   const nombreParticipants = participants.length
 
   const autoinscription = parametrageSqlModel?.autoinscription ?? false

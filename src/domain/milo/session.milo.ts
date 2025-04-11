@@ -133,7 +133,7 @@ export namespace SessionMilo {
     const inscriptionsExistantes = getInscriptionsExistantes(session)
 
     for (const emargement of emargements) {
-      if (!SessionMilo.Inscription.estIncrit(emargement.statut)) continue
+      if (!SessionMilo.Inscription.estOuSeraPresent(emargement.statut)) continue
 
       const inscription = inscriptionsExistantes.get(emargement.idJeune)!
 
@@ -163,26 +163,26 @@ export namespace SessionMilo {
   }
 
   export function calculerStatut(
-    participants: SessionMilo.Inscription.Statut[],
+    participants: Inscription.Statut[],
     maintenant: DateTime,
     dateFin: DateTime,
     dateCloture?: DateTime
-  ): SessionMilo.Statut {
-    if (dateCloture) return SessionMilo.Statut.CLOTUREE
-    if (dateFin > maintenant) return SessionMilo.Statut.A_VENIR
+  ): Statut {
+    if (dateCloture) return Statut.CLOTUREE
+    if (dateFin > maintenant) return Statut.A_VENIR
 
     const participantsNonEmarges = participants.filter(
-      statut => statut === SessionMilo.Inscription.Statut.INSCRIT
+      statut => statut === Inscription.Statut.INSCRIT
     )
     return participantsNonEmarges.length > 0
-      ? SessionMilo.Statut.A_CLOTURER
-      : SessionMilo.Statut.EMARGEE
+      ? Statut.A_CLOTURER
+      : Statut.EMARGEE
   }
 
   export function peutInscrireBeneficiaire(
     session: SessionMiloAllegeeForBeneficiaire
   ): Result {
-    if (SessionMilo.Inscription.estIncrit(session.statutInscription))
+    if (Inscription.estOuSeraPresent(session.statutInscription))
       return failure(new BeneficiaireDejaInscritError())
 
     if (session.nbPlacesDisponibles === 0)
@@ -248,7 +248,7 @@ export namespace SessionMilo {
     idInscription: string
     nom: string
     prenom: string
-    statut: SessionMilo.Inscription.Statut
+    statut: Inscription.Statut
     commentaire?: string
   }
 
@@ -261,7 +261,24 @@ export namespace SessionMilo {
     }
 
     export function estIncrit(statut?: Statut): boolean {
-      return statut === Statut.INSCRIT || statut === Statut.PRESENT
+      switch (statut) {
+        case Inscription.Statut.INSCRIT:
+        case Inscription.Statut.REFUS_JEUNE:
+        case Inscription.Statut.PRESENT:
+          return true
+        default:
+          return false
+      }
+    }
+
+    export function estOuSeraPresent(statut?: Statut): boolean {
+      switch (statut) {
+        case Statut.INSCRIT:
+        case Statut.PRESENT:
+          return true
+        default:
+          return false
+      }
     }
   }
 
