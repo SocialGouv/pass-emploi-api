@@ -5,9 +5,7 @@ import { SessionJeuneMiloQueryModel } from 'src/application/queries/query-models
 import { isFailure, Result, success } from 'src/building-blocks/types/result'
 import { Core } from 'src/domain/core'
 import {
-  MILO_INSCRIT,
-  MILO_PRESENT,
-  MILO_REFUS_JEUNE,
+  aEteInscrit,
   SessionParDossierJeuneDto
 } from 'src/infrastructure/clients/dto/milo.dto'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
@@ -174,12 +172,7 @@ async function recupererSessionsDuJeuneSelonFiltre(
 function recupererSessionsAuxquellesLeJeuneEstInscrit(
   sessions: SessionParDossierJeuneDto[]
 ): SessionParDossierJeuneDto[] {
-  return sessions.filter(
-    session =>
-      session.sessionInstance?.statut === MILO_INSCRIT ||
-      session.sessionInstance?.statut === MILO_PRESENT ||
-      session.sessionInstance?.statut === MILO_REFUS_JEUNE
-  )
+  return sessions.filter(({ sessionInstance }) => aEteInscrit(sessionInstance))
 }
 
 async function recupererSessionsVisiblesPourLeJeune(

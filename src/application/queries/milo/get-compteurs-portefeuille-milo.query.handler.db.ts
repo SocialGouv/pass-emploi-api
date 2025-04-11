@@ -38,25 +38,27 @@ export class GetCompteursBeneficiaireMiloQueryHandler extends QueryHandler<
     const mergeMap: {
       [key: string]: { actions: number; rdvs: number; sessions: number }
     } = {}
+    const dateDebut = query.dateDebut.startOf('day').toUTC()
+    const dateFin = query.dateFin.endOf('day').toUTC()
 
     const compteurActions = await this.getActionsDeLaSemaineByConseiller(
       utilisateur.id,
-      query.dateDebut,
-      query.dateFin
+      dateDebut,
+      dateFin
     )
 
     const compteursRdv = await this.getRdvDeLaSemaineByConseiller(
       utilisateur.id,
-      query.dateDebut,
-      query.dateFin
+      dateDebut,
+      dateFin
     )
 
     let compteursSessions: Result<Array<{ id: string; sessions: number }>> =
       await this.sessionsRecupereesToCompteursSessions(
         utilisateur.id,
         query.accessToken,
-        query.dateDebut.toUTC().startOf('day'),
-        query.dateFin.toUTC().endOf('day')
+        dateDebut,
+        dateFin
       )
 
     if (isFailure(compteursSessions)) {
@@ -135,8 +137,8 @@ export class GetCompteursBeneficiaireMiloQueryHandler extends QueryHandler<
           type: QueryTypes.SELECT,
           replacements: {
             idConseiller,
-            dateDebut: dateDebut.toUTC().startOf('day').toFormat('yyyy-MM-dd'),
-            dateFin: dateFin.toUTC().endOf('day').toFormat('yyyy-MM-dd')
+            dateDebut: dateDebut.toISODate(),
+            dateFin: dateFin.toISODate()
           }
         }
       )
@@ -167,8 +169,8 @@ export class GetCompteursBeneficiaireMiloQueryHandler extends QueryHandler<
           type: QueryTypes.SELECT,
           replacements: {
             idConseiller,
-            dateDebut: dateDebut.toUTC().startOf('day').toFormat('yyyy-MM-dd'),
-            dateFin: dateFin.toUTC().endOf('day').toFormat('yyyy-MM-dd')
+            dateDebut: dateDebut.toISODate(),
+            dateFin: dateFin.toISODate()
           }
         }
       )
