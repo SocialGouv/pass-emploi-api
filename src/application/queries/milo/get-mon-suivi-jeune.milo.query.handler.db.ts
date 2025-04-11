@@ -75,7 +75,7 @@ export class GetMonSuiviMiloQueryHandler extends QueryHandler<
       this.recupererLesActions(query, jeuneSqlModel),
       this.recupererLesRendezVous(query, utilisateur.type),
       this.sessionsJeuneQueryGetter
-        .handle(query.idJeune, jeuneSqlModel.idPartenaire, query.accessToken, {
+        .handle(query.idJeune, query.accessToken, {
           periode: {
             debut: query.dateDebut,
             fin: query.dateFin

@@ -311,7 +311,6 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       try {
         const sessionsQueryModels = await this.getSessionsQueryGetter.handle(
           query.idJeune,
-          jeuneSqlModel.idPartenaire,
           query.accessToken,
           {
             periode: { debut: maintenant, fin: datePlus30Jours }

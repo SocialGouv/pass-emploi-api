@@ -101,7 +101,6 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
         const sessionsQueryModels =
           await this.getSessionsJeuneQueryGetter.handle(
             query.idJeune,
-            jeuneSqlModel.idPartenaire,
             query.accessToken,
             {
               periode: {

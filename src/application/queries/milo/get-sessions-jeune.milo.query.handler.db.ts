@@ -54,7 +54,6 @@ export class GetSessionsJeuneMiloQueryHandler extends QueryHandler<
 
     return this.getSessionsQueryGetter.handle(
       query.idJeune,
-      jeuneSqlModel.idPartenaire,
       query.accessToken,
       {
         periode: {

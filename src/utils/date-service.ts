@@ -38,7 +38,7 @@ export class DateService {
     dateMin: Date,
     dateMax: Date
   ): boolean {
-    return dateAComparer >= dateMin && dateAComparer <= dateMax
+    return dateMin <= dateAComparer && dateAComparer <= dateMax
   }
 
   fromISOStringToJSDate(stringISO: string): Date {

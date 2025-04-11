@@ -87,7 +87,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
     const dimancheEnHuitString = '2022-08-21T23:59:59.999Z'
     beforeEach(async () => {
       sessionsQueryGetter.handle
-        .withArgs(idJeune, 'idDossier', accessToken, {
+        .withArgs(idJeune, accessToken, {
           periode: {
             debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
             fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
@@ -146,7 +146,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
           '2022-08-29T00:00:00-07:00'
         ])
       sessionsQueryGetter.handle
-        .withArgs(idJeune, 'idDossier', accessToken, {
+        .withArgs(idJeune, accessToken, {
           periode: {
             debut: DateTime.fromISO(_lundiDernier, { setZone: true }),
             fin: DateTime.fromISO(_dimancheEnHuit, { setZone: true })
@@ -295,7 +295,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
       it('renvoie un tableau vide si le jeune n’est inscrit à aucune session sur la période', async () => {
         // Given
         sessionsQueryGetter.handle
-          .withArgs(idJeune, 'idDossier', accessToken, {
+          .withArgs(idJeune, accessToken, {
             periode: {
               debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
               fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
@@ -326,7 +326,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
           inscription: SessionMilo.Inscription.Statut.INSCRIT
         })
         sessionsQueryGetter.handle
-          .withArgs(idJeune, 'idDossier', accessToken, {
+          .withArgs(idJeune, accessToken, {
             periode: {
               debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
               fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })
@@ -366,7 +366,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
           inscription: SessionMilo.Inscription.Statut.INSCRIT
         })
         sessionsQueryGetter.handle
-          .withArgs(idJeune, 'idDossier', accessToken, {
+          .withArgs(idJeune, accessToken, {
             periode: {
               debut: DateTime.fromISO(lundiDernierString, { setZone: true }),
               fin: DateTime.fromISO(dimancheEnHuitString, { setZone: true })

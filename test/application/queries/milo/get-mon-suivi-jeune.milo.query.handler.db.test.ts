@@ -170,7 +170,7 @@ describe('GetMonSuiviMiloQueryHandler', () => {
           })
 
           sessionsQueryGetter.handle
-            .withArgs(jeuneDto.id, jeuneDto.idPartenaire!, query.accessToken, {
+            .withArgs(jeuneDto.id, query.accessToken, {
               periode: {
                 debut: dateDebut,
                 fin: dateFin
@@ -264,7 +264,7 @@ describe('GetMonSuiviMiloQueryHandler', () => {
       beforeEach(async () => {
         // Given
         sessionsQueryGetter.handle
-          .withArgs(jeuneDto.id, jeuneDto.idPartenaire!, query.accessToken, {
+          .withArgs(jeuneDto.id, query.accessToken, {
             periode: {
               debut: dateDebut,
               fin: dateFin
@@ -290,7 +290,7 @@ describe('GetMonSuiviMiloQueryHandler', () => {
       it("renvoie l'erreur", async () => {
         // Given
         sessionsQueryGetter.handle
-          .withArgs(jeuneDto.id, jeuneDto.idPartenaire!, query.accessToken, {
+          .withArgs(jeuneDto.id, query.accessToken, {
             periode: {
               debut: dateDebut,
               fin: dateFin
