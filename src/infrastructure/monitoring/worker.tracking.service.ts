@@ -1,5 +1,5 @@
 import { AsyncLocalStorage } from 'node:async_hooks'
-import * as uuid from 'uuid'
+import { v4 as uuidV4 } from 'uuid'
 
 let workerTrackingServiceInstance: WorkerTrackingService
 
@@ -22,7 +22,7 @@ export class WorkerTrackingService {
 
   startJobTracking(name: string): void {
     const currentTraceIds = {
-      transaction: { id: uuid.v4() }
+      transaction: { id: uuidV4() }
     }
     const jobTracking: JobTracking = {
       name,

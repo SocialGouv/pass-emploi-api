@@ -1,6 +1,6 @@
 import { AsSql } from '../sequelize/types'
 import { ActionDto } from '../sequelize/models/action.sql-model'
-import * as uuid from 'uuid'
+import { v4 as uuidV4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { Action } from '../../domain/action/action'
 
@@ -8,7 +8,7 @@ export function uneActionJdd(
   args: Partial<AsSql<ActionDto>> = {}
 ): AsSql<ActionDto> {
   const defaults: AsSql<ActionDto> = {
-    id: uuid.v4(),
+    id: uuidV4(),
     contenu: "Contenu de l'action",
     description: "Description de l'action",
     dateCreation: DateTime.now().toJSDate(),

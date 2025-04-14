@@ -1,13 +1,13 @@
 import { AsSql } from '../sequelize/types'
 import { RechercheDto } from '../sequelize/models/recherche.sql-model'
-import * as uuid from 'uuid'
+import { v4 as uuidV4 } from 'uuid'
 import { Recherche } from '../../domain/offre/recherche/recherche'
 
 export const uneRechercheJdd = (
   args: Partial<RechercheDto> = {}
 ): Omit<AsSql<RechercheDto>, 'geometrie'> => {
   const defaults = {
-    id: uuid.v4(),
+    id: uuidV4(),
     idJeune: 'abcd',
     titre: 'Coiffeur barbier / Coiffeuse barbière - NANTES (44)',
     metier: 'Coiffeur barbier / Coiffeuse barbière',

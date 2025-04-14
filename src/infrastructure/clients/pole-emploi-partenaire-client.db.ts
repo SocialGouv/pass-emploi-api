@@ -6,7 +6,7 @@ import * as https from 'https'
 import { DateTime } from 'luxon'
 import { firstValueFrom } from 'rxjs'
 import { QueryTypes, Sequelize } from 'sequelize'
-import * as uuid from 'uuid'
+import { v4 as uuidV4 } from 'uuid'
 import { Context, ContextKey } from '../../building-blocks/context'
 import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import { Result, failure, success } from '../../building-blocks/types/result'
@@ -457,7 +457,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
       `,
         {
           replacements: {
-            id: uuid.v4(),
+            id: uuidV4(),
             idUtilisateur: utilisateur.id,
             typeUtilisateur: utilisateur.type,
             date: new Date(),
