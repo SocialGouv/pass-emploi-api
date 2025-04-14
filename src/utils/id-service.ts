@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common'
-import * as uuid from 'uuid'
+import { v4 as uuidV4 } from 'uuid'
 
 @Injectable()
 export class IdService {
   uuid(): string {
-    return uuid.v4()
+    return uuidV4()
   }
 }

@@ -117,7 +117,7 @@
     "sequelize-typescript": "2.1.6",
     "swagger-ui-express": "5.0.1",
     "tokenbucket": "0.3.2",
-    "uuid": "9.0.1"
+    "uuid": "11.1.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.4.9",
@@ -142,7 +142,6 @@
     "@types/sinon": "^17.0.4",
     "@types/sinon-chai": "^3.2.12",
     "@types/supertest": "^2.0.16",
-    "@types/uuid": "^9.0.8",
     "@types/yargs": "^17.0.33",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",

@@ -4,7 +4,7 @@ import { IncomingMessage } from 'http'
 import { LoggerModule } from 'nestjs-pino'
 import { MixinFn } from 'pino'
 import { ReqId } from 'pino-http'
-import * as uuid from 'uuid'
+import { v4 as uuidV4 } from 'uuid'
 import { getAPMInstance } from '../infrastructure/monitoring/apm.init'
 import { getWorkerTrackingServiceInstance } from '../infrastructure/monitoring/worker.tracking.service'
 
@@ -46,7 +46,7 @@ export const configureLoggerModule = (): DynamicModule =>
           }
         },
         genReqId: (request: Request): ReqId =>
-          request.header('X-Request-ID') ?? uuid.v4()
+          request.header('X-Request-ID') ?? uuidV4()
       }
     ]
   })

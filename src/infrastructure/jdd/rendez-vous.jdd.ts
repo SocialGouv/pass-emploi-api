@@ -4,14 +4,14 @@ import {
   CodeTypeRendezVous,
   RendezVous
 } from '../../domain/rendez-vous/rendez-vous'
-import * as uuid from 'uuid'
+import { v4 as uuidV4 } from 'uuid'
 import { DateTime } from 'luxon'
 
 export function unRendezVousJDD(
   args: Partial<AsSql<RendezVousDto>> = {}
 ): AsSql<RendezVousDto> {
   const defaults: AsSql<RendezVousDto> = {
-    id: uuid.v4(),
+    id: uuidV4(),
     source: RendezVous.Source.PASS_EMPLOI,
     titre: 'rdv',
     duree: 30,
