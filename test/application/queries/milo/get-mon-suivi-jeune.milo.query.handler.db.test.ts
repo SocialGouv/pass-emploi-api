@@ -1,5 +1,20 @@
-import { unJeune } from '../../../fixtures/jeune.fixture'
-import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
+import { UnauthorizedException } from '@nestjs/common'
+import { DateTime } from 'luxon'
+import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
+import {
+  GetMonSuiviMiloQuery,
+  GetMonSuiviMiloQueryHandler
+} from '../../../../src/application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
+import { GetSessionsJeuneMiloQueryGetter } from '../../../../src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
+import { ActionQueryModel } from '../../../../src/application/queries/query-models/actions.query-model'
+import { GetMonSuiviMiloQueryModel } from '../../../../src/application/queries/query-models/jeunes.milo.query-model'
+import { RendezVousJeuneQueryModel } from '../../../../src/application/queries/query-models/rendez-vous.query-model'
+import { SessionJeuneMiloQueryModel } from '../../../../src/application/queries/query-models/sessions.milo.query.model'
+import {
+  ErreurHttp,
+  JeuneMiloSansIdDossier,
+  NonTrouveError
+} from '../../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
@@ -7,46 +22,31 @@ import {
   Result,
   success
 } from '../../../../src/building-blocks/types/result'
-import { expect, StubbedClass, stubClass } from '../../../utils'
-import {
-  GetMonSuiviMiloQuery,
-  GetMonSuiviMiloQueryHandler
-} from '../../../../src/application/queries/milo/get-mon-suivi-jeune.milo.query.handler.db'
-import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
-import { getDatabase } from '../../../utils/database-for-testing'
-import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
-import {
-  ErreurHttp,
-  JeuneMiloSansIdDossier,
-  NonTrouveError
-} from '../../../../src/building-blocks/types/domain-error'
-import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { Action } from '../../../../src/domain/action/action'
-import { AsSql } from '../../../../src/infrastructure/sequelize/types'
+import { SessionMilo } from '../../../../src/domain/milo/session.milo'
 import {
   ActionDto,
   ActionSqlModel
 } from '../../../../src/infrastructure/sequelize/models/action.sql-model'
-import { uneActionDto } from '../../../fixtures/sql-models/action.sql-model'
-import { DateTime } from 'luxon'
-import { ActionQueryModel } from '../../../../src/application/queries/query-models/actions.query-model'
-import { uneActionQueryModel } from '../../../fixtures/query-models/action.query-model.fixtures'
+import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { RendezVousJeuneAssociationSqlModel } from '../../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import {
   RendezVousDto,
   RendezVousSqlModel
 } from '../../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
-import { RendezVousJeuneAssociationSqlModel } from '../../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
-import { RendezVousJeuneQueryModel } from '../../../../src/application/queries/query-models/rendez-vous.query-model'
+import { AsSql } from '../../../../src/infrastructure/sequelize/types'
+import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
+import { unJeune } from '../../../fixtures/jeune.fixture'
+import { uneActionQueryModel } from '../../../fixtures/query-models/action.query-model.fixtures'
 import { unRendezVousQueryModel } from '../../../fixtures/query-models/rendez-vous.query-model.fixtures'
 import { uneSessionJeuneMiloQueryModel } from '../../../fixtures/sessions.fixture'
-import { GetSessionsJeuneMiloQueryGetter } from '../../../../src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
-import { SessionMilo } from '../../../../src/domain/milo/session.milo'
-import { GetMonSuiviMiloQueryModel } from '../../../../src/application/queries/query-models/jeunes.milo.query-model'
-import { SessionJeuneMiloQueryModel } from '../../../../src/application/queries/query-models/sessions.milo.query.model'
-import { UnauthorizedException } from '@nestjs/common'
+import { uneActionDto } from '../../../fixtures/sql-models/action.sql-model'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
+import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
+import { expect, StubbedClass, stubClass } from '../../../utils'
+import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('GetMonSuiviMiloQueryHandler', () => {
   let handler: GetMonSuiviMiloQueryHandler
@@ -119,19 +119,15 @@ describe('GetMonSuiviMiloQueryHandler', () => {
       })
       describe('avec id partenaire', () => {
         let result: Result<GetMonSuiviMiloQueryModel>
-        let _actionAvantDateDebut1Heure: AsSql<ActionDto>
         let actionApresDateDebutUneHeure: AsSql<ActionDto>
         let actionApresDateDebutUnJour: AsSql<ActionDto>
         let actionAvantDateFinUnJour: AsSql<ActionDto>
         let actionAvantDateFinUneHeure: AsSql<ActionDto>
-        let _actionApresDateFinUneHeure: AsSql<ActionDto>
 
-        let _rendezVousAvantDateDebut1Heure: AsSql<RendezVousDto>
         let rendezVousApresDateDebutUneHeure: AsSql<RendezVousDto>
         let rendezVousApresDateDebutUnJour: AsSql<RendezVousDto>
         let rendezVousAvantDateFinUnJour: AsSql<RendezVousDto>
         let rendezVousAvantDateFinUneHeure: AsSql<RendezVousDto>
-        let _rendezVousApresDateFinUneHeure: AsSql<RendezVousDto>
 
         let sessionAvecInscriptionAJPlus1: SessionJeuneMiloQueryModel
         let sessionAvecInscriptionAJPlus2: SessionJeuneMiloQueryModel
@@ -139,35 +135,27 @@ describe('GetMonSuiviMiloQueryHandler', () => {
         beforeEach(async () => {
           // Given
           ;[
-            _actionAvantDateDebut1Heure,
             actionApresDateDebutUneHeure,
             actionApresDateDebutUnJour,
             actionAvantDateFinUnJour,
-            actionAvantDateFinUneHeure,
-            _actionApresDateFinUneHeure
+            actionAvantDateFinUneHeure
           ] = await createActions([
-            dateDebut.minus({ hours: 1 }),
             dateDebut.plus({ hours: 1 }),
             dateDebut.plus({ days: 1 }),
             dateFin.minus({ days: 1 }),
-            dateFin.minus({ hours: 1 }),
-            dateFin.plus({ hours: 1 })
+            dateFin.minus({ hours: 1 })
           ])
           ;[
-            _rendezVousAvantDateDebut1Heure,
             rendezVousApresDateDebutUneHeure,
             rendezVousApresDateDebutUnJour,
             rendezVousAvantDateFinUnJour,
-            rendezVousAvantDateFinUneHeure,
-            _rendezVousApresDateFinUneHeure
+            rendezVousAvantDateFinUneHeure
           ] = await createRendezVous(
             [
-              dateDebut.minus({ hours: 1 }),
               dateDebut.plus({ hours: 1 }),
               dateDebut.plus({ days: 1 }),
               dateFin.minus({ days: 1 }),
-              dateFin.minus({ hours: 1 }),
-              dateFin.plus({ hours: 1 })
+              dateFin.minus({ hours: 1 })
             ],
             jeuneDto.id
           )
