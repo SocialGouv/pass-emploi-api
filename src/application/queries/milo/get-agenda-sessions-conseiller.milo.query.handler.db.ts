@@ -25,6 +25,7 @@ import {
   InscritSessionMiloQueryModel
 } from '../query-models/sessions.milo.query.model'
 import { sessionsMiloActives } from '../../../config/feature-flipping'
+import { ConfigService } from '@nestjs/config'
 
 export interface GetAgendaSessionsConseillerMiloQuery extends Query {
   idConseiller: string
@@ -43,7 +44,8 @@ export class GetAgendaSessionsConseillerMiloQueryHandler extends QueryHandler<
     private oidcClient: OidcClient,
     @Inject(ConseillerMiloRepositoryToken)
     private conseillerMiloRepository: Conseiller.Milo.Repository,
-    private conseillerAuthorizer: ConseillerAuthorizer
+    private conseillerAuthorizer: ConseillerAuthorizer,
+    private configService: ConfigService
   ) {
     super('GetAgendaSessionsConseillerMiloQueryHandler')
   }
