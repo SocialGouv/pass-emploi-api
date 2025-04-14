@@ -1545,9 +1545,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/common@npm:11.0.6":
-  version: 11.0.6
-  resolution: "@nestjs/common@npm:11.0.6"
+"@nestjs/common@npm:11.0.16":
+  version: 11.0.16
+  resolution: "@nestjs/common@npm:11.0.16"
   dependencies:
     iterare: "npm:1.2.1"
     tslib: "npm:2.8.1"
@@ -1555,6 +1555,7 @@ __metadata:
   peerDependencies:
     class-transformer: "*"
     class-validator: "*"
+    file-type: ^20.4.1
     reflect-metadata: ^0.1.12 || ^0.2.0
     rxjs: ^7.1.0
   peerDependenciesMeta:
@@ -1562,7 +1563,7 @@ __metadata:
       optional: true
     class-validator:
       optional: true
-  checksum: 10/931a6eb6eb31f59cd3184d78b625239c57bb173f6bdcba04dc5b5bb801f8d7c9c29ddc161ad9f0dcb8df74bb0d917229129ac7adb2f01a8d20e6deeb1c0163f3
+  checksum: 10/e212da5be940b3cee4ec802263672313c55c55851382facd69d650e1afd6e16fe08829e00e4384fa80e3d724292e5e998fe3da6be04e6710034cd99f1ad791f8
   languageName: node
   linkType: hard
 
@@ -9218,7 +9219,7 @@ __metadata:
     "@google-cloud/bigquery": "npm:7.9.1"
     "@nestjs/axios": "npm:^3.1.2"
     "@nestjs/cli": "npm:^10.0.0"
-    "@nestjs/common": "npm:11.0.6"
+    "@nestjs/common": "npm:11.0.16"
     "@nestjs/config": "npm:2.3.4"
     "@nestjs/core": "npm:11.0.6"
     "@nestjs/platform-express": "npm:11.0.6"
