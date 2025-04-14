@@ -57,11 +57,23 @@ export class ActionQueryModel {
   @ApiProperty()
   comment: string
 
-  @ApiProperty()
+  @ApiProperty({
+    deprecated: true,
+    description: 'Deprecated format, use dateCreation in ISO format'
+  })
   creationDate: string
 
   @ApiProperty()
+  dateCreation: string
+
+  @ApiProperty({
+    deprecated: true,
+    description: 'Deprecated format, use dateCreation in ISO format'
+  })
   lastUpdate: string
+
+  @ApiProperty()
+  dateDerniereActualisation: string
 
   @ApiProperty()
   status: Action.Statut
