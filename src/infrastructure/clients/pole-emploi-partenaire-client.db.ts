@@ -104,7 +104,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
         DEMARCHES_URL,
         tokenDuJeune,
         undefined,
-        undefined,
+        true,
         idJeune
       )
 
@@ -145,7 +145,8 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     const response = await this.getWithCache<RendezVousPoleEmploiDto[]>(
       'peconnect-rendezvousagenda/v2/listerendezvous',
       tokenDuJeune,
-      params
+      params,
+      true
     )
 
     if (isSuccessApi(response)) {
@@ -169,7 +170,8 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     const response = await this.getWithCache<PrestationDto[]>(
       'peconnect-gerer-prestations/v1/rendez-vous',
       tokenDuJeune,
-      params
+      params,
+      true
     )
 
     if (isSuccessApi(response)) {
@@ -186,7 +188,9 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
 
     return this.getWithCache<string>(
       `peconnect-gerer-prestations/v1/lien-visio/rendez-vous/${idVisio}`,
-      tokenDuJeune
+      tokenDuJeune,
+      undefined,
+      true
     )
   }
 
@@ -195,11 +199,13 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
   ): Promise<Result<DocumentPoleEmploiDto[]>> {
     try {
       this.logger.log('Récupération des documents du jeune')
-      const response = await this.get<DocumentPoleEmploiDto[]>(
+      const result = await this.getWithCache<DocumentPoleEmploiDto[]>(
         'peconnect-telecharger-cv-realisation/v1/piecesjointes',
-        tokenDuJeune
+        tokenDuJeune,
+        undefined,
+        true
       )
-      return success(response.data ? response.data : [])
+      return success(isSuccessApi(result) && result.data ? result.data : [])
     } catch (e) {
       return handleAxiosError(
         e,

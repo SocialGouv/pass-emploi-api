@@ -109,15 +109,18 @@ export class PoleEmploiClient {
     idEvenement: string
   ): Promise<Result<EvenementEmploiDto>> {
     try {
-      const response = await this.get<EvenementEmploiDto>(
+      const result = await this.getWithRetry<EvenementEmploiDto>(
         `evenements/v1/mee/evenement/${idEvenement}`
       )
-      if (!response.data) {
+      if (isFailure(result)) {
+        return result
+      }
+      if (!result.data.data) {
         return failure(
           new NonTrouveError(`évènement emploi ${idEvenement} non trouvé`)
         )
       }
-      return success(response.data)
+      return success(result.data.data)
     } catch (e) {
       return handleAxiosError(
         e,
