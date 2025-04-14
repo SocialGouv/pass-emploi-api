@@ -9281,7 +9281,7 @@ __metadata:
     lodash.isequal: "npm:4.5.0"
     luxon: "npm:3.5.0"
     mocha: "npm:^11.0.0"
-    nestjs-pino: "npm:4.3.0"
+    nestjs-pino: "npm:4.4.0"
     nock: "npm:^14.0.0"
     nyc: "npm:^17.1.0"
     openid-client: "npm:5.7.1"
@@ -9315,13 +9315,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"nestjs-pino@npm:4.3.0":
-  version: 4.3.0
-  resolution: "nestjs-pino@npm:4.3.0"
+"nestjs-pino@npm:4.4.0":
+  version: 4.4.0
+  resolution: "nestjs-pino@npm:4.4.0"
   peerDependencies:
     "@nestjs/common": ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0
+    pino: ^7.5.0 || ^8.0.0 || ^9.0.0
     pino-http: ^6.4.0 || ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
-  checksum: 10/ad6b3c7e097172bb37bc16ffeab37d3e65aa8540a33f02e3ea3264e7831dbba2ec06fe2799841c70b9470a9dcd1ab4f74f8a70cbc2e735dd3ca7934bb2e6aacf
+    rxjs: ^7.1.0
+  checksum: 10/3e4ddb712174da23fe10f28002e444ee9db097b5570290cd5cc36bc4f12f03f25631ffc1acdc511d57b1146bed66bd51598fdfac34ef700e44247baecdd29f9a
   languageName: node
   linkType: hard
 
