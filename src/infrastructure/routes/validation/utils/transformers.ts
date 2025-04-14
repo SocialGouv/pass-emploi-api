@@ -30,15 +30,15 @@ export function transformStringToBoolean(
 export function transformStringToInteger(
   params: TransformFnParams,
   key: string
-): boolean {
+): number {
   params.obj[key] = parseInt(params.value)
-  return params.obj[key] ? params.obj[key] : undefined
+  return params.obj[key]
 }
 
 export function transformStringToFloat(
   params: TransformFnParams,
   key: string
-): boolean {
+): number {
   params.obj[key] = parseFloat(params.value)
-  return params.obj[key] ? params.obj[key] : undefined
+  return params.obj[key]
 }

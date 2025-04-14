@@ -41,13 +41,16 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
 
   beforeEach(() => {
     sandbox = createSandbox()
+    jeuneAuthorizer = stubClass(JeuneAuthorizer)
+
     jeunesRepository = stubInterface(sandbox)
     jeunesRepository.get.resolves(unJeune())
+
     authRepository = stubInterface(sandbox)
     authRepository.getJeuneById.resolves(unUtilisateurJeune())
+
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
     poleEmploiPartenaireClient.getDemarches.resolves(success([]))
-
     poleEmploiPartenaireClient.getPrestations.resolves(success([]))
     poleEmploiPartenaireClient.getRendezVous.resolves(success([]))
 

@@ -15,8 +15,8 @@ import { JeuneMilo } from '../../../../src/domain/milo/jeune.milo'
 import { FirebaseClient } from '../../../../src/infrastructure/clients/firebase-client'
 import { ConseillerSqlRepository } from '../../../../src/infrastructure/repositories/conseiller-sql.repository.db'
 import { DossierMiloDto } from '../../../../src/infrastructure/repositories/dto/milo.dto'
-import { MiloJeuneHttpSqlRepository } from '../../../../src/infrastructure/repositories/milo/jeune-milo-http-sql.repository.db'
 import { JeuneSqlRepository } from '../../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
+import { MiloJeuneHttpSqlRepository } from '../../../../src/infrastructure/repositories/milo/jeune-milo-http-sql.repository.db'
 import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { StructureMiloSqlModel } from '../../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { RateLimiterService } from '../../../../src/utils/rate-limiter.service'
@@ -41,8 +41,6 @@ describe('JeuneMiloHttpRepository', () => {
   const rateLimiterService = new RateLimiterService(configService)
   let miloHttpSqlRepository: MiloJeuneHttpSqlRepository
   const jeune = unJeune({ email: 'john@doe.io' })
-  let idService: IdService
-  let dateService: DateService
   const conseiller = unConseiller()
 
   before(() => {
@@ -58,8 +56,8 @@ describe('JeuneMiloHttpRepository', () => {
     const jeuneSqlRepository = new JeuneSqlRepository(
       databaseForTesting.sequelize,
       firebaseClient,
-      idService,
-      dateService
+      new IdService(),
+      new DateService()
     )
     await jeuneSqlRepository.save(jeune)
 

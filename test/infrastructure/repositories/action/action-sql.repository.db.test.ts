@@ -1,24 +1,24 @@
+import { DateTime } from 'luxon'
+import { DateService } from 'src/utils/date-service'
+import { IdService } from 'src/utils/id-service'
 import { Action } from '../../../../src/domain/action/action'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
+import { FirebaseClient } from '../../../../src/infrastructure/clients/firebase-client'
 import { ActionSqlRepository } from '../../../../src/infrastructure/repositories/action/action-sql.repository.db'
 import { ConseillerSqlRepository } from '../../../../src/infrastructure/repositories/conseiller-sql.repository.db'
 import { JeuneSqlRepository } from '../../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
 import { ActionSqlModel } from '../../../../src/infrastructure/sequelize/models/action.sql-model'
-import { unCommentaire, uneAction } from '../../../fixtures/action.fixture'
-import { unConseiller } from '../../../fixtures/conseiller.fixture'
-import { unJeune } from '../../../fixtures/jeune.fixture'
-import { uneActionDto } from '../../../fixtures/sql-models/action.sql-model'
-import { expect, StubbedClass, stubClass } from '../../../utils'
-import { IdService } from 'src/utils/id-service'
-import { DateService } from 'src/utils/date-service'
-import { FirebaseClient } from '../../../../src/infrastructure/clients/firebase-client'
-import { uneDatetime } from '../../../fixtures/date.fixture'
 import {
   CommentaireDto,
   CommentaireSqlModel
 } from '../../../../src/infrastructure/sequelize/models/commentaire.sql-model'
-import { DateTime } from 'luxon'
 import { AsSql } from '../../../../src/infrastructure/sequelize/types'
+import { unCommentaire, uneAction } from '../../../fixtures/action.fixture'
+import { unConseiller } from '../../../fixtures/conseiller.fixture'
+import { uneDatetime } from '../../../fixtures/date.fixture'
+import { unJeune } from '../../../fixtures/jeune.fixture'
+import { uneActionDto } from '../../../fixtures/sql-models/action.sql-model'
+import { expect, StubbedClass, stubClass } from '../../../utils'
 import {
   DatabaseForTesting,
   getDatabase
@@ -34,7 +34,6 @@ describe('ActionSqlRepository', () => {
 
   let jeune: Jeune
   let actionSqlRepository: ActionSqlRepository
-  let idService: IdService
   let dateService: StubbedClass<DateService>
 
   beforeEach(async () => {
@@ -50,7 +49,7 @@ describe('ActionSqlRepository', () => {
     const jeuneRepository = new JeuneSqlRepository(
       database.sequelize,
       firebaseClient,
-      idService,
+      new IdService(),
       dateService
     )
     await jeuneRepository.save(jeune)
