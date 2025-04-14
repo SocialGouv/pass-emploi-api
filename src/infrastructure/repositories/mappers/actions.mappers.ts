@@ -17,15 +17,13 @@ export function fromSqlToActionQueryModelWithJeune(
     id: actionSqlModel.id,
     comment: actionSqlModel.description || '',
     content: actionSqlModel.contenu,
-    creationDate: DateTime.fromJSDate(actionSqlModel.dateCreation).toFormat(
-      'EEE, d MMM yyyy HH:mm:ss z'
-    ),
     creator: `${actionSqlModel.createur.prenom} ${actionSqlModel.createur.nom}`,
     creatorType: actionSqlModel.typeCreateur,
-    lastUpdate: DateTime.fromJSDate(
-      actionSqlModel.dateDerniereActualisation
-    ).toFormat('EEE, d MMM yyyy HH:mm:ss z'),
     status: actionSqlModel.statut,
+    dateCreation: DateTime.fromJSDate(actionSqlModel.dateCreation).toISO(),
+    dateDerniereActualisation: DateTime.fromJSDate(
+      actionSqlModel.dateDerniereActualisation
+    ).toISO(),
     dateEcheance: DateService.fromJSDateToISOString(
       actionSqlModel.dateEcheance
     ),
@@ -36,7 +34,15 @@ export function fromSqlToActionQueryModelWithJeune(
       qualifiable: actionSqlModel.jeune.dispositif === Jeune.Dispositif.CEJ
     }),
     qualification: buildQualificationQueryModel(actionSqlModel),
-    jeune: fromSqlToBeneficiarieActionQueryModel(actionSqlModel.jeune)
+    jeune: fromSqlToBeneficiarieActionQueryModel(actionSqlModel.jeune),
+    // deprecated
+    creationDate: DateTime.fromJSDate(actionSqlModel.dateCreation).toFormat(
+      'EEE, d MMM yyyy HH:mm:ss z'
+    ),
+    // deprecated
+    lastUpdate: DateTime.fromJSDate(
+      actionSqlModel.dateDerniereActualisation
+    ).toFormat('EEE, d MMM yyyy HH:mm:ss z')
   }
 }
 

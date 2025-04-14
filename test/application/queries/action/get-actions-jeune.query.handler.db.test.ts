@@ -263,12 +263,10 @@ function fromDtoToQueryModel(
     content: actionDto.contenu,
     comment: actionDto.description,
     status: actionDto.statut,
-    creationDate: DateTime.fromJSDate(actionDto.dateCreation).toFormat(
-      'EEE, d MMM yyyy HH:mm:ss z'
-    ),
-    lastUpdate: DateTime.fromJSDate(
+    dateCreation: DateTime.fromJSDate(actionDto.dateCreation).toISO(),
+    dateDerniereActualisation: DateTime.fromJSDate(
       actionDto.dateDerniereActualisation
-    ).toFormat('EEE, d MMM yyyy HH:mm:ss z'),
+    ).toISO(),
     creator: 'Nils Tavernier',
     creatorType: Action.TypeCreateur.CONSEILLER,
     dateEcheance: DateTime.fromJSDate(actionDto.dateEcheance).toISO(),
@@ -283,6 +281,14 @@ function fromDtoToQueryModel(
       dispositif: jeuneDto.dispositif
     },
     etat,
-    qualification
+    qualification,
+    // deprecated
+    creationDate: DateTime.fromJSDate(actionDto.dateCreation).toFormat(
+      'EEE, d MMM yyyy HH:mm:ss z'
+    ),
+    // deprecated
+    lastUpdate: DateTime.fromJSDate(
+      actionDto.dateDerniereActualisation
+    ).toFormat('EEE, d MMM yyyy HH:mm:ss z')
   }
 }
