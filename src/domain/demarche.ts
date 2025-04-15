@@ -191,14 +191,12 @@ export namespace Demarche {
       const maintenantA12Heures = setHoursTo12h00(maintenant)
       if (dateDebut && dateDebut < maintenantA12Heures) {
         return success({
-          ...demarcheModifiee,
-          dateFin: maintenantA12Heures
+          ...demarcheModifiee
         })
       }
       return success({
         ...demarcheModifiee,
-        dateDebut: maintenantA12Heures,
-        dateFin: maintenantA12Heures
+        dateDebut: maintenantA12Heures
       })
     }
   }

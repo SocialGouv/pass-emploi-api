@@ -98,7 +98,7 @@ describe('Demarche', () => {
               statut: Demarche.Statut.REALISEE,
               dateModification: uneDatetime(),
               dateDebut: uneDateAMidi,
-              dateFin: uneDateAMidi
+              dateFin: demarche.dateFin
             })
           )
         })
@@ -125,7 +125,7 @@ describe('Demarche', () => {
               id: demarche.id,
               statut: Demarche.Statut.REALISEE,
               dateModification: uneDatetime(),
-              dateFin: uneDateAMidi
+              dateFin: demarche.dateFin
             })
           )
         })
@@ -150,7 +150,7 @@ describe('Demarche', () => {
               id: demarche.id,
               statut: Demarche.Statut.REALISEE,
               dateModification: uneDatetime(),
-              dateFin: uneDateAMidi,
+              dateFin: demarche.dateFin,
               dateDebut: uneDateAMidi
             })
           )
