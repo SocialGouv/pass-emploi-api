@@ -27,7 +27,6 @@ export class GetSessionsJeuneMiloQueryGetter {
 
   async handle(
     idJeune: string,
-    idPartenaire: string,
     accessToken: string,
     options?: {
       periode?: { debut?: DateTime; fin?: DateTime }
@@ -35,22 +34,19 @@ export class GetSessionsJeuneMiloQueryGetter {
       pourConseiller?: boolean
     }
   ): Promise<Result<SessionJeuneMiloQueryModel[]>> {
-    const timezoneDeLaStructureDuJeune = (
-      await JeuneSqlModel.findByPk(idJeune, {
-        include: [{ model: StructureMiloSqlModel, required: true }]
-      })
-    )?.structureMilo?.timezone
-
-    if (!timezoneDeLaStructureDuJeune) {
+    const beneficiaire = await JeuneSqlModel.findByPk(idJeune, {
+      include: [{ model: StructureMiloSqlModel, required: true }]
+    })
+    if (!beneficiaire?.idPartenaire || !beneficiaire.structureMilo)
       return success([])
-    }
+    const timezoneDeLaStructureDuJeune = beneficiaire.structureMilo.timezone
 
     const sessionGetter = options?.pourConseiller
       ? this.getSessionsJeunePourConseiller.bind(this)
       : this.getSessionsJeune.bind(this)
     const resultSessionMiloClient = await sessionGetter(
       accessToken,
-      idPartenaire,
+      beneficiaire.idPartenaire,
       options?.periode
     )
 
@@ -86,7 +82,7 @@ export class GetSessionsJeuneMiloQueryGetter {
         .map(sessionDuJeune =>
           mapSessionJeuneDtoToQueryModel(
             sessionDuJeune,
-            idPartenaire,
+            beneficiaire.idPartenaire!,
             timezoneDeLaStructureDuJeune,
             configurationsSessions.find(
               ({ id }) => id === sessionDuJeune.session.id.toString()

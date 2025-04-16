@@ -89,7 +89,7 @@ export namespace SessionMilo {
 
   export function extraireInscriptionsATraiter(
     session: SessionMilo,
-    inscriptions: SessionMilo.Modification.Inscription[]
+    inscriptions: Modification.Inscription[]
   ): Result<InscriptionsATraiter> {
     const inscriptionsATraiter = trierInscriptionsATraiter(
       session,
@@ -104,13 +104,11 @@ export namespace SessionMilo {
 
   export function emarger(
     session: SessionMilo,
-    emargements: SessionMilo.Modification.Emargement[],
+    emargements: Modification.Emargement[],
     dateEmargement: DateTime
   ): Result<{
     sessionEmargee: Omit<SessionMilo, 'inscriptions'>
-    inscriptionsAModifier: Array<
-      Omit<SessionMilo.Inscription, 'nom' | 'prenom'>
-    >
+    inscriptionsAModifier: Array<Omit<Inscription, 'nom' | 'prenom'>>
   }> {
     const idsJeuneInscrit = session.inscriptions
       .map(inscription => inscription.idJeune)
@@ -133,7 +131,7 @@ export namespace SessionMilo {
     const inscriptionsExistantes = getInscriptionsExistantes(session)
 
     for (const emargement of emargements) {
-      if (!SessionMilo.Inscription.estOuSeraPresent(emargement.statut)) continue
+      if (!Inscription.estInscrit(emargement.statut)) continue
 
       const inscription = inscriptionsExistantes.get(emargement.idJeune)!
 
@@ -145,15 +143,15 @@ export namespace SessionMilo {
 
       const statutInscription =
         emargement.statut === Inscription.Statut.INSCRIT
-          ? SessionMilo.Inscription.Statut.REFUS_JEUNE
-          : SessionMilo.Inscription.Statut.PRESENT
+          ? Inscription.Statut.REFUS_JEUNE
+          : Inscription.Statut.PRESENT
 
       inscriptionsAModifier.push({
         idJeune: inscription.idJeune,
         idInscription: inscription.idInscription,
         statut: statutInscription,
         commentaire:
-          statutInscription === SessionMilo.Inscription.Statut.REFUS_JEUNE
+          statutInscription === Inscription.Statut.REFUS_JEUNE
             ? 'Absent'
             : undefined
       })
@@ -182,7 +180,7 @@ export namespace SessionMilo {
   export function peutInscrireBeneficiaire(
     session: SessionMiloAllegeeForBeneficiaire
   ): Result {
-    if (Inscription.estOuSeraPresent(session.statutInscription))
+    if (Inscription.estInscrit(session.statutInscription))
       return failure(new BeneficiaireDejaInscritError())
 
     if (session.nbPlacesDisponibles === 0)
@@ -260,7 +258,7 @@ export namespace SessionMilo {
       PRESENT = 'PRESENT'
     }
 
-    export function estIncrit(statut?: Statut): boolean {
+    export function aEteInscrit(statut?: Statut): boolean {
       switch (statut) {
         case Inscription.Statut.INSCRIT:
         case Inscription.Statut.REFUS_JEUNE:
@@ -271,7 +269,7 @@ export namespace SessionMilo {
       }
     }
 
-    export function estOuSeraPresent(statut?: Statut): boolean {
+    export function estInscrit(statut?: Statut): boolean {
       switch (statut) {
         case Statut.INSCRIT:
         case Statut.PRESENT:

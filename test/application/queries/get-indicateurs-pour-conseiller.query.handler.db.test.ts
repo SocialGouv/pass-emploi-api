@@ -1,21 +1,25 @@
 import { DateTime } from 'luxon'
+import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { Core } from 'src/domain/core'
 import { FavoriOffreEmploiSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-emploi.sql-model'
 import { FavoriOffreEngagementSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-engagement.sql-model'
 import { FavoriOffreImmersionSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { uneDate } from 'test/fixtures/date.fixture'
+import { uneSessionJeuneMiloQueryModel } from 'test/fixtures/sessions.fixture'
 import {
   unFavoriOffreEmploi,
   unFavoriOffreEngagement,
   unFavoriOffreImmersion
 } from 'test/fixtures/sql-models/favoris.sql-model'
+import { createSandbox, sinon } from 'test/utils'
+import { stubClassSandbox } from 'test/utils/types'
 import { ConseillerInterAgenceAuthorizer } from '../../../src/application/authorizers/conseiller-inter-agence-authorizer'
 import {
   GetIndicateursPourConseillerQuery,
   GetIndicateursPourConseillerQueryHandler
 } from '../../../src/application/queries/get-indicateurs-pour-conseiller.query.handler.db'
-import { isSuccess } from '../../../src/building-blocks/types/result'
+import { isSuccess, success } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action/action'
 import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
@@ -32,9 +36,12 @@ import { getDatabase } from '../../utils/database-for-testing'
 import Statut = Action.Statut
 
 describe('GetIndicateursPourConseillerQueryHandler', () => {
+  let sandbox: sinon.SinonSandbox
   let getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler
+  let getSessionsJeuneMiloQueryGetter: StubbedClass<GetSessionsJeuneMiloQueryGetter>
   let conseillerAgenceAuthorizer: StubbedClass<ConseillerInterAgenceAuthorizer>
   let dateService: StubbedClass<DateService>
+
   const idConseiller = 'id-conseiller'
   const idJeune = 'id-jeune'
   const utilisateur = unUtilisateurConseiller({
@@ -42,16 +49,24 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
   })
 
   before(async () => {
+    sandbox = createSandbox()
     dateService = stubClass(DateService)
     conseillerAgenceAuthorizer = stubClass(ConseillerInterAgenceAuthorizer)
+    getSessionsJeuneMiloQueryGetter = stubClassSandbox(
+      GetSessionsJeuneMiloQueryGetter,
+      sandbox
+    )
+
     getIndicateursPourConseillerQueryHandler =
       new GetIndicateursPourConseillerQueryHandler(
         dateService,
+        getSessionsJeuneMiloQueryGetter,
         conseillerAgenceAuthorizer
       )
   })
 
   beforeEach(async () => {
+    sandbox.reset()
     await getDatabase().cleanPG()
   })
 
@@ -61,6 +76,10 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
       await ConseillerSqlModel.creer(conseillerDto)
       const jeuneDto = unJeuneDto({ id: idJeune, idConseiller })
       await JeuneSqlModel.creer(jeuneDto)
+
+      getSessionsJeuneMiloQueryGetter.handle.resolves(
+        success([uneSessionJeuneMiloQueryModel()])
+      )
     })
 
     const dateDebut = DateTime.fromISO('2022-03-01T03:24:00')
@@ -74,8 +93,11 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
         const query: GetIndicateursPourConseillerQuery = {
           idConseiller,
           idJeune,
-          dateDebut: dateDebut.toJSDate(),
-          dateFin: dateFin.toJSDate()
+          periode: {
+            debut: dateDebut.toJSDate(),
+            fin: dateFin.toJSDate()
+          },
+          accessToken: 'token'
         }
 
         const actionDto = uneActionDto({
@@ -118,8 +140,11 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
         const query: GetIndicateursPourConseillerQuery = {
           idConseiller,
           idJeune,
-          dateDebut: dateDebut.toJSDate(),
-          dateFin: dateFin.toJSDate()
+          periode: {
+            debut: dateDebut.toJSDate(),
+            fin: dateFin.toJSDate()
+          },
+          accessToken: 'token'
         }
 
         const actionPasCommenceeEnRetardDto = uneActionDto({
@@ -166,8 +191,11 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
         const query: GetIndicateursPourConseillerQuery = {
           idConseiller,
           idJeune,
-          dateDebut: dateDebut.toJSDate(),
-          dateFin: dateFin.toJSDate()
+          periode: {
+            debut: dateDebut.toJSDate(),
+            fin: dateFin.toJSDate()
+          },
+          accessToken: 'token'
         }
 
         const actionTermineeDansLaPeriodeDto = uneActionDto({
@@ -212,13 +240,16 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
     })
 
     describe('indicateurs rendez-vous', () => {
-      it('récupère le nombre de rendez-vous planifiés entre des dates', async () => {
+      it('récupère le nombre de rendez-vous et de sessions planifiés entre des dates', async () => {
         // Given
         const query: GetIndicateursPourConseillerQuery = {
           idConseiller,
           idJeune,
-          dateDebut: dateDebut.toJSDate(),
-          dateFin: dateFin.toJSDate()
+          periode: {
+            debut: dateDebut.toJSDate(),
+            fin: dateFin.toJSDate()
+          },
+          accessToken: 'token'
         }
 
         const rendezVousAvantDto = unRendezVousDto({
@@ -258,8 +289,15 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
 
         // Then
         expect(
+          getSessionsJeuneMiloQueryGetter.handle
+        ).to.have.been.calledOnceWithExactly('id-jeune', 'token', {
+          periode: { debut: dateDebut, fin: dateFin },
+          filtrerEstInscrit: true,
+          pourConseiller: true
+        })
+        expect(
           isSuccess(response) && response.data.rendezVous.planifies
-        ).to.deep.equal(2)
+        ).to.deep.equal(3)
       })
     })
 
@@ -320,8 +358,11 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
         const query: GetIndicateursPourConseillerQuery = {
           idConseiller,
           idJeune,
-          dateDebut: dateDebut.toJSDate(),
-          dateFin: dateFin.toJSDate()
+          periode: {
+            debut: dateDebut.toJSDate(),
+            fin: dateFin.toJSDate()
+          },
+          accessToken: 'token'
         }
         const response = await getIndicateursPourConseillerQueryHandler.handle(
           query,
@@ -345,8 +386,11 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
         const query: GetIndicateursPourConseillerQuery = {
           idJeune: 'id-jeune',
           idConseiller: 'id-conseiller',
-          dateDebut: uneDate(),
-          dateFin: uneDate()
+          periode: {
+            debut: uneDate(),
+            fin: uneDate()
+          },
+          accessToken: 'token'
         }
 
         // When

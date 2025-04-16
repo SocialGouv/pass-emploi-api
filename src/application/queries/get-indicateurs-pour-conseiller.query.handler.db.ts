@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
 import { Op } from 'sequelize'
+import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
+import { SessionJeuneMiloQueryModel } from 'src/application/queries/query-models/sessions.milo.query.model'
 import { estMilo } from 'src/domain/core'
 import { FavoriOffreEmploiSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-emploi.sql-model'
 import { FavoriOffreEngagementSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-engagement.sql-model'
 import { FavoriOffreImmersionSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Result, success } from '../../building-blocks/types/result'
+import { isFailure, Result, success } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
 import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
@@ -19,9 +22,10 @@ import { IndicateursPourConseillerQueryModel } from './query-models/indicateurs-
 export interface GetIndicateursPourConseillerQuery extends Query {
   idConseiller: string
   idJeune: string
-  dateDebut: Date
-  dateFin: Date
+  periode: Periode
+  accessToken: string
 }
+type Periode = { debut: Date; fin: Date }
 
 @Injectable()
 export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
@@ -30,6 +34,7 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
 > {
   constructor(
     private dateService: DateService,
+    private getSessionsJeuneMiloQueryGetter: GetSessionsJeuneMiloQueryGetter,
     private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer
   ) {
     super('GetIndicateursPourConseillerQueryHandler')
@@ -59,29 +64,54 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
 
     let actionsSqlDuJeune: ActionSqlModel[] = []
     let rendezVousSqlDuJeune: RendezVousSqlModel[] = []
+    let sessionsDuJeune: SessionJeuneMiloQueryModel[] = []
     if (estMilo(utilisateur.structure)) {
-      ;[actionsSqlDuJeune, rendezVousSqlDuJeune] = await Promise.all([
-        findAllActions(query),
-        findAllRendezVous(query)
-      ])
+      ;[actionsSqlDuJeune, rendezVousSqlDuJeune, sessionsDuJeune] =
+        await Promise.all([
+          findAllActions(query),
+          findAllRendezVous(query),
+          this.findAllSessions(query)
+        ])
     }
 
     const indicateursActions = getIndicateursActions(
       actionsSqlDuJeune,
-      { debut: query.dateDebut, fin: query.dateFin },
+      query.periode,
       maintenant
     )
 
-    const indicateursSuiviOffres = getIndicateursSuiviOffres(favorisSql, {
-      debut: query.dateDebut,
-      fin: query.dateFin
-    })
+    const indicateursSuiviOffres = getIndicateursSuiviOffres(
+      favorisSql,
+      query.periode
+    )
 
     return success({
       actions: indicateursActions,
-      rendezVous: { planifies: rendezVousSqlDuJeune.length },
+      rendezVous: {
+        planifies: rendezVousSqlDuJeune.length + sessionsDuJeune.length
+      },
       offres: indicateursSuiviOffres
     })
+  }
+
+  private async findAllSessions(
+    query: GetIndicateursPourConseillerQuery
+  ): Promise<SessionJeuneMiloQueryModel[]> {
+    const debut = DateTime.fromJSDate(query.periode.debut)
+    const fin = DateTime.fromJSDate(query.periode.fin)
+    const sessionsJeuneAEteInscrit =
+      await this.getSessionsJeuneMiloQueryGetter.handle(
+        query.idJeune,
+        query.accessToken,
+        {
+          periode: { debut, fin },
+          filtrerEstInscrit: true,
+          pourConseiller: true
+        }
+      )
+
+    if (isFailure(sessionsJeuneAEteInscrit)) return []
+    return sessionsJeuneAEteInscrit.data
   }
 }
 
@@ -98,14 +128,15 @@ function findAllActions(
 function findAllRendezVous(
   query: GetIndicateursPourConseillerQuery
 ): Promise<RendezVousSqlModel[]> {
+  const { idJeune, periode } = query
   return RendezVousSqlModel.findAll({
     where: {
-      date: { [Op.between]: [query.dateDebut, query.dateFin] }
+      date: { [Op.between]: [periode.debut, periode.fin] }
     },
     include: [
       {
         model: JeuneSqlModel,
-        where: { id: query.idJeune }
+        where: { id: idJeune }
       }
     ]
   })
@@ -114,13 +145,14 @@ function findAllRendezVous(
 async function findAllFavorisPostulesOuCreesPendantPeriode(
   query: GetIndicateursPourConseillerQuery
 ): Promise<Array<{ dateCreation: Date; dateCandidature: Date | null }>> {
+  const { idJeune, periode } = query
   const options = {
     attributes: ['dateCreation', 'dateCandidature'],
     where: {
-      idJeune: query.idJeune,
+      idJeune: idJeune,
       [Op.or]: {
-        dateCreation: { [Op.between]: [query.dateDebut, query.dateFin] },
-        dateCandidature: { [Op.between]: [query.dateDebut, query.dateFin] }
+        dateCreation: { [Op.between]: [periode.debut, periode.fin] },
+        dateCandidature: { [Op.between]: [periode.debut, periode.fin] }
       }
     }
   }
@@ -136,7 +168,7 @@ async function findAllFavorisPostulesOuCreesPendantPeriode(
 
 function getIndicateursActions(
   actionsSqlDuJeune: ActionSqlModel[],
-  periode: { debut: Date; fin: Date },
+  periode: Periode,
   maintenant: Date
 ): {
   creees: number
@@ -156,7 +188,7 @@ function getIndicateursActions(
 
 function getIndicateursSuiviOffres(
   favorisSql: Array<{ dateCreation: Date; dateCandidature: Date | null }>,
-  periode: { debut: Date; fin: Date }
+  periode: Periode
 ): {
   sauvegardees: number
   postulees: number
@@ -175,7 +207,7 @@ function getIndicateursSuiviOffres(
 
 function actionCreeePendantPeriode(
   actionSql: ActionSqlModel,
-  periode: { debut: Date; fin: Date }
+  periode: Periode
 ): boolean {
   return DateService.isBetweenDates(
     actionSql.dateCreation,
@@ -194,7 +226,7 @@ function actionEnRetard(actionSql: ActionSqlModel, maintenant: Date): boolean {
 
 function actionTermineePendantPeriode(
   actionSql: ActionSqlModel,
-  periode: { debut: Date; fin: Date }
+  periode: Periode
 ): boolean {
   return (
     actionSql.statut === Action.Statut.TERMINEE &&
@@ -209,7 +241,7 @@ function actionTermineePendantPeriode(
 
 function offreSauvegardeePendantPeriode(
   dateCreation: Date,
-  periode: { debut: Date; fin: Date }
+  periode: Periode
 ): boolean {
   return DateService.isBetweenDates(dateCreation, periode.debut, periode.fin)
 }

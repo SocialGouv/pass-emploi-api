@@ -550,8 +550,11 @@ describe('ConseillersController', () => {
             {
               idConseiller,
               idJeune,
-              dateDebut: new Date(dateDebutString),
-              dateFin: new Date(dateFinString)
+              periode: {
+                debut: new Date(dateDebutString),
+                fin: new Date(dateFinString)
+              },
+              accessToken: 'coucou'
             },
             unUtilisateurDecode()
           )

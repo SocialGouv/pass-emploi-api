@@ -48,11 +48,11 @@ import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from 'test/fixtures/sql-models/rendez-vous.sql-model'
 import { expect, StubbedClass, stubClass } from 'test/utils'
+import { testConfig } from 'test/utils/module-for-testing'
 import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
-import { testConfig } from 'test/utils/module-for-testing'
 
 describe('GetAccueilJeuneMiloQueryHandler', () => {
   let handler: GetAccueilJeuneMiloQueryHandler
@@ -117,7 +117,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       )
 
       sessionsQueryGetter.handle
-        .withArgs(accueilQuery.idJeune, 'idDossier', token, {
+        .withArgs(accueilQuery.idJeune, token, {
           periode: {
             debut: maintenant,
             fin: DateTime.fromISO(datePlus30Jours)
@@ -202,7 +202,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
         it('sans les sessions si le GetSessionsJeuneMiloQueryGetter renvoie une failure', async () => {
           // Given
           sessionsQueryGetter.handle
-            .withArgs(accueilQuery.idJeune, 'idDossier', token, {
+            .withArgs(accueilQuery.idJeune, token, {
               periode: {
                 debut: maintenant,
                 fin: DateTime.fromISO(datePlus30Jours)
@@ -224,7 +224,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
         it('sans les sessions si le jeune n’en a pas où il est inscrit dans la semaine', async () => {
           // Given
           sessionsQueryGetter.handle
-            .withArgs(accueilQuery.idJeune, 'idDossier', token, {
+            .withArgs(accueilQuery.idJeune, token, {
               periode: {
                 debut: maintenant,
                 fin: DateTime.fromISO(datePlus30Jours)
@@ -258,7 +258,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
             })
 
           sessionsQueryGetter.handle
-            .withArgs(accueilQuery.idJeune, 'idDossier', token, {
+            .withArgs(accueilQuery.idJeune, token, {
               periode: {
                 debut: maintenant,
                 fin: DateTime.fromISO(datePlus30Jours)
@@ -361,7 +361,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
           inscription: SessionMilo.Inscription.Statut.INSCRIT
         })
         sessionsQueryGetter.handle
-          .withArgs(accueilQuery.idJeune, 'idDossier', token, {
+          .withArgs(accueilQuery.idJeune, token, {
             periode: {
               debut: maintenant,
               fin: DateTime.fromISO(datePlus30Jours)
@@ -387,7 +387,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       it('à undefined s’il n’y en a pas', async () => {
         // Given
         sessionsQueryGetter.handle
-          .withArgs(accueilQuery.idJeune, 'idDossier', token, {
+          .withArgs(accueilQuery.idJeune, token, {
             periode: {
               debut: maintenant,
               fin: DateTime.fromISO(datePlus30Jours)
@@ -537,7 +537,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
           dateHeureDebut: maintenant.plus({ days: 5 }).toISODate()
         })
         sessionsQueryGetter.handle
-          .withArgs(accueilQuery.idJeune, 'idDossier', token, {
+          .withArgs(accueilQuery.idJeune, token, {
             periode: {
               debut: maintenant,
               fin: DateTime.fromISO(datePlus30Jours)
@@ -569,7 +569,7 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       it('vide s’il n’y en a pas', async () => {
         // Given
         sessionsQueryGetter.handle
-          .withArgs(accueilQuery.idJeune, 'idDossier', token, {
+          .withArgs(accueilQuery.idJeune, token, {
             periode: {
               debut: maintenant,
               fin: DateTime.fromISO(datePlus30Jours)

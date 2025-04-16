@@ -259,6 +259,7 @@ export class ConseillersController {
     @Param('idConseiller') idConseiller: string,
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string,
     @Query()
     getIndicateursPourConseillerQueryParams: GetIndicateursPourConseillerQueryParams
   ): Promise<IndicateursPourConseillerQueryModel> {
@@ -266,8 +267,11 @@ export class ConseillersController {
       {
         idConseiller,
         idJeune,
-        dateDebut: getIndicateursPourConseillerQueryParams.dateDebut,
-        dateFin: getIndicateursPourConseillerQueryParams.dateFin
+        periode: {
+          debut: getIndicateursPourConseillerQueryParams.dateDebut,
+          fin: getIndicateursPourConseillerQueryParams.dateFin
+        },
+        accessToken
       },
       utilisateur
     )
