@@ -1,26 +1,26 @@
+import { DateTime } from 'luxon'
 import { describe } from 'mocha'
 import { createSandbox, SinonSandbox } from 'sinon'
 import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { success } from 'src/building-blocks/types/result'
-import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { MiloClient } from 'src/infrastructure/clients/milo-client'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { StructureMiloSqlModel } from 'src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import { expect, StubbedClass, stubClass } from 'test/utils'
 import { getDatabase } from 'test/utils/database-for-testing'
-import { JeuneSqlModel } from '../../../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { unJeuneDto } from '../../../../fixtures/sql-models/jeune.sql-model'
+import { SessionMilo } from '../../../../../src/domain/milo/session.milo'
+import { MILO_INSCRIT } from '../../../../../src/infrastructure/clients/dto/milo.dto'
 import { ConseillerSqlModel } from '../../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { unConseillerDto } from '../../../../fixtures/sql-models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { SessionMiloSqlModel } from '../../../../../src/infrastructure/sequelize/models/session-milo.sql-model'
-import { DateTime } from 'luxon'
 import {
   uneOffreDto,
   uneSessionDto
 } from '../../../../fixtures/milo-dto.fixture'
 import { uneSessionJeuneMiloQueryModel } from '../../../../fixtures/sessions.fixture'
-import { SessionMilo } from '../../../../../src/domain/milo/session.milo'
-import { MILO_INSCRIT } from '../../../../../src/infrastructure/clients/dto/milo.dto'
+import { unConseillerDto } from '../../../../fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from '../../../../fixtures/sql-models/jeune.sql-model'
 
 describe('GetSessionsJeuneMiloQueryGetter', () => {
   let getSessionsQueryGetter: GetSessionsJeuneMiloQueryGetter
@@ -116,7 +116,6 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
         // When
         const result = await getSessionsQueryGetter.handle(
           jeuneParis.id,
-          jeuneParis.idPartenaire,
           accessToken,
           { pourConseiller: true }
         )
@@ -140,7 +139,6 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
         // When
         const result = await getSessionsQueryGetter.handle(
           idJeuneSansStructure,
-          jeuneParis.idPartenaire,
           accessToken
         )
 
@@ -154,29 +152,26 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
       it('renvoie les sessions visible avec jeune non inscrit', async () => {
         //Given
         oidcClient.exchangeTokenJeune.withArgs(accessToken).resolves(idpToken)
-        miloClient.getSessionsParDossierJeune
-          .withArgs(idpToken, jeuneParis.idPartenaire)
-          .resolves(
-            success([
-              {
-                session: sessionNonVisible,
-                offre: uneOffreDto
-              },
-              {
-                session: sessionVisible1,
-                offre: uneOffreDto,
-                sessionInstance: { statut: MILO_INSCRIT }
-              },
-              {
-                session: sessionVisible2,
-                offre: uneOffreDto
-              }
-            ])
-          )
+        miloClient.getSessionsParDossierJeune.withArgs(idpToken).resolves(
+          success([
+            {
+              session: sessionNonVisible,
+              offre: uneOffreDto
+            },
+            {
+              session: sessionVisible1,
+              offre: uneOffreDto,
+              sessionInstance: { statut: MILO_INSCRIT }
+            },
+            {
+              session: sessionVisible2,
+              offre: uneOffreDto
+            }
+          ])
+        )
         // When
         const result = await getSessionsQueryGetter.handle(
           jeuneParis.id,
-          jeuneParis.idPartenaire,
           accessToken,
           { filtrerEstInscrit: false }
         )
@@ -216,7 +211,6 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
         // When
         const result = await getSessionsQueryGetter.handle(
           jeuneCayenne.id,
-          jeuneCayenne.idPartenaire,
           accessToken,
           { filtrerEstInscrit: false }
         )
@@ -238,30 +232,27 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
       it('renvoie toutes les sessions avec jeune inscrit', async () => {
         //Given
         oidcClient.exchangeTokenJeune.withArgs(accessToken).resolves(idpToken)
-        miloClient.getSessionsParDossierJeune
-          .withArgs(idpToken, jeuneParis.idPartenaire)
-          .resolves(
-            success([
-              {
-                session: sessionNonVisible,
-                offre: uneOffreDto,
-                sessionInstance: { statut: MILO_INSCRIT }
-              },
-              {
-                session: sessionVisible1,
-                offre: uneOffreDto,
-                sessionInstance: { statut: MILO_INSCRIT }
-              },
-              {
-                session: sessionVisible2,
-                offre: uneOffreDto
-              }
-            ])
-          )
+        miloClient.getSessionsParDossierJeune.withArgs(idpToken).resolves(
+          success([
+            {
+              session: sessionNonVisible,
+              offre: uneOffreDto,
+              sessionInstance: { statut: MILO_INSCRIT }
+            },
+            {
+              session: sessionVisible1,
+              offre: uneOffreDto,
+              sessionInstance: { statut: MILO_INSCRIT }
+            },
+            {
+              session: sessionVisible2,
+              offre: uneOffreDto
+            }
+          ])
+        )
         // When
         const result = await getSessionsQueryGetter.handle(
           jeuneParis.id,
-          jeuneParis.idPartenaire,
           accessToken,
           { filtrerEstInscrit: true }
         )
@@ -288,30 +279,27 @@ describe('GetSessionsJeuneMiloQueryGetter', () => {
       it('renvoie toutes les sessions avec jeune inscrit + toutes sessions visible avec jeune non inscrit + retire doublons + trie par date', async () => {
         //Given
         oidcClient.exchangeTokenJeune.withArgs(accessToken).resolves(idpToken)
-        miloClient.getSessionsParDossierJeune
-          .withArgs(idpToken, jeuneParis.idPartenaire)
-          .resolves(
-            success([
-              {
-                session: sessionNonVisible,
-                offre: uneOffreDto,
-                sessionInstance: { statut: MILO_INSCRIT }
-              },
-              {
-                session: sessionVisible1,
-                offre: uneOffreDto,
-                sessionInstance: { statut: MILO_INSCRIT }
-              },
-              {
-                session: sessionVisible2,
-                offre: uneOffreDto
-              }
-            ])
-          )
+        miloClient.getSessionsParDossierJeune.withArgs(idpToken).resolves(
+          success([
+            {
+              session: sessionNonVisible,
+              offre: uneOffreDto,
+              sessionInstance: { statut: MILO_INSCRIT }
+            },
+            {
+              session: sessionVisible1,
+              offre: uneOffreDto,
+              sessionInstance: { statut: MILO_INSCRIT }
+            },
+            {
+              session: sessionVisible2,
+              offre: uneOffreDto
+            }
+          ])
+        )
         // When
         const result = await getSessionsQueryGetter.handle(
           jeuneParis.id,
-          jeuneParis.idPartenaire,
           accessToken
         )
         // Then

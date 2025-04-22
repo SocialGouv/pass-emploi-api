@@ -39,7 +39,7 @@ export function mapSessionJeuneDtoToQueryModel(
   sessionDto: SessionParDossierJeuneDto,
   idDossier: string,
   timezone: string,
-  sqlModel?: SessionMiloSqlModel
+  configuration?: SessionMiloSqlModel
 ): SessionJeuneMiloQueryModel {
   const queryModel: SessionJeuneMiloQueryModel = {
     id: sessionDto.session.id.toString(),
@@ -75,8 +75,8 @@ export function mapSessionJeuneDtoToQueryModel(
     )
   }
 
-  if (sqlModel) {
-    queryModel.autoinscription = sqlModel.autoinscription
+  if (configuration) {
+    queryModel.autoinscription = configuration.autoinscription
   }
 
   return queryModel
@@ -97,7 +97,7 @@ export function mapSessionConseillerDtoToQueryModel(
     .map(({ idDossier, statut }) =>
       dtoToStatutInscription(statut, session.id, idDossier.toString())
     )
-    .filter(statut => SessionMilo.Inscription.estOuSeraPresent(statut))
+    .filter(statut => SessionMilo.Inscription.estInscrit(statut))
   const nombreParticipants = participants.length
 
   const autoinscription = parametrageSqlModel?.autoinscription ?? false
