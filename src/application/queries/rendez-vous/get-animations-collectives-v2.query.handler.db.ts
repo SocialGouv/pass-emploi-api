@@ -9,7 +9,7 @@ import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sq
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { DateService } from '../../../utils/date-service'
 import { ConseillerInterAgenceAuthorizer } from '../../authorizers/conseiller-inter-agence-authorizer'
-import { GetAnimationCollectiveV2QueryModel } from '../query-models/rendez-vous.query-model'
+import { GetRendezVousACloreQueryModel } from '../query-models/rendez-vous.query-model'
 
 const NOMBRE_ANIMATIONS_COLLECTIVES_MAX = 10
 const PAGE_PAR_DEFAUT = 1
@@ -24,7 +24,7 @@ export interface GetAnimationsCollectivesV2Query extends Query {
 @Injectable()
 export class GetAnimationsCollectivesV2QueryHandler extends QueryHandler<
   GetAnimationsCollectivesV2Query,
-  Result<GetAnimationCollectiveV2QueryModel>
+  Result<GetRendezVousACloreQueryModel>
 > {
   constructor(
     private conseillerAgenceAuthorizer: ConseillerInterAgenceAuthorizer,
@@ -35,7 +35,7 @@ export class GetAnimationsCollectivesV2QueryHandler extends QueryHandler<
 
   async handle(
     query: GetAnimationsCollectivesV2Query
-  ): Promise<Result<GetAnimationCollectiveV2QueryModel>> {
+  ): Promise<Result<GetRendezVousACloreQueryModel>> {
     let whereClause = {}
     const maintenant = this.dateService.nowJs()
 
@@ -85,7 +85,7 @@ export class GetAnimationsCollectivesV2QueryHandler extends QueryHandler<
     }
 
     const animationsCollectives = await RendezVousSqlModel.findAndCountAll({
-      attributes: ['id', 'titre', 'date'],
+      attributes: ['id', 'titre', 'date', 'type'],
       ...whereClause,
       include: [{ model: JeuneSqlModel }],
       order: [['date', 'ASC']],
@@ -104,7 +104,8 @@ export class GetAnimationsCollectivesV2QueryHandler extends QueryHandler<
         id: rdv.id,
         titre: rdv.titre,
         date: rdv.date.toISOString(),
-        nombreInscrits: rdv.jeunes.length
+        nombreInscrits: rdv.jeunes.length,
+        type: rdv.type
       }))
     })
   }

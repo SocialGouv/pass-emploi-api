@@ -210,7 +210,7 @@ export class AnimationCollectiveQueryModel extends RendezVousConseillerQueryMode
   statut: RendezVous.AnimationCollective.Statut
 }
 
-export class AnimationCollectiveResumeQueryModel {
+export class RdvResumeQueryModel {
   @ApiProperty()
   id: string
 
@@ -225,18 +225,21 @@ export class AnimationCollectiveResumeQueryModel {
 
   @ApiProperty()
   nombreInscrits: number
+
+  @ApiProperty()
+  type: string
 }
 
-export class GetAnimationCollectiveV2QueryModel {
+export class GetRendezVousACloreQueryModel {
   @ApiProperty({ type: PaginationQueryModel })
   pagination: PaginationQueryModel
 
   @ApiProperty({
-    type: AnimationCollectiveResumeQueryModel,
+    type: RdvResumeQueryModel,
     isArray: true
   })
   @IsArray()
-  resultats: AnimationCollectiveResumeQueryModel[]
+  resultats: RdvResumeQueryModel[]
 }
 
 export class RendezVousConseillerDetailQueryModel extends RendezVousConseillerQueryModel {

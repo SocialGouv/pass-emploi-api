@@ -18,6 +18,7 @@ import {
   CodeTypeRendezVous,
   RendezVous
 } from '../../../domain/rendez-vous/rendez-vous'
+import { Type } from 'class-transformer'
 
 export class CreateRendezVousPayload {
   @ApiPropertyOptional()
@@ -170,4 +171,18 @@ export class UpdateRendezVousPayload {
 export class CloreRendezVousPayload {
   @IsBoolean()
   present: boolean
+}
+
+export class GetRendezVousACloreQueryParams {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  page?: number
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  limit?: number
 }

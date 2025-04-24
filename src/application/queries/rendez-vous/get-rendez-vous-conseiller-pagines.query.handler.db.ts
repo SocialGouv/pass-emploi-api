@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
 import { Op, Order, Sequelize } from 'sequelize'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
@@ -34,8 +33,7 @@ export class GetRendezVousConseillerPaginesQueryHandler extends QueryHandler<
 > {
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
-    private conseillerAuthorizer: ConseillerAuthorizer,
-    private configuration: ConfigService
+    private conseillerAuthorizer: ConseillerAuthorizer
   ) {
     super('GetRendezVousConseillerPaginesQueryHandler')
   }

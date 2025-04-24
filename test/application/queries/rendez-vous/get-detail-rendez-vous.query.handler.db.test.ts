@@ -157,6 +157,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
         // Then
         const data: RendezVousConseillerDetailQueryModel = {
           ...queryModel,
+          statut: RendezVous.AnimationCollective.Statut.A_CLOTURER,
           id: unRendezVous.id,
           jeunes: [
             {
@@ -209,6 +210,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
         const data: RendezVousConseillerDetailQueryModel = {
           ...queryModel,
           id: unRendezVous.id,
+          statut: RendezVous.AnimationCollective.Statut.A_CLOTURER,
           jeunes: [
             {
               id: 'ABCDE',
@@ -279,6 +281,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
         const data: RendezVousConseillerDetailQueryModel = {
           ...queryModel,
           id: unRendezVous.id,
+          statut: RendezVous.AnimationCollective.Statut.A_CLOTURER,
           jeunes: [
             {
               id: 'jeune-1',

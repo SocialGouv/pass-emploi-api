@@ -372,6 +372,7 @@ import { RateLimiterService } from './utils/rate-limiter.service'
 import { NotifierActualisationJobHandler } from './application/jobs/notifier-actualisation.job.handler.db'
 import { ConfigController } from './infrastructure/routes/config.controller'
 import { CloreRendezVousCommandHandler } from './application/commands/clore-rendez-vous.command.handler'
+import { GetRendezVousACloreQueryHandler } from './application/queries/rendez-vous/get-rendez-vous-a-clore.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -708,6 +709,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetDetailRendezVousQueryHandler,
     GetDemarchesQueryHandler,
     GetJeuneMiloByDossierQueryHandler,
+    GetRendezVousACloreQueryHandler,
     UpdateRendezVousCommandHandler,
     CloreRendezVousCommandHandler,
     GetConseillersJeuneQueryHandler,

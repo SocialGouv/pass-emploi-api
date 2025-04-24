@@ -32,6 +32,7 @@ import {
   UpdateRendezVousCommandHandler
 } from '../../application/commands/update-rendez-vous.command.handler'
 import {
+  GetRendezVousACloreQueryModel,
   RendezVousConseillerDetailQueryModel,
   RendezVousConseillerQueryModel,
   RendezVousJeuneDetailQueryModel,
@@ -44,6 +45,10 @@ import {
 } from '../../application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
 import { GetDetailRendezVousJeuneQueryHandler } from '../../application/queries/rendez-vous/get-detail-rendez-vous-jeune.query.handler.db'
 import { GetDetailRendezVousQueryHandler } from '../../application/queries/rendez-vous/get-detail-rendez-vous.query.handler.db'
+import {
+  GetRendezVousACloreQuery,
+  GetRendezVousACloreQueryHandler
+} from '../../application/queries/rendez-vous/get-rendez-vous-a-clore.query.handler.db'
 import {
   GetRendezVousConseillerPaginesQuery,
   GetRendezVousConseillerPaginesQueryHandler
@@ -62,6 +67,7 @@ import {
 import {
   CloreRendezVousPayload,
   CreateRendezVousPayload,
+  GetRendezVousACloreQueryParams,
   UpdateRendezVousPayload
 } from './validation/rendez-vous.inputs'
 
@@ -77,6 +83,7 @@ export class RendezVousController {
     private readonly updateRendezVousCommandHandler: UpdateRendezVousCommandHandler,
     private readonly createRendezVousCommandHandler: CreateRendezVousCommandHandler,
     private readonly cloreRendezVousCommandHandler: CloreRendezVousCommandHandler,
+    private readonly getRendezVousACloreQueryHandler: GetRendezVousACloreQueryHandler,
     private readonly getRendezVousConseillerPaginesQueryHandler: GetRendezVousConseillerPaginesQueryHandler,
     private readonly getRendezVousJeunePoleEmploiQueryHandler: GetRendezVousJeunePoleEmploiQueryHandler,
     private readonly getDetailRendezVousJeuneQueryHandler: GetDetailRendezVousJeuneQueryHandler,
@@ -157,12 +164,36 @@ export class RendezVousController {
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     const command: CloreRendezVousCommand = {
-      idRendezVous: idRendezVous,
+      idRendezVous,
       present: cloreRendezVousPayload.present
     }
 
     const result = await this.cloreRendezVousCommandHandler.execute(
       command,
+      utilisateur
+    )
+
+    return handleResult(result)
+  }
+
+  @ApiOperation({
+    summary: 'Récupère les rdv et AC à clore',
+    description: 'Autorisé pour un conseiller Milo'
+  })
+  @Get('conseillers/:idConseiller/rendezvous/a-clore')
+  async getRendezVousAClore(
+    @Param('idConseiller') idConseiller: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @Query() qp: GetRendezVousACloreQueryParams
+  ): Promise<GetRendezVousACloreQueryModel> {
+    const query: GetRendezVousACloreQuery = {
+      idConseiller,
+      page: qp.page,
+      limit: qp.limit
+    }
+
+    const result = await this.getRendezVousACloreQueryHandler.execute(
+      query,
       utilisateur
     )
 

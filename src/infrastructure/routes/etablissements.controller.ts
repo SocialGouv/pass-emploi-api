@@ -7,7 +7,7 @@ import { GetJeunesEtablissementV2QueryModel } from '../../application/queries/qu
 import { JeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
 import {
   AnimationCollectiveQueryModel,
-  GetAnimationCollectiveV2QueryModel,
+  GetRendezVousACloreQueryModel,
   RendezVousConseillerDetailQueryModel
 } from '../../application/queries/query-models/rendez-vous.query-model'
 import { GetAnimationsCollectivesV2QueryHandler } from '../../application/queries/rendez-vous/get-animations-collectives-v2.query.handler.db'
@@ -93,14 +93,14 @@ export class EtablissementsController {
   })
   @Get('v2/etablissements/:idEtablissement/animations-collectives')
   @ApiResponse({
-    type: GetAnimationCollectiveV2QueryModel
+    type: GetRendezVousACloreQueryModel
   })
   async getAnimationsCollectivesV2(
     @Param('idEtablissement') idEtablissement: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @Query()
     getAnimationsCollectivesQueryParams: GetAnimationsCollectivesV2QueryParams
-  ): Promise<GetAnimationCollectiveV2QueryModel> {
+  ): Promise<GetRendezVousACloreQueryModel> {
     const result = await this.getAnimationsCollectivesV2QueryHandler.execute(
       {
         idEtablissement,

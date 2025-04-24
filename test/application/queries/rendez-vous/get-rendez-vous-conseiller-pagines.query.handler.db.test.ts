@@ -23,7 +23,6 @@ import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
-import { testConfig } from '../../../utils/module-for-testing'
 
 describe('GetRendezVousConseillerPaginesQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
@@ -46,8 +45,7 @@ describe('GetRendezVousConseillerPaginesQueryHandler', () => {
     getRendezVousConseillerPaginesQueryHandler =
       new GetRendezVousConseillerPaginesQueryHandler(
         databaseForTesting.sequelize,
-        conseillerAuthorizer,
-        testConfig()
+        conseillerAuthorizer
       )
   })
 

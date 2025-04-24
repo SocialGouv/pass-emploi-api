@@ -1,6 +1,6 @@
 import {
-  AnimationCollectiveResumeQueryModel,
-  GetAnimationCollectiveV2QueryModel
+  RdvResumeQueryModel,
+  GetRendezVousACloreQueryModel
 } from 'src/application/queries/query-models/rendez-vous.query-model'
 import { Core } from 'src/domain/core'
 import { AsSql } from 'src/infrastructure/sequelize/types'
@@ -162,7 +162,7 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
         const result = await queryHandler.handle(query)
 
         // Then
-        const queryModelAttendu: GetAnimationCollectiveV2QueryModel = {
+        const queryModelAttendu: GetRendezVousACloreQueryModel = {
           pagination: {
             page: 1,
             limit: 10,
@@ -191,7 +191,7 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
         const result = await queryHandler.handle(query)
 
         // Then
-        const queryModelAttendu: GetAnimationCollectiveV2QueryModel = {
+        const queryModelAttendu: GetRendezVousACloreQueryModel = {
           pagination: {
             page: 1,
             limit: 1,
@@ -219,7 +219,7 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
         const result = await queryHandler.handle(query)
 
         // Then
-        const queryModelAttendu: GetAnimationCollectiveV2QueryModel = {
+        const queryModelAttendu: GetRendezVousACloreQueryModel = {
           pagination: {
             page: 2,
             limit: 1,
@@ -244,7 +244,7 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
         const result = await queryHandler.handle(query)
 
         // Then
-        const queryModelAttendu: GetAnimationCollectiveV2QueryModel = {
+        const queryModelAttendu: GetRendezVousACloreQueryModel = {
           pagination: {
             page: 1,
             limit: 10,
@@ -271,11 +271,12 @@ describe('GetAnimationsCollectivesACloreQueryHandler', () => {
 
 function mapRdvSqlToACACloreResumeQueryModel(
   rdvSql: AsSql<RendezVousDto>
-): AnimationCollectiveResumeQueryModel {
+): RdvResumeQueryModel {
   return {
     id: rdvSql.id,
     titre: rdvSql.titre,
     date: rdvSql.date.toISOString(),
-    nombreInscrits: 0
+    nombreInscrits: 0,
+    type: rdvSql.type
   }
 }

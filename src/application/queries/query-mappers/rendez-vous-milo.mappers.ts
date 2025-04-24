@@ -1,5 +1,6 @@
 import { Authentification } from '../../../domain/authentification'
 import {
+  CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous,
   mapCodeLabelTypeRendezVousJeune,
   RendezVous
@@ -147,14 +148,17 @@ export function fromSqlToRendezVousConseillerDetailQueryModel(
     nombreMaxParticipants: rendezVousSql.nombreMaxParticipants ?? undefined
   }
 
-  if (RendezVous.estUnTypeAnimationCollective(rendezVousSql.type)) {
+  if (
+    RendezVous.estUnTypeAnimationCollective(rendezVousSql.type) ||
+    rendezVousSql.type === CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
+  ) {
     rendezVousConseiller.statut = construireStatut(rendezVousSql, maintenant)
   }
 
   return rendezVousConseiller
 }
 
-export function construireStatut(
+function construireStatut(
   rendezVousSql: RendezVousSqlModel,
   maintenant: Date
 ): RendezVous.AnimationCollective.Statut {
