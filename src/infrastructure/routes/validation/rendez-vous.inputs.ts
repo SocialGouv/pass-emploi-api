@@ -166,3 +166,8 @@ export class UpdateRendezVousPayload {
   @IsNumber()
   nombreMaxParticipants?: number
 }
+
+export class CloreRendezVousPayload {
+  @IsBoolean()
+  present: boolean
+}

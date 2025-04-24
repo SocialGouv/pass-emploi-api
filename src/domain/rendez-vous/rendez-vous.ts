@@ -246,7 +246,10 @@ export namespace RendezVous {
 
   @Injectable()
   export class Factory {
-    constructor(private idService: IdService) {}
+    constructor(
+      private idService: IdService,
+      private dateService: DateService
+    ) {}
 
     creer(
       infosRendezVousACreer: InfosRendezVousACreer,
@@ -420,6 +423,37 @@ export namespace RendezVous {
         organisme: infosRendezVousAMettreAJour.organisme,
         presenceConseiller: infosRendezVousAMettreAJour.presenceConseiller,
         nombreMaxParticipants: infosRendezVousAMettreAJour.nombreMaxParticipants
+      })
+    }
+
+    clore(rendezVous: RendezVous, present: boolean): Result<RendezVous> {
+      if (
+        rendezVous.type !==
+          CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER ||
+        rendezVous.jeunes.length !== 1
+      ) {
+        return failure(
+          new MauvaiseCommandeError(
+            'Seuls les rendez-vous individuels peuvent être clos.'
+          )
+        )
+      }
+      if (
+        rendezVous.jeunes[0].present !== undefined ||
+        rendezVous.dateCloture
+      ) {
+        return failure(
+          new MauvaiseCommandeError('Le rendez-vous est déjà clos.')
+        )
+      }
+
+      return success({
+        ...rendezVous,
+        dateCloture: this.dateService.now(),
+        jeunes: rendezVous.jeunes.map(jeune => ({
+          ...jeune,
+          present
+        }))
       })
     }
   }

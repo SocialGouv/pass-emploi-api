@@ -16,6 +16,10 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { DateTime } from 'luxon'
 import { handleResult } from 'src/infrastructure/routes/result.handler'
 import {
+  CloreRendezVousCommand,
+  CloreRendezVousCommandHandler
+} from '../../application/commands/clore-rendez-vous.command.handler'
+import {
   CreateRendezVousCommand,
   CreateRendezVousCommandHandler
 } from '../../application/commands/create-rendez-vous.command.handler'
@@ -23,10 +27,6 @@ import {
   DeleteRendezVousCommand,
   DeleteRendezVousCommandHandler
 } from '../../application/commands/delete-rendez-vous.command.handler.db'
-import {
-  SendNotificationsNouveauxMessagesCommand,
-  SendNotificationsNouveauxMessagesCommandHandler
-} from '../../application/commands/send-notifications-nouveaux-messages.command.handler'
 import {
   UpdateRendezVousCommand,
   UpdateRendezVousCommandHandler
@@ -54,15 +54,13 @@ import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
-import {
-  EnvoyerNotificationsPayload,
-  GetRendezVousConseillerV2QueryParams
-} from './validation/conseillers.inputs'
+import { GetRendezVousConseillerV2QueryParams } from './validation/conseillers.inputs'
 import {
   GetRendezVousJeuneQueryParams,
   MaintenantQueryParams
 } from './validation/jeunes.inputs'
 import {
+  CloreRendezVousPayload,
   CreateRendezVousPayload,
   UpdateRendezVousPayload
 } from './validation/rendez-vous.inputs'
@@ -77,8 +75,8 @@ export class RendezVousController {
     private readonly getDetailRendezVousQueryHandler: GetDetailRendezVousQueryHandler,
     private readonly deleteRendezVousCommandHandler: DeleteRendezVousCommandHandler,
     private readonly updateRendezVousCommandHandler: UpdateRendezVousCommandHandler,
-    private readonly sendNotificationsNouveauxMessages: SendNotificationsNouveauxMessagesCommandHandler,
     private readonly createRendezVousCommandHandler: CreateRendezVousCommandHandler,
+    private readonly cloreRendezVousCommandHandler: CloreRendezVousCommandHandler,
     private readonly getRendezVousConseillerPaginesQueryHandler: GetRendezVousConseillerPaginesQueryHandler,
     private readonly getRendezVousJeunePoleEmploiQueryHandler: GetRendezVousJeunePoleEmploiQueryHandler,
     private readonly getDetailRendezVousJeuneQueryHandler: GetDetailRendezVousJeuneQueryHandler,
@@ -149,20 +147,21 @@ export class RendezVousController {
   }
 
   @ApiOperation({
-    summary: "Envoie une notification d'un nouveau message à des jeunes",
-    description: 'Autorisé pour un conseiller'
+    summary: 'Clos rdv individuel',
+    description: 'Autorisé pour le conseiller du rdv'
   })
-  @Post('conseillers/:idConseiller/jeunes/notify-messages')
-  async postNotifications(
-    @Param('idConseiller') idConseiller: string,
-    @Body() envoyerNotificationsPayload: EnvoyerNotificationsPayload,
+  @Post('rendezvous/:idRendezVous/cloturer')
+  async cloreRendezVous(
+    @Param('idRendezVous', new ParseUUIDPipe()) idRendezVous: string,
+    @Body() cloreRendezVousPayload: CloreRendezVousPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    const command: SendNotificationsNouveauxMessagesCommand = {
-      idsJeunes: envoyerNotificationsPayload.idsJeunes,
-      idConseiller
+    const command: CloreRendezVousCommand = {
+      idRendezVous: idRendezVous,
+      present: cloreRendezVousPayload.present
     }
-    const result = await this.sendNotificationsNouveauxMessages.execute(
+
+    const result = await this.cloreRendezVousCommandHandler.execute(
       command,
       utilisateur
     )

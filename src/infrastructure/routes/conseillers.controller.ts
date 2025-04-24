@@ -50,12 +50,17 @@ import { handleResult } from './result.handler'
 import {
   CreateListeDeDiffusionPayload,
   DetailConseillerPayload,
+  EnvoyerNotificationsPayload,
   GetConseillersQueryParams,
   GetDemarchesConseillerQueryParams,
   GetIdentitesJeunesQueryParams,
   GetIndicateursPourConseillerQueryParams,
   UpdateJeuneDuConseillerPayload
 } from './validation/conseillers.inputs'
+import {
+  SendNotificationsNouveauxMessagesCommand,
+  SendNotificationsNouveauxMessagesCommandHandler
+} from '../../application/commands/send-notifications-nouveaux-messages.command.handler'
 
 @Controller('conseillers')
 @CustomSwaggerApiOAuth2()
@@ -73,7 +78,8 @@ export class ConseillersController {
     private readonly getIdentitesJeunesQueryHandler: GetJeunesIdentitesQueryHandler,
     private readonly deleteConseillerCommandHandler: DeleteConseillerCommandHandler,
     private readonly getDemarchesConseillerQueryHandler: GetDemarchesConseillerQueryHandler,
-    private readonly getRendezVousJeuneQueryHandler: GetRendezVousJeuneQueryHandler
+    private readonly getRendezVousJeuneQueryHandler: GetRendezVousJeuneQueryHandler,
+    private readonly sendNotificationsNouveauxMessages: SendNotificationsNouveauxMessagesCommandHandler
   ) {}
 
   @ApiOperation({
@@ -373,6 +379,28 @@ export class ConseillersController {
   ): Promise<RendezVousJeuneQueryModel[]> {
     const result = await this.getRendezVousJeuneQueryHandler.execute(
       { idJeune, ...getRendezVousQueryParams },
+      utilisateur
+    )
+
+    return handleResult(result)
+  }
+
+  @ApiOperation({
+    summary: "Envoie une notification d'un nouveau message à des jeunes",
+    description: 'Autorisé pour un conseiller'
+  })
+  @Post(':idConseiller/jeunes/notify-messages')
+  async postNotifications(
+    @Param('idConseiller') idConseiller: string,
+    @Body() envoyerNotificationsPayload: EnvoyerNotificationsPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: SendNotificationsNouveauxMessagesCommand = {
+      idsJeunes: envoyerNotificationsPayload.idsJeunes,
+      idConseiller
+    }
+    const result = await this.sendNotificationsNouveauxMessages.execute(
+      command,
       utilisateur
     )
 

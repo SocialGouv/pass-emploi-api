@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import {
   CodeTypeRendezVous,
   InfosRendezVousACreer,
@@ -7,8 +8,6 @@ import { IdService } from 'src/utils/id-service'
 import { unConseiller } from 'test/fixtures/conseiller.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { unConseillerDuJeune, unJeune } from 'test/fixtures/jeune.fixture'
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { failure, isSuccess } from '../../../src/building-blocks/types/result'
 import {
   ConseillerSansAgenceError,
   DateNonAutoriseeError,
@@ -16,14 +15,21 @@ import {
   MauvaiseCommandeError
 } from '../../../src/building-blocks/types/domain-error'
 import {
+  failure,
+  isSuccess,
+  success
+} from '../../../src/building-blocks/types/result'
+import { DateService } from '../../../src/utils/date-service'
+import {
   unJeuneDuRendezVous,
   unRendezVous
 } from '../../fixtures/rendez-vous.fixture'
-import { DateTime } from 'luxon'
+import { expect, StubbedClass, stubClass } from '../../utils'
 
 describe('Rendez-vous', () => {
   const id = '26279b34-318a-45e4-a8ad-514a1090462c'
   let idService: StubbedClass<IdService>
+  let dateService: StubbedClass<DateService>
 
   describe('Factory', () => {
     let factory: RendezVous.Factory
@@ -31,7 +37,9 @@ describe('Rendez-vous', () => {
     beforeEach(() => {
       idService = stubClass(IdService)
       idService.uuid.returns(id)
-      factory = new RendezVous.Factory(idService)
+      dateService = stubClass(DateService)
+      dateService.now.returns(uneDatetime())
+      factory = new RendezVous.Factory(idService, dateService)
     })
 
     describe('creer', () => {
@@ -518,6 +526,69 @@ describe('Rendez-vous', () => {
             })
           })
         })
+      })
+    })
+
+    describe('clore', () => {
+      it('clos le rendez-vous', () => {
+        // Given
+        const rendezVous = unRendezVous({
+          type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
+        })
+
+        // When
+        const result = factory.clore(rendezVous, true)
+
+        // Then
+        expect(result).to.deep.equal(
+          success({
+            ...rendezVous,
+            dateCloture: uneDatetime(),
+            jeunes: [unJeuneDuRendezVous({ present: true })]
+          })
+        )
+      })
+      it('ne clos pas le rendez-vous quand le type est KO', () => {
+        // Given
+        const rendezVous = unRendezVous({
+          type: CodeTypeRendezVous.ATELIER
+        })
+
+        // When
+        const result = factory.clore(rendezVous, true)
+
+        // Then
+        expect(result._isSuccess).to.be.false()
+      })
+      it('ne clos pas le rendez-vous quand deja clos', () => {
+        // Given
+        const rendezVous = unRendezVous({
+          type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+          dateCloture: uneDatetime()
+        })
+
+        // When
+        const result = factory.clore(rendezVous, true)
+
+        // Then
+        expect(result._isSuccess).to.be.false()
+      })
+      it('ne clos pas le rendez-vous quand jeune avec statut', () => {
+        // Given
+        const rendezVous = unRendezVous({
+          type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+          jeunes: [
+            unJeuneDuRendezVous({
+              present: true
+            })
+          ]
+        })
+
+        // When
+        const result = factory.clore(rendezVous, true)
+
+        // Then
+        expect(result._isSuccess).to.be.false()
       })
     })
   })

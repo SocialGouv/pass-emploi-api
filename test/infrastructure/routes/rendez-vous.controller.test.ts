@@ -4,6 +4,7 @@ import {
   UpdateRendezVousCommandHandler
 } from 'src/application/commands/update-rendez-vous.command.handler'
 import {
+  CloreRendezVousPayload,
   CreateRendezVousPayload,
   UpdateRendezVousPayload
 } from 'src/infrastructure/routes/validation/rendez-vous.inputs'
@@ -45,12 +46,17 @@ import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
+import {
+  CloreRendezVousCommand,
+  CloreRendezVousCommandHandler
+} from '../../../src/application/commands/clore-rendez-vous.command.handler'
 
 describe('RendezvousController', () => {
   let getDetailRendezVousQueryHandler: StubbedClass<GetDetailRendezVousQueryHandler>
   let deleteRendezVousCommandHandler: StubbedClass<DeleteRendezVousCommandHandler>
   let updateRendezVousCommandHandler: StubbedClass<UpdateRendezVousCommandHandler>
   let createRendezVousCommandHandler: StubbedClass<CreateRendezVousCommandHandler>
+  let cloreRendezVousCommandHandler: StubbedClass<CloreRendezVousCommandHandler>
   let getRendezVousConseillerPaginesQueryHandler: StubbedClass<GetRendezVousConseillerPaginesQueryHandler>
   let getRendezVousJeunePoleEmploiQueryHandler: StubbedClass<GetRendezVousJeunePoleEmploiQueryHandler>
   let getDetailRendezVousJeuneQueryHandler: StubbedClass<GetDetailRendezVousJeuneQueryHandler>
@@ -62,6 +68,7 @@ describe('RendezvousController', () => {
     app = await getApplicationWithStubbedDependencies()
     getDetailRendezVousQueryHandler = app.get(GetDetailRendezVousQueryHandler)
     deleteRendezVousCommandHandler = app.get(DeleteRendezVousCommandHandler)
+    cloreRendezVousCommandHandler = app.get(CloreRendezVousCommandHandler)
     updateRendezVousCommandHandler = app.get(UpdateRendezVousCommandHandler)
     getRendezVousConseillerPaginesQueryHandler = app.get(
       GetRendezVousConseillerPaginesQueryHandler
@@ -265,6 +272,66 @@ describe('RendezvousController', () => {
         .expect(HttpStatus.BAD_REQUEST)
     })
     ensureUserAuthenticationFailsIfInvalid('put', '/rendezvous/123')
+  })
+  describe('POST rendezvous/:idRendezVous/cloturer', () => {
+    const rendezvous = unRendezVous()
+    it('clos le rendez-vous à present', async () => {
+      // Given
+      const payload: CloreRendezVousPayload = {
+        present: true
+      }
+      const expectedCommand: CloreRendezVousCommand = {
+        idRendezVous: rendezvous.id,
+        present: true
+      }
+      cloreRendezVousCommandHandler.execute.resolves(emptySuccess())
+      // When - Then
+      await request(app.getHttpServer())
+        .post(`/rendezvous/${rendezvous.id}/cloturer`)
+        .set('authorization', unHeaderAuthorization())
+        .send(payload)
+        .expect(HttpStatus.CREATED)
+
+      expect(
+        cloreRendezVousCommandHandler.execute
+      ).to.have.be.calledWithExactly(expectedCommand, unUtilisateurDecode())
+    })
+    it('clos le rendez-vous à abset', async () => {
+      // Given
+      const payload: CloreRendezVousPayload = {
+        present: false
+      }
+      const expectedCommand: CloreRendezVousCommand = {
+        idRendezVous: rendezvous.id,
+        present: false
+      }
+      cloreRendezVousCommandHandler.execute.resolves(emptySuccess())
+      // When - Then
+      await request(app.getHttpServer())
+        .post(`/rendezvous/${rendezvous.id}/cloturer`)
+        .set('authorization', unHeaderAuthorization())
+        .send(payload)
+        .expect(HttpStatus.CREATED)
+
+      expect(
+        cloreRendezVousCommandHandler.execute
+      ).to.have.be.calledWithExactly(expectedCommand, unUtilisateurDecode())
+    })
+    it('bad request', async () => {
+      // Given
+      const payload = {
+        present: 'true'
+      }
+
+      cloreRendezVousCommandHandler.execute.resolves(emptySuccess())
+      // When - Then
+      await request(app.getHttpServer())
+        .post(`/rendezvous/${rendezvous.id}/cloturer`)
+        .set('authorization', unHeaderAuthorization())
+        .send(payload)
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+    ensureUserAuthenticationFailsIfInvalid('post', '/rendezvous/123/cloturer')
   })
 
   describe('GET /v2/conseillers/:idConseiller/rendezvous', () => {

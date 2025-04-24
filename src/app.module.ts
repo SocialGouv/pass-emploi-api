@@ -371,6 +371,7 @@ import { configureLoggerModule } from './utils/logger.module'
 import { RateLimiterService } from './utils/rate-limiter.service'
 import { NotifierActualisationJobHandler } from './application/jobs/notifier-actualisation.job.handler.db'
 import { ConfigController } from './infrastructure/routes/config.controller'
+import { CloreRendezVousCommandHandler } from './application/commands/clore-rendez-vous.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -708,6 +709,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetDemarchesQueryHandler,
     GetJeuneMiloByDossierQueryHandler,
     UpdateRendezVousCommandHandler,
+    CloreRendezVousCommandHandler,
     GetConseillersJeuneQueryHandler,
     GetAgencesQueryHandler,
     ModifierConseillerCommandHandler,
