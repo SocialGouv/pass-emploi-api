@@ -296,6 +296,39 @@ describe('GetDemarchesQueryGetter', () => {
         }
       })
 
+      it('récupère les demarches Pole Emploi du jeune après la date de début et avant date de fin', async () => {
+        const query = {
+          idJeune: '1',
+          accessToken: 'token',
+          tri: GetDemarchesQueryGetter.Tri.parDateFin,
+          dateDebut: DateTime.fromISO('2020-04-03'),
+          dateFin: DateTime.fromISO('2020-04-10')
+        }
+        authRepository.getJeuneById.withArgs(query.idJeune).resolves(jeune)
+        poleEmploiPartenaireClient.getDemarches
+          .withArgs(idpToken)
+          .resolves(
+            success([
+              demarcheDtoAnnulee,
+              demarcheDtoEnCours,
+              demarcheDtoRetard,
+              demarcheDtoRealisee,
+              demarcheDtoAFaireAuMilieu,
+              demarcheDtoEnCoursProche
+            ])
+          )
+
+        // When
+        const result = await getDemarchesQueryGetter.handle(query)
+        // Then
+        expect(isSuccess(result)).to.be.true()
+        if (isSuccess(result)) {
+          const demarches = result.data.queryModel
+          expect(demarches.length).to.equal(1)
+          expect(demarches[0].id).to.equal(demarcheDtoAnnulee.idDemarche)
+        }
+      })
+
       it('récupères les démarches Pole Emploi du jeune pour son conseiller', async () => {
         const query = {
           idJeune: '1',

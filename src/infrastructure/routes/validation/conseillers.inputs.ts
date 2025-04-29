@@ -270,4 +270,8 @@ export class GetDemarchesConseillerQueryParams {
   @IsOptional()
   @IsISO8601({ strict: true })
   dateDebut?: string
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsISO8601({ strict: true })
+  dateFin?: string
 }

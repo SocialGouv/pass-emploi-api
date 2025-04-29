@@ -356,6 +356,11 @@ export class ConseillersController {
           ? DateTime.fromISO(queryParams.dateDebut, {
               setZone: true
             })
+          : undefined,
+        dateFin: queryParams.dateFin
+          ? DateTime.fromISO(queryParams.dateFin, {
+              setZone: true
+            }).endOf('day')
           : undefined
       },
       utilisateur

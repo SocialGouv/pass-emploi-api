@@ -14,6 +14,7 @@ export interface GetDemarchesConseillerQuery extends Query {
   idJeune: string
   accessToken: string
   dateDebut?: DateTime
+  dateFin?: DateTime
 }
 
 @Injectable()
@@ -36,6 +37,7 @@ export class GetDemarchesConseillerQueryHandler extends QueryHandler<
       accessToken: query.accessToken,
       tri: GetDemarchesQueryGetter.Tri.parSatutEtDateFin,
       dateDebut: query.dateDebut,
+      dateFin: query.dateFin,
       pourConseiller: true
     })
   }

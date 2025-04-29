@@ -657,7 +657,8 @@ describe('ConseillersController', () => {
         idConseiller,
         idJeune,
         accessToken: 'coucou',
-        dateDebut: undefined
+        dateDebut: undefined,
+        dateFin: undefined
       })
     })
 

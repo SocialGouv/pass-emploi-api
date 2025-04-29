@@ -33,6 +33,7 @@ export interface Query {
   accessToken: string
   pourConseiller?: boolean
   dateDebut?: DateTime
+  dateFin?: DateTime
   idpToken?: string
 }
 
@@ -75,10 +76,20 @@ export class GetDemarchesQueryGetter {
         )
         .sort(query.tri) ?? []
 
-    if (query.dateDebut) {
+    if (query.dateDebut || query.dateFin) {
       demarches = demarches.filter(({ dateDebut, dateFin }) => {
-        if (dateDebut) return dateDebut >= query.dateDebut!
-        return dateFin >= query.dateDebut!
+        if (dateDebut) {
+          return filtrerSelonDateDebutEtFin(
+            dateDebut,
+            query.dateDebut,
+            query.dateFin
+          )
+        }
+        return filtrerSelonDateDebutEtFin(
+          dateFin,
+          query.dateDebut,
+          query.dateFin
+        )
       })
     }
 
@@ -157,4 +168,18 @@ export namespace GetDemarchesQueryGetter {
   export interface TriQuery {
     (demarche1: Demarche, demarche2: Demarche): number
   }
+}
+
+function filtrerSelonDateDebutEtFin(
+  dateDeReference: DateTime,
+  dateDebut?: DateTime,
+  dateFin?: DateTime
+): boolean {
+  if (dateDebut && dateFin)
+    return dateDeReference >= dateDebut && dateDeReference <= dateFin
+  if (dateDebut) {
+    return dateDeReference >= dateDebut
+  }
+  if (dateFin) return dateDeReference <= dateFin
+  return true
 }

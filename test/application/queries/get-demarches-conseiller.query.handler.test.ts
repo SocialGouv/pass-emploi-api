@@ -50,6 +50,7 @@ describe('GetDemarchesConseillerQueryHandler', () => {
           accessToken: 'token',
           tri: GetDemarchesQueryGetter.Tri.parSatutEtDateFin,
           dateDebut: undefined,
+          dateFin: undefined,
           pourConseiller: true
         }
       )
