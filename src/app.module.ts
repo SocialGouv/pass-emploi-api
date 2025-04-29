@@ -373,6 +373,7 @@ import { NotifierActualisationJobHandler } from './application/jobs/notifier-act
 import { ConfigController } from './infrastructure/routes/config.controller'
 import { CloreRendezVousCommandHandler } from './application/commands/clore-rendez-vous.command.handler'
 import { GetRendezVousACloreQueryHandler } from './application/queries/rendez-vous/get-rendez-vous-a-clore.query.handler.db'
+import { GetComptageJeuneQueryHandler } from './application/queries/get-comptage-jeune.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -804,7 +805,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetCompteursBeneficiaireMiloQueryHandler,
     GetDemarchesConseillerQueryHandler,
     GetNotificationsJeuneQueryHandler,
-    AutoinscrireBeneficiaireSessionMiloCommandHandler
+    AutoinscrireBeneficiaireSessionMiloCommandHandler,
+    GetComptageJeuneQueryHandler
   ]
 }
 

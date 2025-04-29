@@ -127,3 +127,13 @@ export class MaintenantQueryParams {
   @IsISO8601({ strict: true })
   maintenant: string
 }
+
+export class GetComptageJeuneQueryParams {
+  @ApiProperty()
+  @IsISO8601({ strict: true })
+  // TODO force format YYYY-MM-DD
+  dateDebut: string
+  @ApiProperty()
+  @IsISO8601({ strict: true })
+  dateFin: string
+}

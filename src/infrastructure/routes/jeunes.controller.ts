@@ -4,6 +4,7 @@ import {
   Delete,
   ForbiddenException,
   Get,
+  Header,
   Headers,
   HttpCode,
   HttpStatus,
@@ -47,22 +48,27 @@ import { RechercherMessageQueryHandler } from 'src/application/queries/recherche
 import { Result } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { RechercherMessagePayload } from 'src/infrastructure/routes/validation/messages.input'
+import { UpdateJeuneCommandHandler } from '../../application/commands/update-jeune.command.handler'
+import {
+  ComptageJeuneQueryModel,
+  GetComptageJeuneQueryHandler
+} from '../../application/queries/get-comptage-jeune.query.handler.db'
+import {
+  GetNotificationsJeuneQueryHandler,
+  NotificationJeuneQueryModel
+} from '../../application/queries/get-notifications-jeune.query.handler.db'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import { handleResult } from './result.handler'
 import {
   ArchiverJeunePayload,
+  GetComptageJeuneQueryParams,
   MaintenantQueryParams,
   TransfererConseillerPayload,
   UpdateConfigurationInput,
   UpdateJeunePayload,
   UpdateJeunePreferencesPayload
 } from './validation/jeunes.inputs'
-import { UpdateJeuneCommandHandler } from '../../application/commands/update-jeune.command.handler'
-import {
-  GetNotificationsJeuneQueryHandler,
-  NotificationJeuneQueryModel
-} from '../../application/queries/get-notifications-jeune.query.handler.db'
 
 @Controller('jeunes')
 @CustomSwaggerApiOAuth2()
@@ -82,8 +88,42 @@ export class JeunesController {
     private readonly updateJeunePreferencesCommandHandler: UpdateJeunePreferencesCommandHandler,
     private readonly getPreferencesJeuneQueryHandler: GetPreferencesJeuneQueryHandler,
     private rechercherMessageCommandHandler: RechercherMessageQueryHandler,
-    private getNotificationsJeuneQueryHandler: GetNotificationsJeuneQueryHandler
+    private getNotificationsJeuneQueryHandler: GetNotificationsJeuneQueryHandler,
+    private getComptageJeuneQueryHandler: GetComptageJeuneQueryHandler
   ) {}
+
+  @Get(':idJeune/comptage')
+  @ApiOperation({
+    summary:
+      'Récupère le comptage des heures du jeune. La réponse est cachée pendant 1h.',
+    description: 'Autorisé pour un jeune et son conseiller'
+  })
+  @Header('Cache-Control', 'max-age=3600')
+  @ApiResponse({
+    type: DetailJeuneQueryModel
+  })
+  async getComptageJeune(
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string,
+    @Query() queryParams: GetComptageJeuneQueryParams
+  ): Promise<ComptageJeuneQueryModel> {
+    const result = await this.getComptageJeuneQueryHandler.execute(
+      {
+        idJeune,
+        accessToken,
+        dateDebut: DateTime.fromISO(queryParams.dateDebut, {
+          setZone: true
+        }).startOf('day'),
+        dateFin: DateTime.fromISO(queryParams.dateFin, {
+          setZone: true
+        }).endOf('day')
+      },
+      utilisateur
+    )
+
+    return handleResult(result)
+  }
 
   @Get(':idJeune')
   @ApiResponse({

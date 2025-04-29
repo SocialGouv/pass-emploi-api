@@ -13,6 +13,11 @@ import { GetJeuneHomeAgendaQueryHandler } from 'src/application/queries/get-jeun
 import { GetPreferencesJeuneQueryHandler } from 'src/application/queries/get-preferences-jeune.query.handler.db'
 import { JeuneHomeAgendaQueryModel } from 'src/application/queries/query-models/home-jeune-suivi.query-model'
 import { PreferencesJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-model'
+import { ResultatsRechercheMessageQueryModel } from 'src/application/queries/query-models/resultats-recherche-message-query.model'
+import {
+  RechercherMessageQuery,
+  RechercherMessageQueryHandler
+} from 'src/application/queries/rechercher-message.query.handler'
 import {
   DomainError,
   DroitsInsuffisants,
@@ -34,6 +39,7 @@ import {
   UpdateConfigurationInput,
   UpdateJeunePreferencesPayload
 } from 'src/infrastructure/routes/validation/jeunes.inputs'
+import { RechercherMessagePayload } from 'src/infrastructure/routes/validation/messages.input'
 import { DateService } from 'src/utils/date-service'
 import * as request from 'supertest'
 import {
@@ -47,13 +53,8 @@ import { uneActionQueryModel } from 'test/fixtures/query-models/action.query-mod
 import { StubbedClass, enleverLesUndefined, expect } from 'test/utils'
 import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
+import { GetComptageJeuneQueryHandler } from '../../../src/application/queries/get-comptage-jeune.query.handler.db'
 import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
-import {
-  RechercherMessageQuery,
-  RechercherMessageQueryHandler
-} from 'src/application/queries/rechercher-message.query.handler'
-import { RechercherMessagePayload } from 'src/infrastructure/routes/validation/messages.input'
-import { ResultatsRechercheMessageQueryModel } from 'src/application/queries/query-models/resultats-recherche-message-query.model'
 
 describe('JeunesController', () => {
   let getDetailJeuneQueryHandler: StubbedClass<GetDetailJeuneQueryHandler>
@@ -68,6 +69,7 @@ describe('JeunesController', () => {
   let updateJeunePreferencesCommandHandler: StubbedClass<UpdateJeunePreferencesCommandHandler>
   let getPreferencesJeuneQueryHandler: StubbedClass<GetPreferencesJeuneQueryHandler>
   let rechercherMessageQueryHandler: StubbedClass<RechercherMessageQueryHandler>
+  let getComptageJeuneQueryHandler: StubbedClass<GetComptageJeuneQueryHandler>
 
   let jwtService: StubbedClass<JwtService>
   let dateService: StubbedClass<DateService>
@@ -96,6 +98,7 @@ describe('JeunesController', () => {
     )
     getPreferencesJeuneQueryHandler = app.get(GetPreferencesJeuneQueryHandler)
     rechercherMessageQueryHandler = app.get(RechercherMessageQueryHandler)
+    getComptageJeuneQueryHandler = app.get(GetComptageJeuneQueryHandler)
 
     jwtService = app.get(JwtService)
     dateService = app.get(DateService)
@@ -593,6 +596,66 @@ describe('JeunesController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       '/jeunes/1/home/agenda?maintenant=2022-08-17T12%3A00%3A30%2B02%3A00'
+    )
+  })
+  describe('GET /jeunes/:idJeune/comptage', () => {
+    it('retourne le comptage quand tout se passe bien', async () => {
+      // Given
+      const idJeune = '1'
+      const result = {
+        nbHeuresDeclarees: 0,
+        nbHeuresValidees: 0,
+        dateDerniereMiseAJour: uneDatetime().toISO()
+      }
+      getComptageJeuneQueryHandler.execute.resolves(success(result))
+
+      // When
+      await request(app.getHttpServer())
+        .get(
+          `/jeunes/${idJeune}/comptage?dateDebut=2020-10-10&dateFin=2020-10-17`
+        )
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.OK)
+        .expect(result)
+
+      expect(
+        getComptageJeuneQueryHandler.execute
+      ).to.have.been.calledOnceWithExactly(
+        {
+          idJeune,
+          accessToken: 'coucou',
+          dateDebut: DateTime.fromISO('2020-10-10', {
+            setZone: true
+          }).startOf('day'),
+          dateFin: DateTime.fromISO('2020-10-17', {
+            setZone: true
+          }).endOf('day')
+        },
+        unUtilisateurDecode()
+      )
+    })
+    it('retourne 400', async () => {
+      // Given
+      const idJeune = '1'
+      const result = {
+        nbHeuresDeclarees: 0,
+        nbHeuresValidees: 0,
+        dateDerniereMiseAJour: uneDatetime().toISO()
+      }
+      getComptageJeuneQueryHandler.execute.resolves(success(result))
+
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/comptage?dateDebut=2020-10-10`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/jeunes/1/comptage?dateDebut=2020-10-10&dateFin=2020-10-17'
     )
   })
 
