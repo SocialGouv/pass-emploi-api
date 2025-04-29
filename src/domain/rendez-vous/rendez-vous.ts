@@ -426,35 +426,37 @@ export namespace RendezVous {
       })
     }
 
-    clore(rendezVous: RendezVous, present: boolean): Result<RendezVous> {
-      if (
-        rendezVous.type !==
-          CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER ||
-        rendezVous.jeunes.length !== 1
-      ) {
+    clore(
+      rendezVous: RendezVous,
+      idsJeunesPresents: string[]
+    ): Result<RendezVous> {
+      if (this.estAVenir(rendezVous)) {
         return failure(
-          new MauvaiseCommandeError(
-            'Seuls les rendez-vous individuels peuvent être clos.'
-          )
+          new MauvaiseCommandeError("Le rendez-vous n'est pas encore passé.")
         )
       }
-      if (
-        rendezVous.jeunes[0].present !== undefined ||
-        rendezVous.dateCloture
-      ) {
+
+      if (rendezVous.dateCloture) {
         return failure(
           new MauvaiseCommandeError('Le rendez-vous est déjà clos.')
         )
       }
 
+      const jeunesAvecPresence = rendezVous.jeunes.map(jeune => {
+        return { ...jeune, present: idsJeunesPresents.includes(jeune.id) }
+      })
+
       return success({
         ...rendezVous,
         dateCloture: this.dateService.now(),
-        jeunes: rendezVous.jeunes.map(jeune => ({
-          ...jeune,
-          present
-        }))
+        jeunes: jeunesAvecPresence
       })
+    }
+
+    private estAVenir(rdv: RendezVous): boolean {
+      const maintenant = this.dateService.now()
+
+      return Boolean(maintenant < DateTime.fromJSDate(rdv.date))
     }
   }
 }

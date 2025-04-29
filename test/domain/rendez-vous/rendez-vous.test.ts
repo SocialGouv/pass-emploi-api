@@ -532,60 +532,50 @@ describe('Rendez-vous', () => {
     describe('clore', () => {
       it('clos le rendez-vous', () => {
         // Given
+        const j1 = unJeuneDuRendezVous({ id: 'j1' })
+        const j2 = unJeuneDuRendezVous({ id: 'j2' })
         const rendezVous = unRendezVous({
-          type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
+          jeunes: [j1, j2],
+          date: uneDatetime().minus({ hours: 1 }).toJSDate()
         })
 
         // When
-        const result = factory.clore(rendezVous, true)
+        const result = factory.clore(rendezVous, [j2.id])
 
         // Then
         expect(result).to.deep.equal(
           success({
             ...rendezVous,
             dateCloture: uneDatetime(),
-            jeunes: [unJeuneDuRendezVous({ present: true })]
+            jeunes: [
+              { ...j1, present: false },
+              { ...j2, present: true }
+            ]
           })
         )
       })
-      it('ne clos pas le rendez-vous quand le type est KO', () => {
+      it('ne clos pas le rendez-vous quand à venir', () => {
         // Given
-        const rendezVous = unRendezVous({
-          type: CodeTypeRendezVous.ATELIER
-        })
+        const rendezVous = unRendezVous()
 
         // When
-        const result = factory.clore(rendezVous, true)
+        const result = factory.clore(rendezVous, ['id'])
 
         // Then
-        expect(result._isSuccess).to.be.false()
+        expect(result).to.deep.equal(
+          failure(
+            new MauvaiseCommandeError("Le rendez-vous n'est pas encore passé.")
+          )
+        )
       })
       it('ne clos pas le rendez-vous quand deja clos', () => {
         // Given
         const rendezVous = unRendezVous({
-          type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
           dateCloture: uneDatetime()
         })
 
         // When
-        const result = factory.clore(rendezVous, true)
-
-        // Then
-        expect(result._isSuccess).to.be.false()
-      })
-      it('ne clos pas le rendez-vous quand jeune avec statut', () => {
-        // Given
-        const rendezVous = unRendezVous({
-          type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
-          jeunes: [
-            unJeuneDuRendezVous({
-              present: true
-            })
-          ]
-        })
-
-        // When
-        const result = factory.clore(rendezVous, true)
+        const result = factory.clore(rendezVous, ['a'])
 
         // Then
         expect(result._isSuccess).to.be.false()

@@ -47,7 +47,7 @@ describe('CloreRendezVousCommandHandler', () => {
         // Given
         const command: CloreRendezVousCommand = {
           idRendezVous: 'test',
-          present: true
+          idsJeunesPresents: ['test']
         }
         rendezVousRepository.get
           .withArgs(command.idRendezVous)
@@ -67,7 +67,7 @@ describe('CloreRendezVousCommandHandler', () => {
       it('renvoie une failure', async () => {
         // Given
         const command: CloreRendezVousCommand = {
-          present: true,
+          idsJeunesPresents: ['test'],
           idRendezVous: 'test'
         }
         rendezVousRepository.get
@@ -75,7 +75,7 @@ describe('CloreRendezVousCommandHandler', () => {
           .resolves({ ...rendezVous, dateCloture: uneDatetime() })
 
         rendezVousFactory.clore.returns(
-          failure(new MauvaiseCommandeError('Rendez Vous déjà cloturée.'))
+          failure(new MauvaiseCommandeError('Le rendez-vous est déjà clos.'))
         )
 
         // When
@@ -83,7 +83,7 @@ describe('CloreRendezVousCommandHandler', () => {
         // Then
         expect(rendezVousRepository.save).to.have.callCount(0)
         expect(result).to.deep.equal(
-          failure(new MauvaiseCommandeError('Rendez Vous déjà cloturée.'))
+          failure(new MauvaiseCommandeError('Le rendez-vous est déjà clos.'))
         )
       })
     })
@@ -92,7 +92,7 @@ describe('CloreRendezVousCommandHandler', () => {
       it('renvoie un succès', async () => {
         // Given
         const command: CloreRendezVousCommand = {
-          present: true,
+          idsJeunesPresents: ['test'],
           idRendezVous: 'test'
         }
         rendezVousRepository.get
@@ -120,7 +120,7 @@ describe('CloreRendezVousCommandHandler', () => {
     it('authorise un conseiller', async () => {
       // Given
       const command: CloreRendezVousCommand = {
-        present: true,
+        idsJeunesPresents: ['test'],
         idRendezVous: rendezVous.id
       }
 

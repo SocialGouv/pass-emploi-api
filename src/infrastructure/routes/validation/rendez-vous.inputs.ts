@@ -169,8 +169,9 @@ export class UpdateRendezVousPayload {
 }
 
 export class CloreRendezVousPayload {
-  @IsBoolean()
-  present: boolean
+  @ApiProperty()
+  @IsArray()
+  idsJeunesPresents: string[]
 }
 
 export class GetRendezVousACloreQueryParams {

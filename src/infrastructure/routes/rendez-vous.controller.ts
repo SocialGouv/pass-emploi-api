@@ -165,7 +165,7 @@ export class RendezVousController {
   ): Promise<void> {
     const command: CloreRendezVousCommand = {
       idRendezVous,
-      present: cloreRendezVousPayload.present
+      idsJeunesPresents: cloreRendezVousPayload.idsJeunesPresents
     }
 
     const result = await this.cloreRendezVousCommandHandler.execute(

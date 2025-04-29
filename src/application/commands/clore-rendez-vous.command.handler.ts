@@ -17,7 +17,7 @@ import { RendezVousAuthorizer } from '../authorizers/rendezvous-authorizer'
 
 export interface CloreRendezVousCommand extends Command {
   idRendezVous: string
-  present: boolean
+  idsJeunesPresents: string[]
 }
 
 @Injectable()
@@ -41,7 +41,10 @@ export class CloreRendezVousCommandHandler extends CommandHandler<
       return failure(new NonTrouveError('Rendez-Vous', command.idRendezVous))
     }
 
-    const result = this.rendezVousFactory.clore(rendezVous, command.present)
+    const result = this.rendezVousFactory.clore(
+      rendezVous,
+      command.idsJeunesPresents
+    )
 
     if (isFailure(result)) {
       return result

@@ -278,32 +278,11 @@ describe('RendezvousController', () => {
     it('clos le rendez-vous à present', async () => {
       // Given
       const payload: CloreRendezVousPayload = {
-        present: true
+        idsJeunesPresents: ['true']
       }
       const expectedCommand: CloreRendezVousCommand = {
         idRendezVous: rendezvous.id,
-        present: true
-      }
-      cloreRendezVousCommandHandler.execute.resolves(emptySuccess())
-      // When - Then
-      await request(app.getHttpServer())
-        .post(`/rendezvous/${rendezvous.id}/cloturer`)
-        .set('authorization', unHeaderAuthorization())
-        .send(payload)
-        .expect(HttpStatus.CREATED)
-
-      expect(
-        cloreRendezVousCommandHandler.execute
-      ).to.have.be.calledWithExactly(expectedCommand, unUtilisateurDecode())
-    })
-    it('clos le rendez-vous à abset', async () => {
-      // Given
-      const payload: CloreRendezVousPayload = {
-        present: false
-      }
-      const expectedCommand: CloreRendezVousCommand = {
-        idRendezVous: rendezvous.id,
-        present: false
+        idsJeunesPresents: ['true']
       }
       cloreRendezVousCommandHandler.execute.resolves(emptySuccess())
       // When - Then
@@ -319,9 +298,7 @@ describe('RendezvousController', () => {
     })
     it('bad request', async () => {
       // Given
-      const payload = {
-        present: 'true'
-      }
+      const payload = {}
 
       cloreRendezVousCommandHandler.execute.resolves(emptySuccess())
       // When - Then
