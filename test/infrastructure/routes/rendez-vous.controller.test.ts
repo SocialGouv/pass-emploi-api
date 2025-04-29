@@ -273,7 +273,7 @@ describe('RendezvousController', () => {
     })
     ensureUserAuthenticationFailsIfInvalid('put', '/rendezvous/123')
   })
-  describe('POST rendezvous/:idRendezVous/cloturer', () => {
+  describe('POST rendezvous/:idRendezVous/clore', () => {
     const rendezvous = unRendezVous()
     it('clos le rendez-vous à present', async () => {
       // Given
@@ -287,7 +287,7 @@ describe('RendezvousController', () => {
       cloreRendezVousCommandHandler.execute.resolves(emptySuccess())
       // When - Then
       await request(app.getHttpServer())
-        .post(`/rendezvous/${rendezvous.id}/cloturer`)
+        .post(`/rendezvous/${rendezvous.id}/clore`)
         .set('authorization', unHeaderAuthorization())
         .send(payload)
         .expect(HttpStatus.CREATED)
@@ -303,12 +303,12 @@ describe('RendezvousController', () => {
       cloreRendezVousCommandHandler.execute.resolves(emptySuccess())
       // When - Then
       await request(app.getHttpServer())
-        .post(`/rendezvous/${rendezvous.id}/cloturer`)
+        .post(`/rendezvous/${rendezvous.id}/clore`)
         .set('authorization', unHeaderAuthorization())
         .send(payload)
         .expect(HttpStatus.BAD_REQUEST)
     })
-    ensureUserAuthenticationFailsIfInvalid('post', '/rendezvous/123/cloturer')
+    ensureUserAuthenticationFailsIfInvalid('post', '/rendezvous/123/clore')
   })
 
   describe('GET /v2/conseillers/:idConseiller/rendezvous', () => {

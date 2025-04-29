@@ -228,7 +228,7 @@ describe('GetRendezVousACloreQueryHandler', () => {
       }
       expect(result._isSuccess && result.data).to.deep.equal(queryModelAttendu)
     })
-    it('retourne rdvs indiv uniquement', async () => {
+    it('retourne rdvs', async () => {
       // Given
       await ConseillerSqlModel.update(
         { idStructureMilo: null, idAgence: null },

@@ -157,7 +157,7 @@ export class RendezVousController {
     summary: 'Clos rdv individuel',
     description: 'Autorisé pour le conseiller du rdv'
   })
-  @Post('rendezvous/:idRendezVous/cloturer')
+  @Post('rendezvous/:idRendezVous/clore')
   async cloreRendezVous(
     @Param('idRendezVous', new ParseUUIDPipe()) idRendezVous: string,
     @Body() cloreRendezVousPayload: CloreRendezVousPayload,

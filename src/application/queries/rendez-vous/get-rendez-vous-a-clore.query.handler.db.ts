@@ -1,9 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Op, Sequelize } from 'sequelize'
-import {
-  CodeTypeRendezVous,
-  TYPES_ANIMATIONS_COLLECTIVES
-} from 'src/domain/rendez-vous/rendez-vous'
+import { TYPES_ANIMATIONS_COLLECTIVES } from 'src/domain/rendez-vous/rendez-vous'
 import { NonTrouveError } from '../../../building-blocks/types/domain-error'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
@@ -56,7 +53,7 @@ export class GetRendezVousACloreQueryHandler extends QueryHandler<
       ? {
           idAgence: conseillerSql.idStructureMilo,
           type: {
-            [Op.in]: [...TYPES_ANIMATIONS_COLLECTIVES]
+            [Op.in]: TYPES_ANIMATIONS_COLLECTIVES
           },
           dateCloture: null,
           date: {
@@ -74,7 +71,9 @@ export class GetRendezVousACloreQueryHandler extends QueryHandler<
           )`)
       },
       dateCloture: null,
-      type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+      type: {
+        [Op.notIn]: TYPES_ANIMATIONS_COLLECTIVES
+      },
       date: {
         [Op.lt]: maintenant
       }

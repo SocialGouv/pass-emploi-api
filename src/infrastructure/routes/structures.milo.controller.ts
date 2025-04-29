@@ -60,7 +60,8 @@ export class StructuresMiloController {
   @ApiOperation({
     summary: 'Clot une animation collective et inscrit les jeunes',
     description:
-      "Autorisé pour un conseiller appartenant à la structure MILO de l'animation collective"
+      "Autorisé pour un conseiller appartenant à la structure MILO de l'animation collective",
+    deprecated: true
   })
   @Post('animations-collectives/:idAnimationCollective/cloturer')
   async postCloture(
