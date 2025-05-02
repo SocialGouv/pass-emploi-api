@@ -93,7 +93,7 @@
     "cron-parser": "4.9.0",
     "crypto-js": "4.2.0",
     "elastic-apm-node": "3.52.2",
-    "firebase-admin": "13.2.0",
+    "firebase-admin": "13.3.0",
     "fuse.js": "7.1.0",
     "geojson": "0.5.0",
     "helmet": "8.1.0",
