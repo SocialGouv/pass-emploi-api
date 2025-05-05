@@ -1,0 +1,280 @@
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { SinonSandbox } from 'sinon'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import {
+  emptySuccess,
+  failure,
+  success
+} from 'src/building-blocks/types/result'
+import { GetComptageJeunesByConseillerQueryHandler } from '../../../src/application/queries/get-comptage-jeunes-by-conseiller.query.handler.db'
+import { Authentification } from '../../../src/domain/authentification'
+import { Core } from '../../../src/domain/core'
+import { Conseiller } from '../../../src/domain/milo/conseiller'
+import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { DateService } from '../../../src/utils/date-service'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import { unConseiller } from '../../fixtures/conseiller.fixture'
+import { uneDatetime } from '../../fixtures/date.fixture'
+import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { getDatabase } from '../../utils/database-for-testing'
+
+describe('GetComptageJeunesByConseillerQueryHandler', () => {
+  let conseillerRepository: StubbedType<Conseiller.Repository>
+  let dateService: StubbedClass<DateService>
+  let getComptageJeunesByConseillerQueryHandler: GetComptageJeunesByConseillerQueryHandler
+  let sandbox: SinonSandbox
+
+  before(() => {
+    sandbox = createSandbox()
+    conseillerRepository = stubInterface(sandbox)
+    dateService = stubClass(DateService)
+    dateService.now.returns(uneDatetime())
+
+    getComptageJeunesByConseillerQueryHandler =
+      new GetComptageJeunesByConseillerQueryHandler(
+        conseillerRepository,
+        dateService
+      )
+  })
+
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
+  })
+
+  afterEach(() => {
+    sandbox.restore()
+  })
+
+  describe('handle', () => {
+    it('retourne un comptage', async () => {
+      // Given
+      const conseiller = unConseillerDto()
+      const jeune = unJeuneDto({ idConseiller: conseiller.id })
+      await ConseillerSqlModel.create(conseiller)
+      await JeuneSqlModel.create(jeune)
+      // When
+      const result = await getComptageJeunesByConseillerQueryHandler.handle({
+        idConseiller: conseiller.id,
+        accessToken: 'a'
+      })
+      // Then
+      expect(result).to.deep.equal(
+        success({
+          comptages: [{ idJeune: jeune.id, nbHeuresDeclarees: 1 }],
+          dateDerniereMiseAJour: uneDatetime().toISO()
+        })
+      )
+    })
+  })
+
+  describe('authorize', () => {
+    const query = {
+      idConseiller: 'idConseiller',
+      accessToken: 'ok'
+    }
+
+    describe("quand le conseiller concerné est l'utilisateur", () => {
+      it('autorise le conseiller', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({ id: query.idConseiller })
+        conseillerRepository.get.withArgs(query.idConseiller).resolves(
+          unConseiller({
+            id: query.idConseiller
+          })
+        )
+        // When
+        const result =
+          await getComptageJeunesByConseillerQueryHandler.authorize(
+            query,
+            utilisateur
+          )
+        // Then
+        expect(result).to.deep.equal(emptySuccess())
+      })
+    })
+
+    describe("quand le conseiller concerné n'existe pas", () => {
+      it('renvoie un échec NonTrouve', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller()
+        conseillerRepository.get.withArgs(utilisateur.id).resolves(
+          unConseiller({
+            id: utilisateur.id
+          })
+        )
+
+        // When
+        const result =
+          await getComptageJeunesByConseillerQueryHandler.authorize(
+            { idConseiller: 'un-autre-id', accessToken: 'ok' },
+            utilisateur
+          )
+
+        // Then
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
+      })
+    })
+
+    describe("quand l'utilisateur n'est pas le conseiller concerné", () => {
+      it('renvoie un échec DroitsInsuffisants', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({ id: 'au-autre-id' })
+        conseillerRepository.get.withArgs(utilisateur.id).resolves(
+          unConseiller({
+            id: utilisateur.id
+          })
+        )
+        conseillerRepository.get.withArgs(query.idConseiller).resolves(
+          unConseiller({
+            id: query.idConseiller
+          })
+        )
+
+        // When
+        const result =
+          await getComptageJeunesByConseillerQueryHandler.authorize(
+            query,
+            utilisateur
+          )
+
+        // Then
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
+      })
+    })
+
+    describe("quand l'utilisateur est un superviseur", () => {
+      it('retourne les jeunes du conseiller', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          id: 'un-autre-id',
+          structure: Core.Structure.POLE_EMPLOI,
+          roles: [Authentification.Role.SUPERVISEUR]
+        })
+        conseillerRepository.get.withArgs(utilisateur.id).resolves(
+          unConseiller({
+            id: utilisateur.id,
+            structure: Core.Structure.POLE_EMPLOI
+          })
+        )
+        conseillerRepository.get.withArgs(query.idConseiller).resolves(
+          unConseiller({
+            id: query.idConseiller,
+            structure: Core.Structure.POLE_EMPLOI
+          })
+        )
+
+        // When
+        const result =
+          await getComptageJeunesByConseillerQueryHandler.authorize(
+            query,
+            utilisateur
+          )
+
+        // Then
+        expect(result).to.deep.equal(emptySuccess())
+      })
+    })
+
+    describe("quand l'utilisateur est un superviseur d'une autre structure", () => {
+      it('renvoie un échec DroitsInsuffisants', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          id: 'un-autre-id',
+          structure: Core.Structure.MILO,
+          roles: [Authentification.Role.SUPERVISEUR]
+        })
+        conseillerRepository.get.withArgs(utilisateur.id).resolves(
+          unConseiller({
+            id: utilisateur.id,
+            structure: Core.Structure.POLE_EMPLOI
+          })
+        )
+        conseillerRepository.get.withArgs(query.idConseiller).resolves(
+          unConseiller({
+            id: query.idConseiller,
+            structure: Core.Structure.POLE_EMPLOI
+          })
+        )
+
+        // When
+        const result =
+          await getComptageJeunesByConseillerQueryHandler.authorize(
+            query,
+            utilisateur
+          )
+
+        // Then
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
+      })
+    })
+
+    describe("quand l'utilisateur est un superviseur responsable", () => {
+      it('retourne les jeunes du conseiller', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          id: 'un-autre-id',
+          structure: Core.Structure.POLE_EMPLOI,
+          roles: [Authentification.Role.SUPERVISEUR_RESPONSABLE]
+        })
+        conseillerRepository.get.withArgs(utilisateur.id).resolves(
+          unConseiller({
+            id: utilisateur.id,
+            structure: Core.Structure.POLE_EMPLOI_BRSA
+          })
+        )
+        conseillerRepository.get.withArgs(query.idConseiller).resolves(
+          unConseiller({
+            id: query.idConseiller,
+            structure: Core.Structure.POLE_EMPLOI_BRSA
+          })
+        )
+
+        // When
+        const result =
+          await getComptageJeunesByConseillerQueryHandler.authorize(
+            query,
+            utilisateur
+          )
+
+        // Then
+        expect(result).to.deep.equal(emptySuccess())
+      })
+    })
+
+    describe("quand l'utilisateur est un superviseur responsable qui veut récupérer des jeunes d'un conseiller d’une autre structure de référence", () => {
+      it('renvoie un échec DroitsInsuffisants', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          id: 'un-autre-id',
+          structure: Core.Structure.POLE_EMPLOI,
+          roles: [Authentification.Role.SUPERVISEUR_RESPONSABLE]
+        })
+        conseillerRepository.get.withArgs(utilisateur.id).resolves(
+          unConseiller({
+            id: utilisateur.id,
+            structure: Core.Structure.POLE_EMPLOI
+          })
+        )
+        conseillerRepository.get.withArgs(query.idConseiller).resolves(
+          unConseiller({
+            id: query.idConseiller,
+            structure: Core.Structure.MILO
+          })
+        )
+
+        // When
+        const result =
+          await getComptageJeunesByConseillerQueryHandler.authorize(
+            query,
+            utilisateur
+          )
+
+        // Then
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
+      })
+    })
+  })
+})

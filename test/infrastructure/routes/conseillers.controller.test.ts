@@ -41,6 +41,8 @@ import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-a
 import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
 import { GetDemarchesConseillerQueryHandler } from '../../../src/application/queries/get-demarches-conseiller.query.handler'
 import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
+import { GetComptageJeunesByConseillerQueryHandler } from '../../../src/application/queries/get-comptage-jeunes-by-conseiller.query.handler.db'
+import { uneDatetime } from '../../fixtures/date.fixture'
 
 describe('ConseillersController', () => {
   let getDetailConseillerQueryHandler: StubbedClass<GetDetailConseillerQueryHandler>
@@ -55,6 +57,7 @@ describe('ConseillersController', () => {
   let getIdentitesJeunesQueryHandler: StubbedClass<GetJeunesIdentitesQueryHandler>
   let getDemarchesConseillerQueryHandler: StubbedClass<GetDemarchesConseillerQueryHandler>
   let getRendezVousJeuneQueryHandler: StubbedClass<GetRendezVousJeuneQueryHandler>
+  let getComptageJeunesByConseillerQueryHandler: StubbedClass<GetComptageJeunesByConseillerQueryHandler>
 
   let app: INestApplication
 
@@ -84,6 +87,9 @@ describe('ConseillersController', () => {
       GetDemarchesConseillerQueryHandler
     )
     getRendezVousJeuneQueryHandler = app.get(GetRendezVousJeuneQueryHandler)
+    getComptageJeunesByConseillerQueryHandler = app.get(
+      GetComptageJeunesByConseillerQueryHandler
+    )
   })
 
   describe('DELETE /conseillers/:idConseiller', () => {
@@ -220,6 +226,34 @@ describe('ConseillersController', () => {
     })
 
     ensureUserAuthenticationFailsIfInvalid('get', '/conseillers/123')
+  })
+
+  describe('GET /conseillers/:idConseiller/jeunes/comptage', () => {
+    it('renvoie la liste des jeunes du conseiller avec comptage', async () => {
+      // Given
+      getComptageJeunesByConseillerQueryHandler.execute.resolves(
+        success({ dateDerniereMiseAJour: uneDatetime().toISO(), comptages: [] })
+      )
+
+      // When - Then
+      await request(app.getHttpServer())
+        .get('/conseillers/1/jeunes/comptage')
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+        .expect({ dateDerniereMiseAJour: uneDatetime().toISO(), comptages: [] })
+
+      expect(
+        getComptageJeunesByConseillerQueryHandler.execute
+      ).to.have.been.calledWithExactly(
+        { idConseiller: '1', accessToken: 'coucou' },
+        unUtilisateurDecode()
+      )
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/conseillers/1/jeunes/comptage'
+    )
   })
 
   describe('GET /conseillers/:idConseiller/jeunes', () => {

@@ -25,6 +25,14 @@ import {
 } from '../../application/commands/create-liste-de-diffusion.command.handler'
 import { ModifierJeuneDuConseillerCommandHandler } from '../../application/commands/modifier-jeune-du-conseiller.command.handler'
 import { RecupererJeunesDuConseillerCommandHandler } from '../../application/commands/recuperer-jeunes-du-conseiller.command.handler'
+import {
+  SendNotificationsNouveauxMessagesCommand,
+  SendNotificationsNouveauxMessagesCommandHandler
+} from '../../application/commands/send-notifications-nouveaux-messages.command.handler'
+import {
+  ComptageJeunesQueryModel,
+  GetComptageJeunesByConseillerQueryHandler
+} from '../../application/queries/get-comptage-jeunes-by-conseiller.query.handler.db'
 import { GetConseillersQueryHandler } from '../../application/queries/get-conseillers.query.handler.db'
 import { GetDemarchesConseillerQueryHandler } from '../../application/queries/get-demarches-conseiller.query.handler'
 import { GetDetailConseillerQueryHandler } from '../../application/queries/get-detail-conseiller.query.handler.db'
@@ -57,10 +65,6 @@ import {
   GetIndicateursPourConseillerQueryParams,
   UpdateJeuneDuConseillerPayload
 } from './validation/conseillers.inputs'
-import {
-  SendNotificationsNouveauxMessagesCommand,
-  SendNotificationsNouveauxMessagesCommandHandler
-} from '../../application/commands/send-notifications-nouveaux-messages.command.handler'
 
 @Controller('conseillers')
 @CustomSwaggerApiOAuth2()
@@ -70,6 +74,7 @@ export class ConseillersController {
     private readonly getDetailConseillerQueryHandler: GetDetailConseillerQueryHandler,
     private readonly getConseillersQueryHandler: GetConseillersQueryHandler,
     private readonly getJeunesByConseillerQueryHandler: GetJeunesByConseillerQueryHandler,
+    private readonly getComptageJeunesByConseillerQueryHandler: GetComptageJeunesByConseillerQueryHandler,
     private readonly modifierConseillerCommandHandler: ModifierConseillerCommandHandler,
     private readonly recupererJeunesDuConseillerCommandHandler: RecupererJeunesDuConseillerCommandHandler,
     private readonly modifierJeuneDuConseillerCommandHandler: ModifierJeuneDuConseillerCommandHandler,
@@ -168,6 +173,25 @@ export class ConseillersController {
   ): Promise<DetailJeuneConseillerQueryModel[]> {
     const result = await this.getJeunesByConseillerQueryHandler.execute(
       { idConseiller },
+      utilisateur
+    )
+
+    return handleResult(result)
+  }
+
+  @ApiOperation({
+    summary: "Récupère le comptage des heures pour les jeunes d'un conseiller",
+    description: 'Autorisé pour un conseiller'
+  })
+  @Get(':idConseiller/jeunes/comptage')
+  @ApiResponse({ type: ComptageJeunesQueryModel })
+  async getComptageJeunes(
+    @Param('idConseiller') idConseiller: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string
+  ): Promise<ComptageJeunesQueryModel> {
+    const result = await this.getComptageJeunesByConseillerQueryHandler.execute(
+      { idConseiller, accessToken },
       utilisateur
     )
 
