@@ -1,6 +1,5 @@
 import { Authentification } from '../../../domain/authentification'
 import {
-  CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous,
   mapCodeLabelTypeRendezVousJeune,
   RendezVous
@@ -145,14 +144,8 @@ export function fromSqlToRendezVousConseillerDetailQueryModel(
         auteur: log.auteur
       }
     }),
-    nombreMaxParticipants: rendezVousSql.nombreMaxParticipants ?? undefined
-  }
-
-  if (
-    RendezVous.estUnTypeAnimationCollective(rendezVousSql.type) ||
-    rendezVousSql.type === CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
-  ) {
-    rendezVousConseiller.statut = construireStatut(rendezVousSql, maintenant)
+    nombreMaxParticipants: rendezVousSql.nombreMaxParticipants ?? undefined,
+    statut: construireStatut(rendezVousSql, maintenant)
   }
 
   return rendezVousConseiller
