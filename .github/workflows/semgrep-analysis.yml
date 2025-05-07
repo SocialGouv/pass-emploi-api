@@ -25,8 +25,30 @@ jobs:
     container:
       image: returntocorp/semgrep
     steps:
-      - uses: actions/checkout@v4
-      - run: semgrep ci
-        env:
-          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-    
+        # step 1
+        - name: clone application source code
+          uses: actions/checkout@v3
+
+        # step 2
+        - name: full scan
+          run: |
+            semgrep \
+              --sarif --output report.sarif \
+              --metrics=off \
+              --config .semgrep.yml --include src/ ci
+          env:
+            SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+        # step 3
+        - name: save report as pipeline artifact
+          uses: actions/upload-artifact@v3
+          with:
+            name: report.sarif
+            path: report.sarif
+
+        # step 4
+        - name: publish code scanning alerts
+          uses: github/codeql-action/upload-sarif@v2
+          with:
+            sarif_file: report.sarif
+            category: semgrep
