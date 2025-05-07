@@ -1,0 +1,41 @@
+name: Semgrep Differential Scan
+on:
+  push:
+    branches: [develop, master]
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+jobs:
+  semgrep-diff:
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep
+
+    steps:
+      # step 1
+      - name: clone application source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine baseline commit
+        id: baseline
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "BASELINE_COMMIT=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "BASELINE_COMMIT=HEAD^" >> "$GITHUB_OUTPUT"
+          fi
+
+      # step 2
+      - name: Semgrep differential scan
+        run: |
+          semgrep scan \
+            --error \
+            --metrics=off \
+            --baseline-commit "${{ steps.baseline.outputs.BASELINE_COMMIT }}" \
+            --config="p/default"

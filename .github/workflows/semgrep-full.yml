@@ -1,0 +1,41 @@
+name: Semgrep Full Scan
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 7 * * 1' # every Monday at 7:00 AM UTC
+
+jobs:
+  semgrep-full:
+    name: Semgrep Full Scan
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep
+    steps:
+      # step 1
+      - name: clone application source code
+        uses: actions/checkout@v4
+
+      # step 2
+      - name: Semgrep full scan
+        run: |
+          semgrep \
+            --sarif --output report.sarif \
+            --metrics=off \
+            --config="p/default"
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+      # step 3
+      - name: Save report as pipeline artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: report.sarif
+          path: report.sarif
+
+      # step 4
+      - name: Publish code scanning alerts
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: report.sarif
+          category: semgrep
