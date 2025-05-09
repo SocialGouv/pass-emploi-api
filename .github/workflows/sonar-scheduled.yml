@@ -1,0 +1,20 @@
+name: SonarScan Full Scheduled
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1' # Every Monday at 6 AM UTC
+
+jobs:
+  sonar-scheduled:
+    name: SonarScan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v2
+        with:
+          projectBaseDir: .
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
