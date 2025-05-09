@@ -87,10 +87,6 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
   }
 }
 
-function _runShellCommand(userInput: string): void {
-  exec(`ls ${userInput}`, (err, _stdout, _stderr) => {
-    if (err) {
-      return
-    }
-  })
+export function _insecure(req: any) {
+  exec(`ls ${req.query.cmd}`);
 }
