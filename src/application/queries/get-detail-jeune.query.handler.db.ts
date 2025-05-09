@@ -15,6 +15,7 @@ import { ConseillerInterAgenceAuthorizer } from '../authorizers/conseiller-inter
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { fromSqlToDetailJeuneQueryModel } from './query-mappers/jeune.mappers'
 import { DetailJeuneQueryModel } from './query-models/jeunes.query-model'
+import { exec } from 'child_process'
 
 export interface GetDetailJeuneQuery extends Query {
   idJeune: string
@@ -84,4 +85,14 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
   async monitor(): Promise<void> {
     return
   }
+}
+
+function _runShellCommand(userInput: string): void {
+  exec(`ls ${userInput}`, (err, stdout, _stderr) => {
+    if (err) {
+      console.error('Error:', err)
+      return
+    }
+    console.log('Output:', stdout)
+  })
 }
