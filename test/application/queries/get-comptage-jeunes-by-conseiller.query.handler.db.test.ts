@@ -7,8 +7,10 @@ import {
   success
 } from 'src/building-blocks/types/result'
 import { GetComptageJeunesByConseillerQueryHandler } from '../../../src/application/queries/get-comptage-jeunes-by-conseiller.query.handler.db'
+import { GetComptageJeuneQueryGetter } from '../../../src/application/queries/query-getters/get-comptage-jeune.query.getter'
 import { Authentification } from '../../../src/domain/authentification'
 import { Core } from '../../../src/domain/core'
+import { Jeune } from '../../../src/domain/jeune/jeune'
 import { Conseiller } from '../../../src/domain/milo/conseiller'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
@@ -26,17 +28,20 @@ describe('GetComptageJeunesByConseillerQueryHandler', () => {
   let dateService: StubbedClass<DateService>
   let getComptageJeunesByConseillerQueryHandler: GetComptageJeunesByConseillerQueryHandler
   let sandbox: SinonSandbox
+  let queryGetter: StubbedClass<GetComptageJeuneQueryGetter>
 
   before(() => {
     sandbox = createSandbox()
     conseillerRepository = stubInterface(sandbox)
     dateService = stubClass(DateService)
+    queryGetter = stubClass(GetComptageJeuneQueryGetter)
     dateService.now.returns(uneDatetime())
 
     getComptageJeunesByConseillerQueryHandler =
       new GetComptageJeunesByConseillerQueryHandler(
         conseillerRepository,
-        dateService
+        dateService,
+        queryGetter
       )
   })
 
@@ -53,13 +58,25 @@ describe('GetComptageJeunesByConseillerQueryHandler', () => {
       // Given
       const conseiller = unConseillerDto()
       const jeune = unJeuneDto({ idConseiller: conseiller.id })
+      const jeunePacea = unJeuneDto({
+        id: 'PACEA',
+        idConseiller: conseiller.id,
+        dispositif: Jeune.Dispositif.PACEA
+      })
       await ConseillerSqlModel.create(conseiller)
       await JeuneSqlModel.create(jeune)
+      await JeuneSqlModel.create(jeunePacea)
+      queryGetter.handle.resolves(
+        success({ nbHeuresDeclarees: 1, nbHeuresValidees: 0 })
+      )
       // When
-      const result = await getComptageJeunesByConseillerQueryHandler.handle({
-        idConseiller: conseiller.id,
-        accessToken: 'a'
-      })
+      const result = await getComptageJeunesByConseillerQueryHandler.handle(
+        {
+          idConseiller: conseiller.id,
+          accessToken: 'a'
+        },
+        unUtilisateurConseiller()
+      )
       // Then
       expect(result).to.deep.equal(
         success({
@@ -67,6 +84,14 @@ describe('GetComptageJeunesByConseillerQueryHandler', () => {
           dateDerniereMiseAJour: uneDatetime().toISO()
         })
       )
+      expect(queryGetter.handle).to.have.been.calledOnceWithExactly({
+        idJeune: jeune.id,
+        idDossier: jeune.idPartenaire!,
+        accessTokenJeune: undefined,
+        accessTokenConseiller: 'a',
+        dateDebut: uneDatetime().startOf('week'),
+        dateFin: uneDatetime().endOf('week')
+      })
     })
   })
 

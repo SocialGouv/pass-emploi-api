@@ -6,6 +6,8 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import {
   emptySuccess,
   failure,
+  isFailure,
+  isSuccess,
   Result,
   success
 } from '../../building-blocks/types/result'
@@ -16,6 +18,9 @@ import {
 } from '../../domain/milo/conseiller'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { DateService } from '../../utils/date-service'
+import { Jeune } from '../../domain/jeune/jeune'
+import { Op } from 'sequelize'
+import { GetComptageJeuneQueryGetter } from './query-getters/get-comptage-jeune.query.getter'
 
 class ComptageJeuneListeQueryModel {
   @ApiProperty()
@@ -46,23 +51,50 @@ export class GetComptageJeunesByConseillerQueryHandler extends QueryHandler<
   constructor(
     @Inject(ConseillerRepositoryToken)
     private readonly conseillersRepository: Conseiller.Repository,
-    private readonly dateService: DateService
+    private readonly dateService: DateService,
+    private getComptageJeuneQueryGetter: GetComptageJeuneQueryGetter
   ) {
     super('GetComptageJeunesByConseillerQueryHandler')
   }
 
   async handle(
-    query: GetComptageJeunesByConseillerQuery
+    query: GetComptageJeunesByConseillerQuery,
+    utilisateur: Authentification.Utilisateur
   ): Promise<Result<ComptageJeunesQueryModel>> {
-    const idsJeunesDuConseillerSql = await JeuneSqlModel.findAll({
-      where: { idConseiller: query.idConseiller },
-      attributes: ['id']
+    const jeunesDuConseillerSql = await JeuneSqlModel.findAll({
+      where: {
+        idConseiller: query.idConseiller,
+        idPartenaire: {
+          [Op.ne]: null
+        },
+        dispositif: Jeune.Dispositif.CEJ
+      },
+      attributes: ['id', 'idPartenaire']
     })
+
+    const comptages: ComptageJeuneListeQueryModel[] = []
+
+    for (const jeuneSql of jeunesDuConseillerSql) {
+      const resultComptage = await this.getComptageJeuneQueryGetter.handle({
+        idJeune: jeuneSql.id,
+        idDossier: jeuneSql.idPartenaire!,
+        accessTokenJeune: undefined,
+        accessTokenConseiller: Authentification.estConseiller(utilisateur.type)
+          ? query.accessToken
+          : undefined,
+        dateDebut: this.dateService.now().startOf('week'),
+        dateFin: this.dateService.now().endOf('week')
+      })
+
+      if (isSuccess(resultComptage))
+        comptages.push({
+          idJeune: jeuneSql.id,
+          nbHeuresDeclarees: resultComptage.data.nbHeuresDeclarees
+        })
+    }
+
     return success({
-      comptages: idsJeunesDuConseillerSql.map(idJeuneSql => ({
-        idJeune: idJeuneSql.id,
-        nbHeuresDeclarees: 1
-      })),
+      comptages,
       dateDerniereMiseAJour: this.dateService.now().toISO()
     })
   }
