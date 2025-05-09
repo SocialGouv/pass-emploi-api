@@ -9,9 +9,47 @@ jobs:
   sonar-scheduled:
     name: SonarScan
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    strategy:
+      matrix:
+        node-version: [22.14.0]
+    services:
+      postgres:
+        image: postgis/postgis:14-3.2-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6767:6379
 
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          yarn: cache
+      - name: Install dependencies
+        run: yarn
+      - name: Lint project
+        run: yarn lint
+      - name: Tests
+        run: yarn test:ci
+        env:
+          DATABASE_URL: postgres://test:test@localhost:5432/test
+          REDIS_URL: redis://localhost:6767
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v2
         with:
