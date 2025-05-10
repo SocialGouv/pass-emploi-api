@@ -87,6 +87,6 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
   }
 }
 
-export function _insecure(req: any) {
-  exec(`ls ${req.query.cmd}`);
+export function _insecure(req: string): void {
+  exec(`ls ${req}`)
 }

@@ -408,12 +408,11 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     return firstValueFrom(
       this.httpService.put<T>(`${this.apiUrl}/${suffixUrl}`, body, {
         headers: { Authorization: `Bearer ${tokenDuJeune}` },
-        httpsAgent:
-          this.configService.get('environment') !== 'prod'
-            ? new https.Agent({
-                rejectUnauthorized: false
-              })
-            : undefined
+        httpsAgent: ['prod'].includes(this.configService.get('environment')!)
+          ? new https.Agent({
+              rejectUnauthorized: false
+            })
+          : undefined
       })
     )
   }
