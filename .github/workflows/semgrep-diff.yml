@@ -37,5 +37,6 @@ jobs:
           semgrep scan \
             --error \
             --metrics=off \
+            --verbose \
             --baseline-commit "${{ steps.baseline.outputs.BASELINE_COMMIT }}" \
             --config="p/default"

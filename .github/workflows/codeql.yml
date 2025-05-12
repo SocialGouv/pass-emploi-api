@@ -1,10 +1,14 @@
-name: "CodeQL Advanced"
+name: 'CodeQL Advanced'
 
 on:
   push:
-    branches: [ "develop", "master" ]
+    branches: ['develop', 'master']
   pull_request:
-    branches: [ "develop" ]
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
   workflow_dispatch:
   schedule:
     - cron: '* 5 * * 1' # Every Monday at 5 AM UTC
@@ -22,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'javascript' ]  # TypeScript inclus
+        language: ['javascript'] # TypeScript inclus
 
     steps:
       - name: Checkout repository
@@ -33,7 +37,7 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           queries: security-extended
-          source-root: src  # 🔍 Analyse uniquement le dossier `src`
+          source-root: src # 🔍 Analyse uniquement le dossier `src`
 
       - name: Install dependencies with Yarn
         run: yarn install --frozen-lockfile
