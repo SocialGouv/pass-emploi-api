@@ -104,7 +104,7 @@
     "luxon": "3.6.1",
     "nestjs-pino": "4.4.0",
     "openid-client": "5.7.1",
-    "pg": "8.14.1",
+    "pg": "8.16.0",
     "pg-connection-string": "2.7.0",
     "pg-copy-streams": "6.0.6",
     "pino-http": "10.4.0",
