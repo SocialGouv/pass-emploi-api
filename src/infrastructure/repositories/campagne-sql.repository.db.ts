@@ -57,6 +57,10 @@ export class CampagneSqlRepository implements Campagne.Repository {
       reponse => reponse.idQuestion == 4
     )
 
+    const reponse5 = evaluation.reponses.find(
+      reponse => reponse.idQuestion == 5
+    )
+
     await ReponseCampagneSqlModel.inserer({
       idJeune: evaluation.jeune.id,
       structureJeune: evaluation.jeune.structure,
@@ -70,7 +74,9 @@ export class CampagneSqlRepository implements Campagne.Repository {
       reponse3: reponse3?.idReponse.toString() || null,
       pourquoi3: reponse3?.pourquoi || null,
       reponse4: reponse4?.idReponse.toString() || null,
-      pourquoi4: reponse4?.pourquoi || null
+      pourquoi4: reponse4?.pourquoi || null,
+      reponse5: reponse5?.idReponse.toString() || null,
+      pourquoi5: reponse5?.pourquoi || null
     })
   }
 

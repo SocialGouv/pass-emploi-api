@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { DateService } from 'src/utils/date-service'
@@ -16,11 +16,10 @@ import {
   peutVoirLesCampagnes
 } from '../../../domain/core'
 import { Demarche } from '../../../domain/demarche'
-import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { GetFavorisAccueilQueryGetter } from '../query-getters/accueil/get-favoris.query.getter.db'
 import { GetRecherchesSauvegardeesQueryGetter } from '../query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
-import { GetCampagneQueryGetter } from '../query-getters/get-campagne.query.getter'
+import { GetCampagneQueryGetter } from '../query-getters/get-campagne.query.getter.db'
 import { GetDemarchesQueryGetter } from '../query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { DemarcheQueryModel } from '../query-models/actions.query-model'
@@ -40,8 +39,6 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
   Result<AccueilJeunePoleEmploiQueryModel>
 > {
   constructor(
-    @Inject(JeuneRepositoryToken)
-    private jeuneRepository: Jeune.Repository,
     private jeuneAuthorizer: JeuneAuthorizer,
     private oidcClient: OidcClient,
     private getDemarchesQueryGetter: GetDemarchesQueryGetter,

@@ -198,6 +198,12 @@ describe('CampagneSqlRepository', () => {
         expect(reponseCampagneSqlModels[0].pourquoi4).to.equal(
           evaluationComplete.reponses[3].pourquoi
         )
+        expect(reponseCampagneSqlModels[0].reponse5).to.equal(
+          evaluationComplete.reponses[4].idReponse.toString()
+        )
+        expect(reponseCampagneSqlModels[0].pourquoi5).to.equal(
+          evaluationComplete.reponses[4].pourquoi
+        )
       })
     })
   })

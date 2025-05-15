@@ -1,36 +1,33 @@
-import { DateService } from 'src/utils/date-service'
-import { GetDemarchesQueryGetter } from '../../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
-import { AccueilJeunePoleEmploiQueryModel } from '../../../../src/application/queries/query-models/jeunes.pole-emploi.query-model'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
-import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
 import { DateTime } from 'luxon'
+import { GetCampagneQueryGetter } from 'src/application/queries/query-getters/get-campagne.query.getter.db'
+import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
+import { DateService } from 'src/utils/date-service'
+import { uneCampagneQueryModel } from 'test/fixtures/campagne.fixture'
+import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
+import {
+  GetAccueilJeunePoleEmploiQuery,
+  GetAccueilJeunePoleEmploiQueryHandler
+} from '../../../../src/application/queries/pole-emploi/get-accueil-jeune-pole-emploi.query.handler.db'
+import { GetFavorisAccueilQueryGetter } from '../../../../src/application/queries/query-getters/accueil/get-favoris.query.getter.db'
+import { GetRecherchesSauvegardeesQueryGetter } from '../../../../src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
+import { GetDemarchesQueryGetter } from '../../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
+import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
+import { AccueilJeunePoleEmploiQueryModel } from '../../../../src/application/queries/query-models/jeunes.pole-emploi.query-model'
+import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
 import {
   failure,
   isSuccess,
   Result,
   success
 } from '../../../../src/building-blocks/types/result'
-import {
-  GetAccueilJeunePoleEmploiQuery,
-  GetAccueilJeunePoleEmploiQueryHandler
-} from '../../../../src/application/queries/pole-emploi/get-accueil-jeune-pole-emploi.query.handler.db'
-import { Demarche } from '../../../../src/domain/demarche'
-import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
-import { unRendezVousQueryModel } from '../../../fixtures/query-models/rendez-vous.query-model.fixtures'
-import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
-import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { Core, estFranceTravail } from '../../../../src/domain/core'
-import Structure = Core.Structure
-import { JeuneAuthorizer } from '../../../../src/application/authorizers/jeune-authorizer'
-import { uneDemarcheQueryModel } from '../../../fixtures/query-models/demarche.query-model.fixtures'
-import { GetRecherchesSauvegardeesQueryGetter } from '../../../../src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
+import { Demarche } from '../../../../src/domain/demarche'
 import { Recherche } from '../../../../src/domain/offre/recherche/recherche'
-import { GetFavorisAccueilQueryGetter } from '../../../../src/application/queries/query-getters/accueil/get-favoris.query.getter.db'
-import { unJeune } from '../../../fixtures/jeune.fixture'
-import { Jeune } from '../../../../src/domain/jeune/jeune'
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { GetCampagneQueryGetter } from 'src/application/queries/query-getters/get-campagne.query.getter'
-import { uneCampagneQueryModel } from 'test/fixtures/campagne.fixture'
+import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
+import { uneDemarcheQueryModel } from '../../../fixtures/query-models/demarche.query-model.fixtures'
+import { unRendezVousQueryModel } from '../../../fixtures/query-models/rendez-vous.query-model.fixtures'
+import { expect, StubbedClass, stubClass } from '../../../utils'
+import Structure = Core.Structure
 
 describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
   let handler: GetAccueilJeunePoleEmploiQueryHandler
@@ -41,10 +38,8 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
   let getFavorisQueryGetter: StubbedClass<GetFavorisAccueilQueryGetter>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let oidcClient: StubbedClass<OidcClient>
-  let jeuneRepository: StubbedType<Jeune.Repository>
   let dateService: StubbedClass<DateService>
   const idpToken = 'id-token'
-  const jeune = unJeune({ structure: Core.Structure.POLE_EMPLOI })
 
   beforeEach(() => {
     getCampagneQueryGetter = stubClass(GetCampagneQueryGetter)
@@ -56,16 +51,13 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
     getRendezVousJeunePoleEmploiQueryGetter = stubClass(
       GetRendezVousJeunePoleEmploiQueryGetter
     )
-    const sandbox = createSandbox()
-    jeuneRepository = stubInterface(sandbox)
-    jeuneRepository.get.resolves(jeune)
+
     oidcClient = stubClass(OidcClient)
     oidcClient.exchangeTokenJeune.resolves(idpToken)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     dateService = stubClass(DateService)
 
     handler = new GetAccueilJeunePoleEmploiQueryHandler(
-      jeuneRepository,
       jeuneAuthorizer,
       oidcClient,
       getDemarchesQueryGetter,

@@ -75,7 +75,9 @@ export const structuresCampagnes = [
   Core.Structure.MILO,
   Core.Structure.POLE_EMPLOI,
   Core.Structure.POLE_EMPLOI_BRSA,
-  Core.Structure.POLE_EMPLOI_AIJ
+  Core.Structure.POLE_EMPLOI_AIJ,
+  Core.Structure.CONSEIL_DEPT,
+  Core.Structure.AVENIR_PRO
 ]
 
 export function peutVoirLesCampagnes(structure: Core.Structure): boolean {

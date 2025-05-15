@@ -8,6 +8,8 @@ import { DateService } from '../../../utils/date-service'
 import { Op } from 'sequelize'
 import { ReponseCampagneSqlModel } from '../../../infrastructure/sequelize/models/reponse-campagne.sql-model'
 import { Injectable } from '@nestjs/common'
+import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
+import { DateTime } from 'luxon'
 
 export interface GetCampagneQuery extends Query {
   idJeune: string
@@ -21,6 +23,18 @@ export class GetCampagneQueryGetter {
     query: GetCampagneQuery
   ): Promise<CampagneQueryModel | undefined> {
     const now = this.dateService.nowJs()
+    const ilYaDeuxMois = this.dateService.now().minus({ months: 2 })
+    const jeuneSql = await JeuneSqlModel.findByPk(query.idJeune)
+    const leJeuneEstActifDepuisDeuxMois =
+      jeuneSql &&
+      jeuneSql.datePremiereConnexion &&
+      DateService.isGreater(
+        ilYaDeuxMois,
+        DateTime.fromJSDate(jeuneSql.datePremiereConnexion)
+      )
+    if (!leJeuneEstActifDepuisDeuxMois) {
+      return undefined
+    }
     const campagneEnCours = await CampagneSqlModel.findOne({
       where: {
         [Op.and]: {
@@ -46,7 +60,8 @@ export class GetCampagneQueryGetter {
       reponses?.reponse1 &&
       reponses?.reponse2 &&
       reponses?.reponse3 &&
-      reponses?.reponse4
+      reponses?.reponse4 &&
+      reponses?.reponse5
 
     if (campagneEnCours && !aReponduAToutesLesQuestions) {
       return {
@@ -134,6 +149,34 @@ export const questionsInMemory = (): QuestionCampagneQueryModel[] => [
       {
         id: 4,
         libelle: 'Oui, tout à fait'
+      }
+    ]
+  },
+  {
+    id: 5,
+    libelle:
+      "*Lorsque vous naviguez sur l'application, vous trouvez ce que vous êtes venu chercher ?",
+    pourquoi: true,
+    options: [
+      {
+        id: 1,
+        libelle: 'Très difficilement'
+      },
+      {
+        id: 2,
+        libelle: 'Assez difficilement'
+      },
+      {
+        id: 3,
+        libelle: 'Neutre'
+      },
+      {
+        id: 4,
+        libelle: 'Plutôt facilement'
+      },
+      {
+        id: 5,
+        libelle: 'Très facilement'
       }
     ]
   },
