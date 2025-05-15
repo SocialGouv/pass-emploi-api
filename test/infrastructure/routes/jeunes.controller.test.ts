@@ -635,6 +635,26 @@ describe('JeunesController', () => {
         unUtilisateurDecode()
       )
     })
+    it('retourne 400 quand date pas au format', async () => {
+      // Given
+      const idJeune = '1'
+      const result = {
+        nbHeuresDeclarees: 0,
+        nbHeuresValidees: 0,
+        dateDerniereMiseAJour: uneDatetime().toISO()
+      }
+      getComptageJeuneQueryHandler.execute.resolves(success(result))
+
+      // When
+      await request(app.getHttpServer())
+        .get(
+          `/jeunes/${idJeune}/comptage?dateDebut=2020-10-10T12:00:00Z&dateFin=2020-10-17`
+        )
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        // Then
+        .expect(HttpStatus.BAD_REQUEST)
+    })
     it('retourne 400', async () => {
       // Given
       const idJeune = '1'

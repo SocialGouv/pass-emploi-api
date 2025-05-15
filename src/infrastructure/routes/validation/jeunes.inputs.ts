@@ -10,6 +10,7 @@ import {
   IsOptional,
   IsString,
   IsTimeZone,
+  Matches,
   MaxLength,
   ValidateIf
 } from 'class-validator'
@@ -129,11 +130,22 @@ export class MaintenantQueryParams {
 }
 
 export class GetComptageJeuneQueryParams {
-  @ApiProperty()
-  @IsISO8601({ strict: true })
-  // TODO force format YYYY-MM-DD
+  @ApiProperty({
+    example: '2025-05-15',
+    description: 'Date au format YYYY-MM-DD'
+  })
+  @IsString()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, {
+    message: 'dateDebut must be in YYYY-MM-DD format'
+  })
   dateDebut: string
-  @ApiProperty()
-  @IsISO8601({ strict: true })
+  @ApiProperty({
+    example: '2025-05-22',
+    description: 'Date au format YYYY-MM-DD'
+  })
+  @IsString()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, {
+    message: 'dateDebut must be in YYYY-MM-DD format'
+  })
   dateFin: string
 }
