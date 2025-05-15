@@ -7,7 +7,7 @@ import {
 } from 'src/application/queries/milo/get-accueil-jeune-milo.query.handler.db'
 import { GetFavorisAccueilQueryGetter } from 'src/application/queries/query-getters/accueil/get-favoris.query.getter.db'
 import { GetRecherchesSauvegardeesQueryGetter } from 'src/application/queries/query-getters/accueil/get-recherches-sauvegardees.query.getter.db'
-import { GetCampagneQueryGetter } from 'src/application/queries/query-getters/get-campagne.query.getter'
+import { GetCampagneQueryGetter } from 'src/application/queries/query-getters/get-campagne.query.getter.db'
 import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { AccueilJeuneMiloQueryModel } from 'src/application/queries/query-models/jeunes.milo.query-model'
 import {

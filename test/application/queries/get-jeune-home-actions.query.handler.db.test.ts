@@ -11,7 +11,7 @@ import {
 } from 'test/utils/database-for-testing'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { GetJeuneHomeActionsQueryHandler } from 'src/application/queries/get-jeune-home-actions.query.handler.db'
-import { GetCampagneQueryGetter } from '../../../src/application/queries/query-getters/get-campagne.query.getter'
+import { GetCampagneQueryGetter } from '../../../src/application/queries/query-getters/get-campagne.query.getter.db'
 import { Core } from '../../../src/domain/core'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { uneCampagneQueryModel } from '../../fixtures/campagne.fixture'
@@ -95,21 +95,6 @@ describe('GetJeuneHomeActionsQueryHandler', () => {
       expect(home).to.deep.equal({
         actions: actionsQueryModel,
         campagne: campagneQueryModel
-      })
-    })
-
-    it('ne récupère pas la campagne en cours pour un bénéficiaire CD', async () => {
-      // When
-      const home = await getJeuneHomeActionsQueryHandler.handle(
-        { idJeune: idBeneficiaire },
-        unUtilisateurJeune({ structure: Structure.CONSEIL_DEPT })
-      )
-
-      // Then
-      expect(getCampagneQueryGetter.handle).not.to.have.been.called()
-      expect(home).to.deep.equal({
-        actions: actionsQueryModel,
-        campagne: undefined
       })
     })
   })

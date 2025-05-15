@@ -1,13 +1,17 @@
-import { expect, StubbedClass, stubClass } from '../../../utils'
-import { DateService } from '../../../../src/utils/date-service'
+import { DateTime } from 'luxon'
 import {
   GetCampagneQueryGetter,
   questionsInMemory
-} from '../../../../src/application/queries/query-getters/get-campagne.query.getter'
-import { CampagneSqlModel } from '../../../../src/infrastructure/sequelize/models/campagne.sql-model'
-import { DateTime } from 'luxon'
-import { ReponseCampagneSqlModel } from '../../../../src/infrastructure/sequelize/models/reponse-campagne.sql-model'
+} from '../../../../src/application/queries/query-getters/get-campagne.query.getter.db'
 import { Campagne } from '../../../../src/domain/campagne'
+import { CampagneSqlModel } from '../../../../src/infrastructure/sequelize/models/campagne.sql-model'
+import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { ReponseCampagneSqlModel } from '../../../../src/infrastructure/sequelize/models/reponse-campagne.sql-model'
+import { DateService } from '../../../../src/utils/date-service'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
+import { expect, StubbedClass, stubClass } from '../../../utils'
 import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('GetCampagneQueryGetter', () => {
@@ -24,6 +28,7 @@ describe('GetCampagneQueryGetter', () => {
   beforeEach(async () => {
     dateService = stubClass(DateService)
     dateService.nowJs.returns(maintenant.toJSDate())
+    dateService.now.returns(maintenant)
 
     await CampagneSqlModel.create({
       id: idCampagnePassee,
@@ -31,6 +36,15 @@ describe('GetCampagneQueryGetter', () => {
       dateFin: maintenant.minus({ month: 2 }).toJSDate(),
       nom: 'Campagne passée'
     })
+
+    await ConseillerSqlModel.create(unConseillerDto({ id: 'idConseiller' }))
+    await JeuneSqlModel.create(
+      unJeuneDto({
+        id: 'idJeune',
+        idConseiller: 'idConseiller',
+        datePremiereConnexion: maintenant.minus({ month: 3 }).toJSDate()
+      })
+    )
 
     await ReponseCampagneSqlModel.create({
       idJeune: 'idJeune',
@@ -134,9 +148,32 @@ describe('GetCampagneQueryGetter', () => {
           reponse1: '3',
           reponse2: '2',
           reponse3: '1',
-          reponse4: '7'
+          reponse4: '7',
+          reponse5: '1'
         })
 
+        // When
+        const campagne = await getCampagneQueryGetter.handle({
+          idJeune: 'idJeune'
+        })
+
+        // Then
+        expect(campagne).to.be.undefined()
+      })
+    })
+    describe("quand le jeune n'a répondu à rien mais pas actif", () => {
+      it('ne retourne pas la campagne', async () => {
+        // Given
+        await JeuneSqlModel.update(
+          {
+            datePremiereConnexion: maintenant.minus({ month: 1 }).toJSDate()
+          },
+          {
+            where: {
+              id: 'idJeune'
+            }
+          }
+        )
         // When
         const campagne = await getCampagneQueryGetter.handle({
           idJeune: 'idJeune'

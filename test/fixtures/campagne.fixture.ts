@@ -1,7 +1,7 @@
 import { Campagne } from '../../src/domain/campagne'
 import { uneDate, uneDatetime } from './date.fixture'
 import { CampagneQueryModel } from '../../src/application/queries/query-models/campagne.query-model'
-import { questionsInMemory } from '../../src/application/queries/query-getters/get-campagne.query.getter'
+import { questionsInMemory } from '../../src/application/queries/query-getters/get-campagne.query.getter.db'
 import { ReponseCampagneDto } from '../../src/infrastructure/sequelize/models/reponse-campagne.sql-model'
 import { AsSql } from '../../src/infrastructure/sequelize/types'
 
@@ -75,6 +75,11 @@ export const uneEvaluationComplete = (
       idQuestion: 4,
       idReponse: 7,
       pourquoi: 'Imhotep'
+    },
+    {
+      idQuestion: 5,
+      idReponse: 1,
+      pourquoi: 'Imhotep'
     }
   ]
 })
@@ -96,6 +101,8 @@ export const uneEvaluationIncompleteDTO = (
     reponse3: 'reponse3',
     pourquoi3: null,
     reponse4: 'reponse4',
-    pourquoi4: null
+    pourquoi4: null,
+    reponse5: 'reponse5',
+    pourquoi5: null
   }
 }

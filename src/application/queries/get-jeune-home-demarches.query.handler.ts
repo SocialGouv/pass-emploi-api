@@ -8,7 +8,7 @@ import {
   peutVoirLesCampagnes
 } from '../../domain/core'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
-import { GetCampagneQueryGetter } from './query-getters/get-campagne.query.getter'
+import { GetCampagneQueryGetter } from './query-getters/get-campagne.query.getter.db'
 import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
 import { CampagneQueryModel } from './query-models/campagne.query-model'
 import { JeuneHomeDemarcheQueryModel } from './query-models/home-jeune.query-model'

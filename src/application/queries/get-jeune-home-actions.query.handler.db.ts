@@ -10,7 +10,7 @@ import { Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { peutVoirLesCampagnes } from '../../domain/core'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
-import { GetCampagneQueryGetter } from './query-getters/get-campagne.query.getter'
+import { GetCampagneQueryGetter } from './query-getters/get-campagne.query.getter.db'
 import { CampagneQueryModel } from './query-models/campagne.query-model'
 import { JeuneHomeActionQueryModel } from './query-models/home-jeune.query-model'
 

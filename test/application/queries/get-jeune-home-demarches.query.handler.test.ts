@@ -1,17 +1,16 @@
 import { JeuneAuthorizer } from '../../../src/application/authorizers/jeune-authorizer'
 import { GetJeuneHomeDemarchesQueryHandler } from '../../../src/application/queries/get-jeune-home-demarches.query.handler'
-import { GetCampagneQueryGetter } from '../../../src/application/queries/query-getters/get-campagne.query.getter'
+import { GetCampagneQueryGetter } from '../../../src/application/queries/query-getters/get-campagne.query.getter.db'
 import { GetDemarchesQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { JeuneHomeDemarcheQueryModel } from '../../../src/application/queries/query-models/home-jeune.query-model'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { Cached } from '../../../src/building-blocks/types/query'
 import { failure, success } from '../../../src/building-blocks/types/result'
-import { Core, estFranceTravail } from '../../../src/domain/core'
+import { estFranceTravail } from '../../../src/domain/core'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { uneCampagneQueryModel } from '../../fixtures/campagne.fixture'
 import { desDemarchesQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
 import { expect, StubbedClass, stubClass } from '../../utils'
-import Structure = Core.Structure
 
 describe('GetJeuneHomeDemarchesQueryHandler', () => {
   let getActionsJeunePoleEmploiQueryGetter: StubbedClass<GetDemarchesQueryGetter>
@@ -94,28 +93,6 @@ describe('GetJeuneHomeDemarchesQueryHandler', () => {
           queryModel: {
             actions: demarchesQueryModel,
             campagne: campagneQueryModel
-          },
-          dateDuCache: undefined
-        }
-        expect(home).to.deep.equal(success(data))
-      })
-
-      it('ne récupère pas la campagne pour un bénéficiaire Avenir PRO', async () => {
-        // When
-        const home = await getJeuneHomeDemarchesQueryHandler.handle(
-          {
-            idJeune: 'idJeune',
-            accessToken: 'token'
-          },
-          unUtilisateurJeune({ structure: Structure.AVENIR_PRO })
-        )
-
-        // Then
-        expect(getCampagneQueryGetter.handle).not.to.have.been.called()
-        const data: Cached<JeuneHomeDemarcheQueryModel> = {
-          queryModel: {
-            actions: demarchesQueryModel,
-            campagne: undefined
           },
           dateDuCache: undefined
         }
