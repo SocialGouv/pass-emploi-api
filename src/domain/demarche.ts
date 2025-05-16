@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
+import { MauvaiseCommandeError } from '../building-blocks/types/domain-error'
 import { failure, Result, success } from '../building-blocks/types/result'
 import { DateService } from '../utils/date-service'
-import { MauvaiseCommandeError } from '../building-blocks/types/domain-error'
 import { Core } from './core'
 
 export const DemarcheRepositoryToken = 'DemarcheRepositoryToken'
@@ -190,15 +190,29 @@ export namespace Demarche {
     ): Result<Demarche.Modifiee> {
       const maintenantA12Heures = setHoursTo12h00(maintenant)
       if (dateDebut && dateDebut < maintenantA12Heures) {
+        let dateFin = maintenantA12Heures
+        if (demarcheModifiee.dateFin && demarcheModifiee.dateFin >= dateDebut) {
+          dateFin = setHoursTo12h00(demarcheModifiee.dateFin)
+        }
         return success({
           ...demarcheModifiee,
-          dateFin: maintenantA12Heures
+          dateFin
         })
       }
+
+      let dateDebutForcee = maintenantA12Heures
+      if (demarcheModifiee.dateFin) {
+        if (demarcheModifiee.dateFin < dateDebutForcee) {
+          dateDebutForcee = setHoursTo12h00(demarcheModifiee.dateFin)
+        }
+      }
+
       return success({
         ...demarcheModifiee,
-        dateDebut: maintenantA12Heures,
-        dateFin: maintenantA12Heures
+        dateDebut: dateDebutForcee,
+        dateFin: demarcheModifiee.dateFin
+          ? setHoursTo12h00(demarcheModifiee.dateFin)
+          : maintenantA12Heures
       })
     }
   }

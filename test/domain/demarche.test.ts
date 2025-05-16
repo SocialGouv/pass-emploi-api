@@ -1,11 +1,11 @@
 import { DateObjectUnits } from 'luxon'
+import { MauvaiseCommandeError } from '../../src/building-blocks/types/domain-error'
+import { failure, success } from '../../src/building-blocks/types/result'
 import { Demarche } from '../../src/domain/demarche'
 import { DateService } from '../../src/utils/date-service'
 import { uneDatetime, uneDatetimeLocale } from '../fixtures/date.fixture'
 import { uneDemarche } from '../fixtures/demarche.fixture'
 import { expect, StubbedClass, stubClass } from '../utils'
-import { failure, success } from '../../src/building-blocks/types/result'
-import { MauvaiseCommandeError } from '../../src/building-blocks/types/domain-error'
 
 const parametreHeureAMidi: DateObjectUnits = {
   hour: 12,
@@ -14,7 +14,7 @@ const parametreHeureAMidi: DateObjectUnits = {
   millisecond: 0
 }
 
-const uneDateAMidi = uneDatetimeLocale()
+const uneDateAMidi = uneDatetimeLocale().toLocal()
 
 describe('Demarche', () => {
   let demarcheFactory: Demarche.Factory
@@ -76,7 +76,7 @@ describe('Demarche', () => {
         })
       })
     })
-    describe('réalisé', () => {
+    describe('réalisée', () => {
       describe('quand la date de debut est dans le futur', () => {
         it('génère une date de debut et de modification', () => {
           // Given
@@ -97,14 +97,24 @@ describe('Demarche', () => {
               id: demarche.id,
               statut: Demarche.Statut.REALISEE,
               dateModification: uneDatetime(),
-              dateDebut: uneDateAMidi,
-              dateFin: uneDateAMidi
+              dateDebut: demarche.dateFin.set({
+                hour: 12,
+                minute: 0,
+                second: 0,
+                millisecond: 0
+              }),
+              dateFin: demarche.dateFin.set({
+                hour: 12,
+                minute: 0,
+                second: 0,
+                millisecond: 0
+              })
             })
           )
         })
       })
       describe('quand la date de debut est dans le passé', () => {
-        it('génère une date de modification', () => {
+        it('génère une date de modification + garde date debut', () => {
           // Given
           const dateDebutDansLePasse = uneDatetime().minus({ day: 5 })
 
@@ -125,7 +135,12 @@ describe('Demarche', () => {
               id: demarche.id,
               statut: Demarche.Statut.REALISEE,
               dateModification: uneDatetime(),
-              dateFin: uneDateAMidi
+              dateFin: demarche.dateFin.set({
+                hour: 12,
+                minute: 0,
+                second: 0,
+                millisecond: 0
+              })
             })
           )
         })
@@ -150,8 +165,18 @@ describe('Demarche', () => {
               id: demarche.id,
               statut: Demarche.Statut.REALISEE,
               dateModification: uneDatetime(),
-              dateFin: uneDateAMidi,
-              dateDebut: uneDateAMidi
+              dateFin: demarche.dateFin.set({
+                hour: 12,
+                minute: 0,
+                second: 0,
+                millisecond: 0
+              }),
+              dateDebut: demarche.dateFin.set({
+                hour: 12,
+                minute: 0,
+                second: 0,
+                millisecond: 0
+              })
             })
           )
         })
