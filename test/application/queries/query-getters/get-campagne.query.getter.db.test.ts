@@ -102,7 +102,7 @@ describe('GetCampagneQueryGetter', () => {
           dateFin: campagneEnCours.dateFin.toISO(),
           titre: "Votre expérience sur l'application",
           description:
-            "Aidez-nous à améliorer l'application en répondant à 4 questions",
+            "Aidez-nous à améliorer l'application en répondant à 5 questions",
           questions
         })
       })
@@ -131,7 +131,7 @@ describe('GetCampagneQueryGetter', () => {
           dateFin: campagneEnCours.dateFin.toISO(),
           titre: "Votre expérience sur l'application",
           description:
-            "Aidez-nous à améliorer l'application en répondant à 4 questions",
+            "Aidez-nous à améliorer l'application en répondant à 5 questions",
           questions
         })
       })

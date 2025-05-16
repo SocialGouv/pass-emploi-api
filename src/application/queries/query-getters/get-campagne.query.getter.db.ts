@@ -69,8 +69,7 @@ export class GetCampagneQueryGetter {
         dateDebut: DateService.fromJSDateToISOString(campagneEnCours.dateDebut),
         dateFin: DateService.fromJSDateToISOString(campagneEnCours.dateFin),
         titre: "Votre expérience sur l'application",
-        description:
-          "Aidez-nous à améliorer l'application en répondant à 4 questions",
+        description: `Aidez-nous à améliorer l'application en répondant à 5 questions`,
         questions: questionsInMemory()
       }
     }
