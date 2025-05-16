@@ -200,6 +200,7 @@ export const testConfig = (): ConfigService => {
     headers: {
       staleIfErrorSeconds: '60',
       maxAgeMobile: '600',
+      maxAgeComptage: '600',
       maxAgeReferentiels: '600',
       maxAgeCV: '600',
       maxAgeSuggestions: '600',

@@ -255,7 +255,7 @@ export default () => {
       envoyerStatsMatomo: process.env.FEATURE_ENVOYER_STATS_MATOMO === 'true',
       notifierRendezVousMilo: process.env.FEATURE_NOTIFIER_RDV_MILO === 'true',
       recupererStructureMilo:
-        process.env.FEATURE_RECUPERER_STRUCTURE_MILO === 'true',
+        process.env.FEATURE_RECUPERER_STRUCTURE_MILO === 'true'
     },
     values: {
       maxRechercheConseillers: process.env.MAX_RECHERCHE_CONSEILLERS ?? '10'
@@ -263,6 +263,7 @@ export default () => {
     headers: {
       staleIfErrorSeconds: process.env.CACHE_CONTROL_STALE_IF_ERROR_EN_SECONDES,
       maxAgeMobile: process.env.CACHE_CONTROL_MAX_AGE_APP_MOBILE_EN_SECONDES,
+      maxAgeComptage: process.env.CACHE_CONTROL_MAX_AGE_COMPTAGE_EN_SECONDES,
       maxAgeReferentiels:
         process.env.CACHE_CONTROL_MAX_AGE_REFERENTIELS_EN_SECONDES,
       maxAgeCV: process.env.CACHE_CONTROL_MAX_AGE_CV_EN_SECONDES,

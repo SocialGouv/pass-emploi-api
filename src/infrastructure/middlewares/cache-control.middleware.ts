@@ -3,9 +3,10 @@ import { NextFunction, Request, Response } from 'express'
 import { ConfigService } from '@nestjs/config'
 
 @Injectable()
-export class AppMobileCacheControlMiddleware implements NestMiddleware {
+export class CacheControlMiddleware implements NestMiddleware {
   private readonly staleIfErrorSeconds: number
   private readonly maxAgeMobile: number
+  private readonly maxAgeComptage: number
   private readonly maxAgeReferentiels: number
   private readonly maxAgeCV: number
   private readonly maxAgeSuggestions: number
@@ -15,6 +16,7 @@ export class AppMobileCacheControlMiddleware implements NestMiddleware {
   constructor(config: ConfigService) {
     this.staleIfErrorSeconds = config.get('headers.staleIfErrorSeconds')!
     this.maxAgeMobile = config.get('headers.maxAgeMobile')!
+    this.maxAgeComptage = config.get('headers.maxAgeComptage')!
     this.maxAgeReferentiels = config.get('headers.maxAgeReferentiels')!
     this.maxAgeCV = config.get('headers.maxAgeCV')!
     this.maxAgeSuggestions = config.get('headers.maxAgeSuggestions')!
@@ -23,7 +25,12 @@ export class AppMobileCacheControlMiddleware implements NestMiddleware {
   }
 
   use(req: Request, res: Response, next: NextFunction): void {
-    if (req.url.includes('referentiels')) {
+    if (req.url.includes('comptage')) {
+      res.header(
+        'Cache-control',
+        `max-age=${this.maxAgeComptage}, stale-if-error=${this.staleIfErrorSeconds}`
+      )
+    } else if (req.url.includes('referentiels')) {
       res.header(
         'Cache-control',
         `max-age=${this.maxAgeReferentiels}, stale-if-error=${this.staleIfErrorSeconds}`

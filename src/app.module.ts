@@ -29,7 +29,7 @@ import { GetSessionsJeuneMiloQueryGetter } from 'src/application/queries/query-g
 import { RechercherMessageQueryHandler } from 'src/application/queries/rechercher-message.query.handler'
 import { AntivirusClient } from 'src/infrastructure/clients/antivirus-client'
 import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
-import { AppMobileCacheControlMiddleware } from 'src/infrastructure/middlewares/app-mobile-cache-control.middleware'
+import { CacheControlMiddleware } from 'src/infrastructure/middlewares/cache-control.middleware'
 import { ActionAuthorizer } from './application/authorizers/action-authorizer'
 import { ConseillerAuthorizer } from './application/authorizers/conseiller-authorizer'
 import { ConseillerInterAgenceAuthorizer } from './application/authorizers/conseiller-inter-agence-authorizer'
@@ -855,7 +855,7 @@ export const JobHandlerProviders = [
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer
-      .apply(AppMobileCacheControlMiddleware)
+      .apply(CacheControlMiddleware)
       .forRoutes({ path: '*', method: RequestMethod.GET })
   }
 }

@@ -205,6 +205,7 @@ export const configurationSchema = Joi.object({
   headers: Joi.object({
     staleIfErrorSeconds: Joi.number().required(),
     maxAgeMobile: Joi.number().required(),
+    maxAgeComptage: Joi.number().required(),
     maxAgeReferentiels: Joi.number().required(),
     maxAgeCV: Joi.number().required(),
     maxAgeSuggestions: Joi.number().required(),

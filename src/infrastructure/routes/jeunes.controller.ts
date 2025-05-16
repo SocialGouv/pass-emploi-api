@@ -4,7 +4,6 @@ import {
   Delete,
   ForbiddenException,
   Get,
-  Header,
   Headers,
   HttpCode,
   HttpStatus,
@@ -98,7 +97,6 @@ export class JeunesController {
       'Récupère le comptage des heures du jeune. La réponse est cachée pendant 1h.',
     description: 'Autorisé pour un jeune et son conseiller'
   })
-  @Header('Cache-Control', 'max-age=3600')
   @ApiResponse({
     type: DetailJeuneQueryModel
   })
