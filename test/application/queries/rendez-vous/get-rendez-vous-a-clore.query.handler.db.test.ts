@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import {
   GetRendezVousACloreQueryModel,
   RdvResumeQueryModel
@@ -24,23 +25,23 @@ import {
   RendezVousDto,
   RendezVousSqlModel
 } from '../../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import {
+  StructureMiloDto,
+  StructureMiloSqlModel
+} from '../../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
 import { DateService } from '../../../../src/utils/date-service'
 import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
-import { uneDate, uneDatetime } from '../../../fixtures/date.fixture'
+import { uneDate } from '../../../fixtures/date.fixture'
 import { uneAgenceDto } from '../../../fixtures/sql-models/agence.sql-model'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
+import { uneStructureMiloDto } from '../../../fixtures/sql-models/structureMilo.sql-model'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
-import { uneStructureMiloDto } from '../../../fixtures/sql-models/structureMilo.sql-model'
-import {
-  StructureMiloDto,
-  StructureMiloSqlModel
-} from '../../../../src/infrastructure/sequelize/models/structure-milo.sql-model'
 
 describe('GetRendezVousACloreQueryHandler', () => {
   let queryHandler: GetRendezVousACloreQueryHandler
@@ -48,7 +49,7 @@ describe('GetRendezVousACloreQueryHandler', () => {
   let dateService: StubbedClass<DateService>
   let database: DatabaseForTesting
 
-  const datetimeDeBase = uneDatetime()
+  const datetimeDeBase = DateTime.fromISO('2025-05-20T12:00:00.000Z')
 
   let structureMiloDto: AsSql<StructureMiloDto>
   let agence1Dto: AsSql<AgenceDto>
@@ -57,6 +58,7 @@ describe('GetRendezVousACloreQueryHandler', () => {
   let evenementCollectifAClore2Dto: AsSql<RendezVousDto>
   let evenementCollectifAClore3Dto: AsSql<RendezVousDto>
   let evenementIndividuelACloreDto: AsSql<RendezVousDto>
+  let evenementIndividuelACloreMaisTropVieuxDto: AsSql<RendezVousDto>
   let evenementIndividuelClosDto: AsSql<RendezVousDto>
   let evenementCollectifANePasClore1Dto: AsSql<RendezVousDto>
   let evenementCollectifANePasClore3Dto: AsSql<RendezVousDto>
@@ -67,6 +69,7 @@ describe('GetRendezVousACloreQueryHandler', () => {
     database = getDatabase()
     dateService = stubClass(DateService)
     dateService.nowJs.returns(datetimeDeBase.toJSDate())
+    dateService.now.returns(datetimeDeBase)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     queryHandler = new GetRendezVousACloreQueryHandler(
       conseillerAuthorizer,
@@ -171,6 +174,14 @@ describe('GetRendezVousACloreQueryHandler', () => {
         dateCloture: null
       })
 
+      evenementIndividuelACloreMaisTropVieuxDto = unRendezVousDto({
+        id: '896e32b5-4d66-46cb-8485-77c92bd00502',
+        titre: 'Rendez-vous individuel',
+        date: datetimeDeBase.minus({ months: 3, day: 1 }).toJSDate(),
+        type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+        dateCloture: null
+      })
+
       evenementIndividuelClosDto = unRendezVousDto({
         id: '896e32b5-4d66-46cb-8485-77c92bd00553',
         titre: 'Rendez-vous individuel',
@@ -192,12 +203,17 @@ describe('GetRendezVousACloreQueryHandler', () => {
         evenementCollectifANePasClore1Dto,
         evenementCollectifANePasClore3Dto,
         evenementIndividuelACloreDto,
+        evenementIndividuelACloreMaisTropVieuxDto,
         evenementIndividuelClosDto
       ])
       await RendezVousJeuneAssociationSqlModel.bulkCreate([
         {
           idJeune: jeuneDuConseillerDto.id,
           idRendezVous: evenementIndividuelACloreDto.id
+        },
+        {
+          idJeune: jeuneDuConseillerDto.id,
+          idRendezVous: evenementIndividuelACloreMaisTropVieuxDto.id
         },
         {
           idJeune: jeuneDuConseillerDto.id,
@@ -228,12 +244,27 @@ describe('GetRendezVousACloreQueryHandler', () => {
       }
       expect(result._isSuccess && result.data).to.deep.equal(queryModelAttendu)
     })
-    it('retourne rdvs', async () => {
+    it('retourne rdvs sauf rdvs Milo', async () => {
       // Given
       await ConseillerSqlModel.update(
         { idStructureMilo: null, idAgence: null },
         { where: { id: conseillerDto.id } }
       )
+      await RendezVousSqlModel.create(
+        unRendezVousDto({
+          id: '896e32b5-4d66-46cb-8485-77c92bd00512',
+          titre: 'Rendez-vous individuel',
+          date: datetimeDeBase.minus({ hours: 1 }).toJSDate(),
+          type: CodeTypeRendezVous.RENDEZ_VOUS_MILO,
+          dateCloture: null
+        })
+      )
+      await RendezVousJeuneAssociationSqlModel.bulkCreate([
+        {
+          idJeune: jeuneDuConseillerDto.id,
+          idRendezVous: '896e32b5-4d66-46cb-8485-77c92bd00512'
+        }
+      ])
       const query = { idConseiller: conseillerDto.id }
 
       // When

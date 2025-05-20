@@ -1,6 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Op, Sequelize } from 'sequelize'
-import { TYPES_ANIMATIONS_COLLECTIVES } from 'src/domain/rendez-vous/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  TYPES_ANIMATIONS_COLLECTIVES
+} from 'src/domain/rendez-vous/rendez-vous'
 import { NonTrouveError } from '../../../building-blocks/types/domain-error'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
@@ -16,6 +19,7 @@ import { GetRendezVousACloreQueryModel } from '../query-models/rendez-vous.query
 
 const NOMBRE_RDV_MAX = 10
 const PAGE_PAR_DEFAUT = 1
+const NB_MOIS_PASSES_SESSIONS_A_CLORE = 3
 
 export interface GetRendezVousACloreQuery extends Query {
   idConseiller: string
@@ -45,6 +49,19 @@ export class GetRendezVousACloreQueryHandler extends QueryHandler<
     }
 
     const maintenant = this.dateService.nowJs()
+    const dateLimiteRecuperation = this.dateService
+      .now()
+      .minus({ months: NB_MOIS_PASSES_SESSIONS_A_CLORE })
+      .toJSDate()
+    const dateLimiteRecuperationRDVsACloreFixe = new Date(
+      '2025-05-19T00:00:00+02:00'
+    )
+    const dateLimiteRecuperationRDVsAClore = new Date(
+      Math.max(
+        dateLimiteRecuperation.getTime(),
+        dateLimiteRecuperationRDVsACloreFixe.getTime()
+      )
+    )
 
     const limit = query.limit ?? NOMBRE_RDV_MAX
     const page = query.page ?? PAGE_PAR_DEFAUT
@@ -57,6 +74,7 @@ export class GetRendezVousACloreQueryHandler extends QueryHandler<
           },
           dateCloture: null,
           date: {
+            [Op.gte]: dateLimiteRecuperation,
             [Op.lt]: maintenant
           }
         }
@@ -72,9 +90,13 @@ export class GetRendezVousACloreQueryHandler extends QueryHandler<
       },
       dateCloture: null,
       type: {
-        [Op.notIn]: TYPES_ANIMATIONS_COLLECTIVES
+        [Op.notIn]: [
+          ...TYPES_ANIMATIONS_COLLECTIVES,
+          CodeTypeRendezVous.RENDEZ_VOUS_MILO
+        ]
       },
       date: {
+        [Op.gte]: dateLimiteRecuperationRDVsAClore,
         [Op.lt]: maintenant
       }
     }

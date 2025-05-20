@@ -1,5 +1,6 @@
 import { Authentification } from '../../../domain/authentification'
 import {
+  CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous,
   mapCodeLabelTypeRendezVousJeune,
   RendezVous
@@ -145,7 +146,10 @@ export function fromSqlToRendezVousConseillerDetailQueryModel(
       }
     }),
     nombreMaxParticipants: rendezVousSql.nombreMaxParticipants ?? undefined,
-    statut: construireStatut(rendezVousSql, maintenant)
+    statut:
+      rendezVousSql.type === CodeTypeRendezVous.RENDEZ_VOUS_MILO
+        ? undefined
+        : construireStatut(rendezVousSql, maintenant)
   }
 
   return rendezVousConseiller
