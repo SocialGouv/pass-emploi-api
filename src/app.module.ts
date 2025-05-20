@@ -375,6 +375,7 @@ import { CloreRendezVousCommandHandler } from './application/commands/clore-rend
 import { GetRendezVousACloreQueryHandler } from './application/queries/rendez-vous/get-rendez-vous-a-clore.query.handler.db'
 import { GetComptageJeuneQueryHandler } from './application/queries/get-comptage-jeune.query.handler.db'
 import { GetComptageJeunesByConseillerQueryHandler } from './application/queries/get-comptage-jeunes-by-conseiller.query.handler.db'
+import { GetComptageJeuneQueryGetter } from './application/queries/query-getters/get-comptage-jeune.query.getter'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -808,7 +809,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetNotificationsJeuneQueryHandler,
     AutoinscrireBeneficiaireSessionMiloCommandHandler,
     GetComptageJeuneQueryHandler,
-    GetComptageJeunesByConseillerQueryHandler
+    GetComptageJeunesByConseillerQueryHandler,
+    GetComptageJeuneQueryGetter
   ]
 }
 
