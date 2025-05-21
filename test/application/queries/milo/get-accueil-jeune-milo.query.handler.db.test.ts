@@ -48,7 +48,6 @@ import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from 'test/fixtures/sql-models/rendez-vous.sql-model'
 import { expect, StubbedClass, stubClass } from 'test/utils'
-import { testConfig } from 'test/utils/module-for-testing'
 import {
   DatabaseForTesting,
   getDatabase
@@ -77,7 +76,6 @@ describe('GetAccueilJeuneMiloQueryHandler', () => {
       alertesQueryGetter,
       favorisAccueilQueryGetter,
       getCampagneQueryGetter,
-      testConfig(),
       databaseForTesting.sequelize
     )
   })

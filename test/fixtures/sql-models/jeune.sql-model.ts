@@ -35,7 +35,8 @@ export function unJeuneDto(
     timezone: 'Europe/Paris',
     idStructureMilo: null,
     dateSignatureCGU: null,
-    dispositif: Jeune.Dispositif.CEJ
+    dispositif: Jeune.Dispositif.CEJ,
+    peutVoirLeComptageDesHeures: null
   }
 
   return { ...defaults, ...args }

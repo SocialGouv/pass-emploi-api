@@ -188,6 +188,11 @@ export class UpdateJeuneDuConseillerPayload {
   @IsString()
   @IsEnum(Jeune.Dispositif)
   dispositif?: Jeune.Dispositif
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  peutVoirLeComptageDesHeures?: boolean
 }
 
 export class GetIndicateursPourConseillerQueryParams {

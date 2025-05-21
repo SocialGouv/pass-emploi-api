@@ -167,7 +167,8 @@ export class JeuneSqlRepository implements Jeune.Repository {
       instanceId: jeune.configuration.instanceId ?? null,
       timezone: jeune.configuration.fuseauHoraire ?? null,
       dateSignatureCGU: jeune.dateSignatureCGU?.toJSDate() ?? null,
-      dispositif: jeune.dispositif
+      dispositif: jeune.dispositif,
+      peutVoirLeComptageDesHeures: jeune.peutVoirLeComptageDesHeures ?? null
     }
     await JeuneSqlModel.upsert(jeuneDto)
   }
@@ -191,6 +192,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
         | 'timezone'
         | 'idStructureMilo'
         | 'dateSignatureCGU'
+        | 'peutVoirLeComptageDesHeures'
       > = {
         id: jeune.id,
         nom: jeune.lastName,

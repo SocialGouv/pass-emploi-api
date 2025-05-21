@@ -269,6 +269,8 @@ export class ConseillersController {
       {
         idPartenaire: updateJeuneDuConseillerPayload.idPartenaire,
         dispositif: updateJeuneDuConseillerPayload.dispositif,
+        peutVoirLeComptageDesHeures:
+          updateJeuneDuConseillerPayload.peutVoirLeComptageDesHeures,
         idJeune
       },
       utilisateur

@@ -192,6 +192,12 @@ export class JeuneDto extends Model {
     type: DataType.STRING
   })
   dispositif: Jeune.Dispositif
+
+  @Column({
+    field: 'peut_voir_le_comptage_des_heures',
+    type: DataType.BOOLEAN
+  })
+  peutVoirLeComptageDesHeures?: boolean | null
 }
 
 @Table({

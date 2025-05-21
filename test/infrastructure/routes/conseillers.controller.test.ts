@@ -334,7 +334,8 @@ describe('ConseillersController', () => {
         const command: ModifierJeuneDuConseillerCommand = {
           idJeune: jeune.id,
           idPartenaire: 'le-id-part',
-          dispositif: undefined
+          dispositif: undefined,
+          peutVoirLeComptageDesHeures: false
         }
 
         modifierJeuneDuConseillerCommandHandler.execute
@@ -345,7 +346,8 @@ describe('ConseillersController', () => {
         await request(app.getHttpServer())
           .patch(`/conseillers/${conseiller.id}/jeunes/${jeune.id}`)
           .send({
-            idPartenaire: 'le-id-part'
+            idPartenaire: 'le-id-part',
+            peutVoirLeComptageDesHeures: false
           })
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.OK)
@@ -372,7 +374,8 @@ describe('ConseillersController', () => {
         const command: ModifierJeuneDuConseillerCommand = {
           idJeune: jeune.id,
           idPartenaire: 'le-id-part',
-          dispositif: undefined
+          dispositif: undefined,
+          peutVoirLeComptageDesHeures: undefined
         }
 
         modifierJeuneDuConseillerCommandHandler.execute

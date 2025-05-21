@@ -50,6 +50,9 @@ export class AccueilJeuneMiloQueryModel {
 
   @ApiPropertyOptional()
   campagne?: CampagneQueryModel
+
+  @ApiProperty()
+  peutVoirLeComptageDesHeures: boolean
 }
 
 export class GetMonSuiviMiloQueryModel {

@@ -29,6 +29,7 @@ export interface Jeune {
   preferences: Jeune.Preferences
   dateSignatureCGU?: DateTime
   dispositif: Jeune.Dispositif
+  peutVoirLeComptageDesHeures?: boolean
 }
 
 export namespace Jeune {

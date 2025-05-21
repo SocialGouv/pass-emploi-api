@@ -1,7 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
 
-import { ConfigService } from '@nestjs/config'
-
 import { DateTime } from 'luxon'
 import { Op, Sequelize } from 'sequelize'
 import { JeuneAuthorizer } from 'src/application/authorizers/jeune-authorizer'
@@ -56,7 +54,6 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
     private getRecherchesSauvegardeesQueryGetter: GetRecherchesSauvegardeesQueryGetter,
     private getFavorisAccueilQueryGetter: GetFavorisAccueilQueryGetter,
     private getCampagneQueryGetter: GetCampagneQueryGetter,
-    private configService: ConfigService,
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
   ) {
     super('GetAccueilJeuneMiloQueryHandler')
@@ -144,7 +141,10 @@ export class GetAccueilJeuneMiloQueryHandler extends QueryHandler<
       sessionsMiloAVenir: resultatSessionsMilo.sessionsNonInscrit.slice(0, 3),
       mesAlertes: recherchesQueryModels,
       mesFavoris: favorisQueryModels,
-      campagne: campagneQueryModel
+      campagne: campagneQueryModel,
+      peutVoirLeComptageDesHeures: Boolean(
+        jeuneSqlModel.peutVoirLeComptageDesHeures
+      )
     })
   }
 

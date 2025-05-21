@@ -87,7 +87,8 @@ describe('JeunesMiloController', () => {
       evenementsAVenir: [],
       sessionsMiloAVenir: [],
       mesAlertes: [],
-      mesFavoris: []
+      mesFavoris: [],
+      peutVoirLeComptageDesHeures: false
     }
 
     it("renvoie l'accueil d'un jeune MILO sans personnalisation", async () => {
