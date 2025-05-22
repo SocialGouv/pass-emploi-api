@@ -117,7 +117,7 @@ export namespace Demarche {
         case Demarche.Statut.EN_COURS:
           return this.mettreEnCours(dateFin, maintenant, demarcheModifiee)
         case Demarche.Statut.REALISEE:
-          return this.realiser(dateDebut, maintenant, demarcheModifiee)
+          return this.realiser(dateDebut, dateFin, maintenant, demarcheModifiee)
         case Demarche.Statut.A_FAIRE:
           return success({
             ...demarcheModifiee,
@@ -185,34 +185,23 @@ export namespace Demarche {
 
     private realiser(
       dateDebut: DateTime | undefined,
+      dateFin: DateTime,
       maintenant: DateTime,
       demarcheModifiee: Demarche.Modifiee
     ): Result<Demarche.Modifiee> {
       const maintenantA12Heures = setHoursTo12h00(maintenant)
-      if (dateDebut && dateDebut < maintenantA12Heures) {
-        let dateFin = maintenantA12Heures
-        if (demarcheModifiee.dateFin && demarcheModifiee.dateFin >= dateDebut) {
-          dateFin = setHoursTo12h00(demarcheModifiee.dateFin)
-        }
-        return success({
-          ...demarcheModifiee,
-          dateFin
-        })
-      }
-
-      let dateDebutForcee = maintenantA12Heures
-      if (demarcheModifiee.dateFin) {
-        if (demarcheModifiee.dateFin < dateDebutForcee) {
-          dateDebutForcee = setHoursTo12h00(demarcheModifiee.dateFin)
-        }
+      let dateDebutDefinitive = dateDebut
+        ? setHoursTo12h00(dateDebut)
+        : maintenantA12Heures
+      const dateFinDefinitive = setHoursTo12h00(dateFin)
+      if (dateFinDefinitive < dateDebutDefinitive) {
+        dateDebutDefinitive = dateFinDefinitive
       }
 
       return success({
         ...demarcheModifiee,
-        dateDebut: dateDebutForcee,
-        dateFin: demarcheModifiee.dateFin
-          ? setHoursTo12h00(demarcheModifiee.dateFin)
-          : maintenantA12Heures
+        dateDebut: dateDebutDefinitive,
+        dateFin: dateFinDefinitive
       })
     }
   }

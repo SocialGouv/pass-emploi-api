@@ -81,6 +81,7 @@ describe('Demarche', () => {
         it('génère une date de debut et de modification', () => {
           // Given
           const demarche = uneDemarche({
+            dateFin: uneDatetime(),
             dateDebut: uneDatetime().plus({ day: 5 })
           })
           // When
@@ -119,6 +120,7 @@ describe('Demarche', () => {
           const dateDebutDansLePasse = uneDatetime().minus({ day: 5 })
 
           const demarche = uneDemarche({
+            dateFin: uneDatetime(),
             dateDebut: dateDebutDansLePasse
           })
           // When
@@ -136,6 +138,12 @@ describe('Demarche', () => {
               statut: Demarche.Statut.REALISEE,
               dateModification: uneDatetime(),
               dateFin: demarche.dateFin.set({
+                hour: 12,
+                minute: 0,
+                second: 0,
+                millisecond: 0
+              }),
+              dateDebut: dateDebutDansLePasse.set({
                 hour: 12,
                 minute: 0,
                 second: 0,
