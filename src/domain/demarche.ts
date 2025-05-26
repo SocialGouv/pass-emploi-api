@@ -4,6 +4,7 @@ import { MauvaiseCommandeError } from '../building-blocks/types/domain-error'
 import { failure, Result, success } from '../building-blocks/types/result'
 import { DateService } from '../utils/date-service'
 import { Core } from './core'
+import { catalogueDemarchesInMemory } from '../infrastructure/clients/utils/demarches-in-memory'
 
 export const DemarcheRepositoryToken = 'DemarcheRepositoryToken'
 
@@ -138,13 +139,25 @@ export namespace Demarche {
       const dateTimeFin = setHoursTo12h00(demarcheACreer.dateFin)
 
       if (demarcheACreer.quoi && demarcheACreer.pourquoi) {
+        let codeCommentParUnAutreMoyen = undefined
+        const pourquoi = catalogueDemarchesInMemory.find(
+          demarche => demarche.code === demarcheACreer.pourquoi
+        )
+        if (pourquoi) {
+          const quoi = pourquoi.demarches.find(
+            demarche => demarche.codeQuoi === demarcheACreer.quoi
+          )
+          if (quoi) {
+            codeCommentParUnAutreMoyen = quoi.comment[0]?.code
+          }
+        }
         return success({
           statut: Demarche.Statut.A_FAIRE,
           dateCreation: maintenant,
           dateFin: dateTimeFin,
           pourquoi: demarcheACreer.pourquoi,
           quoi: demarcheACreer.quoi,
-          comment: demarcheACreer.comment
+          comment: codeCommentParUnAutreMoyen
         })
       } else if (demarcheACreer.description) {
         return success({

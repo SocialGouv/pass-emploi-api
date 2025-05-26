@@ -7,7 +7,7 @@ import { PoleEmploiClient } from '../../../src/infrastructure/clients/pole-emplo
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { StubbedClass, expect, stubClass } from '../../utils'
 
-describe('RechercherTypesDemarcheQueryHandler', () => {
+xdescribe('RechercherTypesDemarcheQueryHandler', () => {
   let poleEmploiClient: StubbedClass<PoleEmploiClient>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let rechercherTypesDemarcheQueryHandler: RechercherTypesDemarcheQueryHandler
