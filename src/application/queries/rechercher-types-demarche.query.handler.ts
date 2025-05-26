@@ -1,8 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import {
-  codeCommentDemarchesCachees,
-  codeQuoiDemarchesCachees
-} from 'src/infrastructure/clients/utils/demarche-liste-visible'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result } from '../../building-blocks/types/result'
@@ -46,17 +42,16 @@ export class RechercherTypesDemarcheQueryHandler extends QueryHandler<
     const demarchesDto = await this.poleEmploiClient.rechercherTypesDemarches(
       query.recherche
     )
-    const demarchesDtoVisibles = demarchesDto.filter(this.laDemarcheEstVisible)
     this.logger.log(
       'nombre de démarches envoyées par PE : ' +
         demarchesDto.length +
         '-' +
         'nombre de démarches visibles : ' +
-        demarchesDtoVisibles.length
+        demarchesDto.length
     )
 
     const typesDemarcheQueryModels: TypesDemarcheQueryModel[] = []
-    for (const demarcheDtoVisible of demarchesDtoVisibles) {
+    for (const demarcheDtoVisible of demarchesDto) {
       const quoiPourquoi = this.trouverLAggregationQuoiPourquoi(
         typesDemarcheQueryModels,
         demarcheDtoVisible
@@ -116,15 +111,6 @@ export class RechercherTypesDemarcheQueryHandler extends QueryHandler<
     } else {
       quoiPourquoi.commentObligatoire = false
     }
-  }
-
-  private laDemarcheEstVisible(demarcheDto: TypeDemarcheDto): boolean {
-    return (
-      !codeQuoiDemarchesCachees.has(demarcheDto.codeQuoiTypeDemarche) &&
-      (demarcheDto.codeCommentDemarche
-        ? !codeCommentDemarchesCachees.has(demarcheDto.codeCommentDemarche)
-        : true)
-    )
   }
 
   async monitor(): Promise<void> {
