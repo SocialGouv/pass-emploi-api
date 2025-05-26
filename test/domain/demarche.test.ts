@@ -308,7 +308,7 @@ describe('Demarche', () => {
             dateFin: dateFin.set(parametreHeureAMidi),
             quoi: 'C21',
             pourquoi: 'A42',
-            comment: 'B12'
+            comment: undefined
           }
           expect(demarche).to.deep.equal(success(demarcheCree))
         })
