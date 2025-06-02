@@ -8,6 +8,7 @@ export interface FirebaseChat {
   lastMessageSentAt: Timestamp
   lastMessageSentBy: string
   lastMessageIv: string
+  seenByConseiller: boolean
 }
 
 export interface FirebaseMessage {
