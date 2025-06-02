@@ -611,9 +611,7 @@ describe('JeunesController', () => {
 
       // When
       await request(app.getHttpServer())
-        .get(
-          `/jeunes/${idJeune}/comptage?dateDebut=2020-10-10&dateFin=2020-10-17`
-        )
+        .get(`/jeunes/${idJeune}/comptage`)
         .set('authorization', unHeaderAuthorization())
         // Then
         .expect(HttpStatus.OK)
@@ -624,59 +622,13 @@ describe('JeunesController', () => {
       ).to.have.been.calledOnceWithExactly(
         {
           idJeune,
-          accessToken: 'coucou',
-          dateDebut: DateTime.fromISO('2020-10-10', {
-            setZone: true
-          }).startOf('day'),
-          dateFin: DateTime.fromISO('2020-10-17', {
-            setZone: true
-          }).endOf('day')
+          accessToken: 'coucou'
         },
         unUtilisateurDecode()
       )
     })
-    it('retourne 400 quand date pas au format', async () => {
-      // Given
-      const idJeune = '1'
-      const result = {
-        nbHeuresDeclarees: 0,
-        nbHeuresValidees: 0,
-        dateDerniereMiseAJour: uneDatetime().toISO()
-      }
-      getComptageJeuneQueryHandler.execute.resolves(success(result))
 
-      // When
-      await request(app.getHttpServer())
-        .get(
-          `/jeunes/${idJeune}/comptage?dateDebut=2020-10-10T12:00:00Z&dateFin=2020-10-17`
-        )
-        .set('authorization', unHeaderAuthorization())
-        // Then
-        // Then
-        .expect(HttpStatus.BAD_REQUEST)
-    })
-    it('retourne 400', async () => {
-      // Given
-      const idJeune = '1'
-      const result = {
-        nbHeuresDeclarees: 0,
-        nbHeuresValidees: 0,
-        dateDerniereMiseAJour: uneDatetime().toISO()
-      }
-      getComptageJeuneQueryHandler.execute.resolves(success(result))
-
-      // When
-      await request(app.getHttpServer())
-        .get(`/jeunes/${idJeune}/comptage?dateDebut=2020-10-10`)
-        .set('authorization', unHeaderAuthorization())
-        // Then
-        .expect(HttpStatus.BAD_REQUEST)
-    })
-
-    ensureUserAuthenticationFailsIfInvalid(
-      'get',
-      '/jeunes/1/comptage?dateDebut=2020-10-10&dateFin=2020-10-17'
-    )
+    ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1/comptage')
   })
 
   describe('PUT /jeunes/:idJeune/configuration-application', () => {

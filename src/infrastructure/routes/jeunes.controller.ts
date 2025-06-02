@@ -61,7 +61,6 @@ import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import { handleResult } from './result.handler'
 import {
   ArchiverJeunePayload,
-  GetComptageJeuneQueryParams,
   MaintenantQueryParams,
   TransfererConseillerPayload,
   UpdateConfigurationInput,
@@ -103,19 +102,12 @@ export class JeunesController {
   async getComptageJeune(
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
-    @AccessToken() accessToken: string,
-    @Query() queryParams: GetComptageJeuneQueryParams
+    @AccessToken() accessToken: string
   ): Promise<ComptageJeuneQueryModel> {
     const result = await this.getComptageJeuneQueryHandler.execute(
       {
         idJeune,
-        accessToken,
-        dateDebut: DateTime.fromISO(queryParams.dateDebut, {
-          setZone: true
-        }).startOf('day'),
-        dateFin: DateTime.fromISO(queryParams.dateFin, {
-          setZone: true
-        }).endOf('day')
+        accessToken
       },
       utilisateur
     )
