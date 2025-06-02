@@ -128,24 +128,3 @@ export class MaintenantQueryParams {
   @IsISO8601({ strict: true })
   maintenant: string
 }
-
-export class GetComptageJeuneQueryParams {
-  @ApiProperty({
-    example: '2025-05-15',
-    description: 'Date au format YYYY-MM-DD'
-  })
-  @IsString()
-  @Matches(/^\d{4}-\d{2}-\d{2}$/, {
-    message: 'dateDebut must be in YYYY-MM-DD format'
-  })
-  dateDebut: string
-  @ApiProperty({
-    example: '2025-05-22',
-    description: 'Date au format YYYY-MM-DD'
-  })
-  @IsString()
-  @Matches(/^\d{4}-\d{2}-\d{2}$/, {
-    message: 'dateDebut must be in YYYY-MM-DD format'
-  })
-  dateFin: string
-}
