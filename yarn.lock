@@ -4677,7 +4677,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cli-color@npm:^2.0.2, cli-color@npm:^2.0.3":
+"cli-color@npm:^2.0.2":
   version: 2.0.4
   resolution: "cli-color@npm:2.0.4"
   dependencies:
@@ -6902,7 +6902,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:10.4.5, glob@npm:^10.2.2, glob@npm:^10.3.10, glob@npm:^10.3.3, glob@npm:^10.4.5":
+"glob@npm:10.4.5, glob@npm:^10.2.2, glob@npm:^10.3.10, glob@npm:^10.4.2, glob@npm:^10.4.5":
   version: 10.4.5
   resolution: "glob@npm:10.4.5"
   dependencies:
@@ -7987,20 +7987,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-beautify@npm:^1.14.5":
-  version: 1.15.1
-  resolution: "js-beautify@npm:1.15.1"
+"js-beautify@npm:1.15.4":
+  version: 1.15.4
+  resolution: "js-beautify@npm:1.15.4"
   dependencies:
     config-chain: "npm:^1.1.13"
     editorconfig: "npm:^1.0.4"
-    glob: "npm:^10.3.3"
+    glob: "npm:^10.4.2"
     js-cookie: "npm:^3.0.5"
-    nopt: "npm:^7.2.0"
+    nopt: "npm:^7.2.1"
   bin:
     css-beautify: js/bin/css-beautify.js
     html-beautify: js/bin/html-beautify.js
     js-beautify: js/bin/js-beautify.js
-  checksum: 10/9fc7111fc30035e8674e778ed2c271b2762084039482252d0a53fd94341e2009daceda99f4d9d0272672f2e136367ec8ce1008a04eb00140bd42c9668c3ed9af
+  checksum: 10/89f874f994a409868c74d23bdf3869281a25804dd4f77c4eac170cdee671dfb3248370c3b686ea03bb9a7cc7141769c4f450ad85e9158fbed3d7d78c330ae9a1
   languageName: node
   linkType: hard
 
@@ -9327,7 +9327,7 @@ __metadata:
     rimraf: "npm:6.0.1"
     rxjs: "npm:7.8.2"
     sequelize: "npm:6.37.7"
-    sequelize-cli: "npm:6.6.2"
+    sequelize-cli: "npm:6.6.3"
     sequelize-typescript: "npm:2.1.6"
     sinon: "npm:^20.0.0"
     sinon-chai: "npm:^3.7.0"
@@ -9516,7 +9516,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nopt@npm:^7.0.0, nopt@npm:^7.2.0":
+"nopt@npm:^7.0.0, nopt@npm:^7.2.1":
   version: 7.2.1
   resolution: "nopt@npm:7.2.1"
   dependencies:
@@ -11167,21 +11167,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sequelize-cli@npm:6.6.2":
-  version: 6.6.2
-  resolution: "sequelize-cli@npm:6.6.2"
+"sequelize-cli@npm:6.6.3":
+  version: 6.6.3
+  resolution: "sequelize-cli@npm:6.6.3"
   dependencies:
-    cli-color: "npm:^2.0.3"
     fs-extra: "npm:^9.1.0"
-    js-beautify: "npm:^1.14.5"
+    js-beautify: "npm:1.15.4"
     lodash: "npm:^4.17.21"
+    picocolors: "npm:^1.1.1"
     resolve: "npm:^1.22.1"
     umzug: "npm:^2.3.0"
     yargs: "npm:^16.2.0"
   bin:
     sequelize: lib/sequelize
     sequelize-cli: lib/sequelize
-  checksum: 10/eb74375de921fb41be7d6ad707084c58f33651202c2bde80465ecb1761d7cc662b2b4ac5100629d467328c738695bd071f58feda0e352f3afac10ad2a14747ba
+  checksum: 10/78fcc1a3da020ba0046db624e592ee86bee1228b2014c93070015a6e62ff6bbb30c66586399d12aee21babf4a0585c38814c9db0aaed5b2fc106e3a55164832c
   languageName: node
   linkType: hard
 
