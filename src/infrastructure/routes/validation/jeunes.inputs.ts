@@ -10,7 +10,6 @@ import {
   IsOptional,
   IsString,
   IsTimeZone,
-  Matches,
   MaxLength,
   ValidateIf
 } from 'class-validator'
