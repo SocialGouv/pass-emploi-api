@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { Inject, Injectable } from '@nestjs/common'
 import { pipeline } from 'node:stream/promises'
 import { PoolClient } from 'pg'

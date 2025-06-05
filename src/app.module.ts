@@ -376,6 +376,7 @@ import { GetRendezVousACloreQueryHandler } from './application/queries/rendez-vo
 import { GetComptageJeuneQueryHandler } from './application/queries/get-comptage-jeune.query.handler.db'
 import { GetComptageJeunesByConseillerQueryHandler } from './application/queries/get-comptage-jeunes-by-conseiller.query.handler.db'
 import { GetComptageJeuneQueryGetter } from './application/queries/query-getters/get-comptage-jeune.query.getter'
+import { CreerVueAEMensuelleJobHandler } from './application/jobs/analytics/creer-vue-ae-mensuelle'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -845,6 +846,7 @@ export const JobHandlerProviders = [
   ChargerLesVuesJobHandler,
   InitialiserLesVuesJobHandler,
   CreerTablesAEAnnuellesJobHandler,
+  CreerVueAEMensuelleJobHandler,
   QualifierActionsJobHandler,
   RecupererAnalyseAntivirusJobHandler,
   NotifierRappelCreationActionsDemarchesJobHandler,
