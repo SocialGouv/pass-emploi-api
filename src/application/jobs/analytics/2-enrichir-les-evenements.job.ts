@@ -37,6 +37,7 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
       const connexion = await createSequelizeForAnalytics()
       await this.mettreAJourLeSchema(connexion)
       await this.indexerLesColonnes(connexion)
+      await this.mettreAJourLaStructure(connexion)
       await this.creerTableAEJeune(connexion)
       await this.ajouterLesAgencesConseiller(connexion)
       await this.ajouterLesAgencesJeune(connexion)
@@ -102,6 +103,25 @@ export class EnrichirEvenementsJobHandler extends JobHandler<Planificateur.Job> 
       create index if not exists evenement_engagement_agence_index on evenement_engagement (agence);
       create index if not exists evenement_engagement_departement_index on evenement_engagement (departement);
       create index if not exists evenement_engagement_region_index on evenement_engagement (region);
+    `)
+  }
+
+  private async mettreAJourLaStructure(
+    connexion: Sequelize
+  ): Promise<void> {
+    this.logger.log('Mise à jour de la structure en fonction du dispositif')
+    await connexion.query(`
+      UPDATE evenement_engagement
+      SET structure = 'MILO_PACEA'
+      FROM (
+        SELECT id 
+        FROM jeune
+        WHERE structure = 'MILO' AND dispositif = 'PACEA'
+        ) AS subquery
+      WHERE evenement_engagement.id_utilisateur = subquery.id
+        AND evenement_engagement.type_utilisateur = 'JEUNE'
+        AND evenement_engagement.structure = 'MILO'
+      ;
     `)
   }
 
