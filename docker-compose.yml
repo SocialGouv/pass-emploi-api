@@ -30,7 +30,7 @@ services:
       - analytics-db-data:/var/lib/postgresql
 
   redisdb:
-    image: redis:7-alpine
+    image: redis:8-alpine
     ports:
       - "6379:6379"
     volumes:
@@ -49,7 +49,7 @@ services:
 
   redistestdb:
     container_name: redistestdb
-    image: redis:7-alpine
+    image: redis:8-alpine
     ports:
       - "6767:6379"
 
