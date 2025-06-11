@@ -78,17 +78,27 @@ export class GetComptageJeuneQueryGetter {
     comptageActionsDeclarees: number
     comptageActionsValidees: number
   }> {
+    const inPeriode = {
+      [Op.between]: [dateDebut, dateFin]
+    }
     const actions = await ActionSqlModel.findAll({
       where: {
         idJeune,
-        dateEcheance: {
-          [Op.gte]: dateDebut,
-          [Op.lte]: dateFin
-        },
         [Op.or]: [
-          { statut: Action.Statut.EN_COURS },
           {
-            statut: Action.Statut.TERMINEE
+            [Op.and]: {
+              statut: Action.Statut.EN_COURS,
+              dateEcheance: inPeriode
+            }
+          },
+          {
+            [Op.and]: {
+              statut: Action.Statut.TERMINEE,
+              [Op.or]: [
+                { dateFinReelle: inPeriode },
+                { dateFinReelle: null, dateEcheance: inPeriode }
+              ]
+            }
           }
         ]
       }
