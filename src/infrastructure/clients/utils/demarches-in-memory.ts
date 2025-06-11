@@ -458,24 +458,5 @@ export const catalogueDemarchesInMemory: ThematiqueQueryModel[] = [
     code: 'P06',
     libelle: 'Mes entretiens avec un conseiller',
     demarches: []
-  },
-  {
-    code: 'P07',
-    libelle: 'Mes contraintes personnelles',
-    demarches: [
-      {
-        codePourquoi: 'P07',
-        libellePourquoi: 'Mes contraintes personnelles',
-        codeQuoi: 'Q39',
-        libelleQuoi: 'Résoudre ses contraintes personnelles',
-        commentObligatoire: true,
-        comment: [
-          {
-            code: 'C39.03',
-            label: 'Par un autre moyen'
-          }
-        ]
-      }
-    ]
   }
 ]
