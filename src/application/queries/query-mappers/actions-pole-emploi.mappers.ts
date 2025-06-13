@@ -1,5 +1,9 @@
 import { DateService } from '../../../utils/date-service'
-import { Demarche } from '../../../domain/demarche'
+import {
+  Demarche,
+  POURQUOI_DEMARCHE_PERSO,
+  QUOI_DEMARCHE_PERSO
+} from '../../../domain/demarche'
 import {
   DemarcheDto,
   DemarcheDtoEtat
@@ -11,6 +15,13 @@ export function fromDemarcheDtoToDemarche(
   demarcheDto: DemarcheDto,
   dateService: DateService
 ): Demarche {
+  let label = demarcheDto.libellePourquoi
+  if (
+    demarcheDto.pourQuoi === POURQUOI_DEMARCHE_PERSO &&
+    demarcheDto.quoi === QUOI_DEMARCHE_PERSO
+  ) {
+    label = 'Autre démarche'
+  }
   const aujourdhuiAMidi = dateService.now().set({ hour: 12 })
   return {
     id: demarcheDto.idDemarche,
@@ -27,7 +38,7 @@ export function fromDemarcheDtoToDemarche(
     dateAnnulation: demarcheDto.dateAnnulation
       ? DateTime.fromISO(demarcheDto.dateAnnulation)
       : undefined,
-    label: demarcheDto.libellePourquoi,
+    label,
     titre: demarcheDto.libelleQuoi,
     sousTitre: demarcheDto.libelleComment,
     dateCreation: DateTime.fromISO(demarcheDto.dateCreation),

@@ -8,8 +8,8 @@ import { catalogueDemarchesInMemory } from '../infrastructure/clients/utils/dema
 
 export const DemarcheRepositoryToken = 'DemarcheRepositoryToken'
 
-const POURQUOI_DEMARCHE_PERSO = 'P01'
-const QUOI_DEMARCHE_PERSO = 'Q38'
+export const POURQUOI_DEMARCHE_PERSO = 'P01'
+export const QUOI_DEMARCHE_PERSO = 'Q38'
 
 export interface Demarche {
   id: string
