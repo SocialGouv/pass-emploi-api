@@ -88,6 +88,7 @@ export function mapSessionConseillerDtoToQueryModel(
   maintenant: DateTime,
   parametrageSqlModel?: SessionMiloSqlModel
 ): SessionConseillerMiloQueryModel {
+  const dateHeureDebut = dateFromMilo(session.dateHeureDebut, timezone)
   const dateHeureFin = dateFromMilo(session.dateHeureFin, timezone)
   const dateCloture = parametrageSqlModel?.dateCloture
     ? DateTime.fromJSDate(parametrageSqlModel.dateCloture)
@@ -108,13 +109,13 @@ export function mapSessionConseillerDtoToQueryModel(
     nomOffre: offre.nom,
     estVisible: (autoinscription || parametrageSqlModel?.estVisible) ?? false,
     autoinscription,
-    dateHeureDebut: dateFromMilo(session.dateHeureDebut, timezone).toISO(),
+    dateHeureDebut: dateHeureDebut.toISO(),
     dateHeureFin: dateHeureFin.toISO(),
     type: buildSessionTypeQueryModel(offre.type),
     statut: SessionMilo.calculerStatut(
       participants,
       maintenant,
-      dateHeureFin,
+      dateHeureDebut,
       dateCloture
     ),
     nombreParticipants
@@ -218,7 +219,7 @@ export function mapSessionToDetailSessionConseillerQueryModel(
     statut: SessionMilo.calculerStatut(
       session.inscriptions.map(({ statut }) => statut),
       maintenant,
-      session.fin,
+      session.debut,
       session.dateCloture
     )
   }

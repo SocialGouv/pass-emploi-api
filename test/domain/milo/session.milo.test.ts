@@ -22,16 +22,16 @@ describe('SessionMilo', () => {
     const maintenant = DateTime.now()
 
     describe('quand la date de clôture est renseignée', () => {
-      it('retourne le statut CLOTUREE même si la date de fin est postérieure à maintenant', () => {
+      it('retourne le statut CLOTUREE même si la date est postérieure à maintenant', () => {
         // Given
-        const dateFin = maintenant.plus({ days: 1 })
+        const date = maintenant.plus({ days: 1 })
         const dateCloture = maintenant.minus({ hours: 1 })
 
         // When
         const statut = SessionMilo.calculerStatut(
           [],
           maintenant,
-          dateFin,
+          date,
           dateCloture
         )
 
@@ -45,13 +45,13 @@ describe('SessionMilo', () => {
 
       it('si la session se termine dans le futur, retourne le statut A_VENIR', () => {
         // Given
-        const dateFin = maintenant.plus({ days: 1 })
+        const date = maintenant.plus({ days: 1 })
 
         // When
         const statut = SessionMilo.calculerStatut(
           [],
           maintenant,
-          dateFin,
+          date,
           dateCloture
         )
 
@@ -62,13 +62,13 @@ describe('SessionMilo', () => {
       describe('quand la session s’est terminée', () => {
         it('s’il n’y a pas de participant, retourne le statut EMARGEE', () => {
           // Given
-          const dateFin = maintenant.minus({ days: 1 })
+          const date = maintenant.minus({ days: 1 })
 
           // When
           const statut = SessionMilo.calculerStatut(
             [],
             maintenant,
-            dateFin,
+            date,
             dateCloture
           )
 
@@ -78,7 +78,7 @@ describe('SessionMilo', () => {
 
         it('s’il y a des participants non émargés, retourne le statut A_CLOTURER', () => {
           // Given
-          const dateFin = maintenant.minus({ days: 1 })
+          const date = maintenant.minus({ days: 1 })
 
           // When
           const statut = SessionMilo.calculerStatut(
@@ -89,7 +89,7 @@ describe('SessionMilo', () => {
               SessionMilo.Inscription.Statut.PRESENT
             ],
             maintenant,
-            dateFin,
+            date,
             dateCloture
           )
 
@@ -99,7 +99,7 @@ describe('SessionMilo', () => {
 
         it('si tous les partcipants sont émargés, retourne le statut EMARGEE', () => {
           // Given
-          const dateFin = maintenant.minus({ days: 1 })
+          const date = maintenant.minus({ days: 1 })
 
           // When
           const statut = SessionMilo.calculerStatut(
@@ -109,7 +109,7 @@ describe('SessionMilo', () => {
               SessionMilo.Inscription.Statut.PRESENT
             ],
             maintenant,
-            dateFin,
+            date,
             dateCloture
           )
 
