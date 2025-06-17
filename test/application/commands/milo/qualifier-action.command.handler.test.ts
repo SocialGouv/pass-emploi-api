@@ -178,7 +178,7 @@ describe('QualifierActionCommandHandler', () => {
             success({
               code: 'NON_SNP',
               heures: 0,
-              libelle: 'Action non qualifiée en Situation Non Professionnelle',
+              libelle: 'Action non SNP',
               commentaireQualification: undefined
             })
           )

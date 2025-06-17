@@ -62,7 +62,7 @@ export namespace Qualification {
     },
     NON_SNP: {
       code: Code.NON_SNP,
-      label: 'Action non qualifiée en Situation Non Professionnelle',
+      label: 'Action non SNP',
       heures: 0
     }
   }
