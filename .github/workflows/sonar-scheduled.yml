@@ -51,7 +51,7 @@ jobs:
           DATABASE_URL: postgres://test:test@localhost:5432/test
           REDIS_URL: redis://localhost:6767
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v2
+        uses: SonarSource/sonarqube-scan-action@v5
         with:
           projectBaseDir: .
         env:
