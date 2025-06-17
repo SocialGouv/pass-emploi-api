@@ -119,7 +119,8 @@ export class GetActionsConseillerV2QueryHandler extends QueryHandler<
         'contenu',
         'idJeune',
         'dateFinReelle',
-        'codeQualification'
+        'codeQualification',
+        'description'
       ],
       ...(whereClause ? { where: whereClause } : {}),
       limit,
@@ -136,6 +137,7 @@ export class GetActionsConseillerV2QueryHandler extends QueryHandler<
       resultats: actionsSqlModel.rows.map(actionSql => ({
         id: actionSql.id,
         titre: actionSql.contenu,
+        description: actionSql.description,
         jeune: {
           id: actionSql.jeune.id,
           nom: actionSql.jeune.nom,

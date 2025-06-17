@@ -167,6 +167,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
             {
               id: actionNonTermineeDto.id,
               titre: actionNonTermineeDto.contenu,
+              description: actionNonTermineeDto.description,
               jeune: {
                 id: idJeune,
                 nom: jeuneDto.nom,
@@ -178,6 +179,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
             {
               id: actionAQualifier1Dto.id,
               titre: actionAQualifier1Dto.contenu,
+              description: actionAQualifier1Dto.description,
               jeune: {
                 id: idJeune,
                 nom: jeuneDto.nom,
@@ -192,6 +194,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
             {
               id: actionAQualifier3Dto.id,
               titre: actionAQualifier3Dto.contenu,
+              description: actionAQualifier3Dto.description,
               jeune: {
                 id: idJeune2,
                 nom: jeune2Dto.nom,
@@ -220,6 +223,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
             {
               id: actionAQualifier2Dto.id,
               titre: actionAQualifier2Dto.contenu,
+              description: actionAQualifier2Dto.description,
               jeune: {
                 id: idJeune,
                 nom: jeuneDto.nom,
@@ -234,6 +238,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
             {
               id: actionQualifieeDto.id,
               titre: actionQualifieeDto.contenu,
+              description: actionQualifieeDto.description,
               jeune: {
                 id: idJeune2,
                 nom: jeune2Dto.nom,
@@ -269,6 +274,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
             {
               id: actionAQualifier1Dto.id,
               titre: actionAQualifier1Dto.contenu,
+              description: actionAQualifier1Dto.description,
               jeune: {
                 id: idJeune,
                 nom: jeuneDto.nom,
@@ -283,6 +289,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
             {
               id: actionAQualifier2Dto.id,
               titre: actionAQualifier2Dto.contenu,
+              description: actionAQualifier2Dto.description,
               jeune: {
                 id: idJeune,
                 nom: jeuneDto.nom,
@@ -314,6 +321,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
             {
               id: actionAQualifier3Dto.id,
               titre: actionAQualifier3Dto.contenu,
+              description: actionAQualifier3Dto.description,
               jeune: {
                 id: idJeune2,
                 nom: jeune2Dto.nom,
@@ -350,6 +358,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
             {
               id: actionAQualifier2Dto.id,
               titre: actionAQualifier2Dto.contenu,
+              description: actionAQualifier2Dto.description,
               jeune: {
                 id: idJeune,
                 nom: jeuneDto.nom,
@@ -364,6 +373,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
             {
               id: actionQualifieeDto.id,
               titre: actionQualifieeDto.contenu,
+              description: actionQualifieeDto.description,
               jeune: {
                 id: idJeune2,
                 nom: jeune2Dto.nom,
@@ -404,6 +414,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
             {
               id: actionAQualifier1Dto.id,
               titre: actionAQualifier1Dto.contenu,
+              description: actionAQualifier1Dto.description,
               jeune: {
                 id: idJeune,
                 nom: jeuneDto.nom,
@@ -418,6 +429,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
             {
               id: actionAQualifier2Dto.id,
               titre: actionAQualifier2Dto.contenu,
+              description: actionAQualifier2Dto.description,
               jeune: {
                 id: idJeune,
                 nom: jeuneDto.nom,
@@ -432,6 +444,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
             {
               id: actionQualifieeDto.id,
               titre: actionQualifieeDto.contenu,
+              description: actionQualifieeDto.description,
               jeune: {
                 id: idJeune2,
                 nom: jeune2Dto.nom,
@@ -472,6 +485,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
             {
               id: actionAQualifier2Dto.id,
               titre: actionAQualifier2Dto.contenu,
+              description: actionAQualifier2Dto.description,
               jeune: {
                 id: idJeune,
                 nom: jeuneDto.nom,
@@ -511,6 +525,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
             {
               id: actionAQualifier2Dto.id,
               titre: actionAQualifier2Dto.contenu,
+              description: actionAQualifier2Dto.description,
               jeune: {
                 id: idJeune,
                 nom: jeuneDto.nom,
@@ -525,6 +540,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
             {
               id: actionAQualifier1Dto.id,
               titre: actionAQualifier1Dto.contenu,
+              description: actionAQualifier1Dto.description,
               jeune: {
                 id: idJeune,
                 nom: jeuneDto.nom,
@@ -562,6 +578,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
             {
               id: actionAQualifier3Dto.id,
               titre: actionAQualifier3Dto.contenu,
+              description: actionAQualifier3Dto.description,
               jeune: {
                 id: idJeune2,
                 nom: jeune2Dto.nom,
@@ -573,6 +590,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
             {
               id: actionQualifieeDto.id,
               titre: actionQualifieeDto.contenu,
+              description: actionQualifieeDto.description,
               jeune: {
                 id: idJeune2,
                 nom: jeune2Dto.nom,
@@ -612,6 +630,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
             {
               id: actionAQualifier1Dto.id,
               titre: actionAQualifier1Dto.contenu,
+              description: actionAQualifier1Dto.description,
               jeune: {
                 id: idJeune,
                 nom: jeuneDto.nom,
@@ -626,6 +645,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
             {
               id: actionAQualifier2Dto.id,
               titre: actionAQualifier2Dto.contenu,
+              description: actionAQualifier2Dto.description,
               jeune: {
                 id: idJeune,
                 nom: jeuneDto.nom,
@@ -669,11 +689,13 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              titre: actionNonTermineeDto.contenu
+              titre: actionNonTermineeDto.contenu,
+              description: actionNonTermineeDto.description
             },
             {
               id: actionQualifieeDto.id,
               titre: actionQualifieeDto.contenu,
+              description: actionQualifieeDto.description,
               jeune: {
                 id: idJeune2,
                 nom: jeune2Dto.nom,

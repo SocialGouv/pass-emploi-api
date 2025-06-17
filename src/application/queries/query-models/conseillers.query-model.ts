@@ -93,6 +93,9 @@ class ActionResumeV2QueryModel {
   @ApiProperty()
   titre: string
 
+  @ApiProperty()
+  description: string
+
   @ApiProperty({ type: JeuneDuConseillerQueryModel })
   jeune: JeuneDuConseillerQueryModel
 
