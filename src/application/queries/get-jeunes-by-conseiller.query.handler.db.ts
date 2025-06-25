@@ -84,6 +84,7 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
                  jeune.dispositif,
                  jeune.date_creation,
                  jeune.date_premiere_connexion,
+                 jeune.date_derniere_connexion,
                  jeune.id_authentification,
                  jeune.id_conseiller_initial,
                  jeune.date_derniere_actualisation_token,

@@ -34,6 +34,8 @@ export function fromSqlToDetailJeuneQueryModel(
       ? DateService.fromJSDateToISOString(
           jeuneSqlModel.dateDerniereActualisationToken
         )
+      : jeuneSqlModel.dateDerniereConnexion
+      ? DateService.fromJSDateToISOString(jeuneSqlModel.dateDerniereConnexion)
       : undefined,
     isReaffectationTemporaire: Boolean(jeuneSqlModel.idConseillerInitial),
     conseiller: {
@@ -80,9 +82,13 @@ export function toDetailJeuneConseillerQueryModel(
     estAArchiver: estAArchiver(sqlJeune, maintenant),
     dispositif: sqlJeune.dispositif
   }
-  if (sqlJeune.date_derniere_actualisation_token) {
+  if (
+    sqlJeune.date_derniere_actualisation_token ||
+    sqlJeune.date_derniere_connexion
+  ) {
     jeuneQueryModel.lastActivity =
-      sqlJeune.date_derniere_actualisation_token.toISOString()
+      sqlJeune.date_derniere_actualisation_token?.toISOString() ??
+      sqlJeune.date_derniere_connexion?.toISOString()
   }
 
   if (
@@ -143,7 +149,8 @@ export interface DetailJeuneRawSql extends JeuneRawSql {
   date_fin_cej: Date | null
   prenom_conseiller_precedent: string
   situation_courante: Situation
-  date_premiere_connexion: Date
+  date_premiere_connexion: Date | null
+  date_derniere_connexion: Date | null
   id_structure_milo: string | null
   est_a_archiver: boolean
 }
