@@ -9335,7 +9335,7 @@ __metadata:
     openid-client: "npm:5.7.1"
     pg: "npm:8.16.0"
     pg-connection-string: "npm:2.9.0"
-    pg-copy-streams: "npm:6.0.6"
+    pg-copy-streams: "npm:7.0.0"
     pino-http: "npm:10.5.0"
     prettier: "npm:^2.8.8"
     redis: "npm:^4.7.1"
@@ -9703,13 +9703,6 @@ __metadata:
     define-properties: "npm:^1.2.1"
     es-object-atoms: "npm:^1.1.1"
   checksum: 10/24163ab1e1e013796693fc5f5d349e8b3ac0b6a34a7edb6c17d3dd45c6a8854145780c57d302a82512c1582f63720f4b4779d6c1cfba12cbb1420b978802d8a3
-  languageName: node
-  linkType: hard
-
-"obuf@npm:^1.1.2":
-  version: 1.1.2
-  resolution: "obuf@npm:1.1.2"
-  checksum: 10/53ff4ab3a13cc33ba6c856cf281f2965c0aec9720967af450e8fd06cfd50aceeefc791986a16bcefa14e7898b3ca9acdfcf15b9d9a1b9c7e1366581a8ad6e65e
   languageName: node
   linkType: hard
 
@@ -10119,12 +10112,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg-copy-streams@npm:6.0.6":
-  version: 6.0.6
-  resolution: "pg-copy-streams@npm:6.0.6"
-  dependencies:
-    obuf: "npm:^1.1.2"
-  checksum: 10/58bd4a44f618e0706de402b401bad42fbb3b3743985ac5891536a239331469db3be734352955259bfdf46d1b772604a8da493edd16f0399f3685fcb4517bf165
+"pg-copy-streams@npm:7.0.0":
+  version: 7.0.0
+  resolution: "pg-copy-streams@npm:7.0.0"
+  checksum: 10/f62f883e5b3add845283d6df1864ee686a4aa4c0281145128e6c92d4699408cdb9ddcc1fd8fc86a6e160b38610c980173d87ec969d67f5bc33be69a9b0a37b3f
   languageName: node
   linkType: hard
 
