@@ -39,7 +39,8 @@ export function unDetailJeuneQueryModel(
     dateFinCEJ: undefined,
     estAArchiver: undefined,
     dateSignatureCGU: undefined,
-    dispositif: Jeune.Dispositif.CEJ
+    dispositif: Jeune.Dispositif.CEJ,
+    peutVoirLeComptageDesHeures: undefined
   }
 
   return { ...defaults, ...args }

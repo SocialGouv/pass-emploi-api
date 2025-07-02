@@ -56,7 +56,9 @@ export function fromSqlToDetailJeuneQueryModel(
         : undefined,
     estAArchiver: optionsMilo?.estAArchiver,
     dateSignatureCGU: jeuneSqlModel.dateSignatureCGU?.toISOString(),
-    dispositif: jeuneSqlModel.dispositif
+    dispositif: jeuneSqlModel.dispositif,
+    peutVoirLeComptageDesHeures:
+      jeuneSqlModel.peutVoirLeComptageDesHeures ?? undefined
   }
 }
 
