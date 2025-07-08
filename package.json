@@ -136,7 +136,7 @@
     "@types/lodash.isequal": "^4.5.8",
     "@types/luxon": "^3.6.2",
     "@types/mocha": "^10.0.10",
-    "@types/multer": "^1.4.12",
+    "@types/multer": "^2.0.0",
     "@types/node": "^20.17.57",
     "@types/pg-copy-streams": "^1.2.5",
     "@types/pino-multi-stream": "^5.1.6",

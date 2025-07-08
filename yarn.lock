@@ -3128,12 +3128,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/multer@npm:^1.4.12":
-  version: 1.4.12
-  resolution: "@types/multer@npm:1.4.12"
+"@types/multer@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@types/multer@npm:2.0.0"
   dependencies:
     "@types/express": "npm:*"
-  checksum: 10/3d2b32da58ddd67f972d4ef1021492f78d65f33f936b6fb25dd461bb6cc7b03bfd1de1a11562c4310680dac8054e4398038db51767a0ffbf1fe62457b3706e95
+  checksum: 10/87ddd5b39fd572b1d98f84908738eed9fef53fc20628bff066d43b3bcf70481f51010a997554ed65c97121e7b8fe44b59a24cd68ccf59c3d7c64bbffb8c5a127
   languageName: node
   linkType: hard
 
@@ -9298,7 +9298,7 @@ __metadata:
     "@types/lodash.isequal": "npm:^4.5.8"
     "@types/luxon": "npm:^3.6.2"
     "@types/mocha": "npm:^10.0.10"
-    "@types/multer": "npm:^1.4.12"
+    "@types/multer": "npm:^2.0.0"
     "@types/node": "npm:^20.17.57"
     "@types/pg-copy-streams": "npm:^1.2.5"
     "@types/pino-multi-stream": "npm:^5.1.6"
