@@ -303,6 +303,27 @@ export namespace Notification {
       }
     }
 
+    async notifier0Heures(idJeune: string, tokenJeune: string): Promise<void> {
+      try {
+        const notification = {
+          token: tokenJeune,
+          notification: {
+            title: 'Vous avez 2 minutes ? 👀',
+            body: 'Commencez à renseigner vos actions'
+          },
+          data: {
+            type: Type.RAPPEL_CREATION_ACTION
+          }
+        }
+        const promise = this.notificationRepository.send(notification, idJeune)
+        this.logMessageSucces(idJeune)
+        return promise
+      } catch (e) {
+        this.logger.error(e)
+        this.logMessageEchec(idJeune)
+      }
+    }
+
     async notifierNouvelleAction(jeune: Jeune, action: Action): Promise<void> {
       if (
         jeune.configuration.pushNotificationToken &&
