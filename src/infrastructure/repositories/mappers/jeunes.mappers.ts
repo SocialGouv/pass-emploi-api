@@ -17,7 +17,12 @@ export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
     idPartenaire: jeuneSqlModel.idPartenaire ?? undefined,
     configuration: toConfigurationApplication(jeuneSqlModel),
     preferences: fromSqlToPreferencesJeune(jeuneSqlModel),
-    dispositif: jeuneSqlModel.dispositif
+    dispositif: jeuneSqlModel.dispositif,
+    peutVoirLeComptageDesHeures:
+      jeuneSqlModel.peutVoirLeComptageDesHeures ?? undefined,
+    dateSignatureCGU: jeuneSqlModel.dateSignatureCGU
+      ? DateTime.fromJSDate(jeuneSqlModel.dateSignatureCGU)
+      : undefined
   }
   if (jeuneSqlModel.conseiller) {
     jeune.conseiller = {

@@ -74,10 +74,14 @@ describe('JeuneMiloHttpRepository', () => {
     describe('quand le jeune existe', () => {
       it('retourne le jeune', async () => {
         // Given
-        const jeuneMilo: JeuneMilo = unJeune({
-          id: 'milo',
-          configuration: uneConfiguration({ idJeune: 'milo' })
-        })
+        const jeuneMilo: JeuneMilo = {
+          ...unJeune({
+            id: 'milo',
+            configuration: uneConfiguration({ idJeune: 'milo' })
+          }),
+          peutVoirLeComptageDesHeures: undefined,
+          dateSignatureCGU: undefined
+        }
         jeuneMilo.idStructureMilo = 'test'
 
         await StructureMiloSqlModel.create({
@@ -189,7 +193,9 @@ describe('JeuneMiloHttpRepository', () => {
             idJeune: idJeuneAvecDossier,
             dateDerniereActualisationToken: uneDatetime().toJSDate()
           }),
-          idStructureMilo: idStructure
+          idStructureMilo: idStructure,
+          peutVoirLeComptageDesHeures: undefined,
+          dateSignatureCGU: undefined
         }
         await StructureMiloSqlModel.create({
           id: idStructure,

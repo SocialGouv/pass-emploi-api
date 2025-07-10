@@ -92,9 +92,13 @@ describe('JeuneSqlRepository', () => {
 
     beforeEach(async () => {
       // Given
-      jeune = unJeune({
-        conseiller: unConseillerDuJeune({ idAgence: undefined })
-      })
+      jeune = {
+        ...unJeune({
+          conseiller: unConseillerDuJeune({ idAgence: undefined })
+        }),
+        dateSignatureCGU: undefined,
+        peutVoirLeComptageDesHeures: undefined
+      }
       const conseillerDto = unConseillerDto({
         structure: Core.Structure.POLE_EMPLOI
       })
@@ -133,9 +137,13 @@ describe('JeuneSqlRepository', () => {
 
     beforeEach(async () => {
       // Given
-      jeune = unJeune({
-        conseiller: unConseillerDuJeune({ idAgence: undefined })
-      })
+      jeune = {
+        ...unJeune({
+          conseiller: unConseillerDuJeune({ idAgence: undefined })
+        }),
+        dateSignatureCGU: undefined,
+        peutVoirLeComptageDesHeures: undefined
+      }
       const conseillerDto = unConseillerDto({
         structure: Core.Structure.POLE_EMPLOI
       })
@@ -445,7 +453,11 @@ describe('JeuneSqlRepository', () => {
 
     beforeEach(async () => {
       // Given
-      jeune = { ...unJeuneSansConseiller() }
+      jeune = {
+        ...unJeuneSansConseiller(),
+        dateSignatureCGU: undefined,
+        peutVoirLeComptageDesHeures: undefined
+      }
       await JeuneSqlModel.creer(
         unJeuneDto({
           idConseiller: undefined,
@@ -643,17 +655,21 @@ describe('JeuneSqlRepository', () => {
       describe('quand le jeune est transféré de manière définitive', () => {
         it('transfère les chats, crée des transferts, met à jour le jeune avec son conseiller', async () => {
           // Given
-          const jeuneATransferer: Jeune = unJeune({
-            id: 'unJeuneATransferer',
-            datePremiereConnexion: DateTime.fromJSDate(
-              jeuneATransfererDto.datePremiereConnexion!
-            ),
-            conseiller: unConseillerDuJeune({
-              id: 'idConseillerCible',
-              idAgence: undefined
+          const jeuneATransferer: Jeune = {
+            ...unJeune({
+              id: 'unJeuneATransferer',
+              datePremiereConnexion: DateTime.fromJSDate(
+                jeuneATransfererDto.datePremiereConnexion!
+              ),
+              conseiller: unConseillerDuJeune({
+                id: 'idConseillerCible',
+                idAgence: undefined
+              }),
+              configuration: uneConfiguration({ idJeune: 'unJeuneATransferer' })
             }),
-            configuration: uneConfiguration({ idJeune: 'unJeuneATransferer' })
-          })
+            dateSignatureCGU: undefined,
+            peutVoirLeComptageDesHeures: undefined
+          }
 
           // When
           await jeuneSqlRepository.transferAndSaveAll(
@@ -739,17 +755,21 @@ describe('JeuneSqlRepository', () => {
             idConseillerInitial: 'idConseillerCible'
           })
           await JeuneSqlModel.creer(jeuneEnTransfertDto)
-          const jeuneATransferer: Jeune = unJeune({
-            id: 'jeune-en-transfert',
-            datePremiereConnexion: DateTime.fromJSDate(
-              jeuneEnTransfertDto.datePremiereConnexion!
-            ),
-            conseiller: unConseillerDuJeune({
-              id: 'idConseillerCible',
-              idAgence: undefined
+          const jeuneATransferer: Jeune = {
+            ...unJeune({
+              id: 'jeune-en-transfert',
+              datePremiereConnexion: DateTime.fromJSDate(
+                jeuneEnTransfertDto.datePremiereConnexion!
+              ),
+              conseiller: unConseillerDuJeune({
+                id: 'idConseillerCible',
+                idAgence: undefined
+              }),
+              configuration: uneConfiguration({ idJeune: 'jeune-en-transfert' })
             }),
-            configuration: uneConfiguration({ idJeune: 'jeune-en-transfert' })
-          })
+            dateSignatureCGU: undefined,
+            peutVoirLeComptageDesHeures: undefined
+          }
 
           // When
           await jeuneSqlRepository.transferAndSaveAll(
