@@ -79,6 +79,28 @@ describe('ModifierJeuneDuConseillerCommandHandler', () => {
         expect(jeuneRepository.save).to.have.been.calledWithExactly(expected)
         expect(result).to.deep.equal(emptySuccess())
       })
+      it('met à jour comptage', async () => {
+        // Given
+        const jeune = unJeune({ structure: Core.Structure.MILO })
+        jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
+        const command: ModifierJeuneDuConseillerCommand = {
+          idJeune: jeune.id,
+          peutVoirLeComptageDesHeures: false
+        }
+
+        // When
+        const result = await modifierJeuneDuConseillerCommandHandler.handle(
+          command
+        )
+
+        // Then
+        const expected: Jeune = {
+          ...jeune,
+          peutVoirLeComptageDesHeures: command.peutVoirLeComptageDesHeures
+        }
+        expect(jeuneRepository.save).to.have.been.calledWithExactly(expected)
+        expect(result).to.deep.equal(emptySuccess())
+      })
     })
 
     describe("quand le jeune n'existe pas", () => {

@@ -351,6 +351,18 @@ describe('ConseillersController', () => {
           })
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.OK)
+
+        expect(
+          modifierJeuneDuConseillerCommandHandler.execute
+        ).to.have.been.calledWithExactly(
+          {
+            idJeune: jeune.id,
+            idPartenaire: 'le-id-part',
+            dispositif: undefined,
+            peutVoirLeComptageDesHeures: false
+          },
+          unUtilisateurDecode()
+        )
       })
     })
 
