@@ -44,6 +44,7 @@ import { NotificationJeuneSqlModel } from '../../../src/infrastructure/sequelize
 import { RechercheSqlModel } from '../../../src/infrastructure/sequelize/models/recherche.sql-model'
 import { uneRechercheDto } from '../../fixtures/sql-models/recherche.sql-model'
 import { LogModificationRendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/log-modification-rendez-vous-sql.model'
+import { ComptageJeuneSqlModel } from '../../../src/infrastructure/sequelize/models/comptage-jeune.sql-model'
 
 let stats: SuiviJob
 
@@ -335,6 +336,25 @@ describe('NettoyerLesDonneesJobHandler', () => {
       })
     ])
 
+    await ComptageJeuneSqlModel.bulkCreate([
+      {
+        idJeune: idJeune2,
+        heuresDeclarees: 10,
+        heuresValidees: 10,
+        jourDebut: maintenant.toISODate(),
+        jourFin: maintenant.toISODate(),
+        dateMiseAJour: maintenant.minus({ hours: 25 }).toJSDate()
+      },
+      {
+        idJeune: idJeune3,
+        heuresDeclarees: 10,
+        heuresValidees: 10,
+        jourDebut: maintenant.toISODate(),
+        jourFin: maintenant.toISODate(),
+        dateMiseAJour: maintenant.minus({ hours: 2 }).toJSDate()
+      }
+    ])
+
     // When
     stats = await nettoyerLesDonneesJobHandler.handle()
   })
@@ -544,6 +564,18 @@ describe('NettoyerLesDonneesJobHandler', () => {
           animationsCollectivesPasseesAvecInscrits
         ].map(({ id }) => id)
       )
+    })
+  })
+
+  describe('comptages', () => {
+    it('supprime les comptages de plus de 24h', async () => {
+      // Then
+      const comptagesApresNettoyage = await ComptageJeuneSqlModel.findAll()
+      expect(comptagesApresNettoyage.length).to.equal(1)
+      expect(
+        (stats.resultat as { nombreComptageJeuneSupprimes: number })
+          .nombreComptageJeuneSupprimes
+      ).to.equal(1)
     })
   })
 })

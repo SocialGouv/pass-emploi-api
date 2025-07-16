@@ -30,7 +30,7 @@ export class DateService {
   }
 
   static isGreater(greaterDate: DateTime, date: DateTime): boolean {
-    return greaterDate.toUTC().startOf('day') > date.toUTC().startOf('day')
+    return greaterDate.toUTC() > date.toUTC()
   }
 
   static isBetweenDates(

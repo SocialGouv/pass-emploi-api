@@ -31,6 +31,7 @@ import { EvenementEngagementHebdoSqlModel } from './evenement-engagement-hebdo.s
 import { StructureMiloSqlModel } from './structure-milo.sql-model'
 import { SessionMiloSqlModel } from './session-milo.sql-model'
 import { NotificationJeuneSqlModel } from './notification-jeune.sql-model'
+import { ComptageJeuneSqlModel } from './comptage-jeune.sql-model'
 
 export const sqlModels = [
   ConseillerSqlModel,
@@ -65,5 +66,6 @@ export const sqlModels = [
   StructureMiloSqlModel,
   SessionMiloSqlModel,
   JeuneMiloAArchiverSqlModel,
-  NotificationJeuneSqlModel
+  NotificationJeuneSqlModel,
+  ComptageJeuneSqlModel
 ]
