@@ -30,6 +30,7 @@ import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez
 import { SuiviJobSqlModel } from '../../infrastructure/sequelize/models/suivi-job.sql-model'
 import { DateService } from '../../utils/date-service'
 import Source = RendezVous.Source
+import { ComptageJeuneSqlModel } from '../../infrastructure/sequelize/models/comptage-jeune.sql-model'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.NETTOYER_LES_DONNEES)
@@ -67,6 +68,7 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
     let nombreNotificationsJeuneSupprimes = -1
     let nombreHistoriqueRdvSupprimes = -1
     let nombreRecherchesSupprimees = -1
+    let nombreComptageJeuneSupprimes = -1
 
     try {
       const jeunes = await JeuneSqlModel.findAll({
@@ -291,6 +293,18 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
       this.logger.warn(e)
       nbErreurs++
     }
+    try {
+      nombreComptageJeuneSupprimes = await ComptageJeuneSqlModel.destroy({
+        where: {
+          dateMiseAJour: {
+            [Op.lte]: maintenant.minus({ hours: 24 }).toJSDate()
+          }
+        }
+      })
+    } catch (e) {
+      this.logger.warn(e)
+      nbErreurs++
+    }
 
     return {
       jobType: this.jobType,
@@ -315,7 +329,8 @@ export class NettoyerLesDonneesJobHandler extends JobHandler<Job> {
         nombreFavorisImmersionSupprimes,
         nombreNotificationsJeuneSupprimes,
         nombreHistoriqueRdvSupprimes,
-        nombreRecherchesSupprimees
+        nombreRecherchesSupprimees,
+        nombreComptageJeuneSupprimes
       }
     }
   }

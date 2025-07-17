@@ -11,7 +11,6 @@ import { GetComptageJeuneQueryGetter } from '../../../src/application/queries/qu
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { DateService } from '../../../src/utils/date-service'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
@@ -25,7 +24,6 @@ import { getDatabase } from '../../utils/database-for-testing'
 describe('GetComptageJeuneQueryHandler', () => {
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
-  let dateService: StubbedClass<DateService>
   let getComptageJeuneQueryHandler: GetComptageJeuneQueryHandler
   let queryGetter: StubbedClass<GetComptageJeuneQueryGetter>
   let sandbox: SinonSandbox
@@ -35,14 +33,11 @@ describe('GetComptageJeuneQueryHandler', () => {
     sandbox = createSandbox()
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
-    dateService = stubClass(DateService)
     queryGetter = stubClass(GetComptageJeuneQueryGetter)
-    dateService.now.returns(uneDatetime())
 
     getComptageJeuneQueryHandler = new GetComptageJeuneQueryHandler(
       jeuneAuthorizer,
       conseillerAuthorizer,
-      dateService,
       queryGetter
     )
   })
@@ -120,7 +115,11 @@ describe('GetComptageJeuneQueryHandler', () => {
         await ConseillerSqlModel.create(conseiller)
         await JeuneSqlModel.create(jeune)
         queryGetter.handle.resolves(
-          success({ nbHeuresDeclarees: 1, nbHeuresValidees: 3 })
+          success({
+            nbHeuresDeclarees: 1,
+            nbHeuresValidees: 3,
+            dateDerniereMiseAJour: uneDatetime().toISO()
+          })
         )
         // When
         const result = await getComptageJeuneQueryHandler.handle(
@@ -142,9 +141,7 @@ describe('GetComptageJeuneQueryHandler', () => {
           idJeune: jeune.id,
           idDossier: jeune.idPartenaire!,
           accessTokenJeune: 'a',
-          accessTokenConseiller: undefined,
-          dateDebut: uneDatetime().startOf('week'),
-          dateFin: uneDatetime().endOf('week')
+          accessTokenConseiller: undefined
         })
       })
       it('retourne un comptage avec dates pour un conseiller', async () => {
@@ -154,15 +151,17 @@ describe('GetComptageJeuneQueryHandler', () => {
         await ConseillerSqlModel.create(conseiller)
         await JeuneSqlModel.create(jeune)
         queryGetter.handle.resolves(
-          success({ nbHeuresDeclarees: 1, nbHeuresValidees: 3 })
+          success({
+            nbHeuresDeclarees: 1,
+            nbHeuresValidees: 3,
+            dateDerniereMiseAJour: uneDatetime().toISO()
+          })
         )
         // When
         const result = await getComptageJeuneQueryHandler.handle(
           {
             idJeune: jeune.id,
-            accessToken: 'a',
-            dateDebut: uneDatetime(),
-            dateFin: uneDatetime().plus({ day: 7 })
+            accessToken: 'a'
           },
           unUtilisateurConseiller()
         )
@@ -178,9 +177,7 @@ describe('GetComptageJeuneQueryHandler', () => {
           idJeune: jeune.id,
           idDossier: jeune.idPartenaire!,
           accessTokenJeune: undefined,
-          accessTokenConseiller: 'a',
-          dateDebut: uneDatetime(),
-          dateFin: uneDatetime().plus({ day: 7 })
+          accessTokenConseiller: 'a'
         })
       })
     })

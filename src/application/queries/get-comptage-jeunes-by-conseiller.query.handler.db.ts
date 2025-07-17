@@ -72,6 +72,7 @@ export class GetComptageJeunesByConseillerQueryHandler extends QueryHandler<
     })
 
     const comptages: ComptageJeuneListeQueryModel[] = []
+    let dateDerniereMiseAJour = this.dateService.now()
 
     for (const jeuneSql of jeunesDuConseillerSql) {
       const resultComptage = await this.getComptageJeuneQueryGetter.handle({
@@ -80,21 +81,30 @@ export class GetComptageJeunesByConseillerQueryHandler extends QueryHandler<
         accessTokenJeune: undefined,
         accessTokenConseiller: Authentification.estConseiller(utilisateur.type)
           ? query.accessToken
-          : undefined,
-        dateDebut: this.dateService.now().startOf('week'),
-        dateFin: this.dateService.now().endOf('week')
+          : undefined
       })
 
-      if (isSuccess(resultComptage))
+      if (isSuccess(resultComptage)) {
         comptages.push({
           idJeune: jeuneSql.id,
           nbHeuresDeclarees: resultComptage.data.nbHeuresDeclarees
         })
+        const dateTimeMiseAjourComptage = DateService.fromStringToDateTime(
+          resultComptage.data.dateDerniereMiseAJour
+        )!
+        if (
+          DateService.isGreater(
+            dateDerniereMiseAJour,
+            dateTimeMiseAjourComptage
+          )
+        )
+          dateDerniereMiseAJour = dateTimeMiseAjourComptage
+      }
     }
 
     return success({
       comptages,
-      dateDerniereMiseAJour: this.dateService.now().toISO()
+      dateDerniereMiseAJour: dateDerniereMiseAJour.toISO()
     })
   }
 

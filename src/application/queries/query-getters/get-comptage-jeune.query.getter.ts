@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { DateTime } from 'luxon'
 import { Op, QueryTypes, Sequelize } from 'sequelize'
 import { Query } from '../../../building-blocks/types/query'
@@ -20,15 +21,16 @@ import {
 import { MiloClient } from '../../../infrastructure/clients/milo-client'
 import { OidcClient } from '../../../infrastructure/clients/oidc-client.db'
 import { ActionSqlModel } from '../../../infrastructure/sequelize/models/action.sql-model'
+import { ComptageJeuneSqlModel } from '../../../infrastructure/sequelize/models/comptage-jeune.sql-model'
 import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
+import { DateService } from '../../../utils/date-service'
+import { ComptageJeuneQueryModel } from '../get-comptage-jeune.query.handler.db'
 
 export interface GetComptageJeuneQuery extends Query {
   idJeune: string
   idDossier: string
   accessTokenJeune?: string
   accessTokenConseiller?: string
-  dateDebut: DateTime
-  dateFin: DateTime
 }
 
 @Injectable()
@@ -36,23 +38,52 @@ export class GetComptageJeuneQueryGetter {
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
     private oidcClient: OidcClient,
-    private readonly miloClient: MiloClient
+    private readonly miloClient: MiloClient,
+    private readonly dateService: DateService,
+    private readonly configService: ConfigService
   ) {}
 
   async handle(
     query: GetComptageJeuneQuery
-  ): Promise<Result<{ nbHeuresDeclarees: number; nbHeuresValidees: number }>> {
-    const dateDebut = query.dateDebut.startOf('day').toJSDate()
-    const dateFin = query.dateFin.endOf('day').toJSDate()
+  ): Promise<Result<ComptageJeuneQueryModel>> {
+    const dateDebut = this.dateService.now().startOf('week')
+    const dateFin = this.dateService.now().endOf('week')
+
+    const jourDebut = dateDebut.toISODate()
+    const jourFin = dateFin.toISODate()
+
+    const comptageTrouve = await ComptageJeuneSqlModel.findByPk(query.idJeune)
+
+    if (comptageTrouve) {
+      if (
+        comptageTrouve.jourDebut === jourDebut &&
+        comptageTrouve.jourFin === jourFin &&
+        this.leComptageEstAJour(comptageTrouve.dateMiseAJour)
+      ) {
+        return success({
+          nbHeuresDeclarees: comptageTrouve.heuresDeclarees,
+          nbHeuresValidees: comptageTrouve.heuresValidees,
+          dateDerniereMiseAJour: comptageTrouve.dateMiseAJour.toISOString()
+        })
+      }
+    }
 
     const { comptageActionsDeclarees, comptageActionsValidees } =
-      await this.compterAction(query.idJeune, dateDebut, dateFin)
+      await this.compterAction(
+        query.idJeune,
+        dateDebut.toJSDate(),
+        dateFin.toJSDate()
+      )
     const { comptageRdvsDeclares, comptageRdvsValides } =
-      await this.compterRdvs(query.idJeune, dateDebut, dateFin)
+      await this.compterRdvs(
+        query.idJeune,
+        dateDebut.toJSDate(),
+        dateFin.toJSDate()
+      )
     const resultComptageSessions = await this.compterSessions(
       query.idDossier,
-      query.dateDebut,
-      query.dateFin,
+      dateDebut,
+      dateFin,
       query.accessTokenJeune,
       query.accessTokenConseiller
     )
@@ -60,14 +91,38 @@ export class GetComptageJeuneQueryGetter {
     const { comptageSessionsDeclarees, comptageSessionsValidees } =
       resultComptageSessions.data
 
-    return success({
-      nbHeuresDeclarees:
-        comptageActionsDeclarees +
-        comptageRdvsDeclares +
-        comptageSessionsDeclarees,
-      nbHeuresValidees:
-        comptageActionsValidees + comptageRdvsValides + comptageSessionsValidees
+    const nbHeuresDeclarees =
+      comptageActionsDeclarees +
+      comptageRdvsDeclares +
+      comptageSessionsDeclarees
+
+    const nbHeuresValidees =
+      comptageActionsValidees + comptageRdvsValides + comptageSessionsValidees
+
+    await ComptageJeuneSqlModel.upsert({
+      idJeune: query.idJeune,
+      jourDebut,
+      jourFin,
+      heuresDeclarees: nbHeuresDeclarees,
+      heuresValidees: nbHeuresValidees,
+      dateMiseAJour: this.dateService.now().toJSDate()
     })
+
+    return success({
+      nbHeuresDeclarees,
+      nbHeuresValidees,
+      dateDerniereMiseAJour: this.dateService.now().toUTC().toISO()
+    })
+  }
+
+  private leComptageEstAJour(dateMiseAJour: Date): boolean {
+    const maxAgeComptage = this.configService.get('headers.maxAgeComptage')!
+
+    const maintenant = this.dateService.now()
+    const datetimeMiseAJour = DateTime.fromJSDate(dateMiseAJour)
+
+    const ageEnSecondes = maintenant.diff(datetimeMiseAJour, 'seconds').seconds
+    return ageEnSecondes < maxAgeComptage
   }
 
   private async compterAction(

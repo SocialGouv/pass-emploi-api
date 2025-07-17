@@ -67,7 +67,11 @@ describe('GetComptageJeunesByConseillerQueryHandler', () => {
       await JeuneSqlModel.create(jeune)
       await JeuneSqlModel.create(jeunePacea)
       queryGetter.handle.resolves(
-        success({ nbHeuresDeclarees: 1, nbHeuresValidees: 0 })
+        success({
+          nbHeuresDeclarees: 1,
+          nbHeuresValidees: 0,
+          dateDerniereMiseAJour: uneDatetime().minus({ hours: 1 }).toISO()
+        })
       )
       // When
       const result = await getComptageJeunesByConseillerQueryHandler.handle(
@@ -81,16 +85,14 @@ describe('GetComptageJeunesByConseillerQueryHandler', () => {
       expect(result).to.deep.equal(
         success({
           comptages: [{ idJeune: jeune.id, nbHeuresDeclarees: 1 }],
-          dateDerniereMiseAJour: uneDatetime().toISO()
+          dateDerniereMiseAJour: uneDatetime().minus({ hours: 1 }).toISO()
         })
       )
       expect(queryGetter.handle).to.have.been.calledOnceWithExactly({
         idJeune: jeune.id,
         idDossier: jeune.idPartenaire!,
         accessTokenJeune: undefined,
-        accessTokenConseiller: 'a',
-        dateDebut: uneDatetime().startOf('week'),
-        dateFin: uneDatetime().endOf('week')
+        accessTokenConseiller: 'a'
       })
     })
   })
