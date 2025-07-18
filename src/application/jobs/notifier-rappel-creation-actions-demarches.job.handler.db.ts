@@ -59,18 +59,30 @@ export class NotifierRappelCreationActionsDemarchesJobHandler extends JobHandler
       ]
 
       const offset = job?.contenu?.offset || 0
-      let idsJeunesANotifier: Array<{ id_utilisateur: string }> = []
 
-      idsJeunesANotifier = await this.sequelize.query(
-        `SELECT DISTINCT id_utilisateur 
-        FROM evenement_engagement_hebdo
-        WHERE structure IN (:structuresConcernees)
-        AND type_utilisateur = 'JEUNE'
-        GROUP BY id_utilisateur
-        HAVING SUM(CASE WHEN code IN (:codesAECreationActionsDemarches) THEN 1 ELSE 0 END) = 0
-        ORDER BY id_utilisateur ASC
-        LIMIT :maxJeunes
-        OFFSET :offset`,
+      const idsJeunesANotifier: Array<{
+        id: string
+        structure: Core.Structure
+        token: string
+        nb_actions: number
+        peut_voir_le_comptage_des_heures: boolean | null
+      }> = await this.sequelize.query(
+        `SELECT j.id as id,
+            j.structure as structure,
+            j.push_notification_token AS token,
+            j.peut_voir_le_comptage_des_heures as peut_voir_le_comptage_des_heures,
+            SUM(CASE WHEN e.code IN (:codesAECreationActionsDemarches) THEN 1 ELSE 0 END) AS nb_actions
+          FROM evenement_engagement_hebdo e
+          JOIN jeune j ON j.id = e.id_utilisateur
+          WHERE e.structure IN (:structuresConcernees)
+            AND e.type_utilisateur = 'JEUNE'
+            AND j.push_notification_token IS NOT NULL
+            AND j.dispositif != :dispositifExclu
+          GROUP BY j.id, j.structure, j.push_notification_token
+          HAVING SUM(CASE WHEN e.code IN (:codesAECreationActionsDemarches) THEN 1 ELSE 0 END) <= 3
+          ORDER BY j.id ASC
+          LIMIT :maxJeunes
+          OFFSET :offset`,
         {
           type: QueryTypes.SELECT,
           replacements: {
@@ -85,6 +97,7 @@ export class NotifierRappelCreationActionsDemarchesJobHandler extends JobHandler
               Evenement.Code.ACTION_DUPLIQUEE_HORS_REFERENTIEL,
               Evenement.Code.ACTION_DUPLIQUEE_REFERENTIEL
             ],
+            dispositifExclu: Jeune.Dispositif.PACEA,
             maxJeunes: PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM,
             offset
           }
@@ -93,30 +106,16 @@ export class NotifierRappelCreationActionsDemarchesJobHandler extends JobHandler
 
       this.logger.log(`${idsJeunesANotifier.length} ids jeunes à notifier`)
 
-      if (idsJeunesANotifier.length) {
-        const jeunesANotifier: Array<{
-          id: string
-          structure: Core.Structure
-          token: string
-        }> = await this.sequelize.query(
-          `SELECT id, structure, push_notification_token as token from jeune where id in (:idsJeunesANotifier) AND push_notification_token IS NOT NULL AND dispositif != :dispositifExclu`,
-          {
-            type: QueryTypes.SELECT,
-            replacements: {
-              idsJeunesANotifier: idsJeunesANotifier.map(
-                id => id.id_utilisateur
-              ),
-              dispositifExclu: Jeune.Dispositif.PACEA
-            }
-          }
+      stats.nbJeunesNotifies += idsJeunesANotifier.length
+      for (const jeune of idsJeunesANotifier) {
+        this.notificationService.notifierRappelCreationActionDemarche(
+          jeune.id,
+          jeune.structure,
+          jeune.token,
+          jeune.nb_actions,
+          jeune.peut_voir_le_comptage_des_heures ?? undefined
         )
-
-        this.logger.log(`${jeunesANotifier.length} jeunes notifiables`)
-        stats.nbJeunesNotifies += jeunesANotifier.length
-        for (const jeune of jeunesANotifier) {
-          this.notificationService.notifierRappelCreationActionDemarche(jeune)
-          await new Promise(resolve => setTimeout(resolve, 500))
-        }
+        await new Promise(resolve => setTimeout(resolve, 500))
       }
 
       if (idsJeunesANotifier.length === PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM) {

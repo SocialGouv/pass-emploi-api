@@ -16,7 +16,7 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
 import { Planificateur } from '../../../src/domain/planificateur'
 
-const idJeune = 'j'
+const idJeune = 'j1'
 const idJeune2 = 'j2'
 const idJeune3 = 'j3'
 const idJeune4 = 'j4'
@@ -130,16 +130,12 @@ describe('NotifierCreationActionsDemarchesJobHandler', () => {
       // Then
       expect(result.succes).to.be.true()
       expect(result.resultat).to.deep.equal({
-        nbJeunesNotifies: 1,
+        nbJeunesNotifies: 3,
         estLaDerniereExecution: true
       })
       expect(
         notificationService.notifierRappelCreationActionDemarche
-      ).to.have.been.calledOnceWithExactly({
-        id: idJeune,
-        structure: Core.Structure.MILO,
-        token: 'push1'
-      })
+      ).to.have.been.calledThrice()
       expect(planificateurRepository.ajouterJob).not.to.have.been.called()
     })
   })

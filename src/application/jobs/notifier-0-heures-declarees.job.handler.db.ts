@@ -19,7 +19,7 @@ interface Stats {
   estLaDerniereExecution: boolean
 }
 
-const PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM = 1000
+const PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM = 2000
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.NOTIFIER_0_HEURES_DECLAREES)
