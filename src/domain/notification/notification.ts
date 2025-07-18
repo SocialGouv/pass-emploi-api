@@ -3,7 +3,7 @@ import { DateTime } from 'luxon'
 import { SessionMiloAllegeeForBeneficiaire } from 'src/domain/milo/session.milo'
 import { DateService } from '../../utils/date-service'
 import { Action } from '../action/action'
-import { Core, beneficiaireEstFTConnect } from '../core'
+import { Core, beneficiaireEstFTConnect, estMilo } from '../core'
 import { Jeune } from '../jeune/jeune'
 import { Recherche } from '../offre/recherche/recherche'
 import { RendezVous } from '../rendez-vous/rendez-vous'
@@ -283,30 +283,53 @@ export namespace Notification {
       )
     }
 
-    async notifierRappelCreationActionDemarche(jeune: {
-      id: string
-      structure: Core.Structure
-      token: string
-    }): Promise<void> {
+    async notifierRappelCreationActionDemarche(
+      id: string,
+      structure: Core.Structure,
+      token: string,
+      nbActionsCreees: number,
+      peutVoirLeComptageDesHeures?: boolean
+    ): Promise<void> {
       try {
-        const notification = creerNotificationRappelCreationActionDemarche(
-          jeune.token,
-          jeune.structure,
-          this.dateService
-        )
-        const promise = this.notificationRepository.send(notification, jeune.id)
-        this.logMessageSucces(jeune.id)
-        return promise
+        let notification: Notification.Message | undefined
+
+        if (
+          estMilo(structure) &&
+          peutVoirLeComptageDesHeures &&
+          nbActionsCreees > 0
+        ) {
+          notification = {
+            token,
+            notification: {
+              title: 'On est jeudi ! 🥳',
+              body: 'Continuez à saisir vos actions de la semaine'
+            },
+            data: {
+              type: Type.RAPPEL_CREATION_ACTION
+            }
+          }
+        } else if (nbActionsCreees == 0) {
+          notification = creerNotificationRappelCreationActionDemarche(
+            token,
+            structure,
+            this.dateService
+          )
+        }
+        if (notification) {
+          const promise = this.notificationRepository.send(notification, id)
+          this.logMessageSucces(id)
+          return promise
+        }
       } catch (e) {
         this.logger.error(e)
-        this.logMessageEchec(jeune.id)
+        this.logMessageEchec(id)
       }
     }
 
-    async notifier0Heures(idJeune: string, tokenJeune: string): Promise<void> {
+    async notifier0Heures(id: string, token: string): Promise<void> {
       try {
         const notification = {
-          token: tokenJeune,
+          token,
           notification: {
             title: 'Vous avez 2 minutes ? 👀',
             body: 'Commencez à renseigner vos actions'
@@ -315,12 +338,12 @@ export namespace Notification {
             type: Type.RAPPEL_CREATION_ACTION
           }
         }
-        const promise = this.notificationRepository.send(notification, idJeune)
-        this.logMessageSucces(idJeune)
+        const promise = this.notificationRepository.send(notification, id)
+        this.logMessageSucces(id)
         return promise
       } catch (e) {
         this.logger.error(e)
-        this.logMessageEchec(idJeune)
+        this.logMessageEchec(id)
       }
     }
 

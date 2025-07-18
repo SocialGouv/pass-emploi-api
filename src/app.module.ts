@@ -812,8 +812,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     AutoinscrireBeneficiaireSessionMiloCommandHandler,
     GetComptageJeuneQueryHandler,
     GetComptageJeunesByConseillerQueryHandler,
-    GetComptageJeuneQueryGetter,
-    Notifier0HeuresDeclareesJobHandler
+    GetComptageJeuneQueryGetter
   ]
 }
 
@@ -854,7 +853,8 @@ export const JobHandlerProviders = [
   NotifierRappelCreationActionsDemarchesJobHandler,
   NotifierBonneAlternanceJobHandler,
   NotifierCampagneJobHandler,
-  NotifierActualisationJobHandler
+  NotifierActualisationJobHandler,
+  Notifier0HeuresDeclareesJobHandler
 ]
 
 @Module(buildModuleMetadata())

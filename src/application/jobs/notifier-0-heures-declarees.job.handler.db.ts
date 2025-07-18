@@ -19,7 +19,7 @@ interface Stats {
   estLaDerniereExecution: boolean
 }
 
-const PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM = 1000
+const PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM = 2000
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.NOTIFIER_0_HEURES_DECLAREES)
@@ -59,7 +59,7 @@ export class Notifier0HeuresDeclareesJobHandler extends JobHandler<Job> {
         WHERE jeune.structure = :structure
         AND jeune.dispositif = :dispositif
         AND jeune.push_notification_token IS NOT NULL
-        AND jeune.date_derniere_actualisation_token > NOW() - INTERVAL '1 day'
+        AND jeune.date_derniere_actualisation_token > :nowLimit
         AND jeune.peut_voir_le_comptage_des_heures = true
         GROUP BY jeune.id
         HAVING COUNT(action.id) = 0
@@ -73,6 +73,7 @@ export class Notifier0HeuresDeclareesJobHandler extends JobHandler<Job> {
             dispositif: Jeune.Dispositif.CEJ,
             debutSemaine: maintenant.startOf('week').toJSDate(),
             maxJeunes: PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM,
+            nowLimit: maintenant.minus({ days: 1 }).toJSDate(),
             offset
           }
         }
