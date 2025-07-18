@@ -27,6 +27,7 @@ import { fromSqlToRendezVousJeuneQueryModel } from '../query-mappers/rendez-vous
 import { GetSessionsJeuneMiloQueryGetter } from '../query-getters/milo/get-sessions-jeune.milo.query.getter.db'
 import { buildError } from '../../../utils/logger.module'
 import { estMilo } from '../../../domain/core'
+import { SessionMilo } from '../../../domain/milo/session.milo'
 
 export interface GetMonSuiviMiloQuery extends Query {
   idJeune: string
@@ -100,7 +101,20 @@ export class GetMonSuiviMiloQueryHandler extends QueryHandler<
           return null
         })
     ])
-    return success({ actions, rendezVous, sessionsMilo })
+    return success({
+      actions,
+      rendezVous,
+      sessionsMilo: sessionsMilo
+        ? sessionsMilo.filter(
+            sesssion =>
+              sesssion.inscription &&
+              [
+                SessionMilo.Inscription.Statut.INSCRIT,
+                SessionMilo.Inscription.Statut.PRESENT
+              ].includes(sesssion.inscription)
+          )
+        : null
+    })
   }
 
   async monitor(): Promise<void> {
