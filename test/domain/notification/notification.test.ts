@@ -208,7 +208,13 @@ describe('Notification', () => {
         })
 
         // When
-        await notificationService.notifierRappelCreationActionDemarche(jeune)
+        await notificationService.notifierRappelCreationActionDemarche(
+          jeune.id,
+          jeune.structure,
+          jeune.token,
+          0,
+          undefined
+        )
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
@@ -236,13 +242,95 @@ describe('Notification', () => {
         })
 
         // When
-        await notificationService.notifierRappelCreationActionDemarche(jeune)
+        await notificationService.notifierRappelCreationActionDemarche(
+          jeune.id,
+          jeune.structure,
+          jeune.token,
+          0,
+          undefined
+        )
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
           expectedNotification,
           jeune.id
         )
+      })
+      it('notifie les jeunes du comptage à 10h', async () => {
+        // Given
+        const jeune = {
+          id: 'test',
+          structure: Core.Structure.MILO,
+          token: 'tok'
+        }
+        dateService.now.returns(DateTime.fromISO('2020-04-27T12:00:00.000Z'))
+        const expectedNotification = uneNotification({
+          token: 'tok',
+          notification: {
+            title: 'On est jeudi ! 🥳',
+            body: 'Continuez à saisir vos actions de la semaine'
+          },
+          data: {
+            type: Notification.Type.RAPPEL_CREATION_ACTION
+          }
+        })
+
+        // When
+        await notificationService.notifierRappelCreationActionDemarche(
+          jeune.id,
+          jeune.structure,
+          jeune.token,
+          2,
+          true
+        )
+
+        // Then
+        expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
+          expectedNotification,
+          jeune.id
+        )
+      })
+      it('ne notifie pas les jeunes PE du comptage à 10h', async () => {
+        // Given
+        const jeune = {
+          id: 'test',
+          structure: Core.Structure.POLE_EMPLOI,
+          token: 'tok'
+        }
+        dateService.now.returns(DateTime.fromISO('2020-04-27T12:00:00.000Z'))
+
+        // When
+        await notificationService.notifierRappelCreationActionDemarche(
+          jeune.id,
+          jeune.structure,
+          jeune.token,
+          2,
+          true
+        )
+
+        // Then
+        expect(notificationRepository.send).not.to.have.been.called()
+      })
+      it('ne notifie pas les jeunes MILO du comptage à 10h', async () => {
+        // Given
+        const jeune = {
+          id: 'test',
+          structure: Core.Structure.MILO,
+          token: 'tok'
+        }
+        dateService.now.returns(DateTime.fromISO('2020-04-27T12:00:00.000Z'))
+
+        // When
+        await notificationService.notifierRappelCreationActionDemarche(
+          jeune.id,
+          jeune.structure,
+          jeune.token,
+          2,
+          false
+        )
+
+        // Then
+        expect(notificationRepository.send).not.to.have.been.called()
       })
     })
 

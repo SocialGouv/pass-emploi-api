@@ -81,6 +81,7 @@ export namespace Planificateur {
     QUALIFIER_ACTIONS = 'QUALIFIER_ACTIONS',
     RECUPERER_ANALYSE_ANTIVIRUS = 'RECUPERER_ANALYSE_ANTIVIRUS',
     NOTIFIER_RAPPEL_CREATION_ACTIONS_DEMARCHES = 'NOTIFIER_RAPPEL_CREATION_ACTIONS_DEMARCHES',
+    NOTIFIER_0_HEURES_DECLAREES = 'NOTIFIER_0_HEURES_DECLAREES',
     NOTIFIER_BONNE_ALTERNANCE = 'NOTIFIER_BONNE_ALTERNANCE',
     NOTIFIER_CAMPAGNE = 'NOTIFIER_CAMPAGNE',
     NOTIFIER_ACTUALISATION = 'NOTIFIER_ACTUALISATION',
@@ -104,6 +105,11 @@ export namespace Planificateur {
   }
 
   export interface JobRappelCreationActionsDemarches {
+    offset?: number
+    nbJeunesNotifies?: number
+  }
+
+  export interface Job0HeuresDeclarees {
     offset?: number
     nbJeunesNotifies?: number
   }
@@ -210,6 +216,11 @@ export const listeCronJobs: Planificateur.CronJob[] = [
     type: Planificateur.JobType.NOTIFIER_RAPPEL_CREATION_ACTIONS_DEMARCHES,
     expression: '0 10 * * 4',
     description: 'Tous les jeudi à 10h.'
+  },
+  {
+    type: Planificateur.JobType.NOTIFIER_0_HEURES_DECLAREES,
+    expression: '0 16 * * 1',
+    description: 'Tous les lundi à 16h.'
   },
   {
     type: Planificateur.JobType.NOUVELLES_OFFRES_SERVICE_CIVIQUE,
