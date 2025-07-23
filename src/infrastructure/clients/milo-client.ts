@@ -38,6 +38,7 @@ export class MiloClient {
   private readonly apiKeySessionsDetailEtListeJeune: string
   private readonly apiKeySessionDetailConseiller: string
   private readonly apiKeyInstanceSessionEcritureConseiller: string
+  private readonly apiKeyEnvoiEmail: string
   private readonly apiKeyUtilisateurs: string
   private readonly logger: Logger
   private readonly apmService: APM.Agent
@@ -60,6 +61,7 @@ export class MiloClient {
     this.apiKeyInstanceSessionEcritureConseiller =
       this.configService.get('milo').apiKeyInstanceSessionEcritureConseiller
     this.apiKeyUtilisateurs = this.configService.get('milo').apiKeyUtilisateurs
+    this.apiKeyEnvoiEmail = this.configService.get('milo').apiKeyEnvoiEmail
   }
 
   async getSessionsConseillerParStructure(
@@ -303,6 +305,21 @@ export class MiloClient {
     return emptySuccess()
   }
 
+  async envoyerEmailActivation(
+    idpToken: string,
+    email: string
+  ): Promise<Result> {
+    const result = await this.put(
+      `sue/sendVerifyEmail`,
+      email,
+      this.apiKeyEnvoiEmail,
+      idpToken,
+      false
+    )
+    if (isFailure(result)) return result
+    return emptySuccess()
+  }
+
   private async recupererSessionsParDossierJeune(
     idpToken: string,
     idDossier: string,
@@ -391,12 +408,14 @@ export class MiloClient {
     suffixUrl: string,
     payload: { [p: string]: string | undefined } | string,
     apiKey: string,
-    idpToken: string
+    idpToken: string,
+    isAPIOperateur = true
   ): Promise<Result> {
+    const prefixUrl = isAPIOperateur ? 'operateurs/' : ''
     try {
       await firstValueFrom(
         this.httpService.put(
-          `${this.apiUrl}/operateurs/${suffixUrl}`,
+          `${this.apiUrl}/${prefixUrl}${suffixUrl}`,
           payload,
           {
             headers: {
@@ -411,7 +430,7 @@ export class MiloClient {
       return emptySuccess()
     } catch (e) {
       this.apmService.captureError(e)
-      return handleAxiosError(e, this.logger, 'Erreur POST Milo')
+      return handleAxiosError(e, this.logger, 'Erreur PUT Milo')
     }
   }
 

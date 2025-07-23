@@ -43,6 +43,7 @@ import { GetDemarchesConseillerQueryHandler } from '../../../src/application/que
 import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
 import { GetComptageJeunesByConseillerQueryHandler } from '../../../src/application/queries/get-comptage-jeunes-by-conseiller.query.handler.db'
 import { uneDatetime } from '../../fixtures/date.fixture'
+import { EnvoyerEmailActivationCommandHandler } from '../../../src/application/commands/milo/envoyer-email-activation.command.handler'
 
 describe('ConseillersController', () => {
   let getDetailConseillerQueryHandler: StubbedClass<GetDetailConseillerQueryHandler>
@@ -58,6 +59,7 @@ describe('ConseillersController', () => {
   let getDemarchesConseillerQueryHandler: StubbedClass<GetDemarchesConseillerQueryHandler>
   let getRendezVousJeuneQueryHandler: StubbedClass<GetRendezVousJeuneQueryHandler>
   let getComptageJeunesByConseillerQueryHandler: StubbedClass<GetComptageJeunesByConseillerQueryHandler>
+  let envoyerEmailActivationCommandHandler: StubbedClass<EnvoyerEmailActivationCommandHandler>
 
   let app: INestApplication
 
@@ -89,6 +91,9 @@ describe('ConseillersController', () => {
     getRendezVousJeuneQueryHandler = app.get(GetRendezVousJeuneQueryHandler)
     getComptageJeunesByConseillerQueryHandler = app.get(
       GetComptageJeunesByConseillerQueryHandler
+    )
+    envoyerEmailActivationCommandHandler = app.get(
+      EnvoyerEmailActivationCommandHandler
     )
   })
 
@@ -436,6 +441,37 @@ describe('ConseillersController', () => {
           {
             idsJeunes: payload.idsJeunes,
             idConseiller: '1'
+          },
+          unUtilisateurDecode()
+        )
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'post',
+      '/conseillers/1/jeunes/notify-messages'
+    )
+  })
+
+  describe('POST /conseillers/:idConseiller/envoyer-email-activation/:idJeune', () => {
+    describe('quand tout va bien', () => {
+      it('renvoie 200', async () => {
+        // Given
+        envoyerEmailActivationCommandHandler.execute.resolves(emptySuccess())
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/conseillers/1/envoyer-email-activation/2')
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+
+        expect(
+          envoyerEmailActivationCommandHandler.execute
+        ).to.have.been.calledWithExactly(
+          {
+            idJeune: '2',
+            idConseiller: '1',
+            accessToken: 'coucou'
           },
           unUtilisateurDecode()
         )

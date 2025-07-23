@@ -3,10 +3,16 @@ import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import { firstValueFrom } from 'rxjs'
-import { emptySuccess, Result, success } from 'src/building-blocks/types/result'
+import {
+  emptySuccess,
+  failure,
+  Result,
+  success
+} from 'src/building-blocks/types/result'
 import { URLSearchParams } from 'url'
 import { handleAxiosError } from './utils/axios-error-handler'
 import { PartenaireImmersion } from '../repositories/dto/immersion.dto'
+import { ErreurHttp } from '../../building-blocks/types/domain-error'
 
 export interface FormulaireImmersionPayload {
   appellationCode: string
@@ -47,6 +53,9 @@ export class ImmersionClient {
 
       return success(response.data)
     } catch (erreur) {
+      if (erreur.response?.status === 401)
+        return failure(new ErreurHttp('API Key Immersion invalide', 400))
+
       return handleAxiosError(
         erreur,
         this.logger,

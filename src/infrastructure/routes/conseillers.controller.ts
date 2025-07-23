@@ -65,6 +65,7 @@ import {
   GetIndicateursPourConseillerQueryParams,
   UpdateJeuneDuConseillerPayload
 } from './validation/conseillers.inputs'
+import { EnvoyerEmailActivationCommandHandler } from '../../application/commands/milo/envoyer-email-activation.command.handler'
 
 @Controller('conseillers')
 @CustomSwaggerApiOAuth2()
@@ -84,7 +85,8 @@ export class ConseillersController {
     private readonly deleteConseillerCommandHandler: DeleteConseillerCommandHandler,
     private readonly getDemarchesConseillerQueryHandler: GetDemarchesConseillerQueryHandler,
     private readonly getRendezVousJeuneQueryHandler: GetRendezVousJeuneQueryHandler,
-    private readonly sendNotificationsNouveauxMessages: SendNotificationsNouveauxMessagesCommandHandler
+    private readonly sendNotificationsNouveauxMessages: SendNotificationsNouveauxMessagesCommandHandler,
+    private readonly envoyerEmailActivationCommandHandler: EnvoyerEmailActivationCommandHandler
   ) {}
 
   @ApiOperation({
@@ -244,6 +246,31 @@ export class ConseillersController {
     const result = await this.recupererJeunesDuConseillerCommandHandler.execute(
       {
         idConseiller: idConseiller
+      },
+      utilisateur
+    )
+
+    return handleResult(result)
+  }
+
+  @ApiOperation({
+    summary:
+      'Réaffecte les jeunes transférés temporairement au conseiller initial',
+    description: 'Autorisé pour un conseiller'
+  })
+  @Post(':idConseiller/envoyer-email-activation/:idJeune')
+  @HttpCode(200)
+  async envoyerEmailActivation(
+    @Param('idConseiller') idConseiller: string,
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string
+  ): Promise<void> {
+    const result = await this.envoyerEmailActivationCommandHandler.execute(
+      {
+        idConseiller,
+        idJeune,
+        accessToken
       },
       utilisateur
     )
