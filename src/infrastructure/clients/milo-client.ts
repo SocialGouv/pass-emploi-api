@@ -422,7 +422,8 @@ export class MiloClient {
               Authorization: `Bearer ${idpToken}`,
               'X-Gravitee-Api-Key': apiKey,
               operateur: 'APPLICATION_CEJ',
-              'Content-Type': 'application/json'
+              'Content-Type':
+                typeof payload === 'string' ? 'text/plain' : 'application/json'
             }
           }
         )
