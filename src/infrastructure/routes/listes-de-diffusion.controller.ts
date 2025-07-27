@@ -30,6 +30,10 @@ import {
   CreateListeDeDiffusionPayload,
   UpdateListeDeDiffusionPayload
 } from './validation/conseillers.inputs'
+import {
+  AjouterJeuneListeDeDiffusionCommand,
+  AjouterJeuneListeDeDiffusionCommandHandler
+} from '../../application/commands/ajouter-jeune-liste-de-diffusion.command.handler'
 
 @Controller()
 @CustomSwaggerApiOAuth2()
@@ -37,6 +41,7 @@ import {
 export class ListesDeDiffusionController {
   constructor(
     private readonly createListeDeDiffusionCommandHandler: CreateListeDeDiffusionCommandHandler,
+    private readonly ajouterJeuneListeDeDiffusionCommandHandler: AjouterJeuneListeDeDiffusionCommandHandler,
     private readonly updateListeDeDiffusionCommandHandler: UpdateListeDeDiffusionCommandHandler,
     private readonly getListesDeDiffusionQueryHandler: GetListesDeDiffusionDuConseillerQueryHandler,
     private readonly deleteListeDeDiffusionCommandHandler: DeleteListeDeDiffusionCommandHandler,
@@ -63,6 +68,33 @@ export class ListesDeDiffusionController {
       command,
       utilisateur
     )
+
+    return handleResult(result)
+  }
+
+  @ApiOperation({
+    summary: 'Ajout un jeune à une liste de diffusion',
+    description: 'Autorisé pour le conseiller avec son bénéficiaire.'
+  })
+  @Post(
+    'conseillers/:idConseiller/listes-de-diffusion/:idListeDeDiffusion/jeunes/:idJeune'
+  )
+  async ajouterJeune(
+    @Param('idConseiller') idConseiller: string,
+    @Param('idJeune') idJeune: string,
+    @Param('idListeDeDiffusion') idListeDeDiffusion: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: AjouterJeuneListeDeDiffusionCommand = {
+      idConseiller,
+      idJeune,
+      idListeDeDiffusion
+    }
+    const result =
+      await this.ajouterJeuneListeDeDiffusionCommandHandler.execute(
+        command,
+        utilisateur
+      )
 
     return handleResult(result)
   }
