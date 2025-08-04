@@ -32,6 +32,8 @@ export class SuivreEvenementsMiloCronJobHandler extends JobHandler<Job> {
 
   async handle(): Promise<SuiviJob> {
     const debutDuJob = this.dateService.now()
+    let nombreEvenementsMax = 1500
+    let nombreEvenementsTraites = 0
     try {
       const jobEstEnCours = await this.planificateurRepository.estEnCours(
         this.jobType
@@ -42,15 +44,16 @@ export class SuivreEvenementsMiloCronJobHandler extends JobHandler<Job> {
           jobType: this.jobType,
           dateExecution: debutDuJob,
           succes: true,
-          resultat: {},
+          resultat: { nombreEvenementsTraites },
           nbErreurs: 0,
           tempsExecution: DateService.calculerTempsExecution(debutDuJob)
         }
       }
       let evenementsMilo: EvenementMilo[] = []
-      let nombreEvenementsTraites = 0
       do {
         evenementsMilo = await this.evenementMiloRepository.findAllEvenements()
+        if (evenementsMilo.length > nombreEvenementsMax)
+          evenementsMilo = evenementsMilo.slice(0, nombreEvenementsMax)
 
         const evenementsAPlanifier = trouverEvenementsAPlanifier(evenementsMilo)
         for (const evenementAPlanifier of evenementsAPlanifier) {
@@ -63,7 +66,8 @@ export class SuivreEvenementsMiloCronJobHandler extends JobHandler<Job> {
           await this.evenementMiloRepository.acquitterEvenement(evenement)
         }
         nombreEvenementsTraites += evenementsMilo.length
-      } while (evenementsMilo.length > 0)
+        nombreEvenementsMax -= evenementsMilo.length
+      } while (evenementsMilo.length > 0 && nombreEvenementsMax > 0)
 
       return {
         jobType: this.jobType,
@@ -79,7 +83,7 @@ export class SuivreEvenementsMiloCronJobHandler extends JobHandler<Job> {
         jobType: this.jobType,
         dateExecution: debutDuJob,
         succes: false,
-        resultat: {},
+        resultat: { nombreEvenementsTraites },
         nbErreurs: 1,
         tempsExecution: DateService.calculerTempsExecution(debutDuJob),
         erreur: e
