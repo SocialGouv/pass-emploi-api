@@ -11,15 +11,21 @@ import {
 import { DateTime } from 'luxon'
 import { Logger } from '@nestjs/common'
 
+export function estDemarchePerso(
+  codePourquoi?: string,
+  codeQuoi?: string
+): boolean {
+  return (
+    codePourquoi === POURQUOI_DEMARCHE_PERSO && codeQuoi === QUOI_DEMARCHE_PERSO
+  )
+}
+
 export function fromDemarcheDtoToDemarche(
   demarcheDto: DemarcheDto,
   dateService: DateService
 ): Demarche {
   let label = demarcheDto.libellePourquoi
-  if (
-    demarcheDto.pourQuoi === POURQUOI_DEMARCHE_PERSO &&
-    demarcheDto.quoi === QUOI_DEMARCHE_PERSO
-  ) {
+  if (estDemarchePerso(demarcheDto.pourQuoi, demarcheDto.quoi)) {
     label = 'Autre démarche'
   }
   const aujourdhuiAMidi = dateService.now().set({ hour: 12 })

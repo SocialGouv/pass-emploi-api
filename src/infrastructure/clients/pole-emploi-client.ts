@@ -30,7 +30,11 @@ import {
   OffresEmploiDtoWithTotal,
   TypeRDVPE
 } from '../repositories/dto/pole-emploi.dto'
-import { ListeTypeDemarchesDto, TypeDemarcheDto } from './dto/pole-emploi.dto'
+import {
+  DemarcheIADto,
+  ListeTypeDemarchesDto,
+  TypeDemarcheDto
+} from './dto/pole-emploi.dto'
 import { handleAxiosError } from './utils/axios-error-handler'
 
 const CODE_UTILISATEUR = 0
@@ -242,6 +246,76 @@ export class PoleEmploiClient {
     }
   }
 
+  async generateDemarchesIA(contenu: string): Promise<Result<DemarcheIADto[]>> {
+    const token = await this.getToken()
+    const body = { content: contenu, idModel: 'vllm_mistral_small-instruct' }
+    try {
+      const response = await firstValueFrom(
+        this.httpService.post<DemarcheIADto[]>(
+          `${this.apiUrl}/categorisation-demarches/v1/demarches`,
+          body,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        )
+      )
+      return success(response.data)
+    } catch (e) {
+      this.logger.error(
+        buildError('Erreur lors de la génération des démarches IA', e)
+      )
+      try {
+        if (
+          this.configService.get('environment') === 'development' ||
+          this.configService.get('environment') === 'staging'
+        ) {
+          const configProdFT = this.configService.get('prodFT')
+          this.logger.log(configProdFT)
+          if (
+            configProdFT.apiUrl &&
+            configProdFT.clientId &&
+            configProdFT.clientSecret &&
+            configProdFT.scopes &&
+            configProdFT.loginUrl
+          ) {
+            const token = await this.getTokenProd()
+            const response = await firstValueFrom(
+              this.httpService.post<DemarcheIADto[]>(
+                `${configProdFT.apiUrl}/categorisation-demarches/v1/demarches`,
+                body,
+                {
+                  headers: { Authorization: `Bearer ${token}` }
+                }
+              )
+            )
+            return success(response.data)
+          }
+        }
+      } catch (e) {
+        this.logger.error(
+          buildError(
+            'Erreur lors de la génération des démarches IA prod direct',
+            e
+          )
+        )
+        return failure(
+          new ErreurHttp(
+            e.response?.data?.message ??
+              'Erreur lors de la génération des démarches IA prod direct',
+            e.response?.status ?? 500
+          )
+        )
+      }
+      return failure(
+        new ErreurHttp(
+          e.response?.data?.message ??
+            'Erreur lors de la génération des démarches IA',
+          e.response?.status ?? 500
+        )
+      )
+    }
+  }
+
   async getWithRetry<T>(
     suffixUrl: string,
     params?: unknown,
@@ -356,6 +430,35 @@ export class PoleEmploiClient {
       'An access token for Pole Emploi API has been retrieved successfully'
     )
 
+    return token
+  }
+
+  async getTokenProd(): Promise<string> {
+    const configProdFT = this.configService.get('prodFT')
+
+    const params = new URLSearchParams()
+    params.append('grant_type', 'client_credentials')
+    params.append('client_id', configProdFT.clientId)
+    params.append('client_secret', configProdFT.clientSecret)
+    params.append('scope', configProdFT.scopes)
+
+    const loginUrl = `${configProdFT.loginUrl}?realm=%2Fpartenaire`
+
+    const reponse = await firstValueFrom(
+      this.httpService.post(loginUrl, params, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      })
+    )
+
+    const token = reponse.data.access_token
+    const SECONDS_BEFORE_EXPIRY = 30
+    this.tokenExpiryInSeconds = reponse.data.expires_in - SECONDS_BEFORE_EXPIRY
+
+    this.logger.log(
+      'An access token for Pole Emploi API has been retrieved successfully'
+    )
     return token
   }
 

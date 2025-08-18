@@ -211,6 +211,11 @@ export interface ListeTypeDemarchesDto {
   listeDemarches?: TypeDemarcheDto[]
 }
 
+export interface DemarcheIADto {
+  description: string
+  codePourquoi: string
+  codeQuoi: string
+}
 export interface TypeDemarcheDto {
   codeQuoiTypeDemarche: string
   libelleQuoiTypeDemarche: string

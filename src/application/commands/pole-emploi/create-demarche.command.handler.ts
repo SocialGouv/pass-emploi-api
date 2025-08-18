@@ -8,6 +8,7 @@ import { beneficiaireEstFTConnect } from '../../../domain/core'
 import { Demarche, DemarcheRepositoryToken } from '../../../domain/demarche'
 import { Evenement, EvenementService } from '../../../domain/evenement'
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
+import { estDemarchePerso } from '../../queries/query-mappers/actions-pole-emploi.mappers'
 
 export interface CreateDemarcheCommand extends Command {
   idJeune: string
@@ -18,6 +19,7 @@ export interface CreateDemarcheCommand extends Command {
   codeComment?: string
   dateFin: DateTime
   estDuplicata?: boolean
+  genereParIA?: boolean
 }
 
 @Injectable()
@@ -74,6 +76,23 @@ export class CreateDemarcheCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur,
     command: CreateDemarcheCommand
   ): Promise<void> {
+    if (command.genereParIA) {
+      if (
+        command.description &&
+        ((!command.codePourquoi && !command.codeQuoi) ||
+          estDemarchePerso(command.codePourquoi, command.codeQuoi))
+      ) {
+        await this.evenementService.creer(
+          Evenement.Code.ACTION_CREEE_IA_HORS_REFERENTIEL,
+          utilisateur
+        )
+      } else if (command.codePourquoi && command.codeQuoi) {
+        await this.evenementService.creer(
+          Evenement.Code.ACTION_CREEE_IA_REFERENTIEL,
+          utilisateur
+        )
+      }
+    }
     if (command.description && !command.estDuplicata) {
       await this.evenementService.creer(
         Evenement.Code.ACTION_CREEE_HORS_REFERENTIEL,

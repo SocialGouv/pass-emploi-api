@@ -33,9 +33,14 @@ import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import {
   CreateDemarchePayload,
+  CreateDemarchesIAPayload,
   UpdateStatutDemarchePayload
 } from './validation/demarches.inputs'
 import { MaintenantQueryParams } from './validation/jeunes.inputs'
+import {
+  DemarcheIAQueryModel,
+  GenerateDemarchesIACommandHandler
+} from '../../application/commands/pole-emploi/generate-demarches-ia.command.handler'
 
 @Controller()
 @CustomSwaggerApiOAuth2()
@@ -49,7 +54,8 @@ export class JeunesPoleEmploiController {
     private readonly getTokenPoleEmploiQueryHandler: GetTokenPoleEmploiQueryHandler,
     private readonly updateStatutDemarcheCommandHandler: UpdateStatutDemarcheCommandHandler,
     private readonly createDemarcheCommandHandler: CreateDemarcheCommandHandler,
-    private readonly getMonSuiviPoleEmploiQueryHandler: GetMonSuiviPoleEmploiQueryHandler
+    private readonly getMonSuiviPoleEmploiQueryHandler: GetMonSuiviPoleEmploiQueryHandler,
+    private readonly generateDemarchesIACommandHandler: GenerateDemarchesIACommandHandler
   ) {}
 
   @Get('jeunes/:idJeune/pole-emploi/accueil')
@@ -131,6 +137,23 @@ export class JeunesPoleEmploiController {
     )
 
     return handleResult(result, toDemarcheQueryModel)
+  }
+
+  @ApiOperation({
+    summary: "Génère une liste de démarche à partir d'un paragraphe"
+  })
+  @Post('jeunes/:idJeune/demarches-ia')
+  async createDemarchesIA(
+    @Param('idJeune') idJeune: string,
+    @Body() payload: CreateDemarchesIAPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<DemarcheIAQueryModel[]> {
+    const result = await this.generateDemarchesIACommandHandler.execute(
+      { contenu: payload.contenu, idJeune },
+      utilisateur
+    )
+
+    return handleResult(result)
   }
 
   @ApiOperation({

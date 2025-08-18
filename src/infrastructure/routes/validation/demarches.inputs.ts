@@ -5,7 +5,9 @@ import {
   IsEnum,
   IsNotEmpty,
   IsOptional,
-  Length
+  IsString,
+  Length,
+  MaxLength
 } from 'class-validator'
 import { Demarche } from '../../../domain/demarche'
 
@@ -22,6 +24,13 @@ export class UpdateStatutDemarchePayload {
   @IsDateString()
   @IsOptional()
   dateDebut?: string
+}
+
+export class CreateDemarchesIAPayload {
+  @ApiProperty()
+  @IsString()
+  @MaxLength(1000)
+  contenu: string
 }
 
 export class CreateDemarchePayload {
@@ -50,6 +59,10 @@ export class CreateDemarchePayload {
   @IsOptional()
   @IsBoolean()
   estDuplicata?: boolean
+
+  @IsOptional()
+  @IsBoolean()
+  genereParIA?: boolean
 }
 
 export class TypesDemarchesQueryParams {

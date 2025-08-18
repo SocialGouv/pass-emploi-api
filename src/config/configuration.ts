@@ -279,7 +279,8 @@ export default () => {
     },
     remoteConfig: process.env.REMOTE_CONFIG
       ? JSON.parse(process.env.REMOTE_CONFIG)
-      : {}
+      : {},
+    prodFT: process.env.PROD_FT ? JSON.parse(process.env.PROD_FT) : undefined
   }
   return Joi.attempt(configuration, configurationSchema)
 }

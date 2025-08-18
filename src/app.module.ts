@@ -380,6 +380,7 @@ import { CreerVueAEMensuelleJobHandler } from './application/jobs/analytics/cree
 import { Notifier0HeuresDeclareesJobHandler } from './application/jobs/notifier-0-heures-declarees.job.handler.db'
 import { EnvoyerEmailActivationCommandHandler } from './application/commands/milo/envoyer-email-activation.command.handler'
 import { AjouterJeuneListeDeDiffusionCommandHandler } from './application/commands/ajouter-jeune-liste-de-diffusion.command.handler'
+import { GenerateDemarchesIACommandHandler } from './application/commands/pole-emploi/generate-demarches-ia.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -816,7 +817,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetComptageJeunesByConseillerQueryHandler,
     GetComptageJeuneQueryGetter,
     EnvoyerEmailActivationCommandHandler,
-    AjouterJeuneListeDeDiffusionCommandHandler
+    AjouterJeuneListeDeDiffusionCommandHandler,
+    GenerateDemarchesIACommandHandler
   ]
 }
 

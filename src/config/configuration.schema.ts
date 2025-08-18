@@ -216,5 +216,6 @@ export const configurationSchema = Joi.object({
   recherche: Joi.object({
     seuil: Joi.number().required()
   }),
-  remoteConfig: Joi.object()
+  remoteConfig: Joi.object(),
+  prodFT: Joi.object()
 })
