@@ -32,14 +32,19 @@ export function fromPrestationDtoToRendezVousQueryModel(
     theme: prestation.session.typePrestation?.libelle,
     telephone: prestation.session.adresse?.telephone,
     annule: prestation.annule,
-    visio:
-      prestation.session.natureAnimation === 'INTERNE' ||
-      prestation.session.modalitePremierRendezVous === 'WEBCAM',
+    visio: estVisio(prestation),
     lienVisio,
     source: RendezVous.Source.POLE_EMPLOI
   }
 }
 
+export function estVisio(prestation: PrestationDto): boolean {
+  return (
+    prestation.session.natureAnimation === 'INTERNE' ||
+    prestation.session.modalitePremierRendezVous === 'WEBCAM' ||
+    prestation.session.enAgence === false
+  )
+}
 function buildModality(prestation: PrestationDto): string {
   switch (prestation.session.modalitePremierRendezVous) {
     case 'WEBCAM':

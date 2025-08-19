@@ -18,7 +18,10 @@ import {
 import { DateService } from '../../../../utils/date-service'
 import { IdService } from '../../../../utils/id-service'
 import { fromRendezVousDtoToRendezVousQueryModel } from '../../query-mappers/rendez-vous-pole-emploi.mappers'
-import { fromPrestationDtoToRendezVousQueryModel } from '../../query-mappers/rendez-vous-prestation.mappers'
+import {
+  estVisio,
+  fromPrestationDtoToRendezVousQueryModel
+} from '../../query-mappers/rendez-vous-prestation.mappers'
 import { RendezVousJeuneQueryModel } from '../../query-models/rendez-vous.query-model'
 
 export interface Query {
@@ -72,9 +75,7 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
       responsePrestations.data
         .filter(prestation => !prestation.annule)
         .map(async prestation => {
-          const avecVisio =
-            prestation.session.natureAnimation === 'INTERNE' ||
-            prestation.session.modalitePremierRendezVous === 'WEBCAM'
+          const avecVisio = estVisio(prestation)
           let lienVisio = undefined
 
           const laVisioEstDisponible = avecVisio && prestation.identifiantStable
