@@ -56,10 +56,7 @@ interface PoleEmploiPartenaireClientI {
     dateRechercheRendezVous: DateTime
   ): Promise<ResultApi<PrestationDto[]>>
 
-  getLienVisio(
-    tokenDuJeune: string,
-    idVisio: string
-  ): Promise<ResultApi<string>>
+  getLienVisio(tokenDuJeune: string, idVisio: string): Promise<Result<string>>
 
   getDocuments(
     tokenDuJeune: string
@@ -183,15 +180,12 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
   async getLienVisio(
     tokenDuJeune: string,
     idVisio: string
-  ): Promise<ResultApi<string>> {
-    this.logger.log('recuperation visio')
-
-    return this.getWithCache<string>(
+  ): Promise<Result<string>> {
+    const reponse = await this.get<string>(
       `peconnect-gerer-prestations/v1/lien-visio/rendez-vous/${idVisio}`,
-      tokenDuJeune,
-      undefined,
-      true
+      tokenDuJeune
     )
+    return success(reponse.data)
   }
 
   async getDocuments(

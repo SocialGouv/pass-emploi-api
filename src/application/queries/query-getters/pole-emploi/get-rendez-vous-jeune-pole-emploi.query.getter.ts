@@ -5,6 +5,7 @@ import { NonTrouveError } from '../../../../building-blocks/types/domain-error'
 import { Cached } from '../../../../building-blocks/types/query'
 import {
   failure,
+  isFailure,
   Result,
   success
 } from '../../../../building-blocks/types/result'
@@ -85,7 +86,7 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
                 prestation.identifiantStable!
               )
 
-            if (isFailureApi(responseLienVisio)) {
+            if (isFailure(responseLienVisio)) {
               this.logger.error(responseLienVisio.error)
             } else {
               lienVisio = responseLienVisio.data
