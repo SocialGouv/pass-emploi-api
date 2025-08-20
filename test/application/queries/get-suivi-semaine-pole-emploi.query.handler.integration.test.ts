@@ -72,7 +72,8 @@ describe('GetSuiviCetteSemainePoleEmploiQueryHandler', () => {
         jeunesRepository,
         poleEmploiPartenaireClient,
         idService,
-        oidcClient
+        oidcClient,
+        dateService
       )
 
     handler = new GetSuiviSemainePoleEmploiQueryHandler(

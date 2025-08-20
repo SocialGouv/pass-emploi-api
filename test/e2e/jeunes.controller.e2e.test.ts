@@ -72,7 +72,8 @@ describe('JeunesControllerE2E', () => {
         jeuneRepository,
         poleEmploiPartenaireClient,
         idService,
-        oidcClient
+        oidcClient,
+        dateService
       )
 
     getJeuneHomeAgendaPoleEmploiQueryHandler =
