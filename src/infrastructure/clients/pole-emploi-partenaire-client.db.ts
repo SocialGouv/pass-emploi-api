@@ -181,7 +181,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     tokenDuJeune: string,
     idVisio: string
   ): Promise<Result<string>> {
-    const reponse = await this.get<string>(
+    const reponse = await this.getWithRetry<string>(
       `peconnect-gerer-prestations/v1/lien-visio/rendez-vous/${idVisio}`,
       tokenDuJeune
     )

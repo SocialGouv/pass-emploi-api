@@ -42,7 +42,8 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
     @Inject(PoleEmploiPartenaireClientToken)
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,
     private idService: IdService,
-    private oidcClient: OidcClient
+    private oidcClient: OidcClient,
+    private readonly dateService: DateService
   ) {
     this.logger = new Logger('GetRendezVousJeunePoleEmploiQueryGetter')
   }
@@ -78,19 +79,32 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
           const avecVisio = estVisio(prestation)
           let lienVisio = undefined
 
-          const laVisioEstDisponible = avecVisio && prestation.identifiantStable
+          const laPrestationEstAujourdhui = prestation.session.dateDebut
+            ? DateService.isSameDateDay(
+                DateService.fromStringToDateTime(prestation.session.dateDebut)!,
+                this.dateService.now()
+              )
+            : false
+          const laVisioEstDisponible =
+            avecVisio &&
+            prestation.identifiantStable &&
+            laPrestationEstAujourdhui
 
           if (laVisioEstDisponible) {
-            const responseLienVisio =
-              await this.poleEmploiPartenaireClient.getLienVisio(
-                idpToken,
-                prestation.identifiantStable!
-              )
+            try {
+              const responseLienVisio =
+                await this.poleEmploiPartenaireClient.getLienVisio(
+                  idpToken,
+                  prestation.identifiantStable!
+                )
 
-            if (isFailure(responseLienVisio)) {
-              this.logger.error(responseLienVisio.error)
-            } else {
-              lienVisio = responseLienVisio.data
+              if (isFailure(responseLienVisio)) {
+                this.logger.error(responseLienVisio.error)
+              } else {
+                lienVisio = responseLienVisio.data
+              }
+            } catch (e) {
+              this.logger.error(e)
             }
           }
 

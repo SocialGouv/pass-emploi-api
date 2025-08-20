@@ -63,7 +63,8 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
       jeunesRepository,
       poleEmploiPartenaireClient,
       idService,
-      oidcClient
+      oidcClient,
+      dateService
     )
   })
 
@@ -558,7 +559,118 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
       })
 
       describe('quand le lien de la visio prestations est disponible', () => {
-        it('récupère les rendez-vous et les prestations Pole Emploi du jeune avec le lien de la visio', async () => {
+        it('récupère les rendez-vous et les prestations Pole Emploi du jeune sans lien de visio le jour pas j', async () => {
+          // Given
+          const idVisio = '1'
+          const prestations: PrestationDto[] = [
+            {
+              annule: false,
+              datefin: '',
+              identifiantStable: idVisio,
+              session: {
+                natureAnimation: 'INTERNE',
+                modalitePremierRendezVous: 'WEBCAM',
+                dateDebut: '2020-04-07T10:00:00+01:00',
+                dateFinPrevue: '',
+                dateLimite: '',
+                duree: {
+                  unite: 'JOUR',
+                  valeur: 1.0
+                },
+                enAgence: true
+              }
+            }
+          ]
+          const rendezVous: RendezVousPoleEmploiDto[] = [
+            {
+              theme: 'theme',
+              date: '2020-04-06',
+              heure: heureRendezVous,
+              duree: 23,
+              modaliteContact: 'VISIO',
+              agence: 'Agence',
+              adresse: {
+                bureauDistributeur: 'bureau',
+                ligne4: '12 rue Albert Camus',
+                ligne5: '75018',
+                ligne6: 'Paris'
+              },
+              commentaire: 'commentaire',
+              typeRDV: 'RDVL',
+              lienVisio: 'lien'
+            }
+          ]
+
+          dateService.now.returns(maintenant)
+          jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
+          poleEmploiPartenaireClient.getPrestations
+            .withArgs(idpToken, maintenant)
+            .resolves(success(prestations))
+
+          poleEmploiPartenaireClient.getLienVisio
+            .withArgs(idpToken, idVisio)
+            .resolves(success('lienvisio.com'))
+          poleEmploiPartenaireClient.getRendezVous
+            .withArgs(idpToken)
+            .resolves(success(rendezVous))
+
+          // When
+          const result = await queryGetter.handle(query)
+
+          // Then
+          const expected: Cached<RendezVousJeuneQueryModel[]> = {
+            queryModel: [
+              {
+                agencePE: false,
+                date: new Date('2020-04-06T12:20:00.000Z'),
+                duration: 23,
+                id: 'random-id',
+                modality: 'par visio',
+                theme: 'theme',
+                presenceConseiller: true,
+                conseiller: undefined,
+                comment: 'commentaire',
+                adresse: '12 rue Albert Camus 75018 Paris',
+                title: '',
+                type: {
+                  code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+                  label: 'Entretien individuel conseiller'
+                },
+                isLocaleDate: true,
+                visio: true,
+                lienVisio: 'lien',
+                source: RendezVous.Source.POLE_EMPLOI
+              },
+              {
+                idStable: idVisio,
+                adresse: undefined,
+                agencePE: true,
+                annule: false,
+                comment: undefined,
+                date: new Date('2020-04-07T10:00:00.000Z'),
+                isLocaleDate: true,
+                description: undefined,
+                duration: 0,
+                id: 'random-id',
+                lienVisio: undefined,
+                modality: 'par visio',
+                organisme: undefined,
+                telephone: undefined,
+                theme: undefined,
+                title: '',
+                type: {
+                  code: CodeTypeRendezVous.PRESTATION,
+                  label: 'Prestation'
+                },
+                visio: true,
+                source: RendezVous.Source.POLE_EMPLOI
+              }
+            ],
+            dateDuCache: undefined
+          }
+          expect(result).to.deep.equal(success(expected))
+        })
+        it('récupère les rendez-vous et les prestations Pole Emploi du jeune avec le lien de la visio le jour j', async () => {
           // Given
           const idVisio = '1'
           const prestations: PrestationDto[] = [
