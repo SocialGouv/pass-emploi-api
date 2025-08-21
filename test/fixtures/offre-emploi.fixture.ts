@@ -49,7 +49,8 @@ export const uneOffreEmploiDto = (
       urlOrigine: 'url/offre',
       partenaires: []
     },
-    alternance: false
+    alternance: false,
+    accessibleTH: false
   }
   return { ...defaults, ...args }
 }

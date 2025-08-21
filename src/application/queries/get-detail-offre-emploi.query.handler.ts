@@ -75,6 +75,9 @@ export class GetDetailOffreEmploiQueryHandler extends QueryHandler<
 function toOffreEmploiQueryModel(
   offreEmploiDto: OffreEmploiDto
 ): OffreEmploiQueryModel {
+  if (offreEmploiDto.accessibleTH === undefined) {
+    offreEmploiDto.accessibleTH = false
+  }
   return {
     id: offreEmploiDto.id,
     urlRedirectPourPostulation:

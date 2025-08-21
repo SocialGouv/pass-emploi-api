@@ -55,6 +55,7 @@ export interface OffreEmploiDto {
     partenaires?: Array<{ nom?: string; url?: string; logo?: string }>
   }
   alternance?: boolean
+  accessibleTH?: boolean
 }
 
 export interface OffresEmploiDto {
