@@ -19,24 +19,27 @@ import {
   CreateEvaluationCommand,
   CreateEvaluationCommandHandler
 } from '../../application/commands/campagne/create-evaluation.command.handler'
+import { CreateFeedbackCommandHandler } from '../../application/commands/create-feedback.command.handler'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
+import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
 import { Utilisateur } from '../decorators/authenticated.decorator'
+import { SkipOidcAuth } from '../decorators/skip-oidc-auth.decorator'
 import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import { handleResult } from './result.handler'
 import {
   CreateCampagnePayload,
+  CreateFeedbackPayload,
   ReponseCampagnePayload
 } from './validation/campagnes.inputs'
-import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
-import { SkipOidcAuth } from '../decorators/skip-oidc-auth.decorator'
 
 @Controller()
 @CustomSwaggerApiOAuth2()
 export class CampagnesController {
   constructor(
     private createCampagneCommandHandler: CreateCampagneCommandHandler,
-    private createEvaluationCommandHandler: CreateEvaluationCommandHandler
+    private createEvaluationCommandHandler: CreateEvaluationCommandHandler,
+    private createFeedbackCommandHandler: CreateFeedbackCommandHandler
   ) {}
 
   @ApiTags('Support')
@@ -93,6 +96,24 @@ export class CampagnesController {
     }
     const result = await this.createEvaluationCommandHandler.execute(
       command,
+      utilisateur
+    )
+
+    return handleResult(result)
+  }
+
+  @ApiTags('Feedbacks')
+  @ApiOperation({
+    summary: 'Poster un feedback de fonctionnalité'
+  })
+  @Post('feedbacks/evaluer')
+  async postFeedback(
+    @Body() payload: CreateFeedbackPayload,
+    @Utilisateur()
+    utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result = await this.createFeedbackCommandHandler.execute(
+      payload,
       utilisateur
     )
 

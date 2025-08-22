@@ -4,7 +4,10 @@ import {
   IsDefined,
   IsNotEmpty,
   IsNumber,
-  IsString
+  IsOptional,
+  IsString,
+  Max,
+  MaxLength
 } from 'class-validator'
 
 export class CreateCampagnePayload {
@@ -40,4 +43,24 @@ export class ReponseCampagnePayload {
   @ApiPropertyOptional()
   @IsString()
   pourquoi?: string
+}
+
+export class CreateFeedbackPayload {
+  @ApiProperty()
+  @IsDefined()
+  @IsNumber()
+  @Max(10)
+  note: number
+
+  @ApiProperty()
+  @IsDefined()
+  @IsString()
+  @MaxLength(250)
+  tag: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  commentaire?: string
 }

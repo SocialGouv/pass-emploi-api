@@ -32,6 +32,7 @@ import { StructureMiloSqlModel } from './structure-milo.sql-model'
 import { SessionMiloSqlModel } from './session-milo.sql-model'
 import { NotificationJeuneSqlModel } from './notification-jeune.sql-model'
 import { ComptageJeuneSqlModel } from './comptage-jeune.sql-model'
+import { FeedbackSqlModel } from './feedback.sql-model'
 
 export const sqlModels = [
   ConseillerSqlModel,
@@ -67,5 +68,6 @@ export const sqlModels = [
   SessionMiloSqlModel,
   JeuneMiloAArchiverSqlModel,
   NotificationJeuneSqlModel,
-  ComptageJeuneSqlModel
+  ComptageJeuneSqlModel,
+  FeedbackSqlModel
 ]
