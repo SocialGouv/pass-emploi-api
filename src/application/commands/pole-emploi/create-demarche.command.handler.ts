@@ -92,30 +92,31 @@ export class CreateDemarcheCommandHandler extends CommandHandler<
           utilisateur
         )
       }
-    }
-    if (command.description && !command.estDuplicata) {
-      await this.evenementService.creer(
-        Evenement.Code.ACTION_CREEE_HORS_REFERENTIEL,
-        utilisateur
-      )
-    }
-    if (command.description && command.estDuplicata) {
-      await this.evenementService.creer(
-        Evenement.Code.ACTION_DUPLIQUEE_HORS_REFERENTIEL,
-        utilisateur
-      )
-    }
-    if (command.codeQuoi && command.codePourquoi && !command.estDuplicata) {
-      await this.evenementService.creer(
-        Evenement.Code.ACTION_CREEE_REFERENTIEL,
-        utilisateur
-      )
-    }
-    if (command.codeQuoi && command.codePourquoi && command.estDuplicata) {
-      await this.evenementService.creer(
-        Evenement.Code.ACTION_DUPLIQUEE_REFERENTIEL,
-        utilisateur
-      )
+    } else {
+      if (command.description && !command.estDuplicata) {
+        await this.evenementService.creer(
+          Evenement.Code.ACTION_CREEE_HORS_REFERENTIEL,
+          utilisateur
+        )
+      }
+      if (command.description && command.estDuplicata) {
+        await this.evenementService.creer(
+          Evenement.Code.ACTION_DUPLIQUEE_HORS_REFERENTIEL,
+          utilisateur
+        )
+      }
+      if (command.codeQuoi && command.codePourquoi && !command.estDuplicata) {
+        await this.evenementService.creer(
+          Evenement.Code.ACTION_CREEE_REFERENTIEL,
+          utilisateur
+        )
+      }
+      if (command.codeQuoi && command.codePourquoi && command.estDuplicata) {
+        await this.evenementService.creer(
+          Evenement.Code.ACTION_DUPLIQUEE_REFERENTIEL,
+          utilisateur
+        )
+      }
     }
   }
 }

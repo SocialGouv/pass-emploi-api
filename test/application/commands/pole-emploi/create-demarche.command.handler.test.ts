@@ -148,7 +148,7 @@ describe('CreateDemarcheCommandHandler', () => {
       )
 
       // Then
-      expect(evenementService.creer).to.have.been.calledWithExactly(
+      expect(evenementService.creer).to.have.been.calledOnceWithExactly(
         Evenement.Code.ACTION_CREEE_HORS_REFERENTIEL,
         utilisateur
       )
@@ -170,7 +170,7 @@ describe('CreateDemarcheCommandHandler', () => {
         commandPourDemarcheDuReferentiel
       )
       // Then
-      expect(evenementService.creer).to.have.been.calledWithExactly(
+      expect(evenementService.creer).to.have.been.calledOnceWithExactly(
         Evenement.Code.ACTION_CREEE_REFERENTIEL,
         utilisateur
       )
@@ -193,7 +193,7 @@ describe('CreateDemarcheCommandHandler', () => {
       )
 
       // Then
-      expect(evenementService.creer).to.have.been.calledWithExactly(
+      expect(evenementService.creer).to.have.been.calledOnceWithExactly(
         Evenement.Code.ACTION_DUPLIQUEE_HORS_REFERENTIEL,
         utilisateur
       )
@@ -216,8 +216,54 @@ describe('CreateDemarcheCommandHandler', () => {
         commandPourDemarcheDuReferentiel
       )
       // Then
-      expect(evenementService.creer).to.have.been.calledWithExactly(
+      expect(evenementService.creer).to.have.been.calledOnceWithExactly(
         Evenement.Code.ACTION_DUPLIQUEE_REFERENTIEL,
+        utilisateur
+      )
+    })
+
+    it('crée un événement d’engagement pour une démarche IA du référentiel pôle emploi', async () => {
+      // Given
+      const commandPourDemarcheDuReferentiel: CreateDemarcheCommand = {
+        idJeune: 'idJeune',
+        accessToken: 'accessToken',
+        codeQuoi: 'codeQuoi',
+        codePourquoi: 'codePourquoi',
+        description: 'démarche générée par IA',
+        dateFin: uneDatetime(),
+        estDuplicata: true,
+        genereParIA: true
+      }
+      // When
+      await createDemarcheCommandHandler.monitor(
+        utilisateur,
+        commandPourDemarcheDuReferentiel
+      )
+      // Then
+      expect(evenementService.creer).to.have.been.calledOnceWithExactly(
+        Evenement.Code.ACTION_CREEE_IA_REFERENTIEL,
+        utilisateur
+      )
+    })
+
+    it('crée un événement d’engagement pour une démarche IA hors référentiel pôle emploi', async () => {
+      // Given
+      const commandPourDemarcheDuReferentiel: CreateDemarcheCommand = {
+        idJeune: 'idJeune',
+        accessToken: 'accessToken',
+        description: 'démarche générée par IA',
+        dateFin: uneDatetime(),
+        estDuplicata: true,
+        genereParIA: true
+      }
+      // When
+      await createDemarcheCommandHandler.monitor(
+        utilisateur,
+        commandPourDemarcheDuReferentiel
+      )
+      // Then
+      expect(evenementService.creer).to.have.been.calledOnceWithExactly(
+        Evenement.Code.ACTION_CREEE_IA_HORS_REFERENTIEL,
         utilisateur
       )
     })
