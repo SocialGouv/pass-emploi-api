@@ -84,6 +84,7 @@ export interface RendezVousPoleEmploiDto {
 export interface DemarcheDto {
   idDemarche: string
   etat: DemarcheDtoEtat
+  promptIa?: string
   dateDebut?: string
   dateFin: string
   dateAnnulation?: string

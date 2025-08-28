@@ -83,7 +83,8 @@ describe('DemarcheHttpRepository', () => {
           sousTitre: undefined,
           statut: 'A_FAIRE',
           statutsPossibles: ['ANNULEE', 'REALISEE'],
-          titre: 'quoi'
+          titre: 'quoi',
+          promptIa: undefined
         })
       })
       it('met à jour le statut et renvoie la demarche BRSA', async () => {
@@ -135,7 +136,8 @@ describe('DemarcheHttpRepository', () => {
           sousTitre: undefined,
           statut: 'A_FAIRE',
           statutsPossibles: ['ANNULEE', 'REALISEE'],
-          titre: 'quoi'
+          titre: 'quoi',
+          promptIa: undefined
         })
       })
     })
@@ -219,7 +221,8 @@ describe('DemarcheHttpRepository', () => {
           sousTitre: undefined,
           statut: 'A_FAIRE',
           statutsPossibles: ['ANNULEE', 'REALISEE'],
-          titre: 'quoi'
+          titre: 'quoi',
+          promptIa: undefined
         })
       })
       it('sauvegarde et renvoie la demarche BRSA', async () => {
@@ -272,7 +275,8 @@ describe('DemarcheHttpRepository', () => {
           sousTitre: undefined,
           statut: 'A_FAIRE',
           statutsPossibles: ['ANNULEE', 'REALISEE'],
-          titre: 'quoi'
+          titre: 'quoi',
+          promptIa: undefined
         })
       })
     })

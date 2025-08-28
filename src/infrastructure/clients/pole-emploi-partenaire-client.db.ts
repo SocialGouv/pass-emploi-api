@@ -254,7 +254,8 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
         pourquoi: demarche.pourquoi,
         quoi: demarche.quoi,
         comment: demarche.comment,
-        description: demarche.description
+        description: demarche.description,
+        promptIa: demarche.promptIa
       }
       const demarcheDto = await this.post<DemarcheDto>(
         DEMARCHES_URL,

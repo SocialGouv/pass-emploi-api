@@ -57,7 +57,8 @@ export class CreateDemarcheCommandHandler extends CommandHandler<
       description: command.description,
       comment: command.codeComment,
       quoi: command.codeQuoi,
-      pourquoi: command.codePourquoi
+      pourquoi: command.codePourquoi,
+      promptIa: command.genereParIA ? command.description : undefined
     }
     const result = this.demarcheFactory.creerDemarche(demarcheACreer)
 

@@ -51,7 +51,8 @@ export function fromDemarcheDtoToDemarche(
     attributs: buildAttributs(demarcheDto),
     statutsPossibles: buildStatutsPossibles(demarcheDto, aujourdhuiAMidi),
     modifieParConseiller: demarcheDto.origineModificateur === 'CONSEILLER',
-    creeeParConseiller: demarcheDto.origineCreateur === 'CONSEILLER'
+    creeeParConseiller: demarcheDto.origineCreateur === 'CONSEILLER',
+    promptIa: demarcheDto.promptIa ?? undefined
   }
 }
 

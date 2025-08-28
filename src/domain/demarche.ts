@@ -5,6 +5,7 @@ import { failure, Result, success } from '../building-blocks/types/result'
 import { DateService } from '../utils/date-service'
 import { Core } from './core'
 import { catalogueDemarchesInMemory } from '../infrastructure/clients/utils/demarches-in-memory'
+import { estDemarchePerso } from '../application/queries/query-mappers/actions-pole-emploi.mappers'
 
 export const DemarcheRepositoryToken = 'DemarcheRepositoryToken'
 
@@ -28,6 +29,7 @@ export interface Demarche {
   attributs: Demarche.Attribut[]
   codeDemarche: string
   statutsPossibles: Demarche.Statut[]
+  promptIa?: string
 }
 
 export namespace Demarche {
@@ -46,6 +48,7 @@ export namespace Demarche {
     quoi?: string
     comment?: string
     description?: string
+    promptIa?: string
   }
 
   export interface Creee {
@@ -56,6 +59,7 @@ export namespace Demarche {
     quoi: string
     comment?: string
     description?: string
+    promptIa?: string
   }
 
   export enum Statut {
@@ -138,7 +142,11 @@ export namespace Demarche {
       const maintenant = setHoursTo12h00(this.dateService.now())
       const dateTimeFin = setHoursTo12h00(demarcheACreer.dateFin)
 
-      if (demarcheACreer.quoi && demarcheACreer.pourquoi) {
+      if (
+        demarcheACreer.quoi &&
+        demarcheACreer.pourquoi &&
+        !estDemarchePerso(demarcheACreer.pourquoi, demarcheACreer.quoi)
+      ) {
         let codeCommentParUnAutreMoyen = undefined
         const pourquoi = catalogueDemarchesInMemory.find(
           demarche => demarche.code === demarcheACreer.pourquoi
@@ -157,7 +165,8 @@ export namespace Demarche {
           dateFin: dateTimeFin,
           pourquoi: demarcheACreer.pourquoi,
           quoi: demarcheACreer.quoi,
-          comment: codeCommentParUnAutreMoyen
+          comment: codeCommentParUnAutreMoyen,
+          promptIa: demarcheACreer.promptIa
         })
       } else if (demarcheACreer.description) {
         return success({
@@ -166,7 +175,8 @@ export namespace Demarche {
           dateFin: dateTimeFin,
           pourquoi: POURQUOI_DEMARCHE_PERSO,
           quoi: QUOI_DEMARCHE_PERSO,
-          description: demarcheACreer.description
+          description: demarcheACreer.description,
+          promptIa: demarcheACreer.promptIa
         })
       }
 

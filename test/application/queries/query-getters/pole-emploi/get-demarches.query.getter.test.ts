@@ -182,7 +182,8 @@ describe('GetDemarchesQueryGetter', () => {
                 Demarche.Statut.ANNULEE,
                 Demarche.Statut.REALISEE
               ],
-              titre: 'quoi'
+              titre: 'quoi',
+              promptIa: undefined
             }
           ],
           dateDuCache: undefined

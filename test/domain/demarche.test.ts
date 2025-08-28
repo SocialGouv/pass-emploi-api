@@ -261,7 +261,8 @@ describe('Demarche', () => {
           dateFin: dateFin.set(parametreHeureAMidi),
           pourquoi: 'P01',
           quoi: 'Q38',
-          description
+          description,
+          promptIa: undefined
         }
         expect(demarche).to.deep.equal(success(demarcheCree))
       })
@@ -308,7 +309,8 @@ describe('Demarche', () => {
             dateFin: dateFin.set(parametreHeureAMidi),
             quoi: 'C21',
             pourquoi: 'A42',
-            comment: undefined
+            comment: undefined,
+            promptIa: undefined
           }
           expect(demarche).to.deep.equal(success(demarcheCree))
         })

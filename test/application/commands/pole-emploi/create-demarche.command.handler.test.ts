@@ -41,7 +41,8 @@ describe('CreateDemarcheCommandHandler', () => {
     dateFin: uneDatetime(),
     pourquoi: 'P01',
     quoi: 'Q38',
-    description: command.description
+    description: command.description,
+    promptIa: undefined
   }
 
   beforeEach(() => {
@@ -69,7 +70,8 @@ describe('CreateDemarcheCommandHandler', () => {
             dateFin: command.dateFin,
             comment: undefined,
             quoi: undefined,
-            pourquoi: undefined
+            pourquoi: undefined,
+            promptIa: undefined
           })
           .returns(success(demarcheCreee))
 
@@ -96,7 +98,8 @@ describe('CreateDemarcheCommandHandler', () => {
             dateFin: command.dateFin,
             comment: undefined,
             quoi: undefined,
-            pourquoi: undefined
+            pourquoi: undefined,
+            promptIa: undefined
           })
           .returns(success(demarcheCreee))
 

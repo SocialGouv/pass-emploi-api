@@ -173,6 +173,9 @@ export class DemarcheQueryModel {
 
   @ApiProperty({ isArray: true, enum: Demarche.Statut })
   statutsPossibles: Demarche.Statut[]
+
+  @ApiProperty({ required: false })
+  promptIa?: string
 }
 
 export class TypeQualificationQueryModel

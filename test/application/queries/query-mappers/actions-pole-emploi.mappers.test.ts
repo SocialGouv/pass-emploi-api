@@ -88,7 +88,8 @@ describe('ActionPoleEmploiMapper', () => {
         sousTitre: 'Par un autre moyen',
         statut: 'REALISEE',
         statutsPossibles: [],
-        titre: 'Identification de ses points forts et de ses compétences'
+        titre: 'Identification de ses points forts et de ses compétences',
+        promptIa: undefined
       })
     })
     it('retourne statut annulée', async () => {
