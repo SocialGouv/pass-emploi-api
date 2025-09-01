@@ -19,6 +19,10 @@ import { uneDemarcheQueryModel } from '../../../fixtures/query-models/demarche.q
 import { unRendezVousQueryModel } from '../../../fixtures/query-models/rendez-vous.query-model.fixtures'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import Structure = Core.Structure
+import { FeatureFlipSqlModel } from '../../../../src/infrastructure/sequelize/models/feature-flip.sql-model'
+import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
+import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('GetMonSuiviPoleEmploiQueryHandler', () => {
   let getRendezVousJeuneQueryGetter: StubbedClass<GetRendezVousJeunePoleEmploiQueryGetter>
@@ -55,6 +59,7 @@ describe('GetMonSuiviPoleEmploiQueryHandler', () => {
 
     let result: Result<Cached<MonSuiviPoleEmploiQueryModel>>
     beforeEach(async () => {
+      await getDatabase().cleanPG()
       getRendezVousJeuneQueryGetter.handle.resolves(
         success({
           queryModel: [rdv]
@@ -85,6 +90,9 @@ describe('GetMonSuiviPoleEmploiQueryHandler', () => {
       expect(
         isSuccess(result) && result.data.queryModel.rendezVous
       ).to.deep.equal([rdv])
+      expect(
+        isSuccess(result) && result.data.queryModel.eligibleDemarchesIA
+      ).to.be.false()
     })
 
     it('renvoie les démarches', async () => {
@@ -102,6 +110,13 @@ describe('GetMonSuiviPoleEmploiQueryHandler', () => {
     })
 
     it('renvoie dateCache quand les démarches sont KO', async () => {
+      await JeuneSqlModel.create(
+        unJeuneDto({ id: 'id-jeune', idConseiller: undefined })
+      )
+      await FeatureFlipSqlModel.create({
+        idJeune: 'id-jeune',
+        featureTag: 'DEMARCHES_IA'
+      })
       getDemarchesQueryGetter.handle.resolves(
         failure(new NonTrouveError('Démarches KO'))
       )
@@ -118,6 +133,9 @@ describe('GetMonSuiviPoleEmploiQueryHandler', () => {
       expect(
         isSuccess(result) && result.data.queryModel.demarches
       ).to.deep.equal([])
+      expect(
+        isSuccess(result) && result.data.queryModel.eligibleDemarchesIA
+      ).to.be.true()
     })
   })
 

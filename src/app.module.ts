@@ -382,6 +382,7 @@ import { EnvoyerEmailActivationCommandHandler } from './application/commands/mil
 import { AjouterJeuneListeDeDiffusionCommandHandler } from './application/commands/ajouter-jeune-liste-de-diffusion.command.handler'
 import { GenerateDemarchesIACommandHandler } from './application/commands/pole-emploi/generate-demarches-ia.command.handler'
 import { CreateFeedbackCommandHandler } from './application/commands/create-feedback.command.handler'
+import { UpdateFeatureFlipCommandHandler } from './application/commands/support/update-feature-flip.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -820,7 +821,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     EnvoyerEmailActivationCommandHandler,
     AjouterJeuneListeDeDiffusionCommandHandler,
     GenerateDemarchesIACommandHandler,
-    CreateFeedbackCommandHandler
+    CreateFeedbackCommandHandler,
+    UpdateFeatureFlipCommandHandler
   ]
 }
 

@@ -24,6 +24,8 @@ import { Authentification } from '../../../src/domain/authentification'
 import { Core } from '../../../src/domain/core'
 import { StubbedClass, expect } from '../../utils'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
+import { UpdateFeatureFlipCommandHandler } from '../../../src/application/commands/support/update-feature-flip.command.handler'
+import { FeatureFlipTag } from '../../../src/infrastructure/sequelize/models/feature-flip.sql-model'
 
 describe('SupportController', () => {
   let archiverJeuneSupportCommandHandler: StubbedClass<ArchiverJeuneSupportCommandHandler>
@@ -31,6 +33,7 @@ describe('SupportController', () => {
   let creerSuperviseursCommandHandler: StubbedClass<CreerSuperviseursCommandHandler>
   let deleteSuperviseursCommandHandler: StubbedClass<DeleteSuperviseursCommandHandler>
   let transfererJeunesConseillerCommandHandler: StubbedClass<TransfererJeunesConseillerCommandHandler>
+  let updateFeatureFlipCommandHandler: StubbedClass<UpdateFeatureFlipCommandHandler>
   let app: INestApplication
 
   before(async () => {
@@ -44,6 +47,7 @@ describe('SupportController', () => {
     transfererJeunesConseillerCommandHandler = app.get(
       TransfererJeunesConseillerCommandHandler
     )
+    updateFeatureFlipCommandHandler = app.get(UpdateFeatureFlipCommandHandler)
   })
 
   describe('POST /support/archiver-jeune/:idJeune', () => {
@@ -313,6 +317,68 @@ describe('SupportController', () => {
         // When - Then
         await request(app.getHttpServer())
           .delete('/support/superviseurs')
+          .send(payload)
+          .set({ 'X-API-KEY': 'api-key-support' })
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+  })
+
+  describe('POST /feature-flip', () => {
+    describe('quand le payload est valide', () => {
+      it('renvoie 204', async () => {
+        // Given
+        const payload = {
+          tagFeature: FeatureFlipTag.DEMARCHES_IA,
+          emailsConseillersAjout: ['test']
+        }
+        const command = {
+          tagFeature: FeatureFlipTag.DEMARCHES_IA,
+          emailsConseillersAjout: ['test'],
+          supprimerExistants: undefined
+        }
+        updateFeatureFlipCommandHandler.execute
+          .withArgs(command)
+          .resolves(emptySuccess())
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/support/feature-flip')
+          .send(payload)
+          .set({ 'X-API-KEY': 'api-key-support' })
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+      it('renvoie 204 avec supprimerExistants à false', async () => {
+        // Given
+        const payload = {
+          tagFeature: FeatureFlipTag.DEMARCHES_IA,
+          emailsConseillersAjout: ['test'],
+          supprimerExistants: false
+        }
+        const command = {
+          tagFeature: FeatureFlipTag.DEMARCHES_IA,
+          emailsConseillersAjout: ['test'],
+          supprimerExistants: false
+        }
+        updateFeatureFlipCommandHandler.execute
+          .withArgs(command)
+          .resolves(emptySuccess())
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/support/feature-flip')
+          .send(payload)
+          .set({ 'X-API-KEY': 'api-key-support' })
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+      it('renvoie 400 qd supprimerExistants est autre que true', async () => {
+        // Given
+        const payload = {
+          tagFeature: FeatureFlipTag.DEMARCHES_IA,
+          emailsConseillersAjout: ['test'],
+          supprimerExistants: 'true'
+        }
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/support/feature-flip')
           .send(payload)
           .set({ 'X-API-KEY': 'api-key-support' })
           .expect(HttpStatus.BAD_REQUEST)

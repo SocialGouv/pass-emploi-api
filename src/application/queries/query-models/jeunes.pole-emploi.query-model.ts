@@ -77,6 +77,9 @@ export class MonSuiviPoleEmploiQueryModel {
     isArray: true
   })
   rendezVous: RendezVousJeuneQueryModel[]
+
+  @ApiPropertyOptional()
+  eligibleDemarchesIA?: boolean
 }
 
 export class GetMonSuiviPoleEmploiQueryModel {

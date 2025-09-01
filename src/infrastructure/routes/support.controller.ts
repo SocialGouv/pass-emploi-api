@@ -44,8 +44,10 @@ import {
   DeleteSuperviseursPayload,
   RefreshJDDPayload,
   TeleverserCsvPayload,
-  TransfererJeunesPayload
+  TransfererJeunesPayload,
+  UpdateFeatureFlipPayload
 } from './validation/support.inputs'
+import { UpdateFeatureFlipCommandHandler } from '../../application/commands/support/update-feature-flip.command.handler'
 
 @Controller('support')
 @ApiTags('Support')
@@ -60,7 +62,8 @@ export class SupportController {
     private archiverJeuneSupportCommandHandler: ArchiverJeuneSupportCommandHandler,
     private transfererJeunesConseillerCommandHandler: TransfererJeunesConseillerCommandHandler,
     private readonly creerSuperviseursCommandHandler: CreerSuperviseursCommandHandler,
-    private readonly deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler
+    private readonly deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler,
+    private readonly updateFeatureFlipCommandHandler: UpdateFeatureFlipCommandHandler
   ) {}
 
   @SetMetadata(
@@ -220,6 +223,28 @@ export class SupportController {
   ): Promise<void> {
     const result = await this.deleteSuperviseursCommandHandler.execute(
       { emails: superviseursPayload.emails },
+      Authentification.unUtilisateurSupport()
+    )
+
+    return handleResult(result)
+  }
+
+  @SetMetadata(
+    Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
+    Authentification.Partenaire.SUPPORT
+  )
+  @ApiOperation({
+    summary:
+      'Modifie les fonctionnalités accessibles pour un groupe de jeunes selon les conseillers qui les accompagnent',
+    description: 'Autorisé pour le support'
+  })
+  @Post('feature-flip')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updateFeatureFlip(
+    @Body() payload: UpdateFeatureFlipPayload
+  ): Promise<void> {
+    const result = await this.updateFeatureFlipCommandHandler.execute(
+      payload,
       Authentification.unUtilisateurSupport()
     )
 

@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon'
+import { Jeune } from '../../../domain/jeune/jeune'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { Situation } from '../../../infrastructure/sequelize/models/situations-milo.sql-model'
 import { DateService } from '../../../utils/date-service'
@@ -6,7 +7,6 @@ import {
   DetailJeuneConseillerQueryModel,
   DetailJeuneQueryModel
 } from '../query-models/jeunes.query-model'
-import { Jeune } from '../../../domain/jeune/jeune'
 
 export function fromSqlToDetailJeuneQueryModel(
   jeuneSqlModel: JeuneSqlModel,

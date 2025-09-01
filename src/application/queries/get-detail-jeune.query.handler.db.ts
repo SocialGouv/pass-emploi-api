@@ -51,21 +51,21 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
 
+    let infosMilo
+
     if (estMilo(jeuneSqlModel.structure)) {
       const baseUrlDossier = this.configService.get('milo.urlWeb')
       // TODO estAArchiver -> prendre en compte date dernière activité et date fin cej OU renommer
       const estAArchiver = await JeuneMiloAArchiverSqlModel.findByPk(
         jeuneSqlModel.id
       )
-      return success(
-        fromSqlToDetailJeuneQueryModel(jeuneSqlModel, {
-          baseUrlDossier,
-          estAArchiver: Boolean(estAArchiver)
-        })
-      )
+      infosMilo = {
+        baseUrlDossier,
+        estAArchiver: Boolean(estAArchiver)
+      }
     }
 
-    return success(fromSqlToDetailJeuneQueryModel(jeuneSqlModel))
+    return success(fromSqlToDetailJeuneQueryModel(jeuneSqlModel, infosMilo))
   }
 
   async authorize(
