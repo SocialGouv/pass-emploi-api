@@ -173,6 +173,9 @@ export class DetailJeuneQueryModel {
 
   @ApiProperty({ required: false })
   peutVoirLeComptageDesHeures?: boolean
+
+  @ApiProperty({ required: false })
+  featuresActives?: string[]
 }
 
 export class DetailJeuneConseillerQueryModel {

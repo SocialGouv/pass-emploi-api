@@ -15,6 +15,7 @@ import { ConseillerInterAgenceAuthorizer } from '../authorizers/conseiller-inter
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
 import { fromSqlToDetailJeuneQueryModel } from './query-mappers/jeune.mappers'
 import { DetailJeuneQueryModel } from './query-models/jeunes.query-model'
+import { FeatureFlipSqlModel } from '../../infrastructure/sequelize/models/feature-flip.sql-model'
 
 export interface GetDetailJeuneQuery extends Query {
   idJeune: string
@@ -51,21 +52,33 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
 
+    let infosMilo
+
     if (estMilo(jeuneSqlModel.structure)) {
       const baseUrlDossier = this.configService.get('milo.urlWeb')
       // TODO estAArchiver -> prendre en compte date dernière activité et date fin cej OU renommer
       const estAArchiver = await JeuneMiloAArchiverSqlModel.findByPk(
         jeuneSqlModel.id
       )
-      return success(
-        fromSqlToDetailJeuneQueryModel(jeuneSqlModel, {
-          baseUrlDossier,
-          estAArchiver: Boolean(estAArchiver)
-        })
-      )
+      infosMilo = {
+        baseUrlDossier,
+        estAArchiver: Boolean(estAArchiver)
+      }
     }
 
-    return success(fromSqlToDetailJeuneQueryModel(jeuneSqlModel))
+    const featuresActives = (
+      await FeatureFlipSqlModel.findAll({
+        where: { idJeune: jeuneSqlModel.id }
+      })
+    ).map(featureFlipSql => featureFlipSql.featureTag)
+
+    return success(
+      fromSqlToDetailJeuneQueryModel(
+        jeuneSqlModel,
+        infosMilo,
+        featuresActives.length ? featuresActives : undefined
+      )
+    )
   }
 
   async authorize(

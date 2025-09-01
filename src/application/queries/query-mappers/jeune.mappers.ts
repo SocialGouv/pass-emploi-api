@@ -7,13 +7,15 @@ import {
   DetailJeuneQueryModel
 } from '../query-models/jeunes.query-model'
 import { Jeune } from '../../../domain/jeune/jeune'
+import { FeatureFlipTag } from '../../../infrastructure/sequelize/models/feature-flip.sql-model'
 
 export function fromSqlToDetailJeuneQueryModel(
   jeuneSqlModel: JeuneSqlModel,
   optionsMilo?: {
     baseUrlDossier: string
     estAArchiver: boolean
-  }
+  },
+  featuresActives?: FeatureFlipTag[]
 ): DetailJeuneQueryModel {
   const depuis =
     jeuneSqlModel.transferts.length > 0
@@ -58,7 +60,8 @@ export function fromSqlToDetailJeuneQueryModel(
     dateSignatureCGU: jeuneSqlModel.dateSignatureCGU?.toISOString(),
     dispositif: jeuneSqlModel.dispositif,
     peutVoirLeComptageDesHeures:
-      jeuneSqlModel.peutVoirLeComptageDesHeures ?? undefined
+      jeuneSqlModel.peutVoirLeComptageDesHeures ?? undefined,
+    featuresActives
   }
 }
 

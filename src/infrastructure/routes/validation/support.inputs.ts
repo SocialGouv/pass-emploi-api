@@ -6,6 +6,7 @@ import {
   IsBoolean,
   IsEmail,
   IsEnum,
+  IsIn,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -13,6 +14,7 @@ import {
   ValidateNested
 } from 'class-validator'
 import { Core } from '../../../domain/core'
+import { FeatureFlipTag } from '../../sequelize/models/feature-flip.sql-model'
 
 export class TeleverserCsvPayload {
   @ApiProperty({ type: 'string', format: 'binary' })
@@ -94,4 +96,33 @@ export class DeleteSuperviseursPayload {
   @ArrayNotEmpty()
   @IsEmail({}, { each: true })
   emails: string[]
+}
+
+export class UpdateFeatureFlipPayload {
+  @ApiProperty({
+    enum: FeatureFlipTag,
+    description: Object.values(FeatureFlipTag).join(', ')
+  })
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(FeatureFlipTag)
+  tagFeature: FeatureFlipTag
+
+  @ApiProperty()
+  @IsOptional()
+  @IsBoolean()
+  @IsIn([false, true])
+  supprimerExistants?: boolean
+
+  @ApiProperty({ type: String, isArray: true, required: false })
+  @IsOptional()
+  @IsArray()
+  @IsEmail({}, { each: true })
+  emailsConseillersAjout?: string[]
+
+  @ApiProperty({ type: String, isArray: true, required: false })
+  @IsOptional()
+  @IsArray()
+  @IsEmail({}, { each: true })
+  emailsConseillersSuppression?: string[]
 }
