@@ -332,7 +332,7 @@ describe('PoleEmploiPartenaireClient', () => {
       it('renvoie les démarches et stocke en cache', async () => {
         // Given
         nock(PARTENAIRE_BASE_URL)
-          .get('/peconnect-demarches/v1/demarches')
+          .get('/peconnect-demarches/v1/demarches?range=0-99')
           .reply(200, [uneDemarcheDto()])
           .isDone()
 

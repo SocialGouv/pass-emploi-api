@@ -98,7 +98,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
 
     try {
       const response = await this.getWithCache<DemarcheDto[]>(
-        DEMARCHES_URL,
+        `${DEMARCHES_URL}?range=0-99`,
         tokenDuJeune,
         undefined,
         true,

@@ -248,7 +248,7 @@ export class PoleEmploiClient {
 
   async generateDemarchesIA(contenu: string): Promise<Result<DemarcheIADto[]>> {
     const token = await this.getToken()
-    const body = { content: contenu, idModel: 'vllm_mistral_small-instruct' }
+    const body = { content: contenu }
     try {
       const response = await firstValueFrom(
         this.httpService.post<DemarcheIADto[]>(
