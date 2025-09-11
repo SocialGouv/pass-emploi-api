@@ -23,8 +23,6 @@ import { CommunesEtDepartementsQueryModel } from '../../application/queries/quer
 import { MotifSuppressionJeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
 import { MetiersRomeQueryModel } from '../../application/queries/query-models/metiers-rome.query-model'
 import { TypeRendezVousQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
-import { TypesDemarcheQueryModel } from '../../application/queries/query-models/types-demarche.query-model'
-import { RechercherTypesDemarcheQueryHandler } from '../../application/queries/rechercher-types-demarche.query.handler'
 import { GetTypesRendezVousQueryHandler } from '../../application/queries/rendez-vous/get-types-rendez-vous.query.handler'
 import { Authentification } from '../../domain/authentification'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
@@ -32,7 +30,6 @@ import { Public } from '../decorators/public.decorator'
 import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import { handleResult } from './result.handler'
 import { GetAgencesQueryParams } from './validation/agences.inputs'
-import { TypesDemarchesQueryParams } from './validation/demarches.inputs'
 
 @Controller('referentiels')
 @ApiTags('Referentiels')
@@ -41,7 +38,6 @@ export class ReferentielsController {
     private readonly getCommunesEtDepartementsQueryHandler: GetCommunesEtDepartementsQueryHandler,
     private readonly getMetiersRomeQueryHandler: GetMetiersRomeQueryHandler,
     private readonly getTypesRendezvousQueryHandler: GetTypesRendezVousQueryHandler,
-    private readonly rechercherTypesDemarcheQueryHandler: RechercherTypesDemarcheQueryHandler,
     private readonly getCatalogueDemarchesQueryHandler: GetCatalogueDemarchesQueryHandler,
     private readonly getAgencesQueryHandler: GetAgencesQueryHandler,
     private readonly getMotifsSuppressionJeuneQueryHandler: GetMotifsSuppressionJeuneQueryHandler,
@@ -86,15 +82,6 @@ export class ReferentielsController {
   })
   async getTypesRendezvous(): Promise<TypeRendezVousQueryModel[]> {
     return this.getTypesRendezvousQueryHandler.execute({})
-  }
-
-  @Get('pole-emploi/types-demarches')
-  @CustomSwaggerApiOAuth2()
-  async getTypesDemarches(
-    @Query() query: TypesDemarchesQueryParams,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<TypesDemarcheQueryModel[]> {
-    return this.rechercherTypesDemarcheQueryHandler.execute(query, utilisateur)
   }
 
   @Get('pole-emploi/catalogue-demarches')

@@ -1,18 +1,17 @@
 import { HttpService } from '@nestjs/axios'
 import { DateTime } from 'luxon'
 import * as nock from 'nock'
+import { ErreurHttp } from 'src/building-blocks/types/domain-error'
+import { failure, isSuccess, success } from 'src/building-blocks/types/result'
 import { PoleEmploiClient } from 'src/infrastructure/clients/pole-emploi-client'
 import { DateService } from 'src/utils/date-service'
 import { RateLimiterService } from 'src/utils/rate-limiter.service'
-import { expect, stubClass } from 'test/utils'
-import { ErreurHttp } from 'src/building-blocks/types/domain-error'
-import { failure, isSuccess, success } from 'src/building-blocks/types/result'
 import { desNotificationsDunJeunePoleEmploi } from 'test/fixtures/notification.fixture'
 import {
   notificationsRDVPEDto,
   uneOffreEmploiDto
 } from 'test/fixtures/offre-emploi.fixture'
-import { desTypesDemarchesDto } from 'test/fixtures/pole-emploi.dto.fixture'
+import { expect, stubClass } from 'test/utils'
 import { testConfig } from 'test/utils/module-for-testing'
 
 describe('PoleEmploiClient', () => {
@@ -488,90 +487,6 @@ describe('PoleEmploiClient', () => {
       expect(notificationsRendezVous).to.deep.equal([
         desNotificationsDunJeunePoleEmploi()
       ])
-    })
-  })
-  describe('rechercherTypesDemarches', () => {
-    describe('quand il y a des démarches', () => {
-      it('renvoie les types de démarche', async () => {
-        // Given
-        const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
-          minutes: 20
-        })
-        poleEmploiClient.inMemoryToken = {
-          token: 'test-token',
-          tokenDate: uneDatetimeDeMoinsDe25Minutes
-        }
-
-        nock('https://api.peio.pe-qvr.fr/partenaire')
-          .post('/rechercher-demarche/v1/solr/search/demarche', {
-            codeUtilisateur: 0,
-            motCle: 'salon'
-          })
-          .reply(200, { listeDemarches: desTypesDemarchesDto() })
-          .isDone()
-
-        // When
-        const typeDemarcheDtos =
-          await poleEmploiClient.rechercherTypesDemarches('salon')
-
-        // Then
-        expect(typeDemarcheDtos).to.deep.equal(desTypesDemarchesDto())
-      })
-    })
-    describe("quand il n'y a pas de démarche", () => {
-      it('renvoie un tableau vide', async () => {
-        // Given
-        const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
-          minutes: 20
-        })
-        poleEmploiClient.inMemoryToken = {
-          token: 'test-token',
-          tokenDate: uneDatetimeDeMoinsDe25Minutes
-        }
-
-        nock('https://api.peio.pe-qvr.fr/partenaire')
-          .post('/rechercher-demarche/v1/solr/search/demarche', {
-            codeUtilisateur: 0,
-            motCle: 'salon'
-          })
-          .reply(200, { listeDemarches: undefined })
-          .isDone()
-
-        // When
-        const typeDemarcheDtos =
-          await poleEmploiClient.rechercherTypesDemarches('salon')
-
-        // Then
-        expect(typeDemarcheDtos).to.deep.equal([])
-      })
-    })
-    describe("quand ce n'est pas sur staging ou development", () => {
-      describe('quand PE est cassé', () => {
-        it('renvoie une erreur', async () => {
-          // Given
-          const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
-            minutes: 20
-          })
-          poleEmploiClient.inMemoryToken = {
-            token: 'test-token',
-            tokenDate: uneDatetimeDeMoinsDe25Minutes
-          }
-
-          nock('https://api.peio.pe-qvr.fr/partenaire')
-            .post('/rechercher-demarche/v1/solr/search/demarche', {
-              codeUtilisateur: 0,
-              motCle: 'salon'
-            })
-            .reply(500)
-            .isDone()
-
-          // When
-          const call = poleEmploiClient.rechercherTypesDemarches('salon')
-
-          // Then
-          await expect(call).to.be.rejected()
-        })
-      })
     })
   })
 })

@@ -8,27 +8,21 @@ import { Action } from 'src/domain/action/action'
 import * as request from 'supertest'
 import { GetActionsPredefiniesQueryHandler } from '../../../src/application/queries/action/get-actions-predefinies.query.handler'
 import { GetAgencesQueryHandler } from '../../../src/application/queries/get-agences.query.handler.db'
+import { GetCatalogueDemarchesQueryHandler } from '../../../src/application/queries/get-catalogue-demarches.query.handler'
 import { GetCommunesEtDepartementsQueryHandler } from '../../../src/application/queries/get-communes-et-departements.query.handler.db'
 import { GetMetiersRomeQueryHandler } from '../../../src/application/queries/get-metiers-rome.query.handler.db'
 import { GetMotifsSuppressionJeuneQueryHandler } from '../../../src/application/queries/get-motifs-suppression-jeune.query.handler'
 import { CommuneOuDepartementType } from '../../../src/application/queries/query-models/communes-et-departements.query-model'
-import { TypesDemarcheQueryModel } from '../../../src/application/queries/query-models/types-demarche.query-model'
-import { RechercherTypesDemarcheQueryHandler } from '../../../src/application/queries/rechercher-types-demarche.query.handler'
 import { success } from '../../../src/building-blocks/types/result'
 import { Core } from '../../../src/domain/core'
-import {
-  unHeaderAuthorization,
-  unUtilisateurDecode
-} from '../../fixtures/authentification.fixture'
+import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
 import { StubbedClass, stubClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 import Structure = Core.Structure
-import { GetCatalogueDemarchesQueryHandler } from '../../../src/application/queries/get-catalogue-demarches.query.handler'
 
 let getCommunesEtDepartementsQueryHandler: StubbedClass<GetCommunesEtDepartementsQueryHandler>
 let getAgencesQueryHandler: StubbedClass<GetAgencesQueryHandler>
-let rechercherTypesDemarcheQueryHandler: StubbedClass<RechercherTypesDemarcheQueryHandler>
 let getMotifsSuppressionQueryHandler: StubbedClass<GetMotifsSuppressionJeuneQueryHandler>
 let getTypesQualificationsQueryHandler: StubbedClass<GetTypesQualificationsQueryHandler>
 let getActionsPredefiniesQueryHandler: StubbedClass<GetActionsPredefiniesQueryHandler>
@@ -40,9 +34,6 @@ describe('ReferentielsController', () => {
     GetCommunesEtDepartementsQueryHandler
   )
   getAgencesQueryHandler = stubClass(GetAgencesQueryHandler)
-  rechercherTypesDemarcheQueryHandler = stubClass(
-    RechercherTypesDemarcheQueryHandler
-  )
   getMotifsSuppressionQueryHandler = stubClass(
     GetMotifsSuppressionJeuneQueryHandler
   )
@@ -65,9 +56,7 @@ describe('ReferentielsController', () => {
       GetCommunesEtDepartementsQueryHandler
     )
     getAgencesQueryHandler = app.get(GetAgencesQueryHandler)
-    rechercherTypesDemarcheQueryHandler = app.get(
-      RechercherTypesDemarcheQueryHandler
-    )
+
     getMotifsSuppressionQueryHandler = app.get(
       GetMotifsSuppressionJeuneQueryHandler
     )
@@ -288,55 +277,6 @@ describe('ReferentielsController', () => {
     })
   })
 
-  describe('GET /referentiels/types-demarches', () => {
-    describe('sans query param', () => {
-      it('rejette', () => {
-        // When - Then
-        return request(app.getHttpServer())
-          .get('/referentiels/pole-emploi/types-demarches')
-          .set('Authorization', 'Bearer ceci-est-un-jwt')
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-    })
-
-    describe('avec un query param', () => {
-      describe('quand PE est UP', () => {
-        it('renvoie les types de démarches', () => {
-          // Given
-          const desTypesDemarcheQueryModel: TypesDemarcheQueryModel[] = [
-            {
-              codePourquoi: 'FAKE-P03',
-              codeQuoi: 'FAKE-Q12',
-              libellePourquoi: 'FAKE-Mes candidatures',
-              libelleQuoi: "Recherche d'offres d'emploi ou d'entreprises",
-              commentObligatoire: false,
-              comment: [
-                {
-                  code: 'FAKE-C12.06',
-                  label: 'FAKE-Par un autre moyen'
-                }
-              ]
-            }
-          ]
-          rechercherTypesDemarcheQueryHandler.execute
-            .withArgs({ recherche: 'salon' }, unUtilisateurDecode())
-            .resolves(desTypesDemarcheQueryModel)
-
-          // When - Then
-          return request(app.getHttpServer())
-            .get('/referentiels/pole-emploi/types-demarches?recherche=salon')
-            .set('Authorization', 'Bearer ceci-est-un-jwt')
-            .expect(HttpStatus.OK)
-            .expect(desTypesDemarcheQueryModel)
-        })
-      })
-    })
-    ensureUserAuthenticationFailsIfInvalid(
-      'get',
-      '/referentiels/pole-emploi/types-demarches'
-    )
-  })
-
   describe('GET /referentiels/catalogue-demarches', () => {
     describe('quand PE est UP', () => {
       it('renvoie le catalogue de démarches', () => {
@@ -345,7 +285,7 @@ describe('ReferentielsController', () => {
 
         // When - Then
         return request(app.getHttpServer())
-          .get('/referentiels/pole-emploi/types-demarches?recherche=salon')
+          .get('/referentiels/pole-emploi/catalogue-demarches')
           .set('Authorization', 'Bearer ceci-est-un-jwt')
           .expect(HttpStatus.OK)
       })
