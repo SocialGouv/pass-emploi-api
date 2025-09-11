@@ -284,7 +284,7 @@ export class JeunesPoleEmploiController {
 
     return handleResult(result, ({ dateDuCache, queryModel }) => ({
       resultat: queryModel,
-      dateDerniereMiseAJour: dateDuCache?.toISO()
+      dateDerniereMiseAJour: dateDuCache?.toISO() ?? DateTime.now().toISO()
     }))
   }
 }
