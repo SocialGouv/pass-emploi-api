@@ -16,7 +16,6 @@ import {
   success
 } from 'src/building-blocks/types/result'
 import { Notification } from 'src/domain/notification/notification'
-import { desTypeDemarchesDtosMock } from 'src/fixtures/types-demarches.fixture'
 import { DateService } from 'src/utils/date-service'
 import { buildError } from 'src/utils/logger.module'
 import { RateLimiterService } from 'src/utils/rate-limiter.service'
@@ -30,14 +29,8 @@ import {
   OffresEmploiDtoWithTotal,
   TypeRDVPE
 } from '../repositories/dto/pole-emploi.dto'
-import {
-  DemarcheIADto,
-  ListeTypeDemarchesDto,
-  TypeDemarcheDto
-} from './dto/pole-emploi.dto'
+import { DemarcheIADto } from './dto/pole-emploi.dto'
 import { handleAxiosError } from './utils/axios-error-handler'
-
-const CODE_UTILISATEUR = 0
 
 @Injectable()
 export class PoleEmploiClient {
@@ -213,37 +206,6 @@ export class PoleEmploiClient {
         )
       }
     })
-  }
-
-  async rechercherTypesDemarches(
-    recherche: string
-  ): Promise<TypeDemarcheDto[]> {
-    const token = await this.getToken()
-
-    try {
-      const url = `${this.apiUrl}/rechercher-demarche/v1/solr/search/demarche`
-      const body = {
-        codeUtilisateur: CODE_UTILISATEUR,
-        motCle: recherche
-      }
-      const result = await firstValueFrom(
-        this.httpService.post<ListeTypeDemarchesDto>(url, body, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-      )
-      return result.data.listeDemarches ?? []
-    } catch (e) {
-      this.logger.error(
-        buildError('Erreur lors de la récupération des types de démarches', e)
-      )
-      if (
-        this.configService.get('environment') === 'development' ||
-        this.configService.get('environment') === 'staging'
-      ) {
-        return desTypeDemarchesDtosMock()
-      }
-      throw e
-    }
   }
 
   async generateDemarchesIA(contenu: string): Promise<Result<DemarcheIADto[]>> {
