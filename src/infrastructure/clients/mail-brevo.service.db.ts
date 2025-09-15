@@ -7,7 +7,7 @@ import { Authentification } from '../../domain/authentification'
 import { Core, estPassEmploi } from '../../domain/core'
 import { Jeune } from '../../domain/jeune/jeune'
 import { Mail, MailDataDto } from '../../domain/mail'
-import { Conseiller } from '../../domain/milo/conseiller'
+import { Conseiller } from '../../domain/conseiller'
 import {
   mapCodeLabelTypeRendezVous,
   RendezVous,

@@ -9,7 +9,7 @@ import {
 } from '../../../../src/application/commands/pole-emploi/creer-jeune-pole-emploi.command.handler'
 import { EmailExisteDejaError } from '../../../../src/building-blocks/types/domain-error'
 import { Chat } from '../../../../src/domain/chat'
-import { Conseiller } from '../../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../../src/domain/conseiller'
 import { Core, estFranceTravail } from '../../../../src/domain/core'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
 import { DateService } from '../../../../src/utils/date-service'

@@ -17,7 +17,7 @@ import {
 import { DateService } from '../../utils/date-service'
 import { IdService } from '../../utils/id-service'
 import { Jeune } from '../jeune/jeune'
-import { Conseiller } from '../milo/conseiller'
+import { Conseiller } from '../conseiller'
 import * as _AnimationCollective from './animation-collective'
 import * as _Historique from './historique'
 

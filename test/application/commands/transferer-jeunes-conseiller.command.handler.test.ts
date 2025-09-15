@@ -19,7 +19,7 @@ import {
   failure,
   Result
 } from '../../../src/building-blocks/types/result'
-import { Conseiller } from '../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { SupportAuthorizer } from '../../../src/application/authorizers/support-authorizer'

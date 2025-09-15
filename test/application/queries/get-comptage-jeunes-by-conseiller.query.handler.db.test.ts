@@ -11,7 +11,7 @@ import { GetComptageJeuneQueryGetter } from '../../../src/application/queries/qu
 import { Authentification } from '../../../src/domain/authentification'
 import { Core } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune/jeune'
-import { Conseiller } from '../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { DateService } from '../../../src/utils/date-service'

@@ -10,7 +10,7 @@ import {
 } from '../../../../src/building-blocks/types/domain-error'
 import { Failure } from '../../../../src/building-blocks/types/result'
 import { Agence } from '../../../../src/domain/agence'
-import { Conseiller } from '../../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../../src/domain/conseiller'
 import { Core } from '../../../../src/domain/core'
 import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
 import { unConseiller } from '../../../fixtures/conseiller.fixture'

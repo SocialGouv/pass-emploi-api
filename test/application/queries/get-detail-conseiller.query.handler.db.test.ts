@@ -4,7 +4,7 @@ import {
   GetDetailConseillerQuery,
   GetDetailConseillerQueryHandler
 } from '../../../src/application/queries/get-detail-conseiller.query.handler.db'
-import { Conseiller } from '../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller'
 import { Core } from '../../../src/domain/core'
 import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'

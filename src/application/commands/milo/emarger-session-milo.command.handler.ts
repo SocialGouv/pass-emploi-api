@@ -14,7 +14,7 @@ import {
 } from 'src/domain/milo/session.milo'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { ConseillerMiloRepositoryToken } from '../../../domain/milo/conseiller.milo.db'
-import { Conseiller } from '../../../domain/milo/conseiller'
+import { Conseiller } from '../../../domain/conseiller'
 import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { DateService } from 'src/utils/date-service'
 

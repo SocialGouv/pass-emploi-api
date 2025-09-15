@@ -17,7 +17,7 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { Mail } from '../../../src/domain/mail'
-import { Conseiller } from '../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller'
 import { Notification } from '../../../src/domain/notification/notification'
 import { PlanificateurService } from '../../../src/domain/planificateur'
 import {

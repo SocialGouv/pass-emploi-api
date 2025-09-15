@@ -12,10 +12,7 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
-import {
-  Conseiller,
-  ConseillerRepositoryToken
-} from '../../domain/milo/conseiller'
+import { Conseiller, ConseillerRepositoryToken } from '../../domain/conseiller'
 import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 

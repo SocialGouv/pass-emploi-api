@@ -7,7 +7,7 @@ import {
   emptySuccess,
   failure
 } from '../../../src/building-blocks/types/result'
-import { Conseiller } from '../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { createSandbox, expect } from '../../utils'

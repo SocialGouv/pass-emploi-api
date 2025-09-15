@@ -22,7 +22,7 @@ import { Chat, ChatRepositoryToken } from '../../../domain/chat'
 import {
   Conseiller,
   ConseillerRepositoryToken
-} from '../../../domain/milo/conseiller'
+} from '../../../domain/conseiller'
 import { Core, estMilo } from '../../../domain/core'
 import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import {

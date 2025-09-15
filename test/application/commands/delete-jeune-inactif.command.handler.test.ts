@@ -16,7 +16,7 @@ import {
   isFailure
 } from '../../../src/building-blocks/types/result'
 import { Chat } from '../../../src/domain/chat'
-import { Conseiller } from '../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'

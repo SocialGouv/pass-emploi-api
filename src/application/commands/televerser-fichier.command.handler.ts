@@ -18,7 +18,7 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Fichier, FichierRepositoryToken } from '../../domain/fichier'
-import { Conseiller } from '../../domain/milo/conseiller'
+import { Conseiller } from '../../domain/conseiller'
 import {
   ListeDeDiffusion,
   ListeDeDiffusionRepositoryToken

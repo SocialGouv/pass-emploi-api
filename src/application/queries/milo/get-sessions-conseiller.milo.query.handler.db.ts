@@ -7,7 +7,7 @@ import { QueryHandler } from 'src/building-blocks/types/query-handler'
 import { isFailure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { estMilo } from 'src/domain/core'
-import { Conseiller } from 'src/domain/milo/conseiller'
+import { Conseiller } from 'src/domain/conseiller'
 import {
   ConseillerMilo,
   ConseillerMiloRepositoryToken

@@ -11,10 +11,7 @@ import {
   Result,
   success
 } from '../../building-blocks/types/result'
-import {
-  Conseiller,
-  ConseillerRepositoryToken
-} from '../../domain/milo/conseiller'
+import { Conseiller, ConseillerRepositoryToken } from '../../domain/conseiller'
 import {
   DetailJeuneRawSql,
   toDetailJeuneConseillerQueryModel

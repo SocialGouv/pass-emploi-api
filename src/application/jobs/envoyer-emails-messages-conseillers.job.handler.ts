@@ -3,10 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import { Job } from 'bull'
 import { JobHandler } from '../../building-blocks/types/job-handler'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
-import {
-  Conseiller,
-  ConseillerRepositoryToken
-} from '../../domain/milo/conseiller'
+import { Conseiller, ConseillerRepositoryToken } from '../../domain/conseiller'
 import { Mail, MailServiceToken } from '../../domain/mail'
 import { Planificateur, ProcessJobType } from '../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'

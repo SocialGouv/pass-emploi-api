@@ -9,7 +9,7 @@ import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import {
   Conseiller,
   ConseillerRepositoryToken
-} from '../../../domain/milo/conseiller'
+} from '../../../domain/conseiller'
 import { MiloClient } from '../../../infrastructure/clients/milo-client'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 import { OidcClient } from '../../../infrastructure/clients/oidc-client.db'

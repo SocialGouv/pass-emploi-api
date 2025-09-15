@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { Op } from 'sequelize'
-import { Conseiller } from '../../domain/milo/conseiller'
+import { Conseiller } from '../../domain/conseiller'
 import { Core } from '../../domain/core'
 import { AgenceSqlModel } from '../sequelize/models/agence.sql-model'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'

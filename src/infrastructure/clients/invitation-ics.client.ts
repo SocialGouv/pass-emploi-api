@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import * as icsService from 'ics'
 import { Attendee, EventAttributes } from 'ics'
-import { Conseiller } from '../../domain/milo/conseiller'
+import { Conseiller } from '../../domain/conseiller'
 import {
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous,

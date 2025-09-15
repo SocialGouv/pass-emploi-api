@@ -1,4 +1,4 @@
-import { Conseiller } from '../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { expect, StubbedClass, stubClass } from '../../utils'

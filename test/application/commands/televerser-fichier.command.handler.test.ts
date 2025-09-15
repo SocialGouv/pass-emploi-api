@@ -17,7 +17,7 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { Chat } from '../../../src/domain/chat'
 import { Fichier } from '../../../src/domain/fichier'
-import { Conseiller } from '../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller'
 import { Planificateur } from '../../../src/domain/planificateur'
 import { DateService } from '../../../src/utils/date-service'
 import {

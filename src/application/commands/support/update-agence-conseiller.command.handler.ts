@@ -11,7 +11,7 @@ import { Authentification } from '../../../domain/authentification'
 import {
   Conseiller,
   ConseillerRepositoryToken
-} from '../../../domain/milo/conseiller'
+} from '../../../domain/conseiller'
 import {
   AnimationCollective,
   AnimationCollectiveRepositoryToken

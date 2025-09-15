@@ -10,10 +10,7 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
-import {
-  Conseiller,
-  ConseillerRepositoryToken
-} from '../../domain/milo/conseiller'
+import { Conseiller, ConseillerRepositoryToken } from '../../domain/conseiller'
 import {
   RendezVous,
   RendezVousRepositoryToken

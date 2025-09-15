@@ -15,7 +15,7 @@ import {
   success
 } from '../../../../src/building-blocks/types/result'
 import { Agence } from '../../../../src/domain/agence'
-import { Conseiller } from '../../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../../src/domain/conseiller'
 import { AnimationCollective } from '../../../../src/domain/rendez-vous/animation-collective'
 import { DateService } from '../../../../src/utils/date-service'
 import { uneAgence } from '../../../fixtures/agence.fixture'
