@@ -382,6 +382,7 @@ import { DateService } from './utils/date-service'
 import { IdService } from './utils/id-service'
 import { configureLoggerModule } from './utils/logger.module'
 import { RateLimiterService } from './utils/rate-limiter.service'
+import { NotifierBeneficiairesCommandHandler } from './application/commands/notifier-beneficiaires.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -820,7 +821,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     AjouterJeuneListeDeDiffusionCommandHandler,
     GenerateDemarchesIACommandHandler,
     CreateFeedbackCommandHandler,
-    UpdateFeatureFlipCommandHandler
+    UpdateFeatureFlipCommandHandler,
+    NotifierBeneficiairesCommandHandler
   ]
 }
 

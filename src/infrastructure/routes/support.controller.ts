@@ -21,7 +21,7 @@ import {
 import {
   RefreshJddCommand,
   RefreshJddCommandHandler
-} from '../../application/commands/support//refresh-jdd.command.handler'
+} from '../../application/commands/support/refresh-jdd.command.handler'
 import { ArchiverJeuneSupportCommandHandler } from '../../application/commands/support/archiver-jeune-support.command.handler'
 import { CreerSuperviseursCommandHandler } from '../../application/commands/support/creer-superviseurs.command.handler'
 import { DeleteSuperviseursCommandHandler } from '../../application/commands/support/delete-superviseurs.command.handler'
@@ -42,12 +42,14 @@ import {
   ChangerAgenceConseillerPayload,
   CreateSuperviseursPayload,
   DeleteSuperviseursPayload,
+  NotifierBeneficiairesPayload,
   RefreshJDDPayload,
   TeleverserCsvPayload,
   TransfererJeunesPayload,
   UpdateFeatureFlipPayload
 } from './validation/support.inputs'
 import { UpdateFeatureFlipCommandHandler } from '../../application/commands/support/update-feature-flip.command.handler'
+import { NotifierBeneficiairesCommandHandler } from '../../application/commands/notifier-beneficiaires.command.handler'
 
 @Controller('support')
 @ApiTags('Support')
@@ -63,7 +65,8 @@ export class SupportController {
     private transfererJeunesConseillerCommandHandler: TransfererJeunesConseillerCommandHandler,
     private readonly creerSuperviseursCommandHandler: CreerSuperviseursCommandHandler,
     private readonly deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler,
-    private readonly updateFeatureFlipCommandHandler: UpdateFeatureFlipCommandHandler
+    private readonly updateFeatureFlipCommandHandler: UpdateFeatureFlipCommandHandler,
+    private readonly notifierBeneficiairesComand: NotifierBeneficiairesCommandHandler
   ) {}
 
   @SetMetadata(
@@ -250,4 +253,19 @@ export class SupportController {
 
     return handleResult(result)
   }
+
+  @SetMetadata(
+    Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
+    Authentification.Partenaire.SUPPORT
+  )
+  @ApiOperation({
+    summary:
+      'Notifie un groupe de bénéficiaires appartenants à une ou plusieures structures.',
+    description: 'Autorisé pour le support'
+  })
+  @Post('notifier-beneficiaires')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async notifierBeneficiaires(
+    @Body() _payload: NotifierBeneficiairesPayload
+  ): Promise<void> {}
 }
