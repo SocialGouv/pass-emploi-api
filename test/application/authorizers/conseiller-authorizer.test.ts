@@ -3,7 +3,7 @@ import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/conseiller-authorizer'
 import { DroitsInsuffisants } from '../../../src/building-blocks/types/domain-error'
 import { Authentification } from '../../../src/domain/authentification'
-import { Conseiller } from '../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller'
 import { Core } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import {

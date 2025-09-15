@@ -6,7 +6,7 @@ import {
 } from '../../../src/application/commands/create-liste-de-diffusion.command.handler'
 import { emptySuccess } from '../../../src/building-blocks/types/result'
 import { Chat } from '../../../src/domain/chat'
-import { Conseiller } from '../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import {
   unUtilisateurConseiller,

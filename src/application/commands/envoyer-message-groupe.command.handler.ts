@@ -10,7 +10,7 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Chat, ChatIndividuel, ChatRepositoryToken } from '../../domain/chat'
-import { Conseiller } from '../../domain/milo/conseiller'
+import { Conseiller } from '../../domain/conseiller'
 import {
   ListeDeDiffusion,
   ListeDeDiffusionRepositoryToken

@@ -1,6 +1,6 @@
 import { MauvaiseCommandeError } from '../../src/building-blocks/types/domain-error'
 import { Failure, isFailure } from '../../src/building-blocks/types/result'
-import { Conseiller } from '../../src/domain/milo/conseiller'
+import { Conseiller } from '../../src/domain/conseiller'
 import { Core } from '../../src/domain/core'
 import { unConseiller } from '../fixtures/conseiller.fixture'
 import { expect } from '../utils'

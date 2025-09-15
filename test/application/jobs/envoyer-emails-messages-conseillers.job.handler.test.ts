@@ -7,7 +7,7 @@ import { uneDatetime } from 'test/fixtures/date.fixture'
 import { testConfig } from 'test/utils/module-for-testing'
 import { EnvoyerEmailsMessagesConseillersJobHandler } from '../../../src/application/jobs/envoyer-emails-messages-conseillers.job.handler'
 import { Chat } from '../../../src/domain/chat'
-import { Conseiller } from '../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller'
 import { Mail } from '../../../src/domain/mail'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 

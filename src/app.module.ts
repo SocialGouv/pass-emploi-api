@@ -254,7 +254,7 @@ import {
 } from './domain/jeune/jeune'
 import { Mail, MailRepositoryToken, MailServiceToken } from './domain/mail'
 import { ActionMiloRepositoryToken } from './domain/milo/action.milo'
-import { Conseiller, ConseillerRepositoryToken } from './domain/milo/conseiller'
+import { Conseiller, ConseillerRepositoryToken } from './domain/conseiller'
 import { ConseillerMiloRepositoryToken } from './domain/milo/conseiller.milo.db'
 import { EvenementMiloRepositoryToken } from './domain/milo/evenement.milo'
 import { JeuneMiloRepositoryToken } from './domain/milo/jeune.milo'

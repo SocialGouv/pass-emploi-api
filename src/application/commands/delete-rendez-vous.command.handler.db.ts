@@ -13,10 +13,7 @@ import {
 import { Authentification } from '../../domain/authentification'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { Mail, MailServiceToken } from '../../domain/mail'
-import {
-  Conseiller,
-  ConseillerRepositoryToken
-} from '../../domain/milo/conseiller'
+import { Conseiller, ConseillerRepositoryToken } from '../../domain/conseiller'
 import { Notification } from '../../domain/notification/notification'
 import {
   PlanificateurService,

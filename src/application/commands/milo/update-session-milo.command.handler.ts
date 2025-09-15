@@ -7,7 +7,7 @@ import {
   isFailure
 } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { Conseiller } from 'src/domain/milo/conseiller'
+import { Conseiller } from 'src/domain/conseiller'
 import { estMilo } from 'src/domain/core'
 import { ConseillerMiloRepositoryToken } from 'src/domain/milo/conseiller.milo.db'
 import {

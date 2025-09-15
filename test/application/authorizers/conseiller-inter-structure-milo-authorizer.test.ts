@@ -6,7 +6,7 @@ import {
   failure,
   success
 } from '../../../src/building-blocks/types/result'
-import { Conseiller } from '../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller'
 import { JeuneMilo } from '../../../src/domain/milo/jeune.milo'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseillerMilo } from '../../fixtures/conseiller-milo.fixture'

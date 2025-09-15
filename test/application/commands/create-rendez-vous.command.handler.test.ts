@@ -26,7 +26,7 @@ import {
 } from '../../../src/application/commands/create-rendez-vous.command.handler'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Mail } from '../../../src/domain/mail'
-import { Conseiller } from 'src/domain/milo/conseiller'
+import { Conseiller } from 'src/domain/conseiller'
 import { stubClassSandbox } from 'test/utils/types'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'

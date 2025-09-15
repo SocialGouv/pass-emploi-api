@@ -2,7 +2,7 @@ import { ConseillerSqlRepository } from '../../../src/infrastructure/repositorie
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 
 import { uneDatetime } from 'test/fixtures/date.fixture'
-import { Conseiller } from '../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller'
 import { Core } from '../../../src/domain/core'
 import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { unConseiller } from '../../fixtures/conseiller.fixture'

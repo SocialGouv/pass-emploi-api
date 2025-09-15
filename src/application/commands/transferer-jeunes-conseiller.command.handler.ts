@@ -14,10 +14,7 @@ import {
 import { Authentification } from '../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
-import {
-  Conseiller,
-  ConseillerRepositoryToken
-} from '../../domain/milo/conseiller'
+import { Conseiller, ConseillerRepositoryToken } from '../../domain/conseiller'
 import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { SupportAuthorizer } from '../authorizers/support-authorizer'

@@ -10,7 +10,7 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Evenement, EvenementService } from '../../domain/evenement'
-import { Conseiller } from '../../domain/milo/conseiller'
+import { Conseiller } from '../../domain/conseiller'
 import { ListeDeDiffusionRepositoryToken } from '../../domain/milo/liste-de-diffusion'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { ListeDeDiffusionAuthorizer } from '../authorizers/liste-de-diffusion-authorizer'

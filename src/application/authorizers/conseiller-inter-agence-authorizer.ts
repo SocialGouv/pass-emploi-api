@@ -9,10 +9,7 @@ import { Action, ActionRepositoryToken } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
 import { estMilo } from '../../domain/core'
 import { Jeune, JeuneRepositoryToken } from '../../domain/jeune/jeune'
-import {
-  Conseiller,
-  ConseillerRepositoryToken
-} from '../../domain/milo/conseiller'
+import { Conseiller, ConseillerRepositoryToken } from '../../domain/conseiller'
 import {
   RendezVous,
   RendezVousRepositoryToken

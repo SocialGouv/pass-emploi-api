@@ -3,7 +3,7 @@ import { createSandbox, SinonSandbox } from 'sinon'
 import { ListeDeDiffusionAuthorizer } from '../../../src/application/authorizers/liste-de-diffusion-authorizer'
 import { DeleteListeDeDiffusionCommandHandler } from '../../../src/application/commands/delete-liste-de-diffusion.command.handler'
 import { Chat } from '../../../src/domain/chat'
-import { Conseiller } from '../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import {
   unUtilisateurConseiller,

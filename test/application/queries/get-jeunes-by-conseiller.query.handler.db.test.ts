@@ -16,7 +16,7 @@ import {
   success
 } from '../../../src/building-blocks/types/result'
 import { Authentification } from '../../../src/domain/authentification'
-import { Conseiller } from '../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller'
 import { Core } from '../../../src/domain/core'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'

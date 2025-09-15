@@ -6,7 +6,7 @@ import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseill
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { success } from '../../../src/building-blocks/types/result'
-import { Conseiller } from '../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller'
 import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'

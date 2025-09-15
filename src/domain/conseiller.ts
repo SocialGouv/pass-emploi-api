@@ -1,10 +1,10 @@
 import { DateTime } from 'luxon'
-import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
-import { failure, Result, success } from '../../building-blocks/types/result'
-import { Agence } from '../agence'
-import { Core } from '../core'
-import * as _ListeDeDiffusion from './liste-de-diffusion'
-import * as _Conseiller from './conseiller.milo.db'
+import { MauvaiseCommandeError } from '../building-blocks/types/domain-error'
+import { failure, Result, success } from '../building-blocks/types/result'
+import { Agence } from './agence'
+import { Core } from './core'
+import * as _ListeDeDiffusion from './milo/liste-de-diffusion'
+import * as _Conseiller from './milo/conseiller.milo.db'
 import Structure = Core.Structure
 
 export interface Conseiller {

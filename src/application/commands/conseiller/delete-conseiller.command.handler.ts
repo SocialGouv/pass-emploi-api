@@ -19,7 +19,7 @@ import { Jeune, JeuneRepositoryToken } from '../../../domain/jeune/jeune'
 import {
   Conseiller,
   ConseillerRepositoryToken
-} from '../../../domain/milo/conseiller'
+} from '../../../domain/conseiller'
 import { ConseillerAuthorizer } from '../../authorizers/conseiller-authorizer'
 
 export interface DeleteConseillerCommand {

@@ -4,10 +4,7 @@ import { Authentification } from 'src/domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result, success } from '../../building-blocks/types/result'
-import {
-  Conseiller,
-  ConseillerRepositoryToken
-} from '../../domain/milo/conseiller'
+import { Conseiller, ConseillerRepositoryToken } from '../../domain/conseiller'
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'

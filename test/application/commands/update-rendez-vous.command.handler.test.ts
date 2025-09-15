@@ -18,7 +18,7 @@ import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { Conseiller } from '../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller'
 import { Mail } from '../../../src/domain/mail'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { uneDate } from '../../fixtures/date.fixture'

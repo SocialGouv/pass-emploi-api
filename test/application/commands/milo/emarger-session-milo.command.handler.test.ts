@@ -12,7 +12,7 @@ import {
   success
 } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { Conseiller } from 'src/domain/milo/conseiller'
+import { Conseiller } from 'src/domain/conseiller'
 import { SessionMilo } from 'src/domain/milo/session.milo'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unConseillerMilo } from 'test/fixtures/conseiller-milo.fixture'

@@ -1,4 +1,4 @@
-import { Conseiller } from '../../../domain/milo/conseiller'
+import { Conseiller } from '../../../domain/conseiller'
 import {
   ListeDeDiffusionDto,
   ListeDeDiffusionSqlModel

@@ -1,4 +1,4 @@
-import { Conseiller } from '../../../../src/domain/milo/conseiller'
+import { Conseiller } from '../../../../src/domain/conseiller'
 import { ListeDeDiffusionJeuneAssociationSqlModel } from '../../../../src/infrastructure/sequelize/models/liste-de-diffusion-jeune-association.sql-model'
 import { ListeDeDiffusionSqlRepository } from '../../../../src/infrastructure/repositories/conseiller/liste-de-diffusion-sql.repository.db'
 import { unConseillerDuJeune, unJeune } from '../../../fixtures/jeune.fixture'

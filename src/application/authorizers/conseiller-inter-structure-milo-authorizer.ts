@@ -7,7 +7,7 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Conseiller } from '../../domain/milo/conseiller'
+import { Conseiller } from '../../domain/conseiller'
 import { ConseillerMiloRepositoryToken } from '../../domain/milo/conseiller.milo.db'
 import {
   JeuneMilo,
