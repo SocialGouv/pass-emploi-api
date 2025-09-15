@@ -1,5 +1,6 @@
 import { HttpModule } from '@nestjs/axios'
 import {
+  BadRequestException,
   INestApplication,
   Provider,
   Type,
@@ -61,7 +62,20 @@ export const getApplicationWithStubbedDependencies =
 
       applicationForHttpTesting = testingModule.createNestApplication()
       applicationForHttpTesting.useGlobalPipes(
-        new ValidationPipe({ whitelist: true })
+        new ValidationPipe({
+          whitelist: true,
+          forbidNonWhitelisted: true,
+          transform: true,
+          exceptionFactory: (errors): BadRequestException => {
+            return new BadRequestException(
+              errors.map(err => ({
+                property: err.property,
+                constraints: err.constraints,
+                value: err.value
+              }))
+            )
+          }
+        })
       )
       await applicationForHttpTesting.init()
     }
