@@ -142,10 +142,6 @@ export namespace Demarche {
       const maintenant = setHoursTo12h00(this.dateService.now())
       const dateTimeFin = setHoursTo12h00(demarcheACreer.dateFin)
 
-      let statut = Demarche.Statut.A_FAIRE
-      const laDateDeFinEstDansLePasse = dateTimeFin < maintenant
-      if (laDateDeFinEstDansLePasse) statut = Demarche.Statut.REALISEE
-
       if (
         demarcheACreer.quoi &&
         demarcheACreer.pourquoi &&
@@ -164,7 +160,7 @@ export namespace Demarche {
           }
         }
         return success({
-          statut,
+          statut: Demarche.Statut.A_FAIRE,
           dateCreation: maintenant,
           dateFin: dateTimeFin,
           pourquoi: demarcheACreer.pourquoi,
@@ -174,7 +170,7 @@ export namespace Demarche {
         })
       } else if (demarcheACreer.description) {
         return success({
-          statut,
+          statut: Demarche.Statut.A_FAIRE,
           dateCreation: maintenant,
           dateFin: dateTimeFin,
           pourquoi: POURQUOI_DEMARCHE_PERSO,
