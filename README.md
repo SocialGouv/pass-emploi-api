@@ -43,6 +43,10 @@ Mettre en PROD un **HOTFIX** : faire une nouvelle version (`yarn release`) et un
 
 **EN détail :** voir [le CONTRIBUTING](docs/CONTRIBUTING.md)
 
+## Architecture du code
+
+<img src="docs/diagrammes/archi-code.png">
+
 ## Liens utiles
 
 - [Troubleshoot](docs/TROUBLESHOOT.md)
