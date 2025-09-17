@@ -9,6 +9,8 @@ jobs:
   sonar-scheduled:
     name: SonarScan
     runs-on: ubuntu-latest
+    env:
+      SCAN_ACTION_SHA: 1a6d90ebcb0e6a6b1d87e37ba693fe453195ae25 # v5.3.1
     strategy:
       matrix:
         node-version: [22.14.0]
@@ -50,8 +52,9 @@ jobs:
         env:
           DATABASE_URL: postgres://test:test@localhost:5432/test
           REDIS_URL: redis://localhost:6767
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v5
+      # SonarQube Scan action v5.3.1 (SHA pinned)
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@${{ env.SCAN_ACTION_SHA }}
         with:
           projectBaseDir: .
         env:
