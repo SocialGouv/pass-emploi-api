@@ -8,6 +8,8 @@ import { Action } from './action/action'
 import { EvenementMilo } from './milo/evenement.milo'
 import { RendezVous } from './rendez-vous/rendez-vous'
 import { NettoyageJobsStats } from './suivi-job'
+import { Core } from './core'
+import { Notification } from './notification/notification'
 
 export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
 
@@ -85,7 +87,8 @@ export namespace Planificateur {
     NOTIFIER_BONNE_ALTERNANCE = 'NOTIFIER_BONNE_ALTERNANCE',
     NOTIFIER_CAMPAGNE = 'NOTIFIER_CAMPAGNE',
     NOTIFIER_ACTUALISATION = 'NOTIFIER_ACTUALISATION',
-    CLORE_SESSIONS = 'CLORE_SESSIONS'
+    CLORE_SESSIONS = 'CLORE_SESSIONS',
+    NOTIFIER_BENEFICIAIRES = 'NOTIFIER_BENEFICIAIRES'
   }
 
   export interface JobRendezVous {
@@ -133,6 +136,18 @@ export namespace Planificateur {
   }
 
   export type JobTraiterEvenementMilo = EvenementMilo
+
+  export interface JobNotifierBeneficiaires {
+    type: Notification.Type
+    titre: string
+    description: string
+    structures: Core.Structure[]
+    push: boolean
+    batchSize?: number
+    minutesEntreLesBatchs?: number
+    offset?: number
+    nbJeunesNotifies?: number
+  }
 
   export interface JobFake {
     message: string
