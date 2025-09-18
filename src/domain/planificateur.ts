@@ -8,8 +8,8 @@ import { Action } from './action/action'
 import { EvenementMilo } from './milo/evenement.milo'
 import { RendezVous } from './rendez-vous/rendez-vous'
 import { NettoyageJobsStats } from './suivi-job'
-import { Core } from './core'
 import { Notification } from './notification/notification'
+import { Jeune } from './jeune/jeune'
 
 export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
 
@@ -141,12 +141,12 @@ export namespace Planificateur {
     type: Notification.Type
     titre: string
     description: string
-    structures: Core.Structure[]
+    dispositifs: Jeune.Dispositif[]
     push: boolean
     batchSize?: number
     minutesEntreLesBatchs?: number
     offset?: number
-    nbJeunesNotifies?: number
+    nbBeneficiairesNotifies?: number
   }
 
   export interface JobFake {
