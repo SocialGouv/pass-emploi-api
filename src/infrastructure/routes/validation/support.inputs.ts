@@ -18,6 +18,7 @@ import {
 import { Core } from '../../../domain/core'
 import { FeatureFlipTag } from '../../sequelize/models/feature-flip.sql-model'
 import { Notification } from '../../../domain/notification/notification'
+import { Jeune } from '../../../domain/jeune/jeune'
 
 export class TeleverserCsvPayload {
   @ApiProperty({ type: 'string', format: 'binary' })
@@ -152,7 +153,7 @@ export class NotifierBeneficiairesPayload {
 
   @ApiProperty({ type: String, isArray: true })
   @IsArray()
-  structures: Core.Structure[]
+  dispositifs: Jeune.Dispositif[]
 
   @ApiProperty()
   @IsBoolean()

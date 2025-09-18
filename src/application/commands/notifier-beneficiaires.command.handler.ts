@@ -2,7 +2,6 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { Notification } from '../../domain/notification/notification'
-import { Core } from '../../domain/core'
 import { emptySuccess, Result } from '../../building-blocks/types/result'
 import {
   Planificateur,
@@ -10,12 +9,13 @@ import {
 } from '../../domain/planificateur'
 import { DateService } from '../../utils/date-service'
 import JobNotifierBeneficiaires = Planificateur.JobNotifierBeneficiaires
+import { Jeune } from '../../domain/jeune/jeune'
 
 export interface NotifierBeneficiairesCommand extends Command {
   type: Notification.Type
   titre: string
   description: string
-  structures: Core.Structure[]
+  dispositifs: Jeune.Dispositif[]
   push: boolean
   batchSize?: number
   minutesEntreLesBatchs?: number

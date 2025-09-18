@@ -31,6 +31,7 @@ import {
   NotifierBeneficiairesCommand,
   NotifierBeneficiairesCommandHandler
 } from '../../../src/application/commands/notifier-beneficiaires.command.handler'
+import { Jeune } from '../../../src/domain/jeune/jeune'
 
 describe('SupportController', () => {
   let archiverJeuneSupportCommandHandler: StubbedClass<ArchiverJeuneSupportCommandHandler>
@@ -291,10 +292,7 @@ describe('SupportController', () => {
           type: Notification.Type.OUTILS,
           titre: "Les offres d'immersion sont disponibles",
           description: 'Rendez-vous sur la page des offres.',
-          structures: [
-            Core.Structure.POLE_EMPLOI_AIJ,
-            Core.Structure.POLE_EMPLOI_BRSA
-          ],
+          dispositifs: [Jeune.Dispositif.AIJ, Jeune.Dispositif.BRSA],
           push: true,
           batchSize: 2000
         }
@@ -318,7 +316,7 @@ describe('SupportController', () => {
           type: Notification.Type.OUTILS,
           titre: "Les offres d'immersion sont disponibles",
           description: 'Rendez-vous sur la page des offres.',
-          structures: ['PAS_BON'],
+          dispositifs: ['PAS_BON'],
           push: 'true',
           batchSize: 2000
         }
@@ -330,11 +328,11 @@ describe('SupportController', () => {
           .set({ 'X-API-KEY': 'api-key-support' })
           .expect(HttpStatus.BAD_REQUEST)
       })
-      it('renvoie 400 quand les structures sont vides', async () => {
+      it('renvoie 400 quand les dispositifs sont vides', async () => {
         // Given
         const payload = {
           texte: 'Nouvelle notification !',
-          structures: [],
+          dispositifs: [],
           push: true,
           batchSize: 2000
         }
