@@ -66,7 +66,7 @@ export class SupportController {
     private readonly creerSuperviseursCommandHandler: CreerSuperviseursCommandHandler,
     private readonly deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler,
     private readonly updateFeatureFlipCommandHandler: UpdateFeatureFlipCommandHandler,
-    private readonly notifierBeneficiairesComand: NotifierBeneficiairesCommandHandler
+    private readonly notifierBeneficiairesCommandHandler: NotifierBeneficiairesCommandHandler
   ) {}
 
   @SetMetadata(
@@ -264,8 +264,10 @@ export class SupportController {
     description: 'Autorisé pour le support'
   })
   @Post('notifier-beneficiaires')
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.CREATED)
   async notifierBeneficiaires(
-    @Body() _payload: NotifierBeneficiairesPayload
-  ): Promise<void> {}
+    @Body() payload: NotifierBeneficiairesPayload
+  ): Promise<void> {
+    await this.notifierBeneficiairesCommandHandler.execute(payload)
+  }
 }
