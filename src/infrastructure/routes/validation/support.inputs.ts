@@ -8,13 +8,17 @@ import {
   IsEnum,
   IsIn,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
+  Min,
   ValidateIf,
   ValidateNested
 } from 'class-validator'
 import { Core } from '../../../domain/core'
 import { FeatureFlipTag } from '../../sequelize/models/feature-flip.sql-model'
+import { Notification } from '../../../domain/notification/notification'
+import { Jeune } from '../../../domain/jeune/jeune'
 
 export class TeleverserCsvPayload {
   @ApiProperty({ type: 'string', format: 'binary' })
@@ -125,4 +129,46 @@ export class UpdateFeatureFlipPayload {
   @IsArray()
   @IsEmail({}, { each: true })
   emailsConseillersSuppression?: string[]
+}
+
+export class NotifierBeneficiairesPayload {
+  @ApiProperty({
+    enum: Notification.Type,
+    description: Object.values(Notification.Type).join(', ')
+  })
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(Notification.Type)
+  type: Notification.Type
+
+  @ApiProperty({ type: String })
+  @IsString()
+  @IsNotEmpty()
+  titre: string
+
+  @ApiProperty({ type: String })
+  @IsString()
+  @IsNotEmpty()
+  description: string
+
+  @ApiProperty({ type: String, isArray: true })
+  @IsArray()
+  dispositifs: Jeune.Dispositif[]
+
+  @ApiProperty()
+  @IsBoolean()
+  @IsIn([false, true])
+  push: boolean
+
+  @ApiProperty()
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  batchSize?: number
+
+  @ApiProperty()
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  minutesEntreLesBatchs?: number
 }

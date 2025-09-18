@@ -31,7 +31,8 @@ export namespace Notification {
     DETAIL_SESSION_MILO = 'DETAIL_SESSION_MILO',
     DELETED_SESSION_MILO = 'DELETED_SESSION_MILO',
     RAPPEL_CREATION_ACTION = 'RAPPEL_CREATION_ACTION',
-    RAPPEL_CREATION_DEMARCHE = 'RAPPEL_CREATION_DEMARCHE'
+    RAPPEL_CREATION_DEMARCHE = 'RAPPEL_CREATION_DEMARCHE',
+    OUTILS = 'OUTILS'
   }
 
   export type TypeRdv =
@@ -504,6 +505,32 @@ export namespace Notification {
           }
         })
       )
+    }
+
+    async notifierBeneficiaires(
+      id: string,
+      token: string,
+      title: string,
+      body: string
+    ): Promise<void> {
+      try {
+        const notification = {
+          token,
+          notification: {
+            title: title,
+            body: body
+          },
+          data: {
+            type: Type.OUTILS
+          }
+        }
+        const promise = this.notificationRepository.send(notification, id)
+        this.logMessageSucces(id)
+        return promise
+      } catch (e) {
+        this.logger.error(e)
+        this.logMessageEchec(id)
+      }
     }
 
     private creerNotificationNouvelleAction(
