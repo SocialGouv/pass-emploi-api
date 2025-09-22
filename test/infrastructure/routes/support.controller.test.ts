@@ -22,10 +22,15 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { Authentification } from '../../../src/domain/authentification'
 import { Core } from '../../../src/domain/core'
-import { StubbedClass, expect } from '../../utils'
+import { expect, StubbedClass } from '../../utils'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 import { UpdateFeatureFlipCommandHandler } from '../../../src/application/commands/support/update-feature-flip.command.handler'
 import { FeatureFlipTag } from '../../../src/infrastructure/sequelize/models/feature-flip.sql-model'
+import { Notification } from '../../../src/domain/notification/notification'
+import {
+  NotifierBeneficiairesCommand,
+  NotifierBeneficiairesCommandHandler
+} from '../../../src/application/commands/notifier-beneficiaires.command.handler'
 
 describe('SupportController', () => {
   let archiverJeuneSupportCommandHandler: StubbedClass<ArchiverJeuneSupportCommandHandler>
@@ -33,6 +38,7 @@ describe('SupportController', () => {
   let creerSuperviseursCommandHandler: StubbedClass<CreerSuperviseursCommandHandler>
   let deleteSuperviseursCommandHandler: StubbedClass<DeleteSuperviseursCommandHandler>
   let transfererJeunesConseillerCommandHandler: StubbedClass<TransfererJeunesConseillerCommandHandler>
+  let creerNotificationCommandHandler: StubbedClass<NotifierBeneficiairesCommandHandler>
   let updateFeatureFlipCommandHandler: StubbedClass<UpdateFeatureFlipCommandHandler>
   let app: INestApplication
 
@@ -48,6 +54,9 @@ describe('SupportController', () => {
       TransfererJeunesConseillerCommandHandler
     )
     updateFeatureFlipCommandHandler = app.get(UpdateFeatureFlipCommandHandler)
+    creerNotificationCommandHandler = app.get(
+      NotifierBeneficiairesCommandHandler
+    )
   })
 
   describe('POST /support/archiver-jeune/:idJeune', () => {
@@ -267,6 +276,88 @@ describe('SupportController', () => {
         // When - Then
         await request(app.getHttpServer())
           .post('/support/superviseurs')
+          .send(payload)
+          .set({ 'X-API-KEY': 'api-key-support' })
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+  })
+
+  describe('POST /support/notifier-beneficiaires', () => {
+    describe('quand le payload est valide', () => {
+      it('renvoie 201', async () => {
+        // Given
+        const command: NotifierBeneficiairesCommand = {
+          type: Notification.Type.OUTILS,
+          titre: "Les offres d'immersion sont disponibles",
+          description: 'Rendez-vous sur la page des offres.',
+          structures: [
+            Core.Structure.POLE_EMPLOI_AIJ,
+            Core.Structure.POLE_EMPLOI_BRSA
+          ],
+          push: true,
+          batchSize: 2000
+        }
+
+        creerNotificationCommandHandler.execute
+          .withArgs(command)
+          .resolves(emptySuccess())
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/support/notifier-beneficiaires')
+          .send(command)
+          .set({ 'X-API-KEY': 'api-key-support' })
+          .expect(HttpStatus.CREATED)
+      })
+    })
+    describe("quand le payload n'est pas valide", () => {
+      it('renvoie 400 quand le push est une chaine de caractères', async () => {
+        // Given
+        const payload = {
+          type: Notification.Type.OUTILS,
+          titre: "Les offres d'immersion sont disponibles",
+          description: 'Rendez-vous sur la page des offres.',
+          dispositifs: ['PAS_BON'],
+          push: 'true',
+          batchSize: 2000
+        }
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/support/notifier-beneficiaires')
+          .send(payload)
+          .set({ 'X-API-KEY': 'api-key-support' })
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+      it('renvoie 400 quand les dispositifs sont vides', async () => {
+        // Given
+        const payload = {
+          texte: 'Nouvelle notification !',
+          dispositifs: [],
+          push: true,
+          batchSize: 2000
+        }
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/support/notifier-beneficiaires')
+          .send(payload)
+          .set({ 'X-API-KEY': 'api-key-support' })
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+      it('renvoie 400 quand le batch size est négatif', async () => {
+        // Given
+        const payload = {
+          texte: 'Nouvelle notification !',
+          structures: ['MILO', 'POLE_EMPLOI'],
+          push: true,
+          batchSize: -1
+        }
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/support/notifier-beneficiaires')
           .send(payload)
           .set({ 'X-API-KEY': 'api-key-support' })
           .expect(HttpStatus.BAD_REQUEST)

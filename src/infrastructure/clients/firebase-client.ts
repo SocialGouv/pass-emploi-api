@@ -2,7 +2,11 @@ import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import * as APM from 'elastic-apm-node'
 import admin, { firestore } from 'firebase-admin'
-import { getMessaging, TokenMessage } from 'firebase-admin/messaging'
+import {
+  FirebaseMessagingError,
+  getMessaging,
+  TokenMessage
+} from 'firebase-admin/messaging'
 import { DateTime } from 'luxon'
 import { ArchiveJeune } from '../../domain/archive-jeune'
 import { Authentification } from '../../domain/authentification'
@@ -84,13 +88,21 @@ export class FirebaseClient {
       await this.messaging.send(tokenMessage)
       this.logger.log(tokenMessage)
     } catch (e) {
-      this.logger.error(
-        buildError(
-          `Impossible d'envoyer de notification sur le token ${tokenMessage.token}`,
-          e
+      const errorMessage = `Impossible d'envoyer de notification sur le token ${tokenMessage.token}`
+      if (
+        e instanceof FirebaseMessagingError &&
+        e.code === 'messaging/registration-token-not-registered'
+      ) {
+        this.logger.warn(buildError(errorMessage, e))
+      } else {
+        this.logger.error(
+          buildError(
+            `Impossible d'envoyer de notification sur le token ${tokenMessage.token}`,
+            e
+          )
         )
-      )
-      this.apmService.captureError(e)
+        this.apmService.captureError(e)
+      }
     }
   }
 
