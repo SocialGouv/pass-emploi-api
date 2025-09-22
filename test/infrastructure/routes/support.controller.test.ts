@@ -31,7 +31,6 @@ import {
   NotifierBeneficiairesCommand,
   NotifierBeneficiairesCommandHandler
 } from '../../../src/application/commands/notifier-beneficiaires.command.handler'
-import { Jeune } from '../../../src/domain/jeune/jeune'
 
 describe('SupportController', () => {
   let archiverJeuneSupportCommandHandler: StubbedClass<ArchiverJeuneSupportCommandHandler>

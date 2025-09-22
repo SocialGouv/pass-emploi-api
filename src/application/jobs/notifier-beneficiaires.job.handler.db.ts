@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Op, Sequelize } from 'sequelize'
+import { Op } from 'sequelize'
 import { Job } from '../../building-blocks/types/job'
 import { JobHandler } from '../../building-blocks/types/job-handler'
 import {
@@ -12,7 +12,6 @@ import {
   ProcessJobType
 } from '../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
-import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
 import { DateService } from '../../utils/date-service'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 
