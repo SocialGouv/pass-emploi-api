@@ -40,8 +40,6 @@ export namespace Notification {
     | Type.DELETED_RENDEZVOUS
     | Type.UPDATED_RENDEZVOUS
 
-  export type TypeSession = Type.DETAIL_SESSION_MILO | Type.DELETED_SESSION_MILO
-
   export interface Message {
     token: string
     notification: {
@@ -505,32 +503,6 @@ export namespace Notification {
           }
         })
       )
-    }
-
-    async notifierBeneficiaires(
-      id: string,
-      token: string,
-      title: string,
-      body: string
-    ): Promise<void> {
-      try {
-        const notification = {
-          token,
-          notification: {
-            title: title,
-            body: body
-          },
-          data: {
-            type: Type.OUTILS
-          }
-        }
-        const promise = this.notificationRepository.send(notification, id)
-        this.logMessageSucces(id)
-        return promise
-      } catch (e) {
-        this.logger.error(e)
-        this.logMessageEchec(id)
-      }
     }
 
     private creerNotificationNouvelleAction(
