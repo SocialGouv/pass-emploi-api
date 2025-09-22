@@ -142,7 +142,7 @@ export namespace Planificateur {
     titre: string
     description: string
     structures: Core.Structure[]
-    push: boolean
+    push?: boolean
     batchSize?: number
     minutesEntreLesBatchs?: number
     offset?: number

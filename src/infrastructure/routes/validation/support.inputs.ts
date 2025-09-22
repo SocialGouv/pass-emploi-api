@@ -157,8 +157,9 @@ export class NotifierBeneficiairesPayload {
   structures: Core.Structure[]
 
   @ApiProperty()
+  @IsOptional()
   @IsBoolean()
-  @IsIn([false, true])
+  @IsIn([true, false])
   push: boolean
 
   @ApiProperty()

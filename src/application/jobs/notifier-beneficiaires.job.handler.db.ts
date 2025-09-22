@@ -2,7 +2,10 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Op, Sequelize } from 'sequelize'
 import { Job } from '../../building-blocks/types/job'
 import { JobHandler } from '../../building-blocks/types/job-handler'
-import { Notification } from '../../domain/notification/notification'
+import {
+  Notification,
+  NotificationRepositoryToken
+} from '../../domain/notification/notification'
 import {
   Planificateur,
   PlanificateurRepositoryToken,
@@ -18,14 +21,15 @@ interface Stats {
   estLaDerniereExecution: boolean
 }
 
-const PAGINATION_NOMBRE_DE_BENEFICIAIRES_MAXIMUM = 2000
+const PAGINATION_NOMBRE_DE_BENEFICIAIRES_MAXIMUM_DEFAUT = 2000
+const NOMBRE_MINUTES_ENTRE_BATCHS_DEFAUT = 5
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.NOTIFIER_BENEFICIAIRES)
 export class NotifierBeneficiairesJobHandler extends JobHandler<Job> {
   constructor(
-    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
-    private notificationService: Notification.Service,
+    @Inject(NotificationRepositoryToken)
+    private notificationRepository: Notification.Repository,
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service,
     private dateService: DateService,
@@ -58,7 +62,8 @@ export class NotifierBeneficiairesJobHandler extends JobHandler<Job> {
     try {
       const offset = job.contenu?.offset || 0
       const pagination =
-        job.contenu.batchSize || PAGINATION_NOMBRE_DE_BENEFICIAIRES_MAXIMUM
+        job.contenu.batchSize ||
+        PAGINATION_NOMBRE_DE_BENEFICIAIRES_MAXIMUM_DEFAUT
 
       const idsBeneficiairesAvecComptage = await JeuneSqlModel.findAll({
         where: {
@@ -75,25 +80,34 @@ export class NotifierBeneficiairesJobHandler extends JobHandler<Job> {
         order: [['id', 'ASC']]
       })
 
-      this.logger.log(
-        `${idsBeneficiairesAvecComptage.length} ids bénéficiaires à notifier`
-      )
-
       stats.nbBeneficiairesNotifies += idsBeneficiairesAvecComptage.length
       for (const beneficiaire of idsBeneficiairesAvecComptage) {
-        this.notificationService.notifierBeneficiaires(
-          beneficiaire.id,
-          beneficiaire.pushNotificationToken!,
-          job.contenu.titre,
-          job.contenu.description
-        )
+        try {
+          const notification = {
+            token: beneficiaire.pushNotificationToken!,
+            notification: {
+              title: job.contenu.titre,
+              body: job.contenu.description
+            },
+            data: {
+              type: job.contenu.type
+            }
+          }
+          await this.notificationRepository.send(notification, beneficiaire.id)
+        } catch (e) {
+          this.logger.error(e)
+        }
         await new Promise(resolve => setTimeout(resolve, 500))
       }
 
       if (idsBeneficiairesAvecComptage.length === pagination) {
         this.planificateurRepository.ajouterJob({
           dateExecution: maintenant
-            .plus({ minute: job.contenu.minutesEntreLesBatchs || 1 })
+            .plus({
+              minute:
+                job.contenu.minutesEntreLesBatchs ||
+                NOMBRE_MINUTES_ENTRE_BATCHS_DEFAUT
+            })
             .toJSDate(),
           type: Planificateur.JobType.NOTIFIER_BENEFICIAIRES,
           contenu: {

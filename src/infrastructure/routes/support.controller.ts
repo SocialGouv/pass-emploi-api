@@ -50,6 +50,8 @@ import {
 } from './validation/support.inputs'
 import { UpdateFeatureFlipCommandHandler } from '../../application/commands/support/update-feature-flip.command.handler'
 import { NotifierBeneficiairesCommandHandler } from '../../application/commands/notifier-beneficiaires.command.handler'
+import { Notification } from '../../domain/notification/notification'
+import { Core } from '../../domain/core'
 
 @Controller('support')
 @ApiTags('Support')
@@ -261,7 +263,14 @@ export class SupportController {
   @ApiOperation({
     summary:
       'Notifie un groupe de bénéficiaires appartenants à une ou plusieures structures.',
-    description: 'Autorisé pour le support'
+    description: `Notifie un groupe de bénéficiaires appartenants à une ou plusieures structures :
+      \n - type : ${Object.values(Notification.Type).join(', ')}
+      \n - titre : titre de la notification
+      \n - description : texte corps de la notification
+      \n - structures : ${Object.values(Core.Structure).join(', ')}
+      \n - push (optionnel) : notifie les bénéficiaires en mode push (via Firebase) pour apparître dans le centre de notifications de l'appareil
+      \n - batchSize (optionnel - 2000 par défaut) : le job s'exécutera par batchs pour ne pas notifier toute la population d'un coup. Ce paramètre permet de spécifier la taille de chaque batch
+      \n - minutesEntreLesBatch (optionnel - 5 par défaut) : le nombre de minutes entre chaque batch`
   })
   @Post('notifier-beneficiaires')
   @HttpCode(HttpStatus.CREATED)
