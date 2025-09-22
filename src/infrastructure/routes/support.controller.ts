@@ -270,7 +270,19 @@ export class SupportController {
       \n - structures : ${Object.values(Core.Structure).join(', ')}
       \n - push (optionnel) : notifie les bénéficiaires en mode push (via Firebase) pour apparître dans le centre de notifications de l'appareil
       \n - batchSize (optionnel - 2000 par défaut) : le job s'exécutera par batchs pour ne pas notifier toute la population d'un coup. Ce paramètre permet de spécifier la taille de chaque batch
-      \n - minutesEntreLesBatch (optionnel - 5 par défaut) : le nombre de minutes entre chaque batch`
+      \n - minutesEntreLesBatch (optionnel - 5 par défaut) : le nombre de minutes entre chaque batch
+      \n Exemple :
+      {
+       "type": "OUTILS",
+       "titre": "1000 immersions dans les métiers dans la vente et la logistique !",
+       "description": "Explorez les métiers de vente et la logistique",
+       "structures": [
+         "MILO","POLE_EMPLOI_AIJ"
+       ],
+       "push": true,
+       "batchSize": 2000,
+       "minutesEntreLesBatchs": 1
+      }`
   })
   @Post('notifier-beneficiaires')
   @HttpCode(HttpStatus.CREATED)

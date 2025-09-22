@@ -11,6 +11,8 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Max,
+  MaxLength,
   Min,
   ValidateIf,
   ValidateNested
@@ -143,11 +145,13 @@ export class NotifierBeneficiairesPayload {
   @ApiProperty({ type: String })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(50)
   titre: string
 
   @ApiProperty({ type: String })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(150)
   description: string
 
   @ApiProperty({ enum: Core.Structure, isArray: true })
@@ -164,12 +168,14 @@ export class NotifierBeneficiairesPayload {
   @ApiProperty()
   @IsOptional()
   @IsNumber()
-  @Min(1)
+  @Min(2000)
+  @Max(10000)
   batchSize?: number
 
   @ApiProperty()
   @IsOptional()
   @IsNumber()
-  @Min(1)
+  @Min(5)
+  @Min(60)
   minutesEntreLesBatchs?: number
 }
