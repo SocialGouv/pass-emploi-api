@@ -27,7 +27,7 @@ describe('NotifierBeneficiairesJobHandler', () => {
   let handler: NotifierBeneficiairesJobHandler
   let dateService: StubbedClass<DateService>
   let suiviJobService: StubbedType<SuiviJob.Service>
-  let notificationService: StubbedClass<Notification.Service>
+  let notificationRepository: StubbedClass<Notification.Repository>
   let planificateurRepository: StubbedType<Planificateur.Repository>
 
   before(async () => {
@@ -35,15 +35,14 @@ describe('NotifierBeneficiairesJobHandler', () => {
     await databaseForTesting.cleanPG()
 
     const sandbox: SinonSandbox = createSandbox()
-    notificationService = stubClass(Notification.Service)
+    notificationRepository = stubInterface(sandbox)
     dateService = stubClass(DateService)
     dateService.now.returns(maintenant)
     suiviJobService = stubInterface(sandbox)
     planificateurRepository = stubInterface(sandbox)
 
     handler = new NotifierBeneficiairesJobHandler(
-      databaseForTesting.sequelize,
-      notificationService,
+      notificationRepository,
       suiviJobService,
       dateService,
       planificateurRepository
@@ -120,24 +119,36 @@ describe('NotifierBeneficiairesJobHandler', () => {
         estLaDerniereExecution: false,
         nbBeneficiairesNotifies: 2
       })
+      expect(notificationRepository.send).to.have.been.calledTwice()
       expect(
-        notificationService.notifierBeneficiaires
-      ).to.have.been.calledTwice()
-      expect(
-        notificationService.notifierBeneficiaires.firstCall
+        notificationRepository.send.firstCall
       ).to.have.been.calledWithExactly(
-        idJeune1,
-        'push1',
-        'Une notification très importante',
-        "C'est incroyable"
+        {
+          token: 'push1',
+          notification: {
+            title: job.contenu.titre,
+            body: job.contenu.description
+          },
+          data: {
+            type: job.contenu.type
+          }
+        },
+        idJeune1
       )
       expect(
-        notificationService.notifierBeneficiaires.secondCall
+        notificationRepository.send.secondCall
       ).to.have.been.calledWithExactly(
-        idJeune4,
-        'push4',
-        'Une notification très importante',
-        "C'est incroyable"
+        {
+          token: 'push4',
+          notification: {
+            title: job.contenu.titre,
+            body: job.contenu.description
+          },
+          data: {
+            type: job.contenu.type
+          }
+        },
+        idJeune4
       )
       expect(planificateurRepository.ajouterJob).to.have.been.calledWith({
         dateExecution: maintenant.plus({ minute: 5 }).toJSDate(),
