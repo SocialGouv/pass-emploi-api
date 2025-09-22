@@ -11,6 +11,7 @@ import { createSandbox, StubbedClass, stubClass } from '../../utils'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { DateService } from '../../../src/utils/date-service'
 import { Jeune } from '../../../src/domain/jeune/jeune'
+import { Core } from '../../../src/domain/core'
 
 describe('NotifierBeneficiairesCommandHandler', () => {
   let sandbox: SinonSandbox
@@ -40,7 +41,10 @@ describe('NotifierBeneficiairesCommandHandler', () => {
         type: Notification.Type.OUTILS,
         titre: "Les offres d'immersion sont disponibles",
         description: 'Rendez-vous sur la page des offres.',
-        dispositifs: [Jeune.Dispositif.AIJ, Jeune.Dispositif.BRSA],
+        structures: [
+          Core.Structure.POLE_EMPLOI_AIJ,
+          Core.Structure.POLE_EMPLOI_BRSA
+        ],
         push: true,
         batchSize: 2000,
         minutesEntreLesBatchs: 15
@@ -59,7 +63,10 @@ describe('NotifierBeneficiairesCommandHandler', () => {
           type: Notification.Type.OUTILS,
           titre: "Les offres d'immersion sont disponibles",
           description: 'Rendez-vous sur la page des offres.',
-          dispositifs: [Jeune.Dispositif.AIJ, Jeune.Dispositif.BRSA],
+          structures: [
+            Core.Structure.POLE_EMPLOI_AIJ,
+            Core.Structure.POLE_EMPLOI_BRSA
+          ],
           push: true,
           batchSize: 2000,
           minutesEntreLesBatchs: 15

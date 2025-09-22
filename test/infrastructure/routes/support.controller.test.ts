@@ -22,7 +22,7 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { Authentification } from '../../../src/domain/authentification'
 import { Core } from '../../../src/domain/core'
-import { StubbedClass, expect } from '../../utils'
+import { expect, StubbedClass } from '../../utils'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 import { UpdateFeatureFlipCommandHandler } from '../../../src/application/commands/support/update-feature-flip.command.handler'
 import { FeatureFlipTag } from '../../../src/infrastructure/sequelize/models/feature-flip.sql-model'
@@ -292,7 +292,10 @@ describe('SupportController', () => {
           type: Notification.Type.OUTILS,
           titre: "Les offres d'immersion sont disponibles",
           description: 'Rendez-vous sur la page des offres.',
-          dispositifs: [Jeune.Dispositif.AIJ, Jeune.Dispositif.BRSA],
+          structures: [
+            Core.Structure.POLE_EMPLOI_AIJ,
+            Core.Structure.POLE_EMPLOI_BRSA
+          ],
           push: true,
           batchSize: 2000
         }

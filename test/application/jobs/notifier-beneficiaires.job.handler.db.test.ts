@@ -11,10 +11,10 @@ import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { createSandbox, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
 import { NotifierBeneficiairesJobHandler } from '../../../src/application/jobs/notifier-beneficiaires.job.handler.db'
-import { Jeune } from '../../../src/domain/jeune/jeune'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import JobType = Planificateur.JobType
+import { Core } from '../../../src/domain/core'
 
 const idJeune1 = 'j1'
 const idJeune2 = 'j2'
@@ -61,37 +61,37 @@ describe('NotifierBeneficiairesJobHandler', () => {
         id: idJeune1,
         idConseiller: 'con1',
         pushNotificationToken: 'push1',
-        dispositif: Jeune.Dispositif.AIJ
+        structure: Core.Structure.POLE_EMPLOI_AIJ
       }),
       unJeuneDto({
         id: idJeune2,
         idConseiller: 'con1',
         pushNotificationToken: null,
-        dispositif: Jeune.Dispositif.AIJ
+        structure: Core.Structure.POLE_EMPLOI_AIJ
       }),
       unJeuneDto({
         id: idJeune3,
         idConseiller: 'con1',
         pushNotificationToken: 'push3',
-        dispositif: Jeune.Dispositif.CEJ
+        structure: Core.Structure.MILO
       }),
       unJeuneDto({
         id: idJeune4,
         idConseiller: 'con1',
         pushNotificationToken: 'push4',
-        dispositif: Jeune.Dispositif.PACEA
+        structure: Core.Structure.POLE_EMPLOI_BRSA
       }),
       unJeuneDto({
         id: idJeune5,
         idConseiller: 'con1',
         pushNotificationToken: 'push5',
-        dispositif: Jeune.Dispositif.AIJ
+        structure: Core.Structure.POLE_EMPLOI_AIJ
       })
     ])
   })
 
   describe('handle', () => {
-    it('envoie une notification aux bénéficiaires du bon dispositif', async () => {
+    it('envoie une notification aux bénéficiaires de la bonne structure', async () => {
       // Given
       const maintenant = uneDatetime()
       const job: Planificateur.Job<Planificateur.JobNotifierBeneficiaires> = {
@@ -101,7 +101,10 @@ describe('NotifierBeneficiairesJobHandler', () => {
           type: Notification.Type.OUTILS,
           titre: 'Une notification très importante',
           description: "C'est incroyable",
-          dispositifs: [Jeune.Dispositif.AIJ, Jeune.Dispositif.PACEA],
+          structures: [
+            Core.Structure.POLE_EMPLOI_AIJ,
+            Core.Structure.POLE_EMPLOI_BRSA
+          ],
           push: true,
           batchSize: 2,
           minutesEntreLesBatchs: 5
@@ -117,7 +120,9 @@ describe('NotifierBeneficiairesJobHandler', () => {
         estLaDerniereExecution: false,
         nbBeneficiairesNotifies: 2
       })
-      expect(notificationService.notifierBeneficiaires).to.have.been.calledTwice
+      expect(
+        notificationService.notifierBeneficiaires
+      ).to.have.been.calledTwice()
       expect(
         notificationService.notifierBeneficiaires.firstCall
       ).to.have.been.calledWithExactly(
@@ -141,7 +146,10 @@ describe('NotifierBeneficiairesJobHandler', () => {
           type: Notification.Type.OUTILS,
           titre: 'Une notification très importante',
           description: "C'est incroyable",
-          dispositifs: [Jeune.Dispositif.AIJ, Jeune.Dispositif.PACEA],
+          structures: [
+            Core.Structure.POLE_EMPLOI_AIJ,
+            Core.Structure.POLE_EMPLOI_BRSA
+          ],
           push: true,
           batchSize: 2,
           minutesEntreLesBatchs: 5,

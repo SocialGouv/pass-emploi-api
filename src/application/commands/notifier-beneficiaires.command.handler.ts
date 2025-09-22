@@ -8,14 +8,14 @@ import {
   PlanificateurRepositoryToken
 } from '../../domain/planificateur'
 import { DateService } from '../../utils/date-service'
+import { Core } from '../../domain/core'
 import JobNotifierBeneficiaires = Planificateur.JobNotifierBeneficiaires
-import { Jeune } from '../../domain/jeune/jeune'
 
 export interface NotifierBeneficiairesCommand extends Command {
   type: Notification.Type
   titre: string
   description: string
-  dispositifs: Jeune.Dispositif[]
+  structures: Core.Structure[]
   push: boolean
   batchSize?: number
   minutesEntreLesBatchs?: number
@@ -35,6 +35,7 @@ export class NotifierBeneficiairesCommandHandler extends CommandHandler<
   }
 
   async handle(command: NotifierBeneficiairesCommand): Promise<Result> {
+    // TODO vérifier que le job n'existe pas déjà
     const maintenant = this.dateService.now()
     const contenu: JobNotifierBeneficiaires = { ...command }
     await this.planificateurRepository.ajouterJob({

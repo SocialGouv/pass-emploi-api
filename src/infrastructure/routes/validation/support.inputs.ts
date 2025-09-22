@@ -151,9 +151,10 @@ export class NotifierBeneficiairesPayload {
   @IsNotEmpty()
   description: string
 
-  @ApiProperty({ type: String, isArray: true })
+  @ApiProperty({ enum: Core.Structure, isArray: true })
   @IsArray()
-  dispositifs: Jeune.Dispositif[]
+  @IsEnum(Core.Structure, { each: true })
+  structures: Core.Structure[]
 
   @ApiProperty()
   @IsBoolean()

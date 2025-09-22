@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { QueryTypes, Sequelize } from 'sequelize'
+import { Op, Sequelize } from 'sequelize'
 import { Job } from '../../building-blocks/types/job'
 import { JobHandler } from '../../building-blocks/types/job-handler'
 import { Notification } from '../../domain/notification/notification'
@@ -11,6 +11,7 @@ import {
 import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
 import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
 import { DateService } from '../../utils/date-service'
+import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 
 interface Stats {
   nbBeneficiairesNotifies: number
@@ -59,27 +60,20 @@ export class NotifierBeneficiairesJobHandler extends JobHandler<Job> {
       const pagination =
         job.contenu.batchSize || PAGINATION_NOMBRE_DE_BENEFICIAIRES_MAXIMUM
 
-      const idsBeneficiairesAvecComptage: Array<{
-        id_beneficiaire_a_notifier: string
-        push_notification_token: string
-      }> = await this.sequelize.query(
-        `SELECT jeune.id as id_beneficiaire_a_notifier, jeune.push_notification_token as push_notification_token
-        FROM jeune
-        WHERE jeune.dispositif IN (:dispositifs)
-        AND jeune.push_notification_token IS NOT NULL
-        GROUP BY jeune.id
-        ORDER BY jeune.id ASC
-        LIMIT :maxJeunes
-        OFFSET :offset`,
-        {
-          type: QueryTypes.SELECT,
-          replacements: {
-            dispositifs: job.contenu.dispositifs,
-            maxJeunes: job.contenu.batchSize || pagination,
-            offset
+      const idsBeneficiairesAvecComptage = await JeuneSqlModel.findAll({
+        where: {
+          structure: {
+            [Op.in]: job.contenu.structures
+          },
+          pushNotificationToken: {
+            [Op.ne]: null
           }
-        }
-      )
+        },
+        attributes: ['id', 'pushNotificationToken'],
+        offset,
+        limit: pagination,
+        order: [['id', 'ASC']]
+      })
 
       this.logger.log(
         `${idsBeneficiairesAvecComptage.length} ids bénéficiaires à notifier`
@@ -88,8 +82,8 @@ export class NotifierBeneficiairesJobHandler extends JobHandler<Job> {
       stats.nbBeneficiairesNotifies += idsBeneficiairesAvecComptage.length
       for (const beneficiaire of idsBeneficiairesAvecComptage) {
         this.notificationService.notifierBeneficiaires(
-          beneficiaire.id_beneficiaire_a_notifier,
-          beneficiaire.push_notification_token,
+          beneficiaire.id,
+          beneficiaire.pushNotificationToken!,
           job.contenu.titre,
           job.contenu.description
         )

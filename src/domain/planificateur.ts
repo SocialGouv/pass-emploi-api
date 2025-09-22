@@ -9,7 +9,7 @@ import { EvenementMilo } from './milo/evenement.milo'
 import { RendezVous } from './rendez-vous/rendez-vous'
 import { NettoyageJobsStats } from './suivi-job'
 import { Notification } from './notification/notification'
-import { Jeune } from './jeune/jeune'
+import { Core } from './core'
 
 export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
 
@@ -141,7 +141,7 @@ export namespace Planificateur {
     type: Notification.Type
     titre: string
     description: string
-    dispositifs: Jeune.Dispositif[]
+    structures: Core.Structure[]
     push: boolean
     batchSize?: number
     minutesEntreLesBatchs?: number
