@@ -263,26 +263,31 @@ export class SupportController {
   @ApiOperation({
     summary:
       'Notifie un groupe de bénéficiaires appartenants à une ou plusieures structures.',
-    description: `Notifie un groupe de bénéficiaires appartenants à une ou plusieures structures :
-      \n - type : ${Object.values(Notification.Type).join(', ')}
-      \n - titre : titre de la notification
-      \n - description : texte corps de la notification
-      \n - structures : ${Object.values(Core.Structure).join(', ')}
-      \n - push (optionnel) : notifie les bénéficiaires en mode push (via Firebase) pour apparître dans le centre de notifications de l'appareil
-      \n - batchSize (optionnel - 2000 par défaut) : le job s'exécutera par batchs pour ne pas notifier toute la population d'un coup. Ce paramètre permet de spécifier la taille de chaque batch
-      \n - minutesEntreLesBatch (optionnel - 5 par défaut) : le nombre de minutes entre chaque batch
-      \n Exemple :
-      {
-       "type": "OUTILS",
-       "titre": "1000 immersions dans les métiers dans la vente et la logistique !",
-       "description": "Explorez les métiers de vente et la logistique",
-       "structures": [
-         "MILO","POLE_EMPLOI_AIJ"
-       ],
-       "push": true,
-       "batchSize": 2000,
-       "minutesEntreLesBatchs": 1
-      }`
+    description: `
+Notifie un groupe de bénéficiaires appartenant à une ou plusieurs structures.  
+
+**Champs du body :**
+- \`type\` : ${Object.values(Notification.Type).join(', ')}
+- \`titre\` : titre de la notification
+- \`description\` : texte corps de la notification
+- \`structures\` : ${Object.values(Core.Structure).join(', ')}
+- \`push\` (❌ pas encore implémenté - pour l'instant toujours en push) (optionnel) : notifie les bénéficiaires en mode push (via Firebase) pour apparaître dans le centre de notifications de l'appareil
+- \`batchSize\` (optionnel, défaut = 2000) : taille d’un batch
+- \`minutesEntreLesBatch\` (optionnel, défaut = 5) : minutes entre chaque batch
+
+**Exemple JSON :**
+\`\`\`json
+{
+  "type": "OUTILS",
+  "titre": "1000 immersions sur la vente et la logistique !",
+  "description": "Explorez les métiers de vente et de la logistique",
+  "structures": ["MILO","POLE_EMPLOI_AIJ"],
+  "push": true,
+  "batchSize": 2000,
+  "minutesEntreLesBatchs": 5
+}
+\`\`\`
+`
   })
   @Post('notifier-beneficiaires')
   @HttpCode(HttpStatus.CREATED)
