@@ -141,7 +141,7 @@ export class NotifierBeneficiairesPayload {
   @IsString()
   @IsNotEmpty()
   @IsEnum(Notification.Type)
-  type: Notification.Type
+  typeNotification: Notification.Type
 
   @ApiProperty({
     type: String,

@@ -43,7 +43,7 @@ describe('PlanificateurRedisRepository', () => {
     await planificateurRedisRepository.disconnect()
   })
 
-  describe('createJob', () => {
+  describe('ajouterJob', () => {
     describe('si le redis est accessible', () => {
       it('créée un job', async () => {
         // Given
@@ -56,10 +56,12 @@ describe('PlanificateurRedisRepository', () => {
         }
 
         // When
-        await planificateurRedisRepository.ajouterJob(job)
+        const jobId = await planificateurRedisRepository.ajouterJob(job)
 
         // Then
-        const redisJob = await redisClient.hGetAll(`bull:${REDIS_QUEUE_NAME}:1`)
+        const redisJob = await redisClient.hGetAll(
+          `bull:${REDIS_QUEUE_NAME}:${jobId}`
+        )
         expect(
           Duration.fromMillis(parseInt(redisJob.delay)).as('day')
         ).to.equal(2)
@@ -76,7 +78,7 @@ describe('PlanificateurRedisRepository', () => {
         const idJob = 'test'
 
         // When
-        await planificateurRedisRepository.ajouterJob(job, idJob)
+        const jobId = await planificateurRedisRepository.ajouterJob(job, idJob)
 
         // Then
         const redisJob = await redisClient.hGetAll(
@@ -85,6 +87,7 @@ describe('PlanificateurRedisRepository', () => {
         expect(
           Duration.fromMillis(parseInt(redisJob.delay)).as('day')
         ).to.equal(2)
+        expect(jobId).to.equal(idJob)
       })
     })
   })
@@ -216,7 +219,7 @@ describe('PlanificateurRedisRepository', () => {
         expect(await delayedJobFromQueue?.getState()).to.equal('delayed')
         expect(await jobFromQueue?.getState()).to.equal('paused')
 
-        // When Then
+        // When - Then
         expect(
           await planificateurRedisRepository.estEnCoursDeTraitement(jobType)
         ).to.equal(false)
@@ -226,7 +229,7 @@ describe('PlanificateurRedisRepository', () => {
         expect(await delayedJobFromQueue?.getState()).to.equal('delayed')
         expect(await jobFromQueue?.getState()).to.equal('waiting')
 
-        // When Then
+        // When - Then
         expect(
           await planificateurRedisRepository.estEnCoursDeTraitement(jobType)
         ).to.equal(false)
@@ -236,7 +239,7 @@ describe('PlanificateurRedisRepository', () => {
         expect(await delayedJobFromQueue?.getState()).to.equal('delayed')
         expect(await jobFromQueue?.getState()).to.equal('active')
 
-        // When Then
+        // When - Then
         expect(
           await planificateurRedisRepository.estEnCoursDeTraitement(jobType)
         ).to.equal(true)
@@ -246,7 +249,7 @@ describe('PlanificateurRedisRepository', () => {
         expect(await delayedJobFromQueue?.getState()).to.equal('delayed')
         expect(await jobFromQueue?.getState()).to.equal('completed')
 
-        // When Then
+        // When - Then
         expect(
           await planificateurRedisRepository.estEnCoursDeTraitement(jobType)
         ).to.equal(false)
@@ -256,7 +259,7 @@ describe('PlanificateurRedisRepository', () => {
         await jobErrorFromQueue?.moveToFailed({ message: 'error' }, true)
         expect(await jobErrorFromQueue?.getState()).to.equal('failed')
 
-        // When Then
+        // When - Then
         expect(
           await planificateurRedisRepository.estEnCoursDeTraitement(
             jobTypeError
@@ -279,7 +282,7 @@ describe('PlanificateurRedisRepository', () => {
         await queue.getNextJob()
         expect(await job?.getState()).to.equal('active')
 
-        // When Then
+        // When - Then
         expect(
           await planificateurRedisRepository.estEnCoursDeTraitement(
             Planificateur.JobType.MAJ_SEGMENTS
@@ -325,7 +328,7 @@ describe('PlanificateurRedisRepository', () => {
         expect(await jobFromQueue?.getState()).to.equal('paused')
         expect(await jobErrorFromQueue?.getState()).to.equal('paused')
 
-        // When Then
+        // When - Then
         expect(
           await planificateurRedisRepository.aUnJobNonTermine(jobTypeDelayed)
         ).to.equal(true)
@@ -338,7 +341,7 @@ describe('PlanificateurRedisRepository', () => {
         expect(await jobFromQueue?.getState()).to.equal('waiting')
         expect(await jobErrorFromQueue?.getState()).to.equal('waiting')
 
-        // When Then
+        // When - Then
         expect(
           await planificateurRedisRepository.aUnJobNonTermine(jobType)
         ).to.equal(true)
@@ -348,7 +351,7 @@ describe('PlanificateurRedisRepository', () => {
         expect(await jobFromQueue?.getState()).to.equal('active')
         expect(await jobErrorFromQueue?.getState()).to.equal('waiting')
 
-        // When Then
+        // When - Then
         expect(
           await planificateurRedisRepository.aUnJobNonTermine(jobType)
         ).to.equal(true)
@@ -360,7 +363,7 @@ describe('PlanificateurRedisRepository', () => {
         expect(await jobFromQueue?.getState()).to.equal('completed')
         expect(await jobErrorFromQueue?.getState()).to.equal('failed')
 
-        // When Then
+        // When - Then
         expect(
           await planificateurRedisRepository.aUnJobNonTermine(jobType)
         ).to.equal(false)
@@ -381,7 +384,7 @@ describe('PlanificateurRedisRepository', () => {
         await queue.getNextJob()
         expect(await job?.getState()).to.equal('active')
 
-        // When Then
+        // When - Then
         expect(
           await planificateurRedisRepository.aUnJobNonTermine(
             Planificateur.JobType.MAJ_SEGMENTS

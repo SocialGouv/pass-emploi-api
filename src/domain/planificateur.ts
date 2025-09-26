@@ -26,7 +26,7 @@ export namespace Planificateur {
       job: Job<T>,
       jobId?: string,
       params?: JobParams
-    ): Promise<void>
+    ): Promise<string>
 
     ajouterCronJob(cronJob: CronJob): Promise<void>
 
@@ -140,7 +140,7 @@ export namespace Planificateur {
   export type JobTraiterEvenementMilo = EvenementMilo
 
   export interface JobNotifierBeneficiaires {
-    type: Notification.Type
+    typeNotification: Notification.Type
     titre: string
     description: string
     structures: Core.Structure[]
@@ -161,6 +161,10 @@ export namespace Planificateur {
     dateExecution: Date
     type: JobType
     contenu: T
+  }
+
+  export interface JobId {
+    jobId: string
   }
 
   export interface CronJob {

@@ -5,7 +5,8 @@ import { Notification } from '../../domain/notification/notification'
 import {
   emptySuccess,
   failure,
-  Result
+  Result,
+  success
 } from '../../building-blocks/types/result'
 import {
   Planificateur,
@@ -17,7 +18,7 @@ import JobNotifierBeneficiaires = Planificateur.JobNotifierBeneficiaires
 import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
 
 export interface NotifierBeneficiairesCommand extends Command {
-  type: Notification.Type
+  typeNotification: Notification.Type
   titre: string
   description: string
   structures: Core.Structure[]
@@ -29,7 +30,7 @@ export interface NotifierBeneficiairesCommand extends Command {
 @Injectable()
 export class NotifierBeneficiairesCommandHandler extends CommandHandler<
   NotifierBeneficiairesCommand,
-  void
+  Planificateur.JobId
 > {
   constructor(
     private dateService: DateService,
@@ -39,7 +40,9 @@ export class NotifierBeneficiairesCommandHandler extends CommandHandler<
     super('NotifierBeneficiairesCommandHandler')
   }
 
-  async handle(command: NotifierBeneficiairesCommand): Promise<Result> {
+  async handle(
+    command: NotifierBeneficiairesCommand
+  ): Promise<Result<Planificateur.JobId>> {
     const jobDejaPlanifie = await this.planificateurRepository.aUnJobNonTermine(
       Planificateur.JobType.NOTIFIER_BENEFICIAIRES
     )
@@ -52,13 +55,13 @@ export class NotifierBeneficiairesCommandHandler extends CommandHandler<
 
     const maintenant = this.dateService.now()
     const contenu: JobNotifierBeneficiaires = { ...command }
-    await this.planificateurRepository.ajouterJob({
+    const jobId = await this.planificateurRepository.ajouterJob({
       dateExecution: maintenant.toJSDate(),
       type: Planificateur.JobType.NOTIFIER_BENEFICIAIRES,
       contenu
     })
 
-    return emptySuccess()
+    return success({ jobId: jobId })
   }
 
   async authorize(): Promise<Result> {

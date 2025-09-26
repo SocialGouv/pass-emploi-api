@@ -14,7 +14,10 @@ import {
   TransfererJeunesConseillerCommand,
   TransfererJeunesConseillerCommandHandler
 } from '../../../src/application/commands/transferer-jeunes-conseiller.command.handler'
-import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import {
+  MauvaiseCommandeError,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
@@ -285,10 +288,10 @@ describe('SupportController', () => {
 
   describe('POST /support/notifier-beneficiaires', () => {
     describe('quand le payload est valide', () => {
-      it('renvoie 201', async () => {
+      it("renvoie 201 et l'id du job créé", async () => {
         // Given
         const command: NotifierBeneficiairesCommand = {
-          type: Notification.Type.OUTILS,
+          typeNotification: Notification.Type.OUTILS,
           titre: "Les offres d'immersion sont disponibles",
           description: 'Rendez-vous sur la page des offres.',
           structures: [
@@ -301,7 +304,7 @@ describe('SupportController', () => {
 
         creerNotificationCommandHandler.execute
           .withArgs(command)
-          .resolves(emptySuccess())
+          .resolves(success({ jobId: '2' }))
 
         // When - Then
         await request(app.getHttpServer())
@@ -309,6 +312,7 @@ describe('SupportController', () => {
           .send(command)
           .set({ 'X-API-KEY': 'api-key-support' })
           .expect(HttpStatus.CREATED)
+          .expect({ jobId: '2' })
       })
     })
     describe("quand le payload n'est pas valide", () => {
@@ -359,6 +363,39 @@ describe('SupportController', () => {
         await request(app.getHttpServer())
           .post('/support/notifier-beneficiaires')
           .send(payload)
+          .set({ 'X-API-KEY': 'api-key-support' })
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+    describe('quand la commande a échoué', () => {
+      it("renvoie 400 quand l'erreur est de type MauvaiseCommandeError", async () => {
+        // Given
+        const command: NotifierBeneficiairesCommand = {
+          typeNotification: Notification.Type.OUTILS,
+          titre: "Les offres d'immersion sont disponibles",
+          description: 'Rendez-vous sur la page des offres.',
+          structures: [
+            Core.Structure.POLE_EMPLOI_AIJ,
+            Core.Structure.POLE_EMPLOI_BRSA
+          ],
+          push: true,
+          batchSize: 2000
+        }
+
+        creerNotificationCommandHandler.execute
+          .withArgs(command)
+          .resolves(
+            failure(
+              new MauvaiseCommandeError(
+                'Un job de type NOTIFIER_BENEFICIAIRES est déjà planifié.'
+              )
+            )
+          )
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/support/notifier-beneficiaires')
+          .send(command)
           .set({ 'X-API-KEY': 'api-key-support' })
           .expect(HttpStatus.BAD_REQUEST)
       })

@@ -48,7 +48,7 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     job: Planificateur.Job<T>,
     jobId?: string,
     params?: Planificateur.JobParams
-  ): Promise<void> {
+  ): Promise<string> {
     if (this.isReady) {
       const now = this.dateService.now()
       const delay = DateTime.fromJSDate(job.dateExecution).diff(
@@ -61,7 +61,8 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
         backoff: params?.backoff?.delay || 0,
         priority: params?.priority || 0
       }
-      await this.queue.add(job, jobOptions)
+      const bullJob = await this.queue.add(job, jobOptions)
+      return String(bullJob.id)
     } else {
       throw new Error('Redis not ready to accept connection')
     }

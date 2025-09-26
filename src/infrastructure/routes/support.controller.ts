@@ -26,8 +26,8 @@ import { ArchiverJeuneSupportCommandHandler } from '../../application/commands/s
 import { CreerSuperviseursCommandHandler } from '../../application/commands/support/creer-superviseurs.command.handler'
 import { DeleteSuperviseursCommandHandler } from '../../application/commands/support/delete-superviseurs.command.handler'
 import {
-  MettreAJourLesJeunesCEJPoleEmploiCommand,
-  MettreAJourLesJeunesCejPeCommandHandler
+  MettreAJourLesJeunesCejPeCommandHandler,
+  MettreAJourLesJeunesCEJPoleEmploiCommand
 } from '../../application/commands/support/mettre-a-jour-les-jeunes-cej-pe.command.handler'
 import {
   ChangementAgenceQueryModel,
@@ -52,6 +52,8 @@ import { UpdateFeatureFlipCommandHandler } from '../../application/commands/supp
 import { NotifierBeneficiairesCommandHandler } from '../../application/commands/notifier-beneficiaires.command.handler'
 import { Notification } from '../../domain/notification/notification'
 import { Core } from '../../domain/core'
+import { Planificateur } from '../../domain/planificateur'
+import { Result } from '../../building-blocks/types/result'
 
 @Controller('support')
 @ApiTags('Support')
@@ -264,10 +266,11 @@ export class SupportController {
     summary:
       'Notifie un groupe de bénéficiaires appartenants à une ou plusieures structures.',
     description: `
-Notifie un groupe de bénéficiaires appartenant à une ou plusieurs structures.  
+Notifie un groupe de bénéficiaires appartenant à une ou plusieurs structures
+(crée un job de type NOTIFIER_BENEFICIAIRES).
 
 **Champs du body :**
-- \`type\` : ${Object.values(Notification.Type).join(', ')}
+- \`typeNotification\` : ${Object.values(Notification.Type).join(', ')}
 - \`titre\` : titre de la notification
 - \`description\` : texte corps de la notification
 - \`structures\` : ${Object.values(Core.Structure).join(', ')}
@@ -293,8 +296,11 @@ Notifie un groupe de bénéficiaires appartenant à une ou plusieurs structures.
   @HttpCode(HttpStatus.CREATED)
   async notifierBeneficiaires(
     @Body() payload: NotifierBeneficiairesPayload
-  ): Promise<void> {
-    await this.notifierBeneficiairesCommandHandler.execute(payload)
+  ): Promise<Planificateur.JobId> {
+    const createdJobId = await this.notifierBeneficiairesCommandHandler.execute(
+      payload
+    )
+    return handleResult(createdJobId)
   }
 
   // TODO ajouter API pour récupérer les jobs (active + delayed)

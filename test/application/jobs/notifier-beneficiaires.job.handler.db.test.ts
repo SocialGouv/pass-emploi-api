@@ -97,7 +97,7 @@ describe('NotifierBeneficiairesJobHandler', () => {
         dateExecution: maintenant.toJSDate(),
         type: JobType.NOTIFIER_BENEFICIAIRES,
         contenu: {
-          type: Notification.Type.OUTILS,
+          typeNotification: Notification.Type.OUTILS,
           titre: 'Une notification très importante',
           description: "C'est incroyable",
           structures: [
@@ -130,7 +130,7 @@ describe('NotifierBeneficiairesJobHandler', () => {
             body: job.contenu.description
           },
           data: {
-            type: job.contenu.type
+            type: job.contenu.typeNotification
           }
         },
         idJeune1
@@ -145,7 +145,7 @@ describe('NotifierBeneficiairesJobHandler', () => {
             body: job.contenu.description
           },
           data: {
-            type: job.contenu.type
+            type: job.contenu.typeNotification
           }
         },
         idJeune4

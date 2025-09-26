@@ -89,7 +89,7 @@ export class NotifierBeneficiairesJobHandler extends JobHandler<Job> {
               body: job.contenu.description
             },
             data: {
-              type: job.contenu.type
+              type: job.contenu.typeNotification
             }
           }
           await this.notificationRepository.send(notification, beneficiaire.id)
