@@ -7,6 +7,7 @@ import { NettoyageJobsStats } from '../../domain/suivi-job'
 import { DateService } from '../../utils/date-service'
 
 const CRON_TIMEZONE = 'Europe/Paris'
+export const REDIS_QUEUE_NAME = 'JobQueue'
 
 @Injectable()
 export class PlanificateurRedisRepository implements Planificateur.Repository {
@@ -20,7 +21,7 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
   ) {
     this.logger = new Logger('PlanificateurRedisRepository')
     this.queue = new QueueBull(
-      'JobQueue',
+      REDIS_QUEUE_NAME,
       this.configService.get('redis').url,
       {
         redis: {
@@ -88,6 +89,10 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     return this.queue.isReady()
   }
 
+  getQueue(): Bull.Queue {
+    return this.queue
+  }
+
   async disconnect(): Promise<void> {
     await this.queue.close()
   }
@@ -128,8 +133,20 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     await this.queue.removeJobs(`*${pattern}*`)
   }
 
-  async estEnCours(jobType: Planificateur.JobType): Promise<boolean> {
+  async estEnCoursDeTraitement(
+    jobType: Planificateur.JobType
+  ): Promise<boolean> {
     const activeJobs = await this.queue.getActive()
-    return activeJobs.filter(job => job.data.type === jobType).length > 1
+    return activeJobs.some(job => job.data.type === jobType)
+  }
+
+  async aUnJobNonTermine(jobType: Planificateur.JobType): Promise<boolean> {
+    const jobsNonTermines = await this.queue.getJobs([
+      'active',
+      'delayed',
+      'waiting',
+      'paused'
+    ])
+    return jobsNonTermines.some(job => job.data.type === jobType)
   }
 }

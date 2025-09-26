@@ -40,13 +40,13 @@ export class NotifierBeneficiairesCommandHandler extends CommandHandler<
   }
 
   async handle(command: NotifierBeneficiairesCommand): Promise<Result> {
-    const jobEstEnCours = await this.planificateurRepository.estEnCours(
+    const jobDejaPlanifie = await this.planificateurRepository.aUnJobNonTermine(
       Planificateur.JobType.NOTIFIER_BENEFICIAIRES
     )
-    if (jobEstEnCours)
+    if (jobDejaPlanifie)
       return failure(
         new MauvaiseCommandeError(
-          'Un job de type NOTIFIER_BENEFICIAIRES est déjà en cours de traitement.'
+          'Un job de type NOTIFIER_BENEFICIAIRES est déjà planifié.'
         )
       )
 

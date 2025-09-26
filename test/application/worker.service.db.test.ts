@@ -51,9 +51,7 @@ describe('WorkerService', () => {
   describe('handler', () => {
     beforeEach(async () => {
       // Given
-
       await planificateurRepository.isQueueReady()
-
       workerService.subscribe()
 
       // When

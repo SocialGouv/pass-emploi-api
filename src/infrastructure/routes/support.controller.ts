@@ -296,4 +296,6 @@ Notifie un groupe de bénéficiaires appartenant à une ou plusieurs structures.
   ): Promise<void> {
     await this.notifierBeneficiairesCommandHandler.execute(payload)
   }
+
+  // TODO ajouter API pour récupérer les jobs (active + delayed)
 }

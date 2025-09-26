@@ -40,7 +40,9 @@ export namespace Planificateur {
 
     supprimerLesJobsSelonPattern(pattern: string): Promise<void>
 
-    estEnCours(jobType: Planificateur.JobType): Promise<boolean>
+    estEnCoursDeTraitement(jobType: Planificateur.JobType): Promise<boolean>
+
+    aUnJobNonTermine(jobType: Planificateur.JobType): Promise<boolean>
   }
 
   export interface JobParams {
