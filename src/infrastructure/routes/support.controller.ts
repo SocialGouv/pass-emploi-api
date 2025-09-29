@@ -294,9 +294,7 @@ Notifie un groupe de bénéficiaires appartenant à une ou plusieurs structures
   "titre": "1000 immersions sur la vente et la logistique !",
   "description": "Explorez les métiers de vente et de la logistique",
   "structures": ["MILO","POLE_EMPLOI_AIJ"],
-  "push": true,
-  "batchSize": 2000,
-  "minutesEntreLesBatchs": 5
+  "push": true
 }
 \`\`\`
 `

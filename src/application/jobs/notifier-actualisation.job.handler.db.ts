@@ -17,6 +17,7 @@ import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { DateService } from '../../utils/date-service'
 import { buildError } from '../../utils/logger.module'
+import { TIME_ZONE_EUROPE_PARIS } from '../../config/configuration'
 
 interface Stats {
   nbNotifsEnvoyees: number
@@ -109,7 +110,7 @@ export class NotifierActualisationJobHandler extends JobHandler<Job> {
   ): Promise<SuiviJob> {
     const demainA8h = maintenant
       .plus({ days: 1 })
-      .setZone('Europe/Paris')
+      .setZone(TIME_ZONE_EUROPE_PARIS)
       .set({ hour: 8 })
       .toJSDate()
 

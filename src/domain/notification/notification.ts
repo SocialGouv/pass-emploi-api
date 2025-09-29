@@ -16,7 +16,11 @@ export namespace Notification {
   export import PoleEmploi = _PoleEmploi.NotificationPoleEmploi
 
   export interface Repository {
-    send(message: Notification.Message, idJeune?: string): Promise<void>
+    send(
+      message: Notification.Message,
+      idJeune?: string,
+      pushNotification?: boolean
+    ): Promise<void>
   }
 
   export enum Type {

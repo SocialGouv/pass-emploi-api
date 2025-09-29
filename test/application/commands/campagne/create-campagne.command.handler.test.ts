@@ -14,6 +14,7 @@ import { uneDatetime } from '../../../fixtures/date.fixture'
 import { StubbedClass, createSandbox, expect, stubClass } from '../../../utils'
 import { Planificateur } from '../../../../src/domain/planificateur'
 import { DateService } from '../../../../src/utils/date-service'
+import { TIME_ZONE_EUROPE_PARIS } from '../../../../src/config/configuration'
 
 describe('CreateCampagneCommandHandler', () => {
   let campagneRepository: StubbedType<Campagne.Repository>
@@ -107,7 +108,7 @@ describe('CreateCampagneCommandHandler', () => {
         ).to.have.been.calledOnceWithExactly({
           dateExecution: uneDatetime()
             .plus({ days: 1 })
-            .setZone('Europe/Paris')
+            .setZone(TIME_ZONE_EUROPE_PARIS)
             .set({
               hour: 11,
               minute: 40,

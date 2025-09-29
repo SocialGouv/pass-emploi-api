@@ -13,6 +13,7 @@ import {
   PlanificateurRepositoryToken
 } from '../../../domain/planificateur'
 import { DateService } from '../../../utils/date-service'
+import { TIME_ZONE_EUROPE_PARIS } from '../../../config/configuration'
 
 export interface CreateCampagneCommand extends Command {
   nom: string
@@ -72,12 +73,12 @@ export class CreateCampagneCommandHandler extends CommandHandler<
     }
     let dateExecution = maintenant
       .plus({ days: 1 })
-      .setZone('Europe/Paris')
+      .setZone(TIME_ZONE_EUROPE_PARIS)
       .set(heureMinuteExecution)
 
     if (heure <= heureDExecution && jour !== jeudi) {
       dateExecution = maintenant
-        .setZone('Europe/Paris')
+        .setZone(TIME_ZONE_EUROPE_PARIS)
         .set(heureMinuteExecution)
     }
 
@@ -92,9 +93,9 @@ export class CreateCampagneCommandHandler extends CommandHandler<
     })
 
     if (command.dateFin.diff(this.dateService.now()).as('days') > 7) {
-      let rappel = maintenant.plus({ days: 7 }).setZone('Europe/Paris')
+      let rappel = maintenant.plus({ days: 7 }).setZone(TIME_ZONE_EUROPE_PARIS)
       if (rappel.weekday === jeudi) {
-        rappel = maintenant.plus({ days: 8 }).setZone('Europe/Paris')
+        rappel = maintenant.plus({ days: 8 }).setZone(TIME_ZONE_EUROPE_PARIS)
       }
       await this.planificateurRepository.ajouterJob({
         dateExecution: rappel.set(heureMinuteExecution).toJSDate(),
