@@ -5,6 +5,7 @@ import { DateTime, Duration } from 'luxon'
 import { Planificateur } from '../../domain/planificateur'
 import { NettoyageJobsStats } from '../../domain/suivi-job'
 import { DateService } from '../../utils/date-service'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
 
 const CRON_TIMEZONE = 'Europe/Paris'
 export const REDIS_QUEUE_NAME = 'JobQueue'
@@ -141,13 +142,31 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     return activeJobs.some(job => job.data.type === jobType)
   }
 
-  async aUnJobNonTermine(jobType: Planificateur.JobType): Promise<boolean> {
-    const jobsNonTermines = await this.queue.getJobs([
-      'active',
-      'delayed',
-      'waiting',
-      'paused'
-    ])
-    return jobsNonTermines.some(job => job.data.type === jobType)
+  async recupererPremierJobNonTermine(
+    jobType: Planificateur.JobType
+  ): Promise<string | null> {
+    const job = (await this.recupererJobsNonTermines()).find(
+      job => job.data.type === jobType
+    )
+    if (!job) return null
+    return String(job.id)
+  }
+
+  async recupererJobsNonTerminesParType(
+    jobType: Planificateur.JobType
+  ): Promise<Bull.Job[]> {
+    return (await this.recupererJobsNonTermines()).filter(
+      job => job.data.type === jobType
+    )
+  }
+
+  async getJobInformations(jobId: Planificateur.JobId): Promise<Bull.Job> {
+    const job = await this.queue.getJob(jobId.jobId)
+    if (!job) throw new NonTrouveError('Job', jobId.jobId)
+    return job
+  }
+
+  private async recupererJobsNonTermines(): Promise<Bull.Job[]> {
+    return await this.queue.getJobs(['active', 'delayed', 'waiting', 'paused'])
   }
 }

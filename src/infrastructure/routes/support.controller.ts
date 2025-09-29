@@ -2,8 +2,10 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
+  Inject,
   Param,
   Post,
   SetMetadata,
@@ -52,8 +54,13 @@ import { UpdateFeatureFlipCommandHandler } from '../../application/commands/supp
 import { NotifierBeneficiairesCommandHandler } from '../../application/commands/notifier-beneficiaires.command.handler'
 import { Notification } from '../../domain/notification/notification'
 import { Core } from '../../domain/core'
-import { Planificateur } from '../../domain/planificateur'
-import { Result } from '../../building-blocks/types/result'
+import {
+  Planificateur,
+  PlanificateurRepositoryToken
+} from '../../domain/planificateur'
+import { PlanificateurRedisRepository } from '../repositories/planificateur-redis.repository.db'
+import Bull from 'bull'
+import { failure, Result, success } from '../../building-blocks/types/result'
 
 @Controller('support')
 @ApiTags('Support')
@@ -70,7 +77,9 @@ export class SupportController {
     private readonly creerSuperviseursCommandHandler: CreerSuperviseursCommandHandler,
     private readonly deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler,
     private readonly updateFeatureFlipCommandHandler: UpdateFeatureFlipCommandHandler,
-    private readonly notifierBeneficiairesCommandHandler: NotifierBeneficiairesCommandHandler
+    private readonly notifierBeneficiairesCommandHandler: NotifierBeneficiairesCommandHandler,
+    @Inject(PlanificateurRepositoryToken)
+    private readonly planificateurRedisRepository: PlanificateurRedisRepository
   ) {}
 
   @SetMetadata(
@@ -303,5 +312,51 @@ Notifie un groupe de bénéficiaires appartenant à une ou plusieurs structures
     return handleResult(createdJobId)
   }
 
-  // TODO ajouter API pour récupérer les jobs (active + delayed)
+  @SetMetadata(
+    Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
+    Authentification.Partenaire.SUPPORT
+  )
+  @ApiOperation({
+    summary: "Récupère les informations d'un job via son id."
+  })
+  @Get('job-information/:jobId')
+  @HttpCode(HttpStatus.OK)
+  async getJobInformation(@Param('jobId') jobId: string): Promise<Bull.Job> {
+    let result: Result<Bull.Job>
+    try {
+      const job = await this.planificateurRedisRepository.getJobInformations({
+        jobId: jobId
+      })
+      result = success(job)
+    } catch (e) {
+      result = failure(e)
+    }
+    return handleResult(result)
+  }
+
+  @SetMetadata(
+    Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
+    Authentification.Partenaire.SUPPORT
+  )
+  @ApiOperation({
+    summary:
+      'Récupère les jobs non terminés pour un type de job donné (ex. : NOTIFIER_BENEFICIAIRES).'
+  })
+  @Get('job-information/jobs/:jobType')
+  @HttpCode(HttpStatus.OK)
+  async getJobsNonTerminesByType(
+    @Param('jobType') jobType: Planificateur.JobType
+  ): Promise<Bull.Job[]> {
+    let result: Result<Bull.Job[]>
+    try {
+      const jobs =
+        await this.planificateurRedisRepository.recupererJobsNonTerminesParType(
+          jobType
+        )
+      result = success(jobs)
+    } catch (e) {
+      result = failure(e)
+    }
+    return handleResult(result)
+  }
 }

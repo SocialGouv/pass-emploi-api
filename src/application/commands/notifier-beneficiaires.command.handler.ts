@@ -14,8 +14,8 @@ import {
 } from '../../domain/planificateur'
 import { DateService } from '../../utils/date-service'
 import { Core } from '../../domain/core'
-import JobNotifierBeneficiaires = Planificateur.JobNotifierBeneficiaires
 import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
+import JobNotifierBeneficiaires = Planificateur.JobNotifierBeneficiaires
 
 export interface NotifierBeneficiairesCommand extends Command {
   typeNotification: Notification.Type
@@ -43,13 +43,14 @@ export class NotifierBeneficiairesCommandHandler extends CommandHandler<
   async handle(
     command: NotifierBeneficiairesCommand
   ): Promise<Result<Planificateur.JobId>> {
-    const jobDejaPlanifie = await this.planificateurRepository.aUnJobNonTermine(
-      Planificateur.JobType.NOTIFIER_BENEFICIAIRES
-    )
-    if (jobDejaPlanifie)
+    const jobDejaPlanifieId =
+      await this.planificateurRepository.recupererPremierJobNonTermine(
+        Planificateur.JobType.NOTIFIER_BENEFICIAIRES
+      )
+    if (jobDejaPlanifieId !== null)
       return failure(
         new MauvaiseCommandeError(
-          'Un job de type NOTIFIER_BENEFICIAIRES est déjà planifié.'
+          `Un job de type NOTIFIER_BENEFICIAIRES est déjà planifié (id=${jobDejaPlanifieId}).`
         )
       )
 

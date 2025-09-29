@@ -39,7 +39,7 @@ describe('NotifierBeneficiairesCommandHandler', () => {
   describe('handle', () => {
     it('crée un job planifié pour notifier les bénéficiaires', async () => {
       //Given
-      planificateurRepository.aUnJobNonTermine.resolves(false)
+      planificateurRepository.recupererPremierJobNonTermine.resolves(null)
       const jobId = '2'
       planificateurRepository.ajouterJob.resolves(jobId)
 
@@ -83,7 +83,7 @@ describe('NotifierBeneficiairesCommandHandler', () => {
 
     it('ne crée pas de job si un job NOTIFIER_BENEFICIAIRES existe déjà', async () => {
       //Given
-      planificateurRepository.aUnJobNonTermine.resolves(true)
+      planificateurRepository.recupererPremierJobNonTermine.resolves('1')
 
       const command: NotifierBeneficiairesCommand = {
         typeNotification: Notification.Type.OUTILS,
@@ -106,7 +106,7 @@ describe('NotifierBeneficiairesCommandHandler', () => {
       expect(result).to.deep.equal(
         failure(
           new MauvaiseCommandeError(
-            'Un job de type NOTIFIER_BENEFICIAIRES est déjà planifié.'
+            'Un job de type NOTIFIER_BENEFICIAIRES est déjà planifié (id=1).'
           )
         )
       )

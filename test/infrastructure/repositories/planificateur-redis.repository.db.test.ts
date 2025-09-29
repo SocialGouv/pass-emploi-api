@@ -292,7 +292,7 @@ describe('PlanificateurRedisRepository', () => {
     })
   })
 
-  describe('aUnJobNonTermine', () => {
+  describe('recupererPremierJobNonTermine', () => {
     describe('si le redis est accessible', () => {
       it('retourne true uniquement si un job de même type existe en statut wait, delayed, paused ou active', async () => {
         // Given
@@ -330,11 +330,15 @@ describe('PlanificateurRedisRepository', () => {
 
         // When - Then
         expect(
-          await planificateurRedisRepository.aUnJobNonTermine(jobTypeDelayed)
-        ).to.equal(true)
+          await planificateurRedisRepository.recupererPremierJobNonTermine(
+            jobTypeDelayed
+          )
+        ).to.equal('delayedJob')
         expect(
-          await planificateurRedisRepository.aUnJobNonTermine(jobType)
-        ).to.equal(true)
+          await planificateurRedisRepository.recupererPremierJobNonTermine(
+            jobType
+          )
+        ).to.equal('jobError')
 
         // Given - Testing waiting
         await queue.resume()
@@ -343,8 +347,10 @@ describe('PlanificateurRedisRepository', () => {
 
         // When - Then
         expect(
-          await planificateurRedisRepository.aUnJobNonTermine(jobType)
-        ).to.equal(true)
+          await planificateurRedisRepository.recupererPremierJobNonTermine(
+            jobType
+          )
+        ).to.equal('jobError')
 
         // Given - Testing active
         await queue.getNextJob()
@@ -353,8 +359,10 @@ describe('PlanificateurRedisRepository', () => {
 
         // When - Then
         expect(
-          await planificateurRedisRepository.aUnJobNonTermine(jobType)
-        ).to.equal(true)
+          await planificateurRedisRepository.recupererPremierJobNonTermine(
+            jobType
+          )
+        ).to.equal('job')
 
         // Given - Testing completed, failed
         await jobFromQueue?.moveToCompleted('result', true)
@@ -365,8 +373,10 @@ describe('PlanificateurRedisRepository', () => {
 
         // When - Then
         expect(
-          await planificateurRedisRepository.aUnJobNonTermine(jobType)
-        ).to.equal(false)
+          await planificateurRedisRepository.recupererPremierJobNonTermine(
+            jobType
+          )
+        ).to.equal(null)
       })
 
       it('retourne false si un job de type différent existe en statut non terminé', async () => {
@@ -386,10 +396,10 @@ describe('PlanificateurRedisRepository', () => {
 
         // When - Then
         expect(
-          await planificateurRedisRepository.aUnJobNonTermine(
+          await planificateurRedisRepository.recupererPremierJobNonTermine(
             Planificateur.JobType.MAJ_SEGMENTS
           )
-        ).to.equal(false)
+        ).to.equal(null)
       })
     })
   })
