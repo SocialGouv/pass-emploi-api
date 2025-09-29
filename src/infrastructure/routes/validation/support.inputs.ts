@@ -135,8 +135,7 @@ export class UpdateFeatureFlipPayload {
 export class NotifierBeneficiairesPayload {
   @ApiProperty({
     enum: Notification.Type,
-    description: Object.values(Notification.Type).join(', '),
-    example: Notification.Type.OUTILS
+    description: Object.values(Notification.Type).join(', ')
   })
   @IsString()
   @IsNotEmpty()
@@ -144,8 +143,7 @@ export class NotifierBeneficiairesPayload {
   typeNotification: Notification.Type
 
   @ApiProperty({
-    type: String,
-    example: '1000 immersions sur la vente et la logistique !'
+    type: String
   })
   @IsString()
   @IsNotEmpty()
@@ -153,8 +151,7 @@ export class NotifierBeneficiairesPayload {
   titre: string
 
   @ApiProperty({
-    type: String,
-    example: 'Explorez les métiers de vente et de la logistique'
+    type: String
   })
   @IsString()
   @IsNotEmpty()
@@ -163,27 +160,26 @@ export class NotifierBeneficiairesPayload {
 
   @ApiProperty({
     enum: Core.Structure,
-    isArray: true,
-    example: '["MILO","POLE_EMPLOI_AIJ"]'
+    isArray: true
   })
   @IsArray()
   @IsEnum(Core.Structure, { each: true })
   structures: Core.Structure[]
 
-  @ApiProperty({ example: true })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
   @IsIn([true, false])
   push: boolean
 
-  @ApiProperty({ example: 2000 })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
   @Min(2000)
   @Max(10000)
   batchSize?: number
 
-  @ApiProperty({ example: 5 })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
   @Min(5)
