@@ -481,6 +481,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     RendezVousMilo.Factory,
     BigqueryClient,
     DiagorienteClient,
+    PlanificateurRedisRepository,
     {
       provide: APP_GUARD,
       useClass: OidcAuthGuard

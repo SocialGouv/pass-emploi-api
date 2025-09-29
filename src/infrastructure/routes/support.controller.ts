@@ -5,7 +5,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Inject,
   Param,
   Post,
   SetMetadata,
@@ -55,10 +54,7 @@ import { UpdateFeatureFlipCommandHandler } from '../../application/commands/supp
 import { NotifierBeneficiairesCommandHandler } from '../../application/commands/notifier-beneficiaires.command.handler'
 import { Notification } from '../../domain/notification/notification'
 import { Core } from '../../domain/core'
-import {
-  Planificateur,
-  PlanificateurRepositoryToken
-} from '../../domain/planificateur'
+import { Planificateur } from '../../domain/planificateur'
 import { PlanificateurRedisRepository } from '../repositories/planificateur-redis.repository.db'
 import Bull from 'bull'
 import { failure, Result, success } from '../../building-blocks/types/result'
@@ -79,7 +75,6 @@ export class SupportController {
     private readonly deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler,
     private readonly updateFeatureFlipCommandHandler: UpdateFeatureFlipCommandHandler,
     private readonly notifierBeneficiairesCommandHandler: NotifierBeneficiairesCommandHandler,
-    @Inject(PlanificateurRepositoryToken)
     private readonly planificateurRedisRepository: PlanificateurRedisRepository
   ) {}
 

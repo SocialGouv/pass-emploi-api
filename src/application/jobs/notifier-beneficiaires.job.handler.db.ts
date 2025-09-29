@@ -62,19 +62,22 @@ export class NotifierBeneficiairesJobHandler extends JobHandler<Job> {
     try {
       const offset = job.contenu?.offset || 0
 
-      const nbBeneficiairesTotal = await JeuneSqlModel.count({
-        where: {
-          structure: {
-            [Op.in]: job.contenu.structures
-          },
-          pushNotificationToken: {
-            [Op.ne]: null
+      let pagination = job.contenu.batchSize
+      if (!pagination) {
+        const nbBeneficiairesTotal = await JeuneSqlModel.count({
+          where: {
+            structure: {
+              [Op.in]: job.contenu.structures
+            },
+            pushNotificationToken: {
+              [Op.ne]: null
+            }
           }
-        }
-      })
-
-      const pagination =
-        job.contenu.batchSize || Math.trunc(0.2 * nbBeneficiairesTotal)
+        })
+        pagination =
+          job.contenu.batchSize ||
+          Math.max(Math.trunc(0.2 * nbBeneficiairesTotal), 1)
+      }
 
       const idsBeneficiairesAvecComptage = await JeuneSqlModel.findAll({
         where: {
@@ -117,6 +120,7 @@ export class NotifierBeneficiairesJobHandler extends JobHandler<Job> {
 
       const minutesEntreLesBatchs =
         job.contenu.minutesEntreLesBatchs || NOMBRE_MINUTES_ENTRE_BATCHS_DEFAUT
+      // todo: condition d'arret à revoir ?
       if (idsBeneficiairesAvecComptage.length === pagination) {
         let dateExecution = maintenant
           .plus({
