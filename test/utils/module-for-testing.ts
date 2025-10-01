@@ -27,6 +27,8 @@ import { uneDatetime } from '../fixtures/date.fixture'
 import { FakeController } from '../infrastructure/auth/fake.controller'
 import { stubClass, stubClassSandbox } from './types'
 import TokenMessage = messaging.TokenMessage
+import { PlanificateurRepositoryToken } from '../../src/domain/planificateur'
+import { PlanificateurRedisRepository } from '../../src/infrastructure/repositories/planificateur-redis.repository.db'
 
 export function buildTestingModuleForHttpTesting(
   sandbox: SinonSandbox = createSandbox()
@@ -73,8 +75,10 @@ export const getApplicationWithStubbedDependencies =
   }
 
 export const testConfig = (): ConfigService => {
-  // eslint-disable-next-line no-process-env
-  const databaseUrl = process.env.DATABASE_URL as string
+  const databaseUrl =
+    // eslint-disable-next-line no-process-env
+    (process.env.DATABASE_URL as string) ||
+    'postgresql://test:test@localhost:56432/test'
   const { host, port, database, user, password } = parse(databaseUrl)
   return new ConfigService({
     environment: 'test',
@@ -237,6 +241,10 @@ const stubProviders = (sandbox: SinonSandbox): Provider[] => {
     {
       provide: DateService,
       useValue: dateService
+    },
+    {
+      provide: PlanificateurRepositoryToken,
+      useClass: PlanificateurRedisRepository
     }
   ]
   const queryCommandsProviders = buildQueryCommandsProviders().map(

@@ -14,6 +14,7 @@ import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { StubbedClass, createSandbox, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
+import { TIME_ZONE_EUROPE_PARIS } from '../../../src/config/configuration'
 
 describe('NotifierActualisationJobHandler', () => {
   let sandbox: SinonSandbox
@@ -121,7 +122,7 @@ describe('NotifierActualisationJobHandler', () => {
       ).to.have.been.calledOnceWithExactly({
         dateExecution: uneDatetime()
           .plus({ days: 1 })
-          .setZone('Europe/Paris')
+          .setZone(TIME_ZONE_EUROPE_PARIS)
           .set({ hour: 8 })
           .toJSDate(),
         type: Planificateur.JobType.NOTIFIER_ACTUALISATION,

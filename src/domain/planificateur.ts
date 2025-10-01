@@ -10,6 +10,7 @@ import { RendezVous } from './rendez-vous/rendez-vous'
 import { NettoyageJobsStats } from './suivi-job'
 import { Notification } from './notification/notification'
 import { Core } from './core'
+import Bull from 'bull'
 
 export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
 
@@ -26,7 +27,7 @@ export namespace Planificateur {
       job: Job<T>,
       jobId?: string,
       params?: JobParams
-    ): Promise<void>
+    ): Promise<string>
 
     ajouterCronJob(cronJob: CronJob): Promise<void>
 
@@ -40,7 +41,17 @@ export namespace Planificateur {
 
     supprimerLesJobsSelonPattern(pattern: string): Promise<void>
 
-    estEnCours(jobType: Planificateur.JobType): Promise<boolean>
+    estEnCoursDeTraitement(jobType: Planificateur.JobType): Promise<boolean>
+
+    recupererPremierJobNonTermine(
+      jobType: Planificateur.JobType
+    ): Promise<string | null>
+
+    getJobInformations(jobId: Planificateur.JobId): Promise<Bull.Job>
+
+    recupererJobsNonTerminesParType(
+      jobType: Planificateur.JobType
+    ): Promise<Bull.Job[]>
   }
 
   export interface JobParams {
@@ -138,7 +149,7 @@ export namespace Planificateur {
   export type JobTraiterEvenementMilo = EvenementMilo
 
   export interface JobNotifierBeneficiaires {
-    type: Notification.Type
+    typeNotification: Notification.Type
     titre: string
     description: string
     structures: Core.Structure[]
@@ -159,6 +170,10 @@ export namespace Planificateur {
     dateExecution: Date
     type: JobType
     contenu: T
+  }
+
+  export interface JobId {
+    jobId: string
   }
 
   export interface CronJob {

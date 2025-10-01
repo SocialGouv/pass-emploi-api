@@ -21,9 +21,15 @@ export class NotificationFirebaseSqlRepository
     private dateService: DateService
   ) {}
 
-  async send(message: Notification.Message, idJeune?: string): Promise<void> {
-    this.firebaseClient.send(message)
-    this.matomoClient.trackEventPushNotificationEnvoyee(message)
+  async send(
+    message: Notification.Message,
+    idJeune?: string,
+    pushNotification?: boolean
+  ): Promise<void> {
+    if (pushNotification) {
+      this.firebaseClient.send(message)
+      this.matomoClient.trackEventPushNotificationEnvoyee(message)
+    }
     if (idJeune) {
       const notifSql: AsSql<NotificationJeuneDto> = {
         id: this.idService.uuid(),

@@ -9,6 +9,7 @@ import {
   SuiviJobSqlModel
 } from '../sequelize/models/suivi-job.sql-model'
 import { AsSql } from '../sequelize/types'
+import { TIME_ZONE_EUROPE_PARIS } from '../../config/configuration'
 
 const BOT_USERNAME = 'CEJ Lama'
 
@@ -66,7 +67,9 @@ export class SuiviJobService implements SuiviJob.Service {
 function construireMessage(suiviJob: SuiviJob): string {
   const suiviJobStringified = {
     ...suiviJob,
-    dateExecution: suiviJob.dateExecution.setZone('Europe/Paris').toISO()
+    dateExecution: suiviJob.dateExecution
+      .setZone(TIME_ZONE_EUROPE_PARIS)
+      .toISO()
   }
   delete suiviJobStringified.erreur
 

@@ -3,6 +3,8 @@ import * as Joi from 'joi'
 import { parse } from 'pg-connection-string'
 import { configurationSchema } from './configuration.schema'
 
+export const TIME_ZONE_EUROPE_PARIS = 'Europe/Paris'
+
 export default () => {
   const scalingoApp = process.env.APP
   let baseUrl: string

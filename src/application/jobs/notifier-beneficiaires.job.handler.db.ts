@@ -14,13 +14,14 @@ import {
 import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
 import { DateService } from '../../utils/date-service'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
+import { TIME_ZONE_EUROPE_PARIS } from '../../config/configuration'
+import { DateTime, WeekdayNumbers } from 'luxon'
 
 interface Stats {
   nbBeneficiairesNotifies: number
   estLaDerniereExecution: boolean
 }
 
-const PAGINATION_NOMBRE_DE_BENEFICIAIRES_MAXIMUM_DEFAUT = 2000
 const NOMBRE_MINUTES_ENTRE_BATCHS_DEFAUT = 5
 
 @Injectable()
@@ -60,9 +61,26 @@ export class NotifierBeneficiairesJobHandler extends JobHandler<Job> {
 
     try {
       const offset = job.contenu?.offset || 0
-      const pagination =
-        job.contenu.batchSize ||
-        PAGINATION_NOMBRE_DE_BENEFICIAIRES_MAXIMUM_DEFAUT
+
+      let pagination = job.contenu.batchSize
+      if (!pagination) {
+        const nbBeneficiairesTotal = await JeuneSqlModel.count({
+          where: {
+            structure: {
+              [Op.in]: job.contenu.structures
+            },
+            pushNotificationToken: {
+              [Op.ne]: null
+            }
+          }
+        })
+        const unQuartDeLaPopulationTotaleEtMinimum1 = Math.max(
+          Math.trunc(0.25 * nbBeneficiairesTotal),
+          1
+        )
+        pagination =
+          job.contenu.batchSize || unQuartDeLaPopulationTotaleEtMinimum1
+      }
 
       const idsBeneficiairesAvecComptage = await JeuneSqlModel.findAll({
         where: {
@@ -89,28 +107,39 @@ export class NotifierBeneficiairesJobHandler extends JobHandler<Job> {
               body: job.contenu.description
             },
             data: {
-              type: job.contenu.type
+              type: job.contenu.typeNotification
             }
           }
-          await this.notificationRepository.send(notification, beneficiaire.id)
+          await this.notificationRepository.send(
+            notification,
+            beneficiaire.id,
+            job.contenu.push
+          )
         } catch (e) {
           this.logger.error(e)
         }
         await new Promise(resolve => setTimeout(resolve, 500))
       }
 
+      const minutesEntreLesBatchs =
+        job.contenu.minutesEntreLesBatchs || NOMBRE_MINUTES_ENTRE_BATCHS_DEFAUT
+      // todo: condition d'arret à revoir ?
       if (idsBeneficiairesAvecComptage.length === pagination) {
+        let dateExecution = maintenant
+          .plus({
+            minute: minutesEntreLesBatchs
+          })
+          .setZone(TIME_ZONE_EUROPE_PARIS)
+
+        dateExecution = this.reporterDateEnJourOuvreLaJournee(dateExecution)
+
         this.planificateurRepository.ajouterJob({
-          dateExecution: maintenant
-            .plus({
-              minute:
-                job.contenu.minutesEntreLesBatchs ||
-                NOMBRE_MINUTES_ENTRE_BATCHS_DEFAUT
-            })
-            .toJSDate(),
+          dateExecution: dateExecution.toJSDate(),
           type: Planificateur.JobType.NOTIFIER_BENEFICIAIRES,
           contenu: {
             ...job.contenu,
+            batchSize: pagination,
+            minutesEntreLesBatchs: minutesEntreLesBatchs,
             offset: offset + pagination,
             nbBeneficiairesNotifies: stats.nbBeneficiairesNotifies
           }
@@ -131,5 +160,33 @@ export class NotifierBeneficiairesJobHandler extends JobHandler<Job> {
       tempsExecution: DateService.calculerTempsExecution(maintenant),
       resultat: stats
     }
+  }
+
+  private reporterDateEnJourOuvreLaJournee(date: DateTime): DateTime {
+    const lundi = 1
+    const samedi = 6
+
+    const jour = date.localWeekday
+    const prochainJourOuvre = (
+      jour >= samedi ? lundi : jour + 1
+    ) as WeekdayNumbers
+
+    const huitHeures = { hour: 8, minute: 0, second: 0 }
+
+    const prochainJourOuvre8h00 = {
+      localWeekday: prochainJourOuvre,
+      ...huitHeures
+    }
+
+    let newDate = date
+    if (newDate.hour >= 17) {
+      newDate = date.set(prochainJourOuvre8h00)
+    }
+    if (newDate.hour < 8) newDate = newDate.set(huitHeures)
+    if (newDate.localWeekday >= samedi) {
+      newDate = newDate.set(prochainJourOuvre8h00)
+    }
+
+    return newDate
   }
 }

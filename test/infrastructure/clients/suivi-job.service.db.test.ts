@@ -9,6 +9,7 @@ import { SuiviJobSqlModel } from '../../../src/infrastructure/sequelize/models/s
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { testConfig } from '../../utils/module-for-testing'
 import { getDatabase } from '../../utils/database-for-testing'
+import { TIME_ZONE_EUROPE_PARIS } from '../../../src/config/configuration'
 
 describe('SuiviJobService', () => {
   let service: SuiviJobService
@@ -81,7 +82,7 @@ describe('SuiviJobService', () => {
         resultat: new NonTrouveError('test', '1'),
         erreur: { message: "erreur d'e quoi" }
       }
-      const heureParis = uneDatetime().setZone('Europe/Paris').toISO()
+      const heureParis = uneDatetime().setZone(TIME_ZONE_EUROPE_PARIS).toISO()
       const stringBody = `{"username":"CEJ Lama","text":"### Résultat du job _NETTOYER_LES_DONNEES_\\n| Statut | :x: |\\n    |:------------------------|:------------|\\n    | jobType | NETTOYER_LES_DONNEES |\\n| succes | false |\\n| dateExecution | ${heureParis} |\\n| tempsExecution | 0 |\\n| nbErreurs | 0 |\\n| code | NON_TROUVE |\\n| message | test 1 non trouvé(e) |"}`
 
       const scope = nock(configService.get('mattermost').jobWebhookUrl)

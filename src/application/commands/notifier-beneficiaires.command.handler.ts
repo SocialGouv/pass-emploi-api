@@ -5,7 +5,8 @@ import { Notification } from '../../domain/notification/notification'
 import {
   emptySuccess,
   failure,
-  Result
+  Result,
+  success
 } from '../../building-blocks/types/result'
 import {
   Planificateur,
@@ -13,11 +14,11 @@ import {
 } from '../../domain/planificateur'
 import { DateService } from '../../utils/date-service'
 import { Core } from '../../domain/core'
-import JobNotifierBeneficiaires = Planificateur.JobNotifierBeneficiaires
 import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
+import JobNotifierBeneficiaires = Planificateur.JobNotifierBeneficiaires
 
 export interface NotifierBeneficiairesCommand extends Command {
-  type: Notification.Type
+  typeNotification: Notification.Type
   titre: string
   description: string
   structures: Core.Structure[]
@@ -29,7 +30,7 @@ export interface NotifierBeneficiairesCommand extends Command {
 @Injectable()
 export class NotifierBeneficiairesCommandHandler extends CommandHandler<
   NotifierBeneficiairesCommand,
-  void
+  Planificateur.JobId
 > {
   constructor(
     private dateService: DateService,
@@ -39,26 +40,29 @@ export class NotifierBeneficiairesCommandHandler extends CommandHandler<
     super('NotifierBeneficiairesCommandHandler')
   }
 
-  async handle(command: NotifierBeneficiairesCommand): Promise<Result> {
-    const jobEstEnCours = await this.planificateurRepository.estEnCours(
-      Planificateur.JobType.NOTIFIER_BENEFICIAIRES
-    )
-    if (jobEstEnCours)
+  async handle(
+    command: NotifierBeneficiairesCommand
+  ): Promise<Result<Planificateur.JobId>> {
+    const jobDejaPlanifieId =
+      await this.planificateurRepository.recupererPremierJobNonTermine(
+        Planificateur.JobType.NOTIFIER_BENEFICIAIRES
+      )
+    if (jobDejaPlanifieId !== null)
       return failure(
         new MauvaiseCommandeError(
-          'Un job de type NOTIFIER_BENEFICIAIRES est déjà en cours de traitement.'
+          `Un job de type NOTIFIER_BENEFICIAIRES est déjà planifié (id=${jobDejaPlanifieId}).`
         )
       )
 
     const maintenant = this.dateService.now()
     const contenu: JobNotifierBeneficiaires = { ...command }
-    await this.planificateurRepository.ajouterJob({
+    const jobId = await this.planificateurRepository.ajouterJob({
       dateExecution: maintenant.toJSDate(),
       type: Planificateur.JobType.NOTIFIER_BENEFICIAIRES,
       contenu
     })
 
-    return emptySuccess()
+    return success({ jobId: jobId })
   }
 
   async authorize(): Promise<Result> {

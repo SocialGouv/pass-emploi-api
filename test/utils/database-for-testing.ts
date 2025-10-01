@@ -1,4 +1,3 @@
-import { parse } from 'pg-connection-string'
 import { Sequelize } from 'sequelize-typescript'
 import { sqlModels } from '../../src/infrastructure/sequelize/models'
 import { createClient } from 'redis'
@@ -12,10 +11,8 @@ export class DatabaseForTesting {
   redisClient: _RedisClientType
 
   constructor() {
-    const { host, port, database, user, password } = parse(
-      // eslint-disable-next-line no-process-env
-      process.env.DATABASE_URL || 'postgresql://test:test@localhost:56432/test'
-    )
+    const { host, port, database, user, password } =
+      testConfig().get('database')
     this.sequelize = new Sequelize({
       host: host as string,
       port: parseInt(port as string),

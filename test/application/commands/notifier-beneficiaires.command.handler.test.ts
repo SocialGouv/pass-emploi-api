@@ -11,11 +11,9 @@ import { createSandbox, StubbedClass, stubClass } from '../../utils'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { DateService } from '../../../src/utils/date-service'
 import { Core } from '../../../src/domain/core'
-import {
-  emptySuccess,
-  failure
-} from '../../../src/building-blocks/types/result'
+import { failure, success } from '../../../src/building-blocks/types/result'
 import { MauvaiseCommandeError } from '../../../src/building-blocks/types/domain-error'
+import JobNotifierBeneficiaires = Planificateur.JobNotifierBeneficiaires
 
 describe('NotifierBeneficiairesCommandHandler', () => {
   let sandbox: SinonSandbox
@@ -41,10 +39,12 @@ describe('NotifierBeneficiairesCommandHandler', () => {
   describe('handle', () => {
     it('crée un job planifié pour notifier les bénéficiaires', async () => {
       //Given
-      planificateurRepository.estEnCours.resolves(false)
+      planificateurRepository.recupererPremierJobNonTermine.resolves(null)
+      const jobId = '2'
+      planificateurRepository.ajouterJob.resolves(jobId)
 
       const command: NotifierBeneficiairesCommand = {
-        type: Notification.Type.OUTILS,
+        typeNotification: Notification.Type.OUTILS,
         titre: "Les offres d'immersion sont disponibles",
         description: 'Rendez-vous sur la page des offres.',
         structures: [
@@ -66,7 +66,7 @@ describe('NotifierBeneficiairesCommandHandler', () => {
         dateExecution: maintenant.toJSDate(),
         type: Planificateur.JobType.NOTIFIER_BENEFICIAIRES,
         contenu: {
-          type: Notification.Type.OUTILS,
+          typeNotification: Notification.Type.OUTILS,
           titre: "Les offres d'immersion sont disponibles",
           description: 'Rendez-vous sur la page des offres.',
           structures: [
@@ -76,17 +76,17 @@ describe('NotifierBeneficiairesCommandHandler', () => {
           push: true,
           batchSize: 2000,
           minutesEntreLesBatchs: 15
-        }
+        } as JobNotifierBeneficiaires
       })
-      expect(result).to.deep.equal(emptySuccess())
+      expect(result).to.deep.equal(success({ jobId: jobId }))
     })
 
     it('ne crée pas de job si un job NOTIFIER_BENEFICIAIRES existe déjà', async () => {
       //Given
-      planificateurRepository.estEnCours.resolves(true)
+      planificateurRepository.recupererPremierJobNonTermine.resolves('1')
 
       const command: NotifierBeneficiairesCommand = {
-        type: Notification.Type.OUTILS,
+        typeNotification: Notification.Type.OUTILS,
         titre: "Les offres d'immersion sont disponibles",
         description: 'Rendez-vous sur la page des offres.',
         structures: [
@@ -106,7 +106,7 @@ describe('NotifierBeneficiairesCommandHandler', () => {
       expect(result).to.deep.equal(
         failure(
           new MauvaiseCommandeError(
-            'Un job de type NOTIFIER_BENEFICIAIRES est déjà en cours de traitement.'
+            'Un job de type NOTIFIER_BENEFICIAIRES est déjà planifié (id=1).'
           )
         )
       )

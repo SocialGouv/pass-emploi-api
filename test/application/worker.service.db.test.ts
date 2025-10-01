@@ -47,13 +47,12 @@ describe('WorkerService', () => {
 
   afterEach(async () => {
     await app.close()
+    await planificateurRepository.queue.close()
   })
   describe('handler', () => {
     beforeEach(async () => {
       // Given
-
       await planificateurRepository.isQueueReady()
-
       workerService.subscribe()
 
       // When

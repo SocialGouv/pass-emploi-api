@@ -40,7 +40,7 @@ describe('SuivreEvenementsMiloCronJobHandler', () => {
   describe('quand un job est déjà en cours', () => {
     it('il ne doit pas récupérer les évènements milo', async () => {
       // Given
-      planificateurRepository.estEnCours.resolves(true)
+      planificateurRepository.estEnCoursDeTraitement.resolves(true)
 
       // When
       await suivreEvenementsMiloHandler.handle()
@@ -54,7 +54,7 @@ describe('SuivreEvenementsMiloCronJobHandler', () => {
   describe('quand le job n‘est pas en cours', () => {
     beforeEach(() => {
       // Given
-      planificateurRepository.estEnCours.resolves(false)
+      planificateurRepository.estEnCoursDeTraitement.resolves(false)
     })
 
     describe('quand il y a au moins un évènement milo', () => {

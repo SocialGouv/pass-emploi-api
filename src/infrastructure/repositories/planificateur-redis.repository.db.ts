@@ -5,8 +5,10 @@ import { DateTime, Duration } from 'luxon'
 import { Planificateur } from '../../domain/planificateur'
 import { NettoyageJobsStats } from '../../domain/suivi-job'
 import { DateService } from '../../utils/date-service'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
 
 const CRON_TIMEZONE = 'Europe/Paris'
+export const REDIS_QUEUE_NAME = 'JobQueue'
 
 @Injectable()
 export class PlanificateurRedisRepository implements Planificateur.Repository {
@@ -20,7 +22,7 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
   ) {
     this.logger = new Logger('PlanificateurRedisRepository')
     this.queue = new QueueBull(
-      'JobQueue',
+      REDIS_QUEUE_NAME,
       this.configService.get('redis').url,
       {
         redis: {
@@ -47,7 +49,7 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     job: Planificateur.Job<T>,
     jobId?: string,
     params?: Planificateur.JobParams
-  ): Promise<void> {
+  ): Promise<string> {
     if (this.isReady) {
       const now = this.dateService.now()
       const delay = DateTime.fromJSDate(job.dateExecution).diff(
@@ -60,7 +62,8 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
         backoff: params?.backoff?.delay || 0,
         priority: params?.priority || 0
       }
-      await this.queue.add(job, jobOptions)
+      const bullJob = await this.queue.add(job, jobOptions)
+      return String(bullJob.id)
     } else {
       throw new Error('Redis not ready to accept connection')
     }
@@ -86,6 +89,10 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
 
   async isQueueReady(): Promise<Bull.Queue> {
     return this.queue.isReady()
+  }
+
+  getQueue(): Bull.Queue {
+    return this.queue
   }
 
   async disconnect(): Promise<void> {
@@ -128,8 +135,38 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     await this.queue.removeJobs(`*${pattern}*`)
   }
 
-  async estEnCours(jobType: Planificateur.JobType): Promise<boolean> {
+  async estEnCoursDeTraitement(
+    jobType: Planificateur.JobType
+  ): Promise<boolean> {
     const activeJobs = await this.queue.getActive()
-    return activeJobs.filter(job => job.data.type === jobType).length > 1
+    return activeJobs.some(job => job.data.type === jobType)
+  }
+
+  async recupererPremierJobNonTermine(
+    jobType: Planificateur.JobType
+  ): Promise<string | null> {
+    const job = (await this.recupererJobsNonTermines()).find(
+      job => job.data.type === jobType
+    )
+    if (!job) return null
+    return String(job.id)
+  }
+
+  async recupererJobsNonTerminesParType(
+    jobType: Planificateur.JobType
+  ): Promise<Bull.Job[]> {
+    return (await this.recupererJobsNonTermines()).filter(
+      job => job.data.type === jobType
+    )
+  }
+
+  async getJobInformations(jobId: Planificateur.JobId): Promise<Bull.Job> {
+    const job = await this.queue.getJob(jobId.jobId)
+    if (!job) throw new NonTrouveError('Job', jobId.jobId)
+    return job
+  }
+
+  private async recupererJobsNonTermines(): Promise<Bull.Job[]> {
+    return await this.queue.getJobs(['active', 'delayed', 'waiting', 'paused'])
   }
 }

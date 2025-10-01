@@ -2,8 +2,10 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
+  Inject,
   Param,
   Post,
   SetMetadata,
@@ -13,6 +15,7 @@ import {
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
 import {
+  ApiBody,
   ApiConsumes,
   ApiOperation,
   ApiSecurity,
@@ -26,8 +29,8 @@ import { ArchiverJeuneSupportCommandHandler } from '../../application/commands/s
 import { CreerSuperviseursCommandHandler } from '../../application/commands/support/creer-superviseurs.command.handler'
 import { DeleteSuperviseursCommandHandler } from '../../application/commands/support/delete-superviseurs.command.handler'
 import {
-  MettreAJourLesJeunesCEJPoleEmploiCommand,
-  MettreAJourLesJeunesCejPeCommandHandler
+  MettreAJourLesJeunesCejPeCommandHandler,
+  MettreAJourLesJeunesCEJPoleEmploiCommand
 } from '../../application/commands/support/mettre-a-jour-les-jeunes-cej-pe.command.handler'
 import {
   ChangementAgenceQueryModel,
@@ -52,6 +55,12 @@ import { UpdateFeatureFlipCommandHandler } from '../../application/commands/supp
 import { NotifierBeneficiairesCommandHandler } from '../../application/commands/notifier-beneficiaires.command.handler'
 import { Notification } from '../../domain/notification/notification'
 import { Core } from '../../domain/core'
+import {
+  Planificateur,
+  PlanificateurRepositoryToken
+} from '../../domain/planificateur'
+import Bull from 'bull'
+import { failure, Result, success } from '../../building-blocks/types/result'
 
 @Controller('support')
 @ApiTags('Support')
@@ -68,7 +77,9 @@ export class SupportController {
     private readonly creerSuperviseursCommandHandler: CreerSuperviseursCommandHandler,
     private readonly deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler,
     private readonly updateFeatureFlipCommandHandler: UpdateFeatureFlipCommandHandler,
-    private readonly notifierBeneficiairesCommandHandler: NotifierBeneficiairesCommandHandler
+    private readonly notifierBeneficiairesCommandHandler: NotifierBeneficiairesCommandHandler,
+    @Inject(PlanificateurRepositoryToken)
+    private readonly planificateurRepository: Planificateur.Repository
   ) {}
 
   @SetMetadata(
@@ -264,36 +275,86 @@ export class SupportController {
     summary:
       'Notifie un groupe de bénéficiaires appartenants à une ou plusieures structures.',
     description: `
-Notifie un groupe de bénéficiaires appartenant à une ou plusieurs structures.  
+Notifie un groupe de bénéficiaires appartenant à une ou plusieurs structures
+(crée un job de type NOTIFIER_BENEFICIAIRES).
 
 **Champs du body :**
-- \`type\` : ${Object.values(Notification.Type).join(', ')}
+- \`typeNotification\` : ${Object.values(Notification.Type).join(', ')}
 - \`titre\` : titre de la notification
 - \`description\` : texte corps de la notification
 - \`structures\` : ${Object.values(Core.Structure).join(', ')}
-- \`push\` (❌ pas encore implémenté - pour l'instant toujours en push) (optionnel) : notifie les bénéficiaires en mode push (via Firebase) pour apparaître dans le centre de notifications de l'appareil
-- \`batchSize\` (optionnel, défaut = 2000) : taille d’un batch
+- \`push\` (optionnel, défaut = true) : notifie les bénéficiaires en mode push (via Firebase) pour apparaître dans le centre de notifications de l'appareil
+- \`batchSize\` (optionnel, défaut = 1/4 de la population totale) : taille d’un batch
 - \`minutesEntreLesBatch\` (optionnel, défaut = 5) : minutes entre chaque batch
-
-**Exemple JSON :**
-\`\`\`json
-{
-  "type": "OUTILS",
-  "titre": "1000 immersions sur la vente et la logistique !",
-  "description": "Explorez les métiers de vente et de la logistique",
-  "structures": ["MILO","POLE_EMPLOI_AIJ"],
-  "push": true,
-  "batchSize": 2000,
-  "minutesEntreLesBatchs": 5
-}
-\`\`\`
 `
+  })
+  @ApiBody({
+    schema: {
+      example: {
+        typeNotification: 'OUTILS',
+        titre: '1000 immersions sur la vente et la logistique !',
+        description: 'Explorez les métiers de vente et de la logistique',
+        structures: ['MILO', 'POLE_EMPLOI_AIJ'],
+        push: true
+      }
+    }
   })
   @Post('notifier-beneficiaires')
   @HttpCode(HttpStatus.CREATED)
   async notifierBeneficiaires(
     @Body() payload: NotifierBeneficiairesPayload
-  ): Promise<void> {
-    await this.notifierBeneficiairesCommandHandler.execute(payload)
+  ): Promise<Planificateur.JobId> {
+    const createdJobId = await this.notifierBeneficiairesCommandHandler.execute(
+      payload
+    )
+    return handleResult(createdJobId)
+  }
+
+  @SetMetadata(
+    Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
+    Authentification.Partenaire.SUPPORT
+  )
+  @ApiOperation({
+    summary: "Récupère les informations d'un job via son id."
+  })
+  @Get('job-information/:jobId')
+  @HttpCode(HttpStatus.OK)
+  async getJobInformation(@Param('jobId') jobId: string): Promise<Bull.Job> {
+    let result: Result<Bull.Job>
+    try {
+      const job = await this.planificateurRepository.getJobInformations({
+        jobId: jobId
+      })
+      result = success(job)
+    } catch (e) {
+      result = failure(e)
+    }
+    return handleResult(result)
+  }
+
+  @SetMetadata(
+    Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
+    Authentification.Partenaire.SUPPORT
+  )
+  @ApiOperation({
+    summary:
+      'Récupère les jobs non terminés pour un type de job donné (ex. : NOTIFIER_BENEFICIAIRES).'
+  })
+  @Get('job-information/jobs/:jobType')
+  @HttpCode(HttpStatus.OK)
+  async getJobsNonTerminesByType(
+    @Param('jobType') jobType: Planificateur.JobType
+  ): Promise<Bull.Job[]> {
+    let result: Result<Bull.Job[]>
+    try {
+      const jobs =
+        await this.planificateurRepository.recupererJobsNonTerminesParType(
+          jobType
+        )
+      result = success(jobs)
+    } catch (e) {
+      result = failure(e)
+    }
+    return handleResult(result)
   }
 }
