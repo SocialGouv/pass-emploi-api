@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Inject,
   Param,
   Post,
   SetMetadata,
@@ -54,8 +55,10 @@ import { UpdateFeatureFlipCommandHandler } from '../../application/commands/supp
 import { NotifierBeneficiairesCommandHandler } from '../../application/commands/notifier-beneficiaires.command.handler'
 import { Notification } from '../../domain/notification/notification'
 import { Core } from '../../domain/core'
-import { Planificateur } from '../../domain/planificateur'
-import { PlanificateurRedisRepository } from '../repositories/planificateur-redis.repository.db'
+import {
+  Planificateur,
+  PlanificateurRepositoryToken
+} from '../../domain/planificateur'
 import Bull from 'bull'
 import { failure, Result, success } from '../../building-blocks/types/result'
 
@@ -75,7 +78,8 @@ export class SupportController {
     private readonly deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler,
     private readonly updateFeatureFlipCommandHandler: UpdateFeatureFlipCommandHandler,
     private readonly notifierBeneficiairesCommandHandler: NotifierBeneficiairesCommandHandler,
-    private readonly planificateurRedisRepository: PlanificateurRedisRepository
+    @Inject(PlanificateurRepositoryToken)
+    private readonly planificateurRepository: Planificateur.Repository
   ) {}
 
   @SetMetadata(
@@ -318,7 +322,7 @@ Notifie un groupe de bénéficiaires appartenant à une ou plusieurs structures
   async getJobInformation(@Param('jobId') jobId: string): Promise<Bull.Job> {
     let result: Result<Bull.Job>
     try {
-      const job = await this.planificateurRedisRepository.getJobInformations({
+      const job = await this.planificateurRepository.getJobInformations({
         jobId: jobId
       })
       result = success(job)
@@ -344,7 +348,7 @@ Notifie un groupe de bénéficiaires appartenant à une ou plusieurs structures
     let result: Result<Bull.Job[]>
     try {
       const jobs =
-        await this.planificateurRedisRepository.recupererJobsNonTerminesParType(
+        await this.planificateurRepository.recupererJobsNonTerminesParType(
           jobType
         )
       result = success(jobs)

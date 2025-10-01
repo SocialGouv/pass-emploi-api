@@ -27,6 +27,7 @@ import { uneDatetime } from '../fixtures/date.fixture'
 import { FakeController } from '../infrastructure/auth/fake.controller'
 import { stubClass, stubClassSandbox } from './types'
 import TokenMessage = messaging.TokenMessage
+import { PlanificateurRepositoryToken } from '../../src/domain/planificateur'
 import { PlanificateurRedisRepository } from '../../src/infrastructure/repositories/planificateur-redis.repository.db'
 
 export function buildTestingModuleForHttpTesting(
@@ -242,8 +243,8 @@ const stubProviders = (sandbox: SinonSandbox): Provider[] => {
       useValue: dateService
     },
     {
-      provide: PlanificateurRedisRepository,
-      useValue: stubClassSandbox(PlanificateurRedisRepository, sandbox)
+      provide: PlanificateurRepositoryToken,
+      useClass: PlanificateurRedisRepository
     }
   ]
   const queryCommandsProviders = buildQueryCommandsProviders().map(

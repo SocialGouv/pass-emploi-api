@@ -10,6 +10,7 @@ import { RendezVous } from './rendez-vous/rendez-vous'
 import { NettoyageJobsStats } from './suivi-job'
 import { Notification } from './notification/notification'
 import { Core } from './core'
+import Bull from 'bull'
 
 export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
 
@@ -45,6 +46,12 @@ export namespace Planificateur {
     recupererPremierJobNonTermine(
       jobType: Planificateur.JobType
     ): Promise<string | null>
+
+    getJobInformations(jobId: Planificateur.JobId): Promise<Bull.Job>
+
+    recupererJobsNonTerminesParType(
+      jobType: Planificateur.JobType
+    ): Promise<Bull.Job[]>
   }
 
   export interface JobParams {
