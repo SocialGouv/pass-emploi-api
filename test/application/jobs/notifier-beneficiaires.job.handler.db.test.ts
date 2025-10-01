@@ -256,7 +256,7 @@ describe('NotifierBeneficiairesJobHandler', () => {
       })
     })
 
-    it("détermine la taille du batch à 20% de la population à notifier si elle n'est pas définie", async () => {
+    it("détermine la taille du batch à 1/4 de la population à notifier si elle n'est pas définie", async () => {
       // Given
       // Conseiller
       await ConseillerSqlModel.bulkCreate([

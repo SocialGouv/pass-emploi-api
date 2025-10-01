@@ -26,7 +26,7 @@ export class NotificationFirebaseSqlRepository
     idJeune?: string,
     pushNotification?: boolean
   ): Promise<void> {
-    if (pushNotification === true) {
+    if (pushNotification) {
       this.firebaseClient.send(message)
       this.matomoClient.trackEventPushNotificationEnvoyee(message)
     }

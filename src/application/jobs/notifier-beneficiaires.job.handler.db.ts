@@ -74,9 +74,12 @@ export class NotifierBeneficiairesJobHandler extends JobHandler<Job> {
             }
           }
         })
+        const unQuartDeLaPopulationTotaleEtMinimum1 = Math.max(
+          Math.trunc(0.25 * nbBeneficiairesTotal),
+          1
+        )
         pagination =
-          job.contenu.batchSize ||
-          Math.max(Math.trunc(0.2 * nbBeneficiairesTotal), 1)
+          job.contenu.batchSize || unQuartDeLaPopulationTotaleEtMinimum1
       }
 
       const idsBeneficiairesAvecComptage = await JeuneSqlModel.findAll({

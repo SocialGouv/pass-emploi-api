@@ -284,7 +284,7 @@ Notifie un groupe de bénéficiaires appartenant à une ou plusieurs structures
 - \`description\` : texte corps de la notification
 - \`structures\` : ${Object.values(Core.Structure).join(', ')}
 - \`push\` (optionnel, défaut = true) : notifie les bénéficiaires en mode push (via Firebase) pour apparaître dans le centre de notifications de l'appareil
-- \`batchSize\` (optionnel, défaut = 20% de la population totale) : taille d’un batch
+- \`batchSize\` (optionnel, défaut = 1/4 de la population totale) : taille d’un batch
 - \`minutesEntreLesBatch\` (optionnel, défaut = 5) : minutes entre chaque batch
 `
   })
