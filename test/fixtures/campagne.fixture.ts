@@ -1,9 +1,9 @@
-import { Campagne } from '../../src/domain/campagne'
-import { uneDate, uneDatetime } from './date.fixture'
-import { CampagneQueryModel } from '../../src/application/queries/query-models/campagne.query-model'
 import { questionsInMemory } from '../../src/application/queries/query-getters/get-campagne.query.getter.db'
+import { CampagneQueryModel } from '../../src/application/queries/query-models/campagne.query-model'
+import { Campagne } from '../../src/domain/campagne'
 import { ReponseCampagneDto } from '../../src/infrastructure/sequelize/models/reponse-campagne.sql-model'
 import { AsSql } from '../../src/infrastructure/sequelize/types'
+import { uneDate, uneDatetime } from './date.fixture'
 
 export const uneCampagne = (args: Partial<Campagne> = {}): Campagne => {
   const defaults: Campagne = {
@@ -22,7 +22,7 @@ export const uneCampagneQueryModel = (
   id: campagne.id,
   dateDebut: campagne.dateDebut.toString(),
   dateFin: campagne.dateFin.toString(),
-  description: "Votre expérience sur l'application",
+  description: 'Votre avis nous intéresse !',
   titre: 'Donnez nous votre avis',
   questions: questionsInMemory()
 })

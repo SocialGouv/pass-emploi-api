@@ -1,15 +1,15 @@
+import { Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
+import { Op } from 'sequelize'
 import { Query } from '../../../building-blocks/types/query'
+import { CampagneSqlModel } from '../../../infrastructure/sequelize/models/campagne.sql-model'
+import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
+import { ReponseCampagneSqlModel } from '../../../infrastructure/sequelize/models/reponse-campagne.sql-model'
+import { DateService } from '../../../utils/date-service'
 import {
   CampagneQueryModel,
   QuestionCampagneQueryModel
 } from '../query-models/campagne.query-model'
-import { CampagneSqlModel } from '../../../infrastructure/sequelize/models/campagne.sql-model'
-import { DateService } from '../../../utils/date-service'
-import { Op } from 'sequelize'
-import { ReponseCampagneSqlModel } from '../../../infrastructure/sequelize/models/reponse-campagne.sql-model'
-import { Injectable } from '@nestjs/common'
-import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
-import { DateTime } from 'luxon'
 
 export interface GetCampagneQuery extends Query {
   idJeune: string
@@ -68,8 +68,8 @@ export class GetCampagneQueryGetter {
         id: campagneEnCours.id,
         dateDebut: DateService.fromJSDateToISOString(campagneEnCours.dateDebut),
         dateFin: DateService.fromJSDateToISOString(campagneEnCours.dateFin),
-        titre: "Votre expérience sur l'application",
-        description: `Aidez-nous à améliorer l'application en répondant à 5 questions`,
+        titre: 'Votre avis nous intéresse !',
+        description: `Aidez-nous à améliorer l’application`,
         questions: questionsInMemory()
       }
     }
@@ -181,15 +181,14 @@ export const questionsInMemory = (): QuestionCampagneQueryModel[] => [
   },
   {
     id: 4,
-    libelle:
-      'Recommanderiez-vous l’application ? Sur une échelle de 0 à 10, 0 = pas du tout et 10 = très certainement',
+    libelle: '*Recommanderiez-vous l’application ?',
     pourquoi: true,
     libellePourquoi:
       'Que pouvons-nous améliorer pour vous satisfaire davantage ?',
     options: [
       {
         id: 10,
-        libelle: '10'
+        libelle: '10 (très fortement)'
       },
       {
         id: 9,
@@ -209,7 +208,7 @@ export const questionsInMemory = (): QuestionCampagneQueryModel[] => [
       },
       {
         id: 5,
-        libelle: '5'
+        libelle: '5 (neutre)'
       },
       {
         id: 4,
@@ -229,7 +228,7 @@ export const questionsInMemory = (): QuestionCampagneQueryModel[] => [
       },
       {
         id: 0,
-        libelle: '0'
+        libelle: '0 (pas du tout)'
       }
     ]
   }
