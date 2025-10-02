@@ -26,7 +26,14 @@ if [ -z "$DUMP_RESTORE_DB_TARGET" ]; then
 fi
 
 export PATH=$HOME/bin:$PATH
-dbclient-fetcher psql 16
+
+if [[ $APP =~ "pa-back-prod" ]]; then
+  PG_VERSION=13
+else
+  PG_VERSION=16
+fi
+
+dbclient-fetcher psql "$PG_VERSION"
 
 pg_dump --clean --if-exists --format c --dbname "$DUMP_RESTORE_DB_SOURCE" --no-owner --no-privileges --no-comments --schema 'public' --file dump.pgsql \
   --exclude-table 'spatial_ref_sys' \
