@@ -27,24 +27,28 @@ export class ChargerLesVuesJobHandler extends JobHandler<Planificateur.Job> {
   async handle(): Promise<SuiviJob> {
     let erreur
     const maintenant = this.dateService.now()
-    const semaine = maintenant
-      .startOf('week')
-      .minus({ week: 1 })
-      .toFormat('yyyy-MM-dd')
-    const analyticsTableName = 'evenement_engagement'
-    const connexion = await createSequelizeForAnalytics()
-    this.logger.log('Migrer le schéma des vues analytics')
-    await migrate(connexion)
+    try {
+      const semaine = maintenant
+        .startOf('week')
+        .minus({ week: 1 })
+        .toFormat('yyyy-MM-dd')
+      const analyticsTableName = 'evenement_engagement'
+      const connexion = await createSequelizeForAnalytics()
+      this.logger.log('Migrer le schéma des vues analytics')
+      await migrate(connexion)
 
-    await chargerLesVuesDeLaSemaine(
-      connexion,
-      semaine,
-      analyticsTableName,
-      this.logger
-    )
+      await chargerLesVuesDeLaSemaine(
+        connexion,
+        semaine,
+        analyticsTableName,
+        this.logger
+      )
 
-    await connexion.close()
-
+      await connexion.close()
+    } catch (e) {
+      erreur = e
+      this.logger.error(e)
+    }
     return {
       jobType: this.jobType,
       nbErreurs: 0,
@@ -78,7 +82,7 @@ export async function chargerLesVuesDeLaSemaine(
   await chargerLaVueEngagementNational(
     connexion,
     semaine,
-    this.logger,
+    logger,
     analyticsTableName
   )
 }

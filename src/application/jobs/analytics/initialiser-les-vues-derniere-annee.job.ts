@@ -26,30 +26,35 @@ export class InitialiserLesVuesSurLaDerniereAnneeJobHandler extends JobHandler<P
   async handle(): Promise<SuiviJob> {
     let erreur
     const maintenant = this.dateService.now()
-    const connexion = await createSequelizeForAnalytics()
-    this.logger.log('Migrer le schéma des vues analytics')
-    await migrate(connexion)
+    try {
+      const connexion = await createSequelizeForAnalytics()
+      this.logger.log('Migrer le schéma des vues analytics')
+      await migrate(connexion)
 
-    const tableDerniereAnnee = infosTablesAEAnnuelles.reduce((max, curr) =>
-      curr.depuisAnnee > max.depuisAnnee ? curr : max
-    )
-    const tableName = `evenement_engagement${tableDerniereAnnee.suffix}`
-    // Les tables annuelles commencent au 1er novembre de l'année précédente (pour des besoins d'analytics)
-    const semaines = await connexion.query<{ semaine: string }>(
-      `SELECT distinct(semaine) from ${tableName} WHERE EXTRACT(YEAR FROM semaine) >= ${tableDerniereAnnee.depuisAnnee} ORDER BY semaine;`,
-      { raw: true, type: QueryTypes.SELECT }
-    )
-
-    for (const raw of semaines) {
-      await chargerLesVuesDeLaSemaine(
-        connexion,
-        raw.semaine,
-        tableName,
-        this.logger
+      const tableDerniereAnnee = infosTablesAEAnnuelles.reduce((max, curr) =>
+        curr.depuisAnnee > max.depuisAnnee ? curr : max
       )
-    }
+      const tableName = `evenement_engagement${tableDerniereAnnee.suffix}`
+      // Les tables annuelles commencent au 1er novembre de l'année précédente (pour des besoins d'analytics)
+      const semaines = await connexion.query<{ semaine: string }>(
+        `SELECT distinct(semaine) from ${tableName} WHERE EXTRACT(YEAR FROM semaine) >= ${tableDerniereAnnee.depuisAnnee} ORDER BY semaine;`,
+        { raw: true, type: QueryTypes.SELECT }
+      )
 
-    await connexion.close()
+      for (const raw of semaines) {
+        await chargerLesVuesDeLaSemaine(
+          connexion,
+          raw.semaine,
+          tableName,
+          this.logger
+        )
+      }
+
+      await connexion.close()
+    } catch (e) {
+      erreur = e
+      this.logger.error(e)
+    }
 
     return {
       jobType: this.jobType,

@@ -23,29 +23,33 @@ export class InitialiserLesVuesJobHandler extends JobHandler<Planificateur.Job> 
   async handle(): Promise<SuiviJob> {
     let erreur
     const maintenant = this.dateService.now()
-    const connexion = await createSequelizeForAnalytics()
-    this.logger.log('Migrer le schéma des vues analytics')
-    await migrate(connexion)
+    try {
+      const connexion = await createSequelizeForAnalytics()
+      this.logger.log('Migrer le schéma des vues analytics')
+      await migrate(connexion)
 
-    for (const tableAnnuelle of infosTablesAEAnnuelles) {
-      const tableName = `evenement_engagement${tableAnnuelle.suffix}`
-      const semaines = await connexion.query<{ semaine: string }>(
-        `SELECT distinct(semaine) from ${tableName} WHERE EXTRACT(YEAR FROM semaine) >= ${tableAnnuelle.depuisAnnee} ORDER BY semaine;`,
-        { raw: true, type: QueryTypes.SELECT }
-      )
-
-      for (const raw of semaines) {
-        await chargerLesVuesDeLaSemaine(
-          connexion,
-          raw.semaine,
-          tableName,
-          this.logger
+      for (const tableAnnuelle of infosTablesAEAnnuelles) {
+        const tableName = `evenement_engagement${tableAnnuelle.suffix}`
+        const semaines = await connexion.query<{ semaine: string }>(
+          `SELECT distinct(semaine) from ${tableName} WHERE EXTRACT(YEAR FROM semaine) >= ${tableAnnuelle.depuisAnnee} ORDER BY semaine;`,
+          { raw: true, type: QueryTypes.SELECT }
         )
+
+        for (const raw of semaines) {
+          await chargerLesVuesDeLaSemaine(
+            connexion,
+            raw.semaine,
+            tableName,
+            this.logger
+          )
+        }
       }
+
+      await connexion.close()
+    } catch (e) {
+      erreur = e
+      this.logger.error(e)
     }
-
-    await connexion.close()
-
     return {
       jobType: this.jobType,
       nbErreurs: 0,
