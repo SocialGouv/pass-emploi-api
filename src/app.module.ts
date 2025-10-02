@@ -384,6 +384,7 @@ import { configureLoggerModule } from './utils/logger.module'
 import { RateLimiterService } from './utils/rate-limiter.service'
 import { NotifierBeneficiairesCommandHandler } from './application/commands/notifier-beneficiaires.command.handler'
 import { NotifierBeneficiairesJobHandler } from './application/jobs/notifier-beneficiaires.job.handler.db'
+import { InitialiserLesVuesSurLaDerniereAnneeJobHandler } from './application/jobs/analytics/initialiser-les-vues-derniere-annee.job'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -857,6 +858,7 @@ export const JobHandlerProviders = [
   EnrichirEvenementsJobHandler,
   ChargerLesVuesJobHandler,
   InitialiserLesVuesJobHandler,
+  InitialiserLesVuesSurLaDerniereAnneeJobHandler,
   CreerTablesAEAnnuellesJobHandler,
   CreerVueAEMensuelleJobHandler,
   QualifierActionsJobHandler,
