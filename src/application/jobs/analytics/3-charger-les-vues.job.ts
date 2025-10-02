@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Inject, Injectable, Logger } from '@nestjs/common'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
 import { Planificateur, ProcessJobType } from '../../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
@@ -11,6 +11,7 @@ import {
   chargerLaVueEngagementNational
 } from './vues/3-2-vue-engagement'
 import { chargerLaVueFonctionnaliteDemarchesIA } from './vues/3-1bis-vue-fonctionnalites-demarches-ia'
+import { Sequelize } from 'sequelize-typescript'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.CHARGER_LES_VUES_ANALYTICS)
@@ -34,28 +35,14 @@ export class ChargerLesVuesJobHandler extends JobHandler<Planificateur.Job> {
     const connexion = await createSequelizeForAnalytics()
     this.logger.log('Migrer le schéma des vues analytics')
     await migrate(connexion)
-    this.logger.log('Charger la vue fonctionnalité')
-    await chargerLaVueFonctionnalite(connexion, semaine, analyticsTableName)
-    this.logger.log('Charger la vue fonctionnalité démarches IA')
-    await chargerLaVueFonctionnaliteDemarchesIA(
+
+    await chargerLesVuesDeLaSemaine(
       connexion,
       semaine,
-      analyticsTableName
+      analyticsTableName,
+      this.logger
     )
-    this.logger.log('Charger la vue engagement')
-    await chargerLaVueEngagement(
-      connexion,
-      semaine,
-      this.logger,
-      analyticsTableName
-    )
-    this.logger.log('Charger la vue engagement national')
-    await chargerLaVueEngagementNational(
-      connexion,
-      semaine,
-      this.logger,
-      analyticsTableName
-    )
+
     await connexion.close()
 
     return {
@@ -67,4 +54,31 @@ export class ChargerLesVuesJobHandler extends JobHandler<Planificateur.Job> {
       resultat: {}
     }
   }
+}
+
+export async function chargerLesVuesDeLaSemaine(
+  connexion: Sequelize,
+  semaine: string,
+  analyticsTableName: string,
+  logger: Logger
+): Promise<void> {
+  logger.log(`Charger la vue fonctionnalité de la semaine ${semaine}`)
+  await chargerLaVueFonctionnalite(connexion, semaine, analyticsTableName)
+  logger.log(
+    `Charger la vue fonctionnalité démarches IA de la semaine ${semaine}`
+  )
+  await chargerLaVueFonctionnaliteDemarchesIA(
+    connexion,
+    semaine,
+    analyticsTableName
+  )
+  logger.log(`Charger la vue engagement de la semaine ${semaine}`)
+  await chargerLaVueEngagement(connexion, semaine, logger, analyticsTableName)
+  logger.log(`Charger la vue engagement national de la semaine ${semaine}`)
+  await chargerLaVueEngagementNational(
+    connexion,
+    semaine,
+    this.logger,
+    analyticsTableName
+  )
 }

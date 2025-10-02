@@ -63,6 +63,7 @@
     "tasks:enrichir-evenements": "IS_WEB=false TASK_NAME=ENRICHIR_EVENEMENTS_ANALYTICS node dist/main",
     "tasks:charger-vues": "IS_WEB=false TASK_NAME=CHARGER_LES_VUES_ANALYTICS node dist/main",
     "tasks:initialiser-les-vues": "IS_WEB=false TASK_NAME=INITIALISER_LES_VUES node dist/main",
+    "tasks:initialiser-les-vues-derniere-annee": "IS_WEB=false TASK_NAME=INITIALISER_LES_VUES_DERNIERE_ANNEE node dist/main",
     "tasks:creer-tables-ae-annuelles": "IS_WEB=false TASK_NAME=CREER_TABLES_AE_ANNUELLES_ANALYTICS node dist/main",
     "tasks:creer-vue-ae-mensuelle": "IS_WEB=false TASK_NAME=CREER_VUE_AE_MENSUELLE node dist/main",
     "tasks:notifier-bonne-alternance": "IS_WEB=false TASK_NAME=NOTIFIER_BONNE_ALTERNANCE node dist/main",

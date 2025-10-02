@@ -10,14 +10,17 @@ import { infosTablesAEAnnuelles } from './creer-tables-ae-annuelles'
 import { migrate } from './vues/3-0-migrate-schema'
 
 @Injectable()
-@ProcessJobType(Planificateur.JobType.INITIALISER_LES_VUES)
-export class InitialiserLesVuesJobHandler extends JobHandler<Planificateur.Job> {
+@ProcessJobType(Planificateur.JobType.INITIALISER_LES_VUES_DERNIERE_ANNEE)
+export class InitialiserLesVuesSurLaDerniereAnneeJobHandler extends JobHandler<Planificateur.Job> {
   constructor(
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service,
     private dateService: DateService
   ) {
-    super(Planificateur.JobType.INITIALISER_LES_VUES, suiviJobService)
+    super(
+      Planificateur.JobType.INITIALISER_LES_VUES_DERNIERE_ANNEE,
+      suiviJobService
+    )
   }
 
   async handle(): Promise<SuiviJob> {
@@ -27,21 +30,23 @@ export class InitialiserLesVuesJobHandler extends JobHandler<Planificateur.Job> 
     this.logger.log('Migrer le schéma des vues analytics')
     await migrate(connexion)
 
-    for (const tableAnnuelle of infosTablesAEAnnuelles) {
-      const tableName = `evenement_engagement${tableAnnuelle.suffix}`
-      const semaines = await connexion.query<{ semaine: string }>(
-        `SELECT distinct(semaine) from ${tableName} WHERE EXTRACT(YEAR FROM semaine) >= ${tableAnnuelle.depuisAnnee} ORDER BY semaine;`,
-        { raw: true, type: QueryTypes.SELECT }
-      )
+    const tableDerniereAnnee = infosTablesAEAnnuelles.reduce((max, curr) =>
+      curr.depuisAnnee > max.depuisAnnee ? curr : max
+    )
+    const tableName = `evenement_engagement${tableDerniereAnnee.suffix}`
+    // Les tables annuelles commencent au 1er novembre de l'année précédente (pour des besoins d'analytics)
+    const semaines = await connexion.query<{ semaine: string }>(
+      `SELECT distinct(semaine) from ${tableName} WHERE EXTRACT(YEAR FROM semaine) >= ${tableDerniereAnnee.depuisAnnee} ORDER BY semaine;`,
+      { raw: true, type: QueryTypes.SELECT }
+    )
 
-      for (const raw of semaines) {
-        await chargerLesVuesDeLaSemaine(
-          connexion,
-          raw.semaine,
-          tableName,
-          this.logger
-        )
-      }
+    for (const raw of semaines) {
+      await chargerLesVuesDeLaSemaine(
+        connexion,
+        raw.semaine,
+        tableName,
+        this.logger
+      )
     }
 
     await connexion.close()

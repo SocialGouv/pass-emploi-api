@@ -6,6 +6,7 @@ La pipeline fonctionne en mode ELT (Extract, Load, Transform) et est composée d
 2. [1-charger-les-evenements.job.ts](..%2Fsrc%2Fapplication%2Fjobs%2Fanalytics%2F1-charger-les-evenements.job.ts)
 3. [2-enrichir-les-evenements.job.ts](..%2Fsrc%2Fapplication%2Fjobs%2Fanalytics%2F2-enrichir-les-evenements.job.ts)
 4. [3-charger-les-vues.job.ts](..%2Fsrc%2Fapplication%2Fjobs%2Fanalytics%2F3-charger-les-vues.job.ts)
+5. Bonus : [initialiser-les-vues.job.ts](..%2Fsrc%2Fapplication%2Fjobs%2Fanalytics%2Finitialiser-les-vues.job.ts)
 
 ## Ordonnancement
 
@@ -79,3 +80,13 @@ Détaille l'engagement des utilisateurs aux mailles :
   Le retrait des niveaux departement-region permet d'avoir des chiffres exacts à l'échelle nationale.
 
 Les indicateurs sont les mêmes que pour la table analytics_engagement
+
+### initialiser-les-vues.job.ts
+
+Si vous avez besoin de recalculer les vues analytics dans le passé (suite à une mise à jour d'actes d'engagement ou de création de nouvelles vues), vous pouvez relancer les calculs via une task Scalingo
+
+```
+scalingo --region osc-fr1 --app pa-back-staging run yarn tasks:initialiser-les-vues
+```
+
+[Une variante existe pour relancer uniquement les calculs sur la dernière année.](..%2Fsrc%2Fapplication%2Fjobs%2Fanalytics%2Finitialiser-les-vues-derniere-annee.job.ts)
