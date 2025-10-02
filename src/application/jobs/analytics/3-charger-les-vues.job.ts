@@ -10,6 +10,7 @@ import {
   chargerLaVueEngagement,
   chargerLaVueEngagementNational
 } from './vues/3-2-vue-engagement'
+import { chargerLaVueFonctionnaliteDemarchesIA } from './vues/3-1bis-vue-fonctionnalites-demarches-ia'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.CHARGER_LES_VUES_ANALYTICS)
@@ -35,6 +36,12 @@ export class ChargerLesVuesJobHandler extends JobHandler<Planificateur.Job> {
     await migrate(connexion)
     this.logger.log('Charger la vue fonctionnalité')
     await chargerLaVueFonctionnalite(connexion, semaine, analyticsTableName)
+    this.logger.log('Charger la vue fonctionnalité démarches IA')
+    await chargerLaVueFonctionnaliteDemarchesIA(
+      connexion,
+      semaine,
+      analyticsTableName
+    )
     this.logger.log('Charger la vue engagement')
     await chargerLaVueEngagement(
       connexion,

@@ -1,8 +1,31 @@
 import { Sequelize } from 'sequelize-typescript'
 
+export const ANALYTICS_FCT_DEMARCHES_IA_TABLE_NAME =
+  'analytics_fonctionnalites_demarches_ia'
+
 export async function migrate(connexion: Sequelize): Promise<void> {
   await connexion.query(`
     CREATE TABLE IF NOT EXISTS analytics_fonctionnalites
+    (
+      semaine            date,
+      structure          varchar,
+      type_utilisateur   varchar,
+      categorie          varchar,
+      action             varchar,
+      nom                varchar,
+      nb_ae_categorie    integer,
+      nb_users_categorie integer,
+      nb_ae_action       integer,
+      nb_users_action    integer,
+      nb_ae_nom          integer,
+      nb_users_nom       integer,
+      nb_ae_total        integer,
+      nb_users_total     integer
+    );
+  `)
+
+  await connexion.query(`
+    CREATE TABLE IF NOT EXISTS ${ANALYTICS_FCT_DEMARCHES_IA_TABLE_NAME}
     (
       semaine            date,
       structure          varchar,
@@ -58,6 +81,12 @@ export async function migrate(connexion: Sequelize): Promise<void> {
     create index if not exists analytics_fonctionnalites_categorie_index on analytics_fonctionnalites (categorie);
     create index if not exists analytics_fonctionnalites_action_index on analytics_fonctionnalites (action);
     create index if not exists analytics_fonctionnalites_nom_index on analytics_fonctionnalites (nom);
+    create index if not exists ${ANALYTICS_FCT_DEMARCHES_IA_TABLE_NAME}_semaine_index on ${ANALYTICS_FCT_DEMARCHES_IA_TABLE_NAME} (semaine);
+    create index if not exists ${ANALYTICS_FCT_DEMARCHES_IA_TABLE_NAME}_structure_index on ${ANALYTICS_FCT_DEMARCHES_IA_TABLE_NAME} (structure);
+    create index if not exists ${ANALYTICS_FCT_DEMARCHES_IA_TABLE_NAME}_type_utilisateur_index on ${ANALYTICS_FCT_DEMARCHES_IA_TABLE_NAME} (type_utilisateur);
+    create index if not exists ${ANALYTICS_FCT_DEMARCHES_IA_TABLE_NAME}_categorie_index on ${ANALYTICS_FCT_DEMARCHES_IA_TABLE_NAME} (categorie);
+    create index if not exists ${ANALYTICS_FCT_DEMARCHES_IA_TABLE_NAME}_action_index on ${ANALYTICS_FCT_DEMARCHES_IA_TABLE_NAME} (action);
+    create index if not exists ${ANALYTICS_FCT_DEMARCHES_IA_TABLE_NAME}_nom_index on ${ANALYTICS_FCT_DEMARCHES_IA_TABLE_NAME} (nom);
     create index if not exists analytics_engagement_semaine_index on analytics_engagement (semaine);
     create index if not exists analytics_engagement_structure_index on analytics_engagement (structure);
     create index if not exists analytics_engagement_type_utilisateur_index on analytics_engagement (type_utilisateur);
