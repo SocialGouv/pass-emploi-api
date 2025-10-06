@@ -279,7 +279,9 @@ Notifie un groupe de bénéficiaires appartenant à une ou plusieurs structures
 (crée un job de type NOTIFIER_BENEFICIAIRES).
 
 **Champs du body :**
-- \`typeNotification\` : ${Object.values(Notification.Type).join(', ')}
+- \`typeNotification\` : ${Object.values(Notification.TypeNotifManuelle).join(
+      ', '
+    )}
 - \`titre\` : titre de la notification
 - \`description\` : texte corps de la notification
 - \`structures\` : ${Object.values(Core.Structure).join(', ')}

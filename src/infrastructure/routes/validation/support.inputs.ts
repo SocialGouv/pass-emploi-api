@@ -134,7 +134,7 @@ export class UpdateFeatureFlipPayload {
 
 export class NotifierBeneficiairesPayload {
   @ApiProperty({
-    enum: Notification.Type,
+    enum: Notification.TypeNotifManuelle,
     description: Object.values(Notification.Type).join(', ')
   })
   @IsString()
