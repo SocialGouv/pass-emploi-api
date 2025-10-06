@@ -292,6 +292,136 @@ describe('PlanificateurRedisRepository', () => {
     })
   })
 
+  describe('existePlusQuUnJobActifDeCeType', () => {
+    describe('si le redis est accessible', () => {
+      it('retourne true uniquement si + de 2 jobs de même type existent en statut active', async () => {
+        // Given
+        const queue = planificateurRedisRepository.getQueue()
+        await queue.pause()
+        const jobType = Planificateur.JobType.NOTIFIER_BENEFICIAIRES
+        const jobTypeError = Planificateur.JobType.RENDEZVOUS
+        const delayedJob: Planificateur.Job<JobFake> = {
+          dateExecution: maintenant.plus({ minute: 10 }).toJSDate(),
+          type: jobType,
+          contenu: { message: 'delayed' }
+        }
+        const job1: Planificateur.Job = {
+          dateExecution: maintenant.toJSDate(),
+          type: jobType,
+          contenu: { message: 'job1' }
+        }
+        const job2: Planificateur.Job = {
+          dateExecution: maintenant.toJSDate(),
+          type: jobType,
+          contenu: { message: 'job2' }
+        }
+        const jobError: Planificateur.Job = {
+          dateExecution: maintenant.toJSDate(),
+          type: jobTypeError,
+          contenu: { message: 'jobError' }
+        }
+
+        await planificateurRedisRepository.ajouterJob(delayedJob, 'delayedJob')
+        await planificateurRedisRepository.ajouterJob(job1, 'job1')
+        await planificateurRedisRepository.ajouterJob(job2, 'job2')
+        await planificateurRedisRepository.ajouterJob(jobError, 'jobError')
+
+        const delayedJobFromQueue = await queue.getJob('delayedJob')
+        const job1FromQueue = await queue.getJob('job1')
+        const job2FromQueue = await queue.getJob('job2')
+        const jobErrorFromQueue = await queue.getJob('jobError')
+
+        // Testing delayed, paused
+        expect(await delayedJobFromQueue?.getState()).to.equal('delayed')
+        expect(await job1FromQueue?.getState()).to.equal('paused')
+        expect(await job2FromQueue?.getState()).to.equal('paused')
+
+        // When - Then
+        expect(
+          await planificateurRedisRepository.existePlusQuUnJobActifDeCeType(
+            jobType
+          )
+        ).to.equal(false)
+
+        // Given - Testing waiting
+        await queue.resume()
+        expect(await delayedJobFromQueue?.getState()).to.equal('delayed')
+        expect(await job1FromQueue?.getState()).to.equal('waiting')
+        expect(await job2FromQueue?.getState()).to.equal('waiting')
+
+        // When - Then
+        expect(
+          await planificateurRedisRepository.existePlusQuUnJobActifDeCeType(
+            jobType
+          )
+        ).to.equal(false)
+
+        // Given - Testing active
+        await queue.getNextJob()
+        await queue.getNextJob()
+        expect(await delayedJobFromQueue?.getState()).to.equal('delayed')
+        expect(await job1FromQueue?.getState()).to.equal('active')
+        expect(await job2FromQueue?.getState()).to.equal('active')
+
+        // When - Then
+        expect(
+          await planificateurRedisRepository.existePlusQuUnJobActifDeCeType(
+            jobType
+          )
+        ).to.equal(true)
+
+        // Given - Testing completed
+        await job1FromQueue?.moveToCompleted('result', true)
+        await job2FromQueue?.moveToCompleted('result', true)
+        expect(await delayedJobFromQueue?.getState()).to.equal('delayed')
+        expect(await job1FromQueue?.getState()).to.equal('completed')
+        expect(await job2FromQueue?.getState()).to.equal('completed')
+
+        // When - Then
+        expect(
+          await planificateurRedisRepository.existePlusQuUnJobActifDeCeType(
+            jobType
+          )
+        ).to.equal(false)
+
+        // Given - Testing failed
+        await queue.getNextJob()
+        await jobErrorFromQueue?.moveToFailed({ message: 'error' }, true)
+        expect(await jobErrorFromQueue?.getState()).to.equal('failed')
+
+        // When - Then
+        expect(
+          await planificateurRedisRepository.existePlusQuUnJobActifDeCeType(
+            jobTypeError
+          )
+        ).to.equal(false)
+      })
+
+      it('retourne false si 1 seul job du même type existe', async () => {
+        // Given
+        const queue = planificateurRedisRepository.getQueue()
+        await planificateurRedisRepository.ajouterJob(
+          {
+            dateExecution: maintenant.toJSDate(),
+            type: Planificateur.JobType.NETTOYER_LES_JOBS,
+            contenu: { message: 'job' }
+          },
+          'job'
+        )
+        const job = await queue.getJob('job')
+        await queue.getNextJob()
+        expect(await job?.getState()).to.equal('active')
+
+        // When - Then
+        expect(
+          await planificateurRedisRepository.existePlusQuUnJobActifDeCeType(
+            Planificateur.JobType.NETTOYER_LES_JOBS
+          )
+        ).to.equal(false)
+      })
+    })
+  })
+
   describe('recupererPremierJobNonTermine', () => {
     describe('si le redis est accessible', () => {
       it('retourne true uniquement si un job de même type existe en statut wait, delayed, paused ou active', async () => {

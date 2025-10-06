@@ -36,7 +36,9 @@ export class SuivreEvenementsMiloCronJobHandler extends JobHandler<Job> {
     let nombreEvenementsTraites = 0
     try {
       const jobEstEnCours =
-        await this.planificateurRepository.estEnCoursDeTraitement(this.jobType)
+        await this.planificateurRepository.existePlusQuUnJobActifDeCeType(
+          this.jobType
+        )
 
       if (jobEstEnCours) {
         return {

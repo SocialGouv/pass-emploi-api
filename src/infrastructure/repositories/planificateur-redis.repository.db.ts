@@ -142,6 +142,13 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     return activeJobs.some(job => job.data.type === jobType)
   }
 
+  async existePlusQuUnJobActifDeCeType(
+    jobType: Planificateur.JobType
+  ): Promise<boolean> {
+    const activeJobs = await this.queue.getActive()
+    return activeJobs.filter(job => job.data.type === jobType).length > 1
+  }
+
   async recupererPremierJobNonTermine(
     jobType: Planificateur.JobType
   ): Promise<string | null> {

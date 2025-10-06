@@ -43,6 +43,10 @@ export namespace Planificateur {
 
     estEnCoursDeTraitement(jobType: Planificateur.JobType): Promise<boolean>
 
+    existePlusQuUnJobActifDeCeType(
+      jobType: Planificateur.JobType
+    ): Promise<boolean>
+
     recupererPremierJobNonTermine(
       jobType: Planificateur.JobType
     ): Promise<string | null>

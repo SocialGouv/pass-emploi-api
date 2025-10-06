@@ -37,10 +37,10 @@ describe('SuivreEvenementsMiloCronJobHandler', () => {
       planificateurRepository
     )
   })
-  describe('quand un job est déjà en cours', () => {
+  describe("quand plus qu'un job est déjà actif", () => {
     it('il ne doit pas récupérer les évènements milo', async () => {
       // Given
-      planificateurRepository.estEnCoursDeTraitement.resolves(true)
+      planificateurRepository.existePlusQuUnJobActifDeCeType.resolves(true)
 
       // When
       await suivreEvenementsMiloHandler.handle()
@@ -51,10 +51,10 @@ describe('SuivreEvenementsMiloCronJobHandler', () => {
       ).to.not.have.been.called()
     })
   })
-  describe('quand le job n‘est pas en cours', () => {
+  describe('quand le job est le seul actif', () => {
     beforeEach(() => {
       // Given
-      planificateurRepository.estEnCoursDeTraitement.resolves(false)
+      planificateurRepository.existePlusQuUnJobActifDeCeType.resolves(false)
     })
 
     describe('quand il y a au moins un évènement milo', () => {
