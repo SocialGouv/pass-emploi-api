@@ -335,7 +335,7 @@ import { EvenementMiloHttpRepository } from './infrastructure/repositories/milo/
 import { MiloJeuneHttpSqlRepository } from './infrastructure/repositories/milo/jeune-milo-http-sql.repository.db'
 import { RendezVousMiloHttpRepository } from './infrastructure/repositories/milo/rendez-vous-milo-http.repository'
 import { SessionMiloHttpSqlRepository } from './infrastructure/repositories/milo/session-milo-http-sql.repository.db'
-import { NotificationFirebaseSqlRepository } from './infrastructure/repositories/notification-firebase.repository'
+import { NotificationFirebaseSqlRepository } from './infrastructure/repositories/notification-firebase.repository.db'
 import { OffresEmploiHttpSqlRepository } from './infrastructure/repositories/offre/offre-emploi-http-sql.repository.db'
 import { FavorisOffresImmersionSqlRepository } from './infrastructure/repositories/offre/offre-immersion-http-sql.repository.db'
 import { OffreServiceCiviqueHttpSqlRepository } from './infrastructure/repositories/offre/offre-service-civique-http.repository.db'
