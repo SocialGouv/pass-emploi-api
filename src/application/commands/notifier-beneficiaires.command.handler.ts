@@ -21,7 +21,7 @@ export interface NotifierBeneficiairesCommand extends Command {
   typeNotification: Notification.Type
   titre: string
   description: string
-  structures: Core.Structure[]
+  structures?: Core.Structure[]
   push?: boolean
   batchSize?: number
   minutesEntreLesBatchs?: number
@@ -43,6 +43,23 @@ export class NotifierBeneficiairesCommandHandler extends CommandHandler<
   async handle(
     command: NotifierBeneficiairesCommand
   ): Promise<Result<Planificateur.JobId>> {
+    if (command.push === true && !command.structures) {
+      return failure(
+        new MauvaiseCommandeError(
+          `Une notif push doit cibler des structures en particulier.`
+        )
+      )
+    }
+    if (
+      command.push === true &&
+      command.typeNotification === Notification.Type.CENTRE_DE_NOTIFS_UNIQUEMENT
+    ) {
+      return failure(
+        new MauvaiseCommandeError(
+          `Une notif push doit etre de type different de CENTRE_DE_NOTIFS_UNIQUEMENT.`
+        )
+      )
+    }
     const jobDejaPlanifieId =
       await this.planificateurRepository.recupererPremierJobNonTermine(
         Planificateur.JobType.NOTIFIER_BENEFICIAIRES
@@ -55,7 +72,12 @@ export class NotifierBeneficiairesCommandHandler extends CommandHandler<
       )
 
     const maintenant = this.dateService.now()
-    const contenu: JobNotifierBeneficiaires = { ...command }
+    const contenu: JobNotifierBeneficiaires = {
+      ...command,
+      typeNotification:
+        command.typeNotification ??
+        Notification.Type.CENTRE_DE_NOTIFS_UNIQUEMENT
+    }
     const jobId = await this.planificateurRepository.ajouterJob({
       dateExecution: maintenant.toJSDate(),
       type: Planificateur.JobType.NOTIFIER_BENEFICIAIRES,

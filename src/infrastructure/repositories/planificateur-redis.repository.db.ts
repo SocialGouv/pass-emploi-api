@@ -152,10 +152,9 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
   async recupererPremierJobNonTermine(
     jobType: Planificateur.JobType
   ): Promise<string | null> {
-    const job = (await this.recupererJobsNonTermines()).find(
-      job => job.data.type === jobType
-    )
-    if (!job) return null
+    const jobsNonTermines = await this.recupererJobsNonTermines()
+    const job = jobsNonTermines?.find(job => job?.data?.type === jobType)
+    if (!job || !job.id) return null
     return String(job.id)
   }
 

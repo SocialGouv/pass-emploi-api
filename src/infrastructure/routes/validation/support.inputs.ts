@@ -140,7 +140,8 @@ export class NotifierBeneficiairesPayload {
   @IsString()
   @IsNotEmpty()
   @IsEnum(Notification.Type)
-  typeNotification: Notification.Type
+  typeNotification: Notification.Type =
+    Notification.Type.CENTRE_DE_NOTIFS_UNIQUEMENT
 
   @ApiProperty({
     type: String
@@ -162,9 +163,10 @@ export class NotifierBeneficiairesPayload {
     enum: Core.Structure,
     isArray: true
   })
+  @IsOptional()
   @IsArray()
   @IsEnum(Core.Structure, { each: true })
-  structures: Core.Structure[]
+  structures?: Core.Structure[]
 
   @ApiPropertyOptional()
   @IsOptional()

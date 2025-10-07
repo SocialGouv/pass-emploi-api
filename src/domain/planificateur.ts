@@ -157,7 +157,7 @@ export namespace Planificateur {
     typeNotification: Notification.Type
     titre: string
     description: string
-    structures: Core.Structure[]
+    structures?: Core.Structure[]
     push?: boolean
     batchSize?: number
     minutesEntreLesBatchs?: number

@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Op } from 'sequelize'
+import { Op, WhereOptions } from 'sequelize'
 import { Job } from '../../building-blocks/types/job'
 import { JobHandler } from '../../building-blocks/types/job-handler'
 import {
@@ -63,16 +63,17 @@ export class NotifierBeneficiairesJobHandler extends JobHandler<Job> {
       const offset = job.contenu?.offset || 0
 
       let pagination = job.contenu.batchSize
+      const where: WhereOptions = {
+        pushNotificationToken: {
+          [Op.ne]: null
+        }
+      }
+      if (job.contenu.structures && job.contenu.structures.length > 0) {
+        where.structure = { [Op.in]: job.contenu.structures }
+      }
       if (!pagination) {
         const nbBeneficiairesTotal = await JeuneSqlModel.count({
-          where: {
-            structure: {
-              [Op.in]: job.contenu.structures
-            },
-            pushNotificationToken: {
-              [Op.ne]: null
-            }
-          }
+          where
         })
         const unQuartDeLaPopulationTotaleEtMinimum1 = Math.max(
           Math.trunc(0.25 * nbBeneficiairesTotal),
@@ -83,14 +84,7 @@ export class NotifierBeneficiairesJobHandler extends JobHandler<Job> {
       }
 
       const idsBeneficiairesAvecComptage = await JeuneSqlModel.findAll({
-        where: {
-          structure: {
-            [Op.in]: job.contenu.structures
-          },
-          pushNotificationToken: {
-            [Op.ne]: null
-          }
-        },
+        where,
         attributes: ['id', 'pushNotificationToken'],
         offset,
         limit: pagination,
