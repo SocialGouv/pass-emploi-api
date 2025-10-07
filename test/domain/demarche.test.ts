@@ -314,6 +314,31 @@ describe('Demarche', () => {
           }
           expect(demarche).to.deep.equal(success(demarcheCree))
         })
+        it('génère une démarche Réalisée', () => {
+          // Given
+          const dateFin = uneDatetime().minus({ days: 2 })
+          const demarcheACreer: Demarche.ACreer = {
+            dateFin,
+            quoi: 'C21',
+            pourquoi: 'A42',
+            comment: 'B12'
+          }
+
+          // When
+          const demarche = demarcheFactory.creerDemarche(demarcheACreer)
+
+          // Then
+          const demarcheCree: Demarche.Creee = {
+            statut: Demarche.Statut.REALISEE,
+            dateCreation: uneDateAMidi,
+            dateFin: dateFin.set(parametreHeureAMidi),
+            quoi: 'C21',
+            pourquoi: 'A42',
+            comment: undefined,
+            promptIa: undefined
+          }
+          expect(demarche).to.deep.equal(success(demarcheCree))
+        })
       })
     })
   })
