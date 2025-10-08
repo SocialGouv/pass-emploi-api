@@ -394,7 +394,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
         })
       })
     })
-    describe('succès superviseurPEBRSA', () => {
+    describe('succès superviseur France Travail', () => {
       it('effectue un transfert pour des conseillers de structure différente de celle du supérviseur', async () => {
         // Given
         const conseillerSourceBRSA = unConseiller({
@@ -406,17 +406,17 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
           structure: Core.Structure.POLE_EMPLOI_BRSA
         })
 
-        const conseillerCibleBRSA = unConseiller({
+        const conseillerCibleAIJ = unConseiller({
           id: 'idConseillerCibleBRSA',
           agence: {
             id: '1',
             nom: 'Pôle emploi PARIS'
           },
-          structure: Core.Structure.POLE_EMPLOI_BRSA
+          structure: Core.Structure.POLE_EMPLOI_AIJ
         })
         const command: TransfererJeunesConseillerCommand = {
           idConseillerSource: conseillerSourceBRSA.id,
-          idConseillerCible: conseillerCibleBRSA.id,
+          idConseillerCible: conseillerCibleAIJ.id,
           estTemporaire: false,
           idsJeunes: ['1'],
           provenanceUtilisateur: Authentification.Type.CONSEILLER
@@ -426,7 +426,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
           .onFirstCall()
           .resolves(conseillerSourceBRSA)
           .onSecondCall()
-          .resolves(conseillerCibleBRSA)
+          .resolves(conseillerCibleAIJ)
         const jeune1 = unJeune({
           id: command.idsJeunes[0],
           conseiller: conseillerSourceDuJeune,
@@ -485,97 +485,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             // Then
             expect(!result._isSuccess && result.error).to.deep.equal(
               new MauvaiseCommandeError(
-                'Les informations de structure ne correspondent pas'
-              )
-            )
-          })
-        })
-      })
-      describe('en tant que superviseur responsable', () => {
-        describe("quand la structure du conseiller source ou cible n'est pas dans la bonne structure de référence", () => {
-          it('retourne une MauvaiseCommandeError', async () => {
-            // Given
-            const conseillerSource = unConseiller({
-              structure: Structure.MILO
-            })
-            const conseillerCible = unConseiller({
-              structure: Structure.MILO
-            })
-
-            const command: TransfererJeunesConseillerCommand = {
-              idConseillerSource: conseillerSource.id,
-              idConseillerCible: conseillerCible.id,
-              estTemporaire: false,
-              idsJeunes: ['1', '2'],
-              provenanceUtilisateur: Authentification.Type.CONSEILLER
-            }
-
-            conseillerRepository.get
-              .onFirstCall()
-              .resolves(conseillerSource)
-              .onSecondCall()
-              .resolves(conseillerCible)
-
-            jeuneRepository.findAllJeunesByIdsAndConseiller.resolves([
-              unJeune(),
-              unJeune()
-            ])
-
-            // When
-            const result =
-              await transfererJeunesConseillerCommandHandler.handle(
-                command,
-                utilisateurSuperviseurResponsable
-              )
-
-            // Then
-            expect(!result._isSuccess && result.error).to.deep.equal(
-              new MauvaiseCommandeError(
-                'Les informations de structure ne correspondent pas'
-              )
-            )
-          })
-        })
-        describe('quand la structure du conseiller source ou cible est différente', () => {
-          it('retourne une MauvaiseCommandeError', async () => {
-            // Given
-            const conseillerSource = unConseiller({
-              structure: Structure.POLE_EMPLOI_BRSA
-            })
-            const conseillerCible = unConseiller({
-              structure: Structure.POLE_EMPLOI
-            })
-
-            const command: TransfererJeunesConseillerCommand = {
-              idConseillerSource: conseillerSource.id,
-              idConseillerCible: conseillerCible.id,
-              estTemporaire: false,
-              idsJeunes: ['1', '2'],
-              provenanceUtilisateur: Authentification.Type.CONSEILLER
-            }
-
-            conseillerRepository.get
-              .onFirstCall()
-              .resolves(conseillerSource)
-              .onSecondCall()
-              .resolves(conseillerCible)
-
-            jeuneRepository.findAllJeunesByIdsAndConseiller.resolves([
-              unJeune(),
-              unJeune()
-            ])
-
-            // When
-            const result =
-              await transfererJeunesConseillerCommandHandler.handle(
-                command,
-                utilisateurSuperviseurResponsable
-              )
-
-            // Then
-            expect(!result._isSuccess && result.error).to.deep.equal(
-              new MauvaiseCommandeError(
-                'Les informations de structure des conseillers source et cible ne correspondent pas'
+                'Les conseillers source et cible doivent être rattachées à France Travail'
               )
             )
           })
