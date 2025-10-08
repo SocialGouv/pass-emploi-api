@@ -23,6 +23,7 @@ import {
   CreateListeDeDiffusionCommand,
   CreateListeDeDiffusionCommandHandler
 } from '../../application/commands/create-liste-de-diffusion.command.handler'
+import { EnvoyerEmailActivationCommandHandler } from '../../application/commands/milo/envoyer-email-activation.command.handler'
 import { ModifierJeuneDuConseillerCommandHandler } from '../../application/commands/modifier-jeune-du-conseiller.command.handler'
 import { RecupererJeunesDuConseillerCommandHandler } from '../../application/commands/recuperer-jeunes-du-conseiller.command.handler'
 import {
@@ -51,7 +52,6 @@ import {
 } from '../../application/queries/query-models/jeunes.query-model'
 import { Cached } from '../../building-blocks/types/query'
 import { Authentification } from '../../domain/authentification'
-import { Core } from '../../domain/core'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { CustomSwaggerApiOAuth2 } from '../decorators/swagger.decorator'
 import { handleResult } from './result.handler'
@@ -65,7 +65,6 @@ import {
   GetIndicateursPourConseillerQueryParams,
   UpdateJeuneDuConseillerPayload
 } from './validation/conseillers.inputs'
-import { EnvoyerEmailActivationCommandHandler } from '../../application/commands/milo/envoyer-email-activation.command.handler'
 
 @Controller('conseillers')
 @CustomSwaggerApiOAuth2()
@@ -125,9 +124,7 @@ export class ConseillersController {
   ): Promise<ConseillerSimpleQueryModel[]> {
     const result = await this.getConseillersQueryHandler.execute(
       {
-        recherche: queryParams.q,
-        structureDifferenteRecherchee:
-          queryParams.structure as Core.StructuresFT
+        recherche: queryParams.q
       },
       utilisateur
     )
