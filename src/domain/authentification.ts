@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { ConseillerNonValide } from '../building-blocks/types/domain-error'
 import { failure, Result, success } from '../building-blocks/types/result'
 import { IdService } from '../utils/id-service'
-import { Core, getStructureDeReference } from './core'
+import { Core } from './core'
 
 export const AuthentificationRepositoryToken = 'Authentification.Repository'
 
@@ -14,8 +14,7 @@ export namespace Authentification {
   }
 
   export enum Role {
-    SUPERVISEUR = 'SUPERVISEUR',
-    SUPERVISEUR_RESPONSABLE = 'SUPERVISEUR_RESPONSABLE'
+    SUPERVISEUR = 'SUPERVISEUR'
   }
 
   export const METADATA_IDENTIFIER_API_KEY_PARTENAIRE = 'partenaire'
@@ -59,21 +58,6 @@ export namespace Authentification {
     return utilisateur.roles.includes(Authentification.Role.SUPERVISEUR)
   }
 
-  export function estSuperviseurResponsable(
-    utilisateur: Utilisateur,
-    structure: Core.Structure
-  ): boolean {
-    const dansLaBonneStructureDeReference = (): boolean =>
-      getStructureDeReference(utilisateur.structure) ===
-      getStructureDeReference(structure)
-
-    return (
-      utilisateur.roles.includes(
-        Authentification.Role.SUPERVISEUR_RESPONSABLE
-      ) && dansLaBonneStructureDeReference()
-    )
-  }
-
   export function estJeune(type: Authentification.Type): boolean {
     return type === Authentification.Type.JEUNE
   }
@@ -111,7 +95,7 @@ export namespace Authentification {
     estConseillerSuperviseur(
       structure: Core.Structure,
       email?: string | null
-    ): Promise<{ dansSaStructure: boolean; crossStructures: boolean }>
+    ): Promise<boolean>
 
     recupererAccesPartenaire(
       bearer: string,
@@ -136,17 +120,13 @@ export namespace Authentification {
       email: string | undefined,
       username: string | undefined,
       structure: Core.Structure,
-      superviseur: { dansSaStructure: boolean; crossStructures: boolean }
+      superviseur: boolean
     ): Result<Utilisateur> {
       if (!nom || !prenom) {
         return failure(new ConseillerNonValide())
       }
 
-      const roles = []
-      if (superviseur.dansSaStructure)
-        roles.push(Authentification.Role.SUPERVISEUR)
-      if (superviseur.crossStructures)
-        roles.push(Authentification.Role.SUPERVISEUR_RESPONSABLE)
+      const roles = superviseur ? [Authentification.Role.SUPERVISEUR] : []
 
       const utilisateur: Utilisateur = {
         id: this.idService.uuid(),

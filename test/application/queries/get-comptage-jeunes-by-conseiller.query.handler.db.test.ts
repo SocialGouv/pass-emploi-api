@@ -172,24 +172,24 @@ describe('GetComptageJeunesByConseillerQueryHandler', () => {
       })
     })
 
-    describe("quand l'utilisateur est un superviseur", () => {
+    describe("quand l'utilisateur est un superviseur + MILO", () => {
       it('retourne les jeunes du conseiller', async () => {
         // Given
         const utilisateur = unUtilisateurConseiller({
           id: 'un-autre-id',
-          structure: Core.Structure.POLE_EMPLOI,
+          structure: Core.Structure.MILO,
           roles: [Authentification.Role.SUPERVISEUR]
         })
         conseillerRepository.get.withArgs(utilisateur.id).resolves(
           unConseiller({
             id: utilisateur.id,
-            structure: Core.Structure.POLE_EMPLOI
+            structure: Core.Structure.MILO
           })
         )
         conseillerRepository.get.withArgs(query.idConseiller).resolves(
           unConseiller({
             id: query.idConseiller,
-            structure: Core.Structure.POLE_EMPLOI
+            structure: Core.Structure.MILO
           })
         )
 
@@ -223,72 +223,6 @@ describe('GetComptageJeunesByConseillerQueryHandler', () => {
           unConseiller({
             id: query.idConseiller,
             structure: Core.Structure.POLE_EMPLOI
-          })
-        )
-
-        // When
-        const result =
-          await getComptageJeunesByConseillerQueryHandler.authorize(
-            query,
-            utilisateur
-          )
-
-        // Then
-        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
-      })
-    })
-
-    describe("quand l'utilisateur est un superviseur responsable", () => {
-      it('retourne les jeunes du conseiller', async () => {
-        // Given
-        const utilisateur = unUtilisateurConseiller({
-          id: 'un-autre-id',
-          structure: Core.Structure.POLE_EMPLOI,
-          roles: [Authentification.Role.SUPERVISEUR_RESPONSABLE]
-        })
-        conseillerRepository.get.withArgs(utilisateur.id).resolves(
-          unConseiller({
-            id: utilisateur.id,
-            structure: Core.Structure.POLE_EMPLOI_BRSA
-          })
-        )
-        conseillerRepository.get.withArgs(query.idConseiller).resolves(
-          unConseiller({
-            id: query.idConseiller,
-            structure: Core.Structure.POLE_EMPLOI_BRSA
-          })
-        )
-
-        // When
-        const result =
-          await getComptageJeunesByConseillerQueryHandler.authorize(
-            query,
-            utilisateur
-          )
-
-        // Then
-        expect(result).to.deep.equal(emptySuccess())
-      })
-    })
-
-    describe("quand l'utilisateur est un superviseur responsable qui veut récupérer des jeunes d'un conseiller d’une autre structure de référence", () => {
-      it('renvoie un échec DroitsInsuffisants', async () => {
-        // Given
-        const utilisateur = unUtilisateurConseiller({
-          id: 'un-autre-id',
-          structure: Core.Structure.POLE_EMPLOI,
-          roles: [Authentification.Role.SUPERVISEUR_RESPONSABLE]
-        })
-        conseillerRepository.get.withArgs(utilisateur.id).resolves(
-          unConseiller({
-            id: utilisateur.id,
-            structure: Core.Structure.POLE_EMPLOI
-          })
-        )
-        conseillerRepository.get.withArgs(query.idConseiller).resolves(
-          unConseiller({
-            id: query.idConseiller,
-            structure: Core.Structure.MILO
           })
         )
 

@@ -116,9 +116,9 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
     const utilisateur = unUtilisateurConseiller({
       structure: Core.Structure.POLE_EMPLOI
     })
-    const utilisateurSuperviseurResponsable = unUtilisateurConseiller({
+    const utilisateurSuperviseurFT = unUtilisateurConseiller({
       structure: Core.Structure.POLE_EMPLOI,
-      roles: [Authentification.Role.SUPERVISEUR_RESPONSABLE]
+      roles: [Authentification.Role.SUPERVISEUR]
     })
 
     describe('succès', () => {
@@ -439,7 +439,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
         // When
         const result = await transfererJeunesConseillerCommandHandler.handle(
           command,
-          utilisateurSuperviseurResponsable
+          utilisateurSuperviseurFT
         )
 
         // Then

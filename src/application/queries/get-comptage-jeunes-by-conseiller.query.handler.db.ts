@@ -12,6 +12,7 @@ import {
   success
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
+import { estMilo } from '../../domain/core'
 import { Jeune } from '../../domain/jeune/jeune'
 import {
   Conseiller,
@@ -112,16 +113,14 @@ export class GetComptageJeunesByConseillerQueryHandler extends QueryHandler<
     query: GetComptageJeunesByConseillerQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
+    if (!estMilo(utilisateur.structure))
+      return failure(new DroitsInsuffisants())
     const conseiller = await this.conseillersRepository.get(query.idConseiller)
     if (!conseiller) {
       return failure(new DroitsInsuffisants())
     }
     if (
-      !Authentification.estSuperviseurResponsable(
-        utilisateur,
-        conseiller.structure
-      ) &&
-      !utilisateurEstUnSuperviseurDuConseiller(utilisateur, conseiller) &&
+      !utilisateurEstSuperviseurDuConseiller(utilisateur, conseiller) &&
       !utilisateurEstLeConseiller(utilisateur, conseiller)
     ) {
       return failure(new DroitsInsuffisants())
@@ -134,7 +133,7 @@ export class GetComptageJeunesByConseillerQueryHandler extends QueryHandler<
   }
 }
 
-function utilisateurEstUnSuperviseurDuConseiller(
+function utilisateurEstSuperviseurDuConseiller(
   utilisateur: Authentification.Utilisateur,
   conseiller: Conseiller
 ): boolean {

@@ -1,13 +1,14 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common'
+import { Op } from 'sequelize'
 import { Sequelize } from 'sequelize-typescript'
 import {
   ConseillerInactifError,
   NonTrouveError
 } from 'src/building-blocks/types/domain-error'
 import { failure, Result, success } from 'src/building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
-import { Core, estMilo, getStructureDeReference } from '../../domain/core'
 import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
+import { Authentification } from '../../domain/authentification'
+import { Core, estMilo } from '../../domain/core'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { SuperviseurSqlModel } from '../sequelize/models/superviseur.sql-model'
@@ -15,7 +16,6 @@ import {
   fromConseillerSqlToUtilisateur,
   fromJeuneSqlToUtilisateur
 } from './mappers/authentification.mappers'
-import { Op } from 'sequelize'
 
 @Injectable()
 export class AuthentificationSqlOidcRepository
@@ -42,10 +42,7 @@ export class AuthentificationSqlOidcRepository
         conseillerSqlModel.structure,
         conseillerSqlModel.email
       )
-      if (estSuperviseur.dansSaStructure)
-        roles.push(Authentification.Role.SUPERVISEUR)
-      if (estSuperviseur.crossStructures)
-        roles.push(Authentification.Role.SUPERVISEUR_RESPONSABLE)
+      if (estSuperviseur) roles.push(Authentification.Role.SUPERVISEUR)
 
       return fromConseillerSqlToUtilisateur(conseillerSqlModel, roles)
     }
@@ -184,10 +181,9 @@ export class AuthentificationSqlOidcRepository
   async estConseillerSuperviseur(
     structure: Core.Structure,
     email?: string | null
-  ): Promise<{ dansSaStructure: boolean; crossStructures: boolean }> {
-    if (estMilo(structure))
-      return { dansSaStructure: true, crossStructures: false }
-    if (!email) return { dansSaStructure: false, crossStructures: false }
+  ): Promise<boolean> {
+    if (estMilo(structure)) return true
+    if (!email) return false
 
     const superviseursParEmail = await SuperviseurSqlModel.findAll({
       where: { email: { [Op.like]: `${email.split('@')[0]}%` } },
@@ -196,13 +192,7 @@ export class AuthentificationSqlOidcRepository
       ]
     })
 
-    return {
-      dansSaStructure: checkEstSuperviseur(superviseursParEmail, structure),
-      crossStructures: checkEstSuperviseurResponsable(
-        superviseursParEmail,
-        structure
-      )
-    }
+    return checkEstSuperviseur(superviseursParEmail, structure)
   }
 
   async recupererAccesPartenaire(
@@ -250,19 +240,5 @@ function checkEstSuperviseur(
       superviseurParEmail =>
         superviseurParEmail.structure === structureDuConseiller
     )
-  )
-}
-
-function checkEstSuperviseurResponsable(
-  superviseursParEmail: SuperviseurSqlModel[],
-  structureDuConseiller: Core.Structure
-): boolean {
-  const structureDeReference = getStructureDeReference(structureDuConseiller)
-
-  return (
-    superviseursParEmail.filter(
-      ({ structure }) =>
-        getStructureDeReference(structure) === structureDeReference
-    ).length > 1
   )
 }
