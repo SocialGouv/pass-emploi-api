@@ -10,6 +10,8 @@ import { NonTrouveError } from '../../building-blocks/types/domain-error'
 const CRON_TIMEZONE = 'Europe/Paris'
 export const REDIS_QUEUE_NAME = 'JobQueue'
 
+const MAX_NUMBER_REDIS_JOBS = 50
+
 @Injectable()
 export class PlanificateurRedisRepository implements Planificateur.Repository {
   queue: Bull.Queue
@@ -138,14 +140,14 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
   async estEnCoursDeTraitement(
     jobType: Planificateur.JobType
   ): Promise<boolean> {
-    const activeJobs = await this.queue.getActive()
+    const activeJobs = await this.queue.getActive(0, MAX_NUMBER_REDIS_JOBS)
     return activeJobs.some(job => job.data.type === jobType)
   }
 
   async existePlusQuUnJobActifDeCeType(
     jobType: Planificateur.JobType
   ): Promise<boolean> {
-    const activeJobs = await this.queue.getActive()
+    const activeJobs = await this.queue.getActive(0, MAX_NUMBER_REDIS_JOBS)
     return activeJobs.filter(job => job.data.type === jobType).length > 1
   }
 
@@ -173,6 +175,10 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
   }
 
   private async recupererJobsNonTermines(): Promise<Bull.Job[]> {
-    return await this.queue.getJobs(['active', 'delayed', 'waiting', 'paused'])
+    return await this.queue.getJobs(
+      ['active', 'delayed', 'waiting', 'paused'],
+      0,
+      MAX_NUMBER_REDIS_JOBS
+    )
   }
 }
