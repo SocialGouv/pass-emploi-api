@@ -378,13 +378,13 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       })
     })
 
-    describe("quand l'utilisateur est un superviseur responsable", () => {
+    describe("quand l'utilisateur est un superviseur FT", () => {
       it('retourne les jeunes du conseiller', async () => {
         // Given
         const utilisateur = unUtilisateurConseiller({
           id: 'un-autre-id',
           structure: Core.Structure.POLE_EMPLOI,
-          roles: [Authentification.Role.SUPERVISEUR_RESPONSABLE]
+          roles: [Authentification.Role.SUPERVISEUR]
         })
         conseillersRepository.get.withArgs(utilisateur.id).resolves(
           unConseiller({
@@ -395,7 +395,7 @@ describe('GetJeunesByConseillerQueryHandler', () => {
         conseillersRepository.get.withArgs(query.idConseiller).resolves(
           unConseiller({
             id: query.idConseiller,
-            structure: Core.Structure.POLE_EMPLOI_BRSA
+            structure: Core.Structure.POLE_EMPLOI_AIJ
           })
         )
 
@@ -410,13 +410,13 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       })
     })
 
-    describe("quand l'utilisateur est un superviseur responsable qui veut récupérer des jeunes d'un conseiller d’une autre structure de référence", () => {
+    describe("quand l'utilisateur est un superviseur qui veut récupérer des jeunes d'un conseiller d’une autre structure de référence", () => {
       it('renvoie un échec DroitsInsuffisants', async () => {
         // Given
         const utilisateur = unUtilisateurConseiller({
           id: 'un-autre-id',
           structure: Core.Structure.POLE_EMPLOI,
-          roles: [Authentification.Role.SUPERVISEUR_RESPONSABLE]
+          roles: [Authentification.Role.SUPERVISEUR]
         })
         conseillersRepository.get.withArgs(utilisateur.id).resolves(
           unConseiller({
