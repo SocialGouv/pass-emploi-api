@@ -28,7 +28,7 @@ fi
 export PATH=$HOME/bin:$PATH
 
 if [[ $APP =~ "pa-back-prod" ]]; then
-  PG_VERSION=13
+  PG_VERSION=15
 else
   PG_VERSION=16
 fi
