@@ -194,7 +194,7 @@ function verifierStructuresPourConseiller(
     if (!conseillerSourceEtCibleSontFranceTravail)
       return failure(
         new MauvaiseCommandeError(
-          'Les conseillers source et cible doivent être rattachées à France Travail'
+          'Les conseillers source et cible doivent être rattachés à France Travail'
         )
       )
   } else {

@@ -215,8 +215,7 @@ export class SupportController {
   ): Promise<void> {
     const result = await this.creerSuperviseursCommandHandler.execute(
       {
-        superviseurs: superviseursPayload.superviseurs,
-        superEmailFT: superviseursPayload.superEmailFT
+        superviseurs: superviseursPayload.superviseurs
       },
       Authentification.unUtilisateurSupport()
     )

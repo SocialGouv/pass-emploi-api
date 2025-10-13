@@ -485,7 +485,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             // Then
             expect(!result._isSuccess && result.error).to.deep.equal(
               new MauvaiseCommandeError(
-                'Les conseillers source et cible doivent être rattachées à France Travail'
+                'Les conseillers source et cible doivent être rattachés à France Travail'
               )
             )
           })
