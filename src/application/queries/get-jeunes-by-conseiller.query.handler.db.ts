@@ -21,6 +21,7 @@ import {
 } from './query-mappers/jeune.mappers'
 import { DetailJeuneConseillerQueryModel } from './query-models/jeunes.query-model'
 import { DateService } from '../../utils/date-service'
+import { estFranceTravail } from '../../domain/core'
 
 export interface GetJeunesByConseillerQuery extends Query {
   idConseiller: string
@@ -56,10 +57,6 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
       return failure(new DroitsInsuffisants())
     }
     if (
-      !Authentification.estSuperviseurResponsable(
-        utilisateur,
-        conseiller.structure
-      ) &&
       !utilisateurEstSuperviseurDuConseiller(utilisateur, conseiller) &&
       !utilisateurEstConseiller(utilisateur, conseiller)
     ) {
@@ -122,7 +119,9 @@ function utilisateurEstSuperviseurDuConseiller(
 ): boolean {
   return (
     Authentification.estSuperviseur(utilisateur) &&
-    conseiller.structure === utilisateur.structure
+    (conseiller.structure === utilisateur.structure ||
+      (estFranceTravail(conseiller.structure) &&
+        estFranceTravail(utilisateur.structure)))
   )
 }
 

@@ -3,9 +3,7 @@ import {
   GetConseillersQuery,
   GetConseillersQueryHandler
 } from '../../../src/application/queries/get-conseillers.query.handler.db'
-import { DroitsInsuffisants } from '../../../src/building-blocks/types/domain-error'
-import { failure, success } from '../../../src/building-blocks/types/result'
-import { Authentification } from '../../../src/domain/authentification'
+import { success } from '../../../src/building-blocks/types/result'
 import { Core } from '../../../src/domain/core'
 import {
   ConseillerDto,
@@ -206,10 +204,43 @@ describe('GetConseillersQueryHandler', () => {
         )
       })
 
-      it("retourne une liste vide quand le conseiller n'existe pas avec cette structure", async () => {
+      it('retourne conseiller pour une autre structure FT', async () => {
         // Given
         const utilisateur = unUtilisateurConseiller({
           structure: Core.Structure.POLE_EMPLOI_BRSA
+        })
+        // When
+        const actual = await getConseillersQueryHandler.handle(
+          {
+            recherche: 'cOnSeIlLeR@eMaIl.fR'
+          },
+          utilisateur
+        )
+
+        expect(actual).to.deep.equal(
+          success([
+            {
+              id: 'autre-conseiller-ft',
+              prenom: 'toto',
+              nom: 'tata',
+              email: 'new@francetravail.fr',
+              idStructureMilo: undefined
+            },
+            {
+              email: 'nils.tavernier@pole-emploi.fr',
+              id: 'autre-conseiller-pe',
+              nom: 'tata',
+              prenom: 'toto',
+              idStructureMilo: undefined
+            }
+          ])
+        )
+      })
+
+      it("retourne une liste vide quand le conseiller n'existe pas avec cette structure", async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          structure: Core.Structure.AVENIR_PRO
         })
         // When
         const actual = await getConseillersQueryHandler.handle(
@@ -274,74 +305,6 @@ describe('GetConseillersQueryHandler', () => {
               id: '3',
               prenom: 'Bruno',
               nom: 'Dumont',
-              email: 'nils.tavernier@passemploi.com',
-              idStructureMilo: undefined
-            }
-          ])
-        )
-      })
-    })
-
-    describe('quand une structure différente est demandée', () => {
-      it("failure quand le conseiller n'est pas SUPERVISEUR_RESPONSABLE", async () => {
-        // Given
-        const utilisateur = unUtilisateurConseiller({
-          structure: Core.Structure.POLE_EMPLOI
-        })
-        // When
-        const actual = await getConseillersQueryHandler.handle(
-          {
-            recherche: 'nils.tavernier@passemploi.com',
-            structureDifferenteRecherchee: Core.Structure.POLE_EMPLOI_BRSA
-          },
-          utilisateur
-        )
-
-        expect(actual).to.deep.equal(failure(new DroitsInsuffisants()))
-      })
-      it('retourne les conseillers de la structure demandée uniquement quand le conseiller est SUPERVISEUR_RESPONSABLE', async () => {
-        // Given
-        const utilisateur = unUtilisateurConseiller({
-          structure: Core.Structure.POLE_EMPLOI,
-          roles: [Authentification.Role.SUPERVISEUR_RESPONSABLE]
-        })
-        await ConseillerSqlModel.bulkCreate([
-          unConseillerDto({
-            id: '2',
-            prenom: 'Jean',
-            nom: 'Dupont',
-            structure: Core.Structure.POLE_EMPLOI
-          }),
-          unConseillerDto({
-            id: '3',
-            prenom: 'Bruno',
-            nom: 'Dumont',
-            structure: Core.Structure.POLE_EMPLOI
-          }),
-          unConseillerDto({
-            id: '4',
-            prenom: 'Dudu',
-            nom: 'Labiche',
-            structure: Core.Structure.POLE_EMPLOI_BRSA
-          })
-        ])
-
-        // When
-        const actual = await getConseillersQueryHandler.handle(
-          {
-            recherche: 'du',
-            structureDifferenteRecherchee: Core.Structure.POLE_EMPLOI_BRSA
-          },
-          utilisateur
-        )
-
-        // Then
-        expect(actual).to.deep.equal(
-          success([
-            {
-              id: '4',
-              prenom: 'Dudu',
-              nom: 'Labiche',
               email: 'nils.tavernier@passemploi.com',
               idStructureMilo: undefined
             }

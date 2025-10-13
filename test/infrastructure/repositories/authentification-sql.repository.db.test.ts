@@ -131,7 +131,7 @@ describe('AuthentificationSqlRepository', () => {
     })
 
     describe("quand c'est un conseiller superviseur dans plusieurs structures de la même structure de référence", () => {
-      it("retourne l'utilisateur avec le role SUPERVISEUR et SUPERVISEUR_RESPONSABLE", async () => {
+      it("retourne l'utilisateur avec le role SUPERVISEUR", async () => {
         // Given
         await SuperviseurSqlModel.create({
           email: conseillerDtoPE.email,
@@ -154,10 +154,7 @@ describe('AuthentificationSqlRepository', () => {
             email: conseillerDtoPE.email!,
             idAuthentification: conseillerDtoPE.idAuthentification,
             structure: Core.Structure.POLE_EMPLOI,
-            roles: [
-              Authentification.Role.SUPERVISEUR,
-              Authentification.Role.SUPERVISEUR_RESPONSABLE
-            ]
+            roles: [Authentification.Role.SUPERVISEUR]
           })
         )
       })

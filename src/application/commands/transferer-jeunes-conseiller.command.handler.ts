@@ -21,6 +21,7 @@ import {
 import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
 import { ConseillerAuthorizer } from '../authorizers/conseiller-authorizer'
 import { SupportAuthorizer } from '../authorizers/support-authorizer'
+import { estFranceTravail } from '../../domain/core'
 
 export interface TransfererJeunesConseillerCommand extends Command {
   idConseillerSource: string
@@ -185,19 +186,15 @@ function verifierStructuresPourConseiller(
   conseillerSource: Conseiller,
   conseillerCible: Conseiller
 ): Result {
-  if (
-    Authentification.estSuperviseurResponsable(
-      utilisateur,
-      conseillerSource.structure
-    )
-  ) {
-    const conseillerSourceEtCibleDansLaMemeStructure =
-      conseillerSource.structure === conseillerCible.structure
+  if (estFranceTravail(utilisateur.structure)) {
+    const conseillerSourceEtCibleSontFranceTravail =
+      estFranceTravail(conseillerSource.structure) &&
+      estFranceTravail(conseillerCible.structure)
 
-    if (!conseillerSourceEtCibleDansLaMemeStructure)
+    if (!conseillerSourceEtCibleSontFranceTravail)
       return failure(
         new MauvaiseCommandeError(
-          'Les informations de structure des conseillers source et cible ne correspondent pas'
+          'Les conseillers source et cible doivent être rattachés à France Travail'
         )
       )
   } else {

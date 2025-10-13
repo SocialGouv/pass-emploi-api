@@ -238,7 +238,6 @@ describe('SupportController', () => {
       it('renvoie 201', async () => {
         // Given
         const command: CreerSuperviseursCommand = {
-          superEmailFT: undefined,
           superviseurs: [
             { email: 'test@octo.com', structure: Core.Structure.MILO }
           ]

@@ -130,40 +130,10 @@ describe('ConseillersController', () => {
 
       expect(getConseillersQueryHandler.execute).to.have.been.calledWithExactly(
         {
-          recherche: 'jean',
-          structureDifferenteRecherchee: undefined
+          recherche: 'jean'
         },
         unUtilisateurDecode()
       )
-    })
-    it('recherche des conseillers avec une structure', async () => {
-      // Given
-      getConseillersQueryHandler.execute.resolves(success(queryModel))
-
-      // When - Then
-      await request(app.getHttpServer())
-        .get('/conseillers?q=jean&structure=POLE_EMPLOI')
-        .set('authorization', unHeaderAuthorization())
-        .expect(HttpStatus.OK)
-        .expect(queryModel)
-
-      expect(getConseillersQueryHandler.execute).to.have.been.calledWithExactly(
-        {
-          recherche: 'jean',
-          structureDifferenteRecherchee: Core.Structure.POLE_EMPLOI
-        },
-        unUtilisateurDecode()
-      )
-    })
-    it("renvoie bad request si la structure n'est pas correcte", async () => {
-      // Given
-      getConseillersQueryHandler.execute.resolves(success(queryModel))
-
-      // When - Then
-      await request(app.getHttpServer())
-        .get('/conseillers?q=jean&structure=MILO')
-        .set('authorization', unHeaderAuthorization())
-        .expect(HttpStatus.BAD_REQUEST)
     })
     it('renvoie bad request si les criteres de recherche sont inferieurs à 2 caractères', async () => {
       // Given

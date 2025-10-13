@@ -22,7 +22,6 @@ import {
 import { TriActionsConseillerV2 } from 'src/application/queries/action/get-actions-conseiller-v2.query.handler.db'
 import { TriRendezVous } from 'src/application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
 import { Action } from 'src/domain/action/action'
-import { Core } from 'src/domain/core'
 import { AgenceInput } from 'src/infrastructure/routes/validation/agences.inputs'
 import { Jeune } from '../../../domain/jeune/jeune'
 import {
@@ -36,18 +35,6 @@ export class GetConseillersQueryParams {
   @IsNotEmpty()
   @MinLength(2)
   q: string
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsIn([
-    Core.Structure.POLE_EMPLOI,
-    Core.Structure.POLE_EMPLOI_BRSA,
-    Core.Structure.POLE_EMPLOI_AIJ,
-    Core.Structure.FT_ACCOMPAGNEMENT_INTENSIF,
-    Core.Structure.FT_ACCOMPAGNEMENT_GLOBAL,
-    Core.Structure.FT_EQUIP_EMPLOI_RECRUT
-  ])
-  structure?: string
 }
 
 export class CreateJeunePoleEmploiPayload {

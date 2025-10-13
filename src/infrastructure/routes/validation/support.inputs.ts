@@ -80,19 +80,12 @@ class Superviseur {
 }
 
 export class CreateSuperviseursPayload {
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
-  @IsEmail()
-  superEmailFT?: string
-
   @ApiPropertyOptional({ type: Superviseur, isArray: true })
-  @IsOptional()
   @IsArray()
   @ArrayNotEmpty()
   @ValidateNested({ each: true })
   @Type(() => Superviseur)
-  superviseurs?: Superviseur[]
+  superviseurs: Superviseur[]
 }
 
 export class DeleteSuperviseursPayload {
