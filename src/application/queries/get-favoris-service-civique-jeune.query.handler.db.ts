@@ -32,6 +32,7 @@ export class GetFavorisServiceCiviqueJeuneQueryHandler extends QueryHandler<
     ServiceCiviqueQueryModel[] | FavoriOffreServiceCiviqueQueryModel[]
   > {
     const favorisSql = await FavoriOffreEngagementSqlModel.findAll({
+      attributes: ['idOffre', 'dateCreation', 'dateCandidature'],
       where: {
         idJeune: query.idJeune
       },
@@ -59,6 +60,7 @@ export function fromSqlToQueryModel(
   return favoriOffreEngagementSqlModels.map(favori => {
     return {
       id: favori.idOffre,
+      dateCreation: DateService.fromJSDateToISOString(favori.dateCreation),
       dateCandidature: favori.dateCandidature
         ? DateService.fromJSDateToISOString(favori.dateCandidature)
         : undefined

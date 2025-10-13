@@ -43,7 +43,7 @@ export class GetFavorisOffresImmersionJeuneQueryHandler extends QueryHandler<
     idJeune: string
   ): Promise<FavoriOffreImmersionQueryModel[]> {
     const favorisIdsSql = await FavoriOffreImmersionSqlModel.findAll({
-      attributes: ['idOffre', 'dateCandidature'],
+      attributes: ['idOffre', 'dateCreation', 'dateCandidature'],
       where: {
         idJeune
       },
@@ -60,6 +60,7 @@ export function fromSqlToFavorisOffresImmersionQueryModels(
   return favorisIdsSql.map(favori => {
     return {
       id: favori.idOffre,
+      dateCreation: DateService.fromJSDateToISOString(favori.dateCreation),
       dateCandidature: favori.dateCandidature
         ? DateService.fromJSDateToISOString(favori.dateCandidature)
         : undefined

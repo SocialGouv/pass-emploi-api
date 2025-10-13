@@ -77,7 +77,11 @@ describe('GetFavorisServiceCiviqueJeuneQueryHandler', () => {
 
       // Then
       expect(result).to.deep.equal([
-        { id: favori.idOffre, dateCandidature: now.toISO() }
+        {
+          id: favori.idOffre,
+          dateCreation: now.toISO(),
+          dateCandidature: now.toISO()
+        }
       ])
     })
   })

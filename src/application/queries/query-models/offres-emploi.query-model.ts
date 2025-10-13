@@ -80,6 +80,11 @@ export class FavoriOffreEmploiQueryModel {
   @ApiProperty()
   id: string
 
+  @ApiProperty({
+    format: 'date-time'
+  })
+  dateCreation: string
+
   @ApiPropertyOptional({
     format: 'date-time',
     required: false

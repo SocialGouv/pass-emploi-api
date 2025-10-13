@@ -33,6 +33,11 @@ export class FavoriOffreImmersionQueryModel {
   id: string
 
   @ApiProperty({
+    format: 'date-time'
+  })
+  dateCreation: string
+
+  @ApiProperty({
     format: 'date-time',
     required: false
   })

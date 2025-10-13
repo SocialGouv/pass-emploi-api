@@ -52,7 +52,11 @@ describe('GetFavorisOffresEmploiJeuneQueryHandler', () => {
 
     // Then
     expect(favoris).to.deep.equal([
-      { id: '123DXPM', dateCandidature: now.toISO() }
+      {
+        id: '123DXPM',
+        dateCreation: now.toISO(),
+        dateCandidature: now.toISO()
+      }
     ])
   })
 })
