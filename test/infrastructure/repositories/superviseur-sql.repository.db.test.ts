@@ -1,6 +1,5 @@
 import { SuperviseurSqlRepository } from 'src/infrastructure/repositories/superviseur-sql.repository.db'
 import { SuperviseurSqlModel } from 'src/infrastructure/sequelize/models/superviseur.sql-model'
-import { Core } from '../../../src/domain/core'
 import { expect } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
 
@@ -8,16 +7,13 @@ describe('SuperviseurSqlRepository', () => {
   let superviseurSqlRepository: SuperviseurSqlRepository
   // Given
   const unSuperviseur1 = {
-    email: 'test1',
-    structure: Core.Structure.MILO
+    email: 'test1'
   }
   const unSuperviseur2 = {
-    email: 'test2',
-    structure: Core.Structure.MILO
+    email: 'test2'
   }
   const unSuperviseurUppercase = {
-    email: 'TEST@test.test',
-    structure: Core.Structure.MILO
+    email: 'TEST@test.test'
   }
   const emailLowercase = 'test@test.test'
 
@@ -31,15 +27,14 @@ describe('SuperviseurSqlRepository', () => {
       it('les nouveaux superviseurs sont sauvegardés', async () => {
         // When
         const result = await superviseurSqlRepository.saveSuperviseurs([
-          unSuperviseur1
+          unSuperviseur1.email
         ])
 
         // Then
         const superviseurSqlModel = await SuperviseurSqlModel.findOne({
           raw: true,
           where: {
-            email: unSuperviseur1.email,
-            structure: unSuperviseur1.structure
+            email: unSuperviseur1.email
           }
         })
 
@@ -49,15 +44,14 @@ describe('SuperviseurSqlRepository', () => {
       it('les nouveaux superviseurs sont sauvegardés avec email en lowercase', async () => {
         // When
         const result = await superviseurSqlRepository.saveSuperviseurs([
-          unSuperviseurUppercase
+          unSuperviseurUppercase.email
         ])
 
         // Then
         const superviseurSqlModel = await SuperviseurSqlModel.findOne({
           raw: true,
           where: {
-            email: emailLowercase,
-            structure: unSuperviseurUppercase.structure
+            email: emailLowercase
           }
         })
 
@@ -69,16 +63,15 @@ describe('SuperviseurSqlRepository', () => {
       it("les superviseurs sont présents qu'une seule fois", async () => {
         // When
         const result = await superviseurSqlRepository.saveSuperviseurs([
-          unSuperviseur1,
-          unSuperviseur1
+          unSuperviseur1.email,
+          unSuperviseur1.email
         ])
 
         // Then
         const superviseursSqlModel = await SuperviseurSqlModel.findAll({
           raw: true,
           where: {
-            email: unSuperviseur1.email,
-            structure: unSuperviseur1.structure
+            email: unSuperviseur1.email
           }
         })
 
@@ -112,8 +105,8 @@ describe('SuperviseurSqlRepository', () => {
       it('les superviseurs sont supprimés', async () => {
         // Given
         await superviseurSqlRepository.saveSuperviseurs([
-          unSuperviseur1,
-          unSuperviseur2
+          unSuperviseur1.email,
+          unSuperviseur2.email
         ])
 
         // When
@@ -126,15 +119,13 @@ describe('SuperviseurSqlRepository', () => {
         const expectedSuperviseur1 = await SuperviseurSqlModel.findOne({
           raw: true,
           where: {
-            email: unSuperviseur1.email,
-            structure: unSuperviseur1.structure
+            email: unSuperviseur1.email
           }
         })
         const expectedSuperviseur2 = await SuperviseurSqlModel.findOne({
           raw: true,
           where: {
-            email: unSuperviseur2.email,
-            structure: unSuperviseur2.structure
+            email: unSuperviseur2.email
           }
         })
 
@@ -145,7 +136,7 @@ describe('SuperviseurSqlRepository', () => {
       it('les superviseurs avec email uppercase sont supprimés', async () => {
         // Given
         await superviseurSqlRepository.saveSuperviseurs([
-          unSuperviseurUppercase
+          unSuperviseurUppercase.email
         ])
 
         // When
@@ -157,8 +148,7 @@ describe('SuperviseurSqlRepository', () => {
         const expectedSuperviseur = await SuperviseurSqlModel.findOne({
           raw: true,
           where: {
-            email: emailLowercase,
-            structure: unSuperviseurUppercase.structure
+            email: emailLowercase
           }
         })
 

@@ -21,10 +21,8 @@ import {
   ApiSecurity,
   ApiTags
 } from '@nestjs/swagger'
-import {
-  RefreshJddCommand,
-  RefreshJddCommandHandler
-} from '../../application/commands/support/refresh-jdd.command.handler'
+import Bull from 'bull'
+import { NotifierBeneficiairesCommandHandler } from '../../application/commands/notifier-beneficiaires.command.handler'
 import { ArchiverJeuneSupportCommandHandler } from '../../application/commands/support/archiver-jeune-support.command.handler'
 import { CreerSuperviseursCommandHandler } from '../../application/commands/support/creer-superviseurs.command.handler'
 import { DeleteSuperviseursCommandHandler } from '../../application/commands/support/delete-superviseurs.command.handler'
@@ -33,34 +31,35 @@ import {
   MettreAJourLesJeunesCEJPoleEmploiCommand
 } from '../../application/commands/support/mettre-a-jour-les-jeunes-cej-pe.command.handler'
 import {
+  RefreshJddCommand,
+  RefreshJddCommandHandler
+} from '../../application/commands/support/refresh-jdd.command.handler'
+import {
   ChangementAgenceQueryModel,
   UpdateAgenceConseillerCommandHandler
 } from '../../application/commands/support/update-agence-conseiller.command.handler'
+import { UpdateFeatureFlipCommandHandler } from '../../application/commands/support/update-feature-flip.command.handler'
 import { TransfererJeunesConseillerCommandHandler } from '../../application/commands/transferer-jeunes-conseiller.command.handler'
+import { failure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
+import { Core } from '../../domain/core'
+import { Notification } from '../../domain/notification/notification'
+import {
+  Planificateur,
+  PlanificateurRepositoryToken
+} from '../../domain/planificateur'
 import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
 import { SkipOidcAuth } from '../decorators/skip-oidc-auth.decorator'
 import { handleResult } from './result.handler'
 import {
   ChangerAgenceConseillerPayload,
-  CreateSuperviseursPayload,
-  DeleteSuperviseursPayload,
   NotifierBeneficiairesPayload,
   RefreshJDDPayload,
+  SuperviseursPayload,
   TeleverserCsvPayload,
   TransfererJeunesPayload,
   UpdateFeatureFlipPayload
 } from './validation/support.inputs'
-import { UpdateFeatureFlipCommandHandler } from '../../application/commands/support/update-feature-flip.command.handler'
-import { NotifierBeneficiairesCommandHandler } from '../../application/commands/notifier-beneficiaires.command.handler'
-import { Notification } from '../../domain/notification/notification'
-import { Core } from '../../domain/core'
-import {
-  Planificateur,
-  PlanificateurRepositoryToken
-} from '../../domain/planificateur'
-import Bull from 'bull'
-import { failure, Result, success } from '../../building-blocks/types/result'
 
 @Controller('support')
 @ApiTags('Support')
@@ -211,11 +210,11 @@ export class SupportController {
   })
   @Post('superviseurs')
   async postSuperviseurs(
-    @Body() superviseursPayload: CreateSuperviseursPayload
+    @Body() superviseursPayload: SuperviseursPayload
   ): Promise<void> {
     const result = await this.creerSuperviseursCommandHandler.execute(
       {
-        superviseurs: superviseursPayload.superviseurs
+        emails: superviseursPayload.emails
       },
       Authentification.unUtilisateurSupport()
     )
@@ -234,7 +233,7 @@ export class SupportController {
   @Delete('superviseurs')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteSuperviseurs(
-    @Body() superviseursPayload: DeleteSuperviseursPayload
+    @Body() superviseursPayload: SuperviseursPayload
   ): Promise<void> {
     const result = await this.deleteSuperviseursCommandHandler.execute(
       { emails: superviseursPayload.emails },

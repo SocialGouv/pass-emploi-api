@@ -10,7 +10,7 @@ import {
 import { SupportAuthorizer } from '../../authorizers/support-authorizer'
 
 export interface CreerSuperviseursCommand extends Command {
-  superviseurs: Superviseur[]
+  emails: string[]
 }
 
 @Injectable()
@@ -27,8 +27,8 @@ export class CreerSuperviseursCommandHandler extends CommandHandler<
   }
 
   async handle(command: CreerSuperviseursCommand): Promise<Result> {
-    if (command.superviseurs.length) {
-      await this.superviseurRepository.saveSuperviseurs(command.superviseurs)
+    if (command.emails.length) {
+      await this.superviseurRepository.saveSuperviseurs(command.emails)
     }
     return emptySuccess()
   }

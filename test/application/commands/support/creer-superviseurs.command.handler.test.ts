@@ -7,7 +7,6 @@ import {
 } from 'src/application/commands/support/creer-superviseurs.command.handler'
 import { Superviseur } from 'src/domain/superviseur'
 import { emptySuccess } from '../../../../src/building-blocks/types/result'
-import { Core } from '../../../../src/domain/core'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 
 describe('CreerSuperviseursCommandHandler', () => {
@@ -31,14 +30,11 @@ describe('CreerSuperviseursCommandHandler', () => {
       it('retourne un succes', async () => {
         // Given
         const command: CreerSuperviseursCommand = {
-          superviseurs: [
-            { email: 'test', structure: Core.Structure.MILO },
-            { email: 'test2', structure: Core.Structure.MILO }
-          ]
+          emails: ['test', 'test2']
         }
 
         superviseurRepository.saveSuperviseurs
-          .withArgs(command.superviseurs)
+          .withArgs(command.emails)
           .resolves(emptySuccess())
 
         // When
