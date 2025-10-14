@@ -198,7 +198,8 @@ export const configurationSchema = Joi.object({
   features: Joi.object({
     envoyerStatsMatomo: Joi.boolean(),
     notifierRendezVousMilo: Joi.boolean(),
-    recupererStructureMilo: Joi.boolean()
+    recupererStructureMilo: Joi.boolean(),
+    dateMigrationGironde: Joi.string().isoDate().allow(null, '')
   }),
   values: Joi.object({
     maxRechercheConseillers: Joi.number()

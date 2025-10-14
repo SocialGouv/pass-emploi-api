@@ -27,7 +27,11 @@ import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
 import { uneDemarcheQueryModel } from '../../../fixtures/query-models/demarche.query-model.fixtures'
 import { unRendezVousQueryModel } from '../../../fixtures/query-models/rendez-vous.query-model.fixtures'
 import { expect, StubbedClass, stubClass } from '../../../utils'
+import { ConfigService } from '@nestjs/config'
+import { FeatureFlipTag } from '../../../../src/infrastructure/sequelize/models/feature-flip.sql-model'
+import { GetFeaturesQueryGetter } from '../../../../src/application/queries/query-getters/get-features.query.getter.db'
 import Structure = Core.Structure
+import { SinonMatcher } from 'sinon'
 
 describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
   let handler: GetAccueilJeunePoleEmploiQueryHandler
@@ -36,9 +40,11 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
   let getRendezVousJeunePoleEmploiQueryGetter: StubbedClass<GetRendezVousJeunePoleEmploiQueryGetter>
   let getRecherchesSauvegardeesQueryGetter: StubbedClass<GetRecherchesSauvegardeesQueryGetter>
   let getFavorisQueryGetter: StubbedClass<GetFavorisAccueilQueryGetter>
+  let getFeaturesQueryGetter: StubbedClass<GetFeaturesQueryGetter>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let oidcClient: StubbedClass<OidcClient>
   let dateService: StubbedClass<DateService>
+  let configService: StubbedClass<ConfigService>
   const idpToken = 'id-token'
 
   beforeEach(() => {
@@ -48,6 +54,7 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
       GetRecherchesSauvegardeesQueryGetter
     )
     getFavorisQueryGetter = stubClass(GetFavorisAccueilQueryGetter)
+    getFeaturesQueryGetter = stubClass(GetFeaturesQueryGetter)
     getRendezVousJeunePoleEmploiQueryGetter = stubClass(
       GetRendezVousJeunePoleEmploiQueryGetter
     )
@@ -56,6 +63,7 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
     oidcClient.exchangeTokenJeune.resolves(idpToken)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     dateService = stubClass(DateService)
+    configService = stubClass(ConfigService)
 
     handler = new GetAccueilJeunePoleEmploiQueryHandler(
       jeuneAuthorizer,
@@ -65,7 +73,9 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
       getRecherchesSauvegardeesQueryGetter,
       getFavorisQueryGetter,
       getCampagneQueryGetter,
-      dateService
+      getFeaturesQueryGetter,
+      dateService,
+      configService
     )
   })
 
@@ -195,6 +205,19 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
             })
             .resolves(campagneQueryModel)
 
+          getFeaturesQueryGetter.handle
+            .withArgs({
+              idJeune: query.idJeune,
+              featureTag: FeatureFlipTag.MIGRATION_GIRONDE
+            })
+            .resolves(true)
+
+          configService.get
+            .withArgs(
+              'features.dateMigrationGironde' as unknown as SinonMatcher
+            )
+            .returns('2024-09-01T00:00:00.000Z')
+
           // When
           result = await handler.handle(query)
         })
@@ -246,6 +269,12 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
           expect(isSuccess(result) && result.data.campagne).to.deep.equal(
             campagneQueryModel
           )
+        })
+        it('renvoie la date de migration quand le jeune fait partie de la feature et que la config contient une date', async () => {
+          // Then
+          expect(
+            isSuccess(result) && result.data.dateMigrationGironde
+          ).to.equal('2024-09-01T00:00:00.000Z')
         })
       })
     })

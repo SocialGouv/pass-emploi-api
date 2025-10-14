@@ -33,6 +33,9 @@ export class AccueilJeunePoleEmploiQueryModel {
   })
   dateDerniereMiseAJour?: string
 
+  @ApiPropertyOptional({ type: Date })
+  dateMigrationGironde?: string
+
   @ApiProperty()
   cetteSemaine: ResumeSemaineJeune
 

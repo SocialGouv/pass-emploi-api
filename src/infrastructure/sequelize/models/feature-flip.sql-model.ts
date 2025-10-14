@@ -10,7 +10,8 @@ import {
 import { JeuneSqlModel } from './jeune.sql-model'
 
 export enum FeatureFlipTag {
-  DEMARCHES_IA = 'DEMARCHES_IA'
+  DEMARCHES_IA = 'DEMARCHES_IA',
+  MIGRATION_GIRONDE = 'MIGRATION_GIRONDE'
 }
 @Table({
   timestamps: false,
