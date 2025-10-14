@@ -238,9 +238,7 @@ describe('SupportController', () => {
       it('renvoie 201', async () => {
         // Given
         const command: CreerSuperviseursCommand = {
-          superviseurs: [
-            { email: 'test@octo.com', structure: Core.Structure.MILO }
-          ]
+          emails: ['test@octo.com']
         }
 
         creerSuperviseursCommandHandler.execute

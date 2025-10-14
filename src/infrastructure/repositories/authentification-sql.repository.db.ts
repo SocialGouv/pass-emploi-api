@@ -1,6 +1,5 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common'
 import { Op } from 'sequelize'
-import { Sequelize } from 'sequelize-typescript'
 import {
   ConseillerInactifError,
   NonTrouveError
@@ -186,13 +185,10 @@ export class AuthentificationSqlOidcRepository
     if (!email) return false
 
     const superviseursParEmail = await SuperviseurSqlModel.findAll({
-      where: { email: { [Op.like]: `${email.split('@')[0]}%` } },
-      attributes: [
-        [Sequelize.fn('DISTINCT', Sequelize.col('structure')), 'structure']
-      ]
+      where: { email: { [Op.like]: `${email.split('@')[0]}%` } }
     })
 
-    return checkEstSuperviseur(superviseursParEmail, structure)
+    return superviseursParEmail.length > 0
   }
 
   async recupererAccesPartenaire(
@@ -229,16 +225,4 @@ export class AuthentificationSqlOidcRepository
       throw e
     }
   }
-}
-
-function checkEstSuperviseur(
-  superviseursParEmail: SuperviseurSqlModel[],
-  structureDuConseiller: Core.Structure
-): boolean {
-  return Boolean(
-    superviseursParEmail.find(
-      superviseurParEmail =>
-        superviseurParEmail.structure === structureDuConseiller
-    )
-  )
 }

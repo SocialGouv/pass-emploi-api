@@ -1,5 +1,4 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { Type } from 'class-transformer'
 import {
   ArrayNotEmpty,
   IsArray,
@@ -14,12 +13,11 @@ import {
   Max,
   MaxLength,
   Min,
-  ValidateIf,
-  ValidateNested
+  ValidateIf
 } from 'class-validator'
 import { Core } from '../../../domain/core'
-import { FeatureFlipTag } from '../../sequelize/models/feature-flip.sql-model'
 import { Notification } from '../../../domain/notification/notification'
+import { FeatureFlipTag } from '../../sequelize/models/feature-flip.sql-model'
 
 export class TeleverserCsvPayload {
   @ApiProperty({ type: 'string', format: 'binary' })
@@ -62,33 +60,7 @@ export class TransfererJeunesPayload {
   idsJeunes: string[]
 }
 
-class Superviseur {
-  @ApiProperty()
-  @IsString()
-  @IsEmail()
-  @IsNotEmpty()
-  email: string
-
-  @ApiProperty({
-    enum: Core.Structure,
-    example: Object.values(Core.Structure).join(' | ')
-  })
-  @IsString()
-  @IsNotEmpty()
-  @IsEnum(Core.Structure)
-  structure: Core.Structure
-}
-
-export class CreateSuperviseursPayload {
-  @ApiPropertyOptional({ type: Superviseur, isArray: true })
-  @IsArray()
-  @ArrayNotEmpty()
-  @ValidateNested({ each: true })
-  @Type(() => Superviseur)
-  superviseurs: Superviseur[]
-}
-
-export class DeleteSuperviseursPayload {
+export class SuperviseursPayload {
   @ApiProperty({ type: String, isArray: true })
   @IsArray()
   @ArrayNotEmpty()

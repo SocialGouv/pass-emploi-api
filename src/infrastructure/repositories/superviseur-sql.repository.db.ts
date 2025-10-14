@@ -5,12 +5,11 @@ import { emptySuccess, Result } from '../../building-blocks/types/result'
 
 @Injectable()
 export class SuperviseurSqlRepository implements Superviseur.Repository {
-  async saveSuperviseurs(superviseurs: Superviseur[]): Promise<Result> {
+  async saveSuperviseurs(emails: string[]): Promise<Result> {
     await Promise.all(
-      superviseurs.map(superviseur =>
+      emails.map(email =>
         SuperviseurSqlModel.upsert({
-          email: superviseur.email.toLocaleLowerCase(),
-          structure: superviseur.structure
+          email: email.toLocaleLowerCase()
         })
       )
     )

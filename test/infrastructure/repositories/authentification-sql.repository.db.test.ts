@@ -97,19 +97,11 @@ describe('AuthentificationSqlRepository', () => {
     describe("quand c'est un conseiller superviseur dans une seule structure de la même structure de référence", () => {
       it("retourne l'utilisateur avec le role SUPERVISEUR uniquement", async () => {
         // Given
-        await SuperviseurSqlModel.create({
-          email: conseillerDtoPE.email?.replace(
-            /pole-emploi/g,
-            'francetravail'
-          ),
-          structure: conseillerDtoPE.structure
+        await SuperviseurSqlModel.upsert({
+          email: conseillerDtoPE.email?.replace(/pole-emploi/g, 'francetravail')
         })
-        await SuperviseurSqlModel.create({
-          email: conseillerDtoPE.email?.replace(
-            /pole-emploi/g,
-            'francetravail'
-          ),
-          structure: Core.Structure.MILO
+        await SuperviseurSqlModel.upsert({
+          email: conseillerDtoPE.email?.replace(/pole-emploi/g, 'francetravail')
         })
 
         // When
@@ -133,13 +125,11 @@ describe('AuthentificationSqlRepository', () => {
     describe("quand c'est un conseiller superviseur dans plusieurs structures de la même structure de référence", () => {
       it("retourne l'utilisateur avec le role SUPERVISEUR", async () => {
         // Given
-        await SuperviseurSqlModel.create({
-          email: conseillerDtoPE.email,
-          structure: Core.Structure.POLE_EMPLOI
+        await SuperviseurSqlModel.upsert({
+          email: conseillerDtoPE.email
         })
-        await SuperviseurSqlModel.create({
-          email: conseillerDtoPE.email,
-          structure: Core.Structure.POLE_EMPLOI_BRSA
+        await SuperviseurSqlModel.upsert({
+          email: conseillerDtoPE.email
         })
 
         // When
