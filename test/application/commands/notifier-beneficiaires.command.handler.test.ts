@@ -3,11 +3,10 @@ import {
   NotifierBeneficiairesCommandHandler
 } from '../../../src/application/commands/notifier-beneficiaires.command.handler'
 import { Notification } from '../../../src/domain/notification/notification'
-import { expect } from 'chai'
 import { SinonSandbox } from 'sinon'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { Planificateur } from '../../../src/domain/planificateur'
-import { createSandbox, StubbedClass, stubClass } from '../../utils'
+import { createSandbox, StubbedClass, stubClass, expect } from '../../utils'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { DateService } from '../../../src/utils/date-service'
 import { Core } from '../../../src/domain/core'
