@@ -13,10 +13,8 @@ import { Authentification } from '../../../domain/authentification'
 import { beneficiaireEstFTConnect } from '../../../domain/core'
 import { JeuneAuthorizer } from '../../authorizers/jeune-authorizer'
 import { MonSuiviPoleEmploiQueryModel } from '../query-models/jeunes.pole-emploi.query-model'
-import {
-  FeatureFlipSqlModel,
-  FeatureFlipTag
-} from '../../../infrastructure/sequelize/models/feature-flip.sql-model'
+import { FeatureFlipTag } from '../../../infrastructure/sequelize/models/feature-flip.sql-model'
+import { GetFeaturesQueryGetter } from '../query-getters/get-features.query.getter.db'
 
 export interface GetMonSuiviPoleEmploiQuery extends Query {
   idJeune: string
@@ -32,7 +30,8 @@ export class GetMonSuiviPoleEmploiQueryHandler extends QueryHandler<
   constructor(
     private readonly jeuneAuthorizer: JeuneAuthorizer,
     private readonly getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter,
-    private readonly getDemarchesQueryGetter: GetDemarchesQueryGetter
+    private readonly getDemarchesQueryGetter: GetDemarchesQueryGetter,
+    private readonly getFeaturesQueryGetter: GetFeaturesQueryGetter
   ) {
     super('GetMonSuiviPoleEmploiQueryHandler')
   }
@@ -61,19 +60,16 @@ export class GetMonSuiviPoleEmploiQueryHandler extends QueryHandler<
 
     if (isFailure(rdvs) && isFailure(demarches)) return rdvs
 
-    const featuresActives = (
-      await FeatureFlipSqlModel.findAll({
-        where: { idJeune: query.idJeune }
-      })
-    ).map(featureFlipSql => featureFlipSql.featureTag)
+    const eligibleDemarchesIA = await this.getFeaturesQueryGetter.handle({
+      idJeune: query.idJeune,
+      featureTag: FeatureFlipTag.DEMARCHES_IA
+    })
 
     return success({
       queryModel: {
         rendezVous: isFailure(rdvs) ? [] : rdvs.data.queryModel,
         demarches: isFailure(demarches) ? [] : demarches.data.queryModel,
-        eligibleDemarchesIA: featuresActives.includes(
-          FeatureFlipTag.DEMARCHES_IA
-        )
+        eligibleDemarchesIA
       },
       dateDuCache: recupererLaDateLaPlusAncienne(
         isFailure(rdvs) ? DateTime.now() : rdvs.data.dateDuCache,

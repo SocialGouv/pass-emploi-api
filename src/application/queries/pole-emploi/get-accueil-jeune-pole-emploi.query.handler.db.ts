@@ -56,25 +56,6 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
     super('GetAccueilJeunePoleEmploiQueryHandler')
   }
 
-  private async recupererLaDateDeMigration(
-    idJeune: string
-  ): Promise<string | undefined> {
-    let dateDeMigration: string | undefined
-    const faitPartieDeLaMigration = await this.getFeaturesQueryGetter.handle({
-      idJeune: idJeune,
-      featureTag: FeatureFlipTag.MIGRATION
-    })
-    if (faitPartieDeLaMigration) {
-      const dateMigration = this.configService.get(
-        'features.dateDeMigration'
-      ) as string | undefined
-      if (dateMigration) {
-        dateDeMigration = dateMigration
-      }
-    }
-    return dateDeMigration
-  }
-
   async handle(
     query: GetAccueilJeunePoleEmploiQuery
   ): Promise<Result<AccueilJeunePoleEmploiQueryModel>> {
@@ -193,7 +174,7 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
         demarches.dateDuCache,
         rendezVous.dateDuCache
       )?.toISO(),
-      dateDeMigration: dateDeMigration,
+      dateDeMigration,
       cetteSemaine: {
         nombreRendezVous: nombreDeRendezVous,
         nombreActionsDemarchesEnRetard: nombreDeDemarchesEnRetard,
@@ -228,6 +209,20 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
 
   async monitor(): Promise<void> {
     return
+  }
+
+  private async recupererLaDateDeMigration(
+    idJeune: string
+  ): Promise<string | undefined> {
+    let dateDeMigration: string | undefined
+    const faitPartieDeLaMigration = await this.getFeaturesQueryGetter.handle({
+      idJeune: idJeune,
+      featureTag: FeatureFlipTag.MIGRATION
+    })
+    if (faitPartieDeLaMigration) {
+      dateDeMigration = this.configService.get('features.dateDeMigration')
+    }
+    return dateDeMigration
   }
 }
 
