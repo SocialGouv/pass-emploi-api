@@ -277,12 +277,15 @@ Notifie un groupe de bénéficiaires appartenant à une ou plusieurs structures
 (crée un job de type NOTIFIER_BENEFICIAIRES).
 
 **Champs du body :**
-- \`typeNotification\` : ${Object.values(Notification.TypeNotifManuelle).join(
+- \`typeNotification\` (optionnel) : détermine la page et le point d'ancrage vers lequel l'utilisateur sera redirigé en cliquant sur la notification.
+<br>Valeurs possibles : ${Object.values(Notification.TypeNotifManuelle).join(
       ', '
     )}
-- \`titre\` : titre de la notification
-- \`description\` : texte corps de la notification
-- \`structures\` : ${Object.values(Core.Structure).join(', ')}
+- \`titre\` : titre de la notification - maximum 50 caractères
+- \`description\` : texte corps de la notification - maximum 150 caractères
+- \`structures\` (optionnel, défaut = toutes les structures) : ${Object.values(
+      Core.Structure
+    ).join(', ')}
 - \`push\` (optionnel, défaut = true) : notifie les bénéficiaires en mode push (via Firebase) pour apparaître dans le centre de notifications de l'appareil
 - \`batchSize\` (optionnel, défaut = 1/4 de la population totale) : taille d’un batch
 - \`minutesEntreLesBatch\` (optionnel, défaut = 5) : minutes entre chaque batch
