@@ -56,23 +56,23 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
     super('GetAccueilJeunePoleEmploiQueryHandler')
   }
 
-  private async recupererLaDateMigrationGironde(
+  private async recupererLaDateDeMigration(
     idJeune: string
   ): Promise<string | undefined> {
-    let dateMigrationGironde: string | undefined
+    let dateDeMigration: string | undefined
     const faitPartieDeLaMigration = await this.getFeaturesQueryGetter.handle({
       idJeune: idJeune,
-      featureTag: FeatureFlipTag.MIGRATION_GIRONDE
+      featureTag: FeatureFlipTag.MIGRATION
     })
     if (faitPartieDeLaMigration) {
       const dateMigration = this.configService.get(
-        'features.dateMigrationGironde'
+        'features.dateDeMigration'
       ) as string | undefined
       if (dateMigration) {
-        dateMigrationGironde = dateMigration
+        dateDeMigration = dateMigration
       }
     }
-    return dateMigrationGironde
+    return dateDeMigration
   }
 
   async handle(
@@ -186,16 +186,14 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
           )[0]
         : undefined
 
-    const dateMigrationGironde = await this.recupererLaDateMigrationGironde(
-      query.idJeune
-    )
+    const dateDeMigration = await this.recupererLaDateDeMigration(query.idJeune)
 
     const data: AccueilJeunePoleEmploiQueryModel = {
       dateDerniereMiseAJour: recupererLaDateLaPlusAncienne(
         demarches.dateDuCache,
         rendezVous.dateDuCache
       )?.toISO(),
-      dateMigrationGironde: dateMigrationGironde,
+      dateDeMigration: dateDeMigration,
       cetteSemaine: {
         nombreRendezVous: nombreDeRendezVous,
         nombreActionsDemarchesEnRetard: nombreDeDemarchesEnRetard,

@@ -208,14 +208,12 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
           getFeaturesQueryGetter.handle
             .withArgs({
               idJeune: query.idJeune,
-              featureTag: FeatureFlipTag.MIGRATION_GIRONDE
+              featureTag: FeatureFlipTag.MIGRATION
             })
             .resolves(true)
 
           configService.get
-            .withArgs(
-              'features.dateMigrationGironde' as unknown as SinonMatcher
-            )
+            .withArgs('features.dateDeMigration' as unknown as SinonMatcher)
             .returns('2024-09-01T00:00:00.000Z')
 
           // When
@@ -270,17 +268,17 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
             campagneQueryModel
           )
         })
-        it('renvoie la date de migration quand le jeune fait partie de la feature et que la config contient une date', async () => {
+        it('renvoie la date de migration quand le jeune fait partie de la feature MIGRATION et que la config contient une date', async () => {
           // Then
-          expect(
-            isSuccess(result) && result.data.dateMigrationGironde
-          ).to.equal('2024-09-01T00:00:00.000Z')
+          expect(isSuccess(result) && result.data.dateDeMigration).to.equal(
+            '2024-09-01T00:00:00.000Z'
+          )
         })
       })
     })
 
     describe('quand les démarches et les rdv sont en échec', () => {
-      it("retourne une page d'acceuil avec un message informatif", async () => {
+      it("retourne une page d'accueil avec un message informatif", async () => {
         // Given
         getDemarchesQueryGetter.handle.resolves(
           failure(new ErreurHttp('Erreur', 500))

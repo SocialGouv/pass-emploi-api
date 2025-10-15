@@ -259,7 +259,7 @@ export default () => {
       notifierRendezVousMilo: process.env.FEATURE_NOTIFIER_RDV_MILO === 'true',
       recupererStructureMilo:
         process.env.FEATURE_RECUPERER_STRUCTURE_MILO === 'true',
-      dateMigrationGironde: process.env.DATE_MIGRATION_PARCOURS_EMPLOI
+      dateDeMigration: process.env.DATE_MIGRATION_PARCOURS_EMPLOI
     },
     values: {
       maxRechercheConseillers: process.env.MAX_RECHERCHE_CONSEILLERS ?? '10'
