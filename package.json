@@ -85,7 +85,7 @@
     "@nestjs/config": "2.3.4",
     "@nestjs/core": "11.1.2",
     "@nestjs/platform-express": "11.1.2",
-    "@nestjs/swagger": "11.2.0",
+    "@nestjs/swagger": "11.2.1",
     "@nestjs/terminus": "10.3.0",
     "axios": "^1.9.0",
     "bull": "4.16.5",
