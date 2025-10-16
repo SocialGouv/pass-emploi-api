@@ -47,6 +47,7 @@ describe('GetFavorisOffresImmersionJeuneQueryHandler', () => {
       const expectedResult: FavoriOffreImmersionQueryModel[] = [
         {
           id: unFavoriOffreImmersion().id,
+          dateCreation: now.toISO(),
           dateCandidature: now.toISO()
         }
       ]

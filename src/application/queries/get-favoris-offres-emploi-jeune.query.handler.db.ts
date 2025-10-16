@@ -43,7 +43,7 @@ export class GetFavorisOffresEmploiJeuneQueryHandler extends QueryHandler<
     idJeune: string
   ): Promise<FavoriOffreEmploiQueryModel[]> {
     const favorisIdsSql = await FavoriOffreEmploiSqlModel.findAll({
-      attributes: ['idOffre', 'dateCandidature'],
+      attributes: ['idOffre', 'dateCreation', 'dateCandidature'],
       where: {
         idJeune
       },
@@ -60,6 +60,7 @@ function fromSqlToFavorisOffresEmploiQueryModels(
   return favorisIdsSql.map(favori => {
     return {
       id: favori.idOffre,
+      dateCreation: DateService.fromJSDateToISOString(favori.dateCreation),
       dateCandidature: favori.dateCandidature
         ? DateService.fromJSDateToISOString(favori.dateCandidature)
         : undefined

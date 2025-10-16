@@ -8,10 +8,7 @@ import { Authentification } from '../../domain/authentification'
 import { Jeune } from '../../domain/jeune/jeune'
 import { FavoriOffreEngagementSqlModel } from '../../infrastructure/sequelize/models/favori-offre-engagement.sql-model'
 import { JeuneAuthorizer } from '../authorizers/jeune-authorizer'
-import {
-  FavoriOffreServiceCiviqueQueryModel,
-  ServiceCiviqueQueryModel
-} from './query-models/service-civique.query-model'
+import { FavoriOffreServiceCiviqueQueryModel } from './query-models/service-civique.query-model'
 
 export interface GetFavorisOffresEngagementJeuneQuery extends Query {
   idJeune: Jeune.Id
@@ -20,7 +17,7 @@ export interface GetFavorisOffresEngagementJeuneQuery extends Query {
 @Injectable()
 export class GetFavorisServiceCiviqueJeuneQueryHandler extends QueryHandler<
   GetFavorisOffresEngagementJeuneQuery,
-  ServiceCiviqueQueryModel[] | FavoriOffreServiceCiviqueQueryModel[]
+  FavoriOffreServiceCiviqueQueryModel[]
 > {
   constructor(private jeuneAuthorizer: JeuneAuthorizer) {
     super('GetFavorisServiceCiviqueJeuneQueryHandler')
@@ -28,10 +25,9 @@ export class GetFavorisServiceCiviqueJeuneQueryHandler extends QueryHandler<
 
   async handle(
     query: GetFavorisOffresEngagementJeuneQuery
-  ): Promise<
-    ServiceCiviqueQueryModel[] | FavoriOffreServiceCiviqueQueryModel[]
-  > {
+  ): Promise<FavoriOffreServiceCiviqueQueryModel[]> {
     const favorisSql = await FavoriOffreEngagementSqlModel.findAll({
+      attributes: ['idOffre', 'dateCreation', 'dateCandidature'],
       where: {
         idJeune: query.idJeune
       },
@@ -59,6 +55,7 @@ export function fromSqlToQueryModel(
   return favoriOffreEngagementSqlModels.map(favori => {
     return {
       id: favori.idOffre,
+      dateCreation: DateService.fromJSDateToISOString(favori.dateCreation),
       dateCandidature: favori.dateCandidature
         ? DateService.fromJSDateToISOString(favori.dateCandidature)
         : undefined
