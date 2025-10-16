@@ -27,7 +27,11 @@ import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
 import { uneDemarcheQueryModel } from '../../../fixtures/query-models/demarche.query-model.fixtures'
 import { unRendezVousQueryModel } from '../../../fixtures/query-models/rendez-vous.query-model.fixtures'
 import { expect, StubbedClass, stubClass } from '../../../utils'
+import { ConfigService } from '@nestjs/config'
+import { FeatureFlipTag } from '../../../../src/infrastructure/sequelize/models/feature-flip.sql-model'
+import { GetFeaturesQueryGetter } from '../../../../src/application/queries/query-getters/get-features.query.getter.db'
 import Structure = Core.Structure
+import { SinonMatcher } from 'sinon'
 
 describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
   let handler: GetAccueilJeunePoleEmploiQueryHandler
@@ -36,9 +40,11 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
   let getRendezVousJeunePoleEmploiQueryGetter: StubbedClass<GetRendezVousJeunePoleEmploiQueryGetter>
   let getRecherchesSauvegardeesQueryGetter: StubbedClass<GetRecherchesSauvegardeesQueryGetter>
   let getFavorisQueryGetter: StubbedClass<GetFavorisAccueilQueryGetter>
+  let getFeaturesQueryGetter: StubbedClass<GetFeaturesQueryGetter>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let oidcClient: StubbedClass<OidcClient>
   let dateService: StubbedClass<DateService>
+  let configService: StubbedClass<ConfigService>
   const idpToken = 'id-token'
 
   beforeEach(() => {
@@ -48,6 +54,7 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
       GetRecherchesSauvegardeesQueryGetter
     )
     getFavorisQueryGetter = stubClass(GetFavorisAccueilQueryGetter)
+    getFeaturesQueryGetter = stubClass(GetFeaturesQueryGetter)
     getRendezVousJeunePoleEmploiQueryGetter = stubClass(
       GetRendezVousJeunePoleEmploiQueryGetter
     )
@@ -56,6 +63,7 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
     oidcClient.exchangeTokenJeune.resolves(idpToken)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     dateService = stubClass(DateService)
+    configService = stubClass(ConfigService)
 
     handler = new GetAccueilJeunePoleEmploiQueryHandler(
       jeuneAuthorizer,
@@ -65,7 +73,9 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
       getRecherchesSauvegardeesQueryGetter,
       getFavorisQueryGetter,
       getCampagneQueryGetter,
-      dateService
+      getFeaturesQueryGetter,
+      dateService,
+      configService
     )
   })
 
@@ -194,23 +204,29 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
               idJeune: query.idJeune
             })
             .resolves(campagneQueryModel)
-
+        })
+        it('retourne le prochain rendez-vous', async () => {
           // When
           result = await handler.handle(query)
-        })
-        it('retourne le prochain rendez-vous', () => {
+
           // Then
           expect(
             isSuccess(result) && result.data.prochainRendezVous
           ).to.deep.equal(unRendezVousAujourdhui)
         })
         it('compte les rendez-vous du reste de la semaine', async () => {
+          // When
+          result = await handler.handle(query)
+
           // Then
           expect(
             isSuccess(result) && result.data.cetteSemaine.nombreRendezVous
           ).to.deep.equal(1)
         })
         it('compte les démarches à réaliser et en retard du reste de la semaine', async () => {
+          // When
+          result = await handler.handle(query)
+
           // Then
           expect(
             isSuccess(result) &&
@@ -227,18 +243,27 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
           ).to.deep.equal(4)
         })
         it('appelle la query pour récupérer les 3 dernières alertes', async () => {
+          // When
+          result = await handler.handle(query)
+
           // Then
           expect(
             isSuccess(result) && getRecherchesSauvegardeesQueryGetter.handle
           ).to.have.been.calledOnceWithExactly({ idJeune: query.idJeune })
         })
         it('appelle la query pour récupérer les 3 derniers favoris', async () => {
+          // When
+          result = await handler.handle(query)
+
           // Then
           expect(
             isSuccess(result) && getFavorisQueryGetter.handle
           ).to.have.been.calledOnceWithExactly({ idJeune: query.idJeune })
         })
         it('récupère la campagne rattachée', async () => {
+          // When
+          result = await handler.handle(query)
+
           // Then
           expect(
             isSuccess(result) && getCampagneQueryGetter.handle
@@ -247,11 +272,68 @@ describe('GetAccueilJeunePoleEmploiQueryHandler', () => {
             campagneQueryModel
           )
         })
+        it('renvoie la date de migration quand le jeune fait partie de la feature MIGRATION et que la config contient une date', async () => {
+          // Given
+          getFeaturesQueryGetter.handle
+            .withArgs({
+              idJeune: query.idJeune,
+              featureTag: FeatureFlipTag.MIGRATION
+            })
+            .resolves(true)
+          configService.get
+            .withArgs('features.dateDeMigration' as unknown as SinonMatcher)
+            .returns('2024-09-01T00:00:00.000Z')
+
+          // When
+          result = await handler.handle(query)
+
+          // Then
+          expect(isSuccess(result) && result.data.dateDeMigration).to.equal(
+            '2024-09-01T00:00:00.000Z'
+          )
+        })
+        it('ne renvoie pas de date de migration quand le jeune ne fait pas partie de la feature MIGRATION', async () => {
+          // Given
+          getFeaturesQueryGetter.handle
+            .withArgs({
+              idJeune: query.idJeune,
+              featureTag: FeatureFlipTag.MIGRATION
+            })
+            .resolves(false)
+
+          // When
+          result = await handler.handle(query)
+
+          // Then
+          expect(
+            isSuccess(result) && result.data.dateDeMigration
+          ).to.be.undefined()
+        })
+        it('ne renvoie pas de date de migration quand le jeune fait partie de la feature MIGRATION mais que la config ne contient pas de date', async () => {
+          // Given
+          getFeaturesQueryGetter.handle
+            .withArgs({
+              idJeune: query.idJeune,
+              featureTag: FeatureFlipTag.MIGRATION
+            })
+            .resolves(true)
+          configService.get
+            .withArgs('features.dateDeMigration' as unknown as SinonMatcher)
+            .returns(undefined)
+
+          // When
+          result = await handler.handle(query)
+
+          // Then
+          expect(
+            isSuccess(result) && result.data.dateDeMigration
+          ).to.be.undefined()
+        })
       })
     })
 
     describe('quand les démarches et les rdv sont en échec', () => {
-      it("retourne une page d'acceuil avec un message informatif", async () => {
+      it("retourne une page d'accueil avec un message informatif", async () => {
         // Given
         getDemarchesQueryGetter.handle.resolves(
           failure(new ErreurHttp('Erreur', 500))

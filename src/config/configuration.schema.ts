@@ -199,7 +199,13 @@ export const configurationSchema = Joi.object({
   features: Joi.object({
     envoyerStatsMatomo: Joi.boolean(),
     notifierRendezVousMilo: Joi.boolean(),
-    recupererStructureMilo: Joi.boolean()
+    recupererStructureMilo: Joi.boolean(),
+    dateDeMigration: Joi.string()
+      .pattern(/^\d{4}-\d{2}-\d{2}$/)
+      .allow(null)
+      .messages({
+        'string.pattern.base': 'dateDeMigration doit être au format YYYY-MM-DD'
+      })
   }),
   values: Joi.object({
     maxRechercheConseillers: Joi.number()

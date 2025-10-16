@@ -1,18 +1,20 @@
 import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { DateTime } from 'luxon'
 import { OidcClient } from 'src/infrastructure/clients/oidc-client.db'
 import { DateService } from 'src/utils/date-service'
+import { FeatureFlipTag } from '../../../infrastructure/sequelize/models/feature-flip.sql-model'
 import { Cached, Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import {
-  Result,
   isFailure,
+  Result,
   success
 } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
 import {
-  Core,
   beneficiaireEstFTConnect,
+  Core,
   peutVoirLesCampagnes
 } from '../../../domain/core'
 import { Demarche } from '../../../domain/demarche'
@@ -25,6 +27,7 @@ import { GetRendezVousJeunePoleEmploiQueryGetter } from '../query-getters/pole-e
 import { DemarcheQueryModel } from '../query-models/actions.query-model'
 import { AccueilJeunePoleEmploiQueryModel } from '../query-models/jeunes.pole-emploi.query-model'
 import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-model'
+import { GetFeaturesQueryGetter } from '../query-getters/get-features.query.getter.db'
 
 export interface GetAccueilJeunePoleEmploiQuery extends Query {
   idJeune: string
@@ -46,7 +49,9 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
     private getRecherchesSauvegardeesQueryGetter: GetRecherchesSauvegardeesQueryGetter,
     private getFavorisQueryGetter: GetFavorisAccueilQueryGetter,
     private getCampagneQueryGetter: GetCampagneQueryGetter,
-    private dateService: DateService
+    private getFeaturesQueryGetter: GetFeaturesQueryGetter,
+    private dateService: DateService,
+    private configService: ConfigService
   ) {
     super('GetAccueilJeunePoleEmploiQueryHandler')
   }
@@ -162,11 +167,14 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
           )[0]
         : undefined
 
+    const dateDeMigration = await this.recupererLaDateDeMigration(query.idJeune)
+
     const data: AccueilJeunePoleEmploiQueryModel = {
       dateDerniereMiseAJour: recupererLaDateLaPlusAncienne(
         demarches.dateDuCache,
         rendezVous.dateDuCache
       )?.toISO(),
+      dateDeMigration,
       cetteSemaine: {
         nombreRendezVous: nombreDeRendezVous,
         nombreActionsDemarchesEnRetard: nombreDeDemarchesEnRetard,
@@ -201,6 +209,20 @@ export class GetAccueilJeunePoleEmploiQueryHandler extends QueryHandler<
 
   async monitor(): Promise<void> {
     return
+  }
+
+  private async recupererLaDateDeMigration(
+    idJeune: string
+  ): Promise<string | undefined> {
+    let dateDeMigration: string | undefined
+    const faitPartieDeLaMigration = await this.getFeaturesQueryGetter.handle({
+      idJeune: idJeune,
+      featureTag: FeatureFlipTag.MIGRATION
+    })
+    if (faitPartieDeLaMigration) {
+      dateDeMigration = this.configService.get('features.dateDeMigration')
+    }
+    return dateDeMigration
   }
 }
 

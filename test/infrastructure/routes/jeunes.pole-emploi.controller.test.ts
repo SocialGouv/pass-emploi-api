@@ -81,6 +81,7 @@ describe('JeunesPoleEmploiController', () => {
     const maintenant = '2022-08-17T12:00:30+02:00'
     const accueilJeunePoleEmploiQueryModel: AccueilJeunePoleEmploiQueryModel = {
       dateDerniereMiseAJour: undefined,
+      dateDeMigration: '2023-01-01T00:00:00.000Z',
       cetteSemaine: {
         nombreRendezVous: 1,
         nombreActionsDemarchesEnRetard: 1,
@@ -104,6 +105,50 @@ describe('JeunesPoleEmploiController', () => {
           unUtilisateurDecode()
         )
         .resolves(success(accueilJeunePoleEmploiQueryModel))
+      await request(app.getHttpServer())
+        .get(
+          `/jeunes/${idJeune}/pole-emploi/accueil?maintenant=2022-08-17T12%3A00%3A30%2B02%3A00`
+        )
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+        .expect({
+          dateDeMigration: '2023-01-01T00:00:00.000Z',
+          cetteSemaine: {
+            nombreRendezVous: 1,
+            nombreActionsDemarchesEnRetard: 1,
+            nombreActionsDemarchesARealiser: 1,
+            nombreActionsDemarchesAFaireSemaineCalendaire: 1
+          },
+          mesAlertes: [],
+          mesFavoris: []
+        })
+    })
+    it("renvoie l'accueil d'un jeune PE sans dateDeMigration quand undefined", async () => {
+      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+      const accueilSansMigration: AccueilJeunePoleEmploiQueryModel = {
+        dateDerniereMiseAJour: undefined,
+        dateDeMigration: undefined,
+        cetteSemaine: {
+          nombreRendezVous: 1,
+          nombreActionsDemarchesEnRetard: 1,
+          nombreActionsDemarchesARealiser: 1,
+          nombreActionsDemarchesAFaireSemaineCalendaire: 1
+        },
+        prochainRendezVous: undefined,
+        mesAlertes: [],
+        mesFavoris: []
+      }
+      getAccueilJeunePoleEmploiQueryHandler.execute
+        .withArgs(
+          {
+            idJeune,
+            maintenant,
+            accessToken: 'coucou',
+            structure: Core.Structure.MILO
+          },
+          unUtilisateurDecode()
+        )
+        .resolves(success(accueilSansMigration))
       await request(app.getHttpServer())
         .get(
           `/jeunes/${idJeune}/pole-emploi/accueil?maintenant=2022-08-17T12%3A00%3A30%2B02%3A00`

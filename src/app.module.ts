@@ -385,6 +385,7 @@ import { RateLimiterService } from './utils/rate-limiter.service'
 import { NotifierBeneficiairesCommandHandler } from './application/commands/notifier-beneficiaires.command.handler'
 import { NotifierBeneficiairesJobHandler } from './application/jobs/notifier-beneficiaires.job.handler.db'
 import { InitialiserLesVuesSurLaDerniereAnneeJobHandler } from './application/jobs/analytics/initialiser-les-vues-derniere-annee.job'
+import { GetFeaturesQueryGetter } from './application/queries/query-getters/get-features.query.getter.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -819,6 +820,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetComptageJeuneQueryHandler,
     GetComptageJeunesByConseillerQueryHandler,
     GetComptageJeuneQueryGetter,
+    GetFeaturesQueryGetter,
     EnvoyerEmailActivationCommandHandler,
     AjouterJeuneListeDeDiffusionCommandHandler,
     GenerateDemarchesIACommandHandler,
