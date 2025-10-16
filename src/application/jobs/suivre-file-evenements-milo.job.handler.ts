@@ -13,6 +13,7 @@ import {
 } from '../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../domain/suivi-job'
 import { DateService } from '../../utils/date-service'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.SUIVRE_FILE_EVENEMENTS_MILO)
@@ -25,14 +26,17 @@ export class SuivreEvenementsMiloCronJobHandler extends JobHandler<Job> {
     private dateService: DateService,
     private planificateurService: PlanificateurService,
     @Inject(PlanificateurRepositoryToken)
-    private planificateurRepository: Planificateur.Repository
+    private planificateurRepository: Planificateur.Repository,
+    private readonly configService: ConfigService
   ) {
     super(Planificateur.JobType.SUIVRE_FILE_EVENEMENTS_MILO, suiviJobService)
   }
 
   async handle(): Promise<SuiviJob> {
     const debutDuJob = this.dateService.now()
-    let nombreEvenementsMax = 1500
+    let nombreEvenementsMax = this.configService.get(
+      'milo.maxNombreEvenementsBatch'
+    ) as number
     let nombreEvenementsTraites = 0
     try {
       const jobEstEnCours =

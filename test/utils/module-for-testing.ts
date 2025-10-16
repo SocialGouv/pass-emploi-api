@@ -100,6 +100,7 @@ export const testConfig = (): ConfigService => {
     milo: {
       url: 'https://milo.com',
       urlWeb: 'https://milo.com',
+      maxNombreEvenementsBatch: 1500,
       apiKeyDossier: 'apiKeyDossier',
       apiKeyCreerJeune: 'apiKeyCreerJeune',
       apiKeyEvents: 'apiKeyEvents',

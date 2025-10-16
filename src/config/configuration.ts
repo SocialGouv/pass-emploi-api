@@ -58,6 +58,7 @@ export default () => {
     },
     milo: {
       url: process.env.MILO_API_URL,
+      maxNombreEvenementsBatch: process.env.MILO_MAX_NOMBRE_EVENEMENTS_BATCH,
       apiKeyDossier: process.env.MILO_DOSSIER_API_KEY,
       apiKeyCreerJeune: process.env.MILO_JEUNE_API_KEY,
       apiKeyEvents: process.env.MILO_EVENTS_API_KEY,

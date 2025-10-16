@@ -11,6 +11,7 @@ import { SuiviJob } from '../../../src/domain/suivi-job'
 import { DateService } from '../../../src/utils/date-service'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { unEvenementMilo } from '../../fixtures/milo.fixture'
+import { testConfig } from '../../utils/module-for-testing'
 
 describe('SuivreEvenementsMiloCronJobHandler', () => {
   let suivreEvenementsMiloHandler: SuivreEvenementsMiloCronJobHandler
@@ -34,7 +35,8 @@ describe('SuivreEvenementsMiloCronJobHandler', () => {
       evenementMiloRepository,
       dateService,
       planificateurService,
-      planificateurRepository
+      planificateurRepository,
+      testConfig()
     )
   })
   describe("quand plus qu'un job est déjà actif", () => {
