@@ -138,6 +138,7 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
     const nombreDeBatches = Math.ceil(
       nombreDEvenementACharger / TAILLE_DU_BATCH
     )
+
     for (
       let numeroBatchActuel = 0;
       numeroBatchActuel < nombreDeBatches;
@@ -145,12 +146,35 @@ export class ChargerEvenementsJobHandler extends JobHandler<Planificateur.Job> {
     ) {
       const streamCopyToStdout = clientSource.query(
         copyTo(
-          `COPY (SELECT * FROM evenement_engagement_hebdo
-                   WHERE date_evenement>'${dateDernierEvenementCharge}'
-                   ORDER BY date_evenement ASC
-                   LIMIT ${TAILLE_DU_BATCH}
-                   OFFSET ${numeroBatchActuel * TAILLE_DU_BATCH})
-             TO STDOUT WITH NULL '\\LA_VALEUR_NULL'`
+          `COPY (
+            SELECT 
+              * 
+            FROM (
+              SELECT
+                evenement_engagement_hebdo.id,
+                evenement_engagement_hebdo.date_evenement,
+                evenement_engagement_hebdo.categorie,
+                evenement_engagement_hebdo.action,
+                evenement_engagement_hebdo.nom,
+                evenement_engagement_hebdo.id_utilisateur,
+                evenement_engagement_hebdo.type_utilisateur,
+                CASE 
+                  WHEN (evenement_engagement_hebdo.structure = 'MILO' AND jeune.dispositif = 'PACEA') THEN 'MILO_PACEA'
+                  ELSE evenement_engagement_hebdo.structure
+                END AS structure,
+                code
+              FROM
+                evenement_engagement_hebdo
+              LEFT JOIN
+                jeune
+              ON evenement_engagement_hebdo.id_utilisateur = jeune.id
+            ) as subquery
+            WHERE date_evenement>'${dateDernierEvenementCharge}'
+            ORDER BY date_evenement ASC
+            LIMIT ${TAILLE_DU_BATCH}
+            OFFSET ${numeroBatchActuel * TAILLE_DU_BATCH}
+          )
+          TO STDOUT WITH NULL '\\LA_VALEUR_NULL'`
         )
       )
       const streamCopyFromStdin = clientTarget.query(
